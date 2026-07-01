@@ -75,6 +75,14 @@ Drives the full autonomous openclaude agent per task and writes `agentic_rlvr.js
 (prompt, final sequence, verifiable reward, **full stream-json trace**) for each task.
 Swap `--model deepseek/deepseek-v4-pro` or `z-ai/glm-5.2` — one flag, no code change.
 
+**Actuation fidelity on the live agent.** `rna_harness/actuation/trace.py` reconstructs A
+from the real openclaude tool-call chain: for consecutive RnaVerify calls it checks whether
+the agent's next sequence actually changed the positions the previous call diagnosed as
+wrong (`selected`) and whether that improved the fold (`affected`). `agent_runner` reports
+per-task and aggregate `agent_A` / `agent_A_model`. This is the meta-learning-harness loop
+closed and measured on the *actual* agent, not a simulation (measured A_model ≈ 1.0 for
+Opus-4.8 on solved repair chains — the agent does act on the diagnosis).
+
 ### 4. Interactive agent (openclaude runs via bun; requires Node≥22 or bun)
 ```bash
 export CLAUDE_CODE_USE_OPENAI=1 OPENAI_BASE_URL=https://openrouter.ai/api/v1 \

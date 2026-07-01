@@ -135,6 +135,16 @@ def run_agent_on_task(
     final_seq = _extract_final_sequence(lines, task.n)
     v = verify(task, final_seq, compute_cross_oracle=True) if final_seq else None
     tool_calls = _count_tool_calls(lines)
+    # Actuation fidelity (A) reconstructed from the REAL agent tool-call chain.
+    from ..actuation.trace import actuation_from_agent_trace
+
+    events = []
+    for l in lines:
+        try:
+            events.append(json.loads(l))
+        except Exception:
+            continue
+    actuation = actuation_from_agent_trace(events)
     return {
         "task_id": task.task_id,
         "family": task.family,
@@ -146,6 +156,7 @@ def run_agent_on_task(
         "cross_oracle": (v.cross_oracle or {}).get("fraction") if v and v.cross_oracle else None,
         "tool_calls": tool_calls,
         "n_rna_tool_calls": sum(c for k, c in tool_calls.items() if k.startswith("Rna")),
+        "actuation": actuation,
         "n_trace_events": len(lines),
         "trace_path": trace_path,
         "elapsed_s": elapsed,
@@ -222,6 +233,8 @@ def main(argv=None) -> int:
         for rec in records:
             f.write(json.dumps(_agentic_rlvr_record(rec, by_id[rec["task_id"]], knowledge)) + "\n")
     solved = sum(r["solved"] for r in records)
+    a_vals = [r["actuation"]["A"] for r in records if r.get("actuation", {}).get("A") is not None]
+    am_vals = [r["actuation"]["A_model"] for r in records if r.get("actuation", {}).get("A_model") is not None]
     summary = {
         "model": args.model,
         "n_tasks": len(records),
@@ -229,6 +242,10 @@ def main(argv=None) -> int:
         "solve_rate": round(solved / max(len(records), 1), 4),
         "mean_reward": round(sum(r["reward"] for r in records) / max(len(records), 1), 4),
         "mean_rna_calls": round(sum(r["n_rna_tool_calls"] for r in records) / max(len(records), 1), 2),
+        # actuation fidelity on the REAL agent (only tasks that needed >=1 repair step count)
+        "agent_A": round(sum(a_vals) / len(a_vals), 4) if a_vals else None,
+        "agent_A_model": round(sum(am_vals) / len(am_vals), 4) if am_vals else None,
+        "n_tasks_with_repair": len(a_vals),
         "records": records,
     }
     with open(os.path.join(args.out, "summary.json"), "w") as f:
