@@ -1,0 +1,25 @@
+{
+  "config": {
+    "experiment": "all (ablation+baselines+coords at max_len=100; collect at max_len=45)",
+    "max_len": 100,
+    "seeds": 3,
+    "max_steps": 70,
+    "note": "ablation/baselines/coords ran on 40 Eterna100 tasks (<=100nt); the RLVR collect ran at max_len=45 (17 tasks) because rnainverse k-sampling is expensive on 100nt hard targets. Numbers below are as logged."
+  },
+  "n_tasks": 40,
+  "ablation": {
+    "diagnosis": {"solve_rate": 0.2333, "A": 0.8121, "A_model": 0.8121, "A_harness": 1.0, "n_episodes": 120},
+    "random": {"solve_rate": 0.1583, "A": 0.336, "A_model": 0.336, "A_harness": 1.0, "n_episodes": 120},
+    "silent_fallback": {"solve_rate": 0.1583, "A": 0.0, "A_model": 0.336, "A_harness": 0.0, "n_episodes": 120}
+  },
+  "baselines": {
+    "rnainverse": {"solve_rate_best_of_seeds": 0.6, "n_tasks": 40},
+    "local_search": {"solve_rate_best_of_seeds": 0.45, "n_tasks": 40}
+  },
+  "coords": {"D_sym": 1.0, "R_det": 1.0, "T_trace": 1.0, "n_tasks": 40},
+  "collect": {
+    "max_len": 45, "n_tasks": 17,
+    "n_samples": 136, "n_solved": 89, "solve_rate": 0.6544,
+    "rft_rows": 89, "grpo_rows": 136, "full_rows": 136
+  }
+}

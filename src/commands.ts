@@ -30,6 +30,7 @@ import help from './commands/help/index.js'
 import ide from './commands/ide/index.js'
 import init from './commands/init.js'
 import initVerifiers from './commands/init-verifiers.js'
+import rnaDesign from './commands/rna-design/index.js'
 import keybindings from './commands/keybindings/index.js'
 import lsp from './commands/lsp/index.js'
 import login from './commands/login/index.js'
@@ -311,6 +312,7 @@ const COMMANDS = memoize((): Command[] => [
   help,
   ide,
   init,
+  rnaDesign,
   keybindings,
   knowledge,
   lsp,
