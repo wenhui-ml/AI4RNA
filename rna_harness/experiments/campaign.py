@@ -106,9 +106,9 @@ def _agent_worker(payload: Dict) -> Dict:
     if payload.get("teacher") and not rec["solved"]:
         teacher_seq = _teacher_solution(task, payload["teacher_budget"], payload["seed"])
     return {"task_id": task.task_id, "family": task.family, "n": task.n, "solved": rec["solved"],
-            "reward": round(rec["reward"], 4), "oracle_calls": rec["n_rna_tool_calls"],
-            "A": rec.get("actuation", {}).get("A"), "A_memory": adopt["A_memory"],
-            "generator": rec["generator"], "final_sequence": seq,
+            "reward": round(rec.get("reward", 0.0), 4), "oracle_calls": rec.get("n_rna_tool_calls", 0),
+            "A": (rec.get("actuation") or {}).get("A"), "A_memory": adopt["A_memory"],
+            "generator": f"agent:{payload['model'].split('/')[-1]}", "final_sequence": seq,
             "teacher_seq": teacher_seq, "trace_path": rec.get("trace_path")}
 
 
