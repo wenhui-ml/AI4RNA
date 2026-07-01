@@ -1,0 +1,336 @@
+{
+  "config": {
+    "executor": "classical",
+    "source": "hairpin_family",
+    "n_tasks": 12,
+    "max_len": 70,
+    "arms": [
+      "with_memory",
+      "no_memory",
+      "permuted_memory"
+    ],
+    "budget": 4000,
+    "seed": 0,
+    "model": "anthropic/claude-opus-4.8",
+    "max_budget_usd": 0.75,
+    "timeout_s": 400,
+    "out": "rna_harness/runs/meta_classical"
+  },
+  "n_tasks": 12,
+  "arms": {
+    "with_memory": {
+      "arm": "with_memory",
+      "n_cases": 12,
+      "solve_rate": 1.0,
+      "mean_evals_all": 3.2,
+      "mean_evals_solved": 3.2,
+      "A_memory": 1.0,
+      "n_strategies_learned": 2
+    },
+    "no_memory": {
+      "arm": "no_memory",
+      "n_cases": 12,
+      "solve_rate": 1.0,
+      "mean_evals_all": 5.8,
+      "mean_evals_solved": 5.8,
+      "A_memory": null,
+      "n_strategies_learned": 0
+    },
+    "permuted_memory": {
+      "arm": "permuted_memory",
+      "n_cases": 12,
+      "solve_rate": 1.0,
+      "mean_evals_all": 8.5,
+      "mean_evals_solved": 8.5,
+      "A_memory": 1.0,
+      "n_strategies_learned": 1
+    }
+  },
+  "detail": {
+    "with_memory": {
+      "arm": "with_memory",
+      "n_cases": 12,
+      "solve_rate": 1.0,
+      "mean_evals_all": 3.2,
+      "mean_evals_solved": 3.2,
+      "A_memory": 1.0,
+      "n_strategies_learned": 2,
+      "rows": [
+        {
+          "task_id": "hairpin_family:0",
+          "solved": true,
+          "evals": 2,
+          "A_memory": null,
+          "n_applicable": 0
+        },
+        {
+          "task_id": "hairpin_family:1",
+          "solved": true,
+          "evals": 1,
+          "A_memory": 1.0,
+          "n_applicable": 2
+        },
+        {
+          "task_id": "hairpin_family:2",
+          "solved": true,
+          "evals": 2,
+          "A_memory": 1.0,
+          "n_applicable": 2
+        },
+        {
+          "task_id": "hairpin_family:3",
+          "solved": true,
+          "evals": 4,
+          "A_memory": 1.0,
+          "n_applicable": 2
+        },
+        {
+          "task_id": "hairpin_family:4",
+          "solved": true,
+          "evals": 1,
+          "A_memory": 1.0,
+          "n_applicable": 2
+        },
+        {
+          "task_id": "hairpin_family:5",
+          "solved": true,
+          "evals": 1,
+          "A_memory": 1.0,
+          "n_applicable": 2
+        },
+        {
+          "task_id": "hairpin_family:6",
+          "solved": true,
+          "evals": 2,
+          "A_memory": 1.0,
+          "n_applicable": 2
+        },
+        {
+          "task_id": "hairpin_family:7",
+          "solved": true,
+          "evals": 6,
+          "A_memory": 1.0,
+          "n_applicable": 2
+        },
+        {
+          "task_id": "hairpin_family:8",
+          "solved": true,
+          "evals": 15,
+          "A_memory": 1.0,
+          "n_applicable": 2
+        },
+        {
+          "task_id": "hairpin_family:9",
+          "solved": true,
+          "evals": 1,
+          "A_memory": 1.0,
+          "n_applicable": 2
+        },
+        {
+          "task_id": "hairpin_family:10",
+          "solved": true,
+          "evals": 1,
+          "A_memory": 1.0,
+          "n_applicable": 2
+        },
+        {
+          "task_id": "hairpin_family:11",
+          "solved": true,
+          "evals": 2,
+          "A_memory": 1.0,
+          "n_applicable": 2
+        }
+      ]
+    },
+    "no_memory": {
+      "arm": "no_memory",
+      "n_cases": 12,
+      "solve_rate": 1.0,
+      "mean_evals_all": 5.8,
+      "mean_evals_solved": 5.8,
+      "A_memory": null,
+      "n_strategies_learned": 0,
+      "rows": [
+        {
+          "task_id": "hairpin_family:0",
+          "solved": true,
+          "evals": 2,
+          "A_memory": null,
+          "n_applicable": 0
+        },
+        {
+          "task_id": "hairpin_family:1",
+          "solved": true,
+          "evals": 5,
+          "A_memory": null,
+          "n_applicable": 0
+        },
+        {
+          "task_id": "hairpin_family:2",
+          "solved": true,
+          "evals": 2,
+          "A_memory": null,
+          "n_applicable": 0
+        },
+        {
+          "task_id": "hairpin_family:3",
+          "solved": true,
+          "evals": 15,
+          "A_memory": null,
+          "n_applicable": 0
+        },
+        {
+          "task_id": "hairpin_family:4",
+          "solved": true,
+          "evals": 1,
+          "A_memory": null,
+          "n_applicable": 0
+        },
+        {
+          "task_id": "hairpin_family:5",
+          "solved": true,
+          "evals": 2,
+          "A_memory": null,
+          "n_applicable": 0
+        },
+        {
+          "task_id": "hairpin_family:6",
+          "solved": true,
+          "evals": 3,
+          "A_memory": null,
+          "n_applicable": 0
+        },
+        {
+          "task_id": "hairpin_family:7",
+          "solved": true,
+          "evals": 24,
+          "A_memory": null,
+          "n_applicable": 0
+        },
+        {
+          "task_id": "hairpin_family:8",
+          "solved": true,
+          "evals": 8,
+          "A_memory": null,
+          "n_applicable": 0
+        },
+        {
+          "task_id": "hairpin_family:9",
+          "solved": true,
+          "evals": 1,
+          "A_memory": null,
+          "n_applicable": 0
+        },
+        {
+          "task_id": "hairpin_family:10",
+          "solved": true,
+          "evals": 1,
+          "A_memory": null,
+          "n_applicable": 0
+        },
+        {
+          "task_id": "hairpin_family:11",
+          "solved": true,
+          "evals": 6,
+          "A_memory": null,
+          "n_applicable": 0
+        }
+      ]
+    },
+    "permuted_memory": {
+      "arm": "permuted_memory",
+      "n_cases": 12,
+      "solve_rate": 1.0,
+      "mean_evals_all": 8.5,
+      "mean_evals_solved": 8.5,
+      "A_memory": 1.0,
+      "n_strategies_learned": 1,
+      "rows": [
+        {
+          "task_id": "hairpin_family:0",
+          "solved": true,
+          "evals": 13,
+          "A_memory": 1.0,
+          "n_applicable": 1
+        },
+        {
+          "task_id": "hairpin_family:1",
+          "solved": true,
+          "evals": 12,
+          "A_memory": 1.0,
+          "n_applicable": 1
+        },
+        {
+          "task_id": "hairpin_family:2",
+          "solved": true,
+          "evals": 9,
+          "A_memory": 1.0,
+          "n_applicable": 1
+        },
+        {
+          "task_id": "hairpin_family:3",
+          "solved": true,
+          "evals": 4,
+          "A_memory": 1.0,
+          "n_applicable": 1
+        },
+        {
+          "task_id": "hairpin_family:4",
+          "solved": true,
+          "evals": 14,
+          "A_memory": 1.0,
+          "n_applicable": 1
+        },
+        {
+          "task_id": "hairpin_family:5",
+          "solved": true,
+          "evals": 2,
+          "A_memory": 1.0,
+          "n_applicable": 1
+        },
+        {
+          "task_id": "hairpin_family:6",
+          "solved": true,
+          "evals": 5,
+          "A_memory": 1.0,
+          "n_applicable": 1
+        },
+        {
+          "task_id": "hairpin_family:7",
+          "solved": true,
+          "evals": 6,
+          "A_memory": 1.0,
+          "n_applicable": 1
+        },
+        {
+          "task_id": "hairpin_family:8",
+          "solved": true,
+          "evals": 17,
+          "A_memory": 1.0,
+          "n_applicable": 1
+        },
+        {
+          "task_id": "hairpin_family:9",
+          "solved": true,
+          "evals": 1,
+          "A_memory": 1.0,
+          "n_applicable": 1
+        },
+        {
+          "task_id": "hairpin_family:10",
+          "solved": true,
+          "evals": 2,
+          "A_memory": 1.0,
+          "n_applicable": 1
+        },
+        {
+          "task_id": "hairpin_family:11",
+          "solved": true,
+          "evals": 17,
+          "A_memory": 1.0,
+          "n_applicable": 1
+        }
+      ]
+    }
+  }
+}

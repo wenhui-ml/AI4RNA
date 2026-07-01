@@ -40,13 +40,20 @@ class LocalSearchGenerator(Generator):
         self.cooling = cooling
         self.stall_limit = stall_limit
 
-    def design(self, task: DesignTask, budget: int = 3000, seed: Optional[int] = None) -> GenerationResult:
+    def design(
+        self,
+        task: DesignTask,
+        budget: int = 3000,
+        seed: Optional[int] = None,
+        warm_starts: Optional[List[str]] = None,
+    ) -> GenerationResult:
         rng = random.Random(seed)
         target = task.target
         n = len(target)
         spec = task.constraints
         p_gc = gc_target_prob(spec)
         frozen = frozen_motif_positions(spec)
+        warm_starts = [w for w in (warm_starts or []) if len(w) == n]
         orc = ViennaRNAOracle(
             param_set=task.oracle.param_set,
             temperature=task.oracle.temperature,
@@ -59,10 +66,11 @@ class LocalSearchGenerator(Generator):
         solved = False
 
         per_restart_budget = max(1, budget // max(1, self.restarts))
-        for _ in range(self.restarts):
+        for restart_i in range(self.restarts):
             if evals >= budget or solved:
                 break
-            seq = init_sequence(target, spec, rng, p_gc)
+            # Warm-start the first restart(s) from memory-biased inits, if provided.
+            seq = warm_starts[restart_i] if restart_i < len(warm_starts) else init_sequence(target, spec, rng, p_gc)
             struct, _ = orc.fold_mfe(seq)
             cur_d = bp_distance(struct, target)
             evals += 1

@@ -92,7 +92,34 @@ bun dist/cli.mjs --allowedTools RnaVerify RnaFold RnaDiagnose Bash
 # then:  /rna-design ((((....))))
 ```
 
-### 5. RL training (deferred; data-format-ready) — see `rna_harness/rl_train/README.md`
+### 5. Meta-learning harness (cross-case self-improvement over openclaude memdir)
+```bash
+# zero-credit mechanism validation (classical executor, 3 ablation arms):
+conda run -n rna python -m rna_harness.meta.meta_runner --executor classical \
+    --source hairpin_family --n-tasks 12 --out rna_harness/runs/meta
+# live (openclaude agent recalls the learned playbook via CLAUDE_COWORK_MEMORY_PATH_OVERRIDE):
+conda run -n rna python -m rna_harness.meta.meta_runner --executor agent \
+    --model anthropic/claude-opus-4.8 --n-tasks 4 --arms with_memory no_memory
+```
+The harness distills **checkable** strategies from solved cases (`rna_harness/meta/`), writes
+them to an openclaude-format memdir, and the live agent recalls them through its NATIVE memory
+path (verified: a seeded memdir is echoed verbatim by the headless agent). `A_memory` measures
+whether a recalled strategy applicable to a new case is actually adopted.
+
+Zero-credit result (hairpin family, mean oracle calls to solve):
+| arm | solve | mean evals-to-solve | A_memory |
+|---|---|---|---|
+| with_memory (learned) | 1.0 | **3.2** | 1.0 |
+| no_memory (control) | 1.0 | 5.8 | — |
+| permuted_memory (wrong) | 1.0 | 8.5 | 1.0 |
+
+Learned memory cuts oracle cost (5.8→3.2 — capability compounds with experience); a *wrong*
+playbook is still adopted (A_memory=1.0) yet *hurts* (8.5) — a direct demonstration that
+adoption ≠ efficacy, and that the gain comes from the right learned strategies, not from
+"having memory." This is the cross-case analog of the single-case actuation ablation and a
+direct positive test of the Actuation-Fidelity thesis on a real closed loop.
+
+### 6. RL training (deferred; data-format-ready) — see `rna_harness/rl_train/README.md`
 RFT (rejection-sampling SFT) then GRPO with the ViennaRNA verifier as the online reward
 (`rna_harness.rl.reward_fn.rna_reward`). Target open policy: Gemma4-31b (any HF causal LM;
 or plug the data into an existing Qwen2.5 SFT/RL stack).
