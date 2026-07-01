@@ -75,6 +75,18 @@ def api_runs():
     return {"runs": _list_runs()}
 
 
+@app.get("/api/scorecard")
+def api_scorecard():
+    cards = []
+    if os.path.isdir(RUNS):
+        for name in sorted(os.listdir(RUNS)):
+            p = os.path.join(RUNS, name, "scorecard.json")
+            d = _read_json(p) if os.path.exists(p) else None
+            if d:
+                cards.append({"name": name, "scorecard": d})
+    return {"scorecards": cards}
+
+
 @app.get("/fig/{run}/{fname}")
 def figure(run: str, fname: str):
     for base in (os.path.join(RUNS, run, "figures"), RESULTS):
@@ -147,12 +159,14 @@ HTML_PAGE = """<!doctype html><html><head><meta charset="utf-8">
 <header><h1>🧬 openclaude_rna</h1><span class="sub">RNA inverse-design meta-learning harness — live dashboard</span>
  <span id="health" class="sub"></span></header>
 <div class="tabs">
- <span class="tab active" data-t="overview" onclick="tab('overview')">Overview</span>
+ <span class="tab active" data-t="scorecard" onclick="tab('scorecard')">🏆 Scorecard</span>
+ <span class="tab" data-t="overview" onclick="tab('overview')">Overview</span>
  <span class="tab" data-t="runs" onclick="tab('runs')">Runs</span>
  <span class="tab" data-t="figures" onclick="tab('figures')">Figures</span>
  <span class="tab" data-t="logs" onclick="tab('logs')">Logs (live)</span>
 </div>
-<div id="overview" class="panel"></div>
+<div id="scorecard" class="panel"></div>
+<div id="overview" class="panel" style="display:none"></div>
 <div id="runs" class="panel" style="display:none"></div>
 <div id="figures" class="panel" style="display:none"></div>
 <div id="logs" class="panel" style="display:none">
@@ -163,7 +177,7 @@ HTML_PAGE = """<!doctype html><html><head><meta charset="utf-8">
 <script>
 let RUNS=[];
 function tab(t){document.querySelectorAll('.tab').forEach(e=>e.classList.toggle('active',e.dataset.t==t));
- ['overview','runs','figures','logs'].forEach(p=>document.getElementById(p).style.display=p==t?'block':'none');}
+ ['scorecard','overview','runs','figures','logs'].forEach(p=>document.getElementById(p).style.display=p==t?'block':'none');}
 function fmt(x){return x==null?'—':(typeof x=='number'?(Math.round(x*1000)/1000):x)}
 function cls(v){return v==null?'':(v>=0.6?'g':(v>=0.3?'y':'r'))}
 async function load(){
@@ -171,6 +185,31 @@ async function load(){
  document.getElementById('health').textContent=' • '+h.n_runs+' runs • '+h.repo;
  RUNS=(await (await fetch('/api/runs')).json()).runs;
  renderOverview(); renderRuns(); renderFigures();
+ try{const sc=(await (await fetch('/api/scorecard')).json()).scorecards; renderScorecard(sc);}catch(e){}
+}
+function renderScorecard(cards){
+ if(!cards||!cards.length){document.getElementById('scorecard').innerHTML='<div class="card">No scorecard yet. Run <code>python -m rna_harness.experiments.leaderboard</code>.</div>';return;}
+ let h='';
+ for(const c of cards){const p=c.scorecard.panels||{};
+  h+=`<div class="card"><div class="name">🏆 ${c.name}</div><div class="sub">red line: ${c.scorecard.red_line||''}</div>`;
+  const s=p.standard_leaderboard;
+  if(s){h+=`<h4>Panel 1 — ${s.benchmark} (${s.n_puzzles} puzzles, budget: ${s.budget})</h4>
+   <table><tr><th>method</th><th>solved/100</th><th>solved rate</th><th>uMFE</th><th>mean NED (all)</th><th>mean NED (solved)</th><th>mean s</th></tr>`+
+   Object.entries(s.by_method).map(([m,v])=>`<tr><td>${m}</td><td><b>${v.solved}</b></td><td>${fmt(v.solved_rate)}</td><td>${v.umfe}</td><td>${fmt(v.mean_NED_all)}</td><td>${fmt(v.mean_NED_solved)}</td><td>${fmt(v.mean_secs)}</td></tr>`).join('')+`</table>`;}
+  const hy=p.hybrid_seam;
+  if(hy){h+=`<h4>Panel 2 — hybrid-constraint seam (${hy.n_tasks} tasks / ${hy.n_base} base)</h4>
+   <table><tr><th>profile</th><th>solved</th><th>struct match</th><th>constraints ok</th></tr>`+
+   Object.entries(hy.by_profile).map(([pr,v])=>`<tr><td>${pr}</td><td class="${cls(v.solved_rate)}">${fmt(v.solved_rate)}</td><td>${fmt(v.struct_match_rate)}</td><td>${fmt(v.constraints_ok_rate)}</td></tr>`).join('')+`</table>`;}
+  const ag=p.agent_capability;
+  if(ag){const a=ag.actuation_ablation||{};
+   h+=`<h4>Panel 3 — agent capability (actuation ablation, ${ag.n_ablation_tasks} tasks)</h4>
+   <table><tr><th>mode</th><th>solve</th><th>A</th><th>A_model</th><th>A_harness</th></tr>`+
+   Object.entries(a).map(([m,v])=>`<tr><td>${m}</td><td>${fmt(v.solve_rate)}</td><td class="${cls(v.A)}">${fmt(v.A)}</td><td>${fmt(v.A_model)}</td><td>${fmt(v.A_harness)}</td></tr>`).join('')+`</table>`;
+   if(ag.meta_arms){h+=`<h4>meta-learning arms (oracle-calls-to-solve, A_memory)</h4>
+    <table><tr><th>arm</th><th>solve</th><th>mean evals→solve</th><th>A_memory</th><th>strategies</th></tr>`+
+    Object.entries(ag.meta_arms).map(([m,v])=>`<tr><td>${m}</td><td>${fmt(v.solve_rate)}</td><td class="${m=='with_memory'?'g':''}">${fmt(v.mean_evals_solved)}</td><td>${fmt(v.A_memory)}</td><td>${fmt(v.n_strategies_learned)}</td></tr>`).join('')+`</table>`;}}
+  h+=`</div>`;}
+ document.getElementById('scorecard').innerHTML=h;
 }
 function renderOverview(){
  let h='<h3>Headline results</h3>';
