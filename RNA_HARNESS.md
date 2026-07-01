@@ -144,7 +144,20 @@ oracle calls, not correctness, and the classical generator is always available a
 Running Opus-4.8 vs deepseek-v4-pro vs glm-5.2 on the same fixed verifier is a built-in
 ablation (`agent_runner --model ...`).
 
+## Remote dashboard (live web visualization)
+A read-only FastAPI dashboard serves run summaries, figures, the actuation / four-coordinate
+/ meta results, agent traces, and a **live log tail** (auto-refresh) for monitoring in-flight
+runs.
+```bash
+conda run -n rna pip install fastapi "uvicorn[standard]"   # one-time
+conda run -n rna python -m rna_harness.dashboard.app --host 0.0.0.0 --port 8811
+# open http://<server-ip>:8811   (health at /health, JSON at /api/runs)
+```
+Tabs: **Overview** (headline metrics), **Runs** (artifacts/datasets), **Figures**, **Logs
+(live)**. Set `RNA_DASHBOARD_LOG_DIRS=dir1:dir2` to expose extra log directories to the tail.
+⚠️ Binding to `0.0.0.0` with no auth exposes it to anyone who can reach the port.
+
 ## Tests
 ```bash
-conda run -n rna python -m pytest rna_harness/tests -q
+conda run -n rna python -m pytest rna_harness/tests -q   # 31 passed
 ```
