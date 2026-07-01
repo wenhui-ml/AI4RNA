@@ -87,6 +87,17 @@ def api_scorecard():
     return {"scorecards": cards}
 
 
+@app.get("/api/campaigns")
+def api_campaigns():
+    cards = []
+    if os.path.isdir(RUNS):
+        for name in sorted(os.listdir(RUNS)):
+            d = _read_json(os.path.join(RUNS, name, "campaign_summary.json"))
+            if d:
+                cards.append({"name": name, "summary": d})
+    return {"campaigns": cards}
+
+
 @app.get("/fig/{run}/{fname}")
 def figure(run: str, fname: str):
     for base in (os.path.join(RUNS, run, "figures"), RESULTS):
@@ -160,12 +171,14 @@ HTML_PAGE = """<!doctype html><html><head><meta charset="utf-8">
  <span id="health" class="sub"></span></header>
 <div class="tabs">
  <span class="tab active" data-t="scorecard" onclick="tab('scorecard')">🏆 Scorecard</span>
+ <span class="tab" data-t="campaigns" onclick="tab('campaigns')">📈 Campaign</span>
  <span class="tab" data-t="overview" onclick="tab('overview')">Overview</span>
  <span class="tab" data-t="runs" onclick="tab('runs')">Runs</span>
  <span class="tab" data-t="figures" onclick="tab('figures')">Figures</span>
  <span class="tab" data-t="logs" onclick="tab('logs')">Logs (live)</span>
 </div>
 <div id="scorecard" class="panel"></div>
+<div id="campaigns" class="panel" style="display:none"></div>
 <div id="overview" class="panel" style="display:none"></div>
 <div id="runs" class="panel" style="display:none"></div>
 <div id="figures" class="panel" style="display:none"></div>
@@ -177,7 +190,7 @@ HTML_PAGE = """<!doctype html><html><head><meta charset="utf-8">
 <script>
 let RUNS=[];
 function tab(t){document.querySelectorAll('.tab').forEach(e=>e.classList.toggle('active',e.dataset.t==t));
- ['scorecard','overview','runs','figures','logs'].forEach(p=>document.getElementById(p).style.display=p==t?'block':'none');}
+ ['scorecard','campaigns','overview','runs','figures','logs'].forEach(p=>document.getElementById(p).style.display=p==t?'block':'none');}
 function fmt(x){return x==null?'—':(typeof x=='number'?(Math.round(x*1000)/1000):x)}
 function cls(v){return v==null?'':(v>=0.6?'g':(v>=0.3?'y':'r'))}
 async function load(){
@@ -186,6 +199,18 @@ async function load(){
  RUNS=(await (await fetch('/api/runs')).json()).runs;
  renderOverview(); renderRuns(); renderFigures();
  try{const sc=(await (await fetch('/api/scorecard')).json()).scorecards; renderScorecard(sc);}catch(e){}
+ try{const cp=(await (await fetch('/api/campaigns')).json()).campaigns; renderCampaigns(cp);}catch(e){}
+}
+function renderCampaigns(cps){
+ const el=document.getElementById('campaigns'); if(!el)return;
+ if(!cps||!cps.length){el.innerHTML='<div class="card">No meta-learning campaign yet. Run <code>python -m rna_harness.experiments.campaign</code>.</div>';return;}
+ let h='<h3>Meta-learning saturation (phase-2 self-improvement)</h3>';
+ for(const c of cps){h+=`<div class="card"><div class="name">${c.name} — ${c.summary.n_episodes} episodes</div>`;
+  for(const [arm,curve] of Object.entries(c.summary.curves||{})){
+   h+=`<div style="margin:6px 0"><b>${arm}</b><table><tr><th>epoch</th><th>solve</th><th>oracle-calls→solve</th><th>A_memory</th><th>#strategies</th></tr>`+
+   curve.map(e=>`<tr><td>${e.epoch}</td><td class="${cls(e.solve_rate)}">${fmt(e.solve_rate)}</td><td class="${arm=='with_memory'?'g':''}">${fmt(e.mean_oracle_calls_solved)}</td><td>${fmt(e.A_memory)}</td><td>${fmt(e.n_strategies)}</td></tr>`).join('')+`</table></div>`;}
+  h+=`</div>`;}
+ el.innerHTML=h;
 }
 function renderScorecard(cards){
  if(!cards||!cards.length){document.getElementById('scorecard').innerHTML='<div class="card">No scorecard yet. Run <code>python -m rna_harness.experiments.leaderboard</code>.</div>';return;}
