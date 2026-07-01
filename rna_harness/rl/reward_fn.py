@@ -17,11 +17,27 @@ import re
 from typing import List, Optional, Sequence
 
 from ..constraints import ConstraintSpec
-from ..llm.generator import parse_sequence
 from ..task import DesignTask, OracleConfig, RewardConfig
 from ..verifier import verify
 
 _STRUCT_LINE = re.compile(r"^[().]{4,}$", re.MULTILINE)
+_SEQ_RE = re.compile(r"[ACGUacgu]{4,}")
+
+
+def parse_sequence(text: str, n: int) -> Optional[str]:
+    """Extract an n-nt RNA sequence from text (robust to prose). Local copy to avoid a
+    circular import with rna_harness.llm.generator (which imports rl.prompts)."""
+    if not text:
+        return None
+    up = text.upper().replace("T", "U")
+    runs = _SEQ_RE.findall(up)
+    if not runs:
+        return None
+    exact = [r for r in runs if len(r) == n]
+    if exact:
+        return exact[-1]
+    longest = max(runs, key=len)
+    return longest if len(longest) == n else (longest[:n] if len(longest) > n else None)
 
 
 def _extract_target_from_prompt(prompt: str) -> Optional[str]:
@@ -44,11 +60,13 @@ def rna_reward(
     target: Optional[Sequence[str]] = None,
     constraints: Optional[Sequence[dict]] = None,
     oracle: Optional[Sequence[dict]] = None,
+    reward: Optional[Sequence[dict]] = None,
     **kwargs,
 ) -> List[float]:
     """Return a deterministic reward per (prompt, completion). Invalid/absent sequence -> 0.
 
     `target` (preferred) or a dot-bracket line parsed from the prompt defines the task.
+    `reward` (optional) is a per-item RewardConfig dict; defaults to RewardConfig().
     """
     n = len(completions)
     rewards: List[float] = []
@@ -63,7 +81,8 @@ def rna_reward(
             continue
         cspec = ConstraintSpec.from_dict(constraints[i]) if (constraints and i < len(constraints)) else ConstraintSpec()
         oconf = OracleConfig.from_dict(oracle[i]) if (oracle and i < len(oracle)) else OracleConfig()
-        task = DesignTask(task_id=f"rl_{i}", target=tgt, constraints=cspec, oracle=oconf)
+        rconf = RewardConfig(**reward[i]) if (reward and i < len(reward) and isinstance(reward[i], dict)) else RewardConfig()
+        task = DesignTask(task_id=f"rl_{i}", target=tgt, constraints=cspec, oracle=oconf, reward=rconf)
         seq = parse_sequence(_completion_text(completions[i]), len(tgt))
         if not seq:
             rewards.append(0.0)
@@ -76,11 +95,11 @@ def rna_reward(
 def rna_solved_reward(prompts, completions, target=None, constraints=None, oracle=None, **kwargs) -> List[float]:
     """Sparse variant: 1.0 iff solved (uMFE + constraints), else 0.0. Useful as a second
     reward_func alongside the dense one, or for pass@k evaluation."""
-    dense = rna_reward(prompts, completions, target, constraints, oracle, **kwargs)
     out = []
     n = len(completions)
     for i in range(n):
-        tgt = (target[i] if target and i < len(target) else _extract_target_from_prompt(prompts[i])) or ""
+        tgt = (target[i] if target and i < len(target)
+               else _extract_target_from_prompt(prompts[i] if i < len(prompts) else "")) or ""
         seq = parse_sequence(_completion_text(completions[i]), len(tgt)) if tgt else None
         if not (tgt and seq):
             out.append(0.0)

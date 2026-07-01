@@ -9,10 +9,13 @@ Confirmed API (ViennaRNA 2.7.2):
     defect        = fc.ensemble_defect(target)
     RNA.params_load_RNA_Turner2004() / RNA.params_load_RNA_Turner1999()  # global param set
 
-Parameter set is baked into a fold_compound at construction time, so we (re)load the
-requested set immediately before constructing each fold_compound. This is correct
-even when oracles are interleaved within a single process; across processes each
-worker sets its own global state independently.
+IMPORTANT (verified): ViennaRNA's `params_load_RNA_*()` mutates a process-global C param set
+that is STICKY -- the FIRST set loaded in a process wins and later loads are silently
+ignored. So this class is only reliable for ONE param set per process (in practice the
+default turner2004 primary, which is the first load in any fresh worker). Folding MULTIPLE
+distinct param sets in one process silently collapses them to the first -- do NOT do that
+in-process; use oracles/isolated.py (spawn subprocess per param set), which is what
+cross_oracle_consistency() uses for genuine multi-oracle diversity.
 """
 from __future__ import annotations
 
@@ -90,6 +93,12 @@ class ViennaRNAOracle(Oracle):
         return struct, float(energy)
 
     def analyze(self, sequence: str, target: Optional[str] = None) -> FoldResult:
+        # ViennaRNA does NOT raise on a length-mismatched target; it returns garbage
+        # sentinels (pr_structure=0.0, ensemble_defect=-1.0). Fail loudly instead.
+        if target is not None and len(target) != len(sequence):
+            raise ValueError(
+                f"target length {len(target)} != sequence length {len(sequence)}"
+            )
         fc = self._new_fc(sequence)
         mfe_struct, mfe_e = fc.mfe()
         # pf() must run after mfe() on the same fc to enable ensemble queries.
@@ -112,7 +121,8 @@ class ViennaRNAOracle(Oracle):
             except Exception:
                 res.prob_of_target = None
             try:
-                res.ensemble_defect = float(fc.ensemble_defect(target))
+                ed = float(fc.ensemble_defect(target))
+                res.ensemble_defect = ed if 0.0 <= ed <= 1.0 else None  # -1.0 = invalid sentinel
             except Exception:
                 res.ensemble_defect = None
         return res

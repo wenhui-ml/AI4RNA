@@ -76,6 +76,12 @@ class MemStore:
             f"<!-- rna_strategy: {json.dumps(s.to_dict())} -->\n"
         )
 
+    def _atomic_write(self, path: str, text: str) -> None:
+        tmp = path + ".tmp"
+        with open(tmp, "w") as f:
+            f.write(text)
+        os.replace(tmp, path)  # atomic: a crash can't leave a truncated file the agent recalls
+
     def write(self, strategies: List[Strategy]) -> None:
         # clear old strategy files (keep it a clean reflection of current knowledge)
         for fn in os.listdir(self.dir):
@@ -83,11 +89,9 @@ class MemStore:
                 os.remove(os.path.join(self.dir, fn))
         index = ["# RNA design playbook (learned strategies)\n"]
         for s in strategies:
-            with open(os.path.join(self.dir, f"{s.name}.md"), "w") as f:
-                f.write(self._entry_md(s))
+            self._atomic_write(os.path.join(self.dir, f"{s.name}.md"), self._entry_md(s))
             index.append(f"- [{s.name}]({s.name}.md) — {s.description} (support {s.support})")
-        with open(os.path.join(self.dir, "MEMORY.md"), "w") as f:
-            f.write("\n".join(index) + "\n")
+        self._atomic_write(os.path.join(self.dir, "MEMORY.md"), "\n".join(index) + "\n")
 
     def clear(self) -> None:
         for fn in os.listdir(self.dir):

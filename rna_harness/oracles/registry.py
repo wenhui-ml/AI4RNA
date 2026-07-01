@@ -64,13 +64,19 @@ def cross_oracle_consistency(
 ) -> Dict[str, object]:
     """Fraction of the panel whose MFE structure equals the target exactly.
 
-    Returns per-oracle solve flags + the aggregate fraction. This is a robustness /
-    over-fitting signal: a design that only the primary solves is fragile.
+    Each panel oracle is folded in its OWN fresh (spawned) process, because ViennaRNA's
+    global param set is sticky within a process (the first load wins) -- folding the panel
+    in-process would silently collapse every oracle to the primary's energy model and report
+    fake diversity. This is a genuine robustness / over-fitting signal: a design that only the
+    primary solves is fragile.
     """
+    from .isolated import isolated_fold_many
+
+    specs = [(sequence, o.param_set, o.temperature, o.dangles) for o in panel]
+    results = isolated_fold_many(specs)
     per_oracle = {}
     n_solved = 0
-    for orc in panel:
-        struct, energy = orc.fold_mfe(sequence)
+    for orc, (struct, energy) in zip(panel, results):
         ok = struct == target
         per_oracle[orc.name] = {"solved": ok, "mfe": struct, "energy": round(energy, 3)}
         n_solved += int(ok)

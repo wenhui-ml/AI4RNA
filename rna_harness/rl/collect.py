@@ -61,10 +61,15 @@ def _sample_from_verify(task, seq, prompt, generator, group_id, step, cross) -> 
 
 
 def add_group_advantages(samples: List[RLSample]) -> List[RLSample]:
-    """Fill GRPO group-relative advantages: a_i = (r_i - mean_g) / (std_g or 1)."""
+    """Fill GRPO group-relative advantages: a_i = (r_i - mean_g) / (std_g or 1).
+
+    Only samples with a real group_id are grouped; samples with group_id=None are left with
+    advantage=None (they are NOT a group and must not be pooled with unrelated singletons)."""
     groups: Dict[str, List[RLSample]] = {}
     for s in samples:
-        groups.setdefault(s.group_id or "_", []).append(s)
+        if s.group_id is None:
+            continue
+        groups.setdefault(s.group_id, []).append(s)
     for g, members in groups.items():
         rs = [m.reward for m in members]
         mu = mean(rs) if rs else 0.0

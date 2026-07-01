@@ -23,26 +23,32 @@ class RNAinverseGenerator(Generator):
         self.gc_only = gc_only
 
     def design(self, task: DesignTask, budget: int = 50, seed: Optional[int] = None) -> GenerationResult:
-        rng = random.Random(seed)
         target = task.target
         n = len(target)
         symbolset = "GC" if self.gc_only else "AUGC"
+        # RNA.random_string / RNA.inverse_fold draw from ViennaRNA's OWN global RNG, not
+        # Python's -- seed it so runs are reproducible. Save/restore the global symbolset.
+        if seed is not None:
+            RNA.init_rand(int(seed))
+        prev_symbolset = RNA.cvar.symbolset
         RNA.cvar.symbolset = symbolset
-
         best_seq, best_cost = None, float("inf")
         candidates: List[str] = []
         tries = max(1, budget)
         solved = False
-        for _ in range(tries):
-            start = RNA.random_string(n, symbolset)
-            seq, cost = RNA.inverse_fold(start, target)
-            seq = seq.upper().replace("T", "U")
-            candidates.append(seq)
-            if cost < best_cost:
-                best_seq, best_cost = seq, cost
-            if cost == 0.0:
-                solved = True
-                break
+        try:
+            for _ in range(tries):
+                start = RNA.random_string(n, symbolset)
+                seq, cost = RNA.inverse_fold(start, target)
+                seq = seq.upper().replace("T", "U")
+                candidates.append(seq)
+                if cost < best_cost:
+                    best_seq, best_cost = seq, cost
+                if cost == 0.0:
+                    solved = True
+                    break
+        finally:
+            RNA.cvar.symbolset = prev_symbolset  # don't leak global state to other generators
         # verify hard-solved with our own oracle
         best_seq = best_seq or RNA.random_string(n, symbolset)
         from ..metrics import bp_distance

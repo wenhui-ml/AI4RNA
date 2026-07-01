@@ -48,9 +48,11 @@ def distill_strategies(target: str, sequence: str) -> List[Strategy]:
     """Extract strategies exhibited by a *solved* (target, sequence)."""
     seq = sequence.upper().replace("T", "U")
     out: List[Strategy] = []
+    seen = set()  # dedup identical (loop_len, motif) within ONE target so support isn't inflated
     for i, j, L in _hairpin_loops(target):
         motif = seq[i + 1 : j]
-        if set(motif) <= set("ACGU") and 3 <= L <= 6:
+        if set(motif) <= set("ACGU") and 3 <= L <= 6 and (L, motif) not in seen:
+            seen.add((L, motif))
             out.append(Strategy(
                 name=f"rna-hairpin-{L}-{motif.lower()}",
                 kind="hairpin_motif",
@@ -88,11 +90,12 @@ def merge_strategies(existing: List[Strategy], new: List[Strategy]) -> List[Stra
             passthrough[s.key()] = s
     out: List[Strategy] = []
     for L, votes in sorted(motif_votes.items()):
-        motif, support = votes.most_common(1)[0]
+        # deterministic winner: most votes, ties broken by motif string (not insertion order)
+        motif, win_count = max(votes.items(), key=lambda kv: (kv[1], kv[0]))
         out.append(Strategy(
             name=f"rna-hairpin-{L}-{motif.lower()}", kind="hairpin_motif",
             trigger={"loop_len": L}, rule={"motif": motif},
-            description=f"Use '{motif}' for {L}-nt hairpin loops (winning motif of {sum(votes.values())} obs)",
+            description=f"Use '{motif}' for {L}-nt hairpin loops (winner: {win_count}/{sum(votes.values())} obs)",
             support=int(sum(votes.values())),
         ))
     if gc_support > 0:
@@ -123,10 +126,11 @@ def _adopted(strategy: Strategy, target: str, sequence: str) -> bool:
     if strategy.kind == "hairpin_motif":
         L = strategy.trigger["loop_len"]
         motif = strategy.rule["motif"]
-        for i, j, ll in _hairpin_loops(target):
-            if ll == L and seq[i + 1 : j] == motif:
-                return True
-        return False
+        qualifying = [(i, j) for i, j, ll in _hairpin_loops(target) if ll == L]
+        if not qualifying:
+            return False
+        # adopted iff ALL qualifying loops use the remembered motif (not just any one)
+        return all(seq[i + 1 : j] == motif for i, j in qualifying)
     if strategy.kind == "gc_closing":
         cps = _closing_pairs(target)
         if not cps:

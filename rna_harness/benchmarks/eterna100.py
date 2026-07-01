@@ -17,7 +17,9 @@ DEFAULT_TSV = os.path.join(_HERE, "..", "data", "eterna100_puzzles.tsv")
 RAW_URL = "https://raw.githubusercontent.com/eternagame/eterna100-benchmarking/master/data/eterna100_puzzles.tsv"
 
 _STRUCT_COL = {"V1": 2, "V2": 3}
-_SAMPLE_COL = {"V1": 8, "V2": 10}  # matching-engine sample solution (Vienna1 for V1, Vienna1 for V2)
+# We evaluate V2 under installed 2.7.2 (Vienna2 convention), so pick the Vienna2 sample for
+# V2 (col 11 = "Sample Solution (V2/Vienna2)") and the Vienna1 sample for V1 (col 8).
+_SAMPLE_COL = {"V1": 8, "V2": 11}
 
 
 def _ensure_tsv(path: str) -> str:

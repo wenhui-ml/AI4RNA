@@ -71,8 +71,13 @@ def permuted_playbook() -> List[Strategy]:
 def build_memory_init(task: DesignTask, strategies: List[Strategy], rng: random.Random) -> str:
     """Warm-start sequence: standard init, then overwrite hairpin loops with remembered
     motifs and set loop-closing pairs to G-C where the playbook says so."""
+    from ..generators.base import frozen_motif_positions
+
     seq = list(init_sequence(task.target, task.constraints, rng, gc_target_prob(task.constraints)))
+    frozen = frozen_motif_positions(task.constraints)  # never override user-fixed motif positions
     for i, j, L in _hairpin_loops(task.target):
+        if any(p in frozen for p in range(i + 1, j)):
+            continue  # a fixed motif sits in this loop; don't clobber it
         for s in strategies:
             if s.kind == "hairpin_motif" and s.trigger.get("loop_len") == L:
                 motif = s.rule.get("motif", "")
@@ -80,7 +85,8 @@ def build_memory_init(task: DesignTask, strategies: List[Strategy], rng: random.
                     seq[i + 1 : j] = list(motif)
     if any(s.kind == "gc_closing" for s in strategies):
         for i, j in _closing_pairs(task.target):
-            seq[i], seq[j] = ("G", "C") if (i + j) % 2 == 0 else ("C", "G")
+            if i not in frozen and j not in frozen:
+                seq[i], seq[j] = ("G", "C") if (i + j) % 2 == 0 else ("C", "G")
     return "".join(seq)
 
 

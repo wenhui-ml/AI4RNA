@@ -99,6 +99,8 @@ def actuation_from_agent_trace(events: List[Dict]) -> Dict:
         prev, cur = chain[k - 1], chain[k]
         if len(prev["sequence"]) != len(cur["sequence"]):
             continue  # can't align edits across different lengths
+        if prev["sequence"] == cur["sequence"]:
+            continue  # re-verifying the SAME sequence is not a repair step; don't deflate A
         logger.log(
             directive_positions=prev["mismatched_positions"],
             before=prev["sequence"],

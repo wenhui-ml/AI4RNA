@@ -38,6 +38,8 @@ class Diagnosis:
 
 def diagnose(target: str, folded: str) -> Diagnosis:
     """Localize the difference between what the target wants and how the sequence folds."""
+    if len(folded) != len(target):
+        raise ValueError(f"folded length {len(folded)} != target length {len(target)}")
     tgt_pairs: Set[Tuple[int, int]] = set(base_pairs(target))
     fold_pairs: Set[Tuple[int, int]] = set(base_pairs(folded))
     missing = sorted(tgt_pairs - fold_pairs)
@@ -48,12 +50,12 @@ def diagnose(target: str, folded: str) -> Diagnosis:
     mism = [i for i in range(len(target)) if pt_t[i] != pt_f[i]]
 
     directive = _render_directive(target, folded, missing, spurious, mism)
-    from RNA import bp_distance as _bpd
-
+    # bp-distance = size of the symmetric difference of the pair sets; consistent with our
+    # pair_table (which handles pseudoknot brackets that RNA.bp_distance silently ignores).
     return Diagnosis(
         target=target,
         folded=folded,
-        bp_distance=int(_bpd(target, folded)),
+        bp_distance=len(missing) + len(spurious),
         missing_pairs=missing,
         spurious_pairs=spurious,
         mismatched_positions=mism,

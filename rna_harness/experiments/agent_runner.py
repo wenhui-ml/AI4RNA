@@ -57,24 +57,23 @@ def _build_prompt(task: DesignTask, knowledge: str) -> str:
 
 
 def _extract_final_sequence(trace_lines: List[str], n: int) -> Optional[str]:
-    """Scan the stream-json trace for FINAL_SEQUENCE, else any assistant text with an n-mer."""
+    """Extract the agent's submitted sequence from the LAST explicit `FINAL_SEQUENCE:` marker.
+
+    Conservative by design: we only accept the agent's own declared answer. We do NOT scrape
+    arbitrary n-mers from the trace, because tool-result blocks (e.g. RnaVerify echoing a
+    sequence) would otherwise be misread as the agent's submission -> false positives that
+    corrupt scoring. No marker -> None (counts as no submission)."""
     texts: List[str] = []
     for line in trace_lines:
         try:
             ev = json.loads(line)
         except Exception:
             continue
-        # collect any text content anywhere in the event
         blob = json.dumps(ev)
         m = _FINAL_RE.search(blob.replace("\\n", "\n"))
         if m:
             texts.append(m.group(1).upper().replace("T", "U"))
-    if texts:
-        return texts[-1]
-    # fallback: last n-length ACGU run anywhere
-    joined = "\n".join(trace_lines).upper().replace("T", "U")
-    runs = re.findall(r"[ACGU]{%d}" % n, joined)
-    return runs[-1] if runs else None
+    return texts[-1] if texts else None
 
 
 def _count_tool_calls(trace_lines: List[str]) -> Dict[str, int]:

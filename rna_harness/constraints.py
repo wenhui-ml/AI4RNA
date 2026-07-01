@@ -141,7 +141,8 @@ def check_constraints(sequence: str, spec: ConstraintSpec) -> ConstraintReport:
         details["gc_window"] = [lo, hi]
 
     if spec.forbidden:
-        bad = [m for m in spec.forbidden if m.upper().replace("T", "U") in seq]
+        # IUPAC-aware: a forbidden pattern may contain ambiguity codes (N, R, Y, ...).
+        bad = [m for m in spec.forbidden if find_motif(seq, m.upper().replace("T", "U")) >= 0]
         checks["no_forbidden"] = not bad
         details["forbidden_found"] = bad
 

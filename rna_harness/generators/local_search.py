@@ -95,7 +95,10 @@ class LocalSearchGenerator(Generator):
                 d2 = bp_distance(struct2, target)
                 evals += 1
                 dd = d2 - cur_d
-                accept = dd < 0 or (dd == 0 and rng.random() < 0.5) or rng.random() < math.exp(-dd / max(T, 1e-6))
+                # improving: always; sideways: p=0.5; uphill: Metropolis. (Guard the
+                # Metropolis term to dd>0 -- at dd==0, exp(0)=1 would always accept, defeating
+                # the intended 0.5 sideways rate.)
+                accept = dd < 0 or (dd == 0 and rng.random() < 0.5) or (dd > 0 and rng.random() < math.exp(-dd / max(T, 1e-6)))
                 if accept:
                     seq, struct, cur_d = seq2, struct2, d2
                     candidates.append(seq2)
@@ -111,7 +114,11 @@ class LocalSearchGenerator(Generator):
                 if stall >= self.stall_limit:
                     break
 
-        best_seq = best_seq or init_sequence(target, spec, rng, p_gc)
+        if best_seq is None:
+            # e.g. budget=0: nothing was folded. Fold a fallback init once so the reported
+            # distance matches the returned sequence (never leave best_d at the n+1 sentinel).
+            best_seq = init_sequence(target, spec, rng, p_gc)
+            best_d = bp_distance(orc.fold_mfe(best_seq)[0], target)
         return GenerationResult(
             task_id=task.task_id,
             best_sequence=best_seq,

@@ -94,11 +94,16 @@ def _agent_worker(payload: Dict) -> Dict:
     from .agent_runner import run_agent_on_task
 
     task = DesignTask.from_dict(payload["task"])
-    rec = run_agent_on_task(task, payload["model"], payload["out_dir"], payload["budget_usd"],
-                            payload["timeout_s"], None, payload["knowledge"])
-    if not rec.get("final_sequence") or rec.get("rc", 0) != 0:  # one retry
-        rec = run_agent_on_task(task, payload["model"], payload["out_dir"], payload["budget_usd"],
-                                payload["timeout_s"], None, payload["knowledge"])
+    first = run_agent_on_task(task, payload["model"], payload["out_dir"], payload["budget_usd"],
+                              payload["timeout_s"], None, payload["knowledge"])
+    rec = first
+    # Retry ONLY when the first attempt produced no usable answer (don't waste credits or
+    # discard a good result on a nonzero rc); then keep the better of the two.
+    if not first.get("final_sequence"):
+        second = run_agent_on_task(task, payload["model"], payload["out_dir"], payload["budget_usd"],
+                                   payload["timeout_s"], None, payload["knowledge"])
+        if second.get("final_sequence") and (second.get("solved") or second.get("reward", 0) >= first.get("reward", 0)):
+            rec = second
     seq = rec.get("final_sequence") or ""
     strategies = [Strategy.from_dict(s) for s in payload["strategies"]]
     adopt = memory_adoption(strategies, task.target, seq) if (seq and strategies) else {"A_memory": None}
@@ -176,12 +181,23 @@ def run_campaign(
                 return {**base, "model": model, "out_dir": out_dir, "budget_usd": agent_budget_usd,
                         "timeout_s": agent_timeout_s, "knowledge": knowledge}
 
-            def _update_memory_from(t, row):
+            def _rebuild_memory(upto_epoch):
+                # IDEMPOTENT rebuild from state: deterministic function of all solved/teacher
+                # solutions for this arm through upto_epoch -> resume-safe, no support
+                # double-counting. Solved rows already satisfy mfe_match and teacher_seq was
+                # verified at creation, so no re-folding is needed here.
                 if arm != "with_memory":
                     return
-                learn = row["final_sequence"] if row["solved"] else row.get("teacher_seq")
-                if learn and verify(t, learn, compute_cross_oracle=False).mfe_match:
-                    stores[arm].write(merge_strategies(stores[arm].strategies(), distill_strategies(t.target, learn)))
+                strategies: List[Strategy] = []
+                for ep in range(upto_epoch + 1):
+                    for t in tasks:
+                        r = state["done"].get(f"{arm}:{ep}:{t.task_id}")
+                        if not r:
+                            continue
+                        learn = r["final_sequence"] if r["solved"] else r.get("teacher_seq")
+                        if learn:
+                            strategies += distill_strategies(t.target, learn)
+                stores[arm].write(merge_strategies([], strategies))
 
             if executor == "agent":  # env set once per (arm,epoch); frozen memdir shared safely
                 if arm == "no_memory":
@@ -190,14 +206,14 @@ def run_campaign(
                     os.environ["CLAUDE_COWORK_MEMORY_PATH_OVERRIDE"] = stores[arm].dir + os.sep
 
             if pending and online:
-                # ONLINE: sequential; memory updates after EACH solved case so the next case
-                # recalls it (faithful self-improvement; the strong-signal regime).
+                # ONLINE: sequential; memory rebuilt after EACH case so the next case recalls
+                # it (faithful self-improvement; the strong-signal regime).
                 worker = _classical_worker if executor == "classical" else _agent_worker
                 for t in pending:
                     cur = [s.to_dict() for s in stores[arm].strategies()]  # up-to-date memory
                     row = worker(_mk_payload(t, cur))
                     record(arm, epoch, row)
-                    _update_memory_from(t, row)   # immediate -> next task sees it
+                    _rebuild_memory(epoch)   # immediate -> next task sees it
                     _save_state(state_path, state)
             elif pending:
                 # EPOCH-BATCHED: memory frozen within the epoch; all tasks in parallel.
@@ -209,19 +225,10 @@ def run_campaign(
                     with ThreadPoolExecutor(max_workers=max_workers) as ex:
                         for fut in as_completed([ex.submit(_agent_worker, _mk_payload(t, strat_dicts)) for t in pending]):
                             record(arm, epoch, fut.result()); _save_state(state_path, state)
-                # epoch-boundary memory update (batched mode only)
-                if arm == "with_memory":
-                    new: List[Strategy] = []
-                    for t in tasks:
-                        key = f"{arm}:{epoch}:{t.task_id}"
-                        if key not in state["done"]:
-                            continue
-                        r = state["done"][key]
-                        learn = r["final_sequence"] if r["solved"] else r.get("teacher_seq")
-                        if learn and verify(t, learn, compute_cross_oracle=False).mfe_match:
-                            new += distill_strategies(t.target, learn)
-                    if new:
-                        stores[arm].write(merge_strategies(stores[arm].strategies(), new))
+
+            # Always rebuild memory at the epoch boundary (idempotent) -- also repairs a resume
+            # where the epoch's tasks were persisted but the commit hadn't run yet.
+            _rebuild_memory(epoch)
 
             if executor == "agent":
                 os.environ.pop("CLAUDE_COWORK_MEMORY_PATH_OVERRIDE", None)
@@ -239,7 +246,7 @@ def _epoch_point(state, arm, epoch, tasks, n_strategies) -> Dict:
     rows = [state["done"][f"{arm}:{epoch}:{t.task_id}"] for t in tasks
             if f"{arm}:{epoch}:{t.task_id}" in state["done"]]
     solved = [r for r in rows if r["solved"]]
-    oc = [r["oracle_calls"] for r in solved if r["oracle_calls"]]
+    oc = [r["oracle_calls"] for r in solved if r["oracle_calls"] is not None]
     am = [r["A_memory"] for r in rows if r.get("A_memory") is not None]
     return {"epoch": epoch, "n": len(rows),
             "solve_rate": round(len(solved) / max(len(rows), 1), 4),
@@ -258,7 +265,7 @@ def _summary(state: Dict, out_dir: str, arms: List[str], epochs: int) -> Dict:
             if not rows:
                 continue
             solved = [r for r in rows if r["solved"]]
-            oc = [r["oracle_calls"] for r in solved if r["oracle_calls"]]
+            oc = [r["oracle_calls"] for r in solved if r["oracle_calls"] is not None]
             am = [r["A_memory"] for r in rows if r.get("A_memory") is not None]
             pts.append({"epoch": epoch, "n": len(rows),
                         "solve_rate": round(len(solved) / max(len(rows), 1), 4),

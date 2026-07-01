@@ -133,8 +133,11 @@ def structured_mutate(
 
 
 def frozen_motif_positions(spec: ConstraintSpec) -> set:
+    # Only freeze positions that _apply_motifs actually stamps (literal A/C/G/U). Freezing an
+    # ambiguous-IUPAC position would pin it at the default base and make the motif unsatisfiable.
     out = set()
     for pos, motif in spec.motifs:
-        for k in range(len(motif)):
-            out.add(pos + k)
+        for k, ch in enumerate(motif.upper().replace("T", "U")):
+            if ch in "ACGU":
+                out.add(pos + k)
     return out
