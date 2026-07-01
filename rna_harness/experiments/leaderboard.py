@@ -32,10 +32,11 @@ from .run import _parallel
 
 
 def _budget_for(n: int) -> Dict[str, int]:
-    """Length-scaled budgets so the full-100 run (12-400 nt) stays bounded."""
+    """Length-scaled budgets so the full-100 run (12-400 nt) stays BOUNDED (baseline
+    reference under a fixed, modest budget -- not a max-effort SOTA attempt)."""
     return {
-        "rnainverse": max(5, min(30, 3000 // max(n, 1))),
-        "local_search": min(150 * n, 12000),
+        "rnainverse": max(4, min(20, 2000 // max(n, 1))),
+        "local_search": min(60 * n, 4000),
     }
 
 

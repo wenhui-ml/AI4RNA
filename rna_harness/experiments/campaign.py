@@ -129,6 +129,7 @@ def run_campaign(
     resume: bool = True,
     seed: int = 0,
     max_workers: Optional[int] = None,
+    online: bool = False,
 ) -> Dict:
     arms = arms or ["with_memory", "no_memory"]
     if max_workers is None:
@@ -166,44 +167,64 @@ def run_campaign(
             pending = pending[:remaining]  # hard cap: never submit more than the remaining budget
             # freeze strategies for the epoch
             strat_dicts = [s.to_dict() for s in stores[arm].strategies()]
-            if pending:
-                if executor == "classical":
-                    payloads = [{"task": t.to_dict(), "arm": arm, "strategies": strat_dicts,
-                                 "budget": classical_budget, "seed": seed + epoch,
-                                 "teacher": teacher, "teacher_budget": teacher_budget} for t in pending]
-                    with ProcessPoolExecutor(max_workers=max_workers) as ex:
-                        for fut in as_completed([ex.submit(_classical_worker, p) for p in payloads]):
-                            record(arm, epoch, fut.result())
-                            _save_state(state_path, state)
-                else:  # agent: set memory env once per (arm,epoch), then thread-parallel
-                    if arm == "no_memory":
-                        os.environ.pop("CLAUDE_COWORK_MEMORY_PATH_OVERRIDE", None)
-                    else:
-                        os.environ["CLAUDE_COWORK_MEMORY_PATH_OVERRIDE"] = stores[arm].dir + os.sep
-                    payloads = [{"task": t.to_dict(), "arm": arm, "strategies": strat_dicts,
-                                 "model": model, "out_dir": out_dir, "budget_usd": agent_budget_usd,
-                                 "timeout_s": agent_timeout_s, "knowledge": knowledge,
-                                 "teacher": teacher, "teacher_budget": teacher_budget, "seed": seed + epoch}
-                                for t in pending]
-                    with ThreadPoolExecutor(max_workers=max_workers) as ex:
-                        for fut in as_completed([ex.submit(_agent_worker, p) for p in payloads]):
-                            record(arm, epoch, fut.result())
-                            _save_state(state_path, state)
-                    os.environ.pop("CLAUDE_COWORK_MEMORY_PATH_OVERRIDE", None)
 
-            # epoch-boundary memory update (with_memory only): distill from this epoch's solutions
-            if arm == "with_memory":
-                new: List[Strategy] = []
-                for t in tasks:
-                    key = f"{arm}:{epoch}:{t.task_id}"
-                    if key not in state["done"]:  # skipped by the global cap this epoch
-                        continue
-                    r = state["done"][key]
-                    learn = r["final_sequence"] if r["solved"] else r.get("teacher_seq")
-                    if learn and verify(t, learn, compute_cross_oracle=False).mfe_match:
-                        new += distill_strategies(t.target, learn)
-                if new:
-                    stores[arm].write(merge_strategies(stores[arm].strategies(), new))
+            def _mk_payload(t, cur):
+                base = {"task": t.to_dict(), "arm": arm, "strategies": cur,
+                        "teacher": teacher, "teacher_budget": teacher_budget, "seed": seed + epoch}
+                if executor == "classical":
+                    return {**base, "budget": classical_budget}
+                return {**base, "model": model, "out_dir": out_dir, "budget_usd": agent_budget_usd,
+                        "timeout_s": agent_timeout_s, "knowledge": knowledge}
+
+            def _update_memory_from(t, row):
+                if arm != "with_memory":
+                    return
+                learn = row["final_sequence"] if row["solved"] else row.get("teacher_seq")
+                if learn and verify(t, learn, compute_cross_oracle=False).mfe_match:
+                    stores[arm].write(merge_strategies(stores[arm].strategies(), distill_strategies(t.target, learn)))
+
+            if executor == "agent":  # env set once per (arm,epoch); frozen memdir shared safely
+                if arm == "no_memory":
+                    os.environ.pop("CLAUDE_COWORK_MEMORY_PATH_OVERRIDE", None)
+                else:
+                    os.environ["CLAUDE_COWORK_MEMORY_PATH_OVERRIDE"] = stores[arm].dir + os.sep
+
+            if pending and online:
+                # ONLINE: sequential; memory updates after EACH solved case so the next case
+                # recalls it (faithful self-improvement; the strong-signal regime).
+                worker = _classical_worker if executor == "classical" else _agent_worker
+                for t in pending:
+                    cur = [s.to_dict() for s in stores[arm].strategies()]  # up-to-date memory
+                    row = worker(_mk_payload(t, cur))
+                    record(arm, epoch, row)
+                    _update_memory_from(t, row)   # immediate -> next task sees it
+                    _save_state(state_path, state)
+            elif pending:
+                # EPOCH-BATCHED: memory frozen within the epoch; all tasks in parallel.
+                if executor == "classical":
+                    with ProcessPoolExecutor(max_workers=max_workers) as ex:
+                        for fut in as_completed([ex.submit(_classical_worker, _mk_payload(t, strat_dicts)) for t in pending]):
+                            record(arm, epoch, fut.result()); _save_state(state_path, state)
+                else:
+                    with ThreadPoolExecutor(max_workers=max_workers) as ex:
+                        for fut in as_completed([ex.submit(_agent_worker, _mk_payload(t, strat_dicts)) for t in pending]):
+                            record(arm, epoch, fut.result()); _save_state(state_path, state)
+                # epoch-boundary memory update (batched mode only)
+                if arm == "with_memory":
+                    new: List[Strategy] = []
+                    for t in tasks:
+                        key = f"{arm}:{epoch}:{t.task_id}"
+                        if key not in state["done"]:
+                            continue
+                        r = state["done"][key]
+                        learn = r["final_sequence"] if r["solved"] else r.get("teacher_seq")
+                        if learn and verify(t, learn, compute_cross_oracle=False).mfe_match:
+                            new += distill_strategies(t.target, learn)
+                    if new:
+                        stores[arm].write(merge_strategies(stores[arm].strategies(), new))
+
+            if executor == "agent":
+                os.environ.pop("CLAUDE_COWORK_MEMORY_PATH_OVERRIDE", None)
             _save_state(state_path, state)
             pt = _epoch_point(state, arm, epoch, tasks, len(stores[arm].strategies()))
             print(f"[campaign] arm={arm} epoch={epoch} solve={pt['solve_rate']} "
@@ -264,6 +285,7 @@ def main(argv=None) -> int:
     ap.add_argument("--model", default="anthropic/claude-opus-4.8")
     ap.add_argument("--global-episode-cap", type=int, default=10000)
     ap.add_argument("--max-workers", type=int, default=None)
+    ap.add_argument("--online", action="store_true", help="per-task memory update (self-improving, sequential); recommended for agent phase-2")
     ap.add_argument("--teacher", action="store_true")
     ap.add_argument("--no-resume", action="store_true")
     ap.add_argument("--seed", type=int, default=0)
@@ -281,7 +303,7 @@ def main(argv=None) -> int:
         classical_budget=args.classical_budget, agent_budget_usd=args.agent_budget_usd,
         agent_timeout_s=args.agent_timeout_s, model=args.model,
         global_episode_cap=args.global_episode_cap, teacher=args.teacher,
-        resume=not args.no_resume, seed=args.seed, max_workers=args.max_workers,
+        resume=not args.no_resume, seed=args.seed, max_workers=args.max_workers, online=args.online,
     )
     for arm, curve in summ["curves"].items():
         pts = " ".join(f"e{c['epoch']}:{c['solve_rate']}/{c['mean_oracle_calls_solved']}" for c in curve)
