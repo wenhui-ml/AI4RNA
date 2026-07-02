@@ -193,46 +193,76 @@ def _fold_mfe(seq: str) -> str:
         return ""
 
 
-def svg_arc(target: str, mfe: str, seq: str = "") -> str:
-    """Arc diagram: TARGET pairs as arcs ABOVE the axis (grey/green), ACHIEVED MFE pairs BELOW
-    (green if correct, red if spurious). Missing target pairs are amber-dashed above. No JS/CDN."""
+def svg_arc(target: str, mfe: str, seq: str = "", solved=None) -> str:
+    """Diagnostic RNA arc diagram (inline SVG, no JS/CDN). THREE modes:
+      * solved      -> ONE green arc set (target == achieved MFE), 'bp-distance 0'.
+      * diagnostic  -> target arcs ABOVE (green=correct / amber-dashed=missing), achieved MFE
+                       arcs BELOW (green=correct / red=spurious). The point of the view.
+      * target-only -> target arcs in GREY when the agent submitted NO sequence (shows the
+                       structure the agent failed to design).
+    Arcs are ELLIPTICAL, height scaled to fit, so deeply-nested large targets never clip."""
     n = max(len(target), len(mfe))
     if n == 0:
         return "<p class='muted'>no structure</p>"
     tp, mp = _pairs(target), _pairs(mfe)
     correct, missing, spurious = tp & mp, tp - mp, mp - tp
+    has_fold = bool(seq) and bool(mfe)
+    is_solved = solved if solved is not None else (has_fold and not missing and not spurious)
+    mode = "target_only" if not has_fold else ("solved" if is_solved else "diagnostic")
+    draw_below = mode == "diagnostic"
+
     step = max(6, min(16, int(1100 / n)))
     W = n * step + 40
-    maxr = max((j - i) for i, j in (tp | mp)) * step / 2 if (tp | mp) else 20
-    ah = min(180, maxr + 14)
-    H = ah * 2 + 46
-    ax = ah + 20  # baseline y
     x = lambda i: 20 + i * step + step / 2
+    used = (tp | mp) if draw_below else tp
+    maxrx = max(((x(j) - x(i)) / 2) for i, j in used) if used else 20
+    MAXH = 160.0
+    scale = min(1.0, MAXH / maxrx) if maxrx else 1.0  # flatten tall arcs to fit; keeps nesting
+    ah = maxrx * scale + 14
+    ax = ah + 20
+    H = (ah * 2 + 46) if draw_below else (ax + 24)
 
     def arc(i, j, up, color, dashed=False):
-        r = (x(j) - x(i)) / 2
+        rx = (x(j) - x(i)) / 2
+        ry = rx * scale
         sweep = 1 if up else 0
         dash = " stroke-dasharray='4 3'" if dashed else ""
-        return (f"<path d='M {x(i):.1f} {ax} A {r:.1f} {r:.1f} 0 0 {sweep} {x(j):.1f} {ax}' "
+        return (f"<path d='M {x(i):.1f} {ax:.1f} A {rx:.1f} {ry:.1f} 0 0 {sweep} {x(j):.1f} {ax:.1f}' "
                 f"fill='none' stroke='{color}' stroke-width='1.6'{dash}/>")
 
-    parts = [f"<svg viewBox='0 0 {W} {H}' width='{min(W,1180)}' style='max-width:100%;background:#fff;border:1px solid #e6e8ec;border-radius:6px'>"]
-    parts.append(f"<line x1='20' y1='{ax}' x2='{W-20}' y2='{ax}' stroke='#cfd8dc'/>")
-    for i, j in sorted(tp):  # target above
-        parts.append(arc(i, j, True, "#2e7d32" if (i, j) in correct else "#f9a825",
-                         dashed=(i, j) in missing))
-    for i, j in sorted(mp):  # achieved below
-        parts.append(arc(i, j, False, "#2e7d32" if (i, j) in correct else "#e53935"))
+    parts = [f"<svg viewBox='0 0 {W} {H:.0f}' width='{min(W,1180)}' style='max-width:100%;background:#fff;border:1px solid #e6e8ec;border-radius:6px'>"]
+    parts.append(f"<line x1='20' y1='{ax:.1f}' x2='{W-20}' y2='{ax:.1f}' stroke='#cfd8dc'/>")
+    if mode == "target_only":
+        for i, j in sorted(tp):
+            parts.append(arc(i, j, True, "#90a4ae"))
+    elif mode == "solved":
+        for i, j in sorted(tp):
+            parts.append(arc(i, j, True, "#2e7d32"))
+    else:  # diagnostic
+        for i, j in sorted(tp):  # target above
+            parts.append(arc(i, j, True, "#2e7d32" if (i, j) in correct else "#f9a825",
+                             dashed=(i, j) in missing))
+        for i, j in sorted(mp):  # achieved below
+            parts.append(arc(i, j, False, "#2e7d32" if (i, j) in correct else "#e53935"))
     if seq and len(seq) == n and step >= 9:  # sequence letters on the axis
         for i, ch in enumerate(seq.upper()):
-            parts.append(f"<text x='{x(i):.1f}' y='{ax+13}' font-size='{min(step,11)}' "
+            parts.append(f"<text x='{x(i):.1f}' y='{ax+13:.1f}' font-size='{min(step,11)}' "
                          f"text-anchor='middle' font-family='monospace' fill='#455a64'>{ch}</text>")
     parts.append("</svg>")
-    legend = ("<div class='legend'>"
-              "<span><i class='sw' style='background:#2e7d32'></i>correct</span>"
-              "<span><i class='sw' style='background:#f9a825'></i>missing (target only)</span>"
-              "<span><i class='sw' style='background:#e53935'></i>spurious (fold only)</span>"
-              f"<span class='muted'>bp-distance {len(missing)+len(spurious)} &middot; target &#9650; / achieved &#9660;</span></div>")
+
+    if mode == "target_only":
+        legend = ("<div class='legend'><span><i class='sw' style='background:#90a4ae'></i>target structure</span>"
+                  f"<span class='muted'>&#9888; agent produced no sequence within budget &middot; "
+                  f"{len(tp)} base pairs, {n} nt</span></div>")
+    elif mode == "solved":
+        legend = ("<div class='legend'><span><i class='sw' style='background:#2e7d32'></i>all pairs correct</span>"
+                  "<span class='muted'>solved &middot; bp-distance 0 (target = achieved MFE)</span></div>")
+    else:
+        legend = ("<div class='legend'>"
+                  "<span><i class='sw' style='background:#2e7d32'></i>correct</span>"
+                  "<span><i class='sw' style='background:#f9a825'></i>missing (target only, dashed)</span>"
+                  "<span><i class='sw' style='background:#e53935'></i>spurious (fold only)</span>"
+                  f"<span class='muted'>bp-distance {len(missing)+len(spurious)} &middot; target &#9650; / achieved &#9660;</span></div>")
     return "".join(parts) + legend
 
 
@@ -387,7 +417,7 @@ def runs_index(runs_root: str) -> str:
             f"<tr><td><a href='/report/{esc(name)}'><b>{esc(name)}</b></a></td>"
             f"<td>{esc(_kind(d, files))}</td>"
             f"<td><span class='badge {css}'>{esc(headline)}</span></td>"
-            f"<td>{s['n_records'] or '&mdash;'}{(' / '+str(s['solved'])+' solved') if s['n_records'] else ''}</td>"
+            f"<td>{(str(s['solved'])+'/'+str(s['n_records'])+' solved') if s['n_records'] else '&mdash;'}</td>"
             f"<td>{ntr or '&mdash;'}</td>"
             f"<td><a href='/report/{esc(name)}'>Report</a>"
             f"{' &middot; <a href=/trace/'+esc(name)+'>Trace</a>' if ntr else ''}"
@@ -450,23 +480,29 @@ def _agent_episode_rows(recs: List[Dict]) -> str:
 
 def _structure_gallery(run_dir: str, run: str, recs: List[Dict], num: int) -> str:
     solved_ep = [r for r in recs if r.get("solved") and r.get("final_sequence")]
-    unsolved_ep = [r for r in recs if not r.get("solved") and r.get("final_sequence")]
-    gallery = solved_ep[:5] + unsolved_ep[:3]
+    unsolved_seq = [r for r in recs if not r.get("solved") and r.get("final_sequence")]
+    unsolved_noseq = [r for r in recs if not r.get("solved") and not r.get("final_sequence")]
+    # surface the DIAGNOSTIC-rich ones first: failed-with-fold (missing/spurious), then the
+    # monster targets the agent couldn't design, then a few solved as positive controls.
+    gallery = unsolved_seq[:4] + unsolved_noseq[:4] + solved_ep[:4]
     if not gallery:
         return ""
     out = [f"<section><h2>{num} &middot; RNA secondary structure &mdash; target vs achieved MFE</h2>"]
     for r in gallery:
-        seq = r["final_sequence"]
+        seq = r.get("final_sequence") or ""
         tp = _trace_for(run_dir, r.get("task_id", ""))
         target = (_parse_trace(tp)["target"] if tp else "") or ""
-        mfe = _fold_mfe(seq)
+        mfe = _fold_mfe(seq) if seq else ""
         if not target and mfe:
             target = mfe
+        if not target and not mfe:
+            continue  # nothing renderable (no target in trace and no sequence)
         tag = "success" if r.get("solved") else "failure"
+        seq_html = (f"<div class='seq muted' style='margin:4px 0'>{esc(seq)}</div>" if seq
+                    else "<div class='seq muted' style='margin:4px 0'>(no sequence submitted)</div>")
         out.append(f"<div class='card'><b>{esc(str(r.get('task_id','')).replace('eterna100:',''))}</b> "
                    f"({r.get('n')} nt) <span class='badge {tag}'>{'solved' if r.get('solved') else 'unsolved'}</span>"
-                   f"<div class='seq muted' style='margin:4px 0'>{esc(seq)}</div>"
-                   + svg_arc(target, mfe, seq) + "</div>")
+                   + seq_html + svg_arc(target, mfe, seq, solved=r.get("solved")) + "</div>")
     out.append("</section>")
     return "".join(out)
 
