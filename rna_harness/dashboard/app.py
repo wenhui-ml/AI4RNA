@@ -202,33 +202,55 @@ def index():
 
 
 HTML_PAGE = """<!doctype html><html><head><meta charset="utf-8">
-<title>openclaude_rna dashboard</title>
+<title>openclaude_rna 实验总览</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
- body{font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:0;background:#0f1419;color:#e6edf3}
- header{background:#161b22;padding:14px 20px;border-bottom:1px solid #30363d;position:sticky;top:0;z-index:5}
- h1{font-size:18px;margin:0;display:inline-block} .sub{color:#8b949e;font-size:12px;margin-left:10px}
- .tabs{margin:10px 20px 0} .tab{display:inline-block;padding:6px 14px;cursor:pointer;border:1px solid #30363d;border-bottom:none;border-radius:6px 6px 0 0;background:#161b22;color:#8b949e}
- .tab.active{background:#0d1117;color:#e6edf3;font-weight:600}
- .panel{margin:0 20px 30px;border:1px solid #30363d;border-radius:0 8px 8px 8px;padding:16px;background:#0d1117}
- .card{border:1px solid #30363d;border-radius:8px;padding:12px 14px;margin:10px 0;background:#161b22}
- .name{font-weight:700;color:#58a6ff} table{border-collapse:collapse;margin:6px 0;font-size:13px}
- td,th{border:1px solid #30363d;padding:4px 10px;text-align:left} th{background:#161b22}
- .g{color:#3fb950}.r{color:#f85149}.y{color:#d29922} img{max-width:520px;border:1px solid #30363d;border-radius:6px;margin:8px 8px 0 0;background:#fff}
- pre{background:#010409;border:1px solid #30363d;border-radius:6px;padding:10px;overflow:auto;max-height:60vh;font-size:12px;line-height:1.4}
- select,button{background:#161b22;color:#e6edf3;border:1px solid #30363d;border-radius:6px;padding:5px 8px}
- .kv{display:inline-block;margin-right:16px}
+ :root{--bg:#fafafa;--card:#fff;--border:#e6e8ec;--text:#1a1a2e;--muted:#6b7280;--accent:#1976d2;--g:#2e7d32;--r:#c62828;--y:#b07d00}
+ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;margin:0;background:var(--bg);color:var(--text)}
+ header{background:var(--card);padding:14px 22px;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between}
+ h1{font-size:18px;margin:0} .sub{color:var(--muted);font-size:12px;margin-left:8px}
+ .lnk{background:var(--accent);color:#fff!important;padding:7px 14px;border-radius:6px;font-weight:700;font-size:13px}
+ .intro{background:var(--card);border-bottom:1px solid var(--border);padding:12px 22px;font-size:13.5px;line-height:1.7}
+ .tabs{margin:12px 22px 0} .tab{display:inline-block;padding:7px 15px;cursor:pointer;border:1px solid var(--border);border-bottom:none;border-radius:8px 8px 0 0;background:#eef1f5;color:var(--muted);margin-right:3px;font-size:14px}
+ .tab.active{background:var(--card);color:var(--accent);font-weight:700}
+ .panel{margin:0 22px 30px;border:1px solid var(--border);border-radius:0 10px 10px 10px;padding:18px;background:var(--card)}
+ .card{border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin:12px 0;background:var(--card);box-shadow:0 1px 3px rgba(0,0,0,.05)}
+ .name{font-weight:700;color:var(--accent);font-size:15px} h3{margin:4px 0} h4{margin:16px 0 4px;font-size:1rem}
+ .note{color:#374151;font-size:12.5px;line-height:1.75;margin:6px 0 8px;background:#eef4fb;border-left:3px solid var(--accent);padding:9px 12px;border-radius:0 6px 6px 0}
+ table{border-collapse:collapse;margin:6px 0;font-size:13px;background:var(--card)}
+ td,th{border:1px solid var(--border);padding:6px 12px;text-align:left} th{background:#f0f2f5;font-weight:600;color:#374151}
+ .g{color:var(--g);font-weight:700}.r{color:var(--r);font-weight:700}.y{color:var(--y);font-weight:600}
+ img{max-width:520px;border:1px solid var(--border);border-radius:6px;margin:8px 8px 0 0;background:#fff}
+ pre{background:#f6f8fa;border:1px solid var(--border);border-radius:6px;padding:10px;overflow:auto;max-height:60vh;font-size:12px;line-height:1.4}
+ select,button{background:#fff;color:var(--text);border:1px solid var(--border);border-radius:6px;padding:6px 10px} button{cursor:pointer}
+ a{color:var(--accent);text-decoration:none} a:hover{text-decoration:underline}
+ .kv{display:inline-block;margin-right:16px} details{margin:6px 0} summary{cursor:pointer;font-weight:600;color:var(--accent)}
+ ul.gloss{margin:8px 0 0;padding-left:20px;line-height:1.9;font-size:13px}
 </style></head><body>
-<header><h1>🧬 openclaude_rna</h1><span class="sub">RNA inverse-design meta-learning harness — live dashboard</span>
- <a href="/ui" style="float:right;color:#58a6ff;font-weight:600">📋 Rich reports →</a>
- <span id="health" class="sub"></span></header>
+<header><div><h1>🧬 openclaude_rna</h1><span class="sub">让 AI 智能体自动设计 RNA 序列 · 实时看板</span></div>
+ <a href="/ui" class="lnk">📋 运行总览 / 详细报告 →</a></header>
+<div class="intro">
+ <b>这是什么:</b>给 AI 一个目标「形状」(RNA 二级结构),它要设计出能折叠成该形状的碱基序列(A/C/G/U);由 <b>ViennaRNA 折叠算法</b>当裁判验证。下面几个标签是不同角度的汇总结果。
+ <b>红线:</b>所有「成功/解出」仅指「在折叠算法裁判下设计正确」,不代表任何体内或生物功能。
+ <details><summary>看不懂表里的词?点这里(术语表)</summary>
+ <ul class="gloss">
+  <li><b>solved / 解出</b>:设计的序列,其「最低能量折叠」= 目标形状。</li>
+  <li><b>uMFE</b>:更严 —— 目标是「唯一」最低能量解(无并列),更稳健。</li>
+  <li><b>NED(系综缺陷)</b>:折叠「不干脆」的程度(0~1,<b>越低越好</b>)。</li>
+  <li><b>A / A_model / A_harness(驱动保真度)</b>:「正确诊断有没有真的驱动下一步编辑」(0~1)。A_model=模型照做的程度;A_harness=框架有没有如实传达诊断(丢掉=0)。</li>
+  <li><b>A_memory</b>:解答有没有采纳「记忆」里的策略(0~1)。</li>
+  <li><b>mean evals→solve / oracle-calls→solve</b>:平均要试几次(调用几次裁判)才解出,<b>越低越省</b>。</li>
+  <li><b>epoch</b>:把整批题练一遍;<b>episode/尝试</b>:对一道题的一次设计尝试。</li>
+  <li>颜色:<span class="g">绿=好</span> / <span class="y">黄=中</span> / <span class="r">红=差</span>。</li>
+ </ul></details>
+</div>
 <div class="tabs">
- <span class="tab active" data-t="scorecard" onclick="tab('scorecard')">🏆 Scorecard</span>
- <span class="tab" data-t="campaigns" onclick="tab('campaigns')">📈 Campaign</span>
- <span class="tab" data-t="overview" onclick="tab('overview')">Overview</span>
- <span class="tab" data-t="runs" onclick="tab('runs')">Runs</span>
- <span class="tab" data-t="figures" onclick="tab('figures')">Figures</span>
- <span class="tab" data-t="logs" onclick="tab('logs')">Logs (live)</span>
+ <span class="tab active" data-t="scorecard" onclick="tab('scorecard')">🏆 成绩单</span>
+ <span class="tab" data-t="campaigns" onclick="tab('campaigns')">📈 记忆实验</span>
+ <span class="tab" data-t="overview" onclick="tab('overview')">🧭 概览</span>
+ <span class="tab" data-t="runs" onclick="tab('runs')">📂 运行</span>
+ <span class="tab" data-t="figures" onclick="tab('figures')">📊 图表</span>
+ <span class="tab" data-t="logs" onclick="tab('logs')">📜 日志(实时)</span>
 </div>
 <div id="scorecard" class="panel"></div>
 <div id="campaigns" class="panel" style="display:none"></div>
@@ -236,9 +258,10 @@ HTML_PAGE = """<!doctype html><html><head><meta charset="utf-8">
 <div id="runs" class="panel" style="display:none"></div>
 <div id="figures" class="panel" style="display:none"></div>
 <div id="logs" class="panel" style="display:none">
- <select id="logsel"></select> <button onclick="loadlog()">refresh</button>
- <label class="sub"><input type="checkbox" id="auto" checked> auto (3s)</label>
- <pre id="logbox">select a log…</pre>
+ <p class="note">智能体运行时的实时日志尾部。选一个文件查看;可勾选自动刷新。</p>
+ <select id="logsel"></select> <button onclick="loadlog()">刷新</button>
+ <label class="sub"><input type="checkbox" id="auto" checked> 自动(3秒)</label>
+ <pre id="logbox">选择一个日志…</pre>
 </div>
 <script>
 let RUNS=[];
@@ -246,9 +269,10 @@ function tab(t){document.querySelectorAll('.tab').forEach(e=>e.classList.toggle(
  ['scorecard','campaigns','overview','runs','figures','logs'].forEach(p=>document.getElementById(p).style.display=p==t?'block':'none');}
 function fmt(x){return x==null?'—':(typeof x=='number'?(Math.round(x*1000)/1000):x)}
 function cls(v){return v==null?'':(v>=0.6?'g':(v>=0.3?'y':'r'))}
+function note(t){return '<p class="note">'+t+'</p>'}
 async function load(){
  const h=await (await fetch('/health')).json();
- document.getElementById('health').textContent=' • '+h.n_runs+' runs • '+h.repo;
+ document.getElementById('health')&&(document.getElementById('health').textContent='');
  RUNS=(await (await fetch('/api/runs')).json()).runs;
  renderOverview(); renderRuns(); renderFigures();
  try{const sc=(await (await fetch('/api/scorecard')).json()).scorecards; renderScorecard(sc);}catch(e){}
@@ -256,70 +280,78 @@ async function load(){
 }
 function renderCampaigns(cps){
  const el=document.getElementById('campaigns'); if(!el)return;
- if(!cps||!cps.length){el.innerHTML='<div class="card">No meta-learning campaign yet. Run <code>python -m rna_harness.experiments.campaign</code>.</div>';return;}
- let h='<h3>Meta-learning saturation (phase-2 self-improvement)</h3>';
- for(const c of cps){h+=`<div class="card"><div class="name">${c.name} — ${c.summary.n_episodes} episodes</div>`;
+ let intro='<h3>📈 记忆实验:记忆是否让智能体越做越好?</h3>'+note('让智能体反复练同一批题、把经验存进「记忆」。每行是一个 <b>epoch</b>(练一遍)。看 <b>oracle-calls→solve</b>(解题所需尝试次数)是否随 epoch <b>下降</b> —— 下降=记忆在起作用。臂:<b>with_memory</b>=用记忆 · <b>no_memory</b>=不用(对照)· <b>permuted_memory</b>=故意用错的记忆(理应帮不上)。');
+ if(!cps||!cps.length){el.innerHTML=intro+'<div class="card">还没有记忆实验数据。</div>';return;}
+ let h=intro;
+ for(const c of cps){h+=`<div class="card"><div class="name">${c.name} — 共 ${c.summary.n_episodes} 次尝试</div>`;
   for(const [arm,curve] of Object.entries(c.summary.curves||{})){
-   h+=`<div style="margin:6px 0"><b>${arm}</b><table><tr><th>epoch</th><th>solve</th><th>oracle-calls→solve</th><th>A_memory</th><th>#strategies</th></tr>`+
+   h+=`<div style="margin:6px 0"><b>${arm}</b><table><tr><th>epoch(第几遍)</th><th>解出率</th><th>解题所需尝试次数 ↓越低越好</th><th>A_memory</th><th>已学策略数</th></tr>`+
    curve.map(e=>`<tr><td>${e.epoch}</td><td class="${cls(e.solve_rate)}">${fmt(e.solve_rate)}</td><td class="${arm=='with_memory'?'g':''}">${fmt(e.mean_oracle_calls_solved)}</td><td>${fmt(e.A_memory)}</td><td>${fmt(e.n_strategies)}</td></tr>`).join('')+`</table></div>`;}
   h+=`</div>`;}
  el.innerHTML=h;
 }
 function renderScorecard(cards){
- if(!cards||!cards.length){document.getElementById('scorecard').innerHTML='<div class="card">No scorecard yet. Run <code>python -m rna_harness.experiments.leaderboard</code>.</div>';return;}
- let h='';
+ let intro='<h3>🏆 综合成绩单</h3>'+note('把所有能力汇总成三块:① 传统算法在 100 道公认 RNA 谜题上的成绩(定「地板线」)· ② 带额外约束时的设计能力 · ③ AI 智能体的「照诊断行动」与「记忆」能力。');
+ if(!cards||!cards.length){document.getElementById('scorecard').innerHTML=intro+'<div class="card">还没有成绩单数据。</div>';return;}
+ let h=intro;
  for(const c of cards){const p=c.scorecard.panels||{};
-  h+=`<div class="card"><div class="name">🏆 ${c.name}</div><div class="sub">red line: ${c.scorecard.red_line||''}</div>`;
+  h+=`<div class="card"><div class="name">🏆 ${c.name}</div><div class="sub">红线:仅在折叠算法裁判下判成功,不涉体内功能。</div>`;
   const s=p.standard_leaderboard;
-  if(s){h+=`<h4>Panel 1 — ${s.benchmark} (${s.n_puzzles} puzzles, budget: ${s.budget})</h4>
-   <table><tr><th>method</th><th>solved/100</th><th>solved rate</th><th>uMFE</th><th>mean NED (all)</th><th>mean NED (solved)</th><th>mean s</th></tr>`+
+  if(s){h+=`<h4>① Eterna100 基准:传统算法的「地板线」</h4>`+
+   note('100 道公认 RNA 谜题上,两个<b>传统基线算法</b>各解对多少道 —— 这是 AI 要超越的地板。<b>solved/100</b>=解对几道;<b>uMFE</b>=其中「唯一最优解」几道(更稳);<b>NED</b>=折叠不干脆程度(越低越好);<b>mean s</b>=每题耗时秒。')+
+   `<table><tr><th>方法</th><th>解对/100</th><th>解出率</th><th>uMFE</th><th>NED(全部)</th><th>NED(解出)</th><th>每题秒</th></tr>`+
    Object.entries(s.by_method).map(([m,v])=>`<tr><td>${m}</td><td><b>${v.solved}</b></td><td>${fmt(v.solved_rate)}</td><td>${v.umfe}</td><td>${fmt(v.mean_NED_all)}</td><td>${fmt(v.mean_NED_solved)}</td><td>${fmt(v.mean_secs)}</td></tr>`).join('')+`</table>`;}
   const hy=p.hybrid_seam;
-  if(hy){h+=`<h4>Panel 2 — hybrid-constraint seam (${hy.n_tasks} tasks / ${hy.n_base} base)</h4>
-   <table><tr><th>profile</th><th>solved</th><th>struct match</th><th>constraints ok</th></tr>`+
+  if(hy){h+=`<h4>② 混合约束设计(${hy.n_tasks} 题 / ${hy.n_base} 基础题)</h4>`+
+   note('在「结构目标」之外再加约束(GC 含量 / 固定片段 / 禁用序列 / 编码蛋白)时的成绩。<b>solved</b>=结构对且约束全满足;<b>struct match</b>=只看结构;<b>constraints ok</b>=只看约束。⚠ <b>coding=0</b> 说明「编码蛋白」约束目前没搞定(已知短板)。')+
+   `<table><tr><th>约束类型</th><th>解出(结构+约束)</th><th>结构对</th><th>约束满足</th></tr>`+
    Object.entries(hy.by_profile).map(([pr,v])=>`<tr><td>${pr}</td><td class="${cls(v.solved_rate)}">${fmt(v.solved_rate)}</td><td>${fmt(v.struct_match_rate)}</td><td>${fmt(v.constraints_ok_rate)}</td></tr>`).join('')+`</table>`;}
   const ag=p.agent_capability;
   if(ag){const a=ag.actuation_ablation||{};
-   h+=`<h4>Panel 3 — agent capability (actuation ablation, ${ag.n_ablation_tasks} tasks)</h4>
-   <table><tr><th>mode</th><th>solve</th><th>A</th><th>A_model</th><th>A_harness</th></tr>`+
-   Object.entries(a).map(([m,v])=>`<tr><td>${m}</td><td>${fmt(v.solve_rate)}</td><td class="${cls(v.A)}">${fmt(v.A)}</td><td>${fmt(v.A_model)}</td><td>${fmt(v.A_harness)}</td></tr>`).join('')+`</table>`;
-   if(ag.meta_arms){h+=`<h4>meta-learning arms (oracle-calls-to-solve, A_memory)</h4>
-    <table><tr><th>arm</th><th>solve</th><th>mean evals→solve</th><th>A_memory</th><th>strategies</th></tr>`+
-    Object.entries(ag.meta_arms).map(([m,v])=>`<tr><td>${m}</td><td>${fmt(v.solve_rate)}</td><td class="${m=='with_memory'?'g':''}">${fmt(v.mean_evals_solved)}</td><td>${fmt(v.A_memory)}</td><td>${fmt(v.n_strategies_learned)}</td></tr>`).join('')+`</table>`;}}
+   h+=`<h4>③ 智能体能力:核心对照实验(${ag.n_ablation_tasks} 题)</h4>`+
+   note('把「正确诊断」喂给智能体让它<b>照着改</b>(diagnosis)vs <b>随机乱改</b>(random)vs 框架<b>偷偷丢掉诊断</b>(silent_fallback)。<b>A</b>=诊断真的驱动了下一步编辑的程度。<b>看点:diagnosis 的 A 最高、也解得最多 → 证明「照诊断行动」确实有用</b>(这就是项目的核心论点)。')+
+   `<table><tr><th>模式</th><th>解出率</th><th>A(驱动保真度)</th><th>A_model</th><th>A_harness</th></tr>`+
+   Object.entries(a).map(([m,v])=>{const lbl={diagnosis:'照诊断改',random:'随机乱改',silent_fallback:'丢掉诊断'}[m]||m;return `<tr><td>${lbl} <span class="sub">${m}</span></td><td>${fmt(v.solve_rate)}</td><td class="${cls(v.A)}">${fmt(v.A)}</td><td>${fmt(v.A_model)}</td><td>${fmt(v.A_harness)}</td></tr>`}).join('')+`</table>`;
+   if(ag.meta_arms){h+=`<h4>④ 记忆是否提升效率</h4>`+
+    note('<b>with_memory</b>=用记忆 · <b>no_memory</b>=不用(对照)· <b>permuted</b>=故意用错的记忆。<b>平均尝试次数→解出</b>越低越省。看点:with_memory 远低于 no_memory → 记忆把试错砍到约 1/3;错记忆(permuted)帮不上 → 增益来自「正确知识」。')+
+    `<table><tr><th>记忆臂</th><th>解出率</th><th>平均尝试次数→解出 ↓</th><th>A_memory</th><th>已学策略</th></tr>`+
+    Object.entries(ag.meta_arms).map(([m,v])=>{const lbl={with_memory:'用记忆',no_memory:'不用记忆(对照)',permuted_memory:'错记忆(对照)'}[m]||m;return `<tr><td>${lbl}</td><td>${fmt(v.solve_rate)}</td><td class="${m=='with_memory'?'g':''}">${fmt(v.mean_evals_solved)}</td><td>${fmt(v.A_memory)}</td><td>${fmt(v.n_strategies_learned)}</td></tr>`}).join('')+`</table>`;}}
   h+=`</div>`;}
  document.getElementById('scorecard').innerHTML=h;
 }
 function renderOverview(){
- let h='<h3>Headline results</h3>';
+ let h='<h3>🧭 概览:各运行的头条结果</h3>'+note('每张卡片是一次实验运行的一句话结论。想看某次运行的完整报告(逐题表 + RNA 结构图),点右上角「运行总览 / 详细报告」。');
  for(const r of RUNS){
   const s=r.summary||{}, m=r.meta_summary;
-  if(s.ablation){h+=`<div class="card"><div class="name">${r.name} — actuation ablation</div>
-   <table><tr><th>mode</th><th>solve</th><th>A</th><th>A_model</th><th>A_harness</th></tr>`+
+  if(s.ablation){h+=`<div class="card"><div class="name">${r.name} — 驱动保真度对照</div>`+
+   note('「照诊断改 vs 随机 vs 丢弃诊断」的对照;并附「数据/奖励/轨迹」三种确定性(均应 ≈ 1)。')+
+   `<table><tr><th>模式</th><th>解出率</th><th>A</th><th>A_model</th><th>A_harness</th></tr>`+
    Object.entries(s.ablation).map(([k,v])=>`<tr><td>${k}</td><td class="${cls(v.solve_rate)}">${fmt(v.solve_rate)}</td><td class="${cls(v.A)}">${fmt(v.A)}</td><td>${fmt(v.A_model)}</td><td>${fmt(v.A_harness)}</td></tr>`).join('')+`</table>`;
-   if(s.coords)h+=`<div class="kv">D_sym <b class="g">${fmt(s.coords.D_sym)}</b></div><div class="kv">R_det <b class="g">${fmt(s.coords.R_det)}</b></div><div class="kv">T_trace <b class="g">${fmt(s.coords.T_trace)}</b></div>`;
-   if(s.baselines)h+='<div class="kv">baselines: '+Object.entries(s.baselines).map(([k,v])=>`${k} ${fmt(v.solve_rate_best_of_seeds)}`).join(', ')+'</div>';
+   if(s.coords)h+=`<div class="kv">数据确定性 <b class="g">${fmt(s.coords.D_sym)}</b></div><div class="kv">奖励确定性 <b class="g">${fmt(s.coords.R_det)}</b></div><div class="kv">轨迹确定性 <b class="g">${fmt(s.coords.T_trace)}</b></div>`;
+   if(s.baselines)h+='<div class="kv">基线: '+Object.entries(s.baselines).map(([k,v])=>`${k} ${fmt(v.solve_rate_best_of_seeds)}`).join(', ')+'</div>';
    h+=`</div>`;}
-  if(m&&m.arms){h+=`<div class="card"><div class="name">${r.name} — meta-learning arms</div>
-   <table><tr><th>arm</th><th>solve</th><th>mean evals→solve</th><th>A_memory</th><th>strategies</th></tr>`+
+  if(m&&m.arms){h+=`<div class="card"><div class="name">${r.name} — 记忆臂对比</div>
+   <table><tr><th>记忆臂</th><th>解出率</th><th>平均尝试→解出 ↓</th><th>A_memory</th><th>策略数</th></tr>`+
    Object.entries(m.arms).map(([k,v])=>`<tr><td>${k}</td><td>${fmt(v.solve_rate)}</td><td class="${v.arm=='with_memory'?'g':''}">${fmt(v.mean_evals_solved)}</td><td>${fmt(v.A_memory)}</td><td>${fmt(v.n_strategies_learned)}</td></tr>`).join('')+`</table></div>`;}
-  if(s.model){h+=`<div class="card"><div class="name">${r.name} — agent (${s.model})</div>
-   <div class="kv">solve_rate <b>${fmt(s.solve_rate)}</b></div><div class="kv">mean_reward <b>${fmt(s.mean_reward)}</b></div>
-   <div class="kv">agent_A <b class="${cls(s.agent_A)}">${fmt(s.agent_A)}</b></div><div class="kv">A_model <b>${fmt(s.agent_A_model)}</b></div></div>`;}
+  if(s.model){h+=`<div class="card"><div class="name">${r.name} — AI 模型能力(${s.model})</div>
+   <div class="kv">解出率 <b>${fmt(s.solve_rate)}</b></div><div class="kv">平均奖励 <b>${fmt(s.mean_reward)}</b></div>
+   <div class="kv">agent_A(驱动保真度) <b class="${cls(s.agent_A)}">${fmt(s.agent_A)}</b></div><div class="kv">A_model <b>${fmt(s.agent_A_model)}</b></div>
+   <div style="margin-top:6px"><a href="/report/${encodeURIComponent(r.name)}">看完整报告 →</a></div></div>`;}
  }
- document.getElementById('overview').innerHTML=h||'no runs yet';
+ document.getElementById('overview').innerHTML=h;
 }
 function renderRuns(){
- let h='';
- for(const r of RUNS){h+=`<div class="card"><div class="name">${r.name}</div>
-  <div class="sub">files: ${(r.files||[]).join(', ')}</div>`+
-  (r.datasets?('<div class="kv">datasets: '+Object.entries(r.datasets).map(([k,v])=>`${k}=${v} rows`).join(', ')+'</div>'):'')+
-  (r.n_traces?`<div class="kv">agent traces: ${r.n_traces}</div>`:'')+`</div>`;}
- document.getElementById('runs').innerHTML=h||'no runs';
+ let h='<h3>📂 所有运行(文件视图)</h3>'+note('原始文件视图。想要按用途分类 + 白话说明的版本,请用右上角「运行总览」。');
+ for(const r of RUNS){h+=`<div class="card"><div class="name"><a href="/report/${encodeURIComponent(r.name)}">${r.name}</a></div>
+  <div class="sub">文件: ${(r.files||[]).join(', ')}</div>`+
+  (r.datasets?('<div class="kv">数据集: '+Object.entries(r.datasets).map(([k,v])=>`${k}=${v} 行`).join(', ')+'</div>'):'')+
+  (r.n_traces?`<div class="kv">操作录像: ${r.n_traces} 段</div>`:'')+`</div>`;}
+ document.getElementById('runs').innerHTML=h;
 }
 function renderFigures(){
- let h='';
+ let h='<h3>📊 图表</h3>'+note('由实验自动生成的图(如驱动保真度差距、基线解出率、饱和曲线)。');
  for(const r of RUNS){for(const f of (r.figures||[])){h+=`<img src="/fig/${encodeURIComponent(r.name)}/${encodeURIComponent(f)}" title="${r.name}/${f}">`;}}
- document.getElementById('figures').innerHTML=h||'no figures yet';
+ document.getElementById('figures').innerHTML=h;
 }
 async function loadLogList(){
  const j=await (await fetch('/api/loglist')).json();
