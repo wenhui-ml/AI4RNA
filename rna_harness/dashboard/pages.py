@@ -99,15 +99,47 @@ def _state_records(run_dir: str) -> Tuple[List[Dict], int]:
     return recs, st.get("n_episodes", len(recs))
 
 
+def _agent_records(run_dir: str):
+    """Normalize an agent_runner summary.json (single-pass agent eval) into the campaign
+    per-episode record shape, so the same report machinery renders it."""
+    s = _read_json(os.path.join(run_dir, "summary.json"))
+    if not s or not s.get("model") or not isinstance(s.get("records"), list):
+        return None
+    recs = []
+    for r in s["records"]:
+        a = r.get("actuation") or {}
+        recs.append({
+            "arm": "agent", "epoch": 0,
+            "task_id": r.get("task_id", ""), "family": r.get("family", ""), "n": r.get("n", 0),
+            "solved": r.get("solved", False), "reward": r.get("reward", 0.0),
+            "oracle_calls": r.get("n_rna_tool_calls"), "n_mcp_calls": r.get("n_mcp_calls"),
+            "cross_oracle": r.get("cross_oracle"), "A": a.get("A"), "A_memory": None,
+            "final_sequence": r.get("final_sequence") or "", "elapsed_s": r.get("elapsed_s"),
+            "trace_path": r.get("trace_path"), "model": r.get("model"),
+        })
+    return recs, s
+
+
+def _load_records(run_dir: str) -> Tuple[List[Dict], int, Optional[str]]:
+    """Return (records, n_episodes, kind) where kind in {'campaign','agent',None}."""
+    recs, n = _state_records(run_dir)
+    if recs:
+        return recs, n, "campaign"
+    ar = _agent_records(run_dir)
+    if ar:
+        return ar[0], len(ar[0]), "agent"
+    return [], 0, None
+
+
 def _run_summary(run_dir: str) -> Dict:
-    recs, n_ep = _state_records(run_dir)
+    recs, n_ep, kind = _load_records(run_dir)
     solved = sum(1 for r in recs if r.get("solved"))
     arms: Dict[str, Dict] = {}
     for r in recs:
         a = arms.setdefault(r.get("arm", "?"), {"n": 0, "solved": 0})
         a["n"] += 1
         a["solved"] += 1 if r.get("solved") else 0
-    return {"n_episodes": n_ep, "n_records": len(recs), "solved": solved,
+    return {"n_episodes": n_ep, "n_records": len(recs), "solved": solved, "kind": kind,
             "solve_rate": (solved / len(recs)) if recs else None, "arms": arms,
             "has_campaign_summary": os.path.exists(os.path.join(run_dir, "campaign_summary.json")),
             "has_scorecard": os.path.exists(os.path.join(run_dir, "scorecard.json")),
@@ -395,63 +427,106 @@ def _fmt(x) -> str:
     return esc(x)
 
 
+def _agent_episode_rows(recs: List[Dict]) -> str:
+    """Richer per-task table for agent runs (RNA calls / MCP calls / cross-oracle / A / elapsed)."""
+    rows = []
+    for r in sorted(recs, key=lambda x: (not x.get("solved"), x.get("n", 0))):
+        cls = "solved" if r.get("solved") else "unsolved"
+        badge = "success" if r.get("solved") else "failure"
+        seq = r.get("final_sequence") or ""
+        el = r.get("elapsed_s")
+        rows.append(
+            f"<tr class='{cls}'><td>{esc(str(r.get('task_id','')).replace('eterna100:',''))}</td>"
+            f"<td>{r.get('n','')}</td>"
+            f"<td><span class='badge {badge}'>{'solved' if r.get('solved') else 'unsolved'}</span></td>"
+            f"<td>{_fmt(r.get('reward'))}</td><td>{_fmt(r.get('oracle_calls'))}</td>"
+            f"<td>{_fmt(r.get('n_mcp_calls'))}</td><td>{_fmt(r.get('cross_oracle'))}</td>"
+            f"<td>{_fmt(r.get('A'))}</td><td>{(str(int(el))+'s') if isinstance(el,(int,float)) else '&mdash;'}</td>"
+            f"<td class='seq'>{esc(seq[:44])}{'&hellip;' if len(seq)>44 else ''}</td></tr>")
+    return ("<div class='scroll'><table><thead><tr><th>task</th><th>n</th><th>result</th><th>reward</th>"
+            "<th>RNA&nbsp;calls</th><th>MCP&nbsp;calls</th><th>cross&#8209;oracle</th><th>A</th>"
+            "<th>elapsed</th><th>final sequence</th></tr></thead><tbody>" + "".join(rows) + "</tbody></table></div>")
+
+
+def _structure_gallery(run_dir: str, run: str, recs: List[Dict], num: int) -> str:
+    solved_ep = [r for r in recs if r.get("solved") and r.get("final_sequence")]
+    unsolved_ep = [r for r in recs if not r.get("solved") and r.get("final_sequence")]
+    gallery = solved_ep[:5] + unsolved_ep[:3]
+    if not gallery:
+        return ""
+    out = [f"<section><h2>{num} &middot; RNA secondary structure &mdash; target vs achieved MFE</h2>"]
+    for r in gallery:
+        seq = r["final_sequence"]
+        tp = _trace_for(run_dir, r.get("task_id", ""))
+        target = (_parse_trace(tp)["target"] if tp else "") or ""
+        mfe = _fold_mfe(seq)
+        if not target and mfe:
+            target = mfe
+        tag = "success" if r.get("solved") else "failure"
+        out.append(f"<div class='card'><b>{esc(str(r.get('task_id','')).replace('eterna100:',''))}</b> "
+                   f"({r.get('n')} nt) <span class='badge {tag}'>{'solved' if r.get('solved') else 'unsolved'}</span>"
+                   f"<div class='seq muted' style='margin:4px 0'>{esc(seq)}</div>"
+                   + svg_arc(target, mfe, seq) + "</div>")
+    out.append("</section>")
+    return "".join(out)
+
+
 def report(runs_root: str, run: str) -> str:
     d = os.path.join(runs_root, run)
     if not os.path.isdir(d):
         return page("not found", "<main><p>run not found</p></main>")
-    files = os.listdir(d)
     css, headline, expl = _verdict(d)
     s = _run_summary(d)
-    recs, _ = _state_records(d)
+    recs, _, kind = _load_records(d)
+    mem_link = (" &middot; <a href='/memory/" + esc(run) + "'>Memory</a>") if (
+        os.path.exists(os.path.join(d, "campaign_state.json"))
+        or any(x.startswith("memdir") for x in os.listdir(d))) else ""
     body = [f"<header class='verdict {css}'><div class='big'>{esc(run)} &mdash; {esc(headline)}</div>"
             f"<small>{esc(expl)}</small></header>",
             f"<div class='topbar' style='top:0'><span></span>"
             f"<span class='lnk'><a href='/ui'>&#8592; runs</a> &middot; "
-            f"<a href='/trace/{esc(run)}'>Trace</a> &middot; <a href='/memory/{esc(run)}'>Memory</a></span></div>",
+            f"<a href='/trace/{esc(run)}'>Trace</a>{mem_link}</span></div>",
             "<main>"]
-    # 1 overview
-    body.append("<section><h2>1 &middot; Overview</h2><div class='card'>")
-    body.append(f"<span class='kv'>episodes <b>{s['n_episodes']}</b></span>"
-                f"<span class='kv'>records <b>{s['n_records']}</b></span>"
-                f"<span class='kv'>solved <b>{s['solved']}</b></span>")
-    if s["solve_rate"] is not None:
-        body.append(f"<span class='kv'>solve-rate <b>{s['solve_rate']:.1%}</b></span>")
-    for arm, a in s["arms"].items():
-        body.append(f"<span class='kv'>{esc(arm)}: {a['solved']}/{a['n']}</span>")
-    body.append("</div></section>")
-    # 2 saturation curves
-    curves = _curves(d)
-    if curves:
-        body.append("<section><h2>2 &middot; Self-improvement (saturation) curves</h2>"
-                    "<div class='card'>" + svg_saturation(curves) + "</div></section>")
-    # 3 per-episode ranking
-    if recs:
-        body.append("<section><h2>3 &middot; Per-episode results</h2>" + _episode_rows(recs) + "</section>")
-    # 4 structure gallery (target vs achieved MFE) for a few episodes
-    solved_ep = [r for r in recs if r.get("solved") and r.get("final_sequence")]
-    unsolved_ep = [r for r in recs if not r.get("solved") and r.get("final_sequence")]
-    gallery = (solved_ep[:4] + unsolved_ep[:2])
-    if gallery:
-        body.append("<section><h2>4 &middot; RNA secondary structure &mdash; target vs achieved MFE</h2>")
-        for r in gallery:
-            seq = r["final_sequence"]
-            tp = _trace_for(d, r.get("task_id", ""))
-            target = (_parse_trace(tp)["target"] if tp else "") or ""
-            mfe = _fold_mfe(seq)
-            if not target and mfe:
-                target = mfe  # fallback: at least show the fold
-            tag = "success" if r.get("solved") else "failure"
-            body.append(f"<div class='card'><b>{esc(str(r.get('task_id','')).replace('eterna100:',''))}</b> "
-                        f"({r.get('n')} nt) <span class='badge {tag}'>{'solved' if r.get('solved') else 'unsolved'}</span>"
-                        f"<div class='seq muted' style='margin:4px 0'>{esc(seq)}</div>"
-                        + svg_arc(target, mfe, seq) + "</div>")
-        body.append("</section>")
-    # 5 scorecard panels if present
+
+    if kind == "agent":
+        # single-pass AGENT capability report (agent_runner summary.json)
+        sm = _read_json(os.path.join(d, "summary.json")) or {}
+        body.append("<section><h2>1 &middot; Agent capability</h2><div class='card'>"
+                    f"<span class='kv'>model <b>{esc(sm.get('model','?'))}</b></span>"
+                    f"<span class='kv'>solve-rate <b>{(s['solve_rate'] or 0):.0%}</b> "
+                    f"({s['solved']}/{s['n_records']})</span>"
+                    f"<span class='kv'>mean reward <b>{_fmt(sm.get('mean_reward'))}</b></span>"
+                    f"<span class='kv'>agent_A <b>{_fmt(sm.get('agent_A'))}</b></span>"
+                    f"<span class='kv'>A_model <b>{_fmt(sm.get('agent_A_model'))}</b></span>"
+                    f"<span class='kv'>mean RNA calls <b>{_fmt(sm.get('mean_rna_calls'))}</b></span>"
+                    f"<span class='kv'>tasks w/ repair <b>{_fmt(sm.get('n_tasks_with_repair'))}</b></span>"
+                    "</div></section>")
+        body.append("<section><h2>2 &middot; Per-task results</h2>" + _agent_episode_rows(recs) + "</section>")
+        body.append(_structure_gallery(d, run, recs, 3))
+    else:
+        # campaign report (meta-learning arms / epochs)
+        body.append("<section><h2>1 &middot; Overview</h2><div class='card'>"
+                    f"<span class='kv'>episodes <b>{s['n_episodes']}</b></span>"
+                    f"<span class='kv'>records <b>{s['n_records']}</b></span>"
+                    f"<span class='kv'>solved <b>{s['solved']}</b></span>")
+        if s["solve_rate"] is not None:
+            body.append(f"<span class='kv'>solve-rate <b>{s['solve_rate']:.1%}</b></span>")
+        for arm, a in s["arms"].items():
+            body.append(f"<span class='kv'>{esc(arm)}: {a['solved']}/{a['n']}</span>")
+        body.append("</div></section>")
+        curves = _curves(d)
+        if curves:
+            body.append("<section><h2>2 &middot; Self-improvement (saturation) curves</h2>"
+                        "<div class='card'>" + svg_saturation(curves) + "</div></section>")
+        if recs:
+            body.append("<section><h2>3 &middot; Per-episode results</h2>" + _episode_rows(recs) + "</section>")
+        body.append(_structure_gallery(d, run, recs, 4))
+
+    # common trailing sections
     sc = _read_json(os.path.join(d, "scorecard.json"))
     if sc:
-        body.append("<section><h2>5 &middot; Scorecard</h2><div class='card'><pre>"
+        body.append("<section><h2>Scorecard</h2><div class='card'><pre>"
                     + esc(json.dumps(sc.get("panels", sc), indent=2)[:6000]) + "</pre></div></section>")
-    # figures
     figdir = os.path.join(d, "figures")
     if os.path.isdir(figdir):
         imgs = "".join(f"<img src='/fig/{esc(run)}/{esc(f)}' style='max-width:460px;margin:6px;border:1px solid #e6e8ec;border-radius:6px'>"
