@@ -52,8 +52,8 @@ def _build_prompt(task: DesignTask, knowledge: str, enable_mcp: bool = True) -> 
     mcp_hint = (
         " You also have MCP tools. For a design PLAN: mcp__rna_motifs__analyze_target (per-hairpin "
         "plan + hard-feature flags), mcp__rna_motifs__lookup_hairpin_loop (stable cap motifs), "
-        "mcp__rna_motifs__search_motifs (glossary). For COMPUTE (fast, uses up to 160 CPU cores in "
-        "ONE call): mcp__rna_motifs__parallel_search runs a many-restart search that usually solves "
+        "mcp__rna_motifs__search_motifs (glossary). For COMPUTE (fast, many CPU cores in parallel "
+        "in ONE call): mcp__rna_motifs__parallel_search runs a many-restart search that often solves "
         "the target outright -- prefer it over hand-writing a search loop; and "
         "mcp__rna_motifs__batch_fold screens thousands of candidates at once. Always confirm the "
         "final sequence with RnaVerify (the official scorer)."
@@ -62,9 +62,17 @@ def _build_prompt(task: DesignTask, knowledge: str, enable_mcp: bool = True) -> 
     return (
         f"{knowledge}\n\n---\n\n# Your task\n{render_task_prompt(task)}\n\n"
         f"Work autonomously. Use RnaVerify to check candidates and its diagnosis to guide "
-        f"repairs; you may also use RnaFold/RnaDiagnose or write ViennaRNA code.{mcp_hint} "
-        f"When RnaVerify reports solved=true (or you exhaust your budget), output a final "
-        f"line EXACTLY of the form:\nFINAL_SEQUENCE: <your {task.n}-nt sequence>"
+        f"repairs; you may also use RnaFold/RnaDiagnose or write ViennaRNA code.{mcp_hint}\n\n"
+        f"OUTPUT PROTOCOL (critical -- read carefully):\n"
+        f"1. Your sequence MUST be EXACTLY {task.n} nucleotides. Count every base. A sequence that "
+        f"is even 1 nt too short or too long is an AUTOMATIC FAILURE, no matter how good the shape.\n"
+        f"2. As SOON as you have any plausible candidate, output a line EXACTLY of the form:\n"
+        f"   FINAL_SEQUENCE: <your {task.n}-nt sequence>\n"
+        f"   Then keep improving it and RE-EMIT an updated 'FINAL_SEQUENCE:' line every time you "
+        f"find a better candidate. Always keep your current BEST as the most recent FINAL_SEQUENCE "
+        f"line -- if you run low on time, your best work is then already on record (the LAST "
+        f"FINAL_SEQUENCE line is what gets scored).\n"
+        f"3. Stop once RnaVerify reports solved=true."
     )
 
 
@@ -98,6 +106,48 @@ def _count_tool_calls(trace_lines: List[str]) -> Dict[str, int]:
         for name in re.findall(r'"name":"([A-Za-z_]+)"', line):
             counts[name] = counts.get(name, 0) + 1
     return counts
+
+
+def _best_effort_candidate(trace_lines: List[str], task: DesignTask, declared: Optional[str]) -> Optional[Dict]:
+    """Best right-length sequence the agent ACTUALLY tested (any candidate passed to a tool call),
+    scored by the verifier. The strict `solved` metric still requires a DECLARED FINAL_SEQUENCE, but
+    this captures true capability even when the declared answer was lost to a wall-clock timeout --
+    i.e. 'the agent found a working design it never delivered'."""
+    cands = set()
+    if declared:
+        cands.add(declared.upper().replace("T", "U"))
+    for line in trace_lines:
+        if '"rna_memory_snapshot"' in line:
+            continue
+        try:
+            ev = json.loads(line)
+        except Exception:
+            continue
+        if not (isinstance(ev, dict) and ev.get("type") == "assistant"):
+            continue
+        for b in (ev.get("message", {}) or {}).get("content", []) or []:
+            if isinstance(b, dict) and b.get("type") == "tool_use":
+                for s in re.findall(r"[ACGUacgu]{6,}", json.dumps(b.get("input") or {})):
+                    su = s.upper().replace("T", "U")
+                    if len(su) == task.n:
+                        cands.add(su)
+    if not cands:
+        return None
+    try:
+        import RNA
+        md = RNA.md(); md.temperature = 37.0; md.dangles = 2
+        best = None
+        for s in cands:
+            st, _ = RNA.fold_compound(s, md).mfe()
+            bp = RNA.bp_distance(st, task.target)
+            if best is None or bp < best[1]:
+                best = (s, bp)
+    except Exception:
+        return None
+    seq, bp = best
+    bv = verify(task, seq, compute_cross_oracle=False)
+    return {"sequence": seq, "bp_distance": bp, "solved": bool(bv.solved),
+            "reward": bv.reward, "n_candidates_tested": len(cands)}
 
 
 _MEMORY_ENTRYPOINT = "MEMORY.md"  # openclaude injects ONLY <memdir>/MEMORY.md into the prompt
@@ -238,6 +288,7 @@ def run_agent_on_task(
 
     final_seq = _extract_final_sequence(lines, task.n)
     v = verify(task, final_seq, compute_cross_oracle=cross_oracle) if final_seq else None
+    best_eff = _best_effort_candidate(lines, task, final_seq)
     tool_calls = _count_tool_calls(lines)
     # Actuation fidelity (A) reconstructed from the REAL agent tool-call chain.
     from ..actuation.trace import actuation_from_agent_trace
@@ -259,6 +310,9 @@ def run_agent_on_task(
         "final_sequence": final_seq,
         "solved": bool(v.solved) if v else False,
         "reward": v.reward if v else 0.0,
+        "delivered": bool(final_seq),                       # did the agent emit a FINAL_SEQUENCE?
+        "best_effort": best_eff,                            # best right-length candidate it tested
+        "capability_solved": bool(best_eff and best_eff["solved"]),  # solved incl. undelivered work
         "cross_oracle": (v.cross_oracle or {}).get("fraction") if v and v.cross_oracle else None,
         "tool_calls": tool_calls,
         "n_rna_tool_calls": sum(c for k, c in tool_calls.items() if k.startswith("Rna")),
@@ -341,15 +395,24 @@ def main(argv=None) -> int:
         for rec in records:
             f.write(json.dumps(_agentic_rlvr_record(rec, by_id[rec["task_id"]], knowledge)) + "\n")
     solved = sum(r["solved"] for r in records)
+    n = max(len(records), 1)
+    cap_solved = sum(1 for r in records if r.get("capability_solved"))
+    delivered = sum(1 for r in records if r.get("delivered"))
+    # "found but not delivered": the agent tested a verified solution it never emitted as FINAL
+    lost = sum(1 for r in records if r.get("capability_solved") and not r.get("solved"))
     a_vals = [r["actuation"]["A"] for r in records if r.get("actuation", {}).get("A") is not None]
     am_vals = [r["actuation"]["A_model"] for r in records if r.get("actuation", {}).get("A_model") is not None]
     summary = {
         "model": args.model,
         "n_tasks": len(records),
         "solved": solved,
-        "solve_rate": round(solved / max(len(records), 1), 4),
-        "mean_reward": round(sum(r["reward"] for r in records) / max(len(records), 1), 4),
-        "mean_rna_calls": round(sum(r["n_rna_tool_calls"] for r in records) / max(len(records), 1), 2),
+        "solve_rate": round(solved / n, 4),                       # STRICT: delivered + verified
+        "capability_solved": cap_solved,                          # incl. best-effort undelivered
+        "capability_rate": round(cap_solved / n, 4),
+        "found_not_delivered": lost,                              # solved-but-lost (should be ~0 now)
+        "delivered": delivered,
+        "mean_reward": round(sum(r["reward"] for r in records) / n, 4),
+        "mean_rna_calls": round(sum(r["n_rna_tool_calls"] for r in records) / n, 2),
         # actuation fidelity on the REAL agent (only tasks that needed >=1 repair step count)
         "agent_A": round(sum(a_vals) / len(a_vals), 4) if a_vals else None,
         "agent_A_model": round(sum(am_vals) / len(am_vals), 4) if am_vals else None,

@@ -102,19 +102,33 @@ def _run_compute(payload: dict, timeout: float) -> str:
     """Shell out to a CLEAN process for the parallel pool (a fork pool cannot run inside this
     async MCP server). Returns the child's JSON stdout, or a JSON error."""
     import json as _json
+    import os
+    import signal
     import subprocess
     import sys
 
+    # start_new_session so compute_cli is its own process-group leader; on timeout we kill the
+    # ENTIRE group (compute_cli + its ProcessPoolExecutor workers). subprocess.run(timeout=) would
+    # kill only compute_cli and orphan its ~N pool workers -> the process leak that melted the box.
+    p = subprocess.Popen(
+        [sys.executable, "-m", "rna_harness.mcp.compute_cli", _json.dumps(payload)],
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, start_new_session=True,
+    )
     try:
-        r = subprocess.run(
-            [sys.executable, "-m", "rna_harness.mcp.compute_cli", _json.dumps(payload)],
-            capture_output=True, text=True, timeout=timeout,
-        )
+        out, err = p.communicate(timeout=timeout)
     except subprocess.TimeoutExpired:
+        try:
+            os.killpg(os.getpgid(p.pid), signal.SIGKILL)  # reap compute_cli AND all pool workers
+        except Exception:
+            pass
+        try:
+            p.communicate(timeout=5)
+        except Exception:
+            pass
         return _json.dumps({"error": f"compute timed out after {timeout}s"})
-    if r.returncode != 0 or not r.stdout.strip():
-        return _json.dumps({"error": "compute subprocess failed", "stderr": (r.stderr or "")[-400:]})
-    return r.stdout
+    if p.returncode != 0 or not (out or "").strip():
+        return _json.dumps({"error": "compute subprocess failed", "stderr": (err or "")[-400:]})
+    return out
 
 
 @mcp.tool()

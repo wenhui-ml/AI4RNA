@@ -10,9 +10,28 @@ from argv[1] (or stdin) and prints the JSON result to stdout.
 from __future__ import annotations
 
 import json
+import os
+import signal
 import sys
 
 from .compute import batch_fold_impl, parallel_search_impl
+
+# Hard self-limit: if this process (or its pool workers) ever hangs or is orphaned by a parent
+# kill, SIGALRM fires and we SIGKILL our OWN process group -- reaping every pool worker. Prevents
+# the orphaned-worker leak even when the parent times us out or dies mid-search. 240s >> the 180s
+# parallel_search timeout, so a normal call finishes long before this triggers.
+def _watchdog(_signum, _frame):
+    try:
+        os.killpg(os.getpgid(0), signal.SIGKILL)
+    except Exception:
+        os._exit(1)
+
+
+try:
+    signal.signal(signal.SIGALRM, _watchdog)
+    signal.alarm(240)
+except Exception:
+    pass
 
 
 def main() -> int:
