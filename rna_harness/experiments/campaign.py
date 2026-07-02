@@ -94,14 +94,15 @@ def _agent_worker(payload: Dict) -> Dict:
     from .agent_runner import run_agent_on_task
 
     task = DesignTask.from_dict(payload["task"])
+    xo = payload.get("cross_oracle", False)  # B2: skip per-episode multi-oracle spawn by default
     first = run_agent_on_task(task, payload["model"], payload["out_dir"], payload["budget_usd"],
-                              payload["timeout_s"], None, payload["knowledge"])
+                              payload["timeout_s"], None, payload["knowledge"], cross_oracle=xo)
     rec = first
     # Retry ONLY when the first attempt produced no usable answer (don't waste credits or
     # discard a good result on a nonzero rc); then keep the better of the two.
     if not first.get("final_sequence"):
         second = run_agent_on_task(task, payload["model"], payload["out_dir"], payload["budget_usd"],
-                                   payload["timeout_s"], None, payload["knowledge"])
+                                   payload["timeout_s"], None, payload["knowledge"], cross_oracle=xo)
         if second.get("final_sequence") and (second.get("solved") or second.get("reward", 0) >= first.get("reward", 0)):
             rec = second
     seq = rec.get("final_sequence") or ""
@@ -135,6 +136,7 @@ def run_campaign(
     seed: int = 0,
     max_workers: Optional[int] = None,
     online: bool = False,
+    agent_cross_oracle: bool = False,
 ) -> Dict:
     arms = arms or ["with_memory", "no_memory"]
     if max_workers is None:
@@ -179,7 +181,7 @@ def run_campaign(
                 if executor == "classical":
                     return {**base, "budget": classical_budget}
                 return {**base, "model": model, "out_dir": out_dir, "budget_usd": agent_budget_usd,
-                        "timeout_s": agent_timeout_s, "knowledge": knowledge}
+                        "timeout_s": agent_timeout_s, "knowledge": knowledge, "cross_oracle": agent_cross_oracle}
 
             def _rebuild_memory(upto_epoch):
                 # IDEMPOTENT rebuild from state: deterministic function of all solved/teacher
@@ -205,7 +207,11 @@ def run_campaign(
                 else:
                     os.environ["CLAUDE_COWORK_MEMORY_PATH_OVERRIDE"] = stores[arm].dir + os.sep
 
-            if pending and online:
+            # B1: online (sequential) only matters for with_memory (memory accumulates per
+            # case). Control arms (no_memory/permuted) never accumulate -> always run them
+            # epoch-batched-parallel, even in an online run (big speedup).
+            use_online = online and arm == "with_memory"
+            if pending and use_online:
                 # ONLINE: sequential; memory rebuilt after EACH case so the next case recalls
                 # it (faithful self-improvement; the strong-signal regime).
                 worker = _classical_worker if executor == "classical" else _agent_worker
@@ -293,6 +299,7 @@ def main(argv=None) -> int:
     ap.add_argument("--global-episode-cap", type=int, default=10000)
     ap.add_argument("--max-workers", type=int, default=None)
     ap.add_argument("--online", action="store_true", help="per-task memory update (self-improving, sequential); recommended for agent phase-2")
+    ap.add_argument("--agent-cross-oracle", action="store_true", help="compute multi-oracle robustness per agent episode (slower; off by default)")
     ap.add_argument("--teacher", action="store_true")
     ap.add_argument("--no-resume", action="store_true")
     ap.add_argument("--seed", type=int, default=0)
@@ -311,6 +318,7 @@ def main(argv=None) -> int:
         agent_timeout_s=args.agent_timeout_s, model=args.model,
         global_episode_cap=args.global_episode_cap, teacher=args.teacher,
         resume=not args.no_resume, seed=args.seed, max_workers=args.max_workers, online=args.online,
+        agent_cross_oracle=args.agent_cross_oracle,
     )
     for arm, curve in summ["curves"].items():
         pts = " ".join(f"e{c['epoch']}:{c['solve_rate']}/{c['mean_oracle_calls_solved']}" for c in curve)

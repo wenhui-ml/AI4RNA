@@ -32,20 +32,33 @@ def _fold_worker(spec: Tuple[str, str, float, int]) -> Tuple[str, float]:
     return struct, float(energy)
 
 
-def isolated_fold_mfe(sequence: str, param_set: str, temperature: float = 37.0, dangles: int = 2) -> Tuple[str, float]:
-    """Fold one (seq, param_set) in a fresh process. Correct energy model, guaranteed."""
-    ctx = mp.get_context("spawn")
-    with ctx.Pool(processes=1, maxtasksperchild=1) as pool:
-        return pool.apply(_fold_worker, ((sequence, param_set, temperature, dangles),))
+def isolated_fold_mfe(
+    sequence: str, param_set: str, temperature: float = 37.0, dangles: int = 2, timeout: float = 30.0
+) -> Tuple[str, float]:
+    """Fold one (seq, param_set) in a fresh process. Correct energy model, guaranteed.
+    Returns ("", nan) on timeout instead of hanging."""
+    return isolated_fold_many([(sequence, param_set, temperature, dangles)], timeout=timeout)[0]
 
 
-def isolated_fold_many(specs: List[Tuple[str, str, float, int]], max_procs: int = 8) -> List[Tuple[str, float]]:
+def isolated_fold_many(
+    specs: List[Tuple[str, str, float, int]], max_procs: int = 8, timeout: float = 45.0
+) -> List[Tuple[str, float]]:
     """Fold a list of (seq, param_set, temperature, dangles) each in a fresh process.
 
     maxtasksperchild=1 guarantees every fold runs in a brand-new process, so each honors its
-    own param-set load (no sticky-state contamination across the panel)."""
+    own param-set load (no sticky-state contamination across the panel). A TIMEOUT bounds the
+    whole batch so a wedged spawn worker can never hang the caller (returns ("", nan)
+    sentinels for a batch that overruns -> cross-oracle simply scores those as non-matching)."""
     if not specs:
         return []
     ctx = mp.get_context("spawn")
-    with ctx.Pool(processes=min(len(specs), max_procs), maxtasksperchild=1) as pool:
-        return pool.map(_fold_worker, specs)
+    pool = ctx.Pool(processes=min(len(specs), max_procs), maxtasksperchild=1)
+    try:
+        res = pool.map_async(_fold_worker, specs).get(timeout=timeout)
+        pool.close()
+        pool.join()
+        return res
+    except Exception:  # mp.TimeoutError or worker crash -> don't hang the campaign
+        pool.terminate()
+        pool.join()
+        return [("", float("nan"))] * len(specs)

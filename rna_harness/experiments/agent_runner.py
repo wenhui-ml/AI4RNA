@@ -20,6 +20,7 @@ import argparse
 import json
 import os
 import re
+import signal
 import subprocess
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -92,6 +93,7 @@ def run_agent_on_task(
     timeout_s: int = 600,
     allowed_tools: Optional[List[str]] = None,
     knowledge: str = "",
+    cross_oracle: bool = True,
 ) -> Dict:
     allowed_tools = allowed_tools or ["RnaVerify", "RnaFold", "RnaDiagnose", "RnaConstraints", "Bash"]
     prompt = _build_prompt(task, knowledge)
@@ -117,14 +119,26 @@ def run_agent_on_task(
         "--no-session-persistence",
     ]
     t0 = time.time()
+    # Run bun in its OWN process group (start_new_session) so a timeout can kill the whole
+    # tree -- openclaude spawns children (python bridge, etc.) that would otherwise orphan and
+    # hang. subprocess.run's plain timeout only kills the direct child.
+    proc = subprocess.Popen(
+        cmd, env=env, cwd=out_dir, stdin=subprocess.DEVNULL,
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, start_new_session=True,
+    )
     try:
-        proc = subprocess.run(
-            cmd, env=env, cwd=out_dir, stdin=subprocess.DEVNULL,
-            capture_output=True, text=True, timeout=timeout_s,
-        )
-        stdout, stderr, rc = proc.stdout, proc.stderr, proc.returncode
-    except subprocess.TimeoutExpired as e:
-        stdout, stderr, rc = (e.stdout or ""), "TIMEOUT", -1
+        stdout, stderr = proc.communicate(timeout=timeout_s)
+        rc = proc.returncode
+    except subprocess.TimeoutExpired:
+        try:
+            os.killpg(os.getpgid(proc.pid), signal.SIGKILL)  # kill the whole group
+        except Exception:
+            proc.kill()
+        try:
+            stdout, stderr = proc.communicate(timeout=15)
+        except Exception:
+            stdout, stderr = "", "TIMEOUT"
+        rc = -1
     elapsed = round(time.time() - t0, 1)
 
     lines = [l for l in (stdout or "").splitlines() if l.strip()]
@@ -132,7 +146,7 @@ def run_agent_on_task(
         f.write(stdout or "")
 
     final_seq = _extract_final_sequence(lines, task.n)
-    v = verify(task, final_seq, compute_cross_oracle=True) if final_seq else None
+    v = verify(task, final_seq, compute_cross_oracle=cross_oracle) if final_seq else None
     tool_calls = _count_tool_calls(lines)
     # Actuation fidelity (A) reconstructed from the REAL agent tool-call chain.
     from ..actuation.trace import actuation_from_agent_trace
