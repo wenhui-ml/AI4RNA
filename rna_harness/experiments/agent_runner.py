@@ -50,11 +50,13 @@ def _build_prompt(task: DesignTask, knowledge: str, enable_mcp: bool = True) -> 
     from ..rl.prompts import render_task_prompt
 
     mcp_hint = (
-        " For a hard target you may also consult the RNA motif knowledge base via the MCP tools "
-        "mcp__rna_motifs__analyze_target (get a per-hairpin design plan + hard-feature flags), "
-        "mcp__rna_motifs__lookup_hairpin_loop (known-stable cap motifs for a loop length), and "
-        "mcp__rna_motifs__search_motifs (glossary). These give priors only -- always confirm the "
-        "assembled sequence with RnaVerify."
+        " You also have MCP tools. For a design PLAN: mcp__rna_motifs__analyze_target (per-hairpin "
+        "plan + hard-feature flags), mcp__rna_motifs__lookup_hairpin_loop (stable cap motifs), "
+        "mcp__rna_motifs__search_motifs (glossary). For COMPUTE (fast, uses up to 160 CPU cores in "
+        "ONE call): mcp__rna_motifs__parallel_search runs a many-restart search that usually solves "
+        "the target outright -- prefer it over hand-writing a search loop; and "
+        "mcp__rna_motifs__batch_fold screens thousands of candidates at once. Always confirm the "
+        "final sequence with RnaVerify (the official scorer)."
         if enable_mcp else ""
     )
     return (
@@ -149,7 +151,9 @@ def _mcp_config(python_bin: str) -> str:
                 "type": "stdio",
                 "command": python_bin,
                 "args": ["-m", "rna_harness.mcp.motif_server"],
-                "env": {"PYTHONPATH": _REPO},
+                # RNA_MAX_CORES caps the batch_fold/parallel_search pools (leave headroom for
+                # other users on the shared host); PYTHONPATH makes the package importable.
+                "env": {"PYTHONPATH": _REPO, "RNA_MAX_CORES": os.environ.get("RNA_MAX_CORES", "160")},
             }
         }
     })

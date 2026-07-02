@@ -77,6 +77,43 @@ def test_mcp_config_is_valid_stdio_schema():
     assert srv["command"] == "/usr/bin/python3"
     assert srv["args"] == ["-m", "rna_harness.mcp.motif_server"]
     assert "PYTHONPATH" in srv["env"]  # importable regardless of the CLI's cwd
+    assert "RNA_MAX_CORES" in srv["env"]  # core budget passed to the compute pools
+
+
+# --- (b) CPU-parallel compute tools -----------------------------------------------------
+def test_batch_fold_scores_against_target():
+    from rna_harness.mcp.compute import batch_fold_impl
+
+    r = batch_fold_impl(["GGGCGAAAGCCC", "AAAAAAAAAAAA"], target="((((....))))")
+    assert r["n"] == 2 and r["n_solved"] >= 1
+    assert r["best"][0]["solved"] is True and r["best"][0]["bp_distance"] == 0
+    assert r["used_cores"] <= 160
+
+
+def test_parallel_search_solves_simple_target():
+    from rna_harness.mcp.compute import parallel_search_impl
+
+    r = parallel_search_impl("((((....))))", n_restarts=8, steps=1500, base_seed=7)
+    assert r["solved"] is True and r["bp_distance"] == 0
+    # independently confirm with the canonical verifier (no false positives)
+    from rna_harness.task import DesignTask
+    from rna_harness.verifier import verify
+    assert verify(DesignTask(task_id="t", target="((((....))))"),
+                  r["best_sequence"], compute_cross_oracle=False).solved
+
+
+def test_parallel_search_reproducible_with_seed():
+    from rna_harness.mcp.compute import parallel_search_impl
+
+    a = parallel_search_impl("((((....))))", n_restarts=8, steps=1200, base_seed=42)
+    b = parallel_search_impl("((((....))))", n_restarts=8, steps=1200, base_seed=42)
+    assert a["best_sequence"] == b["best_sequence"]  # same seeds -> reproducible (R_det)
+
+
+def test_parallel_search_rejects_bad_target():
+    from rna_harness.mcp.compute import parallel_search_impl
+
+    assert "error" in parallel_search_impl("((((..")  # unbalanced dot-bracket
 
 
 # --- (a) memory snapshot ----------------------------------------------------------------

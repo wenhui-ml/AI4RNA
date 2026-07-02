@@ -98,6 +98,58 @@ def analyze_target(dot_bracket: str) -> str:
     return "\n".join(out)
 
 
+def _run_compute(payload: dict, timeout: float) -> str:
+    """Shell out to a CLEAN process for the parallel pool (a fork pool cannot run inside this
+    async MCP server). Returns the child's JSON stdout, or a JSON error."""
+    import json as _json
+    import subprocess
+    import sys
+
+    try:
+        r = subprocess.run(
+            [sys.executable, "-m", "rna_harness.mcp.compute_cli", _json.dumps(payload)],
+            capture_output=True, text=True, timeout=timeout,
+        )
+    except subprocess.TimeoutExpired:
+        return _json.dumps({"error": f"compute timed out after {timeout}s"})
+    if r.returncode != 0 or not r.stdout.strip():
+        return _json.dumps({"error": "compute subprocess failed", "stderr": (r.stderr or "")[-400:]})
+    return r.stdout
+
+
+@mcp.tool()
+def batch_fold(sequences: list[str], target: str = "") -> str:
+    """Fold MANY candidate sequences' MFE structures IN PARALLEL across up to 160 CPU cores in a
+    single call. If `target` (dot-bracket) is given, each candidate is scored by base-pair
+    distance to it and the closest are returned (solved = bp_distance 0). Use this to screen a
+    whole pool of candidates at once instead of folding one-per-turn.
+
+    Args:
+        sequences: list of RNA/DNA sequences to fold (T is treated as U). Up to 4000.
+        target: optional target dot-bracket to score each candidate against.
+    """
+    return _run_compute({"cmd": "batch_fold", "sequences": sequences, "target": target}, timeout=120)
+
+
+@mcp.tool()
+def parallel_search(target: str, n_restarts: int = 0, steps: int = 3000) -> str:
+    """Run a MANY-RESTART simulated-annealing inverse-folding search IN PARALLEL across up to 160
+    CPU cores to design a sequence whose MFE structure equals `target`. Returns the best sequence
+    found in one call (seconds), replacing a slow hand-written single-threaded search. ALWAYS
+    confirm the returned sequence with RnaVerify (this uses the same Turner2004 model but RnaVerify
+    is the official scorer).
+
+    Args:
+        target: target secondary structure in dot-bracket notation.
+        n_restarts: parallel restarts (0 = use all allotted cores, ~160).
+        steps: annealing steps per restart (default 3000).
+    """
+    return _run_compute(
+        {"cmd": "parallel_search", "target": target, "n_restarts": n_restarts, "steps": steps},
+        timeout=180,
+    )
+
+
 def main() -> None:
     mcp.run()  # default stdio transport -- openclaude connects over stdin/stdout
 
