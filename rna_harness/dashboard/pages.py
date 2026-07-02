@@ -59,6 +59,7 @@ details>summary{cursor:pointer;font-weight:600}
 pre{background:#f6f8fa;padding:10px 12px;border-radius:6px;overflow:auto;font-size:.8rem;max-height:460px}
 .scroll{overflow-x:auto} .chip{display:inline-block;padding:1px 7px;border-radius:8px;font-size:.72rem;margin:1px}
 .chip.g{background:#c8e6c9;color:#1b5e20}.chip.r{background:#ffcdd2;color:#b71c1c}.chip.y{background:#fff3c4;color:#7a5c00}
+td.win{background:#e8f5e9;font-weight:700} td.lose{color:#9e9e9e} .col-b{border-left:2px solid var(--border)}
 .legend span{margin-right:14px;font-size:.82rem} .sw{display:inline-block;width:11px;height:11px;border-radius:2px;margin-right:4px;vertical-align:middle}
 """
 
@@ -405,10 +406,12 @@ def _kind(run_dir: str, files: List[str]) -> str:
 
 def runs_index(runs_root: str) -> str:
     rows = []
+    names = []
     for name in sorted(os.listdir(runs_root)):
         d = os.path.join(runs_root, name)
         if not os.path.isdir(d):
             continue
+        names.append(name)
         files = os.listdir(d)
         s = _run_summary(d)
         css, headline, _ = _verdict(d)
@@ -423,11 +426,19 @@ def runs_index(runs_root: str) -> str:
             f"{' &middot; <a href=/trace/'+esc(name)+'>Trace</a>' if ntr else ''}"
             f"{' &middot; <a href=/memory/'+esc(name)+'>Memory</a>' if os.path.exists(os.path.join(d,'campaign_state.json')) or any(x.startswith('memdir') for x in files) else ''}"
             f"</td></tr>")
+    opts = "".join(f"<option>{esc(nm)}</option>" for nm in names)
+    compare_form = (
+        "<section><h2>&#9878; Compare two runs</h2>"
+        "<form action='/compare' method='get' class='card'>"
+        f"A <select name='a'>{opts}</select> &nbsp; vs &nbsp; B <select name='b'>{opts}</select> &nbsp; "
+        "<button type='submit'>Compare &rarr;</button>"
+        "<span class='muted' style='margin-left:10px'>head-to-head metrics + per-task win/loss "
+        "(best for two agent runs on the same task set)</span></form></section>")
     body = (f"<main><section><h2>Runs</h2><div class='scroll'><table>"
             f"<thead><tr><th>Run</th><th>Type</th><th>Verdict</th><th>Episodes</th>"
             f"<th>Traces</th><th>Actions</th></tr></thead><tbody>{''.join(rows)}</tbody></table></div>"
             f"<p class='muted' style='margin-top:10px'>Red line: design success under the ViennaRNA "
-            f"folding oracle only &mdash; never in-vivo function.</p></section></main>")
+            f"folding oracle only &mdash; never in-vivo function.</p></section>{compare_form}</main>")
     return page("openclaude_rna runs", body)
 
 
@@ -646,3 +657,119 @@ def memory(runs_root: str, run: str) -> str:
         body.append("<p class='muted'>No memory directory or snapshots for this run.</p>")
     body.append("</section></main>")
     return page(f"{run} memory", "".join(body))
+
+
+# ------------------------------------------------------------------ two-run comparison
+def _cmp_metrics(run_dir: str) -> Dict:
+    recs, _, _ = _load_records(run_dir)
+    s = _read_json(os.path.join(run_dir, "summary.json")) or {}
+    solved = sum(1 for r in recs if r.get("solved"))
+    n = len(recs)
+    return {
+        "model": s.get("model") or "?",
+        "n": n, "solved": solved,
+        "solve_rate": s.get("solve_rate", (round(solved / n, 4) if n else None)),
+        "mean_reward": s.get("mean_reward"),
+        "agent_A": s.get("agent_A"),
+        "agent_A_model": s.get("agent_A_model"),
+        "mean_rna_calls": s.get("mean_rna_calls"),
+        "by_task": {r.get("task_id"): r for r in recs},
+    }
+
+
+def _wl(va, vb, higher_better=True) -> Tuple[str, str]:
+    if va is None or vb is None or va == vb:
+        return "", ""
+    a_wins = (va > vb) if higher_better else (va < vb)
+    return ("win", "lose") if a_wins else ("lose", "win")
+
+
+def _run_cells(r, rescls: str, border=False) -> str:
+    bcls = "col-b " if border else ""
+    if not r:
+        return (f"<td class='{bcls}{rescls}'>&mdash;</td><td>&mdash;</td><td>&mdash;</td>"
+                f"<td>&mdash;</td><td>&mdash;</td>")
+    bd = "success" if r.get("solved") else "failure"
+    lab = "solved" if r.get("solved") else "unsolved"
+    return (f"<td class='{bcls}{rescls}'><span class='badge {bd}'>{lab}</span></td>"
+            f"<td>{_fmt(r.get('reward'))}</td><td>{_fmt(r.get('oracle_calls'))}</td>"
+            f"<td>{_fmt(r.get('n_mcp_calls'))}</td><td>{_fmt(r.get('A'))}</td>")
+
+
+def compare(runs_root: str, a: str, b: str) -> str:
+    da, db = os.path.join(runs_root, a), os.path.join(runs_root, b)
+    if not (os.path.isdir(da) and os.path.isdir(db)):
+        return page("compare", "<main><p class='muted'>one or both runs not found</p></main>")
+    ma, mb = _cmp_metrics(da), _cmp_metrics(db)
+
+    # overall verdict = who wins more of the headline metrics
+    win_a = win_b = 0
+    for key, hb in [("solve_rate", True), ("mean_reward", True), ("agent_A", True), ("mean_rna_calls", False)]:
+        ca, cb = _wl(ma.get(key), mb.get(key), hb)
+        win_a += ca == "win"
+        win_b += cb == "win"
+    if win_a > win_b:
+        vcss, headline = "success", f"{esc(ma['model'])} leads ({win_a}–{win_b} headline metrics)"
+    elif win_b > win_a:
+        vcss, headline = "success", f"{esc(mb['model'])} leads ({win_b}–{win_a} headline metrics)"
+    else:
+        vcss, headline = "neutral", "even split"
+
+    body = [f"<header class='verdict {vcss}'><div class='big'>Model comparison &mdash; {headline}</div>"
+            f"<small>A = {esc(ma['model'])} &nbsp;vs&nbsp; B = {esc(mb['model'])} &middot; "
+            f"same task set (n={max(ma['n'], mb['n'])}) &middot; identical config</small></header>",
+            f"<div class='topbar' style='top:0'><span></span><span class='lnk'>"
+            f"<a href='/ui'>&#8592; runs</a> &middot; <a href='/report/{esc(a)}'>report A</a> &middot; "
+            f"<a href='/report/{esc(b)}'>report B</a></span></div>", "<main>"]
+
+    # 1 summary metrics
+    body.append("<section><h2>1 &middot; Summary metrics</h2><div class='scroll'><table>"
+                f"<thead><tr><th>metric</th><th>A &middot; {esc(ma['model'])}</th>"
+                f"<th class='col-b'>B &middot; {esc(mb['model'])}</th><th>winner</th></tr></thead><tbody>")
+    for key, hb, dirn in [("solve_rate", True, "higher"), ("solved", True, "higher"),
+                          ("mean_reward", True, "higher"), ("agent_A", True, "higher"),
+                          ("agent_A_model", True, "higher"), ("mean_rna_calls", False, "lower")]:
+        va, vb = ma.get(key), mb.get(key)
+        ca, cb = _wl(va, vb, hb)
+        winner = ma["model"] if ca == "win" else (mb["model"] if cb == "win" else "—")
+        body.append(f"<tr><td>{key} <span class='muted'>({dirn} better)</span></td>"
+                    f"<td class='{ca}'>{_fmt(va)}</td><td class='col-b {cb}'>{_fmt(vb)}</td>"
+                    f"<td>{esc(winner)}</td></tr>")
+    body.append("</tbody></table></div></section>")
+
+    # 2 per-task
+    tids = sorted(set(ma["by_task"]) | set(mb["by_task"]),
+                  key=lambda t: (ma["by_task"].get(t) or mb["by_task"].get(t) or {}).get("n", 0))
+    a_only = b_only = both = neither = 0
+    trows = []
+    for t in tids:
+        ra, rb = ma["by_task"].get(t), mb["by_task"].get(t)
+        sa = bool(ra and ra.get("solved"))
+        sb = bool(rb and rb.get("solved"))
+        wa = wb = ""
+        if sa and not sb:
+            winner, wa, wb, a_only = esc(ma["model"]), "win", "lose", a_only + 1
+        elif sb and not sa:
+            winner, wa, wb, b_only = esc(mb["model"]), "lose", "win", b_only + 1
+        elif sa and sb:
+            both += 1
+            ca_, cb_ = (ra or {}).get("oracle_calls"), (rb or {}).get("oracle_calls")
+            edge = ""
+            if ca_ is not None and cb_ is not None and ca_ != cb_:
+                edge = f" (edge {esc(ma['model'] if ca_ < cb_ else mb['model'])}, fewer calls)"
+            winner = "both" + edge
+        else:
+            winner, neither = "both failed", neither + 1
+        n = (ra or rb or {}).get("n", "")
+        trows.append(f"<tr><td>{esc(str(t).replace('eterna100:',''))}</td><td>{n}</td>"
+                     + _run_cells(ra, wa) + _run_cells(rb, wb, border=True)
+                     + f"<td>{winner}</td></tr>")
+    body.append("<section><h2>2 &middot; Per-task head-to-head</h2>"
+                f"<p class='muted'>A solved-only: <b>{a_only}</b> &middot; B solved-only: <b>{b_only}</b> "
+                f"&middot; both solved: <b>{both}</b> &middot; neither: <b>{neither}</b></p>"
+                "<div class='scroll'><table><thead><tr><th>task</th><th>n</th>"
+                "<th>A&middot;result</th><th>A&middot;rew</th><th>A&middot;calls</th><th>A&middot;mcp</th><th>A&middot;A</th>"
+                "<th class='col-b'>B&middot;result</th><th>B&middot;rew</th><th>B&middot;calls</th><th>B&middot;mcp</th><th>B&middot;A</th>"
+                "<th>winner</th></tr></thead><tbody>" + "".join(trows) + "</tbody></table></div></section>")
+    body.append("<p class='muted'>Red line: design success under the ViennaRNA folding oracle only.</p></main>")
+    return page(f"compare {a} vs {b}", "".join(body))

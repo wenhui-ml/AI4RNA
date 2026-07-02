@@ -188,6 +188,14 @@ def ui_memory(run: str):
     return pages.memory(RUNS, run)
 
 
+@app.get("/compare", response_class=HTMLResponse)
+def ui_compare(a: str = Query(...), b: str = Query(...)):
+    from . import pages
+    if not (_valid_run(a) and _valid_run(b)):
+        raise HTTPException(404, "run not found")
+    return pages.compare(RUNS, a, b)
+
+
 @app.get("/", response_class=HTMLResponse)
 def index():
     return HTML_PAGE
