@@ -396,7 +396,7 @@ function renderFigures(){
   let items=Object.entries(bm).map(([m,v])=>({label:m,value:v.solved_rate,color:'#90a4ae'}));
   full.forEach(r=>items.push({label:r.summary.model.split('/').pop(),value:r.summary.solve_rate,color:'#4c78a8'}));
   charts+=svgBars('全 Eterna100(100 题):AI 模型 vs 经典基线', items,
-   {ymax:1,caption:'同为「全100题」(含大量 >100nt 难题)。<b>灰 = 传统算法「地板线」</b>(AI 要超越的对象),蓝 = AI 模型。'+(full.length?'':' DeepSeek 全100 运行中,完成后其柱自动加入。')});}
+   {ymax:1,caption:'同为「全100题」(含大量 >100nt 难题)。<b>灰 = 两个传统(非 AI)算法的「地板线」</b>:rnainverse(ViennaRNA 自带的经典逆折叠)与 local_search(本地搜索);数值为<b>本 harness 预算下的测量</b>,非文献上限(加大重启数会更高)。蓝 = AI 模型。'+(full.length?'':' 任一 AI 模型跑完全 100 题后,其柱会自动并入此图与地板线对比。')});}
  // 可比子集:同一题集且 ≥2 个运行(如 sonnet-5 vs deepseek 同 10 题)
  for(const sig in groups){const g=groups[sig];
   if(g.length>=2 && g[0].summary.n_tasks<100){
