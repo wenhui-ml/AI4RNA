@@ -372,34 +372,41 @@ function renderRuns(){
  document.getElementById('runs').innerHTML=h;
 }
 function renderFigures(){
- let h='<h3>📊 图表(动态渲染)</h3>'+note('由实验数据现场渲染的柱状图(内联 SVG,可随数据更新,无外部依赖、不裁切)。');
- let charts='';
+ let h='<h3>📊 图表(动态渲染)</h3>'+note('由实验数据现场渲染(内联 SVG)。<b>重要:只有跑在「同一批题」上的运行才放进同一张对比图</b> —— 不同题集(全100题 / 随机10题 / 小demo)解出率不可直接比,分开呈现以免误导。');
  const sc=(SCORECARD&&SCORECARD[0])?SCORECARD[0].scorecard:null;
  const lbl={diagnosis:'照诊断改',random:'随机乱改',silent_fallback:'丢掉诊断'};
- // 1) 经典基线地板
- if(sc&&sc.panels&&sc.panels.standard_leaderboard){const bm=sc.panels.standard_leaderboard.by_method||{};
-  charts+=svgBars('经典基线在 Eterna100(全100题)的解出率', Object.entries(bm).map(([m,v])=>({label:m,value:v.solved_rate})),
-   {ymax:1,colorByValue:true,caption:'传统算法(非 AI)的「地板线」—— AI 智能体要超越它。'});}
- // 2) 驱动保真度 gap(解出率 + A)
- if(sc&&sc.panels&&sc.panels.agent_capability&&sc.panels.agent_capability.actuation_ablation){const ab=sc.panels.agent_capability.actuation_ablation;
-  charts+=svgBars('① 解出率:照诊断改 vs 随机乱改 vs 丢掉诊断', Object.entries(ab).map(([m,v])=>({label:lbl[m]||m,value:v.solve_rate})),
-   {colorByValue:false,caption:'照诊断行动解得最多 → 「让诊断驱动下一步」确实有用(项目核心论点)。'});
-  charts+=svgBars('② 驱动保真度 A(诊断是否真的控制了编辑)', Object.entries(ab).map(([m,v])=>({label:lbl[m]||m,value:v.A})),
-   {ymax:1,colorByValue:true,caption:'A 越高=越照诊断行动;框架丢弃诊断 → A=0,解出率塌回随机水平。'});}
- // 3) 四坐标确定性
+ // 确定性三坐标:一行陈述(三根 1.00 的柱图无信息量)
  const cr=RUNS.find(r=>r.summary&&r.summary.coords);
  if(cr){const c=cr.summary.coords;
-  charts+=svgBars('确定性四坐标(均应 ≈ 1)', [{label:'数据确定性',value:c.D_sym},{label:'奖励确定性',value:c.R_det},{label:'轨迹确定性',value:c.T_trace}],
-   {ymax:1,color:'#2e7d32',caption:'RNA 是「确定性正对照」:数据/奖励/轨迹都可精确复现,把「驱动保真度」隔离成唯一变量。'});}
- // 4) AI 模型解出率对比(各评测运行)
- const evals=RUNS.filter(r=>r.summary&&r.summary.model&&r.summary.solve_rate!=null);
- if(evals.length){charts+=svgBars('AI 模型解出率对比(各评测运行)',
-   evals.map(r=>({label:(r.summary.model.split('/').pop()||r.name).slice(0,16),value:r.summary.solve_rate})),
-   {ymax:1,colorByValue:true,caption:'各次「AI 模型能力评测」的解出率。点「概览」看每个的完整报告。'});}
+  h+=`<div class="card"><b>✓ 确定性三坐标</b>:数据 <span class="g">${fmt(c.D_sym)}</span> · 奖励 <span class="g">${fmt(c.R_det)}</span> · 轨迹 <span class="g">${fmt(c.T_trace)}</span> —— 均 = 1.00。RNA 是「确定性正对照」,把「驱动保真度」隔离成唯一变量。</div>`;}
+ let charts='';
+ // 驱动保真度 gap(核心)
+ if(sc&&sc.panels&&sc.panels.agent_capability&&sc.panels.agent_capability.actuation_ablation){const ab=sc.panels.agent_capability.actuation_ablation;
+  charts+=svgBars('① 解出率:照诊断改 vs 随机乱改 vs 丢掉诊断', Object.entries(ab).map(([m,v])=>({label:lbl[m]||m,value:v.solve_rate})),
+   {caption:'同一批30题、只改「反馈方式」。照诊断行动解得最多 → 「让诊断驱动下一步」确实有用(项目核心论点)。'});
+  charts+=svgBars('② 驱动保真度 A(诊断是否真的控制了编辑)', Object.entries(ab).map(([m,v])=>({label:lbl[m]||m,value:v.A})),
+   {ymax:1,colorByValue:true,caption:'A 越高=越照诊断行动;框架丢弃诊断 → A=0,解出率塌回随机水平。'});}
+ // 评测运行:按「题目签名」分组,只在同题集内对比
+ const evals=RUNS.filter(r=>r.summary&&r.summary.model&&r.summary.solve_rate!=null&&Array.isArray(r.summary.records));
+ const groups={};
+ for(const r of evals){const sig=r.summary.records.map(x=>x.task_id).sort().join('|');(groups[sig]=groups[sig]||[]).push(r);}
+ // 全 Eterna100(100题):经典基线 = 地板;AI 全100运行跑完自动并入
+ const full=evals.filter(r=>r.summary.n_tasks>=100);
+ if(sc&&sc.panels&&sc.panels.standard_leaderboard){const bm=sc.panels.standard_leaderboard.by_method||{};
+  let items=Object.entries(bm).map(([m,v])=>({label:m,value:v.solved_rate,color:'#90a4ae'}));
+  full.forEach(r=>items.push({label:r.summary.model.split('/').pop(),value:r.summary.solve_rate,color:'#4c78a8'}));
+  charts+=svgBars('全 Eterna100(100 题):AI 模型 vs 经典基线', items,
+   {ymax:1,caption:'同为「全100题」(含大量 >100nt 难题)。<b>灰 = 传统算法「地板线」</b>(AI 要超越的对象),蓝 = AI 模型。'+(full.length?'':' DeepSeek 全100 运行中,完成后其柱自动加入。')});}
+ // 可比子集:同一题集且 ≥2 个运行(如 sonnet-5 vs deepseek 同 10 题)
+ for(const sig in groups){const g=groups[sig];
+  if(g.length>=2 && g[0].summary.n_tasks<100){
+   charts+=svgBars(`同批 ${g[0].summary.n_tasks} 道题:AI 模型对比(严格可比)`,
+    g.map(r=>({label:r.summary.model.split('/').pop(),value:r.summary.solve_rate})),
+    {ymax:1,colorByValue:true,caption:'同一批题、同配置 —— 唯一严格可比的模型对照。逐题胜负见顶部「对比两次运行」。'});}}
  h+=`<div style="display:flex;flex-wrap:wrap;gap:14px">${charts||'<div class="card">暂无可渲染数据</div>'}</div>`;
- // 原始 matplotlib PNG 折叠存档
- let imgs=''; for(const r of RUNS){for(const f of (r.figures||[])){imgs+=`<img src="/fig/${encodeURIComponent(r.name)}/${encodeURIComponent(f)}" title="${r.name}/${f}">`;}}
- if(imgs)h+=`<details style="margin-top:16px"><summary>原始静态图(matplotlib,存档用)</summary><div style="margin-top:8px">${imgs}</div></details>`;
+ // 小规模 demo 运行:题集小且各不相同,不参与对比,仅提示
+ const small=evals.filter(r=>r.summary.n_tasks<10);
+ if(small.length){h+=note('另有小规模 demo 运行:'+small.map(r=>`${r.name}(${r.summary.n_tasks}题)`).join('、')+' —— 题目少且各不相同,解出率不可与上面对比,故不入图(可在「概览」单独查看)。');}
  document.getElementById('figures').innerHTML=h;
 }
 async function loadLogList(){
