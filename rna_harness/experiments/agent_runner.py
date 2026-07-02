@@ -17,6 +17,7 @@ Usage (needs OpenRouter creds in env; runs openclaude via `bun dist/cli.mjs`):
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import re
@@ -45,13 +46,21 @@ def _load_knowledge() -> str:
         return ""
 
 
-def _build_prompt(task: DesignTask, knowledge: str) -> str:
+def _build_prompt(task: DesignTask, knowledge: str, enable_mcp: bool = True) -> str:
     from ..rl.prompts import render_task_prompt
 
+    mcp_hint = (
+        " For a hard target you may also consult the RNA motif knowledge base via the MCP tools "
+        "mcp__rna_motifs__analyze_target (get a per-hairpin design plan + hard-feature flags), "
+        "mcp__rna_motifs__lookup_hairpin_loop (known-stable cap motifs for a loop length), and "
+        "mcp__rna_motifs__search_motifs (glossary). These give priors only -- always confirm the "
+        "assembled sequence with RnaVerify."
+        if enable_mcp else ""
+    )
     return (
         f"{knowledge}\n\n---\n\n# Your task\n{render_task_prompt(task)}\n\n"
         f"Work autonomously. Use RnaVerify to check candidates and its diagnosis to guide "
-        f"repairs; you may also use RnaFold/RnaDiagnose or write ViennaRNA code. "
+        f"repairs; you may also use RnaFold/RnaDiagnose or write ViennaRNA code.{mcp_hint} "
         f"When RnaVerify reports solved=true (or you exhaust your budget), output a final "
         f"line EXACTLY of the form:\nFINAL_SEQUENCE: <your {task.n}-nt sequence>"
     )
@@ -70,6 +79,8 @@ def _extract_final_sequence(trace_lines: List[str], n: int) -> Optional[str]:
             ev = json.loads(line)
         except Exception:
             continue
+        if isinstance(ev, dict) and ev.get("type") == "rna_memory_snapshot":
+            continue  # our injected memory-audit header, not agent output
         blob = json.dumps(ev)
         m = _FINAL_RE.search(blob.replace("\\n", "\n"))
         if m:
@@ -80,9 +91,68 @@ def _extract_final_sequence(trace_lines: List[str], n: int) -> Optional[str]:
 def _count_tool_calls(trace_lines: List[str]) -> Dict[str, int]:
     counts: Dict[str, int] = {}
     for line in trace_lines:
+        if '"rna_memory_snapshot"' in line:
+            continue  # skip our memory-audit header so its JSON isn't miscounted as tool calls
         for name in re.findall(r'"name":"([A-Za-z_]+)"', line):
             counts[name] = counts.get(name, 0) + 1
     return counts
+
+
+_MEMORY_ENTRYPOINT = "MEMORY.md"  # openclaude injects ONLY <memdir>/MEMORY.md into the prompt
+
+
+def _memory_snapshot() -> Optional[Dict]:
+    """Capture the EXACT auto-memory openclaude injects into the agent's system prompt for this
+    episode, so memory recall is auditable from the trace alone (it otherwise leaves no
+    footprint -- the system prompt is not in the stream-json). Per the openclaude source
+    (src/memdir/paths.ts, src/utils/claudemd.ts) only <memdir>/MEMORY.md is injected (individual
+    strategy files are NOT), truncated at 200 lines / 25000 bytes. Returns None when no memdir
+    override is active (e.g. the no_memory arm), which is itself the auditable fact 'no memory'."""
+    memdir = os.environ.get("CLAUDE_COWORK_MEMORY_PATH_OVERRIDE")
+    if not memdir:
+        return None
+    mem_path = os.path.join(memdir, _MEMORY_ENTRYPOINT)
+    content, exists = "", os.path.exists(mem_path)
+    if exists:
+        try:
+            with open(mem_path, encoding="utf-8") as f:
+                content = f.read()
+        except Exception:
+            content = ""
+    injected = content[:25000]  # mirror openclaude's MAX_ENTRYPOINT_BYTES cap
+    try:
+        files = sorted(fn for fn in os.listdir(memdir) if fn.endswith(".md"))
+    except Exception:
+        files = []
+    return {
+        "memdir": memdir,
+        "memory_md_path": mem_path,
+        "injected": exists,
+        "sha256": hashlib.sha256(injected.encode("utf-8")).hexdigest(),
+        "n_chars": len(injected),
+        "n_lines": (injected.count("\n") + 1) if injected else 0,
+        "content": injected,
+        "memdir_md_files": files,
+        "note": "openclaude injects ONLY MEMORY.md into the agent system prompt; other files in "
+                "memdir are present but not auto-injected by default.",
+    }
+
+
+def _mcp_config(python_bin: str) -> str:
+    """Inline --mcp-config JSON connecting the deterministic RNA motif knowledge base as a real
+    MCP server. openclaude's stdio schema has no `cwd` field and agent_runner launches the CLI
+    with cwd=out_dir, so PYTHONPATH makes the package importable regardless of cwd. Tools appear
+    to the agent as mcp__rna_motifs__{lookup_hairpin_loop,search_motifs,analyze_target}."""
+    return json.dumps({
+        "mcpServers": {
+            "rna_motifs": {
+                "type": "stdio",
+                "command": python_bin,
+                "args": ["-m", "rna_harness.mcp.motif_server"],
+                "env": {"PYTHONPATH": _REPO},
+            }
+        }
+    })
 
 
 def run_agent_on_task(
@@ -94,9 +164,10 @@ def run_agent_on_task(
     allowed_tools: Optional[List[str]] = None,
     knowledge: str = "",
     cross_oracle: bool = True,
+    enable_mcp: bool = True,
 ) -> Dict:
     allowed_tools = allowed_tools or ["RnaVerify", "RnaFold", "RnaDiagnose", "RnaConstraints", "Bash"]
-    prompt = _build_prompt(task, knowledge)
+    prompt = _build_prompt(task, knowledge, enable_mcp=enable_mcp)
     env = dict(os.environ)
     env.update({
         "CLAUDE_CODE_USE_OPENAI": "1",
@@ -114,10 +185,22 @@ def run_agent_on_task(
         _BUN, _CLI, "-p", prompt,
         "--output-format", "stream-json", "--verbose",
         "--dangerously-skip-permissions",
+    ]
+    if enable_mcp:
+        # connect the RNA motif KB as a real MCP server. mcp__rna_motifs is added as an explicit
+        # server-level allow rule (redundant under --dangerously-skip-permissions but clarifies
+        # intent and works even without bypass); --strict-mcp-config keeps it a clean, single,
+        # deterministic server (no merged .mcp.json/settings servers).
+        allowed_tools = allowed_tools + ["mcp__rna_motifs"]
+        cmd += ["--mcp-config", _mcp_config(env["RNA_HARNESS_PYTHON"]), "--strict-mcp-config"]
+    cmd += [
         "--allowedTools", *allowed_tools,
         "--max-budget-usd", str(max_budget_usd),
         "--no-session-persistence",
     ]
+    # Snapshot the auto-memory the agent will actually see THIS episode (auditability); taken
+    # before launch because the online loop may rewrite MEMORY.md between episodes.
+    mem_snap = _memory_snapshot()
     t0 = time.time()
     # Run bun in its OWN process group (start_new_session) so a timeout can kill the whole
     # tree -- openclaude spawns children (python bridge, etc.) that would otherwise orphan and
@@ -143,6 +226,10 @@ def run_agent_on_task(
 
     lines = [l for l in (stdout or "").splitlines() if l.strip()]
     with open(trace_path, "w") as f:
+        # in-trace memory footprint: the exact MEMORY.md injected into the agent's system prompt
+        # (all values JSON-encoded so this synthetic line is never miscounted as a tool call).
+        if mem_snap is not None:
+            f.write(json.dumps({"type": "rna_memory_snapshot", **mem_snap}) + "\n")
         f.write(stdout or "")
 
     final_seq = _extract_final_sequence(lines, task.n)
@@ -158,6 +245,8 @@ def run_agent_on_task(
         except Exception:
             continue
     actuation = actuation_from_agent_trace(events)
+    # compact memory footprint for state/summary (full MEMORY.md content stays in the trace file)
+    mem_compact = {k: val for k, val in mem_snap.items() if k != "content"} if mem_snap else None
     return {
         "task_id": task.task_id,
         "family": task.family,
@@ -169,6 +258,8 @@ def run_agent_on_task(
         "cross_oracle": (v.cross_oracle or {}).get("fraction") if v and v.cross_oracle else None,
         "tool_calls": tool_calls,
         "n_rna_tool_calls": sum(c for k, c in tool_calls.items() if k.startswith("Rna")),
+        "n_mcp_calls": sum(c for k, c in tool_calls.items() if k.startswith("mcp__")),
+        "memory_snapshot": mem_compact,
         "actuation": actuation,
         "n_trace_events": len(lines),
         "trace_path": trace_path,
