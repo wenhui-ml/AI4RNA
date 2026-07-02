@@ -311,7 +311,7 @@ def _fold_mfe(seq: str) -> str:
         return ""
 
 
-def svg_arc(target: str, mfe: str, seq: str = "", solved=None) -> str:
+def svg_arc(target: str, mfe: str, seq: str = "", solved=None, reason: str = "") -> str:
     """Diagnostic RNA arc diagram (inline SVG, no JS/CDN). THREE modes:
       * solved      -> ONE green arc set (target == achieved MFE), 'bp-distance 0'.
       * diagnostic  -> target arcs ABOVE (green=correct / amber-dashed=missing), achieved MFE
@@ -376,11 +376,16 @@ def svg_arc(target: str, mfe: str, seq: str = "", solved=None) -> str:
         legend = ("<div class='legend'><span><i class='sw' style='background:#2e7d32'></i>all pairs correct</span>"
                   "<span class='muted'>solved &middot; bp-distance 0 (target = achieved MFE)</span></div>")
     else:
+        bpd = len(missing) + len(spurious)
+        note = (f"<span class='muted'>bp-distance {bpd} &middot; target &#9650; / achieved &#9660;</span>"
+                if not reason else
+                f"<span style='color:#c62828'>&#9888; {esc(reason)}</span>"
+                f"<span class='muted'> &middot; bp-distance {bpd}</span>")
         legend = ("<div class='legend'>"
                   "<span><i class='sw' style='background:#2e7d32'></i>correct</span>"
                   "<span><i class='sw' style='background:#f9a825'></i>missing (target only, dashed)</span>"
                   "<span><i class='sw' style='background:#e53935'></i>spurious (fold only)</span>"
-                  f"<span class='muted'>bp-distance {len(missing)+len(spurious)} &middot; target &#9650; / achieved &#9660;</span></div>")
+                  + note + "</div>")
     return "".join(parts) + legend
 
 
@@ -716,22 +721,37 @@ def _structure_gallery(run_dir: str, run: str, recs: List[Dict], num: int) -> st
     gallery = unsolved_seq[:4] + unsolved_noseq[:4] + solved_ep[:4]
     if not gallery:
         return ""
+    try:
+        emap = _e100_map()
+    except Exception:
+        emap = {}
     out = [f"<section><h2>{num} &middot; RNA secondary structure &mdash; target vs achieved MFE</h2>"]
     for r in gallery:
         seq = r.get("final_sequence") or ""
-        tp = _trace_for(run_dir, r.get("task_id", ""))
-        target = (_parse_trace(tp)["target"] if tp else "") or ""
+        tid = r.get("task_id", "")
+        task = emap.get(re.sub(r"[^A-Za-z0-9_.-]", "_", tid))
+        # authoritative target from the dataset (never fold-vs-self); trace-parse only if unknown.
+        tp = _trace_for(run_dir, tid)
+        target = (getattr(task, "target", "") if task else "") or (_parse_trace(tp)["target"] if tp else "") or ""
+        tlen = getattr(task, "n", 0) or r.get("n") or len(target)
         mfe = _fold_mfe(seq) if seq else ""
         if not target and mfe:
-            target = mfe
+            target = mfe  # last resort only when no known target exists at all
         if not target and not mfe:
-            continue  # nothing renderable (no target in trace and no sequence)
+            continue  # nothing renderable (no target and no sequence)
+        # honest reason WHY an unsolved case may still look clean (bp-distance 0)
+        reason = ""
+        if not r.get("solved") and seq:
+            if len(seq) != tlen:
+                reason = f"序列长度 {len(seq)} ≠ 目标 {tlen} nt(长度不符 → 判负)"
+            elif mfe and not (_pairs(target) ^ _pairs(mfe)):
+                reason = "配对拓扑全对,但未通过唯一最低能(uMFE)判定:目标不是唯一 MFE(简并基态)"
         tag = "success" if r.get("solved") else "failure"
         seq_html = (f"<div class='seq muted' style='margin:4px 0'>{esc(seq)}</div>" if seq
                     else "<div class='seq muted' style='margin:4px 0'>(no sequence submitted)</div>")
-        out.append(f"<div class='card'><b>{esc(str(r.get('task_id','')).replace('eterna100:',''))}</b> "
+        out.append(f"<div class='card'><b>{esc(str(tid).replace('eterna100:',''))}</b> "
                    f"({r.get('n')} nt) <span class='badge {tag}'>{'solved' if r.get('solved') else 'unsolved'}</span>"
-                   + seq_html + svg_arc(target, mfe, seq, solved=r.get("solved")) + "</div>")
+                   + seq_html + svg_arc(target, mfe, seq, solved=r.get("solved"), reason=reason) + "</div>")
     out.append("</section>")
     return "".join(out)
 
