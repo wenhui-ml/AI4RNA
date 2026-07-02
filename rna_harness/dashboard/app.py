@@ -33,6 +33,17 @@ def _safe_under(path: str, roots: List[str]) -> bool:
     return any(rp == os.path.realpath(r) or rp.startswith(os.path.realpath(r) + os.sep) for r in roots)
 
 
+def _valid_run(run: str) -> bool:
+    """A run is valid iff it is a direct entry of RUNS (prevents path traversal while still
+    allowing symlinked runs, which realpath-based _safe_under would wrongly reject)."""
+    if not run or "/" in run or "\\" in run or ".." in run:
+        return False
+    try:
+        return run in set(os.listdir(RUNS)) and os.path.isdir(os.path.join(RUNS, run))
+    except OSError:
+        return False
+
+
 def _read_json(path: str) -> Optional[dict]:
     try:
         with open(path) as f:
@@ -100,9 +111,12 @@ def api_campaigns():
 
 @app.get("/fig/{run}/{fname}")
 def figure(run: str, fname: str):
-    for base in (os.path.join(RUNS, run, "figures"), RESULTS):
+    if os.path.basename(fname) != fname or ".." in fname:
+        raise HTTPException(403, "bad filename")
+    bases = ([os.path.join(RUNS, run, "figures")] if _valid_run(run) else []) + [RESULTS]
+    for base in bases:
         p = os.path.join(base, fname)
-        if os.path.exists(p) and _safe_under(p, [RUNS, RESULTS]):
+        if os.path.exists(p):  # run is a validated RUNS entry (symlinks allowed) or RESULTS
             return FileResponse(p)
     raise HTTPException(404, "figure not found")
 
@@ -144,6 +158,36 @@ def logtail(path: str = Query(...), n: int = Query(120, le=2000)):
         raise HTTPException(500, str(e))
 
 
+@app.get("/ui", response_class=HTMLResponse)
+def ui_runs():
+    from . import pages
+    return pages.runs_index(RUNS)
+
+
+@app.get("/report/{run}", response_class=HTMLResponse)
+def ui_report(run: str):
+    from . import pages
+    if not _valid_run(run):
+        raise HTTPException(404, "run not found")
+    return pages.report(RUNS, run)
+
+
+@app.get("/trace/{run}", response_class=HTMLResponse)
+def ui_trace(run: str, task: Optional[str] = Query(None)):
+    from . import pages
+    if not _valid_run(run):
+        raise HTTPException(404, "run not found")
+    return pages.trace(RUNS, run, task)
+
+
+@app.get("/memory/{run}", response_class=HTMLResponse)
+def ui_memory(run: str):
+    from . import pages
+    if not _valid_run(run):
+        raise HTTPException(404, "run not found")
+    return pages.memory(RUNS, run)
+
+
 @app.get("/", response_class=HTMLResponse)
 def index():
     return HTML_PAGE
@@ -168,6 +212,7 @@ HTML_PAGE = """<!doctype html><html><head><meta charset="utf-8">
  .kv{display:inline-block;margin-right:16px}
 </style></head><body>
 <header><h1>🧬 openclaude_rna</h1><span class="sub">RNA inverse-design meta-learning harness — live dashboard</span>
+ <a href="/ui" style="float:right;color:#58a6ff;font-weight:600">📋 Rich reports →</a>
  <span id="health" class="sub"></span></header>
 <div class="tabs">
  <span class="tab active" data-t="scorecard" onclick="tab('scorecard')">🏆 Scorecard</span>
