@@ -122,14 +122,131 @@ def _agent_records(run_dir: str):
 
 
 def _load_records(run_dir: str) -> Tuple[List[Dict], int, Optional[str]]:
-    """Return (records, n_episodes, kind) where kind in {'campaign','agent',None}."""
+    """Return (records, n_episodes, kind) where kind in {'campaign','agent','agent_live',None}.
+
+    'agent_live' = an agent run still IN PROGRESS (traces present, no summary.json yet): its
+    per-task records are scored on the fly from traces/*.jsonl so the report is a live scoreboard.
+    """
     recs, n = _state_records(run_dir)
     if recs:
         return recs, n, "campaign"
     ar = _agent_records(run_dir)
     if ar:
         return ar[0], len(ar[0]), "agent"
+    live = _live_agent_records(run_dir)
+    if live:
+        return live[0], len(live[0]), "agent_live"
     return [], 0, None
+
+
+# ------------------------------------------------------------------ live scoring (in-progress runs)
+# Cache keyed by trace path -> {mtime,size,rec}. A finished trace never changes, so it is folded
+# exactly once; only new/growing traces are (re)scored on each page load. Read-only.
+_LIVE_CACHE: Dict[str, Dict] = {}
+_E100_BY_SAFE: Optional[Dict[str, object]] = None
+
+
+def _e100_map():
+    global _E100_BY_SAFE
+    if _E100_BY_SAFE is None:
+        from ..benchmarks import eterna100_tasks
+        tasks = eterna100_tasks(ids=None, max_len=400)
+        _E100_BY_SAFE = {re.sub(r"[^A-Za-z0-9_.-]", "_", t.task_id): t for t in tasks}
+    return _E100_BY_SAFE
+
+
+def _score_one_trace(path: str, fn: str):
+    """Score a single finished trace with the SAME extractor + folding oracle the runner uses
+    (verifier.verify), so live numbers match the eventual summary.json exactly. Returns a record
+    in the normalized per-episode shape, or None if the trace can't be matched/scored."""
+    from ..experiments.agent_runner import _extract_final_sequence, _count_tool_calls
+    from ..verifier import verify
+    key = fn[:-6] if fn.endswith(".jsonl") else fn
+    m = _e100_map()
+    task = m.get(key)
+    if task is None:
+        cand = [t for k, t in m.items() if key.startswith(k) or k.startswith(key)]
+        task = cand[0] if cand else None
+    if task is None:
+        return None
+    try:
+        with open(path) as f:
+            lines = [l for l in f.read().splitlines() if l.strip()]
+    except OSError:
+        return None
+    seq = _extract_final_sequence(lines, task.n)
+    v = verify(task, seq, compute_cross_oracle=False) if seq else None
+    calls = _count_tool_calls(lines)
+    return {
+        "arm": "agent", "epoch": 0, "task_id": task.task_id,
+        "family": getattr(task, "family", ""), "n": task.n,
+        "solved": bool(v.solved) if v else False, "reward": (v.reward if v else 0.0),
+        "oracle_calls": sum(c for k, c in calls.items() if k.startswith("Rna")),
+        "n_mcp_calls": sum(c for k, c in calls.items() if k.startswith("mcp__")),
+        "cross_oracle": None, "A": None, "A_memory": None,
+        "final_sequence": seq or "", "elapsed_s": None, "trace_path": path, "model": "",
+    }
+
+
+def _live_agent_records(run_dir: str):
+    """For an in-progress agent run (no summary.json, traces present): fold-score every finished
+    trace on the fly. Returns (records, live_summary) or None. Cached per-trace by (mtime,size)."""
+    if os.path.exists(os.path.join(run_dir, "summary.json")):
+        return None  # finished run -> use the authoritative summary path instead
+    tdir = os.path.join(run_dir, "traces")
+    if not os.path.isdir(tdir):
+        return None
+    tracefiles = sorted(f for f in os.listdir(tdir) if f.endswith(".jsonl"))
+    if not tracefiles:
+        return None
+    recs: List[Dict] = []
+    for fn in tracefiles:
+        path = os.path.join(tdir, fn)
+        try:
+            stt = os.stat(path)
+        except OSError:
+            continue
+        c = _LIVE_CACHE.get(path)
+        if c and c["mtime"] == stt.st_mtime and c["size"] == stt.st_size:
+            rec = c["rec"]
+        else:
+            try:
+                rec = _score_one_trace(path, fn)
+            except Exception:
+                rec = None
+            _LIVE_CACHE[path] = {"mtime": stt.st_mtime, "size": stt.st_size, "rec": rec}
+        if rec is not None:
+            recs.append(rec)
+    if not recs:
+        return None
+    solved = sum(1 for r in recs if r.get("solved"))
+    n = len(recs)
+    model = _run_model(run_dir) or ""
+    summary = {
+        "model": model, "n_tasks": n, "solved": solved,
+        "solve_rate": round(solved / n, 4),
+        "mean_reward": round(sum(r.get("reward", 0.0) for r in recs) / n, 4),
+        "mean_rna_calls": round(sum((r.get("oracle_calls") or 0) for r in recs) / n, 2),
+        "_live": True,
+    }
+    recs.sort(key=lambda r: r.get("n", 0))
+    return recs, summary
+
+
+def _length_bands(recs: List[Dict]) -> str:
+    """Compact solved/total-by-length HTML table (the capability-boundary view)."""
+    bands = [("≤45", 0, 45), ("46–70", 46, 70), ("71–100", 71, 100),
+             ("101–150", 101, 150), ("151–250", 151, 250), (">250", 251, 10 ** 9)]
+    cells = []
+    for lbl, lo, hi in bands:
+        b = [r for r in recs if lo <= r.get("n", 0) <= hi]
+        if not b:
+            continue
+        sv = sum(1 for r in b if r.get("solved"))
+        rate = sv / len(b)
+        col = "var(--ok)" if rate >= 0.6 else ("var(--warnl)" if rate >= 0.3 else "var(--fail)")
+        cells.append(f"<span class='kv'>{lbl} nt: <b style='color:{col}'>{sv}/{len(b)}</b></span>")
+    return "".join(cells)
 
 
 def _run_summary(run_dir: str) -> Dict:
@@ -384,6 +501,11 @@ def _verdict(run_dir: str) -> Tuple[str, str, str]:
     if s["solve_rate"] is not None:
         r = s["solve_rate"]
         css = "success" if r >= 0.6 else ("partial" if r >= 0.3 else "failure")
+        if s.get("kind") == "agent_live":  # run still in progress -> live-scored, partial
+            css = "neutral"
+            return css, f"🔴 运行中 · 已评 {s['solved']}/{s['n_records']} ({r:.0%})", \
+                (f"实时统计:已完成 {s['n_records']} 题,当前解出 {s['solved']} 题(solve-rate {r:.1%})。"
+                 "数字随运行滚动更新,整轮跑完后写入最终 summary。")
         return css, f"Solved {s['solved']}/{s['n_records']} ({r:.0%})", \
             f"{s['n_episodes']} episodes recorded; solve-rate {r:.1%}."
     if s["has_scorecard"]:
@@ -428,7 +550,7 @@ def _categorize(name: str, files: List[str], kind: Optional[str], s: Dict) -> st
         return "score"
     if name == "zero_credit_main" or "meta_summary.json" in files:
         return "found"
-    if kind == "agent":
+    if kind in ("agent", "agent_live"):
         return "eval"
     if kind == "campaign":
         return "meta"
@@ -637,24 +759,41 @@ def report(runs_root: str, run: str) -> str:
                  "下方有每道题「目标形状 vs 实际折叠」的弧线对比图。",
         "campaign": "📈 <b>元学习实验</b>:让智能体反复练同一批谜题、把经验存进记忆,"
                     "看它是否「越做越省」(解题所需尝试次数随练习下降)。",
-    }.get(kind, "")
+    }.get("agent" if kind == "agent_live" else kind, "")
     if _intro:
         body.append(f"<div class='card' style='margin:16px 0 4px'>{_intro}</div>")
 
-    if kind == "agent":
-        # single-pass AGENT capability report (agent_runner summary.json)
-        sm = _read_json(os.path.join(d, "summary.json")) or {}
-        body.append("<section><h2>1 &middot; Agent capability</h2><div class='card'>"
-                    f"<span class='kv'>model <b>{esc(sm.get('model','?'))}</b></span>"
+    if kind in ("agent", "agent_live"):
+        live = kind == "agent_live"
+        if live:
+            # live scoreboard: metrics folded on the fly from traces (no summary.json yet)
+            lr = _live_agent_records(d)
+            sm = lr[1] if lr else {}
+            recs = lr[0] if lr else recs
+            body.insert(len(body), "<script>setTimeout(function(){location.reload()},20000)</script>")
+            body.append("<div class='card' style='margin:8px 0;border-left:4px solid #c62828'>"
+                        "🔴 <b>运行中 (LIVE)</b> — 本页指标由后台<b>实时折叠裁判</b>对已完成的每条 trace "
+                        "现算得到,<b>每 20 秒自动刷新</b>;整轮跑完后会落盘为最终 <code>summary.json</code>。"
+                        "长题排在后面,solve-rate 会随长题进入而变化。</div>")
+        else:
+            # single-pass AGENT capability report (agent_runner summary.json)
+            sm = _read_json(os.path.join(d, "summary.json")) or {}
+        title = "1 &middot; Agent capability" + (" (实时)" if live else "")
+        body.append(f"<section><h2>{title}</h2><div class='card'>"
+                    f"<span class='kv'>model <b>{esc(sm.get('model') or run.split('_')[0])}</b></span>"
                     f"<span class='kv'>solve-rate <b>{(s['solve_rate'] or 0):.0%}</b> "
-                    f"({s['solved']}/{s['n_records']})</span>"
+                    f"({s['solved']}/{s['n_records']}{' 已评' if live else ''})</span>"
                     f"<span class='kv'>mean reward <b>{_fmt(sm.get('mean_reward'))}</b></span>"
-                    f"<span class='kv'>agent_A <b>{_fmt(sm.get('agent_A'))}</b></span>"
-                    f"<span class='kv'>A_model <b>{_fmt(sm.get('agent_A_model'))}</b></span>"
-                    f"<span class='kv'>mean RNA calls <b>{_fmt(sm.get('mean_rna_calls'))}</b></span>"
-                    f"<span class='kv'>tasks w/ repair <b>{_fmt(sm.get('n_tasks_with_repair'))}</b></span>"
+                    + ("" if live else
+                       f"<span class='kv'>agent_A <b>{_fmt(sm.get('agent_A'))}</b></span>"
+                       f"<span class='kv'>A_model <b>{_fmt(sm.get('agent_A_model'))}</b></span>")
+                    + f"<span class='kv'>mean RNA calls <b>{_fmt(sm.get('mean_rna_calls'))}</b></span>"
+                    + ("" if live else f"<span class='kv'>tasks w/ repair <b>{_fmt(sm.get('n_tasks_with_repair'))}</b></span>")
+                    + "<div style='margin-top:8px'><b>按长度分档(能力边界):</b> "
+                    + (_length_bands(recs) or "<span class='muted'>—</span>") + "</div>"
                     "</div></section>")
-        body.append("<section><h2>2 &middot; Per-task results</h2>" + _agent_episode_rows(recs) + "</section>")
+        rt = "2 &middot; Per-task results" + (" — 实时逐题(短→长)" if live else "")
+        body.append(f"<section><h2>{rt}</h2>" + _agent_episode_rows(recs) + "</section>")
         body.append(_structure_gallery(d, run, recs, 3))
     else:
         # campaign report (meta-learning arms / epochs)
