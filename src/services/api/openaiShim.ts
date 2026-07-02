@@ -3359,6 +3359,22 @@ class OpenAIShimMessages {
     if (reasoningRequestPlan.wireFormat === 'reasoning_effort' && reasoningRequestPlan.reasoningEffort) {
       body.reasoning_effort = reasoningRequestPlan.reasoningEffort
     }
+    // openclaude does not recognize openrouter.ai as a route, so its native reasoning-wireformat
+    // resolution is gated off and NO reasoning is sent by default for ANY model routed via
+    // OpenRouter. Enable upstream reasoning through OpenRouter's unified TOP-LEVEL `reasoning`
+    // object for EVERY model on openrouter.ai (anthropic/*, deepseek/*, ...) so lateral model
+    // comparisons get identical reasoning treatment. Guard: only fill the gap if nothing native
+    // already set a reasoning field (defer to reasoning_effort/thinking when present, avoid
+    // double-emission). Toggle off with OPENCLAUDE_OPENROUTER_REASONING=0.
+    if (
+      request.baseUrl.includes('openrouter.ai') &&
+      body.reasoning === undefined &&
+      body.reasoning_effort === undefined &&
+      (body as Record<string, unknown>).thinking === undefined &&
+      process.env.OPENCLAUDE_OPENROUTER_REASONING !== '0'
+    ) {
+      body.reasoning = { enabled: true }
+    }
     // Convert max_tokens to max_completion_tokens for OpenAI API compatibility.
     // Azure OpenAI requires max_completion_tokens and does not accept max_tokens.
     // Ensure max_tokens is a valid positive number before using it.
