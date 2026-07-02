@@ -301,14 +301,23 @@ def _pairs(struct: str):
         return set()
 
 
+_FOLD_CACHE: Dict[str, str] = {}
+
+
 def _fold_mfe(seq: str) -> str:
+    if not seq:
+        return ""
+    key = seq.upper().replace("T", "U")
+    if key in _FOLD_CACHE:
+        return _FOLD_CACHE[key]
     try:
         import RNA
         md = RNA.md(); md.temperature = 37.0; md.dangles = 2
-        st, _ = RNA.fold_compound(seq.upper().replace("T", "U"), md).mfe()
-        return st
+        st, _ = RNA.fold_compound(key, md).mfe()
     except Exception:
-        return ""
+        st = ""
+    _FOLD_CACHE[key] = st
+    return st
 
 
 def svg_arc(target: str, mfe: str, seq: str = "", solved=None, reason: str = "") -> str:
@@ -716,17 +725,14 @@ def _structure_gallery(run_dir: str, run: str, recs: List[Dict], num: int) -> st
     solved_ep = [r for r in recs if r.get("solved") and r.get("final_sequence")]
     unsolved_seq = [r for r in recs if not r.get("solved") and r.get("final_sequence")]
     unsolved_noseq = [r for r in recs if not r.get("solved") and not r.get("final_sequence")]
-    # surface the DIAGNOSTIC-rich ones first: failed-with-fold (missing/spurious), then the
-    # monster targets the agent couldn't design, then a few solved as positive controls.
-    gallery = unsolved_seq[:4] + unsolved_noseq[:4] + solved_ep[:4]
-    if not gallery:
+    if not (solved_ep or unsolved_seq or unsolved_noseq):
         return ""
     try:
         emap = _e100_map()
     except Exception:
         emap = {}
-    out = [f"<section><h2>{num} &middot; RNA secondary structure &mdash; target vs achieved MFE</h2>"]
-    for r in gallery:
+
+    def card(r) -> str:
         seq = r.get("final_sequence") or ""
         tid = r.get("task_id", "")
         task = emap.get(re.sub(r"[^A-Za-z0-9_.-]", "_", tid))
@@ -738,7 +744,7 @@ def _structure_gallery(run_dir: str, run: str, recs: List[Dict], num: int) -> st
         if not target and mfe:
             target = mfe  # last resort only when no known target exists at all
         if not target and not mfe:
-            continue  # nothing renderable (no target and no sequence)
+            return ""  # nothing renderable (no target and no sequence)
         # honest reason WHY an unsolved case may still look clean (bp-distance 0)
         reason = ""
         if not r.get("solved") and seq:
@@ -748,12 +754,53 @@ def _structure_gallery(run_dir: str, run: str, recs: List[Dict], num: int) -> st
                 reason = "配对拓扑全对,但未通过唯一最低能(uMFE)判定:目标不是唯一 MFE(简并基态)"
         tag = "success" if r.get("solved") else "failure"
         seq_html = (f"<div class='seq muted' style='margin:4px 0'>{esc(seq)}</div>" if seq
-                    else "<div class='seq muted' style='margin:4px 0'>(no sequence submitted)</div>")
-        out.append(f"<div class='card'><b>{esc(str(tid).replace('eterna100:',''))}</b> "
-                   f"({r.get('n')} nt) <span class='badge {tag}'>{'solved' if r.get('solved') else 'unsolved'}</span>"
-                   + seq_html + svg_arc(target, mfe, seq, solved=r.get("solved"), reason=reason) + "</div>")
+                    else "<div class='seq muted' style='margin:4px 0'>(未提交序列)</div>")
+        return (f"<div class='card'><b>{esc(str(tid).replace('eterna100:',''))}</b> "
+                f"({r.get('n')} nt) <span class='badge {tag}'>{'solved' if r.get('solved') else 'unsolved'}</span>"
+                + seq_html + svg_arc(target, mfe, seq, solved=r.get("solved"), reason=reason) + "</div>")
+
+    # first-principles: draw EVERY case, grouped by category (nothing hidden / no sampling)
+    out = [f"<section><h2>{num} &middot; RNA 二级结构 &mdash; 目标 vs 实际折叠(<b>每题一张</b>)</h2>"]
+    out.append(_arc_reading_guide())
+    groups = [
+        ("&#10060; 失败(有提交序列)&mdash; 最有诊断价值", unsolved_seq, True),
+        ("&#9888;&#65039; 失败(未提交序列)&mdash; 只画目标结构", unsolved_noseq, True),
+        ("&#9989; 解出(正对照)", solved_ep, False),
+    ]
+    for title, grp, open_default in groups:
+        if not grp:
+            continue
+        cards = "".join(c for c in (card(r) for r in grp) if c)
+        if not cards:
+            continue
+        op = " open" if open_default else ""
+        out.append(f"<details{op}><summary style='font-size:1.02rem'>{title} &mdash; "
+                   f"<b>{len(grp)}</b> 题(点击展开/收起)</summary><div style='margin-top:10px'>"
+                   + cards + "</div></details>")
     out.append("</section>")
     return "".join(out)
+
+
+def _arc_reading_guide() -> str:
+    """Plain-language on-page explainer so a newcomer can read the arc diagrams in 30s."""
+    return (
+        "<div class='card' style='background:#f0f7ff;border-color:#bcd8f5'>"
+        "<b>&#128161; 怎么看这些弧线图(30 秒上手)</b>"
+        "<ul style='margin:8px 0 8px 18px;padding:0'>"
+        "<li>横线是 RNA 序列(左&rarr;右 = 5'&rarr;3'),每个字母一个碱基。<b>一条弧 = 两个碱基配对</b>。</li>"
+        "<li><b>一圈套一圈</b>(嵌套弧)= 一段螺旋(茎);<b>最里层弧下方、没有弧盖住的那几个碱基</b> = 环(loop,不配对)"
+        " —— 环里常是一串 <b>A</b>,因为 A 最不容易乱配对,能稳稳把环撑开(这是正确且常见的设计手法)。</li>"
+        "<li>弧在<b>线上方 &#9650; = 目标</b>结构(想要的);<b>线下方 &#9660; = 实际</b>折叠(提交的序列真正折成的)。"
+        "解出时两者一致,只画一组绿弧。</li></ul>"
+        "<b>颜色含义:</b> "
+        "<span class='chip g'>绿 = 对(目标和实际都有这个配对)</span> "
+        "<span class='chip y'>橙虚线 = 漏了(目标有、实际没折出)</span> "
+        "<span class='chip r'>红 = 多了(实际有、目标没有的错误配对)</span>"
+        "<div style='margin-top:8px'><b>solved(解出)的严格定义:</b> 提交序列折叠后<b>完全等于目标</b> —— "
+        "① 长度一致 &nbsp;②&nbsp;最低能结构(MFE)== 目标 &nbsp;③&nbsp;该结构唯一(uMFE)。三者缺一即 <b>unsolved</b>。</div>"
+        "<div class='muted' style='margin-top:5px'>&#9888; 注意:<b>bp-distance 0(配对全对)也可能判负</b> —— "
+        "如序列长度差 1(off-by-one),或目标不是唯一最低能结构(简并基态)。图注会写明真实原因。</div>"
+        "</div>")
 
 
 def report(runs_root: str, run: str) -> str:
