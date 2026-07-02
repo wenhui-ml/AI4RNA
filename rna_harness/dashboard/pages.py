@@ -404,9 +404,66 @@ def _kind(run_dir: str, files: List[str]) -> str:
     return "run"
 
 
+# plain-language run categories (ordered): key -> (icon+title, one-line question/explanation)
+_CATS = [
+    ("eval", "🧪 AI 模型能力评测", "问题:某个 AI 模型「独立设计 RNA」的能力有多强?(在 Eterna100 谜题上一次性尝试,不给记忆)"),
+    ("meta", "📈 元学习实验:记忆是否让智能体越做越好", "问题:让智能体把解题经验存进「记忆」反复练,它是否用更少的尝试次数就能解题?"),
+    ("score", "🏆 综合成绩单", "把所有能力汇总成一张三面板成绩单:Eterna100 基准排行 · 混合约束设计 · 智能体能力与记忆。"),
+    ("found", "🔬 地基与确定性验证", "验证这个领域是否「确定性可复现」,以及「看诊断再动手 vs 乱试」是否真有用(对照实验)。"),
+    ("debug", "🧫 冒烟 / 调试运行(可忽略)", "开发过程中的小规模测试,没有正式结论,列在这里仅为完整。"),
+    ("other", "其他运行", ""),
+]
+
+
+def _run_model(run_dir: str) -> str:
+    s = _read_json(os.path.join(run_dir, "summary.json")) or {}
+    return s.get("model") or ""
+
+
+def _categorize(name: str, files: List[str], kind: Optional[str], s: Dict) -> str:
+    low = name.lower()
+    if "smoke" in low:
+        return "debug"
+    if "scorecard.json" in files:
+        return "score"
+    if name == "zero_credit_main" or "meta_summary.json" in files:
+        return "found"
+    if kind == "agent":
+        return "eval"
+    if kind == "campaign":
+        return "meta"
+    if s["n_records"] == 0 and s.get("kind") is None:
+        return "debug"  # incomplete / traces-only helper run
+    return "other"
+
+
+def _plain_desc(name: str, cat: str, s: Dict, headline: str, model: str, ntr: int) -> str:
+    n, solved = s["n_records"], s["solved"]
+    rate = f"{s['solve_rate']:.0%}" if s.get("solve_rate") is not None else "—"
+    m = esc(model.split("/")[-1]) if model else "某模型"
+    if cat == "eval":
+        return (f"AI 模型 <b>{m}</b> 独立设计 RNA:在 <b>{n}</b> 道 Eterna100 谜题上解对 "
+                f"<b>{solved}</b> 道(<b>{rate}</b>)。点 Report 看逐题结果 + 每道题的「目标形状 vs 实际折叠」对比图。")
+    if cat == "meta":
+        if "HELP" in headline.upper() or "MEMORY" in headline.upper():
+            return ("记忆实验:让智能体把经验存进记忆反复练 —— 结果显示 <b>记忆有帮助</b>"
+                    "(解题所需尝试次数随练习下降)。点 Report 看自我改进曲线。")
+        return f"元学习 campaign:共 <b>{n}</b> 次尝试,解对 <b>{solved}</b> 次。点 Report 看各「记忆臂」对比曲线。"
+    if cat == "score":
+        return "综合成绩单:三面板 —— Eterna100 基准排行(基线算法解出率)· 混合约束设计 · 智能体能力与记忆增益。"
+    if cat == "found":
+        if name == "zero_credit_main":
+            return ("地基验证:数据/奖励/轨迹三种「确定性」均 ≈ 1;并做「看诊断再动手 vs 随机乱试 vs 丢弃诊断」"
+                    "的对照,证明<b>让诊断驱动下一步</b>确实提升解题率。")
+        return "经典(非 AI)记忆实验对照:用本地搜索验证「记忆能降低搜索成本」这一机制本身。"
+    if cat == "debug":
+        return "小规模冒烟 / 调试测试(开发用,无正式结论)。"
+    return f"运行 {esc(name)}(共 {n} 次尝试,解对 {solved})。"
+
+
 def runs_index(runs_root: str) -> str:
-    rows = []
     names = []
+    buckets: Dict[str, List[str]] = {k: [] for k, _, _ in _CATS}
     for name in sorted(os.listdir(runs_root)):
         d = os.path.join(runs_root, name)
         if not os.path.isdir(d):
@@ -416,30 +473,69 @@ def runs_index(runs_root: str) -> str:
         s = _run_summary(d)
         css, headline, _ = _verdict(d)
         ntr = len(os.listdir(os.path.join(d, "traces"))) if os.path.isdir(os.path.join(d, "traces")) else 0
-        rows.append(
-            f"<tr><td><a href='/report/{esc(name)}'><b>{esc(name)}</b></a></td>"
-            f"<td>{esc(_kind(d, files))}</td>"
-            f"<td><span class='badge {css}'>{esc(headline)}</span></td>"
-            f"<td>{(str(s['solved'])+'/'+str(s['n_records'])+' solved') if s['n_records'] else '&mdash;'}</td>"
-            f"<td>{ntr or '&mdash;'}</td>"
-            f"<td><a href='/report/{esc(name)}'>Report</a>"
-            f"{' &middot; <a href=/trace/'+esc(name)+'>Trace</a>' if ntr else ''}"
-            f"{' &middot; <a href=/memory/'+esc(name)+'>Memory</a>' if os.path.exists(os.path.join(d,'campaign_state.json')) or any(x.startswith('memdir') for x in files) else ''}"
-            f"</td></tr>")
+        cat = _categorize(name, files, s.get("kind"), s)
+        model = _run_model(d)
+        desc = _plain_desc(name, cat, s, headline, model, ntr)
+        scale = []
+        if s["n_records"]:
+            scale.append(f"{s['n_records']} 次尝试")
+        if ntr:
+            scale.append(f"{ntr} 段录像")
+        scale_txt = " · ".join(scale) or "—"
+        actions = f"<a href='/report/{esc(name)}'>Report</a>"
+        if ntr:
+            actions += f" · <a href='/trace/{esc(name)}'>Trace</a>"
+        if os.path.exists(os.path.join(d, "campaign_state.json")) or any(x.startswith("memdir") for x in files):
+            actions += f" · <a href='/memory/{esc(name)}'>Memory</a>"
+        row = (f"<tr><td><a href='/report/{esc(name)}'><b>{esc(name)}</b></a><br>"
+               f"<span class='badge {css}'>{esc(headline)}</span></td>"
+               f"<td>{desc}<div class='muted' style='margin-top:3px'>规模:{scale_txt}</div></td>"
+               f"<td>{actions}</td></tr>")
+        buckets[cat].append(row)
+
+    # hero + glossary
+    hero = ("<section><h2>这是什么?</h2><div class='card'>"
+            "<p><b>openclaude_rna</b> 是一个让 <b>AI 智能体自动设计 RNA 序列</b>的实验平台。"
+            "给它一个目标「形状」(RNA 二级结构,如发夹/茎环),它要设计出一条能折叠成该形状的碱基序列(A/C/G/U);"
+            "由 <b>ViennaRNA 折叠算法</b>当裁判验证对不对。下面每一行是一次「实验运行」,按用途分成几类。</p>"
+            "<p class='muted'><b>红线</b>:所有「成功/解出」都仅指「在折叠算法裁判下设计正确」,不代表任何体内或生物功能。</p>"
+            "</div></section>")
+    glossary = ("<details class='card'><summary>看不懂表格?点这里看术语说明</summary>"
+                "<ul style='margin:8px 0 0;padding-left:20px;line-height:1.9'>"
+                "<li><b>解出 / Solved 8/10</b>:设计的序列其「最低能量折叠」= 目标形状;10 道里解对 8 道。</li>"
+                "<li><b>Memory HELPS</b>:记忆实验的结论 —— 智能体累积经验后更省力(尝试次数下降)。</li>"
+                "<li><b>尝试(episode)</b>:对一道题的一次完整设计尝试。</li>"
+                "<li><b>录像(trace)</b>:智能体每一步操作的完整记录,可在 Trace 页回放。</li>"
+                "<li><b>Report / Trace / Memory</b>:详情报告 / 操作录像 / 它学到的记忆。</li>"
+                "<li><b>Run / Scorecard</b>(灰标):辅助运行 / 综合成绩单。</li>"
+                "</ul></details>")
+
+    sections = [hero, glossary]
+    for key, title, expl in _CATS:
+        rows = buckets.get(key) or []
+        if not rows:
+            continue
+        table = ("<div class='scroll'><table><thead><tr><th style='width:22%'>运行</th>"
+                 "<th>说明与结果</th><th style='width:16%'>操作</th></tr></thead><tbody>"
+                 + "".join(rows) + "</tbody></table></div>")
+        block = f"<h2>{title}</h2>" + (f"<p class='muted'>{expl}</p>" if expl else "") + table
+        if key == "debug":  # collapse the noise
+            sections.append(f"<section><details><summary style='font-size:1.1rem;font-weight:700'>"
+                            f"{title} <span class='muted' style='font-weight:400'>(点开)</span></summary>"
+                            f"{('<p class=muted>'+expl+'</p>') if expl else ''}{table}</details></section>")
+        else:
+            sections.append(f"<section>{block}</section>")
+
     opts = "".join(f"<option>{esc(nm)}</option>" for nm in names)
     compare_form = (
-        "<section><h2>&#9878; Compare two runs</h2>"
+        "<section><h2>&#9878; 对比两次运行</h2>"
+        "<p class='muted'>选两个「AI 模型能力评测」运行(同一批题),看谁解得多、谁更省、逐题胜负。</p>"
         "<form action='/compare' method='get' class='card'>"
         f"A <select name='a'>{opts}</select> &nbsp; vs &nbsp; B <select name='b'>{opts}</select> &nbsp; "
-        "<button type='submit'>Compare &rarr;</button>"
-        "<span class='muted' style='margin-left:10px'>head-to-head metrics + per-task win/loss "
-        "(best for two agent runs on the same task set)</span></form></section>")
-    body = (f"<main><section><h2>Runs</h2><div class='scroll'><table>"
-            f"<thead><tr><th>Run</th><th>Type</th><th>Verdict</th><th>Episodes</th>"
-            f"<th>Traces</th><th>Actions</th></tr></thead><tbody>{''.join(rows)}</tbody></table></div>"
-            f"<p class='muted' style='margin-top:10px'>Red line: design success under the ViennaRNA "
-            f"folding oracle only &mdash; never in-vivo function.</p></section>{compare_form}</main>")
-    return page("openclaude_rna runs", body)
+        "<button type='submit'>对比 &rarr;</button></form></section>")
+
+    body = "<main>" + "".join(sections) + compare_form + "</main>"
+    return page("openclaude_rna 实验总览", body)
 
 
 def _episode_rows(recs: List[Dict]) -> str:
@@ -534,6 +630,16 @@ def report(runs_root: str, run: str) -> str:
             f"<span class='lnk'><a href='/ui'>&#8592; runs</a> &middot; "
             f"<a href='/trace/{esc(run)}'>Trace</a>{mem_link}</span></div>",
             "<main>"]
+
+    _intro = {
+        "agent": "🧪 <b>AI 模型能力评测</b>:给这个 AI 模型一批 RNA 折叠谜题(每题给一个目标「形状」,"
+                 "让它设计出能折叠成该形状的碱基序列 A/C/G/U),看它独立解对几道。绿=解出、红=未解出;"
+                 "下方有每道题「目标形状 vs 实际折叠」的弧线对比图。",
+        "campaign": "📈 <b>元学习实验</b>:让智能体反复练同一批谜题、把经验存进记忆,"
+                    "看它是否「越做越省」(解题所需尝试次数随练习下降)。",
+    }.get(kind, "")
+    if _intro:
+        body.append(f"<div class='card' style='margin:16px 0 4px'>{_intro}</div>")
 
     if kind == "agent":
         # single-pass AGENT capability report (agent_runner summary.json)
