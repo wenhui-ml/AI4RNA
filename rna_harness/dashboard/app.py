@@ -264,7 +264,7 @@ HTML_PAGE = """<!doctype html><html><head><meta charset="utf-8">
  <pre id="logbox">选择一个日志…</pre>
 </div>
 <script>
-let RUNS=[];
+let RUNS=[]; let SCORECARD=[];
 function tab(t){document.querySelectorAll('.tab').forEach(e=>e.classList.toggle('active',e.dataset.t==t));
  ['scorecard','campaigns','overview','runs','figures','logs'].forEach(p=>document.getElementById(p).style.display=p==t?'block':'none');}
 function fmt(x){return x==null?'—':(typeof x=='number'?(Math.round(x*1000)/1000):x)}
@@ -274,9 +274,32 @@ async function load(){
  const h=await (await fetch('/health')).json();
  document.getElementById('health')&&(document.getElementById('health').textContent='');
  RUNS=(await (await fetch('/api/runs')).json()).runs;
- renderOverview(); renderRuns(); renderFigures();
- try{const sc=(await (await fetch('/api/scorecard')).json()).scorecards; renderScorecard(sc);}catch(e){}
+ renderOverview(); renderRuns();
+ try{const sc=(await (await fetch('/api/scorecard')).json()).scorecards; SCORECARD=sc; renderScorecard(sc);}catch(e){}
  try{const cp=(await (await fetch('/api/campaigns')).json()).campaigns; renderCampaigns(cp);}catch(e){}
+ renderFigures();
+}
+function svgBars(title,items,opt){
+ opt=opt||{}; items=items.filter(i=>i&&i.value!=null);
+ if(!items.length) return '';
+ const mx=Math.max.apply(null,items.map(i=>i.value));
+ const ymax=opt.ymax!=null?opt.ymax:(mx<=1?Math.min(1,mx*1.35+0.05):mx*1.15);
+ const W=520,H=300,ml=52,mr=16,mt=42,mb=64,pw=W-ml-mr,ph=H-mt-mb;
+ const gap=pw/items.length, bw=Math.min(96,gap*0.6);
+ const sy=v=>mt+ph*(1-(v/ymax));
+ let s=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;max-width:540px;height:auto;background:#fff;border:1px solid #e6e8ec;border-radius:8px">`;
+ s+=`<text x="${W/2}" y="24" text-anchor="middle" font-size="14" font-weight="700" fill="#1a1a2e">${title}</text>`;
+ for(let k=0;k<=4;k++){const gy=mt+ph*k/4,val=ymax*(1-k/4);
+  s+=`<line x1="${ml}" y1="${gy}" x2="${W-mr}" y2="${gy}" stroke="#eceff1"/>`;
+  s+=`<text x="${ml-6}" y="${gy+4}" text-anchor="end" font-size="10" fill="#90a4ae">${val.toFixed(ymax<=1?2:0)}</text>`;}
+ s+=`<line x1="${ml}" y1="${mt+ph}" x2="${W-mr}" y2="${mt+ph}" stroke="#b0bec5"/>`;
+ items.forEach((it,i)=>{const cx=ml+gap*(i+0.5),x=cx-bw/2,v=it.value,y=sy(v),h=Math.max(0,mt+ph-y);
+  const col=it.color||(opt.colorByValue?(v>=0.6?'#2e7d32':(v>=0.3?'#f9a825':'#c62828')):'#4c78a8');
+  s+=`<rect x="${x}" y="${y}" width="${bw}" height="${h}" fill="${col}" rx="2"/>`;
+  s+=`<text x="${cx}" y="${y-5}" text-anchor="middle" font-size="12" font-weight="700" fill="#1a1a2e">${v.toFixed(opt.dec==null?2:opt.dec)}</text>`;
+  s+=`<text x="${cx}" y="${mt+ph+16}" text-anchor="middle" font-size="11" fill="#374151">${it.label}</text>`;});
+ s+='</svg>';
+ return `<div class="card" style="flex:1 1 360px;min-width:320px">${s}${opt.caption?('<p class="note">'+opt.caption+'</p>'):''}</div>`;
 }
 function renderCampaigns(cps){
  const el=document.getElementById('campaigns'); if(!el)return;
@@ -349,8 +372,34 @@ function renderRuns(){
  document.getElementById('runs').innerHTML=h;
 }
 function renderFigures(){
- let h='<h3>📊 图表</h3>'+note('由实验自动生成的图(如驱动保真度差距、基线解出率、饱和曲线)。');
- for(const r of RUNS){for(const f of (r.figures||[])){h+=`<img src="/fig/${encodeURIComponent(r.name)}/${encodeURIComponent(f)}" title="${r.name}/${f}">`;}}
+ let h='<h3>📊 图表(动态渲染)</h3>'+note('由实验数据现场渲染的柱状图(内联 SVG,可随数据更新,无外部依赖、不裁切)。');
+ let charts='';
+ const sc=(SCORECARD&&SCORECARD[0])?SCORECARD[0].scorecard:null;
+ const lbl={diagnosis:'照诊断改',random:'随机乱改',silent_fallback:'丢掉诊断'};
+ // 1) 经典基线地板
+ if(sc&&sc.panels&&sc.panels.standard_leaderboard){const bm=sc.panels.standard_leaderboard.by_method||{};
+  charts+=svgBars('经典基线在 Eterna100(全100题)的解出率', Object.entries(bm).map(([m,v])=>({label:m,value:v.solved_rate})),
+   {ymax:1,colorByValue:true,caption:'传统算法(非 AI)的「地板线」—— AI 智能体要超越它。'});}
+ // 2) 驱动保真度 gap(解出率 + A)
+ if(sc&&sc.panels&&sc.panels.agent_capability&&sc.panels.agent_capability.actuation_ablation){const ab=sc.panels.agent_capability.actuation_ablation;
+  charts+=svgBars('① 解出率:照诊断改 vs 随机乱改 vs 丢掉诊断', Object.entries(ab).map(([m,v])=>({label:lbl[m]||m,value:v.solve_rate})),
+   {colorByValue:false,caption:'照诊断行动解得最多 → 「让诊断驱动下一步」确实有用(项目核心论点)。'});
+  charts+=svgBars('② 驱动保真度 A(诊断是否真的控制了编辑)', Object.entries(ab).map(([m,v])=>({label:lbl[m]||m,value:v.A})),
+   {ymax:1,colorByValue:true,caption:'A 越高=越照诊断行动;框架丢弃诊断 → A=0,解出率塌回随机水平。'});}
+ // 3) 四坐标确定性
+ const cr=RUNS.find(r=>r.summary&&r.summary.coords);
+ if(cr){const c=cr.summary.coords;
+  charts+=svgBars('确定性四坐标(均应 ≈ 1)', [{label:'数据确定性',value:c.D_sym},{label:'奖励确定性',value:c.R_det},{label:'轨迹确定性',value:c.T_trace}],
+   {ymax:1,color:'#2e7d32',caption:'RNA 是「确定性正对照」:数据/奖励/轨迹都可精确复现,把「驱动保真度」隔离成唯一变量。'});}
+ // 4) AI 模型解出率对比(各评测运行)
+ const evals=RUNS.filter(r=>r.summary&&r.summary.model&&r.summary.solve_rate!=null);
+ if(evals.length){charts+=svgBars('AI 模型解出率对比(各评测运行)',
+   evals.map(r=>({label:(r.summary.model.split('/').pop()||r.name).slice(0,16),value:r.summary.solve_rate})),
+   {ymax:1,colorByValue:true,caption:'各次「AI 模型能力评测」的解出率。点「概览」看每个的完整报告。'});}
+ h+=`<div style="display:flex;flex-wrap:wrap;gap:14px">${charts||'<div class="card">暂无可渲染数据</div>'}</div>`;
+ // 原始 matplotlib PNG 折叠存档
+ let imgs=''; for(const r of RUNS){for(const f of (r.figures||[])){imgs+=`<img src="/fig/${encodeURIComponent(r.name)}/${encodeURIComponent(f)}" title="${r.name}/${f}">`;}}
+ if(imgs)h+=`<details style="margin-top:16px"><summary>原始静态图(matplotlib,存档用)</summary><div style="margin-top:8px">${imgs}</div></details>`;
  document.getElementById('figures').innerHTML=h;
 }
 async function loadLogList(){
