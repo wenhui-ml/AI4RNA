@@ -265,6 +265,7 @@ HTML_PAGE = """<!doctype html><html><head><meta charset="utf-8">
 </div>
 <script>
 let RUNS=[]; let SCORECARD=[];
+const SOTA_V2=[{m:'DesiRNA 经典SOTA',v:0.97,c:'#2e7d32'},{m:'NEMO 严格定预算',v:0.90,c:'#78909c'},{m:'LLM方法SOTA',v:0.80,c:'#d97706'}];
 function tab(t){document.querySelectorAll('.tab').forEach(e=>e.classList.toggle('active',e.dataset.t==t));
  ['scorecard','campaigns','overview','runs','figures','logs'].forEach(p=>document.getElementById(p).style.display=p==t?'block':'none');}
 function fmt(x){return x==null?'—':(typeof x=='number'?(Math.round(x*1000)/1000):x)}
@@ -298,6 +299,9 @@ function svgBars(title,items,opt){
   s+=`<rect x="${x}" y="${y}" width="${bw}" height="${h}" fill="${col}" rx="2"/>`;
   s+=`<text x="${cx}" y="${y-5}" text-anchor="middle" font-size="12" font-weight="700" fill="#1a1a2e">${v.toFixed(opt.dec==null?2:opt.dec)}</text>`;
   s+=`<text x="${cx}" y="${mt+ph+16}" text-anchor="middle" font-size="11" fill="#374151">${it.label}</text>`;});
+ (opt.refs||[]).forEach(rf=>{if(rf.v>ymax)return;const y=sy(rf.v);const col=rf.c||'#c62828';
+  s+=`<line x1="${ml}" y1="${y}" x2="${W-mr}" y2="${y}" stroke="${col}" stroke-width="1.4" stroke-dasharray="5 4"/>`;
+  s+=`<text x="${W-mr-2}" y="${y-3}" text-anchor="end" font-size="10" font-weight="700" fill="${col}">${rf.m} ${rf.v.toFixed(2)}</text>`;});
  s+='</svg>';
  return `<div class="card" style="flex:1 1 360px;min-width:320px">${s}${opt.caption?('<p class="note">'+opt.caption+'</p>'):''}</div>`;
 }
@@ -321,7 +325,7 @@ function renderScorecard(cards){
   h+=`<div class="card"><div class="name">🏆 ${c.name}</div><div class="sub">红线:仅在折叠算法裁判下判成功,不涉体内功能。</div>`;
   const s=p.standard_leaderboard;
   if(s){h+=`<h4>① Eterna100 基准:传统算法的「地板线」</h4>`+
-   note('100 道公认 RNA 谜题上,两个<b>传统基线算法</b>各解对多少道 —— 这是 AI 要超越的地板。<b>solved/100</b>=解对几道;<b>uMFE</b>=其中「唯一最优解」几道(更稳);<b>NED</b>=折叠不干脆程度(越低越好);<b>mean s</b>=每题耗时秒。')+
+   note('100 道公认 RNA 谜题上,两个<b>传统基线算法</b>各解对多少道 —— 这是 AI 要超越的地板(本 harness 预算下的测量,非文献上限)。<b>solved/100</b>=解对几道;<b>uMFE</b>=其中「唯一最优解」几道(更稳);<b>NED</b>=折叠不干脆程度(越低越好);<b>mean s</b>=每题耗时秒。<br>📌 <b>公开 SOTA 标尺</b>:V2 经典榜首 <b>DesiRNA 97/100</b>(NAR 2025)· V2 LLM 方法 SOTA <b>~80</b>(Gautam 2026)· V1 已饱和 100/100。要超越需口径对齐(见「图表」页)。')+
    `<table><tr><th>方法</th><th>解对/100</th><th>解出率</th><th>uMFE</th><th>NED(全部)</th><th>NED(解出)</th><th>每题秒</th></tr>`+
    Object.entries(s.by_method).map(([m,v])=>`<tr><td>${m}</td><td><b>${v.solved}</b></td><td>${fmt(v.solved_rate)}</td><td>${v.umfe}</td><td>${fmt(v.mean_NED_all)}</td><td>${fmt(v.mean_NED_solved)}</td><td>${fmt(v.mean_secs)}</td></tr>`).join('')+`</table>`;}
   const hy=p.hybrid_seam;
@@ -373,6 +377,14 @@ function renderRuns(){
 }
 function renderFigures(){
  let h='<h3>📊 图表(动态渲染)</h3>'+note('由实验数据现场渲染(内联 SVG)。<b>重要:只有跑在「同一批题」上的运行才放进同一张对比图</b> —— 不同题集(全100题 / 随机10题 / 小demo)解出率不可直接比,分开呈现以免误导。');
+ // 🎯 公开 SOTA 标尺(要超越的数字)
+ h+=`<div class="card">🎯 <b>Eterna100 公开 SOTA(要超越的标尺 · 带引用)</b>
+  <div class="scroll"><table><tr><th>关键数字</th><th>值</th><th>出处</th></tr>
+  <tr><td>V1 榜首(已饱和)</td><td><b>100/100</b></td><td>Montparnasse (Cazenave 2025) · DesiRNA (Wirecki, NAR 2025)</td></tr>
+  <tr><td><b>V2 榜首(经典 SOTA)</b></td><td><b class="g">97/100</b></td><td>DesiRNA · Wirecki et al., NAR 2025(24h/题, Vienna2/Turner2004)</td></tr>
+  <tr><td>V2 严格定预算榜首</td><td>90/100</td><td>NEMO · Gautam et al. 2026</td></tr>
+  <tr><td><b>V2 · LLM 方法 SOTA</b></td><td><b class="y">~79–81/100</b></td><td>Qwen2.5-0.5B(SL+RL)· Gautam, arXiv:2602.12470 (2026)</td></tr>
+  </table></div>`+note('要打的目标 = <b>V2 榜首 DesiRNA 97/100</b>;LLM 路线的直接对标 = <b>LLM 方法 SOTA ~80</b>。V2 上无任何方法解到 100/100。对外声称「超越」需口径对齐:V2 题集 + ViennaRNA 2.6.4/Turner2004 + 精确 MFE 判定 + 报告预算。');
  const sc=(SCORECARD&&SCORECARD[0])?SCORECARD[0].scorecard:null;
  const lbl={diagnosis:'照诊断改',random:'随机乱改',silent_fallback:'丢掉诊断'};
  // 确定性三坐标:一行陈述(三根 1.00 的柱图无信息量)
@@ -395,8 +407,8 @@ function renderFigures(){
  if(sc&&sc.panels&&sc.panels.standard_leaderboard){const bm=sc.panels.standard_leaderboard.by_method||{};
   let items=Object.entries(bm).map(([m,v])=>({label:m,value:v.solved_rate,color:'#90a4ae'}));
   full.forEach(r=>items.push({label:r.summary.model.split('/').pop(),value:r.summary.solve_rate,color:'#4c78a8'}));
-  charts+=svgBars('全 Eterna100(100 题):AI 模型 vs 经典基线', items,
-   {ymax:1,caption:'同为「全100题」(含大量 >100nt 难题)。<b>灰 = 两个传统(非 AI)算法的「地板线」</b>:rnainverse(ViennaRNA 自带的经典逆折叠)与 local_search(本地搜索);数值为<b>本 harness 预算下的测量</b>,非文献上限(加大重启数会更高)。蓝 = AI 模型。'+(full.length?'':' 任一 AI 模型跑完全 100 题后,其柱会自动并入此图与地板线对比。')});}
+  charts+=svgBars('全 Eterna100-V2(100 题):AI vs 经典基线 vs 公开 SOTA', items,
+   {ymax:1,refs:SOTA_V2,caption:'柱 = 解出率:<b>灰</b>=两个传统(非 AI)算法地板线(rnainverse=ViennaRNA 经典逆折叠、local_search=本地搜索;本 harness 预算下的测量,非文献上限)、<b>蓝</b>=AI 模型。<b>虚线 = 公开 SOTA 标尺</b>:绿=经典榜首 DesiRNA 0.97、灰=严格定预算 NEMO 0.90、橙=LLM 方法 0.80(见上表引用)。'+(full.length?'':' AI 全 100 题跑完后其柱自动加入,即可直接对着虚线看差距。')});}
  // 可比子集:同一题集且 ≥2 个运行(如 sonnet-5 vs deepseek 同 10 题)
  for(const sig in groups){const g=groups[sig];
   if(g.length>=2 && g[0].summary.n_tasks<100){
