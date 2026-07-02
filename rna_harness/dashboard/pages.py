@@ -336,7 +336,10 @@ def svg_arc(target: str, mfe: str, seq: str = "", solved=None, reason: str = "")
     has_fold = bool(seq) and bool(mfe)
     is_solved = solved if solved is not None else (has_fold and not missing and not spurious)
     mode = "target_only" if not has_fold else ("solved" if is_solved else "diagnostic")
-    draw_below = mode == "diagnostic"
+    # only mirror the achieved structure below the line when the pairings actually DIFFER. If
+    # target==achieved (bp-distance 0) yet the case is unsolved (length/uMFE), draw ONE clean arc
+    # set and let the reason note explain -- avoids confusing redundant "full circles".
+    draw_below = mode == "diagnostic" and bool(missing or spurious)
 
     step = max(6, min(16, int(1100 / n)))
     W = n * step + 40
@@ -369,10 +372,13 @@ def svg_arc(target: str, mfe: str, seq: str = "", solved=None, reason: str = "")
         for i, j in sorted(tp):  # target above
             parts.append(arc(i, j, True, "#2e7d32" if (i, j) in correct else "#f9a825",
                              dashed=(i, j) in missing))
-        for i, j in sorted(mp):  # achieved below
-            parts.append(arc(i, j, False, "#2e7d32" if (i, j) in correct else "#e53935"))
-    if seq and len(seq) == n and step >= 9:  # sequence letters on the axis
-        for i, ch in enumerate(seq.upper()):
+        if draw_below:
+            for i, j in sorted(mp):  # achieved below (only when it differs from target)
+                parts.append(arc(i, j, False, "#2e7d32" if (i, j) in correct else "#e53935"))
+    # sequence letters on the axis -- drawn even when seq is 1nt short so the length gap is VISIBLE
+    # (trailing axis slots stay empty), aligned to the real base positions the arcs use.
+    if seq and step >= 9:
+        for i, ch in enumerate(seq.upper()[:n]):
             parts.append(f"<text x='{x(i):.1f}' y='{ax+13:.1f}' font-size='{min(step,11)}' "
                          f"text-anchor='middle' font-family='monospace' fill='#455a64'>{ch}</text>")
     parts.append("</svg>")
