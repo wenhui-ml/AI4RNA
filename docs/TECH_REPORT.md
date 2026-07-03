@@ -14,6 +14,35 @@
 
 ---
 
+## 0. 全景流程
+
+### 0.1 极宏观:自进化闭环(项目使命)
+
+> 开源基模 →(本框架)→ 自循环进化 → 逼近闭源 / SOTA;由确定性折叠裁判提供可验证奖励闭环。
+
+```mermaid
+flowchart LR
+    BASE["开源顶尖基模<br/>DeepSeek-v4-pro · GLM-5.2 · Kimi"]
+    HARNESS["openclaude_rna<br/>Meta-Learning Harness"]
+    EVO{"自循环进化<br/>记忆蒸馏 + RL"}
+    ORACLE["Eterna100-V2<br/>折叠 oracle 裁判"]
+    GOAL["逼近闭源 / SOTA<br/>Sonnet-5 · DesiRNA 97/100"]
+
+    BASE --> HARNESS
+    HARNESS -->|"设计序列"| ORACLE
+    ORACLE -->|"确定性可验证奖励"| EVO
+    HARNESS --> EVO
+    EVO -->|"可迁移知识 + 更强权重"| HARNESS
+    EVO --> GOAL
+
+    classDef goal fill:#e8f5e9,stroke:#2e7d32,color:#1b5e20;
+    classDef judge fill:#e3f2fd,stroke:#1976d2,color:#0d47a1;
+    class GOAL goal;
+    class ORACLE judge;
+```
+
+---
+
 # 第一部分 · 技术框架
 
 ## 1. 问题定义
@@ -46,6 +75,37 @@
 │  可视化         dashboard/ (实时 solve-rate + 逐题 + 结构图)    │
 └─────────────────────────────────────────────────────────────┘
 ```
+
+### 2.1 相关宏观:单题 Episode + 元学习回路
+
+> 一道题的求解回路(诊断驱动的修复)+ 跨题的自改进回路(蒸馏进记忆 / RL 更新权重)。
+
+```mermaid
+flowchart TB
+    AG["openclaude Agent<br/>自主编排 · 非固定流程"]
+    T["目标结构<br/>dot-bracket"] --> AG
+    K["知识库<br/>rna_expert + motif_kb"] --> AG
+    M[("记忆库 memdir<br/>已学策略")] --> AG
+    AG <-->|"调用"| TOOL["工具集<br/>RnaVerify · parallel_search 160核 · Bash"]
+    AG --> SEQ["候选序列"]
+    SEQ --> V["裁判 verifier<br/>ViennaRNA 折叠"]
+    V -->|"诊断: 缺失/多余对/错配"| AG
+    V --> Q{"MFE == 目标?"}
+    Q -->|"solved"| REC["RLVR 样本<br/>轨迹 + 可验证奖励"]
+    Q -->|"unsolved"| REC
+    REC --> DIST["蒸馏 distill_strategies<br/>可检验策略"]
+    DIST --> M
+    REC --> RL["权重级 RL / GRPO"]
+    RL -.->|"更新权重"| AG
+
+    classDef store fill:#e8f5e9,stroke:#2e7d32,color:#1b5e20;
+    classDef judge fill:#e3f2fd,stroke:#1976d2,color:#0d47a1;
+    class M,DIST store;
+    class V,Q judge;
+```
+
+- **内环(每题)**:Agent → 候选 → 裁判 → **诊断驱动**下一步修复,直到 solved 或撞预算墙。
+- **外环(跨题)**:每条轨迹变成 RLVR 样本 →(a)蒸馏成可检验策略写回记忆(推理期自改进);(b)喂给权重级 RL 更新模型(参数级自进化)。
 
 **设计原则:开放式,而非固定 workflow。** 智能体拿到目标后,**自主**决定用哪些工具、写什么代码、如何迭代 —— 它拥有 openclaude 的完整能力(Bash、代码执行、MCP、记忆、子代理),而不是被编排成一条固定流水线。
 
