@@ -5,6 +5,17 @@
 
 > **Red line**: throughout this report, "success / solved" means **design-correct under the folding oracle only** (the designed sequence's MFE structure == the target dot-bracket). It does **not** imply any in-vivo function or expression.
 
+## Project Philosophy & Goal
+
+**End goal**: a general RNA inverse-design agent. What Claude Code is for people who cannot code, this is for RNA inverse design — hand it a target structure, get back a correct sequence, no expertise required.
+
+**Path — two stages of self-improvement:**
+
+- **Stage 1 · Push meta-learning to its limit.** The agent explores and solves each Eterna100-V2 puzzle using openclaude's **full Claude-Code-class capabilities** (tools, code execution, memory, MCP) in a self-loop that distills every trace into transferable strategy. We drive *inference-time* meta-learning to the ceiling a **fixed** model can reach. The **verifier is the deterministic folding oracle**; mature inverse-design algorithms (e.g. DesiRNA) define the target/ceiling to match or beat. We then **generalize from the fixed 100 puzzles to any open RNA target** (mature algorithms certify designability and generate open tasks). Closing this loop yields an agent adapted to arbitrary RNA inverse-design problems — useful to non-experts, the way Claude Code is.
+- **Stage 2 · Raise the base model.** Every trace is collected as agentic RLVR data. Once meta-learning **saturates against the model's ceiling**, we use that data for on-policy RL (GRPO) to train a **stronger base model** — the same ceiling-lifting progression as opus 4.1 → 4.6/4.7/4.8.
+
+**Why RNA makes this tractable** (see Part 3): the folding oracle is free, exact, and self-checkable → R_det ≈ 1 (no oracle residue) and A is high (loop closed), so self-improvement can actually **compound** — the precondition catalysis lacked. Success is measured by **generalization to open problems and usefulness to non-experts**, not by an Eterna100 score alone.
+
 ## Abstract
 
 We specialize the general coding agent openclaude into an **RNA inverse-design solver** and layer on a **cross-task self-improvement (meta-learning) layer**. The goal is not to pick the strongest static model, but to **drive open frontier models, via a self-evolution loop (memory distillation + RL), toward closed-model / SOTA parity**. Three **memory-free** base-model runs on Eterna100-V2: **GLM-5.2 56 · Sonnet-5 51 · DeepSeek-v4-pro 47** (/100). **90–98 % of failures are 1500 s wall-clock timeouts**, rooted in classical search failing to converge on hard long structures — **not model reasoning, not tool selection**. Theoretically, the framework absorbs two InceptLabs papers and argues that **RNA-under-ViennaRNA is a positive control that simultaneously clears both of their obstacles**: R_det ≈ 1 (no oracle residue), measured **A ≈ 0.86** (loop closed), and its residual bottleneck (search) is of the **amortizable** kind.
