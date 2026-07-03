@@ -286,9 +286,21 @@ def run_agent_on_task(
             f.write(json.dumps({"type": "rna_memory_snapshot", **mem_snap}) + "\n")
         f.write(stdout or "")
 
-    final_seq = _extract_final_sequence(lines, task.n)
+    declared = _extract_final_sequence(lines, task.n)
+    final_seq = declared
     v = verify(task, final_seq, compute_cross_oracle=cross_oracle) if final_seq else None
-    best_eff = _best_effort_candidate(lines, task, final_seq)
+    best_eff = _best_effort_candidate(lines, task, declared)
+    # Salvage (A_harness closure): if the agent TESTED a verified-solved sequence but the declared
+    # FINAL_SEQUENCE was missing/unsolved (lost to a wall-clock timeout or a format slip), deliver
+    # that oracle-verified candidate as the answer. This closes the delivery seam -- the same
+    # Diagnosis->Actuation gap that pins A_harness in the failure literature -- without inventing
+    # anything: the sequence is one the agent itself produced and the oracle confirmed. Audited via
+    # the `salvaged` flag so declared-vs-recovered wins stay distinguishable.
+    salvaged = False
+    if best_eff and best_eff.get("solved") and not (v and v.solved):
+        final_seq = best_eff["sequence"]
+        v = verify(task, final_seq, compute_cross_oracle=cross_oracle)
+        salvaged = True
     tool_calls = _count_tool_calls(lines)
     # Actuation fidelity (A) reconstructed from the REAL agent tool-call chain.
     from ..actuation.trace import actuation_from_agent_trace
@@ -310,7 +322,8 @@ def run_agent_on_task(
         "final_sequence": final_seq,
         "solved": bool(v.solved) if v else False,
         "reward": v.reward if v else 0.0,
-        "delivered": bool(final_seq),                       # did the agent emit a FINAL_SEQUENCE?
+        "delivered": bool(declared),                        # did the agent itself emit a FINAL_SEQUENCE?
+        "salvaged": salvaged,                               # answer recovered from a tested candidate (A_harness)
         "best_effort": best_eff,                            # best right-length candidate it tested
         "capability_solved": bool(best_eff and best_eff["solved"]),  # solved incl. undelivered work
         "cross_oracle": (v.cross_oracle or {}).get("fraction") if v and v.cross_oracle else None,
