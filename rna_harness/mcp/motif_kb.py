@@ -13,7 +13,7 @@ loops are strongest closed by a G-C/C-G pair; loops < 3 nt cannot close a hairpi
 """
 from __future__ import annotations
 
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 from ..structure_utils import pair_table
 
@@ -213,6 +213,71 @@ def _stem_lengths(target: str) -> List[int]:
     return lengths
 
 
+def decompose_structure(dot_bracket: str) -> Dict:
+    """Partition the target into independent stem-loop DESIGN UNITS + the JUNCTIONS that connect
+    them, so a long target is designed piece-by-piece: each unit folds on its own and is short
+    enough for search to converge fast; then assemble and repair the seams. This is the
+    orchestration key to long structures (the classical solver stays fixed; the agent supplies
+    the divide-and-conquer strategy). Recursion: an outermost pair whose interior holds <=1
+    outermost pair is one stem-loop (a leaf unit -- bulges/internal loops included); an outermost
+    pair whose interior holds >=2 is a multiloop closing pair (a junction) -- recurse into each
+    branch."""
+    try:
+        pt = pair_table(dot_bracket)
+    except ValueError as e:
+        return {"error": f"invalid dot-bracket: {e}"}
+    n = len(dot_bracket)
+    units: List[Tuple[int, int]] = []
+    junctions: List[Tuple[int, int]] = []
+
+    def outermost(lo: int, hi: int) -> List[Tuple[int, int]]:
+        res, k = [], lo
+        while k <= hi:
+            j = pt[k]
+            if j > k and j <= hi:
+                res.append((k, j)); k = j + 1
+            else:
+                k += 1
+        return res
+
+    def walk(lo: int, hi: int) -> None:
+        for a, b in outermost(lo, hi):
+            # descend the single-child stem chain (stacks/bulges/internal loops) from (a,b)
+            c, d = a, b
+            inner = outermost(c + 1, d - 1)
+            while len(inner) == 1:
+                c, d = inner[0]
+                inner = outermost(c + 1, d - 1)
+            if len(inner) == 0:
+                units.append((a, b))            # a pure stem-loop -> leaf design unit
+            else:
+                junctions.append((c, d))         # (c,d) closes a multiloop -> a seam
+                for e, f in inner:
+                    walk(e, f)                   # recurse into each branch
+
+    walk(0, n - 1)
+    covered = {k for a, b in units for k in range(a, b + 1)}
+    seam = [k for k in range(n) if k not in covered]   # stems-to-multiloops + multiloop cores + linkers
+    return {
+        "n_units": len(units),
+        "units": [{"positions": [a, b], "len": b - a + 1, "sub_target": dot_bracket[a:b + 1]}
+                  for a, b in sorted(units)],
+        "n_junctions": len(junctions),
+        "junctions": [{"closing_pair_positions": [a, b],
+                       "branches": len(outermost(a + 1, b - 1))} for a, b in sorted(junctions)],
+        "n_seam_positions": len(seam),
+        "strategy": (
+            "DECOMPOSE -> DESIGN -> STITCH -> REPAIR (use for long/hard targets): "
+            "(1) design each unit's `sub_target` INDEPENDENTLY -- each is short, so "
+            "mcp__rna_motifs__parallel_search converges on it fast; (2) place each unit's sequence "
+            "at its `positions`, fill linkers A-rich and multiloop closing pairs with G-C; "
+            "(3) fold the FULL assembly with RnaVerify and run the diagnosis-guided repair loop, "
+            "editing ONLY the diagnosed junction/seam positions (the units are already correct). "
+            "This replaces one exponential whole-length search with N small searches + seam repair."
+        ),
+    }
+
+
 def analyze_structure(dot_bracket: str) -> Dict:
     """Parse a target dot-bracket, enumerate hairpin loops with recommended cap motifs, and
     flag the classic hard features (lonely pairs, triloops, pseudoknots). Actionable priors;
@@ -259,8 +324,11 @@ def analyze_structure(dot_bracket: str) -> Dict:
         "stem_lengths": stems,
         "hairpins": hairpin_recs,
         "hard_feature_flags": flags or ["none obvious"],
+        "decomposition": decompose_structure(dot_bracket),
         "general_advice": "Nucleate each hairpin with its recommended cap on a G-C/C-G closing "
                           "pair, keep unpaired linkers A-rich, then fold and run the "
-                          "verifier-guided repair loop (edit exactly the diagnosed positions).",
+                          "verifier-guided repair loop (edit exactly the diagnosed positions). "
+                          "For long/multiloop targets, use `decomposition`: design each unit "
+                          "independently, assemble, then repair only the junction seams.",
         "kb_version": KB_VERSION,
     }

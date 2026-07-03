@@ -51,12 +51,19 @@ def _build_prompt(task: DesignTask, knowledge: str, enable_mcp: bool = True) -> 
 
     mcp_hint = (
         " You also have MCP tools. For a design PLAN: mcp__rna_motifs__analyze_target (per-hairpin "
-        "plan + hard-feature flags), mcp__rna_motifs__lookup_hairpin_loop (stable cap motifs), "
-        "mcp__rna_motifs__search_motifs (glossary). For COMPUTE (fast, many CPU cores in parallel "
-        "in ONE call): mcp__rna_motifs__parallel_search runs a many-restart search that often solves "
-        "the target outright -- prefer it over hand-writing a search loop; and "
-        "mcp__rna_motifs__batch_fold screens thousands of candidates at once. Always confirm the "
-        "final sequence with RnaVerify (the official scorer)."
+        "plan + hard-feature flags + a `decomposition`), mcp__rna_motifs__lookup_hairpin_loop "
+        "(stable cap motifs), mcp__rna_motifs__search_motifs (glossary). For COMPUTE (fast, many "
+        "CPU cores in parallel in ONE call): mcp__rna_motifs__parallel_search runs a many-restart "
+        "search that often solves the target outright -- prefer it over hand-writing a search loop; "
+        "and mcp__rna_motifs__batch_fold screens thousands of candidates at once. "
+        "STRATEGY FOR LONG / MULTILOOP TARGETS (this is where a single whole-length search times "
+        "out): DO NOT hammer parallel_search on the whole target. Instead DECOMPOSE -> DESIGN -> "
+        "STITCH -> REPAIR: call analyze_target, then for EACH unit in `decomposition.units` run "
+        "parallel_search on that unit's short `sub_target` INDEPENDENTLY (short => it converges "
+        "fast); place each solved unit's bases at its `positions`, fill the seam (linkers A-rich, "
+        "multiloop closing pairs G-C); then RnaVerify the FULL assembly and run the diagnosis-repair "
+        "loop editing ONLY the diagnosed seam positions -- the units are already correct. This turns "
+        "one exponential search into many small ones. Always confirm the final sequence with RnaVerify."
         if enable_mcp else ""
     )
     return (
