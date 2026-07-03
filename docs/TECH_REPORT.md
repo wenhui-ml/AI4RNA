@@ -1,29 +1,30 @@
-# openclaude_rna:RNA 逆设计 Meta-Learning Harness — 技术报告
+# openclaude_rna: An RNA Inverse-Design Meta-Learning Harness — Technical Report
 
-**2026-07-03 · InceptLabs · 裁判 ViennaRNA 2.7.2 (Turner2004, 37°C, dangles=2)**
+**2026-07-03 · InceptLabs · Judge: ViennaRNA 2.7.2 (Turner2004, 37 °C, dangles=2)**
+*Language: **English** · [中文](TECH_REPORT_zh.md)*
 
-> **红线**:全文「成功 / 解出」仅指**折叠 oracle 下设计正确**(设计序列 MFE 结构 == 目标点括号),**不代表 in-vivo 功能或表达**。
+> **Red line**: throughout this report, "success / solved" means **design-correct under the folding oracle only** (the designed sequence's MFE structure == the target dot-bracket). It does **not** imply any in-vivo function or expression.
 
-## 摘要
+## Abstract
 
-把通用编码智能体 openclaude 专化为 **RNA 逆设计求解器**,叠加**跨题自改进的元学习层**。目标不是挑最强静态模型,而是**驱动开源顶尖模型经自循环进化(记忆蒸馏 + RL)逼近闭源 / SOTA**。三基模**无记忆**对照(Eterna100-V2):**GLM-5.2 56 · Sonnet-5 51 · DeepSeek-v4-pro 47**(/100)。失败 **90–98% 是 1500s 超时**,根因是经典搜索在难长结构不收敛——**非模型推理、非工具选择**。理论上本框架吸收 InceptLabs 两篇论文,论证 **RNA-under-ViennaRNA 是同时避开其两道坎的 positive control**:R_det≈1(无 oracle 残差)、实测 **A≈0.86**(环已闭)、残余瓶颈(搜索)属**可 amortize**那一类。
+We specialize the general coding agent openclaude into an **RNA inverse-design solver** and layer on a **cross-task self-improvement (meta-learning) layer**. The goal is not to pick the strongest static model, but to **drive open frontier models, via a self-evolution loop (memory distillation + RL), toward closed-model / SOTA parity**. Three **memory-free** base-model runs on Eterna100-V2: **GLM-5.2 56 · Sonnet-5 51 · DeepSeek-v4-pro 47** (/100). **90–98 % of failures are 1500 s wall-clock timeouts**, rooted in classical search failing to converge on hard long structures — **not model reasoning, not tool selection**. Theoretically, the framework absorbs two InceptLabs papers and argues that **RNA-under-ViennaRNA is a positive control that simultaneously clears both of their obstacles**: R_det ≈ 1 (no oracle residue), measured **A ≈ 0.86** (loop closed), and its residual bottleneck (search) is of the **amortizable** kind.
 
-## 0. 全景
+## 0. Overview
 
-**自进化闭环(使命)** — 确定性裁判提供可验证奖励,驱动开源模型自举向 SOTA:
+**Self-evolution loop (the mission)** — a deterministic judge supplies verifiable reward, driving open models to bootstrap toward SOTA:
 
 ```mermaid
 flowchart LR
-    BASE["开源顶尖基模<br/>DeepSeek-v4-pro · GLM-5.2 · Kimi"]
+    BASE["Open frontier base models<br/>DeepSeek-v4-pro · GLM-5.2 · Kimi"]
     HARNESS["openclaude_rna<br/>Meta-Learning Harness"]
-    EVO{"自循环进化<br/>记忆蒸馏 + RL"}
-    ORACLE["Eterna100-V2<br/>折叠 oracle 裁判"]
-    GOAL["逼近闭源 / SOTA<br/>Sonnet-5 · DesiRNA 97/100"]
+    EVO{"Self-evolution loop<br/>memory distillation + RL"}
+    ORACLE["Eterna100-V2<br/>folding-oracle judge"]
+    GOAL["Approach closed / SOTA<br/>Sonnet-5 · DesiRNA 97/100"]
     BASE --> HARNESS
-    HARNESS -->|"设计序列"| ORACLE
-    ORACLE -->|"确定性可验证奖励"| EVO
+    HARNESS -->|"design sequence"| ORACLE
+    ORACLE -->|"deterministic verifiable reward"| EVO
     HARNESS --> EVO
-    EVO -->|"可迁移知识 + 更强权重"| HARNESS
+    EVO -->|"transferable knowledge + stronger weights"| HARNESS
     EVO --> GOAL
     classDef goal fill:#e8f5e9,stroke:#2e7d32,color:#1b5e20;
     classDef judge fill:#e3f2fd,stroke:#1976d2,color:#0d47a1;
@@ -31,21 +32,21 @@ flowchart LR
     class ORACLE judge;
 ```
 
-**单题内环(诊断驱动修复)+ 跨题外环(蒸馏 / RL)**:
+**Per-task inner loop (diagnosis-driven repair) + cross-task outer loop (distillation / RL):**
 
 ```mermaid
 flowchart TB
-    AG["openclaude Agent<br/>自主编排 · 非固定流程"]
-    T["目标结构 dot-bracket"] --> AG
-    K["知识库 rna_expert + motif_kb"] --> AG
-    M[("记忆库 memdir")] --> AG
-    AG <-->|"调用"| TOOL["工具<br/>RnaVerify · parallel_search 160核 · Bash"]
-    AG --> SEQ["候选序列"] --> V["裁判 verifier<br/>ViennaRNA 折叠"]
-    V -->|"诊断: 缺失/多余对/错配"| AG
-    V --> Q{"MFE == 目标?"}
-    Q -->|"solved / unsolved"| REC["RLVR 样本<br/>轨迹 + 可验证奖励"]
-    REC --> DIST["蒸馏 distill_strategies"] --> M
-    REC --> RL["权重级 RL / GRPO"] -.->|"更新权重"| AG
+    AG["openclaude Agent<br/>autonomous · not a fixed workflow"]
+    T["target structure (dot-bracket)"] --> AG
+    K["knowledge: rna_expert + motif_kb"] --> AG
+    M[("memory (memdir)")] --> AG
+    AG <-->|"call"| TOOL["tools<br/>RnaVerify · parallel_search 160 cores · Bash"]
+    AG --> SEQ["candidate sequence"] --> V["verifier<br/>ViennaRNA folding"]
+    V -->|"diagnosis: missing/spurious/mismatched pairs"| AG
+    V --> Q{"MFE == target?"}
+    Q -->|"solved / unsolved"| REC["RLVR sample<br/>trajectory + verifiable reward"]
+    REC --> DIST["distill_strategies"] --> M
+    REC --> RL["weight-level RL / GRPO"] -.->|"update weights"| AG
     classDef store fill:#e8f5e9,stroke:#2e7d32,color:#1b5e20;
     classDef judge fill:#e3f2fd,stroke:#1976d2,color:#0d47a1;
     class M,DIST store;
@@ -54,122 +55,122 @@ flowchart TB
 
 ---
 
-# 1 · 框架
+# 1 · Framework
 
-**问题**:给定目标二级结构 + 约束(GC 窗口 / 固定 motif / 禁用子序列),设计 {A,C,G,U} 序列使 ViennaRNA MFE == 目标。`solved` = MFE 串等目标;`uMFE` = 唯一 MFE(更严)。
+**Problem**: given a target secondary structure + constraints (GC window / fixed motif / forbidden subsequence), design a sequence over {A,C,G,U} whose ViennaRNA MFE == the target. `solved` = MFE string equals target; `uMFE` = target is the unique MFE (stricter).
 
-**分层(开放式自主,非固定 workflow):**
+**Layers (open-ended and autonomous, not a fixed workflow):**
 
-| 层 | 文件 | 作用 |
+| Layer | File | Role |
 |---|---|---|
-| 裁判 | `verifier.py` | 确定性折叠 oracle + 多能量模型一致性;给**逐位诊断**;不可 game |
-| Agent | `agent_runner.py` | 驱动 openclaude 走 OpenRouter,**换模型只改 `OPENAI_MODEL`**;对 openrouter 自动开 reasoning;每题 = 一条 agentic RLVR 样本 |
-| 工具(MCP)| `mcp/` | 知识:`motif_kb`(tetraloop 表 / 按环长推荐 / 结构分析);计算:`parallel_search`(多重启 SA,fan-out ≤ **160 核**)、`batch_fold`(干净子进程防死锁);原生 `RnaVerify/Fold/Diagnose/Constraints` |
-| 记忆 | `meta/` | 原生 memdir;从解出题蒸馏**可检验**策略(`hairpin_motif` / `gc_closing`)→ 支撑 A_memory;外化文字规则,**跨模型可迁移**(存 `memory_library/`)|
-| 可视化 | `dashboard/` | 自包含 SVG;进行中 run **实时战绩板**(扫 traces → oracle 现算,20s 自刷)|
+| Judge | `verifier.py` | Deterministic folding oracle + multi-energy-model agreement; emits **per-position diagnosis**; cannot be gamed |
+| Agent | `agent_runner.py` | Drives openclaude over OpenRouter; **swap models by changing only `OPENAI_MODEL`**; auto-enables reasoning for OpenRouter; each task = one agentic RLVR sample |
+| Tools (MCP) | `mcp/` | Knowledge: `motif_kb` (tetraloop tables / by-loop-length recommendation / structure analysis); compute: `parallel_search` (multi-restart SA, fan-out ≤ **160 cores**), `batch_fold` (clean subprocess to avoid deadlock); native `RnaVerify/Fold/Diagnose/Constraints` |
+| Memory | `meta/` | Native memdir; distills **checkable** strategies from solved tasks (`hairpin_motif` / `gc_closing`) → supports A_memory; externalized text rules, **transferable across models** (stored in `memory_library/`) |
+| Dashboard | `dashboard/` | Self-contained SVG; **live scoreboard** for in-progress runs (scan traces → oracle scores on the fly, 20 s auto-refresh) |
 
-**指标 = 四坐标诊断系统**(采自两篇论文;前三是域前提,第四是系统属性):
+**Metrics = a four-coordinate diagnostic system** (adopted from the two papers; the first three are domain preconditions, the fourth is a system property):
 
-| 坐标 | 含义 | RNA 取值 |
+| Coordinate | Meaning | RNA value |
 |---|---|---|
-| **D_sym** 数据纯度 | 学的是事物本身? | ≈1(dot-bracket 是可复现符号)|
-| **R_det** 奖励确定性 | 判据无歧义、不漂移? | ≈1(MFE==目标,确定精确)|
-| **T_trace** 轨迹保真 | 失败可归因到某步? | ≈1(逐位诊断)|
-| **A** actuation fidelity | 正确诊断真控制了下一步? | **实测 0.85–0.86** |
+| **D_sym** data purity | Is what we learn the thing itself? | ≈ 1 (dot-bracket is a reproducible symbol) |
+| **R_det** reward determinism | Is the criterion unambiguous and non-drifting? | ≈ 1 (MFE == target: deterministic, exact) |
+| **T_trace** trace fidelity | Is failure attributable to a step? | ≈ 1 (per-position diagnosis) |
+| **A** actuation fidelity | Does a correct diagnosis actually control the next step? | **measured 0.85–0.86** |
 
-A = A_harness × A_model;A_memory = A 的跨题版。四坐标全高 → 落 Paper 1 的 **"learning compounds(目标格)"**(详见 §3)。
+A = A_harness × A_model; A_memory is the cross-task version of A. All four high → the **"learning compounds (goal cell)"** of Paper 1 (see §3).
 
 ---
 
-# 2 · 三基模对照(Eterna100-V2)
+# 2 · Three-base-model comparison (Eterna100-V2)
 
-**设置**:三模型同配置 `--n-tasks 100 --max-len 400 --timeout-s 1500 --workers 3`,**纯基模 · 无记忆 · 无预算封顶**,reasoning 开。
+**Setup**: identical config for all three, `--n-tasks 100 --max-len 400 --timeout-s 1500 --workers 3`, **pure base model · no memory · no budget cap**, reasoning on.
 
-| 模型 | solved | capability | mean_reward | agent_A | mean RNA calls |
+| Model | solved | capability | mean_reward | agent_A | mean RNA calls |
 |---|---|---|---|---|---|
 | **GLM-5.2** | **56** | 58 | 1.21 | 0.86 | 2.61 |
 | **Sonnet-5** | 51 | 51 | 1.08 | 0.85 | 4.44 |
 | **DeepSeek-v4-pro** | 47 | 47 | 0.93 | 0.86 | 4.36 |
 
-**失败分析(300 次尝试)**:
-- **~90–98% 是 1500s 超时**(DeepSeek 46/53 · GLM 41/44 · Sonnet 48/49);答错仅 1–6;actuation 几乎不丢分(delivered ≈ capability)。
-- **frontier 均 400nt** → 长度非死刑,**结构硬度**才是。**硬核 33 题被三家全灭**(几乎全长题 + 全超时)。
-- **根因**:难长结构上经典 SA 在 1500s 内 `n_solved=0`(如 Cesspool 378nt:9 次 `parallel_search` 全 0),模型反复重调撞墙——**非推理、非工具选择**。
+**Failure analysis (300 attempts):**
+- **~90–98 % are 1500 s timeouts** (DeepSeek 46/53 · GLM 41/44 · Sonnet 48/49); genuine wrong answers only 1–6; actuation loses almost nothing (delivered ≈ capability).
+- **Frontier is 400 nt for all three** → length is not a death sentence; **structural hardness** is. **33 puzzles are unsolved by all three** (nearly all long + all timeouts).
+- **Root cause**: on hard long structures classical SA returns `n_solved=0` within 1500 s (e.g. Cesspool 378 nt: 9 `parallel_search` calls, all 0); the model re-invokes it into the wall — **not reasoning, not tool selection**.
 
-**公开 SOTA(目标是超越它,非自测)**:DesiRNA **97**(24h/题)· NEMO 90 · LLM-SOTA ~79–81 · 本框架裸基模 47–56。
+**Public SOTA (the target is to beat this, not local self-scores)**: DesiRNA **97** (24 h/puzzle) · NEMO 90 · LLM-SOTA ~79–81 · this framework, bare base models 47–56.
 
 ---
 
-# 3 · 理论根基:跨过催化的两道坎
+# 3 · Theoretical grounding: clearing catalysis's two obstacles
 
-**两道坎(InceptLabs 两篇论文诊断的自改进死因):**
-- **坎一 · A→0(环未闭)**:正确诊断在控制下一步前被丢弃。催化 A_before≈**0.095**、SAC **0/1781**(Stage-4 静默 bypass 覆盖正确指令)。
-- **坎二 · oracle 残差**:物理 oracle 昂贵 / 近似 / 不可自检 → R_det 有结构天花板 `α_f + q_f(B)(1−α_f) < 1`。反应势垒是低-α_f、oracle-bound 家族,固定预算下必平。「**capability eats knowledge, not computation**」。
+**The two obstacles (the self-improvement failure modes the two InceptLabs papers diagnose):**
+- **Obstacle 1 · A→0 (loop unclosed)**: a correct diagnosis is dropped before it controls the next step. Catalysis A_before ≈ **0.095**, SAC **0/1781** (a Stage-4 silent bypass overrode the correct directive).
+- **Obstacle 2 · oracle residue**: a physical oracle is expensive / approximate / not self-checkable → R_det has a structural ceiling `α_f + q_f(B)(1−α_f) < 1`. Reaction barriers are a low-α_f, oracle-bound family, flat at fixed budget. *"Capability eats knowledge, not computation."*
 
-| 维度 | 催化(踩坑)| RNA-under-ViennaRNA(本框架)|
+| Dimension | Catalysis (failed) | RNA-under-ViennaRNA (this work) |
 |---|---|---|
-| 裁判性质 | DFT/实验:昂贵·近似·**不可自检** | ViennaRNA:近 free · exact · **可自检** |
-| **R_det** | <1,有 oracle 残差 | **≈1,无残差**(closed/symbolic 端)|
-| **α_f** | 低(oracle-bound)| 高(games/code/math 同端)|
-| **A_harness** | →0(静默覆盖)| **≈1**(诊断直达下一轮,无静默 override)|
-| **A(实测)** | 0.095 / SAC 0.00 | **0.85–0.86** |
-| 学习能 compound? | 否(两坎皆中)| **是(两坎皆避)** |
+| Oracle nature | DFT/experiment: expensive · approximate · **not self-checkable** | ViennaRNA: near-free · exact · **self-checkable** |
+| **R_det** | < 1, has oracle residue | **≈ 1, no residue** (closed/symbolic end) |
+| **α_f** | low (oracle-bound) | high (same end as games/code/math) |
+| **A_harness** | → 0 (silent override) | **≈ 1** (diagnosis goes straight to the next turn, no silent override) |
+| **A (measured)** | 0.095 / SAC 0.00 | **0.85–0.86** |
+| Can learning compound? | No (both obstacles hit) | **Yes (both cleared)** |
 
 ```mermaid
 flowchart TD
-    F["学习曲线平?"] --> MA["先测 A<br/>(唯一可从日志直接数)"]
-    MA -->|"A→0"| SEAM{"哪个接缝?"}
-    SEAM -->|"A_harness→0 静默覆盖"| H["修控制路径<br/>【催化 SAC 0/1781】"]
-    SEAM -->|"A_model→0 先验压过上下文"| MM["换 / 重训模型"]
-    MA -->|"A 高"| DOM{"min D,R,T 低?"}
-    DOM -->|"低: oracle residue"| DE["determinism engineering<br/>【催化 barrier: 只能买 oracle】"]
-    DOM -->|"高: 域可学"| GOAL["learning compounds 目标格<br/>【RNA: A≈0.86 · R_det≈1】"]
+    F["Learning curve flat?"] --> MA["Measure A first<br/>(only log-countable coord)"]
+    MA -->|"A→0"| SEAM{"Which seam?"}
+    SEAM -->|"A_harness→0 silent override"| H["repair control path<br/>[catalysis SAC 0/1781]"]
+    SEAM -->|"A_model→0 prior overrides context"| MM["swap / retrain model"]
+    MA -->|"A high"| DOM{"min D,R,T low?"}
+    DOM -->|"low: oracle residue"| DE["determinism engineering<br/>[catalysis barrier: must buy oracle]"]
+    DOM -->|"high: domain learnable"| GOAL["learning compounds (goal cell)<br/>[RNA: A≈0.86 · R_det≈1]"]
     classDef good fill:#e8f5e9,stroke:#2e7d32,color:#1b5e20;
     classDef bad fill:#ffebee,stroke:#c62828,color:#b71c1c;
     class GOAL good;
     class H,MM,DE bad;
 ```
 
-**90–98% 超时的对账**:既非 A→0(A=0.86)、也非残差(R_det≈1),而是**搜索算力**在硬长结构的收敛限。而搜索是**可 amortize**的(search→policy,AlphaZero 那类),**正是自进化能吃掉的一类**——与催化那种「买不回」的残差相反。⚠️ **归因守则**(呼应 Oracle Residue §7):须让 **LLM 内化更好的搜索 / 分治**(真学习),而非只把 `parallel_search` 步数调大(花算力 + 归因陷阱)。判据:**固定工具预算、只加经验,看硬家族 solve-rate 是否升**。
+**Reconciling the 90–98 % timeouts**: these are neither A→0 (A = 0.86) nor oracle residue (R_det ≈ 1); they are a **search-compute** convergence limit on hard long structures. And search is the **amortizable** kind of computation (search → policy, the AlphaZero class) — **exactly what the self-evolution loop is built to eat** — the opposite of catalysis's non-amortizable residue. ⚠️ **Attribution guard** (echoing Oracle Residue §7): the LLM must **internalize better search / decomposition** (genuine learning), *not* merely be given a larger `parallel_search` step count (spending compute + the attribution trap). Clean test: **hold the tool budget fixed, add only experience, and see whether the hard family's solve-rate rises**.
 
 ---
 
-# 4 · 进展与优势:跨过根本障碍了吗?
+# 4 · Progress & advantages: have we cleared the fundamental obstacles?
 
-**进展**:三基模无记忆基线完成;dashboard 实时化;记忆库保全(playbook support 20/10);框架经确定性 + actuation 双重验证。
-**优势**:① 模型无关(一键换基模)② 确定性可自检 oracle(R_det≈1)③ **A 一等可测(0.86)** ④ 记忆外化、跨模型可迁移 ⑤ positive-control 定位——把催化里「域不可学 / 环未闭 / oracle 残差」三重混淆**拆干净**。
+**Progress**: three memory-free base-model baselines complete; dashboard made live; memory library preserved (playbook support 20/10); framework validated on both determinism and actuation.
+**Advantages**: ① model-agnostic (one-line model swap) ② deterministic, self-checkable oracle (R_det ≈ 1) ③ **A is a first-class, measured metric (0.86)** ④ externalized memory, transferable across models ⑤ positive-control positioning — it **disentangles** catalysis's confounded triple ("domain unlearnable / loop unclosed / oracle residue").
 
-**跨过了吗 —— 诚实判读:**
+**Have we cleared them — an honest reading:**
 
-| 根本障碍(两篇论文)| 状态 | 证据 / 口径 |
+| Fundamental obstacle (the two papers) | Status | Evidence / framing |
 |---|---|---|
-| 坎二:oracle 残差(R_det<1)| **结构性绕过** | 选 free·exact·self-checkable 折叠 oracle → R_det≈1;非「解决残差」,而是**选在残差不 binding 的域** |
-| 坎一 · harness 接缝(A_harness→0)| **已跨(实测)** | 无静默 override;**A≈0.86**,高催化两个数量级;A 为一等指标 |
-| 坎一 · model 接缝(A_model<1)| **部分** | A≈0.86 → 仍 ~14% 正确诊断未被采纳 |
-| 自改进曲线真的上升(compound)| **尚未证明** | 三轮均 no-memory 基线;A_memory 与多-epoch 抬升待跑 |
+| Obstacle 2: oracle residue (R_det < 1) | **Structurally sidestepped** | Chose a free·exact·self-checkable folding oracle → R_det ≈ 1; not "solved the residue" but **chosen a domain where it does not bind** |
+| Obstacle 1 · harness seam (A_harness→0) | **Cleared (measured)** | No silent override; **A ≈ 0.86**, two orders of magnitude above catalysis; A is a first-class metric |
+| Obstacle 1 · model seam (A_model < 1) | **Partial** | A ≈ 0.86 → ~14 % of correct diagnoses still not adopted |
+| Does the self-improvement curve actually rise (compound)? | **Not yet demonstrated** | All three runs are no-memory baselines; A_memory and multi-epoch lift remain to be run |
 
-**一句话**:两道**结构性前提**已跨过(R_det≈1 靠选域;A≈0.86 靠闭环 + 仪表化),**落在唯一能 compound 的格**;但「**确实在 compound**」尚未证明。**我们跨过的是「能学」,还没证明「在学」**——那正是下一实验的靶。
+**In one line**: the two **structural preconditions** are cleared (R_det ≈ 1 by domain choice; A ≈ 0.86 by loop closure + instrumentation), placing us in the **only cell where learning can compound** — but that it **does compound** is not yet shown. **We have crossed "able to learn"; we have not yet proven "is learning"** — which is exactly what the next experiment targets.
 
-> **红线重申**:以上仅在 folding-oracle 意义下成立;一旦要 in-vivo 功能,物理 oracle 及其残差回归,坎二天花板重新生效。
+> **Red line, restated**: all of the above holds only under the folding oracle. The moment in-vivo function is the target, the physical oracle and its residue return, and Obstacle 2's ceiling reapplies.
 
 ---
 
-# 下一步
+# Next steps
 
-1. **蒸经验(离线)**:三轮解出题 `distill_strategies` → 刷新 `memory_library`。
-2. **攻硬核 33**:强化搜索 + 分治策略,**严格区分「工具变强」vs「LLM 编排变强」**。
-3. **自进化闭环**:① 带记忆多-epoch(测 A_memory + 抬升);② 权重级 RL / GRPO。
-4. **迁移**:GLM-5.2 无记忆基线 → 带 DeepSeek 蒸馏记忆,测迁移增益。
+1. **Distill experience (offline)**: run `distill_strategies` over all solved tasks from the three runs → refresh `memory_library`.
+2. **Attack the hard-core 33**: strengthen search + add a decomposition strategy, **strictly separating "the tool got stronger" from "the LLM's orchestration got stronger."**
+3. **Close the self-evolution loop**: ① memory-on, multi-epoch (measure A_memory + lift); ② weight-level RL / GRPO.
+4. **Transfer**: GLM-5.2 no-memory baseline → with DeepSeek-distilled memory; measure the transfer gain.
 
-# 附录 · 复现
+# Appendix · Reproduce
 
 ```bash
 python -m rna_harness.experiments.agent_runner \
   --model z-ai/glm-5.2 --n-tasks 100 --max-len 400 --timeout-s 1500 --workers 3 \
   --out rna_harness/runs/<name>
 # env: CLAUDE_CODE_USE_OPENAI=1 · OPENAI_BASE_URL=…/openrouter/api/v1 · OPENAI_API_KEY=<key> · RNA_MAX_CORES=160
-# 看结果: http://<host>:8811/report/<name>
+# view: http://<host>:8811/report/<name>
 ```
 
-**关键路径**:`agent_runner.py`(驱动)· `verifier.py`(裁判)· `mcp/`(工具)· `meta/`(记忆)· `dashboard/`(可视化)· `memory_library/`(已学知识)。
-**引用**:Chen, W. *Actuation Fidelity* (InceptLabs 2026);Chen, W. & Li, Z. *The Oracle Residue Thesis* (InceptLabs 2026)。
+**Key paths**: `agent_runner.py` (driver) · `verifier.py` (judge) · `mcp/` (tools) · `meta/` (memory) · `dashboard/` (visualization) · `memory_library/` (learned knowledge).
+**References**: Chen, W. *Actuation Fidelity* (InceptLabs, 2026); Chen, W. & Li, Z. *The Oracle Residue Thesis* (InceptLabs, 2026).
