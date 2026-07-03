@@ -12,6 +12,8 @@
 
 本报告给出**三份纯净基模(无记忆)在 Eterna100-V2 上的横向对照**:GLM-5.2 56/100、Sonnet-5 51/100、DeepSeek-v4-pro 47/100。核心发现:**约 90–98% 的失败是 1500 秒墙超时,而非模型答错**;进一步定位,超时的根因是**经典搜索求解器在难长结构上不收敛**(而非模型推理能力或工具选择)。这既指明了提升路径,也暴露了一个必须警惕的**归因陷阱**。
 
+理论上,本框架直接吸收 InceptLabs 两篇论文——*Actuation Fidelity*(自改进的"环闭没闭")与 *Oracle Residue Thesis*(物理 oracle 的"算力买不回的残差")——并论证 **RNA-under-ViennaRNA 是同时避开这两道坎的 positive control**(详见第三部分):它的奖励确定性 R_det≈1(无 oracle 残差),actuation fidelity 实测 A≈0.86(环已闭),残余瓶颈(搜索)又恰是**可 amortize**的那一类。这正是把"开源模型自进化到 SOTA"先在 RNA 上跑通的理由。
+
 ---
 
 ## 0. 全景流程
@@ -131,11 +133,20 @@ flowchart TB
 - **蒸馏**(`meta/strategies.py`):从**解出的** (target, sequence) 提取**可检验**策略,两类:`hairpin_motif`(某环长用某稳定环序列)、`gc_closing`(螺旋用 G-C 收口)。可检验 = "该策略是否被采纳"可精确判定 → 支撑 **A_memory**(记忆的 actuation 保真度)。
 - **知识可迁移性**:记忆是**外化的文字规则,与模型权重无关** → 一个模型学到的策略可注入另一个模型(如 DeepSeek 蒸馏 → GLM 起跑)。当前保存于 `memory_library/`。
 
-## 7. 核心指标哲学
+## 7. 核心指标哲学:四坐标诊断系统
 
-- **确定性三元(D_sym / R_det / T_trace ≈ 1.0)**:数据 / 奖励 / 轨迹的可复现性。RNA 是高确定性的正对照(裁判确定、奖励确定)。
-- **Actuation Fidelity(A = A_model × A_harness)**:诊断是否真正驱动了下一步修复,而非随机乱试。是"看诊断再动手 vs 乱试"的可测量差异。
-- **A_memory**:被召回的、适用于新题的策略,是否真被采纳。
+本框架的评测骨架直接采用 InceptLabs 两篇论文的**自改进四坐标**(Chen, *Actuation Fidelity* 2026;Chen & Li, *Oracle Residue Thesis* 2026)。前三个是**领域给定的前提**(域能不能学),第四个是**系统属性**(环闭没闭):
+
+| 坐标 | 含义 | RNA-under-ViennaRNA 取值 |
+|---|---|---|
+| **D_sym** 数据纯度 | 学的是事物本身还是有损投影? | ≈1(dot-bracket 是可复现符号)|
+| **R_det** 奖励确定性 | 有没有无歧义、不漂移的判据? | ≈1(MFE==目标,确定、精确)|
+| **T_trace** 轨迹保真 | 失败时能否归因到某一步? | ≈1(逐位诊断:缺失/多余对/错配)|
+| **A** actuation fidelity | 正确诊断是否真的控制了下一步? | **实测 0.85–0.86**(agent_A)|
+
+- **A = A_harness × A_model**:诊断要先穿过 harness 接缝(能否到达并控制执行路径),再穿过 model 接缝(模型是否愿意推翻自己的先验)。是四坐标里**唯一能直接从日志数出来**的,所以第一个测。
+- **A_memory**:被召回、适用于新题的策略是否真被采纳(A 的跨题版本)。
+- **判读**(Paper 1 Table 1):min(D,R,T) 高 = 域可学;A 高 = 环已闭。RNA 四坐标全高 → 落在**"learning compounds(目标格)"**,既不是"域不可学",也不是"环未闭"。这正是把 RNA 选作 positive control 的理由(详见第三部分)。
 
 ## 8. 可视化(dashboard/)
 
@@ -208,6 +219,75 @@ flowchart TB
 2. **攻硬核 33**:加强 `parallel_search`(steps 3000→30k+ / 加重启)+ 往知识库加**分治策略**,重跑 33 题——**严格区分"工具变强"与"LLM 编排变强"两种涨分来源**。
 3. **自进化闭环**:①推理期元学习(带记忆多 epoch,测 A_memory 与解出率抬升);②权重级 RL(用 agentic RLVR 数据对本地开源模型 GRPO)。
 4. **迁移实验**:GLM-5.2 先无记忆基线,再带 DeepSeek 蒸馏记忆,测跨模型迁移增益。
+
+---
+
+# 第三部分 · 理论根基:RNA 如何跨过催化踩中的两道坎
+
+> 本框架不是凭空搭的。它直接吸收 InceptLabs 两篇论文对**自改进为什么会"空转不学习"**的诊断,并把 RNA-under-ViennaRNA 有意选作**两道坎都避开的 positive control**。这一节说明:同一支团队在催化(computational catalysis)上踩过的坑,为什么在 RNA 上结构性地不会重演。
+
+## 15. 两篇论文诊断的两道坎
+
+**坎一 · Actuation Fidelity(Chen 2026)——"环没闭"。**
+一条平的学习曲线有两个长得一样、药方相反的成因:**域不可学**(min(D_sym,R_det,T_trace) 低)vs **环未闭**(A→0:正确诊断在控制下一步之前被丢弃)。区分二者必须**先测 A**(唯一可从日志直接数出的坐标)。催化系统的现实:playbook 四天从 31 长到 108 条、反模式记满,**成功率却钉在个位数(≈8.6%)**——motion without learning。离线重建的 **A_before ≈ 0.095**;在单原子催化(SAC)子族上 **A = 0/1781**:critic 反复发出正确指令(换 NEB 后端),一个 Stage-4 静默 bypass 在指令被读取前就覆盖了它。**A_harness→0**。
+
+**坎二 · Oracle Residue Thesis(Chen & Li 2026)——"算力买不回的残差"。**
+在物理-oracle 域(DFT/实验),奖励 oracle **昂贵·近似·不可自检**,只能 amortize 成一个**带误差、且漂移不可自检**的代理(MLIP)。于是奖励确定性有**结构性天花板**:R_det → α_f + q_f(B)(1−α_f) < 1。反应势垒/过渡态是**低-α_f、oracle-bound 家族**:再多经验也买不回缺失的 ground-truth 计算,曲线在固定预算下必然平。"**capability eats knowledge, not computation**"。
+
+## 16. RNA 为什么两道坎都跨得过去(positive control)
+
+| 维度 | 催化(踩坑) | RNA-under-ViennaRNA(本框架) |
+|---|---|---|
+| 裁判性质 | DFT/实验:昂贵·近似·**不可自检** | ViennaRNA:近乎 free · exact(相对 Turner2004)· **可自检** |
+| **R_det** | 有结构性天花板(<1),存在 oracle residue | **≈1,无 oracle residue** |
+| **α_f**(可 amortize 比例)| 低(barrier/TS,oracle-bound) | 高(与 games / code / formal math 同端)|
+| **A_harness** | →0(Stage-4 bypass 静默覆盖)| **≈1**(诊断直达下一轮,**无静默 fallback/override**)|
+| **A(实测)** | 0.095 / SAC 0.00 | **0.85–0.86**(三模型 agent_A)|
+| 学习能否 compound | 否(两坎皆中)| **是(两坎皆避)** |
+
+**诊断决策树(平曲线 → 先测 A → 定位到格;催化 vs RNA 的落点):**
+
+```mermaid
+flowchart TD
+    F["学习曲线平?"] --> MA["先测 A<br/>(唯一可从日志直接数)"]
+    MA -->|"A→0"| SEAM{"哪个接缝?"}
+    SEAM -->|"A_harness→0<br/>静默覆盖 / fallback"| H["修控制路径<br/>【催化 SAC: 0/1781】"]
+    SEAM -->|"A_model→0<br/>先验压过上下文"| M["换 / 重训模型"]
+    MA -->|"A 高"| DOM{"min D,R,T 低?"}
+    DOM -->|"低: oracle residue<br/>R_det 有天花板"| DE["determinism engineering<br/>【催化 barrier: 只能买 oracle】"]
+    DOM -->|"高: 域可学"| GOAL["learning compounds 目标格<br/>【RNA: A≈0.86 · R_det≈1】"]
+
+    classDef good fill:#e8f5e9,stroke:#2e7d32,color:#1b5e20;
+    classDef bad fill:#ffebee,stroke:#c62828,color:#b71c1c;
+    class GOAL good;
+    class H,M,DE bad;
+```
+
+**跨过坎一(闭环)的三处具体设计:**
+1. **无静默覆盖**:verifier 的逐位诊断**直接返回给智能体的下一轮**,智能体照诊断改对应位点。回路里没有那种 default-on、会吞掉纠正的深层 gate——催化的 A_harness→0 在结构上就不存在。
+2. **A 是一等公民**:`agent_A` 写进每份 summary,即从**真实工具调用链**重建的 actuation fidelity。三模型实测 **0.85–0.86**,比催化的 0.095/0.00 高**两个数量级**。这正是论文呼吁的"actuation instrumentation as a first-class requirement"。
+3. **交付≈采纳**:实测 delivered ≈ capability_solved(找到即交付),纠正没有在"找到"与"提交"之间被丢弃。
+
+**跨过坎二(无残差)的原因:** ViennaRNA 折叠 oracle 具备论文说的让 oracle 可干净 amortize 的**三性质:free · exact · self-checkable**。所以 RNA-under-ViennaRNA 坐落在**高-α_f 的 closed/symbolic 端**(games/code/formal math 那一端),**R_det≈1,没有 oracle residue**——自改进在这里**能**compound,而不是被结构性天花板压住。
+
+## 17. 那 90–98% 超时怎么对账?(与第 11 节失败分析统一)
+
+关键澄清:第 11 节那批超时**既不是坎一也不是坎二**。
+- **不是 A→0**:A 实测 0.86,环是闭的。
+- **不是 oracle residue**:R_det≈1,折叠 oracle 免费自检,没有买不回的残差。
+- **是搜索算力**在硬长结构上的收敛限(经典 SA 在 1500s 内 `n_solved=0`)。
+
+而这恰恰是**好消息**:按 Oracle Residue 的框架,**搜索是可 amortize 的计算(search → policy,AlphaZero 那一类)**,不是不可 amortize 的 oracle 查询。也就是说,**这个瓶颈正是自进化循环设计来吃掉的那一类**——与催化那种"再多经验也买不回"的残差正相反。
+
+> ⚠️ **归因守则(呼应 Oracle Residue §7 的预注册协议)**:必须让 **LLM 内化更好的搜索/分治**(可 amortize、真学习),而**不是**只把经典 `parallel_search` 的步数调大——后者按论文口径只是"花算力",且是我们反复标红的**归因陷阱**。干净判据:**固定工具/oracle 预算,只加经验,看硬家族 solve-rate 是否上升**;升 = LLM 编排真的进化了,不升 = 只是买了算力。
+
+## 18. 结论:RNA 是自进化的理想 positive control
+
+催化两篇论文证明了自改进会死在哪两道坎;本框架把 RNA-under-ViennaRNA **有意选成两坎皆过的对照**:**R_det≈1(无残差)+ A≈0.86(环已闭)+ 残差瓶颈可 amortize(搜索)**。因此,"开源模型经自循环进化逼近 SOTA"这个命题,若要在**任何**科学域先跑通,RNA 是**最有希望的第一站**——它把催化里纠缠在一起的"域不可学 / 环未闭 / oracle 残差"三重混淆**拆干净了**,只剩"让 LLM 学会更省的搜索与分治"这一个可 amortize 的问题。
+
+> **红线重申**:以上全部成立**仅在 folding-oracle 意义下**。一旦目标换成 in-vivo 功能,物理 oracle 及其残差立刻回归,Oracle Residue 的天花板重新生效——那时 RNA 就从 positive control 变回一个 oracle-bound 域。本框架研究的是**前者**。
+
+**引用**:Chen, W. *Actuation Fidelity: The Missing Coordinate in Self-Improving Agents* (InceptLabs-Shanghai, 2026);Chen, W. & Li, Z. *Capability Eats Knowledge, Not Computation: The Oracle Residue Thesis* (InceptLabs-Shanghai, 2026)。
 
 ---
 
