@@ -89,6 +89,48 @@ def test_rnainverse_reproducible():
     assert a == b  # same seed -> same result (RNA.init_rand seeded)
 
 
+# --- best_effort must not fabricate a solve from a wrong-length declared answer ---------
+def test_best_effort_ignores_wrong_length_declared():
+    """Re-scoring glm52_decomp_hardcore31 exposed two bugs in _best_effort_candidate:
+      (1) it folded the declared FINAL_SEQUENCE even when len != n and called RNA.bp_distance
+          across unequal-length structures -> a spurious bp=0 phantom near-solve ('Fractile');
+      (2) it verified only the single min-bp candidate, so a solve tied at bp==0 could be missed.
+    A wrong-length declared line with NO correct-length candidate must yield best_effort=None."""
+    import json as _json
+
+    from rna_harness.experiments.agent_runner import _best_effort_candidate, _extract_final_sequence
+    from rna_harness.task import DesignTask
+
+    t = DesignTask(task_id="t", target="((((....))))")  # n=12
+    # agent declared a length-14 answer (protocol violation) and tested NOTHING of length 12
+    lines = [_json.dumps({"type": "assistant", "message": {"content": [
+        {"type": "text", "text": "FINAL_SEQUENCE: GGGGAAAACCCCUU"}]}})]  # 14 nt
+    declared = _extract_final_sequence(lines, t.n)
+    assert declared == "GGGGAAAACCCCUU"
+    assert _best_effort_candidate(lines, t, declared) is None  # no phantom bp=0 solve
+
+
+def test_best_effort_recovers_solve_from_tool_input():
+    """A correct-length solving sequence the agent TESTED (but never declared) must be recovered
+    as capability, even when the declared final was a wrong-length dud."""
+    import json as _json
+
+    from rna_harness.experiments.agent_runner import _best_effort_candidate, _extract_final_sequence
+    from rna_harness.task import DesignTask
+
+    t = DesignTask(task_id="t", target="((((....))))")  # n=12; GGGGAAAACCCC folds to it
+    lines = [
+        _json.dumps({"type": "assistant", "message": {"content": [
+            {"type": "tool_use", "name": "RnaVerify", "input": {"sequence": "GGGGAAAACCCC"}}]}}),
+        _json.dumps({"type": "assistant", "message": {"content": [
+            {"type": "text", "text": "FINAL_SEQUENCE: GGGGAAAACCCCUU"}]}}),  # 14 nt dud
+    ]
+    declared = _extract_final_sequence(lines, t.n)
+    be = _best_effort_candidate(lines, t, declared)
+    assert be is not None and be["solved"] is True and be["bp_distance"] == 0
+    assert be["sequence"] == "GGGGAAAACCCC"
+
+
 # --- local_search budget=0 reports a consistent distance -------------------------------
 def test_local_search_budget_zero():
     from rna_harness.generators import LocalSearchGenerator

@@ -117,12 +117,24 @@ def _count_tool_calls(trace_lines: List[str]) -> Dict[str, int]:
 
 def _best_effort_candidate(trace_lines: List[str], task: DesignTask, declared: Optional[str]) -> Optional[Dict]:
     """Best right-length sequence the agent ACTUALLY tested (any candidate passed to a tool call),
-    scored by the verifier. The strict `solved` metric still requires a DECLARED FINAL_SEQUENCE, but
-    this captures true capability even when the declared answer was lost to a wall-clock timeout --
-    i.e. 'the agent found a working design it never delivered'."""
+    scored by the canonical verifier. The strict `solved` metric still requires a DECLARED
+    FINAL_SEQUENCE, but this captures true capability even when the declared answer was lost to a
+    wall-clock timeout or a length slip -- i.e. 'the agent found a working design it never delivered'.
+
+    Correctness notes (both bugs found while re-scoring glm52_decomp_hardcore31):
+      * ONLY length-n candidates are considered. A wrong-length declared answer is not foldable
+        against the target; `RNA.bp_distance` across unequal-length structures returns a spurious
+        value (it reported bp=0 for a 113-nt string vs a 105-nt target on Eterna100 'Fractile',
+        which reads as a phantom near-solve). So we never fold the declared line unless len==n.
+      * We PREFER a candidate the oracle marks `solved`, not merely the min-bp one: bp==0 ties can
+        include both mfe-matching and non-matching folds, and verifying only the single closest
+        candidate could miss a genuine solve. Fast fold-only ranking first, then canonical
+        `verify()` on the promising subset (every bp==0 candidate + the single closest)."""
     cands = set()
     if declared:
-        cands.add(declared.upper().replace("T", "U"))
+        dcl = declared.upper().replace("T", "U")
+        if len(dcl) == task.n:
+            cands.add(dcl)
     for line in trace_lines:
         if '"rna_memory_snapshot"' in line:
             continue
@@ -143,18 +155,25 @@ def _best_effort_candidate(trace_lines: List[str], task: DesignTask, declared: O
     try:
         import RNA
         md = RNA.md(); md.temperature = 37.0; md.dangles = 2
-        best = None
+        folded = []
         for s in cands:
             st, _ = RNA.fold_compound(s, md).mfe()
-            bp = RNA.bp_distance(st, task.target)
-            if best is None or bp < best[1]:
-                best = (s, bp)
+            folded.append((RNA.bp_distance(st, task.target), s))
     except Exception:
         return None
-    seq, bp = best
-    bv = verify(task, seq, compute_cross_oracle=False)
-    return {"sequence": seq, "bp_distance": bp, "solved": bool(bv.solved),
-            "reward": bv.reward, "n_candidates_tested": len(cands)}
+    folded.sort(key=lambda x: x[0])
+    # verify every potential canonical solve (bp==0) + the single closest; prefer solved then reward
+    to_verify = [s for bp, s in folded if bp == 0] or [folded[0][1]]
+    best = None  # (solved, reward, bp, seq)
+    for s in to_verify:
+        bv = verify(task, s, compute_cross_oracle=False)
+        bp = bv.ensemble.get("bp_distance_to_target") if bv.ensemble else folded[0][0]
+        key = (bool(bv.solved), bv.reward)
+        if best is None or key > (best[0], best[1]):
+            best = (bool(bv.solved), bv.reward, bp, s)
+    solved, reward, bp, seq = best
+    return {"sequence": seq, "bp_distance": bp, "solved": solved,
+            "reward": reward, "n_candidates_tested": len(cands)}
 
 
 _MEMORY_ENTRYPOINT = "MEMORY.md"  # openclaude injects ONLY <memdir>/MEMORY.md into the prompt
