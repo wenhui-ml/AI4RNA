@@ -1,0 +1,194 @@
+% PRELIMINARY DRAFT — openclaude_rna paper (Paper C of the InceptLabs self-improvement family).
+% Read paper/POSITIONING.md before editing. Numbers marked [verify] must be confirmed against
+% rna_harness/runs before any submission. Compile: tectonic rna-selfimprovement.tex
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,booktabs,graphicx,xcolor,hyperref,natbib}
+\newcommand{\Dsym}{D_{\mathrm{sym}}}
+\newcommand{\Rdet}{R_{\mathrm{det}}}
+\newcommand{\Ttrace}{T_{\mathrm{trace}}}
+\newcommand{\pending}[1]{\textcolor{red}{[\textsc{pending}: #1]}}
+\newcommand{\verify}[1]{\textcolor{orange}{[\textsc{verify}: #1]}}
+\title{\textbf{What Self-Improves, and What Does Not:\\
+An Honest Mode-Taxonomy of Agent Self-Improvement\\ in a Residue-Free Scientific Domain}\\[3pt]
+\large RNA Inverse Design under an Exact Folding Oracle}
+\author{Wenhui Chen \and [RNA team] \\ InceptLabs-Shanghai}
+\date{2026 --- PRELIMINARY DRAFT}
+\begin{document}\maketitle
+
+\begin{abstract}
+Self-improving LLM agents are usually judged by whether their benchmark score climbs. We ask a
+different, more diagnostic question: given an agent that improves from its own experience, \emph{which
+mechanisms of self-improvement actually work, and where is each one's real efficacy boundary?} We
+study this in RNA secondary-structure inverse design under the ViennaRNA folding oracle --- a domain
+deliberately chosen as a \emph{positive control}: the oracle is free, exact, and self-checkable, so
+reward determinism $\Rdet\approx 1$ (no oracle residue, in the sense of \citealp{oracleresidue}) and
+measured actuation fidelity is high ($A\approx 0.86$, \citealp{actuation}); the loop is closed and the
+domain permits compounding, the precondition catalysis lacked. Any null result here therefore
+indicts the \emph{mechanism}, not the domain. Adopting the four-coordinate diagnostic of
+\citet{determinismmanifold}, we audit four modes of self-improvement on the same harness and tasks
+(Eterna100-V2): (i) \textbf{memory / strategy distillation} --- \emph{null}: a three-arm
+learned/none/permuted ablation leaves the solve set unchanged (\verify{76/75/76}), with distilled
+skills essentially never load-bearing (\verify{3/35 invoked, 0 decisive}); (ii) \textbf{autonomous
+de-scaffolding} --- an attribution method that finds roughly three-quarters of realized capability is
+carried by scaffolding, not the model's autonomous loop (autonomous floor \verify{3/35} vs scaffolded
+\verify{11/35}); (iii) \textbf{solve-rate attribution} --- the agent's successes are predominantly the
+LLM \emph{orchestrating} a classical search/solver, a direct instance of the
+judgment--computation asymmetry of \citet{oracleresidue} in a new, residue-free domain; and (iv)
+\textbf{algorithm self-optimization} (FunSearch-style evolution of the design algorithm against the
+verifier) --- the strongest on-mission route, whose substrate is in place but which a mechanically
+over-reasoning base model fails to drive, so a capable-subject run is the load-bearing pending
+experiment. The contribution is the taxonomy and its honest efficacy map, not a state-of-the-art
+Eterna number: score-boosting to the 24-hour classical-solver ceiling is off-mission. This is the
+RNA member of a companion family (\citealp{determinismmanifold,actuation,oracleresidue,
+compoundingprofile}); \S\ref{sec:family} states the division of labour precisely.
+\end{abstract}
+
+\section{Introduction}
+Open frontier models, given a strong agentic harness, plateau on hard RNA inverse-design puzzles.
+The tempting paper is ``we drove the score to SOTA.'' We argue that is the wrong paper for this
+domain: the Eterna100 ceiling is set by classical search plus compute (the public state of the art,
+DesiRNA, reaches 97/100 at $\sim$24\,h per puzzle; \citealp{wirecki2025desirna,cazenave2025eterna}),
+so a higher number mostly reports solver and hardware, not agent learning. The scientific question
+that \emph{is} ours is orthogonal: \emph{when an agent is allowed to improve from its own experience,
+which mechanisms of self-improvement carry real weight, and which are theatre?}
+
+We answer it in a domain chosen precisely so the answer cannot be blamed on the domain.
+\S\ref{sec:control} argues RNA-under-ViennaRNA is a positive control for the whole self-improvement
+program: unlike a physical-oracle science (catalysis), its oracle is free, exact, and self-checkable,
+so $\Rdet\approx1$ with no oracle residue \citep{oracleresidue}, and the diagnosis-to-action loop is
+closed with measured $A\approx0.86$ \citep{actuation}. In the coordinate system of
+\citet{determinismmanifold} the domain sits in the learnable region; self-improvement \emph{should}
+compound here. So a mechanism that does nothing here is failing on its own merits.
+
+\paragraph{Contributions.}
+\begin{itemize}
+\item A \textbf{mode taxonomy} of agent self-improvement --- memory distillation, autonomous
+  de-scaffolding, tool acquisition, algorithm self-optimization --- and an \emph{honest} efficacy
+  measurement of each on one harness/domain (\S\ref{sec:taxonomy}, \S\ref{sec:audit}). This is a
+  different axis from the storage-substrate taxonomy (weights/context/harness) of
+  \citet{determinismmanifold}: we classify \emph{mechanisms}, not storage locations.
+\item A \textbf{capability-attribution methodology} (autonomous floor vs.\ scaffolded ceiling; a
+  designability split of agent-limited vs.\ oracle-limited failure) that quantifies how much realized
+  capability is the model's own loop versus its scaffolding (\S\ref{sec:audit}).
+\item An \textbf{honest efficacy map} with load-bearing negatives: memory distillation is null here,
+  and most solve-rate is LLM-orchestrated classical search --- a residue-free-domain instance of the
+  judgment--computation asymmetry of \citet{oracleresidue} (\S\ref{sec:audit}).
+\item The \textbf{algorithm-self-optimization} route (\S\ref{sec:engine}): substrate, precedent, and
+  the capable-subject experiment that decides whether an LLM can evolve a cheaper / higher-crack-rate
+  design algorithm against the verifier --- the family's reserved weight/algorithm-substrate result
+  (\citealp{actuation} defers RNA's RL-data program here). \pending{capable-subject run}
+\end{itemize}
+
+\section{RNA inverse design as a positive control}\label{sec:control}
+Task: given a target secondary structure (dot-bracket), emit an RNA sequence whose minimum-free-energy
+fold under ViennaRNA 2.7.2 (Turner2004, 37\,\textdegree C, dangles=2) equals the target. ``Solved''
+means design-correct under the folding oracle only; it implies nothing in vivo. The oracle is the
+reason we chose the domain: it is free (milliseconds), exact (the fold is the reward), and
+self-checkable (the agent can verify its own candidate without paying an external oracle). In the
+language of \citet{oracleresidue} this is the $\alpha_f\!\approx\!1$ clean-oracle pole --- the
+opposite of a physical-DFT oracle --- so there is no amortization residue on the reward channel and
+the residual difficulty (search) is of the \emph{amortizable} kind. In the coordinates of
+\citet{determinismmanifold}, $\Rdet\approx1$, $\Ttrace$ high (per-attempt fold is fully attributable),
+and measured actuation $A\approx0.86$ (\citealp{actuation}: DeepSeek-V4-pro 0.86, GLM-5.2 0.86,
+Sonnet-5 0.85). Base-model, memory-free capability on Eterna100-V2 is \verify{GLM-5.2 56, Sonnet-5
+51, DeepSeek-v4-pro 47}\,/100, with \verify{90--98\%} of failures being wall-clock timeouts of the
+classical search on long/hard targets --- not reasoning or tool-selection failures. The domain thus
+isolates self-improvement mechanisms from oracle noise and from actuation breakdown.
+
+\section{A mode taxonomy of self-improvement}\label{sec:taxonomy}
+Where \citet{determinismmanifold} asks \emph{where} improvement is stored (weights $B_W$, context
+$B_C$, harness $B_H$), we ask \emph{by what mechanism} an agent improves from experience, and audit
+each mechanism's realized effect:
+\begin{enumerate}
+\item[M1] \textbf{Memory / strategy distillation} --- distil each solved trace into transferable
+  strategy (a playbook/skill library), reused on later tasks.
+\item[M2] \textbf{Autonomous de-scaffolding} --- how much capability survives when the agent runs on
+  its own loop with the crutches (hand-built decomposition, solver-calling scaffolds) removed.
+\item[M3] \textbf{Tool acquisition} --- the agent autonomously locating and installing external
+  open-source solvers when it hits a wall (capability extension, not fed).
+\item[M4] \textbf{Algorithm self-optimization} --- the agent using the verifier $V$ to \emph{evolve}
+  its own design algorithm $A_\theta$ (FunSearch-lineage), optionally distilled to weights via RL.
+\end{enumerate}
+M4 is adjacent to the heuristic-discovery loop of the SAT companion \citep{compoundingprofile}, but
+the question differs and we keep them separate (\S\ref{sec:family}): \citet{compoundingprofile}
+\emph{adjudicates} whether verified self-improvement compounds versus amplifies (matched best-of-$N$
+controls); here M4 asks the \emph{capability/discovery} question --- can an LLM evolve a cheaper or
+higher-crack-rate RNA-design algorithm against $V$? We do not import their adjudication.
+
+\section{The honest audit}\label{sec:audit}
+\paragraph{M1 (memory distillation): null.} A three-arm ablation --- learned memory / no memory /
+permuted (wrong) memory --- leaves the solved set essentially unchanged (\verify{76/75/76}), and the
+distilled skills are almost never decisive (\verify{3/35 invoked, 0 decisive solves}). In the
+positive-control domain, strategy recall is not the binding lever.
+
+\emph{Reconciliation with \citet{actuation}.} A1 reports, for RNA, that memory \emph{helps}: a
+learned playbook lowers oracle-calls-to-solve (6.8$\to$2.1) and a controlled severing of a fixed
+correct memory raises them (3.0$\to$15.2). There is no contradiction: A1 measures search
+\emph{efficiency on already-solvable tasks} (oracle-calls, on a classical local-search executor with a
+motif warm-start), whereas M1 measures the \emph{solvable set} for the tool-rich LLM agent. Memory
+makes solvable tasks cheaper; it does not make more tasks solvable, because the binding limit is
+classical-search convergence, not strategy recall. We cite A1 for the efficiency result and the $A$
+measurement and do not re-report them.
+
+\paragraph{M2 (autonomous de-scaffolding): $\sim$73\% of capability is scaffolding.} With the
+hand-built crutches removed, the agent's autonomous floor is \verify{3/35} versus \verify{11/35} with
+scaffolding --- i.e.\ roughly three-quarters of realized capability is carried by the harness, not the
+model's autonomous self-improvement loop. This is a \emph{measurement}, not a score: an honest
+attribution of where capability lives, in the spirit of harness-effect accounting.
+
+\paragraph{M3 (solve-rate attribution): the LLM orchestrates classical search.} Decomposing the
+solved puzzles shows the agent's successes are predominantly the LLM \emph{routing and orchestrating}
+a classical search/solver rather than the model directly designing the sequence
+(\verify{majority of solves solver-carried}). This is the judgment--computation asymmetry of
+\citet{oracleresidue} in a residue-free domain: the LLM internalizes judgment/orchestration, while
+the search computation stays external --- but here, unlike catalysis, that external computation is
+\emph{amortizable} (cheap, exact), which is exactly why the domain still permits compounding. M3 is an
+independent, cross-domain confirmation of A3's asymmetry, not a restatement.
+
+\section{The load-bearing route: algorithm self-optimization}\label{sec:engine}
+M1--M3 stand on data already collected. The strongest \emph{on-mission} self-improvement route is M4:
+let the agent evolve its design algorithm $A_\theta$ against the deterministic verifier $V$
+(FunSearch-lineage; \citealp{romera2024funsearch}), on the autonomous evaluation set of M2, then
+optionally distil the winning algorithm/traces into weights via GRPO
+(\citealp{shao2024deepseekmath}). The substrate is in place (deterministic $V$ + benchmark + trace
+corpus). A first attempt with a mechanically over-reasoning base model (GLM-5.2) stalled --- the model
+returned empty completions rather than compact candidate programs --- which is itself a datum: M4
+requires a subject capable of terse, iterated program proposal. The decisive, honest test is
+therefore a \emph{capable-subject} run: \pending{Claude-class subject on the M2 autonomous set}.
+The pre-registered verdict rule: if M4 evolves a design algorithm that is cheaper (fewer
+oracle/search calls) or higher-crack-rate than the autonomous baseline, ``an LLM can self-optimize
+its algorithm'' is supported; if not, we report the honest boundary of which self-improvement modes
+are within reach of current models. Tool acquisition (M3$\to$M4 bridge, \S\ref{sec:taxonomy} M3) is
+the secondary route and shares the capable-subject requirement. \pending{tool-acquisition run}
+
+\section{Relation to the companion family}\label{sec:family}
+This is the RNA member of a five-paper program; the division of labour is explicit so no result is
+double-counted.
+\begin{itemize}
+\item \citet{determinismmanifold} contributes the four-coordinate framework $(\Dsym,\Rdet,\Ttrace,A)$
+  and the storage-substrate taxonomy; we \emph{adopt} the coordinates and add an orthogonal
+  \emph{mechanism} taxonomy (M1--M4).
+\item \citet{actuation} contributes the $A$ coordinate and reports RNA's $A\approx0.86$ and a
+  memory-severing efficiency ablation; we cite those and contribute the solvable-set audit and the
+  RL/algorithm program it reserves for us.
+\item \citet{oracleresidue} contributes the oracle-residue thesis and the judgment--computation
+  asymmetry; RNA is its clean-oracle ($\alpha_f\!\approx\!1$) pole, and our M3 is an independent
+  instance of the asymmetry in a residue-free domain.
+\item \citet{compoundingprofile} adjudicates compounding-vs-amplification on SAT/A$^\ast$; our M4 asks
+  a distinct capability/discovery question and imports none of their adjudication machinery.
+\end{itemize}
+The one shared quantity across the family, RNA's $A$, is taken verbatim from \citet{actuation}; every
+other RNA result here is this paper's own.
+
+\section{Limitations and honest boundaries}
+Score-boosting to the classical-solver SOTA is off-mission and not attempted; our numbers are
+in-budget agent capability, not a solver benchmark. The load-bearing M4/tool-acquisition experiments
+are pending a capable subject. Several counts (\verify{marked}) are from a preliminary scan and must
+be confirmed against \texttt{rna\_harness/runs} before submission. Generality beyond RNA is a
+prediction the family, not this paper, is designed to test. As with the companions, ``self-improvement''
+here means improvement from the agent's own experience under a fixed deterministic oracle; it makes no
+in-vivo claim.
+
+\small\bibliographystyle{plainnat}\bibliography{references}
+\end{document}
