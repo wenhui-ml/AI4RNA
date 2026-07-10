@@ -15,6 +15,7 @@ import signal
 import sys
 
 from .compute import batch_fold_impl, parallel_search_impl
+from .finisher import parallel_finish, parallel_inverse_fold
 
 # Hard self-limit: if this process (or its pool workers) ever hangs or is orphaned by a parent
 # kill, SIGALRM fires and we SIGKILL our OWN process group -- reaping every pool worker. Prevents
@@ -47,6 +48,14 @@ def main() -> int:
     elif cmd == "parallel_search":
         out = parallel_search_impl(payload["target"], n_restarts=int(payload.get("n_restarts", 0)),
                                    steps=int(payload.get("steps", 3000)))
+    elif cmd == "inverse_fold_search":
+        out = parallel_inverse_fold(payload["target"], warm=payload.get("warm") or None,
+                                    n_restarts=int(payload.get("n_restarts", 0)),
+                                    tries=int(payload.get("tries", 40)))
+    elif cmd == "finish":
+        out = parallel_finish(payload["candidate"], payload["target"],
+                              n_restarts=int(payload.get("n_restarts", 0)),
+                              iters=int(payload.get("iters", 20000)))
     else:
         out = {"error": f"unknown cmd {cmd!r}"}
     sys.stdout.write(json.dumps(out))

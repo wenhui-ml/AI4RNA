@@ -1,0 +1,559 @@
+{
+  "config": {
+    "executor": "agent",
+    "source": "hairpin_family",
+    "n_tasks": 8,
+    "max_len": 70,
+    "arms": [
+      "with_memory",
+      "no_memory"
+    ],
+    "budget": 4000,
+    "seed": 0,
+    "model": "z-ai/glm-5.2",
+    "max_budget_usd": 0.4,
+    "timeout_s": 200,
+    "out": "/tmp/claude-1000/-data-wenhui-openclaude-rna/b78cf7f6-9d78-441b-ac10-393e95696fb8/scratchpad/meta_agent_pilot"
+  },
+  "n_tasks": 8,
+  "arms": {
+    "with_memory": {
+      "arm": "with_memory",
+      "n_cases": 8,
+      "solve_rate": 1.0,
+      "mean_evals_all": 2.5,
+      "mean_evals_solved": 2.5,
+      "A_memory": 0.6429,
+      "n_strategies_learned": 2
+    },
+    "no_memory": {
+      "arm": "no_memory",
+      "n_cases": 8,
+      "solve_rate": 1.0,
+      "mean_evals_all": 2,
+      "mean_evals_solved": 2,
+      "A_memory": null,
+      "n_strategies_learned": 0
+    }
+  },
+  "detail": {
+    "with_memory": {
+      "arm": "with_memory",
+      "n_cases": 8,
+      "solve_rate": 1.0,
+      "mean_evals_all": 2.5,
+      "mean_evals_solved": 2.5,
+      "A_memory": 0.6429,
+      "n_strategies_learned": 2,
+      "rows": [
+        {
+          "task_id": "hairpin_family:0",
+          "solved": true,
+          "evals": 1,
+          "A_memory": null,
+          "n_applicable": 0,
+          "agent_actuation": {
+            "A": null,
+            "A_model": null,
+            "A_harness": null,
+            "adoption": null,
+            "n_steps": 0,
+            "n_directive_calls": 1,
+            "repair_steps": []
+          },
+          "memory_recall": {
+            "memdir": "/tmp/claude-1000/-data-wenhui-openclaude-rna/b78cf7f6-9d78-441b-ac10-393e95696fb8/scratchpad/meta_agent_pilot/memdir_with_memory/",
+            "memory_md_path": "/tmp/claude-1000/-data-wenhui-openclaude-rna/b78cf7f6-9d78-441b-ac10-393e95696fb8/scratchpad/meta_agent_pilot/memdir_with_memory/MEMORY.md",
+            "injected": false,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "n_chars": 0,
+            "n_lines": 0,
+            "memdir_md_files": [],
+            "note": "openclaude injects ONLY MEMORY.md into the agent system prompt; other files in memdir are present but not auto-injected by default."
+          }
+        },
+        {
+          "task_id": "hairpin_family:1",
+          "solved": true,
+          "evals": 2,
+          "A_memory": 1.0,
+          "n_applicable": 2,
+          "agent_actuation": {
+            "A": 1.0,
+            "A_model": 1.0,
+            "A_harness": 1.0,
+            "adoption": 0.6667,
+            "efficacy_when_adopted": 1.0,
+            "n_steps": 1,
+            "n_directive_calls": 2,
+            "repair_steps": [
+              {
+                "step": 0,
+                "n_directive": 32,
+                "read": true,
+                "n_edited": 6,
+                "selected": true,
+                "adoption": 0.6667,
+                "executed": true,
+                "affected": true,
+                "d_before": 32,
+                "d_after": 0
+              }
+            ]
+          },
+          "memory_recall": {
+            "memdir": "/tmp/claude-1000/-data-wenhui-openclaude-rna/b78cf7f6-9d78-441b-ac10-393e95696fb8/scratchpad/meta_agent_pilot/memdir_with_memory/",
+            "memory_md_path": "/tmp/claude-1000/-data-wenhui-openclaude-rna/b78cf7f6-9d78-441b-ac10-393e95696fb8/scratchpad/meta_agent_pilot/memdir_with_memory/MEMORY.md",
+            "injected": true,
+            "sha256": "0f95a0da2e861389734737ab39962be6cd4d58f2382e81281f9601c7719c1028",
+            "n_chars": 237,
+            "n_lines": 5,
+            "memdir_md_files": [
+              "MEMORY.md",
+              "rna-gc-closing.md",
+              "rna-hairpin-4-gaaa.md"
+            ],
+            "note": "openclaude injects ONLY MEMORY.md into the agent system prompt; other files in memdir are present but not auto-injected by default."
+          }
+        },
+        {
+          "task_id": "hairpin_family:2",
+          "solved": true,
+          "evals": 2,
+          "A_memory": 0.5,
+          "n_applicable": 2,
+          "agent_actuation": {
+            "A": 1.0,
+            "A_model": 1.0,
+            "A_harness": 1.0,
+            "adoption": 0.4286,
+            "efficacy_when_adopted": 1.0,
+            "n_steps": 1,
+            "n_directive_calls": 2,
+            "repair_steps": [
+              {
+                "step": 0,
+                "n_directive": 24,
+                "read": true,
+                "n_edited": 28,
+                "selected": true,
+                "adoption": 0.4286,
+                "executed": true,
+                "affected": true,
+                "d_before": 24,
+                "d_after": 0
+              }
+            ]
+          },
+          "memory_recall": {
+            "memdir": "/tmp/claude-1000/-data-wenhui-openclaude-rna/b78cf7f6-9d78-441b-ac10-393e95696fb8/scratchpad/meta_agent_pilot/memdir_with_memory/",
+            "memory_md_path": "/tmp/claude-1000/-data-wenhui-openclaude-rna/b78cf7f6-9d78-441b-ac10-393e95696fb8/scratchpad/meta_agent_pilot/memdir_with_memory/MEMORY.md",
+            "injected": true,
+            "sha256": "fba8474fdac8e1c3564c9bdeaaa52609b94b0f1d92d2a169544ee1f54fc5bd8f",
+            "n_chars": 237,
+            "n_lines": 5,
+            "memdir_md_files": [
+              "MEMORY.md",
+              "rna-gc-closing.md",
+              "rna-hairpin-4-gaaa.md"
+            ],
+            "note": "openclaude injects ONLY MEMORY.md into the agent system prompt; other files in memdir are present but not auto-injected by default."
+          }
+        },
+        {
+          "task_id": "hairpin_family:3",
+          "solved": true,
+          "evals": 2,
+          "A_memory": 0.0,
+          "n_applicable": 2,
+          "agent_actuation": {
+            "A": 1.0,
+            "A_model": 1.0,
+            "A_harness": 1.0,
+            "adoption": 0.52,
+            "efficacy_when_adopted": 1.0,
+            "n_steps": 1,
+            "n_directive_calls": 2,
+            "repair_steps": [
+              {
+                "step": 0,
+                "n_directive": 38,
+                "read": true,
+                "n_edited": 50,
+                "selected": true,
+                "adoption": 0.52,
+                "executed": true,
+                "affected": true,
+                "d_before": 37,
+                "d_after": 0
+              }
+            ]
+          },
+          "memory_recall": {
+            "memdir": "/tmp/claude-1000/-data-wenhui-openclaude-rna/b78cf7f6-9d78-441b-ac10-393e95696fb8/scratchpad/meta_agent_pilot/memdir_with_memory/",
+            "memory_md_path": "/tmp/claude-1000/-data-wenhui-openclaude-rna/b78cf7f6-9d78-441b-ac10-393e95696fb8/scratchpad/meta_agent_pilot/memdir_with_memory/MEMORY.md",
+            "injected": true,
+            "sha256": "87587c0e3345e750b40cb82f4629e07e737667ad3dc4e36523cb78076093eb7a",
+            "n_chars": 237,
+            "n_lines": 5,
+            "memdir_md_files": [
+              "MEMORY.md",
+              "rna-gc-closing.md",
+              "rna-hairpin-4-gaaa.md"
+            ],
+            "note": "openclaude injects ONLY MEMORY.md into the agent system prompt; other files in memdir are present but not auto-injected by default."
+          }
+        },
+        {
+          "task_id": "hairpin_family:4",
+          "solved": true,
+          "evals": 1,
+          "A_memory": 1.0,
+          "n_applicable": 2,
+          "agent_actuation": {
+            "A": null,
+            "A_model": null,
+            "A_harness": null,
+            "adoption": null,
+            "n_steps": 0,
+            "n_directive_calls": 1,
+            "repair_steps": []
+          },
+          "memory_recall": {
+            "memdir": "/tmp/claude-1000/-data-wenhui-openclaude-rna/b78cf7f6-9d78-441b-ac10-393e95696fb8/scratchpad/meta_agent_pilot/memdir_with_memory/",
+            "memory_md_path": "/tmp/claude-1000/-data-wenhui-openclaude-rna/b78cf7f6-9d78-441b-ac10-393e95696fb8/scratchpad/meta_agent_pilot/memdir_with_memory/MEMORY.md",
+            "injected": true,
+            "sha256": "7eef8111c935ffc97bd336cccbae9d24e48afa65c9243481f8d1a4ffc664f2c7",
+            "n_chars": 237,
+            "n_lines": 5,
+            "memdir_md_files": [
+              "MEMORY.md",
+              "rna-gc-closing.md",
+              "rna-hairpin-4-gaaa.md"
+            ],
+            "note": "openclaude injects ONLY MEMORY.md into the agent system prompt; other files in memdir are present but not auto-injected by default."
+          }
+        },
+        {
+          "task_id": "hairpin_family:5",
+          "solved": true,
+          "evals": 5,
+          "A_memory": 1.0,
+          "n_applicable": 2,
+          "agent_actuation": {
+            "A": 1.0,
+            "A_model": 1.0,
+            "A_harness": 1.0,
+            "adoption": 1.0,
+            "efficacy_when_adopted": 1.0,
+            "n_steps": 1,
+            "n_directive_calls": 2,
+            "repair_steps": [
+              {
+                "step": 0,
+                "n_directive": 14,
+                "read": true,
+                "n_edited": 7,
+                "selected": true,
+                "adoption": 1.0,
+                "executed": true,
+                "affected": true,
+                "d_before": 13,
+                "d_after": 0
+              }
+            ]
+          },
+          "memory_recall": {
+            "memdir": "/tmp/claude-1000/-data-wenhui-openclaude-rna/b78cf7f6-9d78-441b-ac10-393e95696fb8/scratchpad/meta_agent_pilot/memdir_with_memory/",
+            "memory_md_path": "/tmp/claude-1000/-data-wenhui-openclaude-rna/b78cf7f6-9d78-441b-ac10-393e95696fb8/scratchpad/meta_agent_pilot/memdir_with_memory/MEMORY.md",
+            "injected": true,
+            "sha256": "bcd9a0017236028d12fdd7ee603f64dde96a7f85cd14b3040b04ebf35f7fdb31",
+            "n_chars": 237,
+            "n_lines": 5,
+            "memdir_md_files": [
+              "MEMORY.md",
+              "rna-gc-closing.md",
+              "rna-hairpin-4-gaaa.md"
+            ],
+            "note": "openclaude injects ONLY MEMORY.md into the agent system prompt; other files in memdir are present but not auto-injected by default."
+          }
+        },
+        {
+          "task_id": "hairpin_family:6",
+          "solved": true,
+          "evals": 1,
+          "A_memory": 1.0,
+          "n_applicable": 2,
+          "agent_actuation": {
+            "A": null,
+            "A_model": null,
+            "A_harness": null,
+            "adoption": null,
+            "n_steps": 0,
+            "n_directive_calls": 1,
+            "repair_steps": []
+          },
+          "memory_recall": {
+            "memdir": "/tmp/claude-1000/-data-wenhui-openclaude-rna/b78cf7f6-9d78-441b-ac10-393e95696fb8/scratchpad/meta_agent_pilot/memdir_with_memory/",
+            "memory_md_path": "/tmp/claude-1000/-data-wenhui-openclaude-rna/b78cf7f6-9d78-441b-ac10-393e95696fb8/scratchpad/meta_agent_pilot/memdir_with_memory/MEMORY.md",
+            "injected": true,
+            "sha256": "30d333f5bbe0071e33edc9350295496954a0cbfb7236e74dc48cf50436e5ebe0",
+            "n_chars": 237,
+            "n_lines": 5,
+            "memdir_md_files": [
+              "MEMORY.md",
+              "rna-gc-closing.md",
+              "rna-hairpin-4-gaaa.md"
+            ],
+            "note": "openclaude injects ONLY MEMORY.md into the agent system prompt; other files in memdir are present but not auto-injected by default."
+          }
+        },
+        {
+          "task_id": "hairpin_family:7",
+          "solved": true,
+          "evals": 6,
+          "A_memory": 0.0,
+          "n_applicable": 2,
+          "agent_actuation": {
+            "A": 1.0,
+            "A_model": 1.0,
+            "A_harness": 1.0,
+            "adoption": 0.2917,
+            "efficacy_when_adopted": 1.0,
+            "n_steps": 1,
+            "n_directive_calls": 2,
+            "repair_steps": [
+              {
+                "step": 0,
+                "n_directive": 20,
+                "read": true,
+                "n_edited": 48,
+                "selected": true,
+                "adoption": 0.2917,
+                "executed": true,
+                "affected": true,
+                "d_before": 20,
+                "d_after": 0
+              }
+            ]
+          },
+          "memory_recall": {
+            "memdir": "/tmp/claude-1000/-data-wenhui-openclaude-rna/b78cf7f6-9d78-441b-ac10-393e95696fb8/scratchpad/meta_agent_pilot/memdir_with_memory/",
+            "memory_md_path": "/tmp/claude-1000/-data-wenhui-openclaude-rna/b78cf7f6-9d78-441b-ac10-393e95696fb8/scratchpad/meta_agent_pilot/memdir_with_memory/MEMORY.md",
+            "injected": true,
+            "sha256": "049416fc6bdfb520d12b8a9e811054e9039ea3e7517024cb94496fe97ce75c02",
+            "n_chars": 240,
+            "n_lines": 5,
+            "memdir_md_files": [
+              "MEMORY.md",
+              "rna-gc-closing.md",
+              "rna-hairpin-4-gaaa.md"
+            ],
+            "note": "openclaude injects ONLY MEMORY.md into the agent system prompt; other files in memdir are present but not auto-injected by default."
+          }
+        }
+      ]
+    },
+    "no_memory": {
+      "arm": "no_memory",
+      "n_cases": 8,
+      "solve_rate": 1.0,
+      "mean_evals_all": 2,
+      "mean_evals_solved": 2,
+      "A_memory": null,
+      "n_strategies_learned": 0,
+      "rows": [
+        {
+          "task_id": "hairpin_family:0",
+          "solved": true,
+          "evals": 1,
+          "A_memory": null,
+          "n_applicable": 0,
+          "agent_actuation": {
+            "A": null,
+            "A_model": null,
+            "A_harness": null,
+            "adoption": null,
+            "n_steps": 0,
+            "n_directive_calls": 1,
+            "repair_steps": []
+          },
+          "memory_recall": null
+        },
+        {
+          "task_id": "hairpin_family:1",
+          "solved": true,
+          "evals": 1,
+          "A_memory": null,
+          "n_applicable": 0,
+          "agent_actuation": {
+            "A": null,
+            "A_model": null,
+            "A_harness": null,
+            "adoption": null,
+            "n_steps": 0,
+            "n_directive_calls": 1,
+            "repair_steps": []
+          },
+          "memory_recall": null
+        },
+        {
+          "task_id": "hairpin_family:2",
+          "solved": true,
+          "evals": 3,
+          "A_memory": null,
+          "n_applicable": 0,
+          "agent_actuation": {
+            "A": 1.0,
+            "A_model": 1.0,
+            "A_harness": 1.0,
+            "adoption": 0.6698,
+            "efficacy_when_adopted": 0.5,
+            "n_steps": 2,
+            "n_directive_calls": 3,
+            "repair_steps": [
+              {
+                "step": 0,
+                "n_directive": 24,
+                "read": true,
+                "n_edited": 10,
+                "selected": true,
+                "adoption": 1.0,
+                "executed": true,
+                "affected": false,
+                "d_before": 24,
+                "d_after": 26
+              },
+              {
+                "step": 1,
+                "n_directive": 27,
+                "read": true,
+                "n_edited": 53,
+                "selected": true,
+                "adoption": 0.3396,
+                "executed": true,
+                "affected": true,
+                "d_before": 26,
+                "d_after": 0
+              }
+            ]
+          },
+          "memory_recall": null
+        },
+        {
+          "task_id": "hairpin_family:3",
+          "solved": true,
+          "evals": 2,
+          "A_memory": null,
+          "n_applicable": 0,
+          "agent_actuation": {
+            "A": 1.0,
+            "A_model": 1.0,
+            "A_harness": 1.0,
+            "adoption": 0.3696,
+            "efficacy_when_adopted": 1.0,
+            "n_steps": 1,
+            "n_directive_calls": 2,
+            "repair_steps": [
+              {
+                "step": 0,
+                "n_directive": 28,
+                "read": true,
+                "n_edited": 46,
+                "selected": true,
+                "adoption": 0.3696,
+                "executed": true,
+                "affected": true,
+                "d_before": 28,
+                "d_after": 0
+              }
+            ]
+          },
+          "memory_recall": null
+        },
+        {
+          "task_id": "hairpin_family:4",
+          "solved": true,
+          "evals": 1,
+          "A_memory": null,
+          "n_applicable": 0,
+          "agent_actuation": {
+            "A": null,
+            "A_model": null,
+            "A_harness": null,
+            "adoption": null,
+            "n_steps": 0,
+            "n_directive_calls": 1,
+            "repair_steps": []
+          },
+          "memory_recall": null
+        },
+        {
+          "task_id": "hairpin_family:5",
+          "solved": true,
+          "evals": 1,
+          "A_memory": null,
+          "n_applicable": 0,
+          "agent_actuation": {
+            "A": null,
+            "A_model": null,
+            "A_harness": null,
+            "adoption": null,
+            "n_steps": 0,
+            "n_directive_calls": 1,
+            "repair_steps": []
+          },
+          "memory_recall": null
+        },
+        {
+          "task_id": "hairpin_family:6",
+          "solved": true,
+          "evals": 5,
+          "A_memory": null,
+          "n_applicable": 0,
+          "agent_actuation": {
+            "A": 1.0,
+            "A_model": 1.0,
+            "A_harness": 1.0,
+            "adoption": 0.3871,
+            "efficacy_when_adopted": 1.0,
+            "n_steps": 1,
+            "n_directive_calls": 2,
+            "repair_steps": [
+              {
+                "step": 0,
+                "n_directive": 30,
+                "read": true,
+                "n_edited": 62,
+                "selected": true,
+                "adoption": 0.3871,
+                "executed": true,
+                "affected": true,
+                "d_before": 29,
+                "d_after": 0
+              }
+            ]
+          },
+          "memory_recall": null
+        },
+        {
+          "task_id": "hairpin_family:7",
+          "solved": true,
+          "evals": 2,
+          "A_memory": null,
+          "n_applicable": 0,
+          "agent_actuation": {
+            "A": null,
+            "A_model": null,
+            "A_harness": null,
+            "adoption": null,
+            "n_steps": 0,
+            "n_directive_calls": 1,
+            "repair_steps": []
+          },
+          "memory_recall": null
+        }
+      ]
+    }
+  }
+}

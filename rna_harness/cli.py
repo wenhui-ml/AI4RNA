@@ -13,6 +13,7 @@ distinguish failures. This is deliberately stateless and deterministic.
 from __future__ import annotations
 
 import json
+import os
 import sys
 from typing import Dict
 
@@ -71,7 +72,19 @@ def h_verify(req: Dict) -> Dict:
         compute_cross_oracle=bool(req.get("cross_oracle", True)),
         panel_kind=req.get("panel", "default"),
     )
-    return res.to_dict()
+    out = res.to_dict()
+    # Mode-A guard: if the harness pinned the canonical target, refuse to report solved when the
+    # agent verified against a DRIFTED target (its own mis-typed dot-bracket). Prevents the false
+    # is_umfe=true that makes the agent stop "satisfied" against a wrong target.
+    pinned = (os.environ.get("RNA_TASK_TARGET") or "").strip()
+    tgt = (req.get("target") or "").strip()
+    if pinned and tgt and tgt != pinned and not (len(tgt) < len(pinned) and tgt in pinned):
+        out["solved"] = False
+        out["is_umfe"] = False
+        out["target_mismatch"] = (
+            f"NOT a real solve: you verified against a {len(tgt)}-nt target, but the task target is "
+            f"{len(pinned)} nt. Re-copy the EXACT task target verbatim and design against it.")
+    return out
 
 
 def h_diagnose(req: Dict) -> Dict:

@@ -123,6 +123,11 @@ def applicable_strategies(strategies: List[Strategy], target: str) -> List[Strat
 
 def _adopted(strategy: Strategy, target: str, sequence: str) -> bool:
     seq = sequence.upper().replace("T", "U")
+    # A produced sequence whose length != the target cannot have "adopted" a position-specific
+    # strategy on that target (and indexing closing pairs would raise). The classical path always
+    # yields target-length sequences, but the LIVE agent can emit a wrong-length FINAL_SEQUENCE.
+    if len(seq) != len(target):
+        return False
     if strategy.kind == "hairpin_motif":
         L = strategy.trigger["loop_len"]
         motif = strategy.rule["motif"]

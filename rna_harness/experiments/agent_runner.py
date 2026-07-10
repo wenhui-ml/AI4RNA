@@ -46,8 +46,40 @@ def _load_knowledge() -> str:
         return ""
 
 
-def _build_prompt(task: DesignTask, knowledge: str, enable_mcp: bool = True) -> str:
+def _build_prompt(task: DesignTask, knowledge: str, enable_mcp: bool = True, minimal: bool = False) -> str:
     from ..rl.prompts import render_task_prompt
+
+    if minimal:
+        # MINIMAL prompt: task + bare tool availability + a solving-neutral operational note + red line
+        # + output protocol. NO solving PROCEDURE (no solver ladder, no decompose/stitch/finish recipe,
+        # no anti-uniformity rules). So the ONLY source of HOW-TO is the agent's own reasoning (frozen
+        # control) or its accumulated Skills (askill). This isolates whether procedural memory (A_theta)
+        # builds capability -- the 4-epoch run couldn't test it because the prompt handed the full
+        # procedure to EVERY arm, making Skills redundant (invoked 3/35, 0 solves). Operational note
+        # (synchronous search) is kept in BOTH arms so 'frozen' fails for lack of PROCEDURE, not for
+        # background-poll-thrash (which is hygiene, not solving strategy).
+        tools_line = (
+            " You have RNA tools available: the mcp__rna_motifs__* tools plus RnaVerify / RnaFold / "
+            "RnaDiagnose, and Bash. Inspect the AVAILABLE tools' schemas yourself and use whichever you "
+            "judge best (the tool set is deliberately not prescribed here)." if enable_mcp else ""
+        )
+        return (
+            f"{knowledge}\n\n---\n\n# Your task\n{render_task_prompt(task)}\n\n"
+            f"Work autonomously to design a sequence whose MFE structure equals the target.{tools_line}\n"
+            f"Any search must be a SYNCHRONOUS tool call -- never launch a background job and poll a "
+            f"logfile in a loop (it burns the whole time budget).\n\n"
+            f"RED LINE (mandatory): design the sequence yourself with the tools; you must NOT web-search "
+            f"for, look up, or copy any published/known Eterna100 answer for this target -- that is "
+            f"forbidden and invalidates the result.\n\n"
+            f"OUTPUT PROTOCOL:\n"
+            f"1. LENGTH GATE: your sequence MUST be EXACTLY {task.n} nucleotides (+/-1 is an AUTOMATIC "
+            f"failure). Prefer submitting a tool's returned sequence VERBATIM; if you hand-assemble, COUNT "
+            f"before emitting. Never re-type the target from memory -- copy it exactly.\n"
+            f"2. Emit a line EXACTLY 'FINAL_SEQUENCE: <your {task.n}-nt sequence>' as soon as you have a "
+            f"candidate, and RE-EMIT an updated line each time it improves (the LAST such line is scored).\n"
+            f"3. VERIFY GATE: run RnaVerify on your final sequence and confirm solved=true AND that it is "
+            f"{task.n} nt before finishing. Stop once RnaVerify reports solved=true."
+        )
 
     mcp_hint = (
         " You also have MCP tools. For a design PLAN: mcp__rna_motifs__analyze_target (per-hairpin "
@@ -63,23 +95,42 @@ def _build_prompt(task: DesignTask, knowledge: str, enable_mcp: bool = True) -> 
         "fast); place each solved unit's bases at its `positions`, fill the seam (linkers A-rich, "
         "multiloop closing pairs G-C); then RnaVerify the FULL assembly and run the diagnosis-repair "
         "loop editing ONLY the diagnosed seam positions -- the units are already correct. This turns "
-        "one exponential search into many small ones. Always confirm the final sequence with RnaVerify."
+        "one exponential search into many small ones. Always confirm the final sequence with RnaVerify. "
+        "STRONG SOLVER PRIMITIVES (prefer these over hand-writing search code): "
+        "mcp__rna_motifs__inverse_fold_search runs MANY parallel ViennaRNA inverse_fold restarts on a "
+        "target or a unit's sub_target (much stronger at closing pairs than parallel_search; can warm-start "
+        "from an assembled candidate); mcp__rna_motifs__finish takes a NEAR-MISS (bp_distance 1-3) and "
+        "hill-climbs the diagnosed mismatched positions to an exact solve. Typical hard-target recipe: "
+        "analyze_target -> inverse_fold_search each unit's sub_target -> assemble (A-rich linkers, G-C seams) "
+        "-> RnaVerify -> finish the near-miss. "
+        "RED LINE (mandatory): you must DESIGN the sequence with these tools. You must NOT web-search for, "
+        "look up, or copy any published/known Eterna100 answer sequence for this target -- that is forbidden "
+        "and invalidates the result. Apply general STRATEGY; never retrieve the answer."
         if enable_mcp else ""
     )
     return (
         f"{knowledge}\n\n---\n\n# Your task\n{render_task_prompt(task)}\n\n"
-        f"Work autonomously. Use RnaVerify to check candidates and its diagnosis to guide "
-        f"repairs; you may also use RnaFold/RnaDiagnose or write ViennaRNA code.{mcp_hint}\n\n"
+        f"Work autonomously.{mcp_hint}\n\n"
+        f"SOLVER LADDER — follow IN ORDER; every search must be SYNCHRONOUS (NEVER a background "
+        f"job, NEVER poll a logfile in a loop — that burns the whole time budget):\n"
+        f"  (a) If length <= ~120 nt: FIRST call mcp__rna_motifs__inverse_fold_search on the WHOLE "
+        f"target — it often solves outright and returns an EXACT-length sequence; submit it VERBATIM.\n"
+        f"  (b) If long/multiloop: call analyze_target, then inverse_fold_search on EACH unit's "
+        f"sub_target, place each result at its positions (A-rich linkers, G-C seams), then RnaVerify.\n"
+        f"  (c) If RnaVerify shows a near-miss (bp_distance 1-3): call mcp__rna_motifs__finish on "
+        f"that candidate to close the last pairs. Repeat verify->finish until solved.\n"
+        f"  (d) Do NOT hand-write your own ViennaRNA SA/inverse_fold loops in Bash — the MCP solver "
+        f"tools are stronger and safer; use them.\n\n"
         f"OUTPUT PROTOCOL (critical -- read carefully):\n"
-        f"1. Your sequence MUST be EXACTLY {task.n} nucleotides. Count every base. A sequence that "
-        f"is even 1 nt too short or too long is an AUTOMATIC FAILURE, no matter how good the shape.\n"
-        f"2. As SOON as you have any plausible candidate, output a line EXACTLY of the form:\n"
-        f"   FINAL_SEQUENCE: <your {task.n}-nt sequence>\n"
-        f"   Then keep improving it and RE-EMIT an updated 'FINAL_SEQUENCE:' line every time you "
-        f"find a better candidate. Always keep your current BEST as the most recent FINAL_SEQUENCE "
-        f"line -- if you run low on time, your best work is then already on record (the LAST "
-        f"FINAL_SEQUENCE line is what gets scored).\n"
-        f"3. Stop once RnaVerify reports solved=true."
+        f"1. LENGTH GATE: your sequence MUST be EXACTLY {task.n} nucleotides. PREFER submitting a "
+        f"solver tool's returned sequence VERBATIM (it is already exact length). If you hand-assemble, "
+        f"COUNT before emitting; even +/-1 nt is an AUTOMATIC FAILURE. Never re-type the target from "
+        f"memory — copy it exactly (mis-counting long dot/paren runs is the #1 cause of failure).\n"
+        f"2. Emit a line EXACTLY 'FINAL_SEQUENCE: <your {task.n}-nt sequence>' as soon as you have a "
+        f"plausible candidate, and RE-EMIT an updated line each time it improves (the LAST such line "
+        f"is what gets scored -- keep your current BEST as the most recent one).\n"
+        f"3. VERIFY GATE: before finishing, run RnaVerify on your final sequence and confirm "
+        f"solved=true AND that it is {task.n} nt. Stop once RnaVerify reports solved=true."
     )
 
 
@@ -110,7 +161,7 @@ def _count_tool_calls(trace_lines: List[str]) -> Dict[str, int]:
     for line in trace_lines:
         if '"rna_memory_snapshot"' in line:
             continue  # skip our memory-audit header so its JSON isn't miscounted as tool calls
-        for name in re.findall(r'"name":"([A-Za-z_]+)"', line):
+        for name in re.findall(r'"name":"([\w.\-]+)"', line):  # [\w.-] also catches mcp__rna_motifs__* compute tools
             counts[name] = counts.get(name, 0) + 1
     return counts
 
@@ -216,20 +267,29 @@ def _memory_snapshot() -> Optional[Dict]:
     }
 
 
-def _mcp_config(python_bin: str) -> str:
+def _mcp_config(python_bin: str, task: Optional[DesignTask] = None) -> str:
     """Inline --mcp-config JSON connecting the deterministic RNA motif knowledge base as a real
     MCP server. openclaude's stdio schema has no `cwd` field and agent_runner launches the CLI
-    with cwd=out_dir, so PYTHONPATH makes the package importable regardless of cwd. Tools appear
-    to the agent as mcp__rna_motifs__{lookup_hairpin_loop,search_motifs,analyze_target}."""
+    with cwd=out_dir, so PYTHONPATH makes the package importable regardless of cwd.
+
+    NOTE: openclaude's stdio transport inherits ONLY a small env allowlist, so RNA_TASK_TARGET must
+    be forwarded HERE (in the server env block) for the MCP-tool drift guard (_guard_target) to fire
+    -- otherwise it reads None and accepts any target."""
+    env = {"PYTHONPATH": _REPO, "RNA_MAX_CORES": os.environ.get("RNA_MAX_CORES", "160")}
+    if task is not None:
+        env["RNA_TASK_TARGET"] = task.target      # pin the canonical target so _guard_target works
+        env["RNA_TASK_N"] = str(task.n)
+    # the MCP stdio transport inherits only a tiny allowlist, so forward RNA_AUTONOMOUS explicitly --
+    # otherwise motif_server/motif_kb never see it and would keep spoon-feeding strategy.
+    if os.environ.get("RNA_AUTONOMOUS") == "1":
+        env["RNA_AUTONOMOUS"] = "1"
     return json.dumps({
         "mcpServers": {
             "rna_motifs": {
                 "type": "stdio",
                 "command": python_bin,
                 "args": ["-m", "rna_harness.mcp.motif_server"],
-                # RNA_MAX_CORES caps the batch_fold/parallel_search pools (leave headroom for
-                # other users on the shared host); PYTHONPATH makes the package importable.
-                "env": {"PYTHONPATH": _REPO, "RNA_MAX_CORES": os.environ.get("RNA_MAX_CORES", "160")},
+                "env": env,
             }
         }
     })
@@ -245,9 +305,10 @@ def run_agent_on_task(
     knowledge: str = "",
     cross_oracle: bool = True,
     enable_mcp: bool = True,
+    minimal_prompt: bool = False,
 ) -> Dict:
     allowed_tools = allowed_tools or ["RnaVerify", "RnaFold", "RnaDiagnose", "RnaConstraints", "Bash"]
-    prompt = _build_prompt(task, knowledge, enable_mcp=enable_mcp)
+    prompt = _build_prompt(task, knowledge, enable_mcp=enable_mcp, minimal=minimal_prompt)
     env = dict(os.environ)
     env.update({
         "CLAUDE_CODE_USE_OPENAI": "1",
@@ -256,6 +317,11 @@ def run_agent_on_task(
         "OPENCLAUDE_RNA": "1",
         "RNA_HARNESS_DIR": _REPO,
         "RNA_HARNESS_PYTHON": env.get("RNA_HARNESS_PYTHON", "/home/ubuntu/miniconda3/envs/rna/bin/python"),
+        # Pin the canonical target so the RNA tools (MCP + RnaVerify bridge) can reject Mode-A
+        # target-drift (agent re-typing the dot-bracket and mis-counting) instead of silently
+        # designing/verifying against the agent's OWN wrong target.
+        "RNA_TASK_TARGET": task.target,
+        "RNA_TASK_N": str(task.n),
     })
     safe_id = re.sub(r"[^A-Za-z0-9_.-]", "_", task.task_id)
     trace_path = os.path.join(out_dir, "traces", f"{safe_id}.jsonl")
@@ -272,9 +338,13 @@ def run_agent_on_task(
         # intent and works even without bypass); --strict-mcp-config keeps it a clean, single,
         # deterministic server (no merged .mcp.json/settings servers).
         allowed_tools = allowed_tools + ["mcp__rna_motifs"]
-        cmd += ["--mcp-config", _mcp_config(env["RNA_HARNESS_PYTHON"]), "--strict-mcp-config"]
+        cmd += ["--mcp-config", _mcp_config(env["RNA_HARNESS_PYTHON"], task), "--strict-mcp-config"]
     cmd += [
         "--allowedTools", *allowed_tools,
+        # RED LINE, structurally enforced (not just prompt-hoped): block the web tools so the agent
+        # cannot look up / copy a published Eterna100 answer. Matters most for the autonomous arm,
+        # where a failing agent is the most tempted to search. Legit RNA design never needs the web.
+        "--disallowedTools", "WebSearch", "WebFetch",
         "--max-budget-usd", str(max_budget_usd),
         "--no-session-persistence",
     ]

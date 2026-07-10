@@ -104,7 +104,8 @@ def run_arm_classical(tasks: List[DesignTask], arm: str, budget: int, seed: int)
         v = verify(t, res.best_sequence, compute_cross_oracle=False)
         adopt = memory_adoption(strategies, t.target, res.best_sequence) if strategies else {"A_memory": None, "n_applicable": 0}
         rows.append({"task_id": t.task_id, "solved": v.solved, "evals": res.n_evals,
-                     "A_memory": adopt["A_memory"], "n_applicable": adopt["n_applicable"]})
+                     "A_memory": adopt["A_memory"], "n_applicable": adopt["n_applicable"],
+                     "n": t.n, "reward": v.reward, "final_sequence": res.best_sequence})
         # accumulate ONLY real learned strategies (with_memory)
         if arm == "with_memory" and v.solved:
             strategies = merge_strategies(strategies, distill_strategies(t.target, res.best_sequence))
@@ -141,10 +142,16 @@ def run_arm_agent(tasks: List[DesignTask], arm: str, model: str, out_dir: str,
     knowledge = _load_knowledge()
     rows: List[Dict] = []
     for t in tasks:
-        # point the agent's auto-memory at our store for this arm (empty for no_memory)
+        # point the agent's auto-memory at our store for this arm. For no_memory we must DISABLE
+        # auto-memory entirely -- merely popping the override lets openclaude fall back to the HOST
+        # project memdir (~/.claude/projects/<repo>/memory/), which would both contaminate the
+        # control (it reads real host memory) and pollute the host (turn-end extractMemories writes
+        # into it). CLAUDE_CODE_DISABLE_AUTO_MEMORY=1 is the first-priority off switch (paths.ts).
         if arm == "no_memory":
             os.environ.pop("CLAUDE_COWORK_MEMORY_PATH_OVERRIDE", None)
+            os.environ["CLAUDE_CODE_DISABLE_AUTO_MEMORY"] = "1"
         else:
+            os.environ.pop("CLAUDE_CODE_DISABLE_AUTO_MEMORY", None)
             os.environ["CLAUDE_COWORK_MEMORY_PATH_OVERRIDE"] = mem_dir + os.sep
         rec = run_agent_on_task(t, model, out_dir, max_budget_usd, timeout_s, None, knowledge)
         seq = rec.get("final_sequence") or ""
@@ -152,10 +159,14 @@ def run_arm_agent(tasks: List[DesignTask], arm: str, model: str, out_dir: str,
         adopt = memory_adoption(strategies, t.target, seq) if (seq and strategies) else {"A_memory": None, "n_applicable": 0}
         rows.append({"task_id": t.task_id, "solved": rec["solved"], "evals": rec["n_rna_tool_calls"],
                      "A_memory": adopt["A_memory"], "n_applicable": adopt["n_applicable"],
-                     "agent_actuation": rec.get("actuation", {})})
+                     "agent_actuation": rec.get("actuation", {}),
+                     "n": rec.get("n"), "reward": rec.get("reward"), "final_sequence": seq,
+                     # audit trail: did the live agent actually RECALL the seeded playbook this case?
+                     "memory_recall": rec.get("memory_snapshot")})
         if arm == "with_memory" and rec["solved"] and seq:
             store.write(merge_strategies(store.strategies(), distill_strategies(t.target, seq)))
     os.environ.pop("CLAUDE_COWORK_MEMORY_PATH_OVERRIDE", None)
+    os.environ.pop("CLAUDE_CODE_DISABLE_AUTO_MEMORY", None)
     return _summarize_arm(arm, rows, len(store.strategies()))
 
 
@@ -196,6 +207,20 @@ def main(argv=None) -> int:
                "detail": results}
     with open(os.path.join(args.out, "meta_summary.json"), "w") as f:
         json.dump(summary, f, indent=2)
+    # ALSO emit campaign_state.json so the dashboard's meta-learning report renders this run
+    # (arms comparison + per-episode A_memory table). Each arm is one epoch=0 pass over the tasks.
+    done = {}
+    for arm, r in results.items():
+        for row in r.get("rows", []):
+            done[f"{arm}:{row['task_id']}"] = {
+                "arm": arm, "epoch": 0, "task_id": row["task_id"], "n": row.get("n"),
+                "solved": bool(row["solved"]), "reward": row.get("reward"),
+                "oracle_calls": row.get("evals"), "A_memory": row.get("A_memory"),
+                "final_sequence": row.get("final_sequence") or "",
+            }
+    with open(os.path.join(args.out, "campaign_state.json"), "w") as f:
+        json.dump({"n_episodes": len(done), "executor": args.executor,
+                   "model": args.model, "done": done}, f, indent=2)
     # headline: does learned memory help vs control?
     if "with_memory" in results and "no_memory" in results:
         wm, nm = results["with_memory"], results["no_memory"]

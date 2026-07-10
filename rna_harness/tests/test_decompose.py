@@ -1,5 +1,6 @@
 """Decomposition of a target into independent stem-loop units + seam (P1a)."""
-from rna_harness.mcp.motif_kb import decompose_structure
+from rna_harness.mcp.motif_kb import analyze_structure, decompose_structure
+from rna_harness.mcp.motif_server import _format_target_analysis
 
 
 def _balanced(db: str) -> bool:
@@ -38,3 +39,21 @@ def test_buried_multiloop_is_found_through_the_stem():
     d = decompose_structure(db)
     assert d["n_units"] == 2          # not 1: the stem is descended, multiloop found
     assert max(u["len"] for u in d["units"]) < len(db)
+
+
+def test_analyze_target_surfaces_decomposition_for_compositional_target():
+    # REGRESSION: general_advice tells the agent to iterate `decomposition.units`, so the
+    # formatted analyze_target output MUST actually contain the units + their sub_targets.
+    db = "(((" + "((((....))))" * 3 + ")))"   # multiloop: 3 units + 1 junction
+    text = _format_target_analysis(analyze_structure(db))
+    assert "decomposition plan" in text
+    assert "3 design unit" in text
+    assert "unit[0]" in text and "unit[2]" in text
+    assert "sub_target=" in text            # the per-unit target the agent must design
+    assert "junction closing_pair@" in text
+
+
+def test_analyze_target_omits_decomposition_for_simple_hairpin():
+    # a single stem-loop has nothing to decompose -> keep the output clean (no unit noise)
+    text = _format_target_analysis(analyze_structure("((((....))))"))
+    assert "decomposition plan" not in text

@@ -48,6 +48,15 @@ def test_applicable_and_adoption():
     assert adopt2["A_memory"] < 1.0
 
 
+def test_adoption_wrong_length_sequence_no_crash():
+    """A live agent can emit a FINAL_SEQUENCE whose length != target; memory_adoption must not
+    raise (regression: gc_closing indexed closing pairs out of range on a short sequence)."""
+    ss = distill_strategies(HAIRPIN, GAAA_SOL)  # has a gc_closing + hairpin_motif strategy
+    short = "GGGG"          # far shorter than the 12-nt target
+    out = memory_adoption(ss, HAIRPIN, short)
+    assert out["A_memory"] == 0.0 and out["n_adopted"] == 0  # nothing adopted, no exception
+
+
 def test_memstore_roundtrip():
     d = tempfile.mkdtemp()
     store = MemStore(d)

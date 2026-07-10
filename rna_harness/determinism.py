@@ -47,24 +47,42 @@ def estimate_d_sym(task: DesignTask, sequences: List[str], repeats: int = 3) -> 
     return Coordinate("D_sym", val, {"n_sequences": len(sequences), "repeats": repeats, "n_stable": stable})
 
 
-def estimate_r_det(task: DesignTask, sequences: List[str], repeats: int = 3) -> Coordinate:
-    """Reward determinism: recompute the official reward ``repeats`` times; R_det = fraction
-    of sequences whose reward is bit-stable. Also flags self-checkability (ViennaRNA reward
-    needs no external budget -> alpha_f ~ 1, no error-bearing surrogate)."""
+def estimate_r_det(
+    task: DesignTask, sequences: List[str], repeats: int = 3, reward_oracle=None
+) -> Coordinate:
+    """Reward EXACTNESS (the oracle-residue axis). R_det = fraction of sequences whose
+    reward-path ``solved`` verdict matches EXACT ground truth: 1.0 for the exact ViennaRNA
+    oracle (no residue), < 1.0 for a surrogate/noisy ``reward_oracle`` whose measured residue
+    is ``1 - R_det``.
+
+    This corrects a prior conflation: the old implementation measured only REPRODUCIBILITY
+    (reward bit-stable across repeats), so a deterministic-but-WRONG surrogate scored R_det=1.0.
+    Reproducibility is a real but separate property (self-checkability), reported here as
+    ``reproducible``; exactness-vs-ground-truth is the axis the compounding study dials."""
+    from .oracles.residue import ExactRewardOracle, realized_residue
+
+    ro = reward_oracle or ExactRewardOracle()
+    res = realized_residue(ro, task, sequences)  # exactness vs ground truth (1 - residue)
+    # reproducibility of the EXACT reward across repeats (determinism / self-checkability)
     stable = 0
     for s in sequences:
         rewards = {round(verify(task, s, compute_cross_oracle=False).reward, 9) for _ in range(max(1, repeats))}
         stable += int(len(rewards) == 1)
-    val = stable / len(sequences) if sequences else 1.0
+    reproducible = stable / len(sequences) if sequences else 1.0
     return Coordinate(
         "R_det",
-        val,
+        res["r_det"],
         {
-            "n_sequences": len(sequences),
+            "n_sequences": res["n"],
             "repeats": repeats,
-            "n_stable": stable,
-            "self_checkable": True,
-            "surrogate_in_reward_path": False,
+            "exactness": res["r_det"],
+            "residue": res["residue"],
+            "false_positive_rate": res["false_positive_rate"],
+            "false_negative_rate": res["false_negative_rate"],
+            "reproducible": reproducible,
+            "reward_oracle": res["reward_oracle"],
+            "self_checkable": isinstance(ro, ExactRewardOracle),
+            "surrogate_in_reward_path": not isinstance(ro, ExactRewardOracle),
         },
     )
 

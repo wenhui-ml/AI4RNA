@@ -13,11 +13,20 @@ loops are strongest closed by a G-C/C-G pair; loops < 3 nt cannot close a hairpi
 """
 from __future__ import annotations
 
+import os
 from typing import Dict, List, Tuple
 
 from ..structure_utils import pair_table
 
 KB_VERSION = "rna-motif-kb/1.0"
+
+
+def _autonomous() -> bool:
+    """RNA_AUTONOMOUS=1 => strip all SOLVING STRATEGY / problem-recognition / design ADVICE from
+    tool outputs, leaving only neutral structural FACTS. The agent must then recognize the problem
+    and derive its own method (its A_theta), instead of executing the harness's hand-coded strategy.
+    Flag UNSET => today's crutched behavior, byte-identical (existing runs untouched)."""
+    return os.environ.get("RNA_AUTONOMOUS") == "1"
 
 # --- Hairpin-cap motifs, the highest-leverage knowledge for inverse folding --------------
 # GNRA: G-N-R-A (N=any, R=purine A/G). UNCG: U-N-C-G (N=any). Both are unusually stable
@@ -258,7 +267,7 @@ def decompose_structure(dot_bracket: str) -> Dict:
     walk(0, n - 1)
     covered = {k for a, b in units for k in range(a, b + 1)}
     seam = [k for k in range(n) if k not in covered]   # stems-to-multiloops + multiloop cores + linkers
-    return {
+    result = {
         "n_units": len(units),
         "units": [{"positions": [a, b], "len": b - a + 1, "sub_target": dot_bracket[a:b + 1]}
                   for a, b in sorted(units)],
@@ -266,7 +275,13 @@ def decompose_structure(dot_bracket: str) -> Dict:
         "junctions": [{"closing_pair_positions": [a, b],
                        "branches": len(outermost(a + 1, b - 1))} for a, b in sorted(junctions)],
         "n_seam_positions": len(seam),
-        "strategy": (
+    }
+    if not _autonomous():
+        # STRIP_STRATEGY: this is the "DECOMPOSE->DESIGN->STITCH->REPAIR" playbook -- the flagship
+        # hand-coded strategy. Under RNA_AUTONOMOUS the agent gets only the geometric partition above
+        # (positions + sub_target substrings are FACTS) and must decide for itself whether/how to
+        # decompose. Present only in the crutched (flag-off) mode.
+        result["strategy"] = (
             "DECOMPOSE -> DESIGN -> STITCH -> REPAIR (use for long/hard targets): "
             "(1) design each unit's `sub_target` INDEPENDENTLY -- each is short, so "
             "mcp__rna_motifs__parallel_search converges on it fast; (2) place each unit's sequence "
@@ -274,8 +289,8 @@ def decompose_structure(dot_bracket: str) -> Dict:
             "(3) fold the FULL assembly with RnaVerify and run the diagnosis-guided repair loop, "
             "editing ONLY the diagnosed junction/seam positions (the units are already correct). "
             "This replaces one exponential whole-length search with N small searches + seam repair."
-        ),
-    }
+        )
+    return result
 
 
 def analyze_structure(dot_bracket: str) -> Dict:
@@ -293,17 +308,42 @@ def analyze_structure(dot_bracket: str) -> Dict:
     stems = _stem_lengths(dot_bracket)
     n_lonely = sum(1 for L in stems if L == 1)
 
+    auto = _autonomous()
     hairpin_recs = []
     for i, j, L in hairpins:
-        rec = recommend_hairpin(L)
-        hairpin_recs.append({
-            "closing_pair_positions": [i, j],  # 0-indexed
+        h = {
+            "closing_pair_positions": [i, j],  # 0-indexed FACT
             "loop_positions": [i + 1, j - 1] if L > 0 else None,
             "loop_len": L,
-            "recommended_motifs": rec.get("motifs"),
-            "closing_pair": rec.get("closing_pair"),
-            "note": rec.get("note"),
-        })
+        }
+        if not auto:  # STRIP: recommended cap motif / closing pair / design note are ADVICE
+            rec = recommend_hairpin(L)
+            h.update({"recommended_motifs": rec.get("motifs"), "closing_pair": rec.get("closing_pair"),
+                      "note": rec.get("note")})
+        hairpin_recs.append(h)
+
+    n_triloop = sum(1 for _, _, L in hairpins if L == 3)
+    if auto:
+        # FACTS ONLY: presence + positions, no "fragile / hard feature / give G-C support / close with C-G".
+        notes = []
+        if has_pk:
+            notes.append("crossing pairs present; the default ViennaRNA MFE model does not fold "
+                         "pseudoknots (this target is out-of-model for standard MFE-match).")
+        if n_lonely:
+            notes.append(f"{n_lonely} isolated (length-1) stem(s).")
+        if n_triloop:
+            notes.append(f"{n_triloop} hairpin loop(s) of length 3.")
+        result = {
+            "length": n,
+            "n_hairpins": len(hairpins),
+            "n_base_pairs": sum(1 for k in range(n) if pt[k] > k),
+            "stem_lengths": stems,
+            "hairpins": hairpin_recs,
+            "structural_notes": notes or ["none"],
+            "decomposition": decompose_structure(dot_bracket),
+            "kb_version": KB_VERSION,
+        }
+        return result
 
     flags = []
     if has_pk:
@@ -312,9 +352,8 @@ def analyze_structure(dot_bracket: str) -> Dict:
     if n_lonely:
         flags.append(f"{n_lonely} LONELY PAIR(S): isolated unstacked pairs are fragile and a "
                      "common cause of hard/undesignable targets -- give them G-C support.")
-    triloops = [h for h in hairpin_recs if h["loop_len"] == 3]
-    if triloops:
-        flags.append(f"{len(triloops)} TRILOOP(S) (3-nt hairpin): strained; often the hard "
+    if n_triloop:
+        flags.append(f"{n_triloop} TRILOOP(S) (3-nt hairpin): strained; often the hard "
                      "feature. Close with C-G and verify a stable triloop sequence.")
 
     return {

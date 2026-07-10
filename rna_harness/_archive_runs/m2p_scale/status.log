@@ -1,0 +1,14 @@
+=== SCALE START Mon Jul  6 02:14:43 AM UTC 2026 : 30 tasks x 3 conds x K=3, concurrent ===
+[orch] launched no_memory (pid 2648289)
+[orch] launched seeded_uniform (pid 2648290)
+[orch] launched seeded_diverse (pid 2648291)
+[orch] all 3 conditions done Mon Jul  6 07:43:38 AM UTC 2026; merging...
+===== SCALE-UP MERGED SUMMARY (30 tasks x K, paired bootstrap) =====
+  no_memory       solve_prob=0.567 (sd_tasks=0.274, 30 tasks, 90 draws) evals=3.82
+  seeded_uniform  solve_prob=0.578 (sd_tasks=0.297, 30 tasks, 90 draws) evals=3.77
+  seeded_diverse  solve_prob=0.656 (sd_tasks=0.349, 30 tasks, 90 draws) evals=3.22
+  --- paired contrasts vs no_memory (bootstrap 95% CI over tasks) ---
+  seeded_uniform_minus_no_memory Δ=0.011 CI95=[-0.133, 0.144] SIGNIFICANT=False (n_tasks=30)
+  seeded_diverse_minus_no_memory Δ=0.089 CI95=[-0.044, 0.211] SIGNIFICANT=False (n_tasks=30)
+[merge] wrote /data/wenhui/openclaude_rna/rna_harness/runs/m2p_scale/meta_summary.json
+=== SCALE_DONE Mon Jul  6 07:43:38 AM UTC 2026 ===

@@ -52,11 +52,23 @@ def _read_json(path: str) -> Optional[dict]:
         return None
 
 
+# Off-mission runs hidden from the web display (archived per the Paper C mainline: the brute-force
+# decompose / number-chasing probes are 本末倒置, orthogonal to the de-scaffolding + mode-efficacy
+# thesis). Files stay on disk and remain reachable directly via /report/<run>; only the listing hides.
+_ARCHIVED_SUBSTR = ("decomp", "_smoke")
+
+
+def _archived_from_display(name: str) -> bool:
+    return name == "p1_logs" or any(s in name for s in _ARCHIVED_SUBSTR)
+
+
 def _list_runs() -> List[Dict]:
     out = []
     if not os.path.isdir(RUNS):
         return out
     for name in sorted(os.listdir(RUNS)):
+        if _archived_from_display(name):
+            continue
         d = os.path.join(RUNS, name)
         if not os.path.isdir(d):
             continue
@@ -67,6 +79,18 @@ def _list_runs() -> List[Dict]:
         entry["figures"] = sorted(os.listdir(figdir)) if os.path.isdir(figdir) else []
         tdir = os.path.join(d, "traces")
         entry["n_traces"] = len(os.listdir(tdir)) if os.path.isdir(tdir) else 0
+        # live flag: a progress file touched in the last 90s => the run is actively producing output
+        import time as _t
+        _mt = 0.0
+        for _f in ("epoch_progress.json", "scorecard.json", "summary.json", "rows_partial.json",
+                   "campaign_state.json", "solved.json"):
+            _p = os.path.join(d, _f)
+            if os.path.exists(_p):
+                _mt = max(_mt, os.path.getmtime(_p))
+        # live if a progress file was touched recently. Threshold > episode TIMEOUT (1500s): with a
+        # few workers all mid-long-episode, progress writes can be ~1 episode apart, so 90s falsely
+        # read genuinely-running arms as dead. 1900s covers the worst-case gap.
+        entry["live"] = bool(_mt and (_t.time() - _mt) < 1900)
         # count RLVR rows if present
         for f in ("rft.jsonl", "grpo.jsonl", "trajectories.jsonl", "agentic_rlvr.jsonl"):
             p = os.path.join(d, f)
@@ -265,7 +289,7 @@ HTML_PAGE = """<!doctype html><html><head><meta charset="utf-8">
 </div>
 <script>
 let RUNS=[]; let SCORECARD=[];
-const SOTA_V2=[{m:'DesiRNA 经典SOTA',v:0.97,c:'#2e7d32'},{m:'NEMO 严格定预算',v:0.90,c:'#78909c'},{m:'LLM方法SOTA',v:0.80,c:'#d97706'}];
+const SOTA_V2=[{m:'DesiRNA 经典SOTA(24h/题)',v:0.97,c:'#2e7d32'},{m:'NEMO 原生',v:0.94,c:'#78909c'},{m:'LLM方法SOTA(Gautam·最可比)',v:0.80,c:'#d97706'}];
 function tab(t){document.querySelectorAll('.tab').forEach(e=>e.classList.toggle('active',e.dataset.t==t));
  ['scorecard','campaigns','overview','runs','figures','logs'].forEach(p=>document.getElementById(p).style.display=p==t?'block':'none');}
 function fmt(x){return x==null?'—':(typeof x=='number'?(Math.round(x*1000)/1000):x)}
@@ -321,8 +345,71 @@ function renderScorecard(cards){
  let intro='<h3>🏆 综合成绩单</h3>'+note('把所有能力汇总成三块:① 传统算法在 100 道公认 RNA 谜题上的成绩(定「地板线」)· ② 带额外约束时的设计能力 · ③ AI 智能体的「照诊断行动」与「记忆」能力。');
  if(!cards||!cards.length){document.getElementById('scorecard').innerHTML=intro+'<div class="card">还没有成绩单数据。</div>';return;}
  let h=intro;
+ // === 元学习三臂对照 overlay(frozen / K_θ / A_θ)—— the money comparison ===
+ const armMeta={'meta_ladder_frozen':{label:'frozen 对照(种子不变)',color:'#868e96'},
+   'meta_ladder_accumulate':{label:'K_θ 内容记忆(memdir bullets)',color:'#e8590c'},
+   'meta_ladder_askill':{label:'A_θ 过程记忆(Skills)',color:'#2f9e44'}};
+ const arms=cards.filter(c=>armMeta[c.name]&&c.scorecard.panels&&c.scorecard.panels.capability_ladder&&(c.scorecard.panels.capability_ladder.epochs||[]).length);
+ if(arms.length>=2){const tgt=80,base=65;let maxEp=1;
+  arms.forEach(c=>c.scorecard.panels.capability_ladder.epochs.forEach(e=>{if(e.epoch>maxEp)maxEp=e.epoch;}));
+  const W=640,H=270,pL=44,pB=40,pT=24,pR=230;
+  const xs=e=>pL+(W-pL-pR)*(maxEp<2?0.5:(e-1)/(maxEp-1));
+  const ys=v=>pT+(H-pT-pB)*(1-v/100);
+  const yt=ys(tgt).toFixed(1),yb=ys(base).toFixed(1);let lines='',legend='';
+  arms.forEach((c,ai)=>{const m=armMeta[c.name];const byEp={};
+   c.scorecard.panels.capability_ladder.epochs.forEach(e=>{byEp[e.epoch]=Math.max(byEp[e.epoch]||0,e.solved);});
+   const pts=Object.keys(byEp).map(Number).sort((a,b)=>a-b);
+   const poly=pts.map(ep=>`${xs(ep).toFixed(1)},${ys(byEp[ep]).toFixed(1)}`).join(' ');
+   lines+=`<polyline points="${poly}" fill="none" stroke="${m.color}" stroke-width="2.5"/>`+
+    pts.map(ep=>`<circle cx="${xs(ep).toFixed(1)}" cy="${ys(byEp[ep]).toFixed(1)}" r="3.5" fill="${m.color}"/>`).join('');
+   const cur=pts.length?byEp[pts[pts.length-1]]:'?';
+   legend+=`<text x="${W-pR+10}" y="${pT+18+ai*20}" font-size="11" fill="${m.color}">■ ${m.label} · 当前 ${cur}</text>`;});
+  const svg=`<svg viewBox="0 0 ${W} ${H}" style="max-width:100%;height:auto;display:block">
+    <line x1="${pL}" y1="${ys(0)}" x2="${W-pR}" y2="${ys(0)}" stroke="#ccc"/><line x1="${pL}" y1="${pT}" x2="${pL}" y2="${ys(0)}" stroke="#ccc"/>
+    <text x="${pL-6}" y="${(ys(0)+3).toFixed(1)}" font-size="10" text-anchor="end" fill="#888">0</text>
+    <text x="${pL-6}" y="${(ys(100)+3).toFixed(1)}" font-size="10" text-anchor="end" fill="#888">100</text>
+    <line x1="${pL}" y1="${yt}" x2="${W-pR}" y2="${yt}" stroke="#e03131" stroke-width="1.3" stroke-dasharray="6 4"/>
+    <text x="${pL+6}" y="${(+yt-5)}" font-size="10" fill="#e03131">▲ LLM法 SOTA ~80 (Gautam·经典97@24h)</text>
+    <line x1="${pL}" y1="${yb}" x2="${W-pR}" y2="${yb}" stroke="#adb5bd" stroke-width="1" stroke-dasharray="3 3"/>
+    <text x="${pL+6}" y="${(+yb-5)}" font-size="10" fill="#868e96">基线 65</text>
+    ${lines}${legend}
+    ${Array.from({length:maxEp},(_,i)=>i+1).map(ep=>`<text x="${xs(ep).toFixed(1)}" y="${(ys(0)+16).toFixed(1)}" font-size="10" text-anchor="middle" fill="#888">e${ep}</text>`).join('')}
+  </svg>`;
+  h+=`<div class="card"><div class="name">🧬 元学习三臂对照:哪种「记忆表征」在复利?</div>`+
+   note('同一 agent、同一 memdir 种子;<b>唯一差别 = epoch 间积累的记忆表征</b>。<b>A_θ(Skills,绿)</b>=可迁移的推理/搜索/规划<b>过程</b> · <b>K_θ(memdir,橙)</b>=内容/事实 bullet(易被过度套用→坍缩)· <b>frozen(灰)</b>=不积累(对照)。epoch1 三臂应重合;之后 <b>A_θ 与 frozen 的差 = 过程记忆带来的元学习增益</b>。')+svg+`</div>`;}
  for(const c of cards){const p=c.scorecard.panels||{};
-  h+=`<div class="card"><div class="name">🏆 ${c.name}</div><div class="sub">红线:仅在折叠算法裁判下判成功,不涉体内功能。</div>`;
+  const _am=armMeta[c.name];
+  const _role=_am?` <span style="color:${_am.color};font-weight:700">— ${_am.label} 臂</span>`:'';
+  h+=`<div class="card"><div class="name">🏆 ${c.name}${_role}</div><div class="sub">红线:仅在折叠算法裁判下判成功,不涉体内功能。${_am?' · 本卡是三臂对照之一(见顶部叠加图),不是旧实验。':''}</div>`;
+  const cl=p.capability_ladder;
+  if(cl&&cl.epochs&&cl.epochs.length){const eps=cl.epochs,tgt=80;
+   const _last=eps[eps.length-1];
+   const live=(_last&&_last.provisional)?`<div style="margin:6px 0 2px;color:#e8590c;font-weight:600">🔴 正在攻:${_last.current_task||'?'} (${_last.current_len||'?'}nt) · 全集第 <b>${_last.current_idx_100||'?'}/${_last.n}</b> 道 · 未解集第 <b>${_last.attempted||0}/${_last.to_attempt||'?'}</b> 道</div>`:'';
+   const W=560,H=230,pL=42,pB=34,pT=22,pR=140;
+   const xs=i=>pL+(W-pL-pR)*(eps.length<2?0.5:i/(eps.length-1));
+   const ys=v=>pT+(H-pT-pB)*(1-v/100);
+   const poly=eps.map((e,i)=>`${xs(i).toFixed(1)},${ys(e.solved).toFixed(1)}`).join(' ');
+   const dots=eps.map((e,i)=>`<circle cx="${xs(i).toFixed(1)}" cy="${ys(e.solved).toFixed(1)}" r="4" fill="#2f9e44"/><text x="${xs(i).toFixed(1)}" y="${(ys(e.solved)-9).toFixed(1)}" font-size="12" font-weight="700" text-anchor="middle" fill="#2f9e44">${e.solved}</text>`).join('');
+   const yt=ys(tgt).toFixed(1);
+   const svg=`<svg viewBox="0 0 ${W} ${H}" style="max-width:100%;height:auto;display:block">
+     <line x1="${pL}" y1="${ys(0)}" x2="${W-pR}" y2="${ys(0)}" stroke="#ccc"/>
+     <line x1="${pL}" y1="${pT}" x2="${pL}" y2="${ys(0)}" stroke="#ccc"/>
+     <text x="${pL-6}" y="${(ys(0)+3).toFixed(1)}" font-size="10" text-anchor="end" fill="#888">0</text>
+     <text x="${pL-6}" y="${(ys(100)+3).toFixed(1)}" font-size="10" text-anchor="end" fill="#888">100</text>
+     <line x1="${pL}" y1="${yt}" x2="${W-pR}" y2="${yt}" stroke="#e03131" stroke-width="1.5" stroke-dasharray="6 4"/>
+     <text x="${W-pR+6}" y="${yt}" font-size="11" fill="#e03131">▲ LLM法 SOTA ~${tgt}</text>
+     <text x="${W-pR+6}" y="${(+yt+14)}" font-size="10" fill="#e03131">Gautam 2026 · 经典97@24h</text>
+     <polyline points="${poly}" fill="none" stroke="#2f9e44" stroke-width="2.5"/>${dots}
+     ${eps.map((e,i)=>`<text x="${xs(i).toFixed(1)}" y="${(ys(0)+16).toFixed(1)}" font-size="10" text-anchor="middle" fill="#888">e${e.epoch}</text>`).join('')}
+   </svg>`;
+   h+=`<h4>🚀 解题能力阶梯 — 逐 epoch 提升(${cl.benchmark||'Eterna100-V2'})</h4>`+
+    note((cl.benchmark||'').includes('autonomous')
+      ? '目标:量化拿掉硬编码策略后的<b>自主解题地板</b>。本梯 = <b>自主 AGENT</b>(glm-5.2,<b>RNA_AUTONOMOUS=1:中性工具(仅 fold/verify/diagnose/通用搜索)+ 空记忆 + 无策略</b>)—— 工具层不再喂「分解→拼接→修复」套路,agent 必须<b>自己识别问题、自组装搜索</b>。绿点=解对题数;红虚线=<b>LLM法 SOTA ~80</b>(Gautam 2026;经典榜首 DesiRNA 97 要 24h/题、V1 已饱和 100)。这是<b>诚实基线</b>,预期<b>低于</b>带拐杖的 ~76;二者之差 = 之前被硬编码策略替 agent 干掉的部分。从基线 65 起、只做错的 35 题;token 为估算。'
+      : '目标:通过<b>不断改进→测试</b>让解题率逐 epoch 上升。每个 epoch 叠加一个新技术、在<b>固定预算</b>下重测整批题(固定预算=提升来自策略而非堆算力)。绿线=解对题数;红虚线=<b>LLM法 SOTA ~80</b>(Gautam 2026;经典榜首 DesiRNA 97 要 24h/题、V1 已饱和 100)。solved 只增不减。本梯 = <b>meta-learning AGENT</b>(glm-5.2,全工具+策略记忆);从 with-memory 基线 <b>65</b> 起、只迭代做错的 35 题;token 为<b>估算</b>(glm/OpenRouter 报 usage=0,按 trace 字符/4)。')+
+    live+svg+
+    `<table><tr><th>epoch</th><th>新增技术</th><th>解对/100</th><th>解出率</th><th>本轮新解出</th><th>耗时</th></tr>`+
+    eps.map(e=>`<tr><td>${e.epoch}</td><td>${e.note||('L'+e.level)}</td><td><b class="${e.solved>=tgt?'g':''}">${e.solved}</b></td><td>${fmt(e.solve_rate)}</td><td class="sub">${(e.new_this_epoch||[]).slice(0,10).join(', ')}${(e.new_this_epoch||[]).length>10?'…':''}</td><td>${fmt(e.epoch_secs)}s</td></tr>`).join('')+
+    `</table>`;}
   const s=p.standard_leaderboard;
   if(s){h+=`<h4>① Eterna100 基准:传统算法的「地板线」</h4>`+
    note('100 道公认 RNA 谜题上,两个<b>传统基线算法</b>各解对多少道 —— 这是 AI 要超越的地板(本 harness 预算下的测量,非文献上限)。<b>solved/100</b>=解对几道;<b>uMFE</b>=其中「唯一最优解」几道(更稳);<b>NED</b>=折叠不干脆程度(越低越好);<b>mean s</b>=每题耗时秒。<br>📌 <b>公开 SOTA 标尺</b>:V2 经典榜首 <b>DesiRNA 97/100</b>(NAR 2025)· V2 LLM 方法 SOTA <b>~80</b>(Gautam 2026)· V1 已饱和 100/100。要超越需口径对齐(见「图表」页)。')+
@@ -360,7 +447,7 @@ function renderOverview(){
   if(m&&m.arms){h+=`<div class="card"><div class="name">${r.name} — 记忆臂对比</div>
    <table><tr><th>记忆臂</th><th>解出率</th><th>平均尝试→解出 ↓</th><th>A_memory</th><th>策略数</th></tr>`+
    Object.entries(m.arms).map(([k,v])=>`<tr><td>${k}</td><td>${fmt(v.solve_rate)}</td><td class="${v.arm=='with_memory'?'g':''}">${fmt(v.mean_evals_solved)}</td><td>${fmt(v.A_memory)}</td><td>${fmt(v.n_strategies_learned)}</td></tr>`).join('')+`</table></div>`;}
-  if(s.model){h+=`<div class="card"><div class="name">${r.name} — AI 模型能力(${s.model})</div>
+  if(s.model){h+=`<div class="card"><div class="name">${r.live?'🔴 <span style="color:#e8590c">运行中</span> · ':''}${r.name} — AI 模型能力(${s.model})</div>
    <div class="kv">解出率 <b>${fmt(s.solve_rate)}</b></div><div class="kv">平均奖励 <b>${fmt(s.mean_reward)}</b></div>
    <div class="kv">agent_A(驱动保真度) <b class="${cls(s.agent_A)}">${fmt(s.agent_A)}</b></div><div class="kv">A_model <b>${fmt(s.agent_A_model)}</b></div>
    <div style="margin-top:6px"><a href="/report/${encodeURIComponent(r.name)}">看完整报告 →</a></div></div>`;}
@@ -369,7 +456,8 @@ function renderOverview(){
 }
 function renderRuns(){
  let h='<h3>📂 所有运行(文件视图)</h3>'+note('原始文件视图。想要按用途分类 + 白话说明的版本,请用右上角「运行总览」。');
- for(const r of RUNS){h+=`<div class="card"><div class="name"><a href="/report/${encodeURIComponent(r.name)}">${r.name}</a></div>
+ const _runs=[...RUNS].sort((a,b)=>(b.live?1:0)-(a.live?1:0));
+ for(const r of _runs){h+=`<div class="card"><div class="name">${r.live?'🔴 <span style="color:#e8590c">运行中</span> · ':''}<a href="/report/${encodeURIComponent(r.name)}">${r.name}</a></div>
   <div class="sub">文件: ${(r.files||[]).join(', ')}</div>`+
   (r.datasets?('<div class="kv">数据集: '+Object.entries(r.datasets).map(([k,v])=>`${k}=${v} 行`).join(', ')+'</div>'):'')+
   (r.n_traces?`<div class="kv">操作录像: ${r.n_traces} 段</div>`:'')+`</div>`;}
@@ -380,11 +468,11 @@ function renderFigures(){
  // 🎯 公开 SOTA 标尺(要超越的数字)
  h+=`<div class="card">🎯 <b>Eterna100 公开 SOTA(要超越的标尺 · 带引用)</b>
   <div class="scroll"><table><tr><th>关键数字</th><th>值</th><th>出处</th></tr>
-  <tr><td>V1 榜首(已饱和)</td><td><b>100/100</b></td><td>Montparnasse (Cazenave 2025) · DesiRNA (Wirecki, NAR 2025)</td></tr>
-  <tr><td><b>V2 榜首(经典 SOTA)</b></td><td><b class="g">97/100</b></td><td>DesiRNA · Wirecki et al., NAR 2025(24h/题, Vienna2/Turner2004)</td></tr>
-  <tr><td>V2 严格定预算榜首</td><td>90/100</td><td>NEMO · Gautam et al. 2026</td></tr>
-  <tr><td><b>V2 · LLM 方法 SOTA</b></td><td><b class="y">~79–81/100</b></td><td>Qwen2.5-0.5B(SL+RL)· Gautam, arXiv:2602.12470 (2026)</td></tr>
-  </table></div>`+note('要打的目标 = <b>V2 榜首 DesiRNA 97/100</b>;LLM 路线的直接对标 = <b>LLM 方法 SOTA ~80</b>。V2 上无任何方法解到 100/100。对外声称「超越」需口径对齐:V2 题集 + ViennaRNA 2.6.4/Turner2004 + 精确 MFE 判定 + 报告预算。');
+  <tr><td>V1 榜首(已饱和)</td><td><b>100/100</b></td><td>Montparnasse (Cazenave 2026, arXiv:2606.07562, 嵌套MC/GNRPA) · DesiRNA (Wirecki, NAR 2025, REMC)</td></tr>
+  <tr><td><b>V2 榜首(经典 SOTA)</b></td><td><b class="g">97/100</b></td><td>DesiRNA · NAR 2025 gkae1306(<b>24h/题</b>, Turner2004, 开源 github.com/fryzjergda/DesiRNA)</td></tr>
+  <tr><td>V2 · NEMO 原生</td><td>~94/100</td><td>NEMO · Portela 2018 / Koodli 2021(经典 MC)</td></tr>
+  <tr><td><b>V2 · LLM 方法 SOTA</b>(对我们最可比)</td><td><b class="y">~79–81/100</b></td><td>Qwen2.5-0.5B(SL+RL)· Gautam, arXiv:2602.12470 (2026)</td></tr>
+  </table></div>`+note('<b>纠正两处常见误传</b>:① 传说的「<b>99/100</b>」是 <b>Montparnasse 在 V1</b> 的时限快照(10,240s/题内 99;100/100 需给最难的 Gladius #90 单独跑 24,108s)——<b>是 V1、不是 V2</b>。② 「NEMO 严格定预算 <b>90</b>」其实是 Gautam 2026 那篇 LLM 论文里把 NEMO 当<b>固定采样预算基线</b>跑出来的数,<b>非 NEMO 真实水平(~94)、更非 solver 榜首</b>;NEMO 是 Portela 2018,不是 Gautam。<br>结论:<b>V1 已饱和(100)</b>;<b>V2 经典天花板 = DesiRNA 97,但要 24h/题</b>;<b>LLM 路线直接对标 = ~80(Gautam)</b>。口径对齐:V2 题集 + ViennaRNA/Turner2004 + 精确 MFE + 报告预算。');
  const sc=(SCORECARD&&SCORECARD[0])?SCORECARD[0].scorecard:null;
  const lbl={diagnosis:'照诊断改',random:'随机乱改',silent_fallback:'丢掉诊断'};
  // 确定性三坐标:一行陈述(三根 1.00 的柱图无信息量)
@@ -408,7 +496,7 @@ function renderFigures(){
   let items=Object.entries(bm).map(([m,v])=>({label:m,value:v.solved_rate,color:'#90a4ae'}));
   full.forEach(r=>items.push({label:r.summary.model.split('/').pop(),value:r.summary.solve_rate,color:'#4c78a8'}));
   charts+=svgBars('全 Eterna100-V2(100 题):AI vs 经典基线 vs 公开 SOTA', items,
-   {ymax:1,refs:SOTA_V2,caption:'柱 = 解出率:<b>灰</b>=两个传统(非 AI)算法地板线(rnainverse=ViennaRNA 经典逆折叠、local_search=本地搜索;本 harness 预算下的测量,非文献上限)、<b>蓝</b>=AI 模型。<b>虚线 = 公开 SOTA 标尺</b>:绿=经典榜首 DesiRNA 0.97、灰=严格定预算 NEMO 0.90、橙=LLM 方法 0.80(见上表引用)。'+(full.length?'':' AI 全 100 题跑完后其柱自动加入,即可直接对着虚线看差距。')});}
+   {ymax:1,refs:SOTA_V2,caption:'柱 = 解出率:<b>灰</b>=两个传统(非 AI)算法地板线(rnainverse=ViennaRNA 经典逆折叠、local_search=本地搜索;本 harness 预算下的测量,非文献上限)、<b>蓝</b>=AI 模型。<b>虚线 = 公开 SOTA 标尺</b>:绿=经典榜首 DesiRNA 0.97(24h/题)、灰=NEMO 原生 0.94、橙=LLM 方法 0.80(对我们最可比)。'+(full.length?'':' AI 全 100 题跑完后其柱自动加入,即可直接对着虚线看差距。')});}
  // 可比子集:同一题集且 ≥2 个运行(如 sonnet-5 vs deepseek 同 10 题)
  for(const sig in groups){const g=groups[sig];
   if(g.length>=2 && g[0].summary.n_tasks<100){
