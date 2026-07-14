@@ -547,14 +547,34 @@ def _kind(run_dir: str, files: List[str]) -> str:
 
 
 # plain-language run categories (ordered): key -> (icon+title, one-line question/explanation)
+# The eval runs are split BY EXPERIMENT TYPE (aligned with the Cognitive-Core weekly-report framing)
+# so the runs list reads as a structured experiment log, not one flat pile.
 _CATS = [
-    ("eval", "🧪 AI 模型能力评测", "问题:某个 AI 模型「独立设计 RNA」的能力有多强?(在 Eterna100 谜题上一次性尝试,不给记忆)"),
-    ("meta", "📈 元学习实验:记忆是否让智能体越做越好", "问题:让智能体把解题经验存进「记忆」反复练,它是否用更少的尝试次数就能解题?"),
+    ("base_capability", "① 基线能力(无记忆 · 全100)", "问题:某 AI 模型「独立设计 RNA」的能力有多强?(Eterna100 全 100 题,一次性,不给记忆)——模型间横向对比。"),
+    ("memory_meta", "② 记忆 / 元学习(对照①:蒸馏 A_θ 是否复利?)", "问题:把解题经验蒸馏进「记忆」反复练,解题是否复利?K_θ=内容 · A_θ=技能 · frozen=对照(同 agent 同种子,只变积累什么)。"),
+    ("descaffold", "③ 去脚手架:地板 vs 天花板(对照②)", "问题:把工具层预置的解题流程剥掉(RNA_AUTONOMOUS),agent 自身 A_θ 能解几道?地板=自主(仅中性原语)· 天花板=带拐杖(全工具+策略)。"),
+    ("selfrevise", "④ 自修订求解 harness(能力提升 · 新)", "问题:富诊断 + 算子库 + 验证门控的表征自修订(self-revising),能否啃下盲搜啃不动的硬题?"),
+    ("eval", "🧪 其他能力评测(未归类)", "其他 AI 模型独立设计 RNA 的运行。"),
+    ("meta", "📈 元学习 campaign", "问题:让智能体把解题经验存进「记忆」反复练,它是否用更少的尝试次数就能解题?"),
     ("score", "🏆 综合成绩单", "把所有能力汇总成一张三面板成绩单:Eterna100 基准排行 · 混合约束设计 · 智能体能力与记忆。"),
     ("found", "🔬 地基与确定性验证", "验证这个领域是否「确定性可复现」,以及「看诊断再动手 vs 乱试」是否真有用(对照实验)。"),
     ("debug", "🧫 冒烟 / 调试运行(可忽略)", "开发过程中的小规模测试,没有正式结论,列在这里仅为完整。"),
     ("other", "其他运行", ""),
 ]
+
+
+def _eval_subtype(low: str) -> Optional[str]:
+    """Split agent-eval runs into experiment TYPES by name pattern (order matters:
+    auto_frozen is de-scaffolding even though it contains 'frozen'/'ladder')."""
+    if "self_revise" in low or "selfrev" in low or "decomp" in low:
+        return "selfrevise"
+    if "p1_floor" in low or "p1_ceiling" in low or "auto_frozen" in low or "autonomous" in low:
+        return "descaffold"
+    if "memon" in low or "meta_ladder" in low or "askill" in low or "accumulate" in low:
+        return "memory_meta"
+    if "eterna100" in low or "eterna_" in low:
+        return "base_capability"
+    return None
 
 
 def _run_model(run_dir: str) -> str:
@@ -566,6 +586,11 @@ def _categorize(name: str, files: List[str], kind: Optional[str], s: Dict) -> st
     low = name.lower()
     if "smoke" in low:
         return "debug"
+    # experiment TYPE takes precedence: a named arm groups by its type even if it also carries a
+    # scorecard.json / campaign kind (that is how meta_ladder_* arms stop piling into 综合成绩单).
+    st = _eval_subtype(low)
+    if st:
+        return st
     if "scorecard.json" in files:
         return "score"
     if name == "zero_credit_main" or "meta_summary.json" in files:
@@ -583,6 +608,18 @@ def _plain_desc(name: str, cat: str, s: Dict, headline: str, model: str, ntr: in
     n, solved = s["n_records"], s["solved"]
     rate = f"{s['solve_rate']:.0%}" if s.get("solve_rate") is not None else "—"
     m = esc(model.split("/")[-1]) if model else "某模型"
+    if cat == "base_capability":
+        return (f"AI 模型 <b>{m}</b> 独立设计 RNA(<b>无记忆</b>):在 <b>{n}</b> 道 Eterna100 解对 "
+                f"<b>{solved}</b> 道(<b>{rate}</b>)。Report 看逐题「目标形状 vs 实际折叠」。")
+    if cat == "memory_meta":
+        return (f"记忆/元学习臂(<b>{m}</b>):<b>{n}</b> 道解对 <b>{solved}</b>(<b>{rate}</b>);"
+                f"与 frozen 对照测「蒸馏 A_θ 是否复利」。Report 看曲线。")
+    if cat == "descaffold":
+        return (f"去脚手架臂(<b>{m}</b>):<b>{n}</b> 道解对 <b>{solved}</b>(<b>{rate}</b>);"
+                f"地板=自主 / 天花板=带拐杖,测「内生 A_θ vs harness 预置」。")
+    if cat == "selfrevise":
+        return (f"自修订求解 harness:<b>{n}</b> 道解对 <b>{solved}</b>(<b>{rate}</b>);"
+                f"富诊断 + 算子库 + 验证门控的表征自修订。")
     if cat == "eval":
         return (f"AI 模型 <b>{m}</b> 独立设计 RNA:在 <b>{n}</b> 道 Eterna100 谜题上解对 "
                 f"<b>{solved}</b> 道(<b>{rate}</b>)。点 Report 看逐题结果 + 每道题的「目标形状 vs 实际折叠」对比图。")
@@ -809,10 +846,71 @@ def _arc_reading_guide() -> str:
         "</div>")
 
 
+def _self_revise_report(d: str, run: str) -> Optional[str]:
+    """Custom report for the self-revising solver experiment (custom JSON, not episode records)."""
+    p1 = _read_json(os.path.join(d, "phase1_blind.json"))
+    p2 = _read_json(os.path.join(d, "phase2_controllers.json"))
+    if not p1 and not p2:
+        return None
+    rows1 = (p1 or {}).get("phase1", [])
+    done = len(rows1)
+    solved = sum(1 for r in rows1 if r.get("solved"))
+    fails = [r for r in rows1 if not r.get("solved")]
+    body = [f"<header class='verdict neutral'><div class='big'>{esc(run)} &mdash; 自修订求解 harness</div>"
+            "<small>富诊断 Cₜ + 算子库 Aθ + 验证门控的表征自修订;blind=基线 · roundrobin=消融 · greedy=机制</small></header>",
+            f"<div class='topbar' style='top:0'><span></span><span class='lnk'>"
+            f"<a href='/ui'>&#8592; runs</a></span></div>", "<main>"]
+    if not p2:
+        body.append("<script>setTimeout(function(){location.reload()},20000)</script>")
+        body.append("<div class='card' style='margin:8px 0;border-left:4px solid #c62828'>"
+                    "🔴 <b>运行中</b> — Phase 1(blind 扫 ≤120nt 定 short-hard 集)进行中,每 20 秒自动刷新;"
+                    "跑完自动进 Phase 2(三控制器 ×3 种子对比)。</div>")
+    body.append("<section><h2>1 &middot; Phase 1:blind 基线扫描</h2><div class='card'>"
+                f"<span class='kv'>已扫 <b>{done}/64</b></span>"
+                f"<span class='kv'>blind 解出 <b>{solved}</b></span>"
+                f"<span class='kv'>short-hard 失败 <b>{len(fails)}</b></span>"
+                "<div class='muted' style='margin-top:6px'>失败集 = 盲搜在预算内解不出的 ≤120nt 题,即自修订要战胜的靶。"
+                "<b>bp=1</b> = 只差一对碱基(临门一脚,自修订最可能吃下)。</div></div></section>")
+    if fails:
+        fr = "".join(f"<tr><td>{r['pid']}</td><td>{r['len']}</td><td>{esc(r['name'])}</td>"
+                     f"<td class='{'r' if (r.get('bp') or 9) <= 1 else ''}'><b>{r.get('bp')}</b></td>"
+                     f"<td class='muted'>{r.get('t')}s</td></tr>"
+                     for r in sorted(fails, key=lambda x: x['len']))
+        body.append("<section><h2>2 &middot; short-hard 失败集(blind 的 bp-距离)</h2>"
+                    "<div class='scroll'><table><thead><tr><th>pid</th><th>len</th><th>题</th>"
+                    "<th>blind bp</th><th>t</th></tr></thead><tbody>" + fr + "</tbody></table></div></section>")
+    if p2:
+        res = p2.get("results", {})
+        ctls = ["blind", "roundrobin", "greedy"]
+        crack = {c: sum(1 for v in res.values() if v["arms"].get(c, {}).get("solved_any")) for c in ctls}
+        tot = len(res) or 1
+        body.append("<section><h2>3 &middot; Phase 2:控制器对比(crack @ short-hard)</h2><div class='card'>"
+                    + "".join(f"<span class='kv'>{c} <b class='{'g' if crack[c] > crack['blind'] else ''}'>"
+                              f"{crack[c]}/{len(res)}</b></span>" for c in ctls)
+                    + "<div class='muted' style='margin-top:6px'>同预算、同 n_ops。<b>greedy &gt; blind</b> = 诊断驱动的表征自修订"
+                    "能啃下盲搜死角(<b>能力↑</b>);<b>greedy &gt; roundrobin</b> = 诊断是关键(不只是多试几种表征)。</div></div>")
+        hr = "".join(
+            f"<tr><td>{pid}</td><td>{v['len']}</td><td>{esc(v['name'])}</td>"
+            + "".join(f"<td class='{'g' if v['arms'].get(c, {}).get('solved_any') else 'r'}'>"
+                      f"{'✓' if v['arms'].get(c, {}).get('solved_any') else '·'}"
+                      f"<span class='muted'> {v['arms'].get(c, {}).get('solved_n', 0)}/"
+                      f"{len(v['arms'].get(c, {}).get('runs', []))}</span></td>" for c in ctls) + "</tr>"
+            for pid, v in sorted(res.items(), key=lambda kv: kv[1]['len']))
+        body.append("<div class='scroll'><table><thead><tr><th>pid</th><th>len</th><th>题</th>"
+                    "<th>blind</th><th>roundrobin</th><th>greedy</th></tr></thead><tbody>"
+                    + hr + "</tbody></table></div></section>")
+    body.append("</main>")
+    return page(f"{run} report", "".join(body))
+
+
 def report(runs_root: str, run: str) -> str:
     d = os.path.join(runs_root, run)
     if not os.path.isdir(d):
         return page("not found", "<main><p>run not found</p></main>")
+    if os.path.exists(os.path.join(d, "phase1_blind.json")):
+        r = _self_revise_report(d, run)
+        if r:
+            return r
     css, headline, expl = _verdict(d)
     s = _run_summary(d)
     recs, _, kind = _load_records(d)

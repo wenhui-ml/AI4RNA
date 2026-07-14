@@ -55,11 +55,23 @@ def _read_json(path: str) -> Optional[dict]:
 # Off-mission runs hidden from the web display (archived per the Paper C mainline: the brute-force
 # decompose / number-chasing probes are 本末倒置, orthogonal to the de-scaffolding + mode-efficacy
 # thesis). Files stay on disk and remain reachable directly via /report/<run>; only the listing hides.
-_ARCHIVED_SUBSTR = ("decomp", "_smoke")
+# Goal (2026-07-13): the web shows ONLY accurate, key experiments. Hidden (files kept on disk,
+# still reachable at /report/<run>; only the listing/figures hide):
+#   *decomp*   brute-force decompose number-chasing probes (glm52_decomp_hardcore31[_refix])
+#   *_smoke    smoke tests (glm52_decomp_smoke shows a misleading 1.000@3-task)
+#   *tail35*   P1 spectrum-law hard-35 subset replicates (0.09-0.23) -- real science but small-n /
+#              low-absolute, easily misread out of context; raw data stays on disk for the P1 work
+#   self_revise*  first capability-positive result but no summary.json -> renders as a bare card
+#   p1_logs / funsearch_rna  raw log dir / abandoned empty FunSearch probe (no result)
+#   glm52_eterna_memON  single memory-ON run; 0.65 next to the memory-null mainline reads as "+7 memory"
+# (User-confirmed 2026-07-13: archive the borderline tail35 / self_revise / memON groups; keep the
+# clean model baselines + meta-ladder memory-null + p1_floor_full100 + the orchestration-81 card.)
+_ARCHIVED_SUBSTR = ("decomp", "_smoke", "tail35", "self_revise")
+_ARCHIVED_EXACT = {"p1_logs", "funsearch_rna", "glm52_eterna_memON"}
 
 
 def _archived_from_display(name: str) -> bool:
-    return name == "p1_logs" or any(s in name for s in _ARCHIVED_SUBSTR)
+    return name in _ARCHIVED_EXACT or any(s in name for s in _ARCHIVED_SUBSTR)
 
 
 def _list_runs() -> List[Dict]:
@@ -131,6 +143,31 @@ def api_campaigns():
             if d:
                 cards.append({"name": name, "summary": d})
     return {"campaigns": cards}
+
+
+@app.get("/api/orchestration")
+def api_orchestration():
+    """Plan-A orchestration result: base model + oracle-verified calls to the external SOTA tool
+    (DesiRNA). Reported SEPARATELY from single-model solve rates -- 81 is base 58 + tool 23, it
+    measures the tool/pipeline, NOT model learning. Returns None if the sweep hasn't run."""
+    d = _read_json(os.path.join(RUNS, "desirna_residual", "desirna_residual.json"))
+    if not d:
+        return {"orchestration": None}
+    rows = d.get("rows", [])
+    unsolved = [r for r in rows if not r.get("solved")]
+    A = [r for r in unsolved if (r.get("len") or 0) <= 214 and (r.get("bp") or 99) <= 2]
+    D = [r for r in unsolved if r.get("pid") == 100]
+    B = [r for r in unsolved if r not in A and r not in D]
+    def pids(rs): return sorted(x["pid"] for x in rs)
+    return {"orchestration": {
+        "model_solved": d.get("model_solved"),
+        "tool_solved_of_unsolved": d.get("n_desirna_solved_of_unsolved"),
+        "n_unsolved_before_tool": len(rows),
+        "orchestrated_total": d.get("orchestrated_total"),
+        "config": d.get("config"),
+        "residual": {"n": len(unsolved),
+                     "A_small_near_miss": pids(A), "B_large_compute": pids(B),
+                     "D_undesignable": pids(D)}}}
 
 
 @app.get("/fig/{run}/{fname}")
@@ -288,8 +325,8 @@ HTML_PAGE = """<!doctype html><html><head><meta charset="utf-8">
  <pre id="logbox">选择一个日志…</pre>
 </div>
 <script>
-let RUNS=[]; let SCORECARD=[];
-const SOTA_V2=[{m:'DesiRNA 经典SOTA(24h/题)',v:0.97,c:'#2e7d32'},{m:'NEMO 原生',v:0.94,c:'#78909c'},{m:'LLM方法SOTA(Gautam·最可比)',v:0.80,c:'#d97706'}];
+let RUNS=[]; let SCORECARD=[]; let ORCH=null;
+const SOTA_V2=[{m:'DesiRNA 24h/题(经典极限)',v:0.97,c:'#2e7d32'},{m:'DesiRNA <1min(同预算·最可比)',v:0.85,c:'#66bb6a'},{m:'NEMO 原生',v:0.94,c:'#78909c'},{m:'LLM方法SOTA(Gautam)',v:0.80,c:'#d97706'}];
 function tab(t){document.querySelectorAll('.tab').forEach(e=>e.classList.toggle('active',e.dataset.t==t));
  ['scorecard','campaigns','overview','runs','figures','logs'].forEach(p=>document.getElementById(p).style.display=p==t?'block':'none');}
 function fmt(x){return x==null?'—':(typeof x=='number'?(Math.round(x*1000)/1000):x)}
@@ -302,6 +339,7 @@ async function load(){
  renderOverview(); renderRuns();
  try{const sc=(await (await fetch('/api/scorecard')).json()).scorecards; SCORECARD=sc; renderScorecard(sc);}catch(e){}
  try{const cp=(await (await fetch('/api/campaigns')).json()).campaigns; renderCampaigns(cp);}catch(e){}
+ try{ORCH=(await (await fetch('/api/orchestration')).json()).orchestration;}catch(e){}
  renderFigures();
 }
 function svgBars(title,items,opt){
@@ -323,9 +361,14 @@ function svgBars(title,items,opt){
   s+=`<rect x="${x}" y="${y}" width="${bw}" height="${h}" fill="${col}" rx="2"/>`;
   s+=`<text x="${cx}" y="${y-5}" text-anchor="middle" font-size="12" font-weight="700" fill="#1a1a2e">${v.toFixed(opt.dec==null?2:opt.dec)}</text>`;
   s+=`<text x="${cx}" y="${mt+ph+16}" text-anchor="middle" font-size="11" fill="#374151">${it.label}</text>`;});
- (opt.refs||[]).forEach(rf=>{if(rf.v>ymax)return;const y=sy(rf.v);const col=rf.c||'#c62828';
+ // reference lines: draw at true y; LEFT-anchor labels (away from the right-side bars) and
+ // de-collide vertically so close refs (e.g. 0.97/0.94, 0.85/0.80) never overlap each other.
+ const refs=(opt.refs||[]).filter(rf=>rf.v<=ymax).slice().sort((a,b)=>b.v-a.v);
+ let lastLy=-1e9;
+ refs.forEach(rf=>{const y=sy(rf.v);const col=rf.c||'#c62828';
   s+=`<line x1="${ml}" y1="${y}" x2="${W-mr}" y2="${y}" stroke="${col}" stroke-width="1.4" stroke-dasharray="5 4"/>`;
-  s+=`<text x="${W-mr-2}" y="${y-3}" text-anchor="end" font-size="10" font-weight="700" fill="${col}">${rf.m} ${rf.v.toFixed(2)}</text>`;});
+  let ly=y-3; if(ly<lastLy+11.5) ly=lastLy+11.5; lastLy=ly;
+  s+=`<text x="${ml+5}" y="${ly}" text-anchor="start" font-size="10" font-weight="700" fill="${col}">${rf.m} ${rf.v.toFixed(2)}</text>`;});
  s+='</svg>';
  return `<div class="card" style="flex:1 1 360px;min-width:320px">${s}${opt.caption?('<p class="note">'+opt.caption+'</p>'):''}</div>`;
 }
@@ -341,10 +384,39 @@ function renderCampaigns(cps){
   h+=`</div>`;}
  el.innerHTML=h;
 }
+// 🔧 编排求解卡片(基座模型 + 调用外部 SOTA 工具 DesiRNA)。单列呈现,绝不与"模型自身能力"混为一柱。
+// 成绩单页(首屏)与图表页共用,保证一打开就能看到 81 这个 headline。
+function orchHTML(){
+ if(!(ORCH && ORCH.orchestrated_total!=null)) return '';
+ const o=ORCH;const R=o.residual||{};
+ const A=(R.A_small_near_miss||[]).length,B=(R.B_large_compute||[]).length,D=(R.D_undesignable||[]).length;
+ // 图:两根柱 + 仅保留两条最可比的 SOTA 参照(同预算 DesiRNA 0.85、LLM 方法 0.80);
+ // 24h 极限 0.97 / NEMO 0.94 挪到右侧说明,避免虚线标签在图上挤成一团。
+ const bars=svgBars('基座模型独立  →  + 编排调用 DesiRNA',[
+   {label:'GLM-5.2 独立',value:o.model_solved/100,color:'#4c78a8'},
+   {label:'+编排 DesiRNA',value:o.orchestrated_total/100,color:'#2e7d32'}],
+  {ymax:1,dec:2,refs:[{m:'DesiRNA <1min·同预算',v:0.85,c:'#2e7d32'},{m:'LLM 方法 SOTA',v:0.80,c:'#d97706'}],
+   caption:'柱=解出率;两条虚线=同分钟级预算下最可比的公开 SOTA。'});
+ // 右侧信息块:大字 headline + 拆解 + 残差三桶 + 一行红色告警。分区块,不再堆成一段。
+ const info=`<div class="card" style="flex:1 1 300px;min-width:290px">
+   <div style="font-size:30px;font-weight:800;color:#2e7d32;line-height:1">${o.orchestrated_total}<span style="font-size:15px;color:#6b7280;font-weight:600">/100</span></div>
+   <div class="sub" style="margin:3px 0 10px"><b>${o.model_solved}</b> 基座模型独立 &nbsp;+&nbsp; <b>${o.tool_solved_of_unsolved}</b> 智能体调用 DesiRNA 回收(${o.n_unsolved_before_tool} 未解中)</div>
+   <table style="width:100%"><tr><th>编排后残差 ${R.n} 题</th><th>数</th><th>说明</th></tr>
+   <tr><td>A 小题近失 bp≤2</td><td class="y">${A}</td><td class="sub">最后一毫米,可更长 -t/收官算子再推</td></tr>
+   <tr><td>B 大题算力受限</td><td class="y">${B}</td><td class="sub">需更多算力预算</td></tr>
+   <tr><td>D 不可设计</td><td>${D}</td><td class="sub">样本永不折叠到目标,非搜索失败</td></tr>
+   </table>
+   <div style="margin-top:10px;background:#fdecea;border-left:3px solid #c62828;padding:8px 11px;border-radius:0 6px 6px 0;font-size:12.5px;line-height:1.6"><b class="r">⚠ 这测的是"调用工具"这条工程链路,不是模型学到的能力(全程无 self-improvement)</b> —— "直接调 DesiRNA" = 绿区 null 的部署侧陈述。</div>
+  </div>`;
+ const foot=note('口径:每条候选序列都经我们<b>自己的 oracle</b> 复验,绝不信工具自报;DesiRNA 能量模型已对齐 (-p 2004)。其余 SOTA 参照:24h 经典极限 <b>0.97</b>、NEMO 原生 <b>0.94</b>(均非同预算,故不画在图上)。');
+ return `<h4>🔧 编排求解(基座模型 + 调用 SOTA 工具 DesiRNA)· 当前 headline</h4>
+  <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start">${bars}${info}</div>${foot}`;
+}
 function renderScorecard(cards){
  let intro='<h3>🏆 综合成绩单</h3>'+note('把所有能力汇总成三块:① 传统算法在 100 道公认 RNA 谜题上的成绩(定「地板线」)· ② 带额外约束时的设计能力 · ③ AI 智能体的「照诊断行动」与「记忆」能力。');
- if(!cards||!cards.length){document.getElementById('scorecard').innerHTML=intro+'<div class="card">还没有成绩单数据。</div>';return;}
- let h=intro;
+ const orch=orchHTML();   // headline: 编排求解 81(基座 + 调工具),放最上方,一打开就看到
+ if(!cards||!cards.length){document.getElementById('scorecard').innerHTML=intro+orch+'<div class="card">还没有成绩单数据。</div>';return;}
+ let h=intro+orch;
  // === 元学习三臂对照 overlay(frozen / K_θ / A_θ)—— the money comparison ===
  const armMeta={'meta_ladder_frozen':{label:'frozen 对照(种子不变)',color:'#868e96'},
    'meta_ladder_accumulate':{label:'K_θ 内容记忆(memdir bullets)',color:'#e8590c'},
@@ -369,7 +441,7 @@ function renderScorecard(cards){
     <text x="${pL-6}" y="${(ys(0)+3).toFixed(1)}" font-size="10" text-anchor="end" fill="#888">0</text>
     <text x="${pL-6}" y="${(ys(100)+3).toFixed(1)}" font-size="10" text-anchor="end" fill="#888">100</text>
     <line x1="${pL}" y1="${yt}" x2="${W-pR}" y2="${yt}" stroke="#e03131" stroke-width="1.3" stroke-dasharray="6 4"/>
-    <text x="${pL+6}" y="${(+yt-5)}" font-size="10" fill="#e03131">▲ LLM法 SOTA ~80 (Gautam·经典97@24h)</text>
+    <text x="${pL+6}" y="${(+yt-5)}" font-size="10" fill="#e03131">▲ LLM法 SOTA ~80 (Gautam 2026)</text>
     <line x1="${pL}" y1="${yb}" x2="${W-pR}" y2="${yb}" stroke="#adb5bd" stroke-width="1" stroke-dasharray="3 3"/>
     <text x="${pL+6}" y="${(+yb-5)}" font-size="10" fill="#868e96">基线 65</text>
     ${lines}${legend}
@@ -398,21 +470,21 @@ function renderScorecard(cards){
      <text x="${pL-6}" y="${(ys(100)+3).toFixed(1)}" font-size="10" text-anchor="end" fill="#888">100</text>
      <line x1="${pL}" y1="${yt}" x2="${W-pR}" y2="${yt}" stroke="#e03131" stroke-width="1.5" stroke-dasharray="6 4"/>
      <text x="${W-pR+6}" y="${yt}" font-size="11" fill="#e03131">▲ LLM法 SOTA ~${tgt}</text>
-     <text x="${W-pR+6}" y="${(+yt+14)}" font-size="10" fill="#e03131">Gautam 2026 · 经典97@24h</text>
+     <text x="${W-pR+6}" y="${(+yt+14)}" font-size="10" fill="#e03131">经典 DesiRNA 85@1min·97@24h</text>
      <polyline points="${poly}" fill="none" stroke="#2f9e44" stroke-width="2.5"/>${dots}
      ${eps.map((e,i)=>`<text x="${xs(i).toFixed(1)}" y="${(ys(0)+16).toFixed(1)}" font-size="10" text-anchor="middle" fill="#888">e${e.epoch}</text>`).join('')}
    </svg>`;
    h+=`<h4>🚀 解题能力阶梯 — 逐 epoch 提升(${cl.benchmark||'Eterna100-V2'})</h4>`+
     note((cl.benchmark||'').includes('autonomous')
-      ? '目标:量化拿掉硬编码策略后的<b>自主解题地板</b>。本梯 = <b>自主 AGENT</b>(glm-5.2,<b>RNA_AUTONOMOUS=1:中性工具(仅 fold/verify/diagnose/通用搜索)+ 空记忆 + 无策略</b>)—— 工具层不再喂「分解→拼接→修复」套路,agent 必须<b>自己识别问题、自组装搜索</b>。绿点=解对题数;红虚线=<b>LLM法 SOTA ~80</b>(Gautam 2026;经典榜首 DesiRNA 97 要 24h/题、V1 已饱和 100)。这是<b>诚实基线</b>,预期<b>低于</b>带拐杖的 ~76;二者之差 = 之前被硬编码策略替 agent 干掉的部分。从基线 65 起、只做错的 35 题;token 为估算。'
-      : '目标:通过<b>不断改进→测试</b>让解题率逐 epoch 上升。每个 epoch 叠加一个新技术、在<b>固定预算</b>下重测整批题(固定预算=提升来自策略而非堆算力)。绿线=解对题数;红虚线=<b>LLM法 SOTA ~80</b>(Gautam 2026;经典榜首 DesiRNA 97 要 24h/题、V1 已饱和 100)。solved 只增不减。本梯 = <b>meta-learning AGENT</b>(glm-5.2,全工具+策略记忆);从 with-memory 基线 <b>65</b> 起、只迭代做错的 35 题;token 为<b>估算</b>(glm/OpenRouter 报 usage=0,按 trace 字符/4)。')+
+      ? '目标:量化拿掉硬编码策略后的<b>自主解题地板</b>。本梯 = <b>自主 AGENT</b>(glm-5.2,<b>RNA_AUTONOMOUS=1:中性工具(仅 fold/verify/diagnose/通用搜索)+ 空记忆 + 无策略</b>)—— 工具层不再喂「分解→拼接→修复」套路,agent 必须<b>自己识别问题、自组装搜索</b>。绿点=解对题数;红虚线=<b>LLM法 SOTA ~80</b>(Gautam 2026;经典 DesiRNA <b>同预算(&lt;1min)~85</b> / 1h~95 / 24h 97、V1 已饱和 100)。这是<b>诚实基线</b>,预期<b>低于</b>带拐杖的 ~76;二者之差 = 之前被硬编码策略替 agent 干掉的部分。从基线 65 起、只做错的 35 题;token 为估算。'
+      : '目标:通过<b>不断改进→测试</b>让解题率逐 epoch 上升。每个 epoch 叠加一个新技术、在<b>固定预算</b>下重测整批题(固定预算=提升来自策略而非堆算力)。绿线=解对题数;红虚线=<b>LLM法 SOTA ~80</b>(Gautam 2026;经典 DesiRNA <b>同预算(&lt;1min)~85</b> / 1h~95 / 24h 97、V1 已饱和 100)。solved 只增不减。本梯 = <b>meta-learning AGENT</b>(glm-5.2,全工具+策略记忆);从 with-memory 基线 <b>65</b> 起、只迭代做错的 35 题;token 为<b>估算</b>(glm/OpenRouter 报 usage=0,按 trace 字符/4)。')+
     live+svg+
     `<table><tr><th>epoch</th><th>新增技术</th><th>解对/100</th><th>解出率</th><th>本轮新解出</th><th>耗时</th></tr>`+
     eps.map(e=>`<tr><td>${e.epoch}</td><td>${e.note||('L'+e.level)}</td><td><b class="${e.solved>=tgt?'g':''}">${e.solved}</b></td><td>${fmt(e.solve_rate)}</td><td class="sub">${(e.new_this_epoch||[]).slice(0,10).join(', ')}${(e.new_this_epoch||[]).length>10?'…':''}</td><td>${fmt(e.epoch_secs)}s</td></tr>`).join('')+
     `</table>`;}
   const s=p.standard_leaderboard;
   if(s){h+=`<h4>① Eterna100 基准:传统算法的「地板线」</h4>`+
-   note('100 道公认 RNA 谜题上,两个<b>传统基线算法</b>各解对多少道 —— 这是 AI 要超越的地板(本 harness 预算下的测量,非文献上限)。<b>solved/100</b>=解对几道;<b>uMFE</b>=其中「唯一最优解」几道(更稳);<b>NED</b>=折叠不干脆程度(越低越好);<b>mean s</b>=每题耗时秒。<br>📌 <b>公开 SOTA 标尺</b>:V2 经典榜首 <b>DesiRNA 97/100</b>(NAR 2025)· V2 LLM 方法 SOTA <b>~80</b>(Gautam 2026)· V1 已饱和 100/100。要超越需口径对齐(见「图表」页)。')+
+   note('100 道公认 RNA 谜题上,两个<b>传统基线算法</b>各解对多少道 —— 这是 AI 要超越的地板(本 harness 预算下的测量,非文献上限)。<b>solved/100</b>=解对几道;<b>uMFE</b>=其中「唯一最优解」几道(更稳);<b>NED</b>=折叠不干脆程度(越低越好);<b>mean s</b>=每题耗时秒。<br>📌 <b>公开 SOTA 标尺</b>:V2 经典榜首 <b>DesiRNA 97/100</b>(NAR 2025;<b>同预算&lt;1min 仅 ~85</b>,24h 才 97)· V2 LLM 方法 SOTA <b>~80</b>(Gautam 2026)· V1 已饱和 100/100。要超越需口径对齐(见「图表」页)。')+
    `<table><tr><th>方法</th><th>解对/100</th><th>解出率</th><th>uMFE</th><th>NED(全部)</th><th>NED(解出)</th><th>每题秒</th></tr>`+
    Object.entries(s.by_method).map(([m,v])=>`<tr><td>${m}</td><td><b>${v.solved}</b></td><td>${fmt(v.solved_rate)}</td><td>${v.umfe}</td><td>${fmt(v.mean_NED_all)}</td><td>${fmt(v.mean_NED_solved)}</td><td>${fmt(v.mean_secs)}</td></tr>`).join('')+`</table>`;}
   const hy=p.hybrid_seam;
@@ -469,10 +541,11 @@ function renderFigures(){
  h+=`<div class="card">🎯 <b>Eterna100 公开 SOTA(要超越的标尺 · 带引用)</b>
   <div class="scroll"><table><tr><th>关键数字</th><th>值</th><th>出处</th></tr>
   <tr><td>V1 榜首(已饱和)</td><td><b>100/100</b></td><td>Montparnasse (Cazenave 2026, arXiv:2606.07562, 嵌套MC/GNRPA) · DesiRNA (Wirecki, NAR 2025, REMC)</td></tr>
-  <tr><td><b>V2 榜首(经典 SOTA)</b></td><td><b class="g">97/100</b></td><td>DesiRNA · NAR 2025 gkae1306(<b>24h/题</b>, Turner2004, 开源 github.com/fryzjergda/DesiRNA)</td></tr>
+  <tr><td><b>V2 榜首(经典 SOTA)</b></td><td><b class="g">97/100</b><span class="sub"> @24h</span></td><td>DesiRNA · NAR 2025 gkae1306(Turner2004, 开源 github.com/fryzjergda/DesiRNA;<b>分层预算 85@&lt;1min · 95@&lt;1h · 97@24h</b> —— 同分钟级预算下 ~85)</td></tr>
   <tr><td>V2 · NEMO 原生</td><td>~94/100</td><td>NEMO · Portela 2018 / Koodli 2021(经典 MC)</td></tr>
   <tr><td><b>V2 · LLM 方法 SOTA</b>(对我们最可比)</td><td><b class="y">~79–81/100</b></td><td>Qwen2.5-0.5B(SL+RL)· Gautam, arXiv:2602.12470 (2026)</td></tr>
-  </table></div>`+note('<b>纠正两处常见误传</b>:① 传说的「<b>99/100</b>」是 <b>Montparnasse 在 V1</b> 的时限快照(10,240s/题内 99;100/100 需给最难的 Gladius #90 单独跑 24,108s)——<b>是 V1、不是 V2</b>。② 「NEMO 严格定预算 <b>90</b>」其实是 Gautam 2026 那篇 LLM 论文里把 NEMO 当<b>固定采样预算基线</b>跑出来的数,<b>非 NEMO 真实水平(~94)、更非 solver 榜首</b>;NEMO 是 Portela 2018,不是 Gautam。<br>结论:<b>V1 已饱和(100)</b>;<b>V2 经典天花板 = DesiRNA 97,但要 24h/题</b>;<b>LLM 路线直接对标 = ~80(Gautam)</b>。口径对齐:V2 题集 + ViennaRNA/Turner2004 + 精确 MFE + 报告预算。');
+  </table></div>`+note('<b>纠正两处常见误传</b>:① 传说的「<b>99/100</b>」是 <b>Montparnasse 在 V1</b> 的时限快照(10,240s/题内 99;100/100 需给最难的 Gladius #90 单独跑 24,108s)——<b>是 V1、不是 V2</b>。② 「NEMO 严格定预算 <b>90</b>」其实是 Gautam 2026 那篇 LLM 论文里把 NEMO 当<b>固定采样预算基线</b>跑出来的数,<b>非 NEMO 真实水平(~94)、更非 solver 榜首</b>;NEMO 是 Portela 2018,不是 Gautam。<br>结论:<b>V1 已饱和(100)</b>;<b>V2 经典天花板 = DesiRNA 97,但要 24h/题</b>;<b>LLM 路线直接对标 = ~80(Gautam)</b>。口径对齐:V2 题集 + ViennaRNA/Turner2004 + 精确 MFE + 报告预算。<br>⏱️ <b>预算对齐是关键</b>:DesiRNA 的 97 是 <b>24h/题</b>数,分层为 <b>85@&lt;1min · 95@&lt;1h · 97@24h</b>;故与本 harness(分钟级)最公平的经典对比是 <b>~85</b>,而非 97 —— 21 分那个差里,只有 ~9 是同预算差,其余 ~12 是额外 24h 才买到的最后 2 道。');
+ h+=orchHTML();   // 🔧 编排求解卡片(定义见 orchHTML;图表页与成绩单页共用)
  const sc=(SCORECARD&&SCORECARD[0])?SCORECARD[0].scorecard:null;
  const lbl={diagnosis:'照诊断改',random:'随机乱改',silent_fallback:'丢掉诊断'};
  // 确定性三坐标:一行陈述(三根 1.00 的柱图无信息量)
@@ -496,7 +569,7 @@ function renderFigures(){
   let items=Object.entries(bm).map(([m,v])=>({label:m,value:v.solved_rate,color:'#90a4ae'}));
   full.forEach(r=>items.push({label:r.summary.model.split('/').pop(),value:r.summary.solve_rate,color:'#4c78a8'}));
   charts+=svgBars('全 Eterna100-V2(100 题):AI vs 经典基线 vs 公开 SOTA', items,
-   {ymax:1,refs:SOTA_V2,caption:'柱 = 解出率:<b>灰</b>=两个传统(非 AI)算法地板线(rnainverse=ViennaRNA 经典逆折叠、local_search=本地搜索;本 harness 预算下的测量,非文献上限)、<b>蓝</b>=AI 模型。<b>虚线 = 公开 SOTA 标尺</b>:绿=经典榜首 DesiRNA 0.97(24h/题)、灰=NEMO 原生 0.94、橙=LLM 方法 0.80(对我们最可比)。'+(full.length?'':' AI 全 100 题跑完后其柱自动加入,即可直接对着虚线看差距。')});}
+   {ymax:1,refs:SOTA_V2,caption:'柱 = 解出率:<b>灰</b>=两个传统(非 AI)算法地板线(rnainverse=ViennaRNA 经典逆折叠、local_search=本地搜索;本 harness 预算下的测量,非文献上限)、<b>蓝</b>=AI 模型。<b>虚线 = 公开 SOTA 标尺</b>:深绿=DesiRNA 0.97(24h/题·经典极限)、浅绿=DesiRNA ~0.85(&lt;1min·<b>同预算最可比</b>)、灰=NEMO 原生 0.94、橙=LLM 方法 0.80。同分钟级预算下经典对标是 <b>~85</b>,不是 97。'+(full.length?'':' AI 全 100 题跑完后其柱自动加入,即可直接对着虚线看差距。')});}
  // 可比子集:同一题集且 ≥2 个运行(如 sonnet-5 vs deepseek 同 10 题)
  for(const sig in groups){const g=groups[sig];
   if(g.length>=2 && g[0].summary.n_tasks<100){

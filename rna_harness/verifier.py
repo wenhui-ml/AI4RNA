@@ -19,6 +19,7 @@ from .constraints import ConstraintReport, check_constraints
 from .metrics import EnsembleMetrics, bp_distance, ensemble_metrics, gc_content
 from .oracles.registry import build_panel, cross_oracle_consistency
 from .oracles.vienna import ViennaRNAOracle
+from .structure_utils import has_pseudoknot
 from .task import DesignTask
 
 _VALID = set("ACGU")
@@ -103,6 +104,22 @@ def verify(
             is_umfe=False, reward=0.0, reward_breakdown={}, ensemble=None,
             constraints={}, cross_oracle=None, negative_design=None, diagnosis=None,
             gc_content=None, error=f"illegal base(s) {bad}; sequence must be over A/C/G/U",
+        )
+
+    # --- pseudoknot guard ----------------------------------------------
+    # The ViennaRNA MFE oracle is pseudoknot-FREE: RNA.fold never emits '[]{}' and bp_distance /
+    # string-match silently drop them, so an MFE verdict on a pseudoknot target is wrong EITHER way
+    # (string-match under-reports; bp_distance over-reports -- a measured 29% false-positive rate on
+    # Pseudobase++). Refuse to emit an MFE 'solved' here; a pseudoknot-aware verifier must be used
+    # (rna_harness.benchmarks.rnainvbench.verify_pk, backed by pKiss).
+    if has_pseudoknot(task.target):
+        return VerificationResult(
+            task_id=task.task_id, sequence=seq, valid=True, solved=False, mfe_match=False,
+            is_umfe=False, reward=0.0, reward_breakdown={}, ensemble=None,
+            constraints={}, cross_oracle=None, negative_design=None, diagnosis=None,
+            gc_content=gc_content(seq),
+            error="pseudoknot target ('[]{}<>' in target): not verifiable under the ViennaRNA MFE "
+                  "oracle (pseudoknot-free). Use rna_harness.benchmarks.rnainvbench.verify_pk (pKiss).",
         )
 
     prim = primary or _primary_from_task(task)

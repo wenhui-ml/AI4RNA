@@ -124,6 +124,10 @@ def h_generate(req: Dict) -> Dict:
         from .generators import LocalSearchGenerator
 
         gen = LocalSearchGenerator()
+    elif method == "desirna":
+        from .generators import DesiRNAGenerator
+
+        gen = DesiRNAGenerator(replicas=int(req.get("replicas", 10)))
     else:
         raise ValueError(f"unknown generator method {method!r}")
     res = gen.design(task, budget=budget, seed=seed)

@@ -296,6 +296,31 @@ def finish(candidate: str, target: str, n_restarts: int = 0, iters: int = 20000)
             f"sequence: {d.get('seq')}\n(confirm with RnaVerify)")
 
 
+def desirna_solve(target: str) -> str:
+    """Design a sequence for `target` by calling the external DesiRNA solver (replica-exchange Monte
+    Carlo; SOTA on Eterna100-V2). Returns the best sequence VERIFIED by RnaVerify -- use this for
+    hard/long targets where the built-in search stalls. If DesiRNA is not installed on this host,
+    returns a clear message and you should fall back to parallel_search / inverse_fold_search / finish.
+
+    Args:
+        target: target dot-bracket."""
+    err = _guard_target(target)
+    if err:
+        return err
+    from ..generators.desirna import DesiRNAGenerator, desirna_available
+    from ..task import DesignTask
+    if not desirna_available():
+        return ("DesiRNA is not installed on this host. Set DESIRNA_CMD to its launcher to enable it; "
+                "meanwhile use parallel_search / inverse_fold_search / finish.")
+    r = DesiRNAGenerator().design(DesignTask(task_id="mcp", target=(target or "").strip(), family="mcp"))
+    if not r.meta.get("available", True):
+        return str(r.meta.get("hint", "DesiRNA unavailable."))
+    if r.solved:
+        return f"DesiRNA SOLVED (bp_distance=0).\nsequence: {r.best_sequence}\n(confirm with RnaVerify)"
+    return (f"DesiRNA best bp_distance={r.best_bp_distance} over {r.n_evals} candidate(s).\n"
+            f"sequence: {r.best_sequence or '(none)'}\n(confirm with RnaVerify; polish with finish)")
+
+
 # --- tool registration (gated by RNA_AUTONOMOUS) -----------------------------------------
 # Neutral (facts-only) docstrings used when RNA_AUTONOMOUS=1, so even the tool SCHEMA descriptions
 # carry no solving strategy. Flag-OFF keeps each function's ORIGINAL docstring => unchanged behavior.
@@ -327,8 +352,10 @@ def _register_tools() -> None:
     auto = _autonomous()
     # neutral capabilities/facts -- registered in BOTH modes
     always = [analyze_target, parallel_search, finish, batch_fold]
-    # strategy/advice tools + the native ViennaRNA inverse_fold solver -- ONLY in crutched (flag-off) mode
-    crutch_only = [lookup_hairpin_loop, search_motifs, inverse_fold_search]
+    # strategy/advice tools + external/native solvers that "do the solving for you" -- ONLY in
+    # crutched (flag-off) mode, so they never contaminate the autonomous-A_theta experiments.
+    # desirna_solve is the PLAN-A accessibility surface: the agent calls the SOTA tool, Claude-Code-style.
+    crutch_only = [lookup_hairpin_loop, search_motifs, inverse_fold_search, desirna_solve]
     for fn in always:
         if auto and fn.__name__ in _NEUTRAL_DOCS:
             fn.__doc__ = _NEUTRAL_DOCS[fn.__name__]

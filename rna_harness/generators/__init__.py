@@ -10,5 +10,7 @@ from __future__ import annotations
 from .base import GenerationResult, Generator  # noqa: F401
 from .rnainverse import RNAinverseGenerator  # noqa: F401
 from .local_search import LocalSearchGenerator  # noqa: F401
+from .desirna import DesiRNAGenerator, desirna_available  # noqa: F401
 
-__all__ = ["GenerationResult", "Generator", "RNAinverseGenerator", "LocalSearchGenerator"]
+__all__ = ["GenerationResult", "Generator", "RNAinverseGenerator", "LocalSearchGenerator",
+           "DesiRNAGenerator", "desirna_available"]
