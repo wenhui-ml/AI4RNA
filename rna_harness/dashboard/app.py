@@ -170,6 +170,130 @@ def api_orchestration():
                      "D_undesignable": pids(D)}}}
 
 
+@app.get("/api/rssd")
+def api_rssd():
+    """RSSD experiment board, organised by the three mainlines (categories) with key-focus headlines.
+    Reads the custom result JSONs each rssd_* experiment writes; missing files -> status 'pending'.
+    Everything is computed server-side into render-ready strings so the UI just draws cards."""
+    def rj(run, fname):
+        return _read_json(os.path.join(RUNS, run, fname))
+
+    def x_cheaper(sota, c):
+        return f"{sota / c:.0f}×" if c and c > 0 else "—"
+
+    # ---- category C: agent self-authoring (north-star) ----
+    agent_rows = []
+    for label, run in (("人工基线 v1", None), ("gpt-4o", "rssd_agent_openai_gpt-4o"),
+                       ("GLM-5.2 (关推理)", "rssd_agent_z-ai_glm-5.2"),
+                       ("GLM-5.2 (开推理)", "rssd_agent_glm_reason_on"),
+                       ("GLM-5.2 (Eterna/路线A)", "rssd_agent_nested")):
+        if run is None:
+            agent_rows.append({"model": label, "skill": "—", "held": "96/125", "x": "13×",
+                               "discovered": "是(基准)", "note": "手写技能"})
+            continue
+        d = rj(run, "agent_result.json")
+        if not d:
+            agent_rows.append({"model": label, "status": "pending"}); continue
+        h, s = d.get("held", {}), d.get("held_always_sota", {})
+        sota_c = s.get("cost") or 0
+        code = ""
+        try:
+            code = open(os.path.join(RUNS, run, "authored_skill.py")).read()
+        except OSError:
+            pass
+        disc = "✅ 发现交叉互补" if "fix_crossing" in code or "s_list[i] = 'G'" in code else \
+               ("✅ 发现方法" if (h.get("skill_solved", 0) or 0) > 0.3 * (h.get("n") or 1) else "❌ 未发现")
+        agent_rows.append({
+            "model": label,
+            "skill": f"{h.get('skill_solved','?')}/{h.get('n','?')}",
+            "held": f"{h.get('solved','?')}/{h.get('n','?')}",
+            "x": x_cheaper(sota_c, h.get("cost")),
+            "discovered": disc,
+            "note": f"弃权丢 {h.get('solves_lost','?')} 解" if run != "rssd_agent_nested" else "路线A:嵌套域"})
+
+    # ---- category B: efficiency (real threshold) ----
+    B = []
+    comp = rj("rssd_compounding", "compounding.json")
+    if comp:
+        h = (comp.get("arms") or {}).get("held", {})
+        sota = (h.get("always_sota") or {}).get("cost") or 0
+        ab = h.get("abstain") or {}
+        best = min((v for v in ab.values() if v.get("solves_lost") == 0),
+                   key=lambda v: v.get("cost", 9e9), default=None)
+        orc = h.get("oracle_abstain") or {}
+        B.append({"name": "B1/G1 留出集 + 弃权消融", "purpose": "学到的路由在同质量下降本?来自哪个部件?",
+                  "result": (f"弃权 {x_cheaper(sota, best['cost'])} @ 0损失 (便宜级联仅 "
+                             f"{x_cheaper(sota, (h.get('cold') or {}).get('cost'))});oracle 上界 "
+                             f"{x_cheaper(sota, orc.get('cost'))}") if best else "—",
+                  "status": "done"})
+    st = rj("rssd_stream", "stream.json")
+    if st:
+        B.append({"name": "F4 在线流式复利", "purpose": "冷启动边学边降本(时间维度)?",
+                  "result": f"cost/solve 跌 {st.get('drop_pct',0):.0f}%,累计 "
+                            f"{x_cheaper(st.get('cum_sota'), st.get('cum_stream'))}(丢 {st.get('lost_per_stream',0):.1f}/流)",
+                  "status": "done"})
+    ec = rj("rssd_eterna_cost", "eterna_cost.json")
+    if ec:
+        h = ec.get("held_result", {})
+        sota = (h.get("always_sota") or {}).get("cost") or 0
+        casc = (h.get("cascade") or {}).get("cost")
+        B.append({"name": "F2 Eterna 跨域成本", "purpose": "成本论题跨数据集成立?",
+                  "result": f"留出集 {x_cheaper(sota, casc)} 便宜、0 丢失(n={ec.get('n_puzzles','?')})",
+                  "status": "done"})
+    vc = rj("rssd_verifier_cost", "verifier_cost.json")
+    if vc and vc.get("results"):
+        res, ids = vc["results"], vc.get("ids", [])
+        scr = vc.get("config", {}).get("screens", [])
+        def agg(scv):
+            sv = sum(1 for i in ids if res.get(f"{i}:{scv}", {}).get("solved"))
+            ow = sum(res.get(f"{i}:{scv}", {}).get("oracle_s", 0) for i in ids)
+            return sv, ow
+        base = agg(-1) if -1 in scr else (None, None)
+        parts = []
+        for scv in scr:
+            sv, ow = agg(scv)
+            parts.append(f"{'无筛' if scv < 0 else '≤%d' % scv}:{sv}解/{ow:.0f}s")
+        B.append({"name": "F5 验证器成本路由", "purpose": "便宜 oracle 预筛砍贵 oracle 成本?",
+                  "result": " | ".join(parts) + "(弱杠杆:砍成本但丢几解)", "status": "done"})
+
+    # ---- category A: capability ceiling ----
+    A = []
+    des = rj("rssd_designability", "designability.json")
+    if des:
+        rec, stuck = des.get("recovered", []), des.get("stuck", [])
+        A.append({"name": "E1 可设计性证书", "purpose": "71 残差是搜索限制还是真墙?",
+                  "result": f"{len(rec)}/{len(rec)+len(stuck)} 被 5× 重搜索救回 → "
+                            f"{'全是可设计性墙,天花板 180/251(认证)' if not rec else '部分可救'}",
+                  "status": "done"})
+    con = rj("rssd_constrained", "constrained.json")
+    if con:
+        cracked, broke = con.get("residual_cracked", []), con.get("solved_broke", [])
+        A.append({"name": "E2 约束设计", "purpose": "丢了 IUPAC 约束是否低估了 180?",
+                  "result": f"约束救回残差 {len(cracked)}/71,搞坏已解 {len(broke)}/20 → "
+                            f"{'180 不是低估' if not cracked else '约束能救 %d' % len(cracked)}",
+                  "status": "done"})
+    bud = rj("rssd_eterna_budget", "budget_curve.json")
+    if bud:
+        sa = bud.get("solved_at", {})
+        hard = bud.get("hard", [])
+        seq = " → ".join(f"{len(sa.get(str(b), sa.get(b, [])))}" for b in (bud.get("config", {}).get("budgets") or [60, 600, 1800]))
+        A.append({"name": "E5 Eterna 86→97 预算曲线", "purpose": "到 97 是不是纯预算?",
+                  "result": f"硬集 {len(hard)} 题:逐级加预算解出 {seq};剩 {len(bud.get('still_unsolved',[]))} 需数小时 → 差距主要是预算",
+                  "status": "done"})
+
+    return {"rssd": {"categories": [
+        {"id": "C", "title": "🌟 北极星 · agent 自写方法",
+         "headline": "把'写方法'交给 LLM agent:GLM-5.2 自发现假结命门(交叉互补),留出集 91/125、62× 便宜;gpt-4o 不行 → 方法发现是模型能力问题。",
+         "table": agent_rows},
+        {"id": "B", "title": "⚙️ 效率 · 真门槛(同质量降本)",
+         "headline": "学到的编排/弃权在同质量下省 8–62× 算力、随时间复利(31.6×)、跨域成立(2.7×)→ 认知核不是壳,真门槛已过。",
+         "experiments": B},
+        {"id": "A", "title": "🎯 能力 · 天花板认证",
+         "headline": "假结 71 残差是可设计性墙(重搜索+约束都救不回);Eterna 86→97 差距主要是预算。",
+         "experiments": A},
+    ]}}
+
+
 @app.get("/fig/{run}/{fname}")
 def figure(run: str, fname: str):
     if os.path.basename(fname) != fname or ".." in fname:
@@ -307,6 +431,7 @@ HTML_PAGE = """<!doctype html><html><head><meta charset="utf-8">
 </div>
 <div class="tabs">
  <span class="tab active" data-t="scorecard" onclick="tab('scorecard')">🏆 成绩单</span>
+ <span class="tab" data-t="rssd" onclick="tab('rssd')">🧬 认知核/RSSD</span>
  <span class="tab" data-t="campaigns" onclick="tab('campaigns')">📈 记忆实验</span>
  <span class="tab" data-t="overview" onclick="tab('overview')">🧭 概览</span>
  <span class="tab" data-t="runs" onclick="tab('runs')">📂 运行</span>
@@ -314,6 +439,7 @@ HTML_PAGE = """<!doctype html><html><head><meta charset="utf-8">
  <span class="tab" data-t="logs" onclick="tab('logs')">📜 日志(实时)</span>
 </div>
 <div id="scorecard" class="panel"></div>
+<div id="rssd" class="panel" style="display:none"></div>
 <div id="campaigns" class="panel" style="display:none"></div>
 <div id="overview" class="panel" style="display:none"></div>
 <div id="runs" class="panel" style="display:none"></div>
@@ -328,7 +454,7 @@ HTML_PAGE = """<!doctype html><html><head><meta charset="utf-8">
 let RUNS=[]; let SCORECARD=[]; let ORCH=null;
 const SOTA_V2=[{m:'DesiRNA 24h/题(经典极限)',v:0.97,c:'#2e7d32'},{m:'DesiRNA <1min(同预算·最可比)',v:0.85,c:'#66bb6a'},{m:'NEMO 原生',v:0.94,c:'#78909c'},{m:'LLM方法SOTA(Gautam)',v:0.80,c:'#d97706'}];
 function tab(t){document.querySelectorAll('.tab').forEach(e=>e.classList.toggle('active',e.dataset.t==t));
- ['scorecard','campaigns','overview','runs','figures','logs'].forEach(p=>document.getElementById(p).style.display=p==t?'block':'none');}
+ ['scorecard','rssd','campaigns','overview','runs','figures','logs'].forEach(p=>document.getElementById(p).style.display=p==t?'block':'none');}
 function fmt(x){return x==null?'—':(typeof x=='number'?(Math.round(x*1000)/1000):x)}
 function cls(v){return v==null?'':(v>=0.6?'g':(v>=0.3?'y':'r'))}
 function note(t){return '<p class="note">'+t+'</p>'}
@@ -340,7 +466,30 @@ async function load(){
  try{const sc=(await (await fetch('/api/scorecard')).json()).scorecards; SCORECARD=sc; renderScorecard(sc);}catch(e){}
  try{const cp=(await (await fetch('/api/campaigns')).json()).campaigns; renderCampaigns(cp);}catch(e){}
  try{ORCH=(await (await fetch('/api/orchestration')).json()).orchestration;}catch(e){}
+ try{const rs=(await (await fetch('/api/rssd')).json()).rssd; renderRSSD(rs);}catch(e){document.getElementById('rssd').innerHTML=note('RSSD 数据加载失败');}
  renderFigures();
+}
+function renderRSSD(rs){
+ const el=document.getElementById('rssd'); if(!rs){el.innerHTML=note('暂无 RSSD 数据');return;}
+ let h=`<div class="card"><h2>🧬 认知核 / RSSD 实验板</h2>`+
+   note('把 RNA 求解器当工具,验证"经济地编排 + agent 自发现方法"。三条主线:🌟 北极星(agent 自写方法)、⚙️ 效率(同质量降本)、🎯 能力(天花板)。全部防自欺:训练/评估不相交,pKiss/MFE 亲自复验。')+`</div>`;
+ (rs.categories||[]).forEach(c=>{
+   h+=`<div class="card"><h3>${c.title}</h3><p class="note" style="font-size:13px;color:#333"><b>重点:</b>${c.headline}</p>`;
+   if(c.table){ // 北极星对比表
+     h+=`<table style="width:100%"><tr><th>方法作者</th><th>技能单独解出</th><th>留出集总解出</th><th>vs always-SOTA</th><th>是否自发现方法</th><th>备注</th></tr>`;
+     c.table.forEach(r=>{ if(r.status=='pending'){h+=`<tr><td>${r.model}</td><td colspan="5" class="y">运行中/待出</td></tr>`;return;}
+       const dc=(r.discovered||'').indexOf('✅')>=0?'g':((r.discovered||'').indexOf('❌')>=0?'r':'');
+       h+=`<tr><td><b>${r.model}</b></td><td>${r.skill}</td><td>${r.held}</td><td class="g">${r.x}</td><td class="${dc}">${r.discovered}</td><td class="sub">${r.note||''}</td></tr>`;});
+     h+=`</table>`;
+   }
+   (c.experiments||[]).forEach(e=>{
+     const st=e.status=='done'?'<span class="g">✓ 完成</span>':'<span class="y">运行中</span>';
+     h+=`<div style="margin:8px 0;padding:8px 10px;border-left:3px solid var(--accent);background:#f8fafc">
+       <b>${e.name}</b> ${st}<br><span class="sub">目的:${e.purpose}</span><br><span style="font-size:13px">结果:${e.result}</span></div>`;
+   });
+   h+=`</div>`;
+ });
+ el.innerHTML=h;
 }
 function svgBars(title,items,opt){
  opt=opt||{}; items=items.filter(i=>i&&i.value!=null);
