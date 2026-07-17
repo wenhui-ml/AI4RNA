@@ -84,7 +84,8 @@ def _ensemble_defect(seq_s: str, target: str) -> float:
 
 
 def coordinated_endgame(seq: str, target: str, trigger_bp: int = 6, sys_top: int = 3,
-                        stoch_iters: int = 4000, restarts: int = 10, seed: int = 0) -> Dict:
+                        stoch_iters: int = 4000, restarts: int = 10, seed: int = 0,
+                        wall_s: float = None) -> Dict:
     """Last-mile coordinated repair for near-misses (bp <= trigger). Attacks the DEFECT CLUSTER --
     unformed target pairs + the intruder positions currently competing with them + flank -- and
     JOINTLY reassigns them: the coordinated multi-base change (break intruder + build the target pair)
@@ -92,6 +93,7 @@ def coordinated_endgame(seq: str, target: str, trigger_bp: int = 6, sys_top: int
     (bp, then ensemble_defect): among bp-equal candidates it prefers the one thermodynamically closest
     to forming the missing pair. ensemble_defect is only evaluated on improve-or-tie => bounded cost."""
     n = len(target)
+    deadline = (time.time() + wall_s) if wall_s else None   # bound last-mile repair (large-n hang guard)
     pt = pair_table(target)
     st = RNA.fold(seq)[0]
     bp = RNA.bp_distance(st, target)
@@ -114,6 +116,8 @@ def coordinated_endgame(seq: str, target: str, trigger_bp: int = 6, sys_top: int
     ps = pair_table(st)
     unformed = [(i, pt[i]) for i in range(n) if pt[i] > i and ps[i] != pt[i]][:sys_top]
     for combo in itertools.product(PAIRS, repeat=len(unformed)):
+        if deadline and time.time() > deadline:
+            return {"seq": best, "bp": best_bp, "solved": best_bp == 0 and RNA.fold(best)[0] == target}
         cand = list(best)
         for (i, j), (a, b) in zip(unformed, combo):
             cand[i], cand[j] = a, b
@@ -127,6 +131,8 @@ def coordinated_endgame(seq: str, target: str, trigger_bp: int = 6, sys_top: int
 
     # PHASE 2 -- many-restart stochastic search restricted to the (recomputed) defect cluster
     for _r in range(restarts):
+        if deadline and time.time() > deadline:
+            break
         cur = list(best)
         ps_c = pair_table(RNA.fold("".join(cur))[0])
         cl = set()
@@ -143,7 +149,9 @@ def coordinated_endgame(seq: str, target: str, trigger_bp: int = 6, sys_top: int
                     cl.add(q)
         cluster = sorted(cl) or list(range(n))
         cur_bp = RNA.bp_distance(RNA.fold("".join(cur))[0], target)
-        for _ in range(stoch_iters):
+        for _it in range(stoch_iters):
+            if deadline and (_it & 63) == 0 and time.time() > deadline:
+                break
             i = rng.choice(cluster)
             saved = {i: cur[i]}
             cur[i] = rng.choice(_BASES)
@@ -217,7 +225,8 @@ def replica_exchange(target: str, n_replicas: int = 8, max_calls: int = 400000, 
     calls = budget.calls
     eg_applied = False
     if endgame and 0 < g_best_e <= endgame_trigger:
-        eg = coordinated_endgame(g_best, target, trigger_bp=endgame_trigger, seed=seed)
+        eg_wall = max(2.0, wall_s - (time.time() - t0))   # endgame shares the total wall_s budget
+        eg = coordinated_endgame(g_best, target, trigger_bp=endgame_trigger, seed=seed, wall_s=eg_wall)
         if eg["bp"] < g_best_e:
             g_best_e, g_best = eg["bp"], eg["seq"]
             eg_applied = True

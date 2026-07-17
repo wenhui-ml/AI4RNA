@@ -1,7 +1,7 @@
 # Paper C — Positioning v2: The Green-Zone Null (the algorithmic-core headroom coordinate)
 
-Supersedes the mode-taxonomy framing of `POSITIONING.md` (which the 2026 harness-effect cluster
-pre-empted — see `REVIEW_internal_aaai.md`). This is the reframe that threads the crack between the
+Supersedes the mode-taxonomy framing of `old/POSITIONING.md` (which the 2026 harness-effect cluster
+pre-empted — see `old/REVIEW_internal_aaai.md`). This is the reframe that threads the crack between the
 InceptLabs family (A1/A2/A3/B) and the crowded external field. Written 2026-07-11.
 
 Working title: **"Everything Green, Still Null: An Algorithmic-Core Headroom Coordinate for

@@ -1,7 +1,9 @@
 # openclaude_rna:RNA 逆设计 Meta-Learning Harness — 技术报告
 
-**2026-07-03 · InceptLabs · 裁判 ViennaRNA 2.7.2 (Turner2004, 37°C, dangles=2)**
+**2026-07-03 · Rev. 2026-07-14(成本感知认知核迭代)· InceptLabs · 裁判 ViennaRNA 2.7.2 (Turner2004, 37°C, dangles=2)**
 *语言:[English](TECH_REPORT.md) · **中文***
+
+> **阅读指引**:§0–§4 是奠基框架 + 理论(2026-07-03,仍然有效);§5–§8(2026-07-14)追加此后的迭代:成本(cost-to-solve)重构、域无关认知核、verifier 即可声明谓词、以及本轮结果。
 
 > **红线**:全文「成功 / 解出」仅指**折叠 oracle 下设计正确**(设计序列 MFE 结构 == 目标点括号),**不代表 in-vivo 功能或表达**。
 
@@ -166,22 +168,105 @@ flowchart TD
 
 ---
 
+# 5 · 更新 2026-07-14 —— 从「墙时间超时」到「解题成本」
+
+两条方法论纠正,取代 §2 的失败口径:
+
+1. **不要卡时间再贴错标签。** §2 把 90–98% 的失败读作「1500s 超时」。那道墙是**外加的预算**,不是问题本身的属性。纠正(现为第一性原则):给求解器**开放时间,并记录成本**。一次 run 用**解题成本(cost-to-solution)**刻画,绝不用被砍断的封顶来描述。
+2. **一切求解器同一种货币。** 经济由**消耗**控制,不由秒表控制:**经典求解器 = CPU 秒**(`核数 × 墙 × 费率`),**LLM = token**(`in·p_in + out·p_out`)。两者映到同一条 USD 轴,异质工具因此可比、可路由。组件:[`cognitive/cost.py`](../rna_harness/cognitive/cost.py)(`solver_cost_usd`、`llm_cost_usd`;费率可用环境变量覆盖,只有相对尺度要紧)。
+
+这把使命的残余瓶颈重构了:不再是「怎么翻过 1500s 的墙」,而是**「到达一个被验证的解,最便宜的路径是什么;经验能否让这条路径更便宜」**。
+
+---
+
+# 6 · 成本感知认知核(域无关的工具编排)
+
+稀缺的能力**不是更强的求解器**—— DesiRNA 已在 Eterna100-V2 达 **97/100**(24h/题)。稀缺的是人类专家带来的**元过程**:读题、判难度/边界、挑一个最可能奏效且最便宜的工具 + 预算、调用、验证、失败即升级——用**最低成本**解**任意**问题。领域知识全部住在**工具**里;核是域无关的 ML 工程——一套学到的路由**过程**(A_θ),不是背下来的答案(K_θ)。
+
+```
+特征(机械、零生物)  →  router(成本最小、可学)  →  tool.attempt
+     →  verify(正确 oracle)  →  失败则升级,一路累计成本
+```
+
+| 组件 | 文件 | 作用 |
+|---|---|---|
+| 特征 | `cognitive/features.py` | 15 个机械结构特征(长度、对数、假结、junction、茎、孤立对、嵌套深度…);**零生物**,假结鲁棒 |
+| 工具 | `cognitive/tools.py` | 统一 `Tool.attempt → ToolResult`,携带**成本 + oracle 校验过的 `solved`**。工具箱 = 3× 自家 REMC(`anneal.py`,便宜)+ 2× **DesiRNA**(SOTA 子进程)。**DesiRNA 是工具,不是核** |
+| Router | `cognitive/router.py` | 冷启动 = 标称成本升序;**学习**后 = 标准化特征上的 k-NN → 按 `eff = cost / P(solve)` 排序。只**重排**工具箱、从不删 → **解出数不变、成本变** |
+| 核 | `cognitive/core.py` | analyse → route → invoke → verify → escalate;记录每次结果供 router 学习。`FixedPolicy` = 它必须打败的基线 |
+| 评测 | `cognitive/evaluate.py` | cost-at-quality:cognitive vs `always_cheap` vs `always_sota` |
+
+**DesiRNA 是被调用,不是被重写**:子进程调真的 `/data/wenhui/DesiRNA/DesiRNA.py`(`-p 2004` 参数对齐),产出一律用我们的 oracle 复验。(`anneal.py` 的副本交换 MC 是**我们自己**的重实现——一件独立的便宜工具,不是 DesiRNA。)
+
+**可证伪门槛**:在 cost-at-quality 上打败固定策略,**并且**证明学习能砍掉难题上白费的便宜尝试。若退化成「永远顶配调 SOTA」,那就是**壳,不是核**。
+
+---
+
+# 7 · verifier:一个可声明的可判定谓词(三条轴)
+
+`solved` 的可信度不超过 verifier,所以它是一等的、**与求解器解耦**的阶段([`cognitive/tools.py::verify`](../rna_harness/cognitive/tools.py))。这里**没有绝对的物理 oracle**;**形式**真值 = 一个**可判定谓词**经**求值**得到的取值——折一次、比一次——正如 SAT 赋值的真值就是 `φ(x)` 求值。**模型即规约**,所以在模型内真值是绝对、可复现、且**验证便宜而求解昂贵**的(verify ≠ solve 的不对称,正是整个核吃的那口饭)。两条不变量:**出题人 ≠ 判卷人**(每个候选——包括 DesiRNA 自报的「solved」——都被复折)、以及 **`solved` 永不等于物理/生物真相**(红线)。
+
+开放边界解题 = 在**三条轴**上做对选择(不只是「搜得更狠」),三轴都坐落在 `verify`:
+
+| 轴 | 选择 | 机制 | 具体例子 |
+|---|---|---|---|
+| **1 · 选 oracle** | 嵌套 → ViennaRNA MFE;假结 → pKiss | `has_pseudoknot(target)` 路由 | 拿 MFE 判假结是**范畴错误**——它吐不出 `[`,`fold==T_pk` 永远 False;29% 假阳来源 |
+| **2 · 定严格度** | `match` / `umfe` / `pfe`(可声明、可用环境变量调) | 新增 `strictness` 参数 | `GGGGGGAAUUUCUC` 对 `(((((....)))))`:`match`=True 但 P(T)=0.19 → `pfe`=False(脆弱的多解之一) |
+| **3 · 无 oracle** | 弃权 | `oracle="none"` | **功能**规约(「结合茶碱」)没有可计算谓词 → 拒绝声称 solved |
+
+本轮把**轴 2 做成了可声明契约**——`verify(seq, target, strictness=…)`,而不是藏在代码里的常量(`match` 仍是默认,故此前所有结果不变)。把 **verifier 本身**(oracle + 严格度)也当被路由对象、而不只路由求解器,是下一步的活;B 轨会逼出它。
+
+---
+
+# 8 · 本轮结果
+
+**搜索线(诚实记录):**
+- **结构检索 / warm-start(对标 AlphaFold-1):NULL。** 逐例最优的检索单元,组合起来**不如**组合鲁棒的通用 GC-硬先验(uniformity trap)。n = 28 公平聚合。
+- **单轨迹 guided search:失败**(输给多重启爬山)。就此放弃从零定制搜索。
+- **副本交换 MC(`anneal.py`):有界主力**——统一的 fold-call + 墙预算,逃局部最优;现为便宜档。
+
+**DesiRNA 编排(记成本、不贴错封顶标签):** 基座 agent 58 → **81–83** → **86**;公开 SOTA 97(24h)。此前的「6 道墙」是**预算假象**(1–3 分钟 DesiRNA = 它的快速档);预算拉长后大部分残余会掉——**真墙 ≈ 3**。
+
+**Cost-at-quality(`cogeval`,18 题混合;成本单位 USD):**
+
+| 策略 | 解出 | 总 $ | $/解 |
+|---|---|---|---|
+| **cognitive** | **18/18** | **0.269** | 0.015 |
+| always_cheap(仅 REMC) | 11/18 | 0.212 | 0.019 |
+| always_sota(仅 DesiRNA) | 17/18 | 0.464 | 0.027 |
+
+认知核**严格支配**always-SOTA——**多解 1 题、且便宜 1.72×**——靠便宜档解掉简单的大多数、只在被逼时才为 DesiRNA 付费(11 道易题**根本没碰** DesiRNA)。这跨过了**低**门槛(便宜级联在易题占多数时打败 always-SOTA)。
+
+**learning vs no-learning(**有意义**的门槛——运行中):** 一个受控的固定表模拟。**先建一次**(题 × 工具)→(solved, cost)表,再在**同一张表**上模拟 `cold` 级联 vs `learn` 后的 router 排序,使唯一变量是工具顺序(消除工具随机性 / CPU 争抢噪声)。因为 router 只重排(从不删工具),**解出数按构造完全相同**——学习只能改成本。论点:学习把预测为难的题**绕过注定失败的便宜档**,从而砍成本,省下的钱集中在难题上。`experiments/learning_vs_cold.py`;**结果待建表完成**(将补上)。
+
+**已知局限(诚实记录):** REMC 的墙是**软**的(每 epoch 才查一次 → 单个长 epoch 会超,如 remc@120 → ~590s)。成本记账仍诚实(记的是**真实**墙),且 learning-vs-cold 的**差值**对此鲁棒——两臂共用同一张表。
+
+---
+
 # 下一步
 
-1. **蒸经验(离线)**:三轮解出题 `distill_strategies` → 刷新 `memory_library`。
-2. **攻硬核 33**:强化搜索 + 分治策略,**严格区分「工具变强」vs「LLM 编排变强」**。
-3. **自进化闭环**:① 带记忆多-epoch(测 A_memory + 抬升);② 权重级 RL / GRPO。
-4. **迁移**:GLM-5.2 无记忆基线 → 带 DeepSeek 蒸馏记忆,测迁移增益。
+1. **跑完 learning-vs-no-learning** —— 核 vs 壳的判据:报告省下的 $,并确认它集中在难题上。
+2. **B 轨 —— 换 oracle 的开放域**:同一个核跑 RNAInvBench 假结(pKiss verifier);检验它能否识别出模型、切换 oracle、并在贵 verifier 下保持经济。
+3. **verifier 作为被路由的一等对象**:让核选 oracle + 严格度(轴 1–2),不只选求解器。
+4. **(阶段一线继续)**:对解出题蒸馏经验 → 刷新 `memory_library`;在**固定工具预算的归因守则**下攻硬核残余(是「LLM 编排变强」,不是「工具调大了」);闭合记忆/RL 环(A_memory、多-epoch、GRPO);测跨模型记忆迁移。
 
 # 附录 · 复现
 
 ```bash
+# --- 阶段一 元学习 agent(基线) ---
 python -m rna_harness.experiments.agent_runner \
   --model z-ai/glm-5.2 --n-tasks 100 --max-len 400 --timeout-s 1500 --workers 3 \
   --out rna_harness/runs/<name>
 # env: CLAUDE_CODE_USE_OPENAI=1 · OPENAI_BASE_URL=…/openrouter/api/v1 · OPENAI_API_KEY=<key> · RNA_MAX_CORES=160
 # 看结果: http://<host>:8811/report/<name>
+
+# --- 认知核(成本感知路由) ---
+export DESIRNA_CMD="/home/ubuntu/miniconda3/envs/rna/bin/python /data/wenhui/DesiRNA/DesiRNA.py"
+python -m rna_harness.cognitive.evaluate --ids 8 1 45 59 66 57 72 \
+  --policies cognitive always_cheap always_sota      # cost-at-quality
+python -m rna_harness.experiments.learning_vs_cold --build   # 建固定结果表(一次)
+python -m rna_harness.experiments.learning_vs_cold --sim     # 在表上模拟 cold vs learn
 ```
 
-**关键路径**:`agent_runner.py`(驱动)· `verifier.py`(裁判)· `mcp/`(工具)· `meta/`(记忆)· `dashboard/`(可视化)· `memory_library/`(已学知识)。
+**关键路径**:`agent_runner.py`(阶段一驱动)· `verifier.py` / `cognitive/tools.py::verify`(裁判)· `cognitive/`(成本感知核)· `experiments/anneal.py`(自家 REMC)· `generators/desirna.py`(DesiRNA 适配器)· `mcp/` · `meta/` · `dashboard/` · `memory_library/`。
 **引用**:Chen, W. *Actuation Fidelity* (InceptLabs 2026);Chen, W. & Li, Z. *The Oracle Residue Thesis* (InceptLabs 2026)。

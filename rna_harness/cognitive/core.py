@@ -32,7 +32,8 @@ class CognitiveCore:
             r = tool.attempt(target, seed=seed)
             total_cost += r.cost_usd
             trace.append({"tool": tool.name, "solved": r.solved, "bp": r.bp,
-                          "cost_usd": round(r.cost_usd, 8), "wall_s": r.wall_s, "oracle": r.oracle})
+                          "cost_usd": round(r.cost_usd, 8), "wall_s": r.wall_s, "oracle": r.oracle,
+                          "oracle_s": r.oracle_s})
             if self.learn:
                 self.router.record(feat, tool.name, r.solved, r.cost_usd)
             if r.solved:
@@ -56,7 +57,7 @@ class FixedPolicy:
             r = tool.attempt(target, seed=seed)
             total_cost += r.cost_usd
             trace.append({"tool": tool.name, "solved": r.solved, "bp": r.bp,
-                          "cost_usd": round(r.cost_usd, 8)})
+                          "cost_usd": round(r.cost_usd, 8), "oracle": r.oracle, "oracle_s": r.oracle_s})
             if r.solved:
                 return {"solved": True, "cost_usd": total_cost, "seq": r.seq,
                         "n_actions": len(trace), "trace": trace}

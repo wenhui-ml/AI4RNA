@@ -41,6 +41,33 @@ def test_verify_mfe_gate():
     assert s2 is False and b2 > 0
 
 
+def test_verify_strictness_axes():
+    """Axis 2: the same sequence gets different truth values under stricter declared predicates."""
+    T = "(((((....)))))"                       # 5bp-stem tetraloop hairpin
+    robust = "GCGCGAAAACGCGC"                  # folds to T with high ensemble probability
+    knife = "GGGGGGAAUUUCUC"                   # folds to T but P(T)~0.19 -- a fragile 1-of-many
+    # robust: passes all three strictness levels
+    assert verify(robust, T, "match")[0] is True
+    assert verify(robust, T, "umfe")[2] == "mfe:umfe" and verify(robust, T, "umfe")[0] is True
+    assert verify(robust, T, "pfe")[2] == "mfe:pfe" and verify(robust, T, "pfe")[0] is True
+    # knife-edge: exact-match says solved, but the strict ensemble predicate rejects it
+    assert verify(knife, T, "match")[0] is True
+    assert verify(knife, T, "pfe")[0] is False   # P(T) below _PFE_MIN -> not a robust solution
+    # unknown strictness is a hard error, not a silent default
+    import pytest
+    with pytest.raises(ValueError):
+        verify(robust, T, "bogus")
+
+
+def test_remc_tool_pseudoknot_fails_gracefully():
+    """Regression: REMC (MFE-only, nested warm-start) must NOT crash on a pseudoknot target -- it designs
+    the nested skeleton and pKiss judges the full target (a graceful failure, not a ValueError on '[')."""
+    r = RemcTool(wall_s=2).attempt(PK, seed=0)     # PK has crossing [] over ()
+    assert r.tool.startswith("remc@")              # returned a ToolResult, did not raise
+    assert r.solved is False                       # REMC cannot form the crossing stem
+    assert r.oracle in ("pkiss", "none")           # judged by the pseudoknot-aware oracle, never 'mfe'
+
+
 def test_remc_tool_solves_small_and_costs():
     r = RemcTool(wall_s=10, n_replicas=6).attempt(HAIRPIN, seed=0)
     assert r.tool.startswith("remc@")

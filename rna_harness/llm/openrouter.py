@@ -33,6 +33,9 @@ class LLMResult:
     model: str = ""
     raw: Dict = field(default_factory=dict)
     error: Optional[str] = None
+    reasoning: str = ""          # separate reasoning-trace field (reasoning models); empty otherwise
+    reasoning_details: Optional[object] = None  # pass back UNMODIFIED in the next assistant turn so a
+                                                # reasoning model continues its chain across turns
 
 
 class OpenRouterClient:
@@ -60,15 +63,23 @@ class OpenRouterClient:
         self,
         messages: List[Dict[str, str]],
         temperature: float = 0.7,
-        max_tokens: int = 1024,
+        max_tokens: Optional[int] = 1024,
         system: Optional[str] = None,
+        reasoning: Optional[Dict] = None,
     ) -> LLMResult:
+        """`reasoning` passes OpenRouter's reasoning control, e.g. {"enabled": True} to let a reasoning model
+        think. IMPORTANT: `max_tokens` is the TOTAL output cap (reasoning + content); a reasoning model's
+        chain can exceed a small cap and leave NO room for content -> empty reply. Pass max_tokens=None to
+        omit the cap (use the provider default) when reasoning is enabled. Ignored by non-reasoning models."""
         if not self.api_key:
             return LLMResult(text="", error="no API key (set OPENROUTER_API_KEY or OPENAI_API_KEY)")
         msgs = ([{"role": "system", "content": system}] if system else []) + list(messages)
-        body = json.dumps(
-            {"model": self.model, "messages": msgs, "temperature": temperature, "max_tokens": max_tokens}
-        ).encode()
+        payload = {"model": self.model, "messages": msgs, "temperature": temperature}
+        if max_tokens is not None:
+            payload["max_tokens"] = max_tokens
+        if reasoning is not None:
+            payload["reasoning"] = reasoning
+        body = json.dumps(payload).encode()
         headers = {
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json",
@@ -81,13 +92,17 @@ class OpenRouterClient:
                 req = urllib.request.Request(self.base_url + "/chat/completions", data=body, headers=headers)
                 with urllib.request.urlopen(req, timeout=self.timeout) as resp:
                     d = json.loads(resp.read().decode())
-                text = d["choices"][0]["message"]["content"]
+                msg = d["choices"][0]["message"]
+                text = msg.get("content") or ""
+                rtext = msg.get("reasoning") or msg.get("reasoning_content") or ""
                 usage = d.get("usage", {}) or {}
                 pt, ct = int(usage.get("prompt_tokens", 0)), int(usage.get("completion_tokens", 0))
                 self.total_prompt_tokens += pt
                 self.total_completion_tokens += ct
                 self.n_calls += 1
-                return LLMResult(text=text, prompt_tokens=pt, completion_tokens=ct, model=d.get("model", self.model), raw=d)
+                return LLMResult(text=text, prompt_tokens=pt, completion_tokens=ct,
+                                 model=d.get("model", self.model), raw=d, reasoning=rtext,
+                                 reasoning_details=msg.get("reasoning_details"))
             except urllib.error.HTTPError as e:
                 detail = e.read().decode()[:400]
                 last_err = f"HTTP {e.code}: {detail}"

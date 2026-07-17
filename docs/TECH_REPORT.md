@@ -1,7 +1,9 @@
 # openclaude_rna: An RNA Inverse-Design Meta-Learning Harness — Technical Report
 
-**2026-07-03 · InceptLabs · Judge: ViennaRNA 2.7.2 (Turner2004, 37 °C, dangles=2)**
+**2026-07-03 · Rev. 2026-07-14 (cost-aware cognitive-core iteration) · InceptLabs · Judge: ViennaRNA 2.7.2 (Turner2004, 37 °C, dangles=2)**
 *Language: **English** · [中文](TECH_REPORT_zh.md)*
+
+> **Reading guide**: §0–§4 are the founding framework + theory (2026-07-03, still current). §5–§8 (2026-07-14) add the iteration since: the cost-to-solve reframe, the domain-agnostic cognitive core, the verifier-as-declarable-predicate, and this iteration's results.
 
 > **Red line**: throughout this report, "success / solved" means **design-correct under the folding oracle only** (the designed sequence's MFE structure == the target dot-bracket). It does **not** imply any in-vivo function or expression.
 
@@ -166,22 +168,105 @@ flowchart TD
 
 ---
 
+# 5 · Update 2026-07-14 — from wall-timeouts to cost-to-solve
+
+Two methodology corrections that supersede §2's failure framing:
+
+1. **Do not cap time and mislabel it.** §2 read 90–98 % of failures as "1500 s timeouts." That wall was an *imposed budget*, not a property of the problem. Correction (now a first principle): give the solver **open time and RECORD the cost**. A run is described by its **cost-to-solution**, never by the cap it was cut off at.
+2. **One currency for every kind of solver.** Economics is controlled by consumption, not by a stopwatch: **classical solver = CPU-seconds** (`cores × wall × rate`), **LLM = tokens** (`in·p_in + out·p_out`). Both map to USD on one axis, so heterogeneous tools become comparable and routable. Component: [`cognitive/cost.py`](../rna_harness/cognitive/cost.py) (`solver_cost_usd`, `llm_cost_usd`; rates env-overridable, only the relative scale matters).
+
+This reframes the mission's residual bottleneck: not "how do we beat a 1500 s wall" but **"what is the cheapest path to a verified solution, and does experience make that path cheaper."**
+
+---
+
+# 6 · The cost-aware cognitive core (domain-agnostic orchestration)
+
+The scarce capability is **not a better solver** — DesiRNA already reaches Eterna100-V2 **97/100** at 24 h/puzzle. It is the **meta-process** a human expert brings: read a problem, gauge its difficulty/boundary, pick the cheapest tool+budget likely to work, invoke, verify, escalate on failure — solving **any** problem at the **lowest cost**. Domain knowledge lives entirely in the TOOLS; the core is domain-agnostic ML engineering — a learned routing **procedure** (A_θ), not memorized answers (K_θ).
+
+```
+features (mechanical, zero biology)  →  router (cost-min, learned)  →  tool.attempt
+     →  verify (correct oracle)  →  escalate on failure, accumulating COST
+```
+
+| Component | File | Role |
+|---|---|---|
+| Features | `cognitive/features.py` | 15 mechanical structural features (len, pairs, pseudoknot, junctions, stems, lonely pairs, nesting…); **zero biology**, pseudoknot-robust |
+| Tools | `cognitive/tools.py` | Uniform `Tool.attempt → ToolResult` carrying **cost + oracle-verified `solved`**. Toolbox = 3× our REMC (`anneal.py`, cheap) + 2× **DesiRNA** (SOTA subprocess). **DesiRNA is a tool, not the core** |
+| Router | `cognitive/router.py` | Cold-start = ascending nominal cost; **learned** = k-NN over standardized features → order by `eff = cost / P(solve)`. Only **reorders** the toolbox, never drops → **solves invariant, cost varies** |
+| Core | `cognitive/core.py` | analyse → route → invoke → verify → escalate; records every outcome so the router learns. `FixedPolicy` = the baselines it must beat |
+| Evaluate | `cognitive/evaluate.py` | cost-at-quality: cognitive vs `always_cheap` vs `always_sota` |
+
+**DesiRNA is called, not reimplemented**: a subprocess to the real `/data/wenhui/DesiRNA/DesiRNA.py` (`-p 2004` param-aligned), its output re-verified by our oracle. (`anneal.py`'s replica-exchange MC is **our own** reimplementation — a distinct cheap tool, not DesiRNA.)
+
+**Falsifiable bar**: beat fixed policies on cost-at-quality **and** show learning trims wasted cheap attempts on hard puzzles. If it degenerates to "always SOTA at max budget" it is a **wrapper, not a core**.
+
+---
+
+# 7 · The verifier: a declarable decidable predicate (three axes)
+
+`solved` is only as trustworthy as the verifier, so it is a first-class, **solver-independent** stage ([`cognitive/tools.py::verify`](../rna_harness/cognitive/tools.py)). There is **no absolute physical oracle** here; the **formal** truth value is the value of a **decidable predicate** obtained by **evaluation** — fold once, compare — exactly as a SAT assignment's truth is `φ(x)` evaluated. *The model IS the specification*, so within it the truth is absolute, reproducible, and **cheap to check yet expensive to find** (the verify ≠ solve asymmetry the whole core exploits). Two invariants: **proposer ≠ judge** (every candidate — including DesiRNA's own "solved" — is re-folded) and **`solved` never means physical/biological truth** (the red line).
+
+Open-boundary solving = navigating **three axes**, all seated in `verify` (not merely "harder search"):
+
+| Axis | Choice | Mechanism | Concrete example |
+|---|---|---|---|
+| **1 · which oracle** | nested → ViennaRNA MFE ; pseudoknot → pKiss | `has_pseudoknot(target)` routing | MFE on a pseudoknot is a *category error* — it cannot emit `[`, so `fold==T_pk` is never True; the 29 % false-positive source |
+| **2 · how strict** | `match` / `umfe` / `pfe` (declarable, env-tunable) | new `strictness` param | `GGGGGGAAUUUCUC` on `(((((....)))))`: `match`=True but P(T)=0.19 → `pfe`=False (a fragile 1-of-many) |
+| **3 · no oracle** | abstain | `oracle="none"` | a *functional* spec ("binds theophylline") has no computable predicate → refuse to claim solved |
+
+This iteration made **axis 2 a declared contract** — `verify(seq, target, strictness=…)` — rather than a constant hidden in code (`match` stays the default, so all prior results are unchanged). Routing the **verifier** itself (oracle + strictness), not just solvers, is the next build; Track B forces it.
+
+---
+
+# 8 · Results this iteration
+
+**Search line (honest record):**
+- **Structural retrieval / warm-start (AlphaFold-1 analogy): NULL.** Per-instance-optimal retrieved units compose *worse* than composition-robust generic GC-stiff priors (the uniformity trap). Fair aggregate over n = 28.
+- **Single-trajectory guided search: FAILED** (lost to multi-restart hillclimb). Pivoted away from bespoke from-scratch search.
+- **Replica-exchange MC (`anneal.py`): the bounded workhorse** — one unified fold-call + wall budget, escapes local minima; now our cheap tier.
+
+**DesiRNA orchestration (cost-recorded, no mislabeled cap):** base agent 58 → **81–83** → **86**; public SOTA 97 (24 h). The earlier "6 walls" was a **budget artifact** (1–3 min DesiRNA = its fast regime); at longer budget most of the residual falls — **true walls ≈ 3**.
+
+**Cost-at-quality (`cogeval`, 18-puzzle mix; cost in USD):**
+
+| Policy | solved | total $ | $/solve |
+|---|---|---|---|
+| **cognitive** | **18/18** | **0.269** | 0.015 |
+| always_cheap (REMC only) | 11/18 | 0.212 | 0.019 |
+| always_sota (DesiRNA only) | 17/18 | 0.464 | 0.027 |
+
+The cognitive core **strictly dominates** always-SOTA — **+1 solve and 1.72× cheaper** — by solving the easy majority on the cheap tier and paying for DesiRNA only when forced (11 easy puzzles never touch DesiRNA). This clears the *low* bar (cheap-first cascade beats always-SOTA on an easy-heavy mix).
+
+**Learning vs no-learning (the *meaningful* bar — running):** a controlled fixed-table simulation. Build a (puzzle × tool) → (solved, cost) table **once**, then simulate `cold` cascade vs `learn`ed-router ordering on the **same** table, so the only variable is tool order (no tool-stochasticity / CPU-contention confound). Because the router only reorders (never drops a tool), **solves are identical by construction** — learning can change only cost. Claim: learning cuts total cost by routing predicted-hard puzzles **past the doomed cheap tier**, with the saving concentrated on hard puzzles. `experiments/learning_vs_cold.py`; **results pending table completion** (to be appended).
+
+**Known limitation (recorded honestly):** REMC's wall bound is *soft* (checked once per epoch → a long epoch can overshoot, e.g. remc@120 → ~590 s). Cost accounting stays honest (it records the *real* wall), and the learning-vs-cold **delta** is robust to it because both arms share one table.
+
+---
+
 # Next steps
 
-1. **Distill experience (offline)**: run `distill_strategies` over all solved tasks from the three runs → refresh `memory_library`.
-2. **Attack the hard-core 33**: strengthen search + add a decomposition strategy, **strictly separating "the tool got stronger" from "the LLM's orchestration got stronger."**
-3. **Close the self-evolution loop**: ① memory-on, multi-epoch (measure A_memory + lift); ② weight-level RL / GRPO.
-4. **Transfer**: GLM-5.2 no-memory baseline → with DeepSeek-distilled memory; measure the transfer gain.
+1. **Finish learning-vs-no-learning** — the core-vs-wrapper judge: report the $ saved and confirm it concentrates on hard puzzles.
+2. **Track B — open domain under a switched oracle**: run the same core on RNAInvBench pseudoknots (pKiss verifier); test whether it recognises out-of-model, switches oracle, and stays economical under the expensive verifier.
+3. **Verifier as a routed first-class object**: let the core select oracle + strictness (axes 1–2), not only solvers.
+4. **(Stage-1 line continues)**: distill experience over solved tasks → refresh `memory_library`; attack the hard-core residual under the **fixed-tool-budget attribution guard** ("LLM orchestration got stronger", not "the tool got bigger"); close the memory/RL loop (A_memory, multi-epoch, GRPO); measure cross-model memory transfer.
 
 # Appendix · Reproduce
 
 ```bash
+# --- Stage-1 meta-learning agent (baselines) ---
 python -m rna_harness.experiments.agent_runner \
   --model z-ai/glm-5.2 --n-tasks 100 --max-len 400 --timeout-s 1500 --workers 3 \
   --out rna_harness/runs/<name>
 # env: CLAUDE_CODE_USE_OPENAI=1 · OPENAI_BASE_URL=…/openrouter/api/v1 · OPENAI_API_KEY=<key> · RNA_MAX_CORES=160
 # view: http://<host>:8811/report/<name>
+
+# --- Cognitive core (cost-aware routing) ---
+export DESIRNA_CMD="/home/ubuntu/miniconda3/envs/rna/bin/python /data/wenhui/DesiRNA/DesiRNA.py"
+python -m rna_harness.cognitive.evaluate --ids 8 1 45 59 66 57 72 \
+  --policies cognitive always_cheap always_sota      # cost-at-quality
+python -m rna_harness.experiments.learning_vs_cold --build   # build the fixed outcome table (once)
+python -m rna_harness.experiments.learning_vs_cold --sim     # simulate cold vs learn on it
 ```
 
-**Key paths**: `agent_runner.py` (driver) · `verifier.py` (judge) · `mcp/` (tools) · `meta/` (memory) · `dashboard/` (visualization) · `memory_library/` (learned knowledge).
+**Key paths**: `agent_runner.py` (Stage-1 driver) · `verifier.py` / `cognitive/tools.py::verify` (judge) · `cognitive/` (cost-aware core) · `experiments/anneal.py` (our REMC) · `generators/desirna.py` (DesiRNA adapter) · `mcp/` · `meta/` · `dashboard/` · `memory_library/`.
 **References**: Chen, W. *Actuation Fidelity* (InceptLabs, 2026); Chen, W. & Li, Z. *The Oracle Residue Thesis* (InceptLabs, 2026).
