@@ -91,9 +91,13 @@ def main():
         mfe_solved += int(mfe_says_solved)
         pk_solved += int(pk_says_solved)
         false_pos += int(mfe_says_solved and not pk_says_solved)
-        rows.append({"task_id": t.task_id, "n": t.n, "n_pk_pairs": d["n_pk_pairs"],
+        rows.append({"task_id": t.task_id, "n": t.n, "n_pk_pairs": d["n_pk_pairs"], "target": t.target,
                      "mfe_reported_solved": mfe_says_solved, "mfe_bp_vs_reduction": d["mfe_bp"],
-                     "pk_verified_solved": pk_says_solved, "pk_best_bp": best_pk_bp})
+                     "pk_verified_solved": pk_says_solved, "pk_best_bp": best_pk_bp,
+                     # R3.1 oracle-validity: persist the actual sequences so the verdict can be
+                     # re-checked under INDEPENDENT pseudoknot oracles (ProbKnot/ShapeKnots), not just pKiss.
+                     "mfe_best_seq": d["mfe_best_seq"], "best_pk_seq": best_pk_seq,
+                     "candidates": [c for c in ([d["mfe_best_seq"]] + list(d["candidates"])) if c][: a.pk_check_cands]})
         print(f"  {t.task_id:>14} n={t.n:>3} pk_pairs={d['n_pk_pairs']:>2} | "
               f"MFE-oracle says solved={mfe_says_solved} | pKiss REAL bp={best_pk_bp} solved={pk_says_solved}"
               f"{'  <-- FALSE POSITIVE' if (mfe_says_solved and not pk_says_solved) else ''}", flush=True)
