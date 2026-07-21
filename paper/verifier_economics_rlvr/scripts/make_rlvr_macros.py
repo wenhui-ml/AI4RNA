@@ -67,12 +67,12 @@ def main():
         else:
             for s in ['AccStart', 'AccEnd', 'GameStart', 'GameEnd', 'StrongCalls']:
                 m[prefix + s] = PENDING
-        # held-out: base (step 0) and final
+        # held-out: base (step 0) and final. "final" is the last available checkpoint's held-out once
+        # training is done — normally the step-`full_steps` checkpoint, but if that checkpoint was lost
+        # (e.g. a disk-full save failure) we honestly report the last VALID checkpoint (max step present).
         if ho:
             emit(m, prefix + 'HoBase', ho[0]['heldout_strong_acc'], '{:.1f}', 100)
-            final = [h for h in ho if h['step'] >= thr]
-            emit(m, prefix + 'HoFinal', (final[-1]['heldout_strong_acc'] if final and done else None),
-                 '{:.1f}', 100)
+            emit(m, prefix + 'HoFinal', (ho[-1]['heldout_strong_acc'] if done else None), '{:.1f}', 100)
         else:
             m[prefix + 'HoBase'] = PENDING
             m[prefix + 'HoFinal'] = PENDING

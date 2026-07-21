@@ -21,10 +21,13 @@ from arms import strong_verify  # noqa: E402
 SYSTEM = (BASE / 'configs' / 'system_prompt.txt').read_text().strip()
 
 
-def eval_model(model_path: str, evalset, util: float, max_tokens: int):
+def eval_model(model_path: str, evalset, util: float, max_tokens: int, tokenizer_path: str = None):
     from vllm import LLM, SamplingParams
+    # RL training does not change the vocabulary, and swift's save_only_model checkpoints omit tokenizer
+    # files, so load the tokenizer from a path that has them (the base model) to avoid a load failure.
+    kw = {'tokenizer': tokenizer_path} if tokenizer_path else {}
     llm = LLM(model=model_path, gpu_memory_utilization=util, max_model_len=4096,
-              dtype='bfloat16', enforce_eager=False)
+              dtype='bfloat16', enforce_eager=False, **kw)
     tok = llm.get_tokenizer()
     prompts = [tok.apply_chat_template(
         [{'role': 'system', 'content': SYSTEM}, {'role': 'user', 'content': r['problem']}],
@@ -71,7 +74,9 @@ def main():
     print(f'{len(todo)} checkpoints to eval on {len(evalset)} held-out problems')
 
     for step, path in todo:
-        acc = eval_model(path, evalset, args.util, args.max_tokens)
+        # for a checkpoint (not the base itself), borrow the base model's tokenizer files
+        tok = args.base if (args.base and path != args.base) else None
+        acc = eval_model(path, evalset, args.util, args.max_tokens, tokenizer_path=tok)
         rec = {'step': step, 'ckpt': path, 'heldout_strong_acc': round(acc, 4), 'n': len(evalset)}
         with open(out_path, 'a') as f:
             f.write(json.dumps(rec) + '\n')

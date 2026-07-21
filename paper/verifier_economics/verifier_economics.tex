@@ -1110,6 +1110,7 @@ Qwen. (b)~Goodhart under best-of-$12$ on held-out gold: the strong arm's advanta
 
 \begin{table}[t]\centering\small
 \setlength{\tabcolsep}{4pt}
+\resizebox{\linewidth}{!}{%
 \begin{tabular}{lccc}
 \toprule
 model (proposer) & joint (num/den, CI) & conditional (num/den, CI) & gold best-of-12 (cheap$\to$strong)\\
@@ -1117,7 +1118,7 @@ model (proposer) & joint (num/den, CI) & conditional (num/den, CI) & gold best-o
 \texttt{llama-3.1-8b} (weak)  & $\mathbf{21.7\%}$\ \ ($424/1956$)\ \ $[17.1,26.6]$ & $\mathbf{28.4\%}$\ \ ($424/1493$)\ \ $[22.8,34.4]$ & $82.8\to82.8$\ \ ($+0.0$)\\
 Qwen3.6-27B (strong)          & $2.2\%$\ \ ($44/1956$)\ \ $[0.9,4.1]$   & $2.4\%$\ \ ($44/1872$)\ \ $[0.8,4.2]$   & $97.5\to98.2$\ \ ($+0.6$)\\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \caption{LLM code verifier over-acceptance on \textsc{HumanEval+} ($163$ problems, $12$ samples/problem, two
 open-weights proposers), scored on \emph{held-out gold} tests with no exact test-case reuse under a
 \emph{fixed} seed-$0$ split (plus tests split into a tuning half for the strong arm's selection and a gold

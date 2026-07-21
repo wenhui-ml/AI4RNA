@@ -272,7 +272,7 @@ accuracy rather than diverging.
 \caption{7B GRPO, verifier as sole variable. On-policy = training-distribution strong-verified accuracy
 (first$\to$last $100$ steps); held-out = strict accuracy on $500$ MATH problems (base$\to$final); calls =
 cumulative strong-verifier invocations. Top: standard $800$-step budget. Bottom: long-horizon probe ($2000$
-steps, higher lr). Numbers auto-generated from run logs; {\color{red}[PENDING]} entries fill as runs finish.}
+steps, higher lr). Numbers auto-generated from run logs.}
 \label{tab:rlvr}
 \begin{tabular}{lccccc}
 \toprule
@@ -297,9 +297,11 @@ probability $p$ (a deterministic content hash, reproducible across workers). $p{
 $p{=}1$ is \textsc{cascade}; interior $p$ trades verifier cost against soundness continuously. We sweep
 $p\in\{0.25,0.5,0.75\}$ on the 7B policy (Fig.~\ref{fig:frontier}), which with the $p{=}0$/$p{=}1$ endpoints
 traces the cost$\times$robustness frontier. Held-out and strong-calls at the interior points:
-$p{=}0.25$ \pending{dialTwentyFiveHoFinal\%, \dialTwentyFiveStrongCalls\ calls},
-$p{=}0.5$ \pending{dialFiftyHoFinal\%, \dialFiftyStrongCalls\ calls},
-$p{=}0.75$ \pending{dialSeventyFiveHoFinal\%, \dialSeventyFiveStrongCalls\ calls}.
+$p{=}0.25$ (\dialTwentyFiveHoFinal\%, \dialTwentyFiveStrongCalls{} calls),
+$p{=}0.5$ (\dialFiftyHoFinal\%, \dialFiftyStrongCalls{} calls),
+$p{=}0.75$ (\dialSeventyFiveHoFinal\%, \dialSeventyFiveStrongCalls{} calls)---held-out stays within noise
+while verifier cost rises monotonically, i.e.\ at this budget the dial is a clean \emph{cost} control at
+fixed quality (quality separation requires the longer horizon of Table~\ref{tab:rlvr}).
 
 \paragraph{Saving decays with capability; cross-family.} The cascade's saving is $1-(\text{cheap-accept
 rate})$, which rises as the policy learns to produce genuinely correct answers: empirically it falls from
@@ -307,19 +309,21 @@ rate})$, which rises as the policy learns to produce genuinely correct answers: 
 early training, where verifier cost dominates the budget---the more routing saves.} On the weaker
 Llama-3.1-8B (base held-out $\sim$\llamaStrongHoBase\%), the same pattern holds: \textsc{strong}/\textsc{cascade}
 gain on-policy true accuracy (\llamaStrongAccStart\%$\to$\llamaStrongAccEnd\% /
-\llamaCascadeAccStart\%$\to$\llamaCascadeAccEnd\%) with the cascade saving \textbf{\llamaSavings\%} strong-calls;
-held-out finals \pending{llamaStrong/Cascade/Cheap HoFinal}. We report the monotone dependence rather than a
+\llamaCascadeAccStart\%$\to$\llamaCascadeAccEnd\%) with the cascade saving \textbf{\llamaSavings\%} strong-calls,
+and---because the weak base leaves large headroom---held-out rises for all arms (final
+cheap \llamaCheapHoFinal\%, strong \llamaStrongHoFinal\%, cascade \llamaCascadeHoFinal\%): the cost result
+transfers across families, while the cheap-vs-strong quality gap is smaller here than on Qwen (an honest
+model-dependence we do not overstate). We report the monotone dependence rather than a
 single headline multiplier and make no order-of-magnitude claim---in numeric math the sound saving is a small
 constant, consistent with the RNA cost finding and against the steeper SAT case.
 
 \begin{figure}[t]\centering
-% frontier figure to be produced by make_figs once the dial sweep completes
-\fbox{\parbox{0.9\linewidth}{\centering\vspace{2em}\small\itshape
-\pending{dial cost$\times$robustness frontier figure --- held-out accuracy vs.\ cumulative
-strong-verifier calls, 5 points $p\in\{0,0.25,0.5,0.75,1\}$; drawn by make\_figs.py when the sweep finishes}
-\vspace{2em}}}
-\caption{The verifier as a continuous dial: held-out quality vs.\ verifier cost between the cheap ($p{=}0$)
-and strong-equivalent cascade ($p{=}1$) endpoints.}\label{fig:frontier}
+\includegraphics[width=0.92\linewidth]{f1_frontier.pdf}
+\caption{The verifier as a continuous dial (7B, $800$ steps): held-out strict accuracy vs.\ cumulative
+strong-verifier calls, for $p\in\{0,0.25,0.5,0.75,1\}$ from cheap ($p{=}0$, zero strong-calls) to the
+strong-equivalent cascade ($p{=}1$). Cost rises monotonically with $p$ while held-out stays within noise at
+this budget---the dial is a clean \emph{cost} control at fixed quality; the quality separation appears at the
+longer horizon of Table~\ref{tab:rlvr}.}\label{fig:frontier}
 \end{figure}
 
 \paragraph{Honest scope.} That the cascade matches strong's \emph{decisions} is guaranteed by construction
@@ -376,8 +380,8 @@ result is RL-free, so it is attributable to the verifier, and a learned-policy r
 direction; the cost claim is a ratio under a declared model, whose RNA-vs-SAT contrast is exactly the reported
 $4\times$ vs.\ $400\times$. \textbf{Limitations.} Held-out quality separation is modest ($+2$--$3$ points,
 near the $n{=}500$ floor) and emerges only at longer horizons; the sound saving in numeric math is a small
-constant, not an order of magnitude; and cross-family (Llama-3.1-8B) and second-seed dial runs
-\pending{completing} tighten the error bars and complete the frontier of Fig.~\ref{fig:frontier}. All verdicts
+constant, not an order of magnitude; and the cheap-vs-strong quality gap is model-dependent (clean on Qwen at
+long horizon, smaller on the weaker Llama). All verdicts
 are relative to a declared computational model---exactly the regime in which every practical verifier already
 operates. The practical takeaway is direct: do not choose a single verifier strength; \emph{route, and price
 the routing.}
