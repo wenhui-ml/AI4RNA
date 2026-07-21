@@ -44,9 +44,14 @@ This is COST-repair, not degrade-repair (degrade-repair via a stronger verifier 
 - Verifier fuzzing to surface over-acceptance (buggy vs strict, FPR 0.83/0.87/0.56) → **Ray 2026,
   arXiv:2606.01066** (diagnostic, NOT end-to-end trained RLVR — it lists that as a limitation).
 - Generation-verification gap + weak-verifier ensembling for SELECTION → **Weaver, arXiv:2506.18203**.
-- RLVR phase transition governed by **Youden's J = TPR−FPR** ("rate, not fate": while J>0, over-acceptance
-  rescales convergence TIME, not final quality; degradation only once J≤0) → **"Rate or Fate?"
-  arXiv:2601.04411**. USE this as principled grounding for the dial (stay J>0 at min cost).
+- RLVR phase transition governed by **Youden's J = TPR−FPR** ("rate, not fate": while J>0 noise
+  rescales convergence TIME, not final quality; degradation only once J≤0). USE as principled grounding
+  for the dial (stay J>0 at min cost). **CORRECT CITATION (verified online 2026-07-21 — an EARLIER
+  version of this doc listed a WRONG/Anonymous title, which propagated a fabricated bib entry; now
+  fixed):** Rad, Filom, Keivan, Mohajerin Esfahani, Kamalinejad. "Rate or Fate? RLV$^\epsilon$R:
+  Reinforcement Learning with Verifiable Noisy Rewards." arXiv:2601.04411 (2026). NB the paper is about
+  general verifier NOISE (FP+FN); over-acceptance is the false-positive (FPR) direction — cite it that
+  way, do not imply the paper is specifically about over-acceptance.
 - RLVR reliability/measurement position paper → **arXiv:2509.21882** (Leskovec/Choi/Saberi/Yao).
 
 **OPEN / UNCONTESTED (ours):** the verified Helff finding literally states their repair "is NOT a

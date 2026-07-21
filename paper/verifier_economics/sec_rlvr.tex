@@ -38,9 +38,13 @@ Youden's $J=\mathrm{TPR}-\mathrm{FPR}$ of the arm's accept decision against the 
 and cumulative strong-verifier calls. Held-out quality is the strong-verified accuracy of saved checkpoints
 under greedy decoding.
 
-\paragraph{Grounding the dial.} We take as given the phase-transition result of \citet{rateorfate2026}: under
-verifier over-acceptance, while $J>0$ over-acceptance rescales \emph{convergence time}, not the final
-quality, and degradation sets in only once $J\le0$. This reframes the design target precisely---\emph{stay at
+\paragraph{Grounding the dial.} We take as given the phase-transition result of \citet{rateorfate2026}, who
+show---via a replicator/bandit analysis of GRPO under a \emph{noisy} verifier---that the dynamics are governed
+by Youden's index $J=\mathrm{TPR}-\mathrm{FPR}$: a sharp transition at $J{=}0$, with $J>0$ merely rescaling
+\emph{convergence time} (``rate, not fate'') and $J<0$ amplifying incorrect reasoning modes to collapse.
+Over-acceptance is the \emph{false-positive} direction of that verifier noise (it raises the FPR and thus
+lowers $J$), so while $J>0$ it rescales convergence time rather than the final quality, with degradation only
+once $J\le0$. This reframes the design target precisely---\emph{stay at
 $J>0$ at the least verifier cost}---and predicts, rather than assumes, that a strictly-sound cheap cascade
 should match the strong verifier's quality while a genuinely over-accepting cheap reward should converge
 \emph{slower} (and, if pushed past $J\le0$, collapse). Our contribution is not that phase transition; it is

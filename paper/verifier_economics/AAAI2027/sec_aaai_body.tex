@@ -54,9 +54,11 @@ classical in software testing \citep{barr2015oracle}. These establish the \emph{
 in real RLVR training is known (an invariance/isomorphic verifier removes shortcuts \citep{gamingverifiers});
 that repair is \emph{degrade-then-strengthen}---not cost-priced, not continuously dial-able, not a routing
 cascade. Ours is orthogonal: \emph{buy the strong verifier's verdict cheaply by routing}, and quantify the
-price. The \textbf{RLVR phase transition} governed by Youden's $\J=\mathrm{TPR}-\mathrm{FPR}$---while $\J>0$
-over-acceptance rescales convergence \emph{time}, not final quality; degradation sets in only at
-$\J\le0$~\citep{rateorfate2026}---gives our dial its principled target: stay at $\J>0$ at least cost.
+price. \citet{rateorfate2026} show that RLVR dynamics under a \emph{noisy} verifier are governed by Youden's
+$\J=\mathrm{TPR}-\mathrm{FPR}$: a sharp transition at $\J{=}0$, with $\J>0$ merely rescaling convergence
+\emph{time} (``rate, not fate'') and $\J<0$ amplifying incorrect modes to collapse. Over-acceptance is the
+false-positive direction of that noise (it raises the FPR, lowering $\J$), so this \textbf{phase transition}
+gives our dial its principled target: keep $\J>0$ at least verifier cost.
 
 \textbf{Cascades, abstention, and cost-aware inference.} Routing queries through a cheap-to-expensive ladder
 is standard for \emph{inference} cost \citep{chen2024frugalgpt}, as are abstention/selective prediction
