@@ -101,6 +101,25 @@ cascade & \mSevenBCascadeAccStart\%$\to$\mSevenBCascadeAccEnd\% & \mSevenBCascad
 \end{tabular}
 \end{table}
 
+\paragraph{The dial: a continuous frontier.} Between \textsc{cheap} (escalate none) and \textsc{cascade}
+(escalate all cheap-accepts) sits a risk-calibrated \emph{dial}: escalate a cheap-accept to strong with
+probability $p$ decided by a deterministic content hash (reproducible across data-parallel workers).
+$p{=}0$ recovers cheap and $p{=}1$ recovers cascade exactly; interior $p$ trades verifier cost against
+soundness continuously. Sweeping $p\in\{0.25,0.5,0.75\}$ on the 7B policy, together with the $p{=}0$/$p{=}1$
+endpoints, traces the cost$\times$robustness frontier (Figure~\ref{fig:rlvr}): cumulative strong-verifier
+calls rise monotonically with $p$ ($0\to\dialTwentyFiveStrongCalls\to\dialFiftyStrongCalls\to
+\dialSeventyFiveStrongCalls\to\mSevenBCascadeStrongCalls$) while held-out accuracy stays within noise at this
+$800$-step budget---so at this budget the dial is a clean \emph{cost} control at fixed quality, and the
+quality separation appears only at the longer horizon (the $2000$-step probe above).
+
+\begin{figure}[t]\centering
+\includegraphics[width=0.72\linewidth]{figs/f_dial_frontier.pdf}
+\caption{\textbf{The verifier as a continuous dial} (7B, $800$ steps): held-out strict accuracy vs.\
+cumulative strong-verifier calls, for $p\in\{0,0.25,0.5,0.75,1\}$ from cheap ($p{=}0$, zero strong-calls) to
+the strong-equivalent cascade ($p{=}1$). Cost rises monotonically with $p$ while held-out stays within noise
+at this budget; the quality separation appears at the longer horizon (Table~\ref{tab:rlvr7b}).}\label{fig:rlvr}
+\end{figure}
+
 \paragraph{Cost saving shrinks as the policy strengthens.} The cascade's saving is
 $1-(\text{cheap-accept rate})$, and the cheap-accept rate rises as the policy learns to produce genuinely
 right answers. Empirically the saving falls from $\sim\!40\%$ ($3$B) to \mSevenBSavings\% ($7$B): \emph{the
@@ -114,5 +133,7 @@ construction ($\epsilon{=}0$); it is not an empirical discovery and we do not pr
 contributions are three: (i) the \emph{magnitude and dynamics} of the cost saving in-loop, including its decay
 with policy strength; (ii) that the cheap arm fails to convert inflated reward into true quality while gaming
 rises, consistent with $J>0$ slow-convergence rather than immediate collapse \citep{rateorfate2026}; and
-(iii) the curriculum-erasure mechanism. Cross-family (Llama-3.1-8B) and second-seed runs are in progress and
-will populate the error bars in Table~\ref{tab:rlvr7b} and Figure~\ref{fig:rlvr} before submission.
+(iii) the curriculum-erasure mechanism. The cross-family Llama-3.1-8B runs reproduce the pattern (the cascade
+saving is \llamaSavings\% there), and the dial of Figure~\ref{fig:rlvr} makes the cost--quality trade
+continuous; a second seed of the long-horizon strong arm reproduces its held-out gain
+(\longStrongBHoBase\%$\to$\longStrongBHoFinal\%).
