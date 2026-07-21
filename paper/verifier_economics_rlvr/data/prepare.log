@@ -1,0 +1,24 @@
+Using the latest cached version of the dataset since AI-MO/NuminaMath-CoT couldn't be found on the Hugging Face Hub (offline mode is enabled).
+Found the latest cached dataset configuration 'default' at /home/ubuntu/.cache/huggingface/datasets/AI-MO___numina_math-co_t/default/0.0.0/9d8d210c9f6a36c8f3cd84045668c9b7800ef517 (last modified on Wed May 27 12:28:29 2026).
+Map (num_proc=32):   0%|          | 0/859494 [00:00<?, ? examples/s]Map (num_proc=32):   0%|          | 1673/859494 [00:00<00:51, 16583.76 examples/s]Map (num_proc=32):   7%|▋         | 58627/859494 [00:00<00:02, 335219.26 examples/s]Map (num_proc=32):  11%|█         | 95815/859494 [00:00<00:02, 349695.23 examples/s]Map (num_proc=32):  16%|█▌        | 135815/859494 [00:00<00:01, 366819.39 examples/s]Map (num_proc=32):  22%|██▏       | 191000/859494 [00:00<00:01, 430378.01 examples/s]Map (num_proc=32):  30%|██▉       | 257000/859494 [00:00<00:01, 504933.65 examples/s]Map (num_proc=32):  37%|███▋      | 320000/859494 [00:00<00:00, 544236.17 examples/s]Map (num_proc=32):  45%|████▍     | 384702/859494 [00:00<00:00, 575592.31 examples/s]Map (num_proc=32):  51%|█████▏    | 442487/859494 [00:00<00:00, 574236.43 examples/s]Map (num_proc=32):  58%|█████▊    | 500122/859494 [00:01<00:00, 574799.76 examples/s]Map (num_proc=32):  65%|██████▌   | 560836/859494 [00:01<00:00, 584494.74 examples/s]Map (num_proc=32):  72%|███████▏  | 619718/859494 [00:01<00:00, 526484.58 examples/s]Map (num_proc=32):  78%|███████▊  | 673718/859494 [00:01<00:00, 520513.19 examples/s]Map (num_proc=32):  85%|████████▍ | 728718/859494 [00:01<00:00, 528508.76 examples/s]Map (num_proc=32):  92%|█████████▏| 786691/859494 [00:01<00:00, 542664.24 examples/s]Map (num_proc=32):  98%|█████████▊| 842112/859494 [00:01<00:00, 440853.59 examples/s]Map (num_proc=32): 100%|██████████| 859494/859494 [00:01<00:00, 443921.23 examples/s]
+Filter (num_proc=32):   0%|          | 0/859494 [00:00<?, ? examples/s]Filter (num_proc=32):   3%|▎         | 30000/859494 [00:00<00:02, 294964.31 examples/s]Filter (num_proc=32):  14%|█▍        | 119000/859494 [00:00<00:01, 640714.84 examples/s]Filter (num_proc=32):  32%|███▏      | 277000/859494 [00:00<00:00, 1066324.41 examples/s]Filter (num_proc=32):  55%|█████▍    | 469860/859494 [00:00<00:00, 1392005.36 examples/s]Filter (num_proc=32):  77%|███████▋  | 662860/859494 [00:00<00:00, 1579473.61 examples/s]Filter (num_proc=32):  96%|█████████▌| 821904/859494 [00:00<00:00, 1574184.88 examples/s]Filter (num_proc=32): 100%|██████████| 859494/859494 [00:00<00:00, 1222238.12 examples/s]
+usable rows with numeric gold: 388152
+source==math rows: 5942, other: 382210
+{
+  "seed": 0,
+  "train_n": 50000,
+  "eval_n": 500,
+  "smoke_n": 256,
+  "max_problem_chars": 1500,
+  "train_sources": {
+    "olympiads": 5300,
+    "synthetic_math": 15879,
+    "orca_math": 17278,
+    "cn_k12": 9020,
+    "aops_forum": 1042,
+    "gsm8k": 671,
+    "synthetic_amc": 678,
+    "amc_aime": 132
+  },
+  "filter": "numeric-canonical boxed gold; no proof problems; math source held out entirely"
+}

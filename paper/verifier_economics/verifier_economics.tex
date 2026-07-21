@@ -6,17 +6,43 @@
 % ============================================================================================
 \documentclass[11pt]{article}
 \usepackage[margin=1in]{geometry}
-\usepackage{amsmath,amssymb,amsthm}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{textcomp}
+\usepackage{amsmath,amssymb,amsthm,amsfonts}
 \usepackage{booktabs}
 \usepackage{graphicx}
 \usepackage{xcolor}
 \usepackage{array}
+\usepackage{enumitem}
+\usepackage{multirow}
+\usepackage{placeins}
+\usepackage{tabularx}
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
 \usepackage[hidelinks]{hyperref}
-\usepackage{natbib}
+\usepackage[numbers,sort&compress]{natbib}
 \usepackage{authblk}
 \usepackage{caption}
 \captionsetup{font=small,labelfont=bf,skip=4pt}
 \emergencystretch=1.5em
+\graphicspath{{figs/}}
+
+% --- float placement tuning (CycleMorph-master convention): keep figures/tables near their
+%     sections and prevent an end-of-document float backlog ---
+\renewcommand{\topfraction}{0.92}
+\renewcommand{\bottomfraction}{0.85}
+\renewcommand{\textfraction}{0.06}
+\renewcommand{\floatpagefraction}{0.72}
+\setcounter{topnumber}{4}
+\setcounter{bottomnumber}{3}
+\setcounter{totalnumber}{6}
+
+% --- boxed placeholder for data from runs still in flight (CycleMorph-master \pending style).
+%     Auto-generated numeric macros still render inline; use \pending{...} for prose-level gaps. ---
+\newcommand{\pending}[1]{%
+  \begin{center}\fbox{\parbox{0.92\linewidth}{\small\itshape
+  [\textbf{Pending}: run in flight; to be filled from
+  \texttt{verifier\_economics\_rlvr/runs/*} via \texttt{make\_rlvr\_macros.py}]: #1}}\end{center}}
 
 \newtheorem{theorem}{Theorem}
 \newtheorem{proposition}{Proposition}
@@ -24,10 +50,13 @@
 \newcommand{\umfe}{\ensuremath{\mathcal{A}_{\mathrm{uMFE}}}}
 \newcommand{\pfe}{\ensuremath{\mathcal{A}_{\mathrm{pfe}}}}
 \newcommand{\PT}{\ensuremath{P(T)}}
+\input{figs/rlvr_numbers.tex} % auto-generated RLVR measurements; [PENDING]=run not yet finished
 
 \title{\textbf{``Solved'' Is a Choice of Verifier, Not a Fact}\\[2pt]
 \large Deterministic Cost--Robustness Frontiers of Verifier Choice in RNA and SAT}
 \author[1]{Wenhui Chen\thanks{Corresponding author: \texttt{wenhui.chen@inceptlabs.ai}}}
+\author[1]{Qingqing Mao\thanks{\texttt{qmao@inceptlabs.ai}}}
+\author[1]{Chenghua Wang\thanks{\texttt{chenghua.wang@inceptlabs.ai}}}
 \affil[1]{InceptLabs-Shanghai}
 \date{}
 
@@ -193,6 +222,11 @@ is a false positive)---a quantified, \emph{workload-specific} incompressibility 
 \item A cross-domain validation on a real LLM code verifier (HumanEval+): Axis-2 over-acceptance and rung
 dial-ability transfer to code, while the Goodhart-under-selection effect is a \emph{null} once scored on
 held-out gold tests---we report it as such rather than claim a code-domain selection effect (\S\ref{sec:llm}).
+\item A demonstration that the priced, sound cascade operates \emph{inside} a real RLVR loop: GRPO on
+mathematical reasoning (Qwen2.5-3B/7B, Llama-3.1-8B) with the verifier as the sole variable, where the sound
+cheapest-first cascade attains the strong verifier's training quality at a measured fraction of its
+verifier-compute, the cheap reward fails to convert its inflated signal into true quality, and the routing
+saving decays monotonically as the policy strengthens (\S\ref{sec:rlvr}).
 \end{enumerate}
 \S\ref{sec:discussion} draws the implications for reward design; \S\ref{sec:related} positions the work.
 
@@ -230,6 +264,10 @@ conditional $2.4\%$ (strong) to $28.4\%$ (weak proposer) pass weak base tests ye
 dialing the rung stronger cuts it in both (\S\ref{sec:llm}) & confirmed (target domain, held-out gold, saved artifacts)\\
 Goodhart-under-selection in code is a null once selection leakage is removed &
 best-of-12 gold gap $+0.0$/$+0.6$; we do not claim a code-domain selection effect (\S\ref{sec:llm}) & corrected (honest null)\\
+The sound cascade delivers strong-verifier RLVR quality at a fraction of verifier compute (in-loop) &
+GRPO on math (Qwen2.5-3B/7B, Llama-3.1-8B), verifier as sole variable: cascade matches strong ($\epsilon{=}0$,
+$J{=}1$) at $\threeBSavings\%$/$\mSevenBSavings\%$ fewer strong-calls (3B/7B); cheap gains do not transfer
+(\S\ref{sec:rlvr}) & measured (3B done; 7B \mSevenBArmsComplete{}/3; Llama in progress)\\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -362,7 +400,7 @@ computational model, never a claim about in-vivo biology (\S\ref{sec:limits}).
 accept, we run a replica-exchange Monte-Carlo (REMC) search that optimizes \emph{only} the cheap proxy to
 $\mathrm{bp}=0$: eight replicas on a geometric temperature ladder with adjacent-replica swaps, a structural
 warm-start, and a defect-cluster ``endgame'' for last-mile repair, under a $30$\,s wall budget per target.
-SAT candidates come from a WalkSAT-style local search. We call it a \emph{cheap-proxy optimizer} advisedly:
+SAT candidates come from a WalkSAT-style local search \citep{selman1994walksat}. We call it a \emph{cheap-proxy optimizer} advisedly:
 it is a stand-in for an RL policy that has learned to satisfy the reward it is given, and we claim \emph{no}
 optimality for it (not global-, verification-cost-, nor Pareto-optimal)---``cheap-proxy'' names \emph{what} it
 optimizes (the cheap rung), not that it does so optimally. We draw $5$ independent
@@ -433,7 +471,7 @@ given production system falls into it is an empirical question about that system
 
 \paragraph{The targets are solvable---it is the oracle that is blind.} To confirm the $99.6\%$ measures
 oracle-blindness rather than target infeasibility, we solve the same $251$ pseudoknots with a
-\emph{pseudoknot-aware} designer (DesiRNA, which enforces the crossing-pair constraints) and verify with
+\emph{pseudoknot-aware} designer (DesiRNA \citep{wirecki2025desirna}, which enforces the crossing-pair constraints) and verify with
 pKiss: $180/251$ ($72\%$) are solved \emph{relative to the pKiss reference}. So the targets are far from
 impossible; the skeleton-only optimizer's near-total false-accept is entirely an artifact of scoring under an
 oracle that cannot see the objective. Notably, even these pseudoknot-aware designs, if scored by the
@@ -1304,6 +1342,8 @@ sound-cascade cost: on this reject-heavy workload every cheap-rung accept is a f
 ($10/10$, Clopper--Pearson upper bound $1.0$), so savings come only from
 cheap rejects, not cheap accepts. Empirical and workload-specific, not a general theorem.}\label{fig:routing}
 \end{figure}
+
+\input{sec_rlvr.tex}
 
 \section{Discussion, Related Work, and Conclusion}\label{sec:disc}
 

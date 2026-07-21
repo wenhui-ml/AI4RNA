@@ -1,0 +1,197 @@
+%File: verifier_economics_supp.tex -- AAAI-27 supplementary technical appendix (anonymous).
+% Standalone; carries the detailed material cut from the main paper for the page limit.
+% Content-synced with the venue-neutral master; RLVR numbers via ../figs/rlvr_numbers.tex.
+\documentclass[letterpaper]{article} % DO NOT CHANGE THIS
+\usepackage[submission]{aaai2027}
+\usepackage[hyphens]{url}
+\usepackage{graphicx}
+\urlstyle{rm}
+\def\UrlFont{\rm}
+\usepackage{natbib}
+\usepackage{caption}
+\frenchspacing
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{xcolor}
+\graphicspath{{figs/}{../figs/}}
+\pdfinfo{/TemplateVersion (2027.1)}
+\setcounter{secnumdepth}{1}
+\renewcommand{\thesection}{\Alph{section}}
+\newtheorem{proposition}{Proposition}
+\newtheorem{theorem}{Theorem}
+\input{../figs/rlvr_numbers.tex}
+\newcommand{\pending}[1]{{\color{red}\textbf{[PENDING]}}}
+\newcommand{\match}{\ensuremath{\mathcal{A}_{\mathrm{match}}}}
+\newcommand{\umfe}{\ensuremath{\mathcal{A}_{\mathrm{uMFE}}}}
+\newcommand{\pfe}{\ensuremath{\mathcal{A}_{\mathrm{pfe}}}}
+\newcommand{\PT}{\ensuremath{P(T)}}
+\newcommand{\J}{\ensuremath{J}}
+
+\title{Supplementary Material:\\
+``Solved'' Is a Choice of Verifier, Not a Fact}
+\author{Anonymous submission}
+\affiliations{Anonymous submission}
+
+\begin{document}
+\maketitle
+
+\noindent This appendix carries the material cut from the main paper for length: (A) the ladder's soundness
+proof and strictness-nesting theorem; (B) the RNA and SAT verifier definitions, oracle-validity analysis, and
+native positive control; (C) the controlled Goodhart (transfer-failure) study; (D) the end-to-end cost model;
+(E) the LLM code-verifier (HumanEval+) protocol; (F) the full RLVR configuration, difficulty filter, and
+per-family results; (G) the risk-calibrated dial and routing calibration; (H) reproduction. References to the
+main paper are prefixed ``main.''
+
+\section{Soundness and the Strictness Nesting}\label{supp:proof}
+\begin{theorem}[Strictness nesting]\label{thm:nest}
+For a target structure $T$ and the RNA rungs of \S\ref{supp:rnasat}, for any Boltzmann threshold
+$\theta>\tfrac12$ the accept-sets satisfy $\pfe\subseteq\umfe\subseteq\match$.
+\end{theorem}
+\begin{proof}[Proof sketch]
+If $\PT\ge\theta>\tfrac12$ then $T$ has strictly greater equilibrium probability than any other structure
+(their probabilities sum to $\le1-\theta<\theta$), so $T$ is the unique MFE structure: $\pfe\subseteq\umfe$.
+If $T$ is the unique MFE structure then in particular $\mathrm{MFE}(s)=T$: $\umfe\subseteq\match$. Both
+inclusions can be strict (a sequence can fold to $T$ as its MFE without $T$ dominating the ensemble). \end{proof}
+
+\begin{proposition}[Sound cascade, $\epsilon{=}0$]\label{prop:cascade}
+Let $\mathcal{A}_1\supseteq\cdots\supseteq\mathcal{A}_k$ be nested accept-sets ordered by increasing cost,
+$\mathcal{A}_k$ the gold rung. The cheapest-first cascade---evaluate in order, reject at the first rejecting
+rung, escalate to gold only if all cheaper rungs accept---returns $\mathbf{1}[x\in\mathcal{A}_k]$ on every
+$x$, and evaluates gold only on $x\in\mathcal{A}_{k-1}$.
+\end{proposition}
+\begin{proof}
+If some $j<k$ rejects $x$ then by nesting $\mathcal{A}_k\subseteq\mathcal{A}_j$, so $x\notin\mathcal{A}_k$ and
+the early reject equals the gold reject. Otherwise $x$ reaches and is decided by gold. The gold rung fires
+only when all cheaper rungs accept, i.e.\ $x\in\mathcal{A}_{k-1}$. \end{proof}
+On a stream with penultimate-rung accept-rate $\alpha$, expected cost over always-gold is
+$\alpha + (1-\alpha)\,c_{\mathrm{cheap}}/c_{\mathrm{gold}}$, so the saving $(1-\alpha)(1-c_{\mathrm{cheap}}/
+c_{\mathrm{gold}})$ is largest on reject-heavy streams (small $\alpha$)---e.g.\ early RL training.
+
+\section{RNA/SAT Verifier Definitions, Oracle Validity, Native Control}\label{supp:rnasat}
+\paragraph{RNA ladder.} For target $T$ and designed sequence $s$ under a fixed folding model
+\citep{lorenz2011viennarna}: $\match$ accepts iff $\mathrm{MFE}(s)=T$; $\umfe$ iff $T$ is the unique MFE
+structure; $\pfe$ iff the target Boltzmann probability $\PT\ge\theta$ (an ensemble-defect--style objective
+\citep{zadeh2011nupack}). The pseudoknot branch replaces the MFE oracle with a pseudoknot-aware predictor
+(pKiss \citep{janssen2015pkiss}); the MFE ladder cannot represent crossing pairs, so for a pseudoknot target
+it is out-of-domain.
+\paragraph{Oracle validity of the $28\%$ (Axis 1).} The conditional false-accept rate for state-of-the-art
+pseudoknot-aware designs \citep{wirecki2025desirna} is itself an oracle verdict, so we report its dependence
+rather than a point estimate. Under the pKiss reference it is $28\%$; the fixed-single-design cross-oracle
+envelope across three independent predictors spans $30$--$88\%$ (vs.\ $15$--$60\%$ best-of-pool). The
+qualitative conclusion is invariant: under \emph{no} pseudoknot-aware reference does the declared crossing
+stem form in more than a small minority of skeleton-``solved'' designs (it forms in $0/250$ of the
+blind-search designs). \paragraph{Native positive control.} As a control that the pseudoknot predictors are
+not simply pessimistic, we fold \emph{native} pseudoknot sequences (which are known to form the crossing
+pairs) under the same three-predictor panel; they recover the crossing stems at the expected high rate,
+establishing that the near-zero recovery on skeleton designs is a property of those designs, not of the
+oracle panel. \paragraph{SAT mirror.} Satisfying-assignment check $\supseteq$ unit-propagation-robust
+$\supseteq$ Hamming-ball-robust; SAT candidates come from a WalkSAT-style local search
+\citep{selman1994walksat}. The Axis-2 hardness trend is confirmed \emph{selection-free} by exhaustive
+enumeration \citep{ardelius2008exhaustive}, tracking the random-SAT clustering/freezing transition
+\citep{krzakala2007clustering,zhou2008frozen}, so it is a property of cheap-proxy verification, not of RNA or
+of a generator's selection.
+
+\section{Controlled Transfer-Failure (Goodhart) Study}\label{supp:goodhart}
+With the proposer fixed and only the reward varied (RL-free), we optimize either the cheap exact-match proxy
+(the reward used by RL RNA designers \citep{runge2019learna}) or a robustness-aligned reward, at matched
+optimization budgets. The cheap arm drives its own proxy $31\%\!\to\!70\%$ while robustness stays flat
+($18\%\!\to\!16\%$); the aligned arm climbs robustness $12\%\!\to\!33\%$. The hierarchical
+arm$\times$budget difference-in-differences is $+23.3$ points with a target-label permutation test
+$p{=}0.0002$, and it survives a matched-\emph{wall-time} control ($+18.9$ at equal compute), so it is not an
+artifact of the cheap arm running more steps. This is over-optimization of the proxy
+\citep{gao2023overoptimization} localized to the verifier; a policy-gradient replication reproduces the
+\emph{direction} on easy targets without a dramatic collapse, consistent with the effect being
+reward-attributable yet optimizer-modulated. We flag the weaker within-cheap-arm peak-then-decline as
+suggestive, not load-bearing.
+
+\section{End-to-End Cost Model}\label{supp:cost}
+Per-call cost is dominated by the oracle's algorithmic complexity, then by setup reuse. In RNA all rungs share
+the $O(n^3)$ partition-function/folding machinery (measured empirical scaling $\sim n^{2.8}$ on
+$\le150$\,nt targets) and reuse the fold-compound setup, so strictness is a small constant ($\sim\!4\times$
+from $\match$ to $\pfe$). In SAT robustness needs a higher-complexity Hamming-ball neighborhood scan, so the
+strong rung is $\sim\!400\times$ the assignment check. The two-order-of-magnitude contrast is the point: the
+price of strictness is set by \emph{whether the strong rung shares the cheap oracle's complexity}, not by a
+generic ``stronger is costlier.'' In the RLVR loop the math verifier is shared-complexity (parsing/evaluating a
+boxed value vs.\ scanning for a number), so routing saves a small constant, consistent with the RNA case and
+against the SAT case.
+
+\section{LLM Code-Verifier Protocol (HumanEval+)}\label{supp:code}
+On HumanEval+ \citep{evalplus} we run two open-weights proposers (a strong one, Qwen3.6-27B, and a weak one,
+Llama-3.1-8B \citep{llama3_2024}), scoring on held-out gold tests under a fixed seed-$0$ split, with all
+completions and sandbox diagnostics saved. The cheap rung is ``passes the provided base tests''; the strong
+rung is ``passes a held-out gold test.'' The conditional false-accept rate (passes base, fails gold) is
+$2.4\%$ (strong proposer) and $28.4\%$ (weak), an order of magnitude larger where it matters; strengthening
+the rung monotonically cuts it in both. The Goodhart-\emph{under-selection} best-of-$12$ gap on held-out gold
+is a null ($+0.0$/$+0.6$), which we report as such rather than claim a code-domain selection effect.
+
+\section{RLVR Configuration and Per-Family Results}\label{supp:rlvr}
+\paragraph{Policies/data.} Qwen2.5-3B/7B-Instruct \citep{qwen25_2024} and Llama-3.1-8B-Instruct
+\citep{llama3_2024}. Train prompts: NuminaMath-CoT \citep{numinamath2024} restricted to numeric-canonical
+gold; held-out: $500$ MATH-source problems excluded from training. DAPO-style difficulty filtering
+\citep{dapo2025} (base pass-rate $1$--$7$ of $8$) retains $7{,}113/24{,}000$ prompts for 7B ($32\%$
+all-wrong, $38\%$ all-right groups discarded as zero-gradient).
+\paragraph{GRPO.} $8$ generations/prompt, temperature $1.0$, $\beta{=}0.001$, $\epsilon{=}0.2/0.28$,
+token-level importance sampling, full-parameter tuning, bf16, vLLM colocate rollouts; $2$ GPUs/run
+(data-parallel), $2000$-step runs peak $\sim\!272/275$\,GB. Standard budget $800$ steps, lr
+$2{\times}10^{-6}$; long-horizon probe $2000$ steps, lr $5{\times}10^{-6}$. All arms share every setting
+except the reward verifier. Metrics per step: strong-verified true accuracy, $\J{=}\mathrm{TPR}-\mathrm{FPR}$
+against strong gold (locating the run relative to the $\J{=}0$ boundary \citep{rateorfate2026}), gaming rate
+(cheap-accept $\wedge$ strong-reject), and cumulative strong-verifier calls. Reported runs: 3B pilot
+($5$ runs), 7B main ($3$ arms $\times2$ seeds, $800$ steps), 7B long-horizon ($3$ arms $+$ a second strong
+seed, $2000$ steps), Llama-3.1-8B ($3$ arms). The 3B pilot's flat held-out is diagnosed to the zero-variance
+groups that difficulty filtering removes; the long-horizon budget is the regime in which the strong arm
+itself moves held-out, the only regime in which a held-out quality claim is meaningful.
+
+\begin{table*}[t]\centering\small
+\setlength{\tabcolsep}{6pt}\renewcommand{\arraystretch}{1.2}
+\caption{Cross-family (Llama-3.1-8B, $800$ steps) and dial-sweep (7B) detail. On-policy = training-distribution
+strong-verified accuracy (first$\to$last $100$ steps); held-out = strict accuracy on $500$ MATH problems;
+calls = cumulative strong-verifier invocations. {\color{red}[PENDING]} entries auto-fill from run logs as the
+in-flight runs finish (no hand-transcription).}\label{supp:tab}
+\begin{tabular}{lcccc}
+\toprule
+run & on-policy acc & gaming & held-out (base$\to$final) & strong-calls\\
+\midrule
+Llama-8B cheap   & \llamaCheapAccStart\%$\to$\llamaCheapAccEnd\%     & \llamaCheapGameStart$\to$\llamaCheapGameEnd     & \llamaCheapHoBase\%$\to$\llamaCheapHoFinal\%     & \llamaCheapStrongCalls\\
+Llama-8B strong  & \llamaStrongAccStart\%$\to$\llamaStrongAccEnd\%   & \llamaStrongGameStart$\to$\llamaStrongGameEnd   & \llamaStrongHoBase\%$\to$\llamaStrongHoFinal\%   & \llamaStrongStrongCalls\\
+Llama-8B cascade & \llamaCascadeAccStart\%$\to$\llamaCascadeAccEnd\% & \llamaCascadeGameStart$\to$\llamaCascadeGameEnd & \llamaCascadeHoBase\%$\to$\llamaCascadeHoFinal\% & \llamaCascadeStrongCalls\\
+\midrule
+7B dial $p{=}0.25$ & -- & -- & \dialTwentyFiveHoFinal\%  & \dialTwentyFiveStrongCalls\\
+7B dial $p{=}0.5$  & -- & -- & \dialFiftyHoFinal\%       & \dialFiftyStrongCalls\\
+7B dial $p{=}0.75$ & -- & -- & \dialSeventyFiveHoFinal\% & \dialSeventyFiveStrongCalls\\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\section{The Risk-Calibrated Dial and Routing Calibration}\label{supp:dial}
+Between \textsc{cheap} (escalate none) and \textsc{cascade} (escalate all cheap-accepts) sits a one-parameter
+family: escalate a cheap-accept to strong with probability $p$, decided by a deterministic content hash
+$u(x)=\mathrm{sha256}(\text{completion}\,\|\,\text{gold})/2^{64}\in[0,1)$, escalating iff $u(x)<p$. The hash
+makes the decision reproducible and identical across data-parallel workers (unlike a per-process RNG). Expected
+verifier cost is $c_{\mathrm{cheap}}+p\cdot(\text{cheap-accept rate})\cdot c_{\mathrm{strong}}$ (monotone
+increasing in $p$); expected rewarded-gaming is $(1-p)\cdot(\text{gaming rate})$ (monotone decreasing).
+$p{=}0$ recovers \textsc{cheap}, $p{=}1$ recovers \textsc{cascade} exactly; interior $p$ traces the continuous
+cost$\times$robustness frontier (main Fig.~2). \paragraph{Stop-and-accept calibration.} A rung-based
+stop-and-accept rule is admissible only if its false-positive rate has a Clopper--Pearson
+\citep{clopperpearson1934} upper bound $\le\epsilon$. On a deliberately reject-heavy workload ($n{=}195$
+candidates, $13$ per target) the cheap rung accepts $10$ candidates while gold accepts $0$: all $10$ are false
+positives ($10/10$, one-sided $95\%$ upper bound $1.0$), so no cheaper-than-gold rung clears any $\epsilon<1$.
+This is a demonstrated, workload-specific incompressibility, not a general theorem; a different proposer, gold
+prevalence, or training stage gives a different rate. The mechanism that generalizes: once a cheap rung is
+highly gameable---the regime optimization pressure produces---the strong rung must run.
+
+\section{Reproduction}\label{supp:repro}
+All verifier arms, the difficulty filter, the GRPO reward plugin, the held-out evaluator, and the
+aggregation/figure scripts accompany the paper. Every reported RLVR number is emitted by a single generator
+from raw run logs (no hand-transcription); the dial escalation is a pure function of content, so a rerun with
+the same seed reproduces per-sample escalation decisions bit-for-bit. RNA uses ViennaRNA
+\citep{lorenz2011viennarna} and pKiss \citep{janssen2015pkiss}; SAT uses a WalkSAT-style solver
+\citep{selman1994walksat} with an exhaustive Hamming-ball checker \citep{ardelius2008exhaustive}; the code
+study uses HumanEval+ \citep{evalplus} under a fixed seed-$0$ split.
+
+\bibliographystyle{aaai2027}
+\bibliography{references}
+
+\end{document}
