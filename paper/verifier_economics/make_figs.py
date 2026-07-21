@@ -124,7 +124,7 @@ def f_pk():
     ax[1].scatter(fp_x, fp_y, s=12, color=C["gold"], alpha=0.6, label=f"false accept ({len(fp_x)})")
     ax[1].scatter(ok_x, ok_y, s=30, color=C["sat"], marker="D", label=f"abstain/correct ({len(ok_x)})")
     ax[1].set_xlabel("target length $n$"); ax[1].set_ylabel("crossing bp (pKiss)")
-    ax[1].set_title("(b) every complexity level fails"); ax[1].legend(frameon=False, fontsize=7, loc="upper right")
+    ax[1].set_title("(b) every complexity level fails"); ax[1].legend(frameon=False, fontsize=7, loc="upper center", bbox_to_anchor=(0.5, -0.30), ncol=2)
     fig.tight_layout(); fig.savefig(FIGS + "/f_pk.pdf"); plt.close(fig)
     print("f_pk.pdf")
 
@@ -148,7 +148,7 @@ def f2():
     ax.annotate("robustness↓", (budgets[-1], cheap_rob[-1]), fontsize=7, color=C["gold"], ha="right", va="top")
     ax.set_xscale("log"); ax.set_xlabel("optimization budget (evals)")
     ax.set_ylabel("acceptance rate (%)"); ax.set_ylim(0, 80)
-    ax.set_title("RNA Goodhart: proxy–objective divergence"); ax.legend(frameon=False, fontsize=6.5, loc="upper left")
+    ax.set_title("RNA Goodhart: proxy–objective divergence"); ax.legend(frameon=False, fontsize=6.5, loc="upper center", bbox_to_anchor=(0.5, -0.22), ncol=3)
     fig.tight_layout(); fig.savefig(FIGS + "/f2_goodhart.pdf"); plt.close(fig)
     print("f2_goodhart.pdf")
 
@@ -163,14 +163,14 @@ def f3():
     if rna.get("pkiss", {}).get("n"):
         ax[0].plot(rna["pkiss"]["n"], [m * 1e3 for m in rna["pkiss"]["med"]], "^--", color="gray", label="pKiss (branch)", ms=3)
     ax[0].set_xscale("log"); ax[0].set_yscale("log"); ax[0].set_xlabel("length n")
-    ax[0].set_ylabel("verify wall (ms)"); ax[0].set_title("(a) RNA: cost per rung"); ax[0].legend(frameon=False, fontsize=7)
+    ax[0].set_ylabel("verify wall (ms)"); ax[0].set_title("(a) RNA: cost per rung"); ax[0].legend(frameon=False, fontsize=7, loc="upper center", bbox_to_anchor=(0.5, -0.32), ncol=2)
     labs = {"V0": "V0 (satisfy)", "rho(r=1)": r"$\rho$ (r=1)", "V(r=2)": "r=2 ball"}
     cols = {"V0": C["match"], "rho(r=1)": C["umfe"], "V(r=2)": C["pfe"]}
     for r in ["V0", "rho(r=1)", "V(r=2)"]:
         ns = [t[0] for t in sat[r]]; ms = [t[1] * 1e3 for t in sat[r]]
         ax[1].plot(ns, ms, "s-", color=cols[r], label=labs[r], ms=3)
     ax[1].set_xscale("log"); ax[1].set_yscale("log"); ax[1].set_xlabel("n variables")
-    ax[1].set_ylabel("verify wall (ms)"); ax[1].set_title("(b) SAT: cost per rung"); ax[1].legend(frameon=False, fontsize=7)
+    ax[1].set_ylabel("verify wall (ms)"); ax[1].set_title("(b) SAT: cost per rung"); ax[1].legend(frameon=False, fontsize=7, loc="upper center", bbox_to_anchor=(0.5, -0.32), ncol=3)
     fig.tight_layout(); fig.savefig(FIGS + "/f3_cost.pdf"); plt.close(fig)
     print("f3_cost.pdf")
 
@@ -221,9 +221,9 @@ def f_llm():
             k = f"{q:.1f}"
             ax[0].annotate(f"{rc[k]['mean_tests']:.0f}t", (100 * rc[k]["coverage"], 100 * rc[k]["risk_cond_fp"]),
                            fontsize=5.2, color=cols[nm], xytext=(2, 2), textcoords="offset points")
-    ax[0].set_xlabel("coverage (% candidates accepted)"); ax[0].set_ylabel("risk: cond.\\ false-accept (%)")
+    ax[0].set_xlabel("coverage (% candidates accepted)"); ax[0].set_ylabel("risk: cond. false-accept (%)")
     ax[0].set_title("(a) risk--coverage--cost (dial the rung)")
-    ax[0].legend(frameon=False, fontsize=6.3)
+    ax[0].legend(frameon=False, fontsize=6.3, loc="upper center", bbox_to_anchor=(0.5, -0.32), ncol=2)
     # (b) Goodhart under best-of-12 on HELD-OUT GOLD: cheap vs strong selection (null)
     x = np.arange(len(order))
     cg = [R[nm]["cheap_gold"][0] for nm in order]; sg = [R[nm]["strong_gold"][0] for nm in order]
@@ -231,10 +231,10 @@ def f_llm():
     ax[1].bar(x + 0.19, sg, 0.38, color=C["sat"], label="strong-selected")
     for i, nm in enumerate(order):
         ax[1].annotate(f"$+{sg[i]-cg[i]:.1f}$", (i, max(cg[i], sg[i]) + 1.5), ha="center", fontsize=6.0)
-    ax[1].set_xticks(x); ax[1].set_xticklabels([lab[n] for n in order], rotation=15, fontsize=6.3, ha="right")
+    ax[1].set_xticks(x); ax[1].set_xticklabels(["llama-3.1-8b\n(weak)", "qwen3.6-27b\n(strong)"], rotation=0, fontsize=6.3, ha="center")
     ax[1].set_ylabel("gold robustness (%)"); ax[1].set_ylim(40, 100)
     ax[1].set_title("(b) best-of-12 on held-out gold (null)")
-    ax[1].legend(frameon=False, fontsize=6.3, loc="lower right")
+    ax[1].legend(frameon=False, fontsize=6.3, loc="upper center", bbox_to_anchor=(0.5, -0.32), ncol=2)
     fig.tight_layout(); fig.savefig(FIGS + "/f_llm.pdf"); plt.close(fig)
     print("f_llm.pdf")
 
@@ -360,12 +360,12 @@ def f_costdecomp():
     ax[0].plot(ns, [r["pfe_inc"] * 1e3 for r in dec], "s--", color=C["umfe"], label="pfe incremental (reuse, 66%)", ms=3)
     ax[0].plot(ns, [r["match"] * 1e3 for r in dec], ":", color=C["gray"], label="match (cheap rung)", ms=3)
     ax[0].set_xscale("log"); ax[0].set_yscale("log"); ax[0].set_xlabel("length n"); ax[0].set_ylabel("verify wall (ms)")
-    ax[0].set_title("(a) reuse measured: incr.\\ = 66% of standalone"); ax[0].legend(frameon=False, fontsize=6.3)
+    ax[0].set_title("(a) reuse measured: incr. = 66% of standalone"); ax[0].legend(frameon=False, fontsize=6.3, loc="upper center", bbox_to_anchor=(0.5, -0.32), ncol=3)
     ax[1].plot([r["n"] for r in xo], [r["pkiss"] * 1e3 for r in xo], "^-", color=C["branch"], label="pKiss (cross-oracle)", ms=3)
     ax[1].plot([r["n"] for r in xo], [r["probknot"] * 1e3 for r in xo], "s-", color=C["sat"], label="ProbKnot (cross-oracle)", ms=3)
     ax[1].plot(ns, [r["pfe_sa"] * 1e3 for r in dec], "o--", color=C["pfe"], label="pfe (same-oracle)", ms=3)
     ax[1].set_xscale("log"); ax[1].set_yscale("log"); ax[1].set_xlabel("length n"); ax[1].set_ylabel("wall (ms)")
-    ax[1].set_title("(b) cross-oracle cost (sub-second)"); ax[1].legend(frameon=False, fontsize=6.3)
+    ax[1].set_title("(b) cross-oracle cost (sub-second)"); ax[1].legend(frameon=False, fontsize=6.3, loc="upper center", bbox_to_anchor=(0.5, -0.32), ncol=1)
     fig.tight_layout(); fig.savefig(FIGS + "/f_costdecomp.pdf"); plt.close(fig)
     print("f_costdecomp.pdf")
 
@@ -384,7 +384,7 @@ def f_oracle():
     for i, v in enumerate(vals):
         ax[0].text(i, v + 1.5, f"{v:.0f}%", ha="center", fontsize=7)
     ax[0].set_ylabel("false-accept rate (%)"); ax[0].set_ylim(0, 70)
-    ax[0].set_title("(a) Axis-1 rate is oracle-dependent"); ax[0].legend(frameon=False, fontsize=7)
+    ax[0].set_title("(a) Axis-1 rate is oracle-dependent"); ax[0].legend(frameon=False, fontsize=7, loc="upper center", bbox_to_anchor=(0.5, -0.30), ncol=1)
     frows = [r for r in rows if r.get("mfe_reported_solved") and not r.get("forms_T_pkiss")
              and r.get("minbp_pkiss") is not None]
     mb = [r["minbp_pkiss"] for r in frows]; cnt = Counter(mb); xs = sorted(cnt); ys = [cnt[x] for x in xs]

@@ -27,7 +27,7 @@ Prop.~\ref{prop:cascade}; measured cost saving on reject-heavy streams &
 confirmed (proof $+$ measurement)\\
 \textbf{In-loop cost-repair}: the sound cascade attains the strong verifier's RLVR quality at a fraction of its compute &
 GRPO, verifier as sole variable: cascade matches strong at \mSevenBSavings\%/\longSavings\% fewer strong-calls (7B); cheap gains do not transfer &
-measured (3B/7B; Llama in progress)\\
+measured (3B/7B/Llama)\\
 \bottomrule
 \end{tabular}
 \end{table*}
@@ -320,7 +320,7 @@ single headline multiplier and make no order-of-magnitude claim---in numeric mat
 constant, consistent with the RNA cost finding and against the steeper SAT case.
 
 \begin{figure}[t]\centering
-\includegraphics[width=0.92\linewidth]{f1_frontier.pdf}
+\includegraphics[width=0.92\linewidth]{f_dial_frontier.pdf}
 \caption{The verifier as a continuous dial (7B, $800$ steps): held-out strict accuracy vs.\ cumulative
 strong-verifier calls, for $p\in\{0,0.25,0.5,0.75,1\}$ from cheap ($p{=}0$, zero strong-calls) to the
 strong-equivalent cascade ($p{=}1$). Cost rises monotonically with $p$ while held-out stays within noise at
