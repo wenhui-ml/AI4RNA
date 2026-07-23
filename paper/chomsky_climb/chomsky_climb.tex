@@ -101,7 +101,7 @@ artifact}, the operator having learned to game the predictor it optimized. This 
 intended: the decidable negative side and the abstaining panel expose oracle-gaming that a one-sided
 evaluation would have reported as ``discovery.'' Switching the operator's objective from a single oracle to
 \emph{panel agreement} then yields the first panel-robust autonomous crossings we observe: $3$--$8/60$ (mean
-$5.3$, three seeds) unanimous across three predictors, versus $\sim\!1/60$ for the gamer and $0/60$ for a
+$5.0$, five seeds) unanimous across three predictors, versus $\sim\!1/60$ for the gamer and $0/60$ for a
 borrowed solver---a small but measurable gain in held-out-oracle robustness above the decidable $0/60$ floor.
 The broader lesson for AI4S: self-revision and automated discovery need an \emph{audit layer} that separates
 scientific capability from verifier-specific optimization, or a single fallible oracle can dress a $1/60$
@@ -175,7 +175,7 @@ separating \emph{generative power} (main line) from \emph{folding complexity} (c
 invented, DesiRNA-free operator scores $43/60$ on held-out crossing targets under a single pseudoknot oracle
 but only $1/60$ \emph{panel-unanimous}---a $43\times$ inflation the panel exposes---above a context-free floor
 of $0/60$. Re-optimizing the operator for cross-oracle \emph{agreement} then recovers a small panel-robust
-ascent ($3$--$8/60$ over three seeds, mean $5.3$, unanimous across three independent predictors)---the honest positive counterpart to the collapse.
+ascent ($3$--$8/60$ over five seeds, mean $5.0$, unanimous across three independent predictors)---the honest positive counterpart to the collapse.
 \end{enumerate}
 
 \noindent Figure~\ref{fig:arch} shows how these components compose into a single pipeline: a graded target
@@ -665,7 +665,7 @@ not}---\emph{robustly} and \emph{autonomously}? We fix the protocol (oracles, gr
 and then walk three findings in order: (i) the negative side is a decidable $0/60$---the distinctive,
 load-bearing claim, that a whole repertoire is confined below the class boundary as a \emph{theorem}, not a
 failed search; (ii) a naive operator crosses the boundary only by \emph{gaming} its oracle, which the panel
-exposes; and (iii) an operator optimizing cross-oracle agreement crosses it \emph{robustly} on $3$--$8/60$ (mean $5.3$, three seeds). Only
+exposes; and (iii) an operator optimizing cross-oracle agreement crosses it \emph{robustly} on $3$--$8/60$ (mean $5.0$, five seeds). Only
 (ii) touches verifier model-relativity---the object of our companion \citep{verifiereconomics}, not of this
 paper; here it is merely the hazard the panel disciplines, en route to the class-ascent certificate that is
 our contribution. Dataset facts (Table~\ref{tab:data}) are established and cited. Multi-seed panel results and a bootstrap
@@ -884,25 +884,25 @@ $-$ repair (no oracle-guided search) & $25$\\
 \paragraph{A panel-optimizing operator partially recovers the ascent.} We then built exactly that operator: a
 variant whose repair loop optimizes \emph{agreement} between two predictors (pKiss and ProbKnot,
 lexicographically), never a single one, and is still autonomous (no external solver). On the two oracles it
-optimizes it solves $34$--$37/60$ across three seeds (mean $36$)---far above the pKiss-gamer's ProbKnot-robust
+optimizes it solves $34$--$37/60$ across five seeds (mean $36$)---far above the pKiss-gamer's ProbKnot-robust
 $2/60$. The decisive test is a \emph{held-out} oracle it did \emph{not} optimize, ShapeKnots: of those solves,
-$3$--$8$ (mean $5.3$ over three seeds) are also confirmed, i.e.\ \emph{panel-unanimous across all three
+$3$--$8$ (mean $5.0$ over five seeds) are also confirmed, i.e.\ \emph{panel-unanimous across all three
 independent predictors} (Table~\ref{tab:recovered})---versus $\sim\!1/60$ for the pKiss-only operator and
 $0/60$ for the borrowed SOTA solver. This is the modest-but-genuine outcome the certificate exists to
 license: an \emph{autonomous}, \emph{panel-robust} crossing of the $\CF\!\to\!\MCF$ boundary, above a
 decidable $0/60$ floor, robust to an oracle \emph{outside its objective}. Generalization to the held-out
-oracle grows with the number of oracles optimized---from $\sim\!1/60$ (one predictor) to a mean $5.3/60$
+oracle grows with the number of oracles optimized---from $\sim\!1/60$ (one predictor) to a mean $5.0/60$
 (two)---but is incomplete and \emph{variable}: only $3$--$8$ of the $\sim\!36$ two-oracle solves clear the
 held-out third, seed to seed. Optimizing agreement sharpens cross-oracle robustness without guaranteeing it;
 the honest ceiling is that more independent checks tighten the certificate, none makes the positive side exact.
 
 \paragraph{Is the ascent statistically separated from gaming?} The bar is that the panel-unanimous held-out
 rate exceed the single-oracle gaming baseline ($1/60$) with a confidence interval clear of it.
-Table~\ref{tab:sep} settles it with the honest nuance: \emph{pooled} over three seeds the separation is
-decisive (bootstrap $95\%$ CI $[5.0,13.3]\%$ excludes $1.7\%$; exact binomial $p\!\approx\!8{\times}10^{-8}$;
+Table~\ref{tab:sep} settles it with the honest nuance: \emph{pooled} over five seeds the separation is
+decisive (bootstrap $95\%$ CI $[5.3,11.7]\%$ excludes $1.7\%$; exact binomial $p\!\approx\!8{\times}10^{-11}$;
 paired McNemar $p{=}0.016$ on the strongest seed), but a \emph{single} $60$-target seed is
-underpowered---seeds~1--2 are not individually significant. The separation is real in aggregate and on the
-strongest seed yet requires pooling; one small held-out pool cannot carry it. The certificate reports the
+underpowered---only the strongest seed is individually significant. The separation is real in aggregate and on
+the strongest seed yet requires pooling; one small held-out pool cannot carry it. The certificate reports the
 small effect \emph{as} small, with quantified uncertainty, not as a discovery.
 
 \begin{table}[t]\centering\small
@@ -920,8 +920,10 @@ gamer (single-oracle, seed 0) & $1$ & $1.7\%$ & --- & --- & ---\\
 panel\_auto seed 0 & $8$ & $13.3\%$ & $[5.0,21.7]\%$ & $b{=}7,c{=}0,p{=}0.016$ & $7{\times}10^{-6}$\\
 panel\_auto seed 1 & $3$ & $5.0\%$ & $[0.0,11.7]\%$ & $b{=}2,c{=}0,p{=}0.50$ & $0.079$\\
 panel\_auto seed 2 & $5$ & $8.3\%$ & $[1.7,16.7]\%$ & $b{=}5,c{=}1,p{=}0.22$ & $3.3{\times}10^{-3}$\\
+panel\_auto seed 3 & $5$ & $8.3\%$ & $[1.7,16.7]\%$ & $b{=}4,c{=}0,p{=}0.13$ & $3.3{\times}10^{-3}$\\
+panel\_auto seed 4 & $4$ & $6.7\%$ & $[1.7,13.3]\%$ & $b{=}3,c{=}0,p{=}0.25$ & $1.8{\times}10^{-2}$\\
 \midrule
-panel\_auto pooled (3 seeds) & $16/180$ & $8.9\%$ & $[5.0,13.3]\%$ & --- & $8{\times}10^{-8}$\\
+panel\_auto pooled (5 seeds) & $25/300$ & $8.3\%$ & $[5.3,11.7]\%$ & --- & $8{\times}10^{-11}$\\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -931,7 +933,7 @@ panel\_auto pooled (3 seeds) & $16/180$ & $8.9\%$ & $[5.0,13.3]\%$ & --- & $8{\t
 \caption{\textbf{Panel-robust autonomous crossings, by training objective} (held-out crossing pool, $n=60$).
 Optimizing \emph{agreement} across two predictors generalizes to a held-out third (ShapeKnots) far better
 than gaming one predictor, and beats the borrowed SOTA solver---a small but genuine panel-robust ascent
-($3$--$8/60$ over three seeds, mean $5.3$) above the decidable $0/60$ floor.}\label{tab:recovered}
+($3$--$8/60$ over five seeds, mean $5.0$) above the decidable $0/60$ floor.}\label{tab:recovered}
 \begin{tabularx}{\linewidth}{@{}Lccc@{}}
 \toprule
 \textbf{method (in-loop objective)} & \textbf{optimized} & \textbf{held-out} & \textbf{unanimous\,/\,60}\\
@@ -951,7 +953,7 @@ yields designs an independent predictor confirms only $2/43$ of the time; optimi
 the held-out pKiss confirms $26/51$ of the time. pKiss is markedly the more \emph{gameable} oracle---its
 accepted set contains many sequences other predictors reject---while ProbKnot is stricter; the full-panel
 unanimous rate correspondingly rises with the number \emph{and} stringency of the optimized oracles ($1$ for
-pKiss only, $5$ for ProbKnot only, $3$--$8$ for both across three seeds). The lesson sharpens the model-relativity thesis: a panel is
+pKiss only, $5$ for ProbKnot only, $3$--$8$ for both across five seeds). The lesson sharpens the model-relativity thesis: a panel is
 necessary, and \emph{which} oracles compose it matters---a single lax verifier is far more easily mistaken
 for ground truth than a strict one.
 
@@ -959,7 +961,7 @@ for ground truth than a strict one.
 \setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.15}
 \caption{\textbf{Leave-one-oracle-out.} Single-oracle gaming is asymmetric---pKiss is more gameable than
 ProbKnot---and full-panel robustness grows with the number and stringency of the optimized oracles. Single-run
-values; the pKiss$\wedge$ProbKnot row is $3$--$8$ across three seeds (Table~\ref{tab:recovered}).}\label{tab:looo}
+values; the pKiss$\wedge$ProbKnot row is $3$--$8$ across five seeds (Table~\ref{tab:recovered}).}\label{tab:looo}
 \begin{tabularx}{\linewidth}{@{}Lccc@{}}
 \toprule
 \textbf{optimized in-loop} & \textbf{held-out} & \textbf{held-out agreement} & \textbf{unanimous\,/\,60}\\
@@ -990,7 +992,7 @@ undesignability rates carry one-sided Clopper--Pearson bounds, and autonomy and 
 contrasts over held-out targets.
 
 \noindent The \CF{} floor ($0/60$), the single-oracle rate ($43/60$), the panel-unanimous rate ($1/60$;
-Tables~\ref{tab:baselines},\ref{tab:panel}), and the three-seed panel-operator rates with the bootstrap
+Tables~\ref{tab:baselines},\ref{tab:panel}), and the five-seed panel-operator rates with the bootstrap
 separation test (above) are all measured from logged runs; per-grade transfer and the undesignability axis
 are out of scope here.
 
@@ -1043,9 +1045,22 @@ matching or exceeding the borrowed SOTA solver, while short/long stems clear onl
 oracle-agreement window, not a search failure.}\label{fig:family}
 \end{figure}
 
+\paragraph{Robustness checks: instrument validity, generalization, budget.} Three controls close the section.
+\emph{(i) Verifier validity (E0).} Designing each held-out target's \CF{} skeleton and folding it under the
+panel, the panel credits the crossing on $0/60$ skeletons (and recovers the nested skeleton on $57/60$)---versus
+the naive-MFE oracle's $80/80$ (above). The panel is a \emph{sound} discriminator, not a lenient one, so the
+positive-side verdicts are not skeleton false positives. \emph{(ii) Generalization.} On a \emph{second,
+disjoint} held-out pool (Pseudobase indices $60$--$110$, never used to tune anything) the \CF{} floor is again
+$0/50$ and the panel operator is panel-unanimous on $5/50$---the same rate regime as the first pool, so the
+capability is not overfit to one $60$-target sample. \emph{(iii) Budget.} Scaling the operator's repair budget
+over $\{60,180,300\}$\,s on a fixed $20$-target subset gives panel-unanimous $\{1,3,1\}/20$: \emph{no} clean
+budget trend at this scale---the outcome is dominated by search variance, consistent with the operator being
+oracle-guided \emph{search} rather than a budget-monotone capability. We report this null rather than a
+favorable point.
+
 \paragraph{Where this leaves the ascent, and a bounded fallback.} The question we posed---can an operator
 optimizing \emph{panel agreement} beat the oracle-gamer's $1/60$?---is answered in the affirmative, if
-modestly: $3$--$8/60$ across three seeds (mean $5.3$; Table~\ref{tab:recovered}). The certificate fires with
+modestly: $3$--$8/60$ across five seeds (mean $5.0$; Table~\ref{tab:recovered}). The certificate fires with
 all three sides intact on a few targets per seed---the first panel-robust, autonomous $\CF\!\to\!\MCF$
 crossings we observe---while the negative floor stays a decidable $0/60$. The remaining gap ($\sim\!5/60$, not
 most of $60$) is itself the honest finding: robust
@@ -1153,11 +1168,12 @@ ascent---the first for which all three sides hold at once---would need an operat
 \emph{panel agreement} rather than any single predictor: optimize the intersection of pKiss, ProbKnot, and
 ShapeKnots (or hold one predictor out of the loop and judge on it), so solutions are model-robust by
 construction, and require the panel-unanimous held-out rate to exceed the oracle-gaming baseline with a
-bootstrap CI clear of it. We now measure this target (\S\ref{sec:exp}): pooled over three seeds it is met---a
-percentile-bootstrap $95\%$ CI of $[5.0\%,13.3\%]$ clears the $1.7\%$ gaming baseline (exact binomial
-$p\!\approx\!8\times10^{-8}$; paired McNemar $p\!=\!0.016$ on the strongest seed)---but a single $60$-target
-seed is underpowered and not individually significant, so the separation presently requires pooling, and a
-larger held-out pool would be needed to certify it seed-by-seed. The certificate does not make the ascent
+bootstrap CI clear of it. We now measure this target (\S\ref{sec:exp}): pooled over five seeds it is met---a
+percentile-bootstrap $95\%$ CI of $[5.3\%,11.7\%]$ (pooled $25/300$) clears the $1.7\%$ gaming baseline (exact
+binomial $p\!\approx\!8\times10^{-11}$; paired McNemar $p\!=\!0.016$ on the strongest seed)---but a single
+$60$-target seed is underpowered and only the strongest is individually significant, so the separation
+presently requires pooling, and a second disjoint pool (Pseudobase $60$--$110$: floor $0/50$, operator
+$5/50$) confirms it generalizes rather than certifying it seed-by-seed. The certificate does not make the ascent
 happen---it makes ``did it happen?'' decidable-plus-adjudicated rather than a matter of which oracle one chose
 to report.
 
@@ -1240,7 +1256,7 @@ objective for cross-oracle \emph{agreement} recovers a small but panel-robust as
 \S\ref{sec:exp})---so the honest state is a modest robust ascent, not none, and where no crossing is found at
 all E3 provides a bounded fallback. (iv) The criterion certifies an ascent \emph{to
 \MCF}; higher tiers are out of scope. (v) The empirical result covers one crossing pool ($n=60$, pKiss
-reference; the panel operator over three seeds); a second benchmark and the undesignability axis are not yet
+reference; the panel operator over five seeds); a second benchmark and the undesignability axis are not yet
 measured.
 
 \paragraph{Future work.} The decisive next test is a \emph{parameterized} non-\CF{} crossing family
@@ -1267,7 +1283,7 @@ decidable context-free floor of $0/60$---the demarcation catching a $43\times$ o
 one-sided criterion would have reported as an autonomous discovery. The contribution is a demarcation
 instrument whose negative side is a theorem rather than a statistic and whose positive side is panel-adjudicated
 rather than oracle-chosen; and, re-optimized for cross-oracle agreement, an autonomous operator recovers a
-small but genuine panel-robust ascent ($3$--$8/60$ across three seeds, mean $5.3$, unanimous across three
+small but genuine panel-robust ascent ($3$--$8/60$ across five seeds, mean $5.0$, unanimous across three
 independent predictors)---the first crossings we observe with all three sides intact.
 
 \appendix

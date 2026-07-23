@@ -18,8 +18,18 @@ IDS = [f"pseudobase:{i}" for i in range(60)]          # the frozen 60-target hel
 GAMER_BASELINE = 1 / 60                                 # single-oracle gamer, panel-unanimous
 
 def uni_set(path):
+    """Panel-unanimous id set. Handles both panel_*.json (rows have 'unanimous') and the parallel
+    sweep.py format (rows have arms.panel_auto.panel.unanimous)."""
     d = json.load(open(os.path.join(HERE, path)))
-    return {r["id"] for r in d["rows"] if r.get("unanimous")}
+    ids = set()
+    for r in d["rows"]:
+        if "arms" in r:
+            u = ((r["arms"].get("panel_auto") or {}).get("panel") or {}).get("unanimous")
+        else:
+            u = r.get("unanimous")
+        if u:
+            ids.add(r["id"])
+    return ids
 
 def vec(s):  # binary unanimous vector over the 60 held-out ids
     return [1 if i in s else 0 for i in IDS]
@@ -46,6 +56,8 @@ seeds = {
     "panel_auto seed0": uni_set("panel_auto/panel_panel_auto.json"),
     "panel_auto seed1": uni_set("seed1/panel/panel_panel_auto.json"),
     "panel_auto seed2": uni_set("seed2/panel/panel_panel_auto.json"),
+    "panel_auto seed3": uni_set("seed3/sweep.json"),
+    "panel_auto seed4": uni_set("seed4/sweep.json"),
 }
 
 print(f"held-out pool n=60 ; gamer panel-unanimous = {len(gamer)}/60 = {len(gamer)/60:.4f}  ids={sorted(gamer)}\n")
