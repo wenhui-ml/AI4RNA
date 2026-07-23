@@ -1,0 +1,10 @@
+RSSD-agent: split=parity train=126 held=125; self-revise on 24 TRAIN targets; DesiRNA cost=measured median of 8 runs ($4.34e-02); model=STUB
+  [stub] TRAIN-subset: solved=13/24 cost=$0.3505 skill_solved=13 lost=0 errors=11
+
+  FROZEN authored procedure -> evaluating on 125 HELD-OUT targets ...
+
+=== RSSD v2 (agent-authored procedure, HELD-OUT = 125 targets, gaming-proof) ===
+  always_sota           solved= 96/125  cost=$5.4199
+  agent procedure       solved= 93/125  cost=$0.7571  -> 7x cheaper
+    (cheap skill solved 92; SOTA fired 17, abstained 16; REAL solves lost by abstaining: 3; code errors on 33 targets)
+  wrote /data/wenhui/openclaude_rna/rna_harness/experiments/../runs/rssd_agent/agent_result.json + authored_skill.py

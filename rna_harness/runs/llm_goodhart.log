@@ -1,0 +1,30 @@
+LLM verifier Goodhart: model=openai/gpt-4o-mini, 14 problems, N_max=12, T=0.8
+  floor_div      sampled 12 | held-correct candidates: 1/12
+  is_leap_year   sampled 12 | held-correct candidates: 12/12
+  days_in_month  sampled 12 | held-correct candidates: 12/12
+  median         sampled 12 | held-correct candidates: 12/12
+  mode           sampled 12 | held-correct candidates: 12/12
+  count_overlap  sampled 12 | held-correct candidates: 12/12
+  primes_up_to   sampled 12 | held-correct candidates: 12/12
+  fib            sampled 12 | held-correct candidates: 12/12
+  is_palindrome  sampled 12 | held-correct candidates: 12/12
+  gcd            sampled 12 | held-correct candidates: 12/12
+  first_index    sampled 12 | held-correct candidates: 12/12
+  round_half_even sampled 12 | held-correct candidates: 7/12
+  chunk          sampled 12 | held-correct candidates: 12/12
+  binary_search  sampled 12 | held-correct candidates: 12/12
+
+=== Axis-2 survival (LLM code) === provided-rung acceptance 166/168; of those, 91.6% also pass held-out (strong rung). False-positive mass = 8.4%.
+
+=== LLM best-of-N: proxy vs robustness (mean over 14 problems) ===
+  N= 1 | cheap-arm PROXY(provided)=100.0%  cheap-arm ROBUST(held)= 85.7%  strong-arm ROBUST(held)= 85.7%
+  N= 2 | cheap-arm PROXY(provided)=100.0%  cheap-arm ROBUST(held)= 85.7%  strong-arm ROBUST(held)= 92.9%
+  N= 4 | cheap-arm PROXY(provided)=100.0%  cheap-arm ROBUST(held)= 85.7%  strong-arm ROBUST(held)= 92.9%
+  N= 8 | cheap-arm PROXY(provided)=100.0%  cheap-arm ROBUST(held)= 85.7%  strong-arm ROBUST(held)= 92.9%
+  N=12 | cheap-arm PROXY(provided)=100.0%  cheap-arm ROBUST(held)= 85.7%  strong-arm ROBUST(held)=100.0%
+
+  cheap arm 1->12: proxy 100.0->100.0%  robustness 85.7->85.7%
+  strong arm 1->12: robustness 85.7->100.0%
+  tokens: prompt=12168 completion=9957
+LLM_GOODHART_DONE
+LLMG_DONE

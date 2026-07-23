@@ -1,0 +1,895 @@
+{
+  "budget": {
+    "n_ops": 8,
+    "restarts": 6,
+    "tries": 50,
+    "iters": 8000,
+    "plateau_k": 2,
+    "wall_s": 160.0
+  },
+  "seeds": [
+    0,
+    1
+  ],
+  "hard_ids": [
+    66,
+    65,
+    57,
+    62,
+    61,
+    72,
+    52,
+    14,
+    49,
+    17,
+    87,
+    79,
+    16,
+    60,
+    71,
+    89,
+    64,
+    50,
+    83,
+    92
+  ],
+  "blind_solved_short": 44,
+  "n_short": 64,
+  "results": {
+    "66": {
+      "name": "Bug 38",
+      "len": 36,
+      "arms": {
+        "blind": {
+          "solved_any": false,
+          "solved_n": 0,
+          "best_bp": 1,
+          "runs": [
+            {
+              "seed": 0,
+              "solved": false,
+              "bp": 1,
+              "trans": 0,
+              "t": 44.8
+            },
+            {
+              "seed": 1,
+              "solved": false,
+              "bp": 1,
+              "trans": 0,
+              "t": 44.5
+            }
+          ]
+        },
+        "roundrobin": {
+          "solved_any": false,
+          "solved_n": 0,
+          "best_bp": 1,
+          "runs": [
+            {
+              "seed": 0,
+              "solved": false,
+              "bp": 1,
+              "trans": 3,
+              "t": 66.2
+            },
+            {
+              "seed": 1,
+              "solved": false,
+              "bp": 1,
+              "trans": 3,
+              "t": 66.3
+            }
+          ]
+        },
+        "greedy": {
+          "solved_any": true,
+          "solved_n": 2,
+          "best_bp": 0,
+          "runs": [
+            {
+              "seed": 0,
+              "solved": true,
+              "bp": 0,
+              "trans": 2,
+              "t": 37.8
+            },
+            {
+              "seed": 1,
+              "solved": true,
+              "bp": 0,
+              "trans": 2,
+              "t": 38.0
+            }
+          ]
+        }
+      }
+    },
+    "65": {
+      "name": "Branching Loop",
+      "len": 40,
+      "arms": {
+        "blind": {
+          "solved_any": false,
+          "solved_n": 0,
+          "best_bp": 1,
+          "runs": [
+            {
+              "seed": 0,
+              "solved": false,
+              "bp": 1,
+              "trans": 0,
+              "t": 37.8
+            },
+            {
+              "seed": 1,
+              "solved": false,
+              "bp": 1,
+              "trans": 0,
+              "t": 37.5
+            }
+          ]
+        },
+        "roundrobin": {
+          "solved_any": false,
+          "solved_n": 0,
+          "best_bp": 1,
+          "runs": [
+            {
+              "seed": 0,
+              "solved": false,
+              "bp": 1,
+              "trans": 3,
+              "t": 54.4
+            },
+            {
+              "seed": 1,
+              "solved": false,
+              "bp": 1,
+              "trans": 3,
+              "t": 54.3
+            }
+          ]
+        },
+        "greedy": {
+          "solved_any": false,
+          "solved_n": 0,
+          "best_bp": 1,
+          "runs": [
+            {
+              "seed": 0,
+              "solved": false,
+              "bp": 1,
+              "trans": 3,
+              "t": 51.7
+            },
+            {
+              "seed": 1,
+              "solved": false,
+              "bp": 1,
+              "trans": 3,
+              "t": 51.0
+            }
+          ]
+        }
+      }
+    },
+    "57": {
+      "name": "multilooping fun",
+      "len": 44,
+      "arms": {
+        "blind": {
+          "solved_any": true,
+          "solved_n": 2,
+          "best_bp": 0,
+          "runs": [
+            {
+              "seed": 0,
+              "solved": true,
+              "bp": 0,
+              "trans": 0,
+              "t": 39.0
+            },
+            {
+              "seed": 1,
+              "solved": true,
+              "bp": 0,
+              "trans": 0,
+              "t": 38.7
+            }
+          ]
+        },
+        "roundrobin": {
+          "solved_any": true,
+          "solved_n": 2,
+          "best_bp": 0,
+          "runs": [
+            {
+              "seed": 0,
+              "solved": true,
+              "bp": 0,
+              "trans": 0,
+              "t": 38.6
+            },
+            {
+              "seed": 1,
+              "solved": true,
+              "bp": 0,
+              "trans": 0,
+              "t": 38.7
+            }
+          ]
+        },
+        "greedy": {
+          "solved_any": true,
+          "solved_n": 2,
+          "best_bp": 0,
+          "runs": [
+            {
+              "seed": 0,
+              "solved": true,
+              "bp": 0,
+              "trans": 0,
+              "t": 38.9
+            },
+            {
+              "seed": 1,
+              "solved": true,
+              "bp": 0,
+              "trans": 0,
+              "t": 38.8
+            }
+          ]
+        }
+      }
+    },
+    "62": {
+      "name": "Bug 18",
+      "len": 53,
+      "arms": {
+        "blind": {
+          "solved_any": false,
+          "solved_n": 0,
+          "best_bp": 1,
+          "runs": [
+            {
+              "seed": 0,
+              "solved": false,
+              "bp": 1,
+              "trans": 0,
+              "t": 170.8
+            },
+            {
+              "seed": 1,
+              "solved": false,
+              "bp": 1,
+              "trans": 0,
+              "t": 170.9
+            }
+          ]
+        },
+        "roundrobin": {
+          "solved_any": false,
+          "solved_n": 0,
+          "best_bp": 1,
+          "runs": [
+            {
+              "seed": 0,
+              "solved": false,
+              "bp": 1,
+              "trans": 1,
+              "t": 170.0
+            },
+            {
+              "seed": 1,
+              "solved": false,
+              "bp": 1,
+              "trans": 1,
+              "t": 169.2
+            }
+          ]
+        },
+        "greedy": {
+          "solved_any": false,
+          "solved_n": 0,
+          "best_bp": 1,
+          "runs": [
+            {
+              "seed": 0,
+              "solved": false,
+              "bp": 1,
+              "trans": 1,
+              "t": 170.8
+            },
+            {
+              "seed": 1,
+              "solved": false,
+              "bp": 1,
+              "trans": 1,
+              "t": 172.1
+            }
+          ]
+        }
+      }
+    },
+    "61": {
+      "name": "Chicken feet",
+      "len": 69,
+      "arms": {
+        "blind": {
+          "solved_any": false,
+          "solved_n": 0,
+          "best_bp": 1,
+          "runs": [
+            {
+              "seed": 0,
+              "solved": false,
+              "bp": 1,
+              "trans": 0,
+              "t": 237.0
+            },
+            {
+              "seed": 1,
+              "solved": false,
+              "bp": 1,
+              "trans": 0,
+              "t": 230.8
+            }
+          ]
+        },
+        "roundrobin": {
+          "solved_any": false,
+          "solved_n": 0,
+          "best_bp": 1,
+          "runs": [
+            {
+              "seed": 0,
+              "solved": false,
+              "bp": 1,
+              "trans": 0,
+              "t": 252.6
+            },
+            {
+              "seed": 1,
+              "solved": false,
+              "bp": 1,
+              "trans": 0,
+              "t": 236.1
+            }
+          ]
+        },
+        "greedy": {
+          "solved_any": false,
+          "solved_n": 0,
+          "best_bp": 1,
+          "runs": [
+            {
+              "seed": 0,
+              "solved": false,
+              "bp": 1,
+              "trans": 0,
+              "t": 251.0
+            },
+            {
+              "seed": 1,
+              "solved": false,
+              "bp": 1,
+              "trans": 0,
+              "t": 258.0
+            }
+          ]
+        }
+      }
+    },
+    "72": {
+      "name": "Loop next to a Multiloop",
+      "len": 73,
+      "arms": {
+        "blind": {
+          "solved_any": false,
+          "solved_n": 0,
+          "best_bp": 1,
+          "runs": [
+            {
+              "seed": 0,
+              "solved": false,
+              "bp": 1,
+              "trans": 0,
+              "t": 176.5
+            },
+            {
+              "seed": 1,
+              "solved": false,
+              "bp": 1,
+              "trans": 0,
+              "t": 177.0
+            }
+          ]
+        },
+        "roundrobin": {
+          "solved_any": false,
+          "solved_n": 0,
+          "best_bp": 1,
+          "runs": [
+            {
+              "seed": 0,
+              "solved": false,
+              "bp": 1,
+              "trans": 1,
+              "t": 210.0
+            },
+            {
+              "seed": 1,
+              "solved": false,
+              "bp": 1,
+              "trans": 1,
+              "t": 212.0
+            }
+          ]
+        },
+        "greedy": {
+          "solved_any": false,
+          "solved_n": 0,
+          "best_bp": 1,
+          "runs": [
+            {
+              "seed": 0,
+              "solved": false,
+              "bp": 1,
+              "trans": 1,
+              "t": 173.6
+            },
+            {
+              "seed": 1,
+              "solved": false,
+              "bp": 1,
+              "trans": 1,
+              "t": 174.4
+            }
+          ]
+        }
+      }
+    },
+    "52": {
+      "name": "[RNA] Repetitious Sequences 8/10",
+      "len": 81,
+      "arms": {
+        "blind": {
+          "solved_any": false,
+          "solved_n": 0,
+          "best_bp": 1,
+          "runs": [
+            {
+              "seed": 0,
+              "solved": false,
+              "bp": 1,
+              "trans": 0,
+              "t": 221.7
+            },
+            {
+              "seed": 1,
+              "solved": false,
+              "bp": 1,
+              "trans": 0,
+              "t": 241.3
+            }
+          ]
+        },
+        "roundrobin": {
+          "solved_any": false,
+          "solved_n": 0,
+          "best_bp": 1,
+          "runs": [
+            {
+              "seed": 0,
+              "solved": false,
+              "bp": 1,
+              "trans": 0,
+              "t": 252.9
+            },
+            {
+              "seed": 1,
+              "solved": false,
+              "bp": 1,
+              "trans": 0,
+              "t": 251.9
+            }
+          ]
+        },
+        "greedy": {
+          "solved_any": false,
+          "solved_n": 0,
+          "best_bp": 1,
+          "runs": [
+            {
+              "seed": 0,
+              "solved": false,
+              "bp": 1,
+              "trans": 0,
+              "t": 268.0
+            },
+            {
+              "seed": 1,
+              "solved": false,
+              "bp": 1,
+              "trans": 0,
+              "t": 268.9
+            }
+          ]
+        }
+      }
+    },
+    "14": {
+      "name": "Six legd turtle 2",
+      "len": 98,
+      "arms": {
+        "blind": {
+          "solved_any": false,
+          "solved_n": 0,
+          "best_bp": 1,
+          "runs": [
+            {
+              "seed": 0,
+              "solved": false,
+              "bp": 1,
+              "trans": 0,
+              "t": 417.5
+            },
+            {
+              "seed": 1,
+              "solved": false,
+              "bp": 1,
+              "trans": 0,
+              "t": 424.7
+            }
+          ]
+        },
+        "roundrobin": {
+          "solved_any": false,
+          "solved_n": 0,
+          "best_bp": 1,
+          "runs": [
+            {
+              "seed": 0,
+              "solved": false,
+              "bp": 1,
+              "trans": 0,
+              "t": 454.6
+            },
+            {
+              "seed": 1,
+              "solved": false,
+              "bp": 1,
+              "trans": 0,
+              "t": 462.9
+            }
+          ]
+        },
+        "greedy": {
+          "solved_any": false,
+          "solved_n": 0,
+          "best_bp": 1,
+          "runs": [
+            {
+              "seed": 0,
+              "solved": false,
+              "bp": 1,
+              "trans": 0,
+              "t": 467.0
+            },
+            {
+              "seed": 1,
+              "solved": false,
+              "bp": 1,
+              "trans": 0,
+              "t": 456.1
+            }
+          ]
+        }
+      }
+    },
+    "49": {
+      "name": "Kudzu",
+      "len": 101,
+      "arms": {
+        "blind": {
+          "solved_any": false,
+          "solved_n": 0,
+          "best_bp": 1,
+          "runs": [
+            {
+              "seed": 0,
+              "solved": false,
+              "bp": 1,
+              "trans": 0,
+              "t": 409.0
+            },
+            {
+              "seed": 1,
+              "solved": false,
+              "bp": 1,
+              "trans": 0,
+              "t": 411.4
+            }
+          ]
+        },
+        "roundrobin": {
+          "solved_any": true,
+          "solved_n": 2,
+          "best_bp": 0,
+          "runs": [
+            {
+              "seed": 0,
+              "solved": true,
+              "bp": 0,
+              "trans": 0,
+              "t": 475.9
+            },
+            {
+              "seed": 1,
+              "solved": true,
+              "bp": 0,
+              "trans": 0,
+              "t": 469.7
+            }
+          ]
+        },
+        "greedy": {
+          "solved_any": true,
+          "solved_n": 2,
+          "best_bp": 0,
+          "runs": [
+            {
+              "seed": 0,
+              "solved": true,
+              "bp": 0,
+              "trans": 0,
+              "t": 463.7
+            },
+            {
+              "seed": 1,
+              "solved": true,
+              "bp": 0,
+              "trans": 0,
+              "t": 466.8
+            }
+          ]
+        }
+      }
+    },
+    "17": {
+      "name": "Six legd Turtle",
+      "len": 105,
+      "arms": {
+        "blind": {
+          "solved_any": false,
+          "solved_n": 0,
+          "best_bp": 2,
+          "runs": [
+            {
+              "seed": 0,
+              "solved": false,
+              "bp": 2,
+              "trans": 0,
+              "t": 543.9
+            },
+            {
+              "seed": 1,
+              "solved": false,
+              "bp": 2,
+              "trans": 0,
+              "t": 516.5
+            }
+          ]
+        },
+        "roundrobin": {
+          "solved_any": false,
+          "solved_n": 0,
+          "best_bp": 1,
+          "runs": [
+            {
+              "seed": 0,
+              "solved": false,
+              "bp": 1,
+              "trans": 0,
+              "t": 577.3
+            },
+            {
+              "seed": 1,
+              "solved": false,
+              "bp": 1,
+              "trans": 0,
+              "t": 600.1
+            }
+          ]
+        },
+        "greedy": {
+          "solved_any": false,
+          "solved_n": 0,
+          "best_bp": 1,
+          "runs": [
+            {
+              "seed": 0,
+              "solved": false,
+              "bp": 1,
+              "trans": 0,
+              "t": 586.2
+            },
+            {
+              "seed": 1,
+              "solved": false,
+              "bp": 1,
+              "trans": 0,
+              "t": 573.5
+            }
+          ]
+        }
+      }
+    },
+    "87": {
+      "name": "Cat's Toy 2",
+      "len": 100,
+      "arms": {
+        "blind": {
+          "solved_any": false,
+          "solved_n": 0,
+          "best_bp": 2,
+          "runs": [
+            {
+              "seed": 0,
+              "solved": false,
+              "bp": 2,
+              "trans": 0,
+              "t": 390.2
+            },
+            {
+              "seed": 1,
+              "solved": false,
+              "bp": 2,
+              "trans": 0,
+              "t": 395.0
+            }
+          ]
+        },
+        "roundrobin": {
+          "solved_any": false,
+          "solved_n": 0,
+          "best_bp": 2,
+          "runs": [
+            {
+              "seed": 0,
+              "solved": false,
+              "bp": 2,
+              "trans": 0,
+              "t": 433.1
+            },
+            {
+              "seed": 1,
+              "solved": false,
+              "bp": 2,
+              "trans": 0,
+              "t": 438.6
+            }
+          ]
+        },
+        "greedy": {
+          "solved_any": false,
+          "solved_n": 0,
+          "best_bp": 2,
+          "runs": [
+            {
+              "seed": 0,
+              "solved": false,
+              "bp": 2,
+              "trans": 0,
+              "t": 432.3
+            },
+            {
+              "seed": 1,
+              "solved": false,
+              "bp": 2,
+              "trans": 0,
+              "t": 444.3
+            }
+          ]
+        }
+      }
+    },
+    "79": {
+      "name": "Shapes and Energy",
+      "len": 101,
+      "arms": {
+        "blind": {
+          "solved_any": false,
+          "solved_n": 0,
+          "best_bp": 2,
+          "runs": [
+            {
+              "seed": 0,
+              "solved": false,
+              "bp": 2,
+              "trans": 0,
+              "t": 406.8
+            },
+            {
+              "seed": 1,
+              "solved": false,
+              "bp": 2,
+              "trans": 0,
+              "t": 430.4
+            }
+          ]
+        },
+        "roundrobin": {
+          "solved_any": false,
+          "solved_n": 0,
+          "best_bp": 2,
+          "runs": [
+            {
+              "seed": 0,
+              "solved": false,
+              "bp": 2,
+              "trans": 0,
+              "t": 480.3
+            },
+            {
+              "seed": 1,
+              "solved": false,
+              "bp": 2,
+              "trans": 0,
+              "t": 484.7
+            }
+          ]
+        },
+        "greedy": {
+          "solved_any": false,
+          "solved_n": 0,
+          "best_bp": 2,
+          "runs": [
+            {
+              "seed": 0,
+              "solved": false,
+              "bp": 2,
+              "trans": 0,
+              "t": 547.0
+            },
+            {
+              "seed": 1,
+              "solved": false,
+              "bp": 2,
+              "trans": 0,
+              "t": 635.3
+            }
+          ]
+        }
+      }
+    },
+    "16": {
+      "name": "Fractile",
+      "len": 105,
+      "arms": {
+        "blind": {
+          "solved_any": false,
+          "solved_n": 0,
+          "best_bp": 3,
+          "runs": [
+            {
+              "seed": 0,
+              "solved": false,
+              "bp": 3,
+              "trans": 0,
+              "t": 557.8
+            },
+            {
+              "seed": 1,
+              "solved": false,
+              "bp": 3,
+              "trans": 0,
+              "t": 546.5
+            }
+          ]
+        }
+      }
+    }
+  }
+}

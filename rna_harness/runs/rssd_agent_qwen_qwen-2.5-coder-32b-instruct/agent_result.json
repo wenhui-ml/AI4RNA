@@ -1,0 +1,65 @@
+{
+ "split": "parity",
+ "model": "qwen/qwen-2.5-coder-32b-instruct",
+ "des_cost": 0.04335906296637323,
+ "des_src": "measured median of 8 runs",
+ "budget_calls": 120,
+ "history": [
+  {
+   "round": 0,
+   "solved": 13,
+   "cost": 1.0406175111929576,
+   "skill_solved": 0,
+   "solves_lost": 0,
+   "code_errors": 24,
+   "budget_hit": 0,
+   "policy_err": "exec error: invalid syntax (<string>, line 1)"
+  },
+  {
+   "round": 1,
+   "solved": 8,
+   "cost": 0.6504989050461186,
+   "skill_solved": 0,
+   "solves_lost": 5,
+   "code_errors": 0,
+   "budget_hit": 0,
+   "policy_err": null
+  },
+  {
+   "round": 2,
+   "solved": 13,
+   "cost": 1.0406175111929576,
+   "skill_solved": 0,
+   "solves_lost": 0,
+   "code_errors": 24,
+   "budget_hit": 0,
+   "policy_err": "exec error: invalid syntax (<string>, line 1)"
+  },
+  {
+   "round": 3,
+   "solved": 13,
+   "cost": 1.0406175111929576,
+   "skill_solved": 0,
+   "solves_lost": 0,
+   "code_errors": 24,
+   "budget_hit": 0,
+   "policy_err": "exec error: invalid syntax (<string>, line 1)"
+  }
+ ],
+ "held": {
+  "solved": 96,
+  "cost": 5.419882870796647,
+  "solves_lost": 0,
+  "skill_solved": 0,
+  "sota_fired": 125,
+  "abstained": 0,
+  "code_errors": 125,
+  "budget_hit": 0,
+  "policy_err": "exec error: invalid syntax (<string>, line 1)",
+  "n": 125
+ },
+ "held_always_sota": {
+  "solved": 96,
+  "cost": 5.419882870796654
+ }
+}

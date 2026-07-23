@@ -1,0 +1,47 @@
+{
+ "config": {
+  "seeds": 5,
+  "batch": 32,
+  "budget": 20000,
+  "lr": 0.5,
+  "ent": 0.02,
+  "checkpoints": [
+   500,
+   2000,
+   8000,
+   20000
+  ],
+  "workers": 44,
+  "robust_theta": 0.9,
+  "nmin": 50,
+  "nmax": 110,
+  "outdir": "rna_harness/runs/rl_goodhart_hard"
+ },
+ "n_targets": 42,
+ "rows": [
+  {
+   "budget": 500,
+   "cheap_proxy": 0.9523809523809523,
+   "cheap_robust": 0.0,
+   "strong_robust": 0.0
+  },
+  {
+   "budget": 2000,
+   "cheap_proxy": 3.8095238095238093,
+   "cheap_robust": 0.9523809523809523,
+   "strong_robust": 0.47619047619047616
+  },
+  {
+   "budget": 8000,
+   "cheap_proxy": 5.238095238095238,
+   "cheap_robust": 2.380952380952381,
+   "strong_robust": 2.380952380952381
+  },
+  {
+   "budget": 20000,
+   "cheap_proxy": 4.761904761904762,
+   "cheap_robust": 4.285714285714286,
+   "strong_robust": 3.3333333333333335
+  }
+ ]
+}

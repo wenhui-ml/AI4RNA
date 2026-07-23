@@ -1,0 +1,31 @@
+Axis-1 oracle panel on 251 tasks x 3 oracles (pkiss, probknot, shapeknots); pool benefit-of-doubt. Independent oracles = ProbKnot, ShapeKnots.
+  25/251 tasks
+  50/251 tasks
+  75/251 tasks
+  100/251 tasks
+  125/251 tasks
+  150/251 tasks
+  175/251 tasks
+  200/251 tasks
+  225/251 tasks
+  250/251 tasks
+
+=== R3.1 AXIS-1 ORACLE VALIDITY (251 scored, 0 gated/abstained) ===
+  MFE-reported solved: 250
+  per-oracle false-accept rate among MFE-solved (the '28%' recomputed per oracle):
+    pkiss     :  70/250 =  28.0%  (forms T on 180)
+    probknot  :  37/250 =  14.8%  (forms T on 213)
+    shapeknots: 151/250 =  60.4%  (forms T on 99)
+    -> RANGE across oracles: [14.8, 60.4]%
+  cross-oracle agreement on 'forms T' (raw %, Cohen kappa):
+    pkiss|probknot        : raw  75.7%  kappa 0.30
+    pkiss|shapeknots      : raw  41.4%  kappa -0.07
+    probknot|shapeknots   : raw  41.0%  kappa -0.03
+  3-way unanimous: 73/251  |  disagreement (abstain): 178/251 = 70.9%
+  ORACLE-ROBUST false-accept (unanimous subset): 13/72 = 18.1%
+  positive control (independent oracles confirming pKiss-certified solves):
+    probknot  : 166/180 = 92.2%
+    shapeknots: 66/180 = 36.7%
+
+  wrote /data/wenhui/openclaude_rna/rna_harness/experiments/../runs/axis1_oracle_panel/panel.json
+PANEL_DONE

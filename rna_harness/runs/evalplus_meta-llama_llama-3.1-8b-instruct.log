@@ -1,0 +1,17 @@
+W4 EvalPlus: model=meta-llama/llama-3.1-8b-instruct dataset=humaneval problems=163 N=12 T=0.8
+  20/163 problems
+  40/163 problems
+  60/163 problems
+  80/163 problems
+  100/163 problems
+  120/163 problems
+  140/163 problems
+  160/163 problems
+
+=== k1 === cheap-passers 1509/1956; also pass strong 69.5% (OVER-ACCEPT mass 30.5%); best-of-12: cheap-robust=60.1% strong-robust=79.8%
+
+=== kbase === cheap-passers 1127/1956; also pass strong 93.1% (OVER-ACCEPT mass 6.9%); best-of-12: cheap-robust=76.7% strong-robust=79.8%
+
+  DIAL-ABILITY: over-accept mass 30.5% (k=1 base test) -> 6.9% (all base tests) -> 0% at strong (base+plus by definition). Standard benchmark, 163 problems.
+  tokens: prompt=377265 completion=190052
+  wrote /data/wenhui/openclaude_rna/rna_harness/experiments/../runs/llm_evalplus/meta-llama_llama-3.1-8b-instruct_summary.json

@@ -1,0 +1,13 @@
+E5' routing: |workload|=90 (match-accept 61%, gold-accept 1%)
+
+[Sound cascade, epsilon=0]  E[cost]=1.4743 ms  vs always-gold 1.2678 ms  (saving -16.3%)  correctness=100.0%  unsound_cases=0 (must be 0)
+
+[Risk-cost frontier]  epsilon -> stop-rung, E[cost], actual test FP:
+  eps<= 0.00 | stop@pfe   | E[cost]=1.5493 ms | actual FP=0.000
+  eps<= 0.05 | stop@pfe   | E[cost]=1.5493 ms | actual FP=0.000
+  eps<= 0.10 | stop@pfe   | E[cost]=1.5493 ms | actual FP=0.000
+  eps<= 0.25 | stop@pfe   | E[cost]=1.5493 ms | actual FP=0.000
+  eps<= 0.50 | stop@pfe   | E[cost]=1.5493 ms | actual FP=0.000
+  eps<= 0.90 | stop@pfe   | E[cost]=1.5493 ms | actual FP=0.000
+
+Takeaway: nesting gives a SOUND (eps=0) cost saving from cheap REJECTS; small-eps accept-stopping is blocked when cheap rungs are gameable -> robustness must pay the strong rung.

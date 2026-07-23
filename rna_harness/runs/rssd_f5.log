@@ -1,0 +1,10 @@
+F5 verifier-cost routing: 35 targets x screens [-1, 12, 8, 4] (-1=no screen); repair=40.0s
+
+=== F5 VERIFIER-COST ROUTING (pKiss wall + solves per screen strictness) ===
+  no-screen (baseline)   solved=20/35  total pKiss wall=634s
+  MFE-screen<=12bp       solved=19/35  total pKiss wall=630s
+  MFE-screen<=8bp        solved=16/35  total pKiss wall=544s
+  MFE-screen<=4bp        solved=16/35  total pKiss wall=429s
+
+  interpretation: a screen that keeps solved=20 while cutting pKiss wall below 634s is a free verification saving; one that drops solves is too strict.
+  wrote /data/wenhui/openclaude_rna/rna_harness/experiments/../runs/rssd_verifier_cost/verifier_cost.json

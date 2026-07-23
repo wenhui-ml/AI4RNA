@@ -1,0 +1,113 @@
+=== MODEL openai/gpt-3.5-turbo ===
+LLM verifier Goodhart: model=openai/gpt-3.5-turbo, 19 problems, N_max=12, T=0.8, provided-k=[1, 3]
+  floor_div      sampled 12 | strong-correct: 12/12
+  is_leap_year   sampled 12 | strong-correct: 12/12
+  days_in_month  sampled 12 | strong-correct: 12/12
+  median         sampled 12 | strong-correct: 12/12
+  mode           sampled 12 | strong-correct: 11/12
+  count_overlap  sampled 12 | strong-correct: 12/12
+  primes_up_to   sampled 12 | strong-correct: 8/12
+  fib            sampled 12 | strong-correct: 12/12
+  is_palindrome  sampled 12 | strong-correct: 12/12
+  gcd            sampled 12 | strong-correct: 12/12
+  first_index    sampled 12 | strong-correct: 12/12
+  round_half_even sampled 12 | strong-correct: 11/12
+  chunk          sampled 12 | strong-correct: 12/12
+  binary_search  sampled 12 | strong-correct: 12/12
+  str_to_int     sampled 12 | strong-correct: 12/12
+  avg            sampled 12 | strong-correct: 12/12
+  is_anagram     sampled 12 | strong-correct: 12/12
+  nth_largest    sampled 12 | strong-correct: 0/12
+  count_words    sampled 12 | strong-correct: 12/12
+
+=== provided-k=1 === Axis-2 survival: 227/228 pass cheap rung; 92.5% also pass strong (FP-mass 7.5%). best-of-12: cheap-robust=94.7% strong-robust=94.7%
+
+=== provided-k=3 === Axis-2 survival: 222/228 pass cheap rung; 94.6% also pass strong (FP-mass 5.4%). best-of-12: cheap-robust=94.7% strong-robust=94.7%
+
+  tokens: prompt=16668 completion=8066
+LLM_GOODHART_DONE
+=== MODEL meta-llama/llama-3.1-8b-instruct ===
+LLM verifier Goodhart: model=meta-llama/llama-3.1-8b-instruct, 19 problems, N_max=12, T=0.8, provided-k=[1, 3]
+  floor_div      sampled 12 | strong-correct: 9/12
+  is_leap_year   sampled 12 | strong-correct: 12/12
+  days_in_month  sampled 12 | strong-correct: 12/12
+  median         sampled 12 | strong-correct: 12/12
+  mode           sampled 12 | strong-correct: 11/12
+  count_overlap  sampled 12 | strong-correct: 9/12
+  primes_up_to   sampled 12 | strong-correct: 12/12
+  fib            sampled 12 | strong-correct: 12/12
+  is_palindrome  sampled 12 | strong-correct: 12/12
+  gcd            sampled 12 | strong-correct: 12/12
+  first_index    sampled 12 | strong-correct: 12/12
+  round_half_even sampled 12 | strong-correct: 2/12
+  chunk          sampled 12 | strong-correct: 10/12
+  binary_search  sampled 12 | strong-correct: 12/12
+  str_to_int     sampled 12 | strong-correct: 4/12
+  avg            sampled 12 | strong-correct: 11/12
+  is_anagram     sampled 12 | strong-correct: 12/12
+  nth_largest    sampled 12 | strong-correct: 10/12
+  count_words    sampled 12 | strong-correct: 12/12
+
+=== provided-k=1 === Axis-2 survival: 218/228 pass cheap rung; 90.8% also pass strong (FP-mass 9.2%). best-of-12: cheap-robust=89.5% strong-robust=100.0%
+
+=== provided-k=3 === Axis-2 survival: 200/228 pass cheap rung; 99.0% also pass strong (FP-mass 1.0%). best-of-12: cheap-robust=100.0% strong-robust=100.0%
+
+  tokens: prompt=17882 completion=11561
+LLM_GOODHART_DONE
+=== MODEL qwen/qwen-2.5-coder-32b-instruct ===
+LLM verifier Goodhart: model=qwen/qwen-2.5-coder-32b-instruct, 19 problems, N_max=12, T=0.8, provided-k=[1, 3]
+  floor_div      sampled 12 | strong-correct: 12/12
+  is_leap_year   sampled 12 | strong-correct: 0/12
+  days_in_month  sampled 12 | strong-correct: 0/12
+  median         sampled 12 | strong-correct: 0/12
+  mode           sampled 12 | strong-correct: 12/12
+  count_overlap  sampled 12 | strong-correct: 0/12
+  primes_up_to   sampled 12 | strong-correct: 7/12
+  fib            sampled 12 | strong-correct: 0/12
+  is_palindrome  sampled 12 | strong-correct: 12/12
+  gcd            sampled 12 | strong-correct: 0/12
+  first_index    sampled 12 | strong-correct: 12/12
+  round_half_even sampled 12 | strong-correct: 12/12
+  chunk          sampled 12 | strong-correct: 12/12
+  binary_search  sampled 12 | strong-correct: 0/12
+  str_to_int     sampled 12 | strong-correct: 11/12
+  avg            sampled 12 | strong-correct: 12/12
+  is_anagram     sampled 12 | strong-correct: 12/12
+  nth_largest    sampled 12 | strong-correct: 12/12
+  count_words    sampled 12 | strong-correct: 12/12
+
+=== provided-k=1 === Axis-2 survival: 138/228 pass cheap rung; 100.0% also pass strong (FP-mass 0.0%). best-of-12: cheap-robust=63.2% strong-robust=63.2%
+
+=== provided-k=3 === Axis-2 survival: 138/228 pass cheap rung; 100.0% also pass strong (FP-mass 0.0%). best-of-12: cheap-robust=63.2% strong-robust=63.2%
+
+  tokens: prompt=12206 completion=5714
+LLM_GOODHART_DONE
+=== MODEL openai/gpt-4o-mini ===
+LLM verifier Goodhart: model=openai/gpt-4o-mini, 19 problems, N_max=12, T=0.8, provided-k=[1, 3]
+  floor_div      sampled 12 | strong-correct: 0/12
+  is_leap_year   sampled 12 | strong-correct: 12/12
+  days_in_month  sampled 12 | strong-correct: 12/12
+  median         sampled 12 | strong-correct: 12/12
+  mode           sampled 12 | strong-correct: 12/12
+  count_overlap  sampled 12 | strong-correct: 12/12
+  primes_up_to   sampled 12 | strong-correct: 12/12
+  fib            sampled 12 | strong-correct: 12/12
+  is_palindrome  sampled 12 | strong-correct: 12/12
+  gcd            sampled 12 | strong-correct: 12/12
+  first_index    sampled 12 | strong-correct: 12/12
+  round_half_even sampled 12 | strong-correct: 5/12
+  chunk          sampled 12 | strong-correct: 12/12
+  binary_search  sampled 12 | strong-correct: 12/12
+  str_to_int     sampled 12 | strong-correct: 12/12
+  avg            sampled 12 | strong-correct: 12/12
+  is_anagram     sampled 12 | strong-correct: 12/12
+  nth_largest    sampled 12 | strong-correct: 12/12
+  count_words    sampled 12 | strong-correct: 12/12
+
+=== provided-k=1 === Axis-2 survival: 226/228 pass cheap rung; 92.5% also pass strong (FP-mass 7.5%). best-of-12: cheap-robust=89.5% strong-robust=94.7%
+
+=== provided-k=3 === Axis-2 survival: 209/228 pass cheap rung; 100.0% also pass strong (FP-mass 0.0%). best-of-12: cheap-robust=94.7% strong-robust=94.7%
+
+  tokens: prompt=16644 completion=12283
+LLM_GOODHART_DONE
+LLM_MULTI_DONE

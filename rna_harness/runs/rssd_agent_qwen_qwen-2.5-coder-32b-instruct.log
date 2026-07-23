@@ -1,0 +1,13 @@
+RSSD-agent: split=parity train=126 held=125; self-revise on 24 TRAIN targets; DesiRNA cost=measured median of 8 runs ($4.34e-02); model=qwen/qwen-2.5-coder-32b-instruct
+  [round 0] TRAIN-subset: solved=13/24 cost=$1.0406 skill_solved=0 lost=0 code_err=24 budget_hit=0 policy_err=exec error: invalid syntax (<string>, line 1)
+  [round 1] TRAIN-subset: solved=8/24 cost=$0.6505 skill_solved=0 lost=5 code_err=0 budget_hit=0 policy_err=None
+  [round 2] TRAIN-subset: solved=13/24 cost=$1.0406 skill_solved=0 lost=0 code_err=24 budget_hit=0 policy_err=exec error: invalid syntax (<string>, line 1)
+  [round 3] TRAIN-subset: solved=13/24 cost=$1.0406 skill_solved=0 lost=0 code_err=24 budget_hit=0 policy_err=exec error: invalid syntax (<string>, line 1)
+
+  FROZEN authored procedure -> evaluating on 125 HELD-OUT targets ...
+
+=== RSSD v2 (agent-authored procedure, HELD-OUT = 125 targets, gaming-proof) ===
+  always_sota           solved= 96/125  cost=$5.4199
+  agent procedure       solved= 96/125  cost=$5.4199  -> 1x cheaper
+    (cheap skill solved 0; SOTA fired 125, abstained 0; REAL solves lost by abstaining: 0; real code exceptions: 125 targets; budget-exhausted (unsolvable): 0)
+  wrote rna_harness/runs/rssd_agent_qwen_qwen-2.5-coder-32b-instruct/agent_result.json + authored_skill.py

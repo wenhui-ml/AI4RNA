@@ -1,0 +1,21 @@
+
+=== RSSD held-out compounding (Pseudobase++ PK; DesiRNA cost = measured median of 8 runs) ===
+  pkdecomp solves 175/251, DesiRNA 180/251; skill-only (delta-capability) = 0  -> NULL (designability wall)
+
+  HELD-OUT (125 targets, learned router trained ONLY on the disjoint TRAIN split):
+    always_sota  solved= 96/125  cost=$5.4199
+    cold         solved= 96/125  cost=$1.5585  first_solver={'pkdecomp': 92, None: 0, 'desirna@300': 4}
+    learned      solved= 96/125  cost=$1.5451  first_solver={'pkdecomp': 92, None: 0, 'desirna@300': 4}
+
+  cost to reach the same held-out solve set:
+    skill (cold)   vs always-SOTA : $1.5585 vs $5.4199  -> 3.5x cheaper
+    skill+learned  vs always-SOTA : $1.5451 vs $5.4199  -> 3.5x cheaper
+    learning gain (cold->learned) : $1.5585 -> $1.5451  (0.9% of cold)
+
+  LEARNED ABSTENTION (fire SOTA only when P(DesiRNA solves)>=tau, learned on TRAIN):
+    always_sota      solved= 96/125  cost=$5.4199
+    abstain@tau=0.15   solved= 96/125  cost=$0.8414  -> 6x cheaper | SOTA fired 19, abstained 14 (real solves lost: 0)
+    abstain@tau=0.3    solved= 96/125  cost=$0.4512  -> 12x cheaper | SOTA fired 10, abstained 23 (real solves lost: 0)
+    abstain@tau=0.5    solved= 96/125  cost=$0.4078  -> 13x cheaper | SOTA fired 9, abstained 24 (real solves lost: 0)
+
+  wrote /data/wenhui/openclaude_rna/rna_harness/experiments/../runs/rssd_compounding/compounding.json

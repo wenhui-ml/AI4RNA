@@ -1,0 +1,17 @@
+W4 EvalPlus: model=qwen/qwen-2.5-coder-32b-instruct dataset=humaneval problems=163 N=12 T=0.8
+  20/163 problems
+  40/163 problems
+  60/163 problems
+  80/163 problems
+  100/163 problems
+  120/163 problems
+  140/163 problems
+  160/163 problems
+
+=== k1 === cheap-passers 793/1956; also pass strong 93.4% (OVER-ACCEPT mass 6.6%); best-of-12: cheap-robust=57.7% strong-robust=60.7%
+
+=== kbase === cheap-passers 741/1956; also pass strong 100.0% (OVER-ACCEPT mass 0.0%); best-of-12: cheap-robust=60.7% strong-robust=60.7%
+
+  DIAL-ABILITY: over-accept mass 6.6% (k=1 base test) -> 0.0% (all base tests) -> 0% at strong (base+plus by definition). Standard benchmark, 163 problems.
+  tokens: prompt=229355 completion=75086
+  wrote /data/wenhui/openclaude_rna/rna_harness/experiments/../runs/llm_evalplus/qwen_qwen-2.5-coder-32b-instruct_summary.json

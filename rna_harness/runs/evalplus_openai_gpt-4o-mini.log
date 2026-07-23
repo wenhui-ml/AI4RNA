@@ -1,0 +1,17 @@
+W4 EvalPlus: model=openai/gpt-4o-mini dataset=humaneval problems=163 N=12 T=0.8
+  20/163 problems
+  40/163 problems
+  60/163 problems
+  80/163 problems
+  100/163 problems
+  120/163 problems
+  140/163 problems
+  160/163 problems
+
+=== k1 === cheap-passers 1656/1956; also pass strong 88.3% (OVER-ACCEPT mass 11.7%); best-of-12: cheap-robust=81.0% strong-robust=86.5%
+
+=== kbase === cheap-passers 1489/1956; also pass strong 98.3% (OVER-ACCEPT mass 1.7%); best-of-12: cheap-robust=85.9% strong-robust=86.5%
+
+  DIAL-ABILITY: over-accept mass 11.7% (k=1 base test) -> 1.7% (all base tests) -> 0% at strong (base+plus by definition). Standard benchmark, 163 problems.
+  tokens: prompt=367488 completion=156944
+  wrote /data/wenhui/openclaude_rna/rna_harness/experiments/../runs/llm_evalplus/openai_gpt-4o-mini_summary.json

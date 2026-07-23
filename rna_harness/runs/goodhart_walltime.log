@@ -1,0 +1,19 @@
+matched-wall-time Goodhart: 18 targets x 5 seeds x 4 walls x 2 arms = 720 runs; theta=0.9
+  100/720
+  200/720
+  300/720
+  400/720
+  500/720
+  600/720
+  700/720
+
+=== MATCHED-WALL-TIME Goodhart (18 targets x 5 seeds) ===
+ wall(s) |        cheap: proxy  robust  steps |      strong: robust  steps
+    0.25 | proxy= 44.4% robust= 17.8% steps=  588 | robust= 12.2% steps=  196
+     1.0 | proxy= 55.6% robust= 18.9% steps= 2126 | robust= 20.0% steps=  786
+     4.0 | proxy= 61.1% robust= 13.3% steps= 8273 | robust= 26.7% steps= 3196
+    16.0 | proxy= 72.2% robust= 17.8% steps=33785 | robust= 31.1% steps=12747
+
+  cheap-arm robustness across wall-budget:  [17.8, 18.9, 13.3, 17.8]
+  strong-arm robustness across wall-budget: [12.2, 20.0, 26.7, 31.1]
+  DiD (strong gain - cheap gain, first->last): +18.9 pts

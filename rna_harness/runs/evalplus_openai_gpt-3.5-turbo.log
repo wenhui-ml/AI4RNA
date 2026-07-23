@@ -1,0 +1,17 @@
+W4 EvalPlus: model=openai/gpt-3.5-turbo dataset=humaneval problems=163 N=12 T=0.8
+  20/163 problems
+  40/163 problems
+  60/163 problems
+  80/163 problems
+  100/163 problems
+  120/163 problems
+  140/163 problems
+  160/163 problems
+
+=== k1 === cheap-passers 1527/1956; also pass strong 75.8% (OVER-ACCEPT mass 24.2%); best-of-12: cheap-robust=67.5% strong-robust=81.6%
+
+=== kbase === cheap-passers 1206/1956; also pass strong 95.9% (OVER-ACCEPT mass 4.1%); best-of-12: cheap-robust=77.9% strong-robust=81.6%
+
+  DIAL-ABILITY: over-accept mass 24.2% (k=1 base test) -> 4.1% (all base tests) -> 0% at strong (base+plus by definition). Standard benchmark, 163 problems.
+  tokens: prompt=367488 completion=117936
+  wrote /data/wenhui/openclaude_rna/rna_harness/experiments/../runs/llm_evalplus/openai_gpt-3.5-turbo_summary.json

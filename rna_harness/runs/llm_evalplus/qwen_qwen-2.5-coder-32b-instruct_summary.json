@@ -1,0 +1,68 @@
+{
+ "model": "qwen/qwen-2.5-coder-32b-instruct",
+ "dataset": "humaneval",
+ "n_problems": 163,
+ "config": {
+  "model": "qwen/qwen-2.5-coder-32b-instruct",
+  "dataset": "humaneval",
+  "limit": 0,
+  "n_max": 12,
+  "budgets": [
+   1,
+   4,
+   12
+  ],
+  "temperature": 0.8,
+  "gen_workers": 8,
+  "seed": 0,
+  "outdir": "/data/wenhui/openclaude_rna/rna_harness/experiments/../runs/llm_evalplus"
+ },
+ "agg": {
+  "k1": {
+   "survival": 93.4,
+   "cheap_accept": 793,
+   "total": 1956,
+   "over_accept_pct": 6.6,
+   "byN": {
+    "1": {
+     "cheap_proxy": 36.8,
+     "cheap_robust": 33.1,
+     "strong_robust": 33.1
+    },
+    "4": {
+     "cheap_proxy": 55.2,
+     "cheap_robust": 49.7,
+     "strong_robust": 52.1
+    },
+    "12": {
+     "cheap_proxy": 63.2,
+     "cheap_robust": 57.7,
+     "strong_robust": 60.7
+    }
+   }
+  },
+  "kbase": {
+   "survival": 100.0,
+   "cheap_accept": 741,
+   "total": 1956,
+   "over_accept_pct": 0.0,
+   "byN": {
+    "1": {
+     "cheap_proxy": 33.1,
+     "cheap_robust": 33.1,
+     "strong_robust": 33.1
+    },
+    "4": {
+     "cheap_proxy": 52.1,
+     "cheap_robust": 52.1,
+     "strong_robust": 52.1
+    },
+    "12": {
+     "cheap_proxy": 60.7,
+     "cheap_robust": 60.7,
+     "strong_robust": 60.7
+    }
+   }
+  }
+ }
+}

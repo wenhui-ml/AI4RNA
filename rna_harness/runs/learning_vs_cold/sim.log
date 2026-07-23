@@ -1,0 +1,21 @@
+
+=== learning vs no-learning on 18 puzzles (7 hard: [59, 66, 57, 72, 77, 60, 50]) ===
+  cold (no-learn)        solved=18/18  total=$0.6130
+  learn pass 0           solved=18/18  total=$0.4040
+  learn pass 1           solved=18/18  total=$0.3084
+  learn pass 2           solved=18/18  total=$0.2676
+  learn pass 3           solved=18/18  total=$0.1649
+
+  converged saving = $0.4481  (73.1% of cold)  | solves equal: True
+
+  hard-puzzle attribution (cold cost -> learn cost | learn's first tool):
+    pid  59: $0.0513 -> $0.0089  first=desirna@60s  SKIPPED cheap tier
+    pid  66: $0.0171 -> $0.0130  first=remc@5s      still cheap-first
+    pid  57: $0.0210 -> $0.0089  first=desirna@60s  SKIPPED cheap tier
+    pid  72: $0.0555 -> $0.0089  first=desirna@60s  SKIPPED cheap tier
+    pid  77: $0.1493 -> $0.0349  first=desirna@60s  SKIPPED cheap tier
+    pid  60: $0.2261 -> $0.0257  first=desirna@180s SKIPPED cheap tier
+    pid  50: $0.0903 -> $0.0091  first=desirna@60s  SKIPPED cheap tier
+  saving on hard puzzles alone = $0.5013 (112% of total saving)
+
+  wrote /data/wenhui/openclaude_rna/rna_harness/experiments/../runs/learning_vs_cold/sim.json

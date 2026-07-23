@@ -1,0 +1,16 @@
+=== RSSD DECOUPLE: agent-discovered skill + proven 0-loss k-NN abstention ===
+  [PK] running GLM-authored skill on 251 targets ...
+
+  === PK (held-out 125; agent skill solved 170/251 overall) ===
+    always-SOTA                 solved=96/125  cost=$5.4199  (1.0x)
+    skill cascade (no abstain)  solved=96/125  cost=$1.5038  (3.6x)
+  [nested] running GLM-authored skill on 100 Eterna targets ...
+
+  === NESTED (held-out 50; agent skill solved 42/100 overall) ===
+    always-SOTA                 solved=42/50  cost=$1.2911  (1.0x)
+    skill cascade (no abstain)  solved=42/50  cost=$0.7998  (1.6x)
+    skill + 0-loss abstention   solved=42/50  cost=$0.6965  (1.9x cheaper, SAME quality, 0 lost)
+
+=== HEADLINE (decoupled, equal-quality) ===
+  nested : agent-discovered skill + 0-loss abstention = same 42/50 solved as always-SOTA, at 1.9x lower compute.
+  wrote /data/wenhui/openclaude_rna/rna_harness/experiments/../runs/rssd_decouple/decouple.json

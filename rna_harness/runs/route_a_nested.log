@@ -1,0 +1,14 @@
+Route A (nested/Eterna agent-authoring): 73 puzzles with DesiRNA outcome (train 36/held 37); self-revise on 24; model=z-ai/glm-5.2 reasoning=off; DesiRNA cost=$2.58e-02
+  [round 0] TRAIN: solved=16/24 cost=$0.0076 skill_solved=16 lost=6 code_err=0
+  [round 1] TRAIN: solved=15/24 cost=$0.0085 skill_solved=15 lost=7 code_err=0
+  [round 2] TRAIN: solved=16/24 cost=$0.0086 skill_solved=16 lost=6 code_err=0
+  [round 3] TRAIN: solved=15/24 cost=$0.0094 skill_solved=15 lost=7 code_err=0
+
+  FROZEN -> HELD-OUT (37 nested puzzles) ...
+
+=== ROUTE A (nested agent-authoring, HELD-OUT=37) ===
+  always_sota      solved=37/37  cost=$0.9548
+  agent procedure  solved=24/37  cost=$0.0383  -> 25x cheaper
+    (cheap nested skill solved 23; SOTA fired 1, abstained 13; real solves lost 13; code exceptions 0)
+  => agent method-discovery GENERALISES to nested (skill alone solved 23/37)
+  wrote /data/wenhui/openclaude_rna/rna_harness/experiments/../runs/rssd_agent_nested/agent_result.json + authored_skill.py

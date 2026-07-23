@@ -1,0 +1,18 @@
+W1 RL-Goodhart: 18 targets (n<=50) x 5 seeds x 2 arms; REINFORCE batch=32 budget=20000 lr=0.5 ent=0.02
+  30/180 units done
+  60/180 units done
+  90/180 units done
+  120/180 units done
+  150/180 units done
+  180/180 units done
+
+=== W1: GOODHART UNDER RL (REINFORCE; 18x5=90 units/cell) ===
+   budget | cheap: proxy(match)  robust(P>= 0.9) | strong: robust
+      200 |         11.1%          4.4%       |         12.2%
+     1000 |         15.6%          8.9%       |         23.3%
+     5000 |         31.1%         24.4%       |         32.2%
+    20000 |         34.4%         27.8%       |         36.7%
+
+  -> cheap arm: proxy 11->34% while robustness 4->28%  (GOODHART (proxy up, robustness stalls/falls))
+  -> strong arm robustness 12->37% (control: optimizing the true objective builds robustness)
+  wrote /data/wenhui/openclaude_rna/rna_harness/experiments/../runs/rl_goodhart/rl_goodhart.json

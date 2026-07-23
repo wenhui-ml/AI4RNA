@@ -1,0 +1,25 @@
+cognitive-eval on 18 puzzles; policies=['cognitive', 'always_cheap', 'always_sota']
+  pid   8 n=  12 | cognitive:True/$2.75e-07 always_cheap:True/$7.93e-08 always_sota:True/$2.58e-02
+  pid   1 n=  16 | cognitive:True/$1.07e-07 always_cheap:True/$7.71e-08 always_sota:True/$2.63e-02
+  pid  23 n=  17 | cognitive:True/$1.17e-07 always_cheap:True/$8.28e-08 always_sota:True/$2.62e-02
+  pid  45 n=  63 | cognitive:True/$6.02e-06 always_cheap:True/$5.49e-06 always_sota:True/$2.54e-02
+  pid  18 n=  67 | cognitive:True/$5.23e-07 always_cheap:True/$3.60e-07 always_sota:True/$2.56e-02
+  pid  59 n=  68 | cognitive:True/$5.42e-02 always_cheap:False/$2.34e-02 always_sota:True/$2.57e-02
+  pid  95 n=  82 | cognitive:True/$1.41e-04 always_cheap:True/$1.43e-04 always_sota:True/$2.57e-02
+  pid  49 n= 101 | cognitive:True/$2.16e-04 always_cheap:True/$2.17e-04 always_sota:True/$2.55e-02
+  pid  37 n= 103 | cognitive:True/$1.32e-04 always_cheap:True/$1.34e-04 always_sota:True/$2.57e-02
+  pid  16 n= 105 | cognitive:True/$8.61e-05 always_cheap:True/$8.57e-05 always_sota:True/$2.56e-02
+  pid  36 n= 151 | cognitive:True/$2.71e-05 always_cheap:True/$2.69e-05 always_sota:True/$2.59e-02
+  pid   6 n= 379 | cognitive:True/$1.74e-03 always_cheap:True/$1.74e-03 always_sota:True/$2.63e-02
+  pid  66 n=  36 | cognitive:True/$1.70e-02 always_cheap:False/$4.06e-03 always_sota:True/$2.58e-02
+  pid  57 n=  44 | cognitive:True/$2.25e-02 always_cheap:False/$3.51e-03 always_sota:True/$2.57e-02
+  pid  72 n=  73 | cognitive:True/$6.16e-02 always_cheap:False/$2.52e-02 always_sota:True/$2.56e-02
+  pid  77 n= 105 | cognitive:True/$5.32e-02 always_cheap:False/$4.45e-02 always_sota:True/$2.56e-02
+  pid  60 n= 106 | cognitive:True/$8.69e-03 always_cheap:False/$6.56e-02 always_sota:False/$2.61e-02
+  pid  50 n= 108 | cognitive:True/$4.96e-02 always_cheap:False/$4.31e-02 always_sota:True/$2.55e-02
+
+=== AGGREGATE (solve-count, total $, mean $/solve) ===
+  cognitive      solved=18/18  total_cost=$2.692e-01  mean_$/solve=$1.496e-02
+  always_cheap   solved=11/18  total_cost=$2.118e-01  mean_$/solve=$1.925e-02
+  always_sota    solved=17/18  total_cost=$4.638e-01  mean_$/solve=$2.728e-02
+thesis: cognitive should match always_sota's solved at a LOWER total_cost.

@@ -1,0 +1,16 @@
+E4' verifier cost: lengths=[30, 60, 100, 150, 200, 250, 300] reps=15 (+pKiss branch up to n=150)
+  n=  30  match=   0.12ms(p95    0.25)  umfe=   0.37ms(p95    0.58)  pfe=   0.44ms(p95    1.14)  pKiss=   120.9ms  RSS=28MB
+  n=  60  match=   2.34ms(p95    2.62)  umfe=   6.95ms(p95    8.18)  pfe=   7.90ms(p95    9.14)  pKiss=   121.5ms  RSS=28MB
+  n= 100  match=   8.27ms(p95    9.61)  umfe=  25.26ms(p95   29.55)  pfe=  29.83ms(p95   34.31)  pKiss=   121.3ms  RSS=28MB
+  n= 150  match=  22.19ms(p95   24.05)  umfe=  67.06ms(p95   72.78)  pfe=  81.64ms(p95   89.26)  pKiss=   122.6ms  RSS=28MB
+  n= 200  match=  41.23ms(p95   44.85)  umfe= 126.46ms(p95  137.22)  pfe= 155.21ms(p95  169.23)  RSS=28MB
+  n= 250  match=  63.54ms(p95   68.99)  umfe= 195.00ms(p95  213.15)  pfe= 245.93ms(p95  263.86)  RSS=28MB
+  n= 300  match=  98.39ms(p95  107.60)  umfe= 300.97ms(p95  333.02)  pfe= 384.18ms(p95  418.73)  RSS=28MB
+
+=== empirical scaling exponent (slope of log median-wall vs log n) ===
+  match : ~n^2.78   (median wall at n=300: 98.39 ms)
+  umfe  : ~n^2.79   (median wall at n=300: 300.97 ms; uMFE/heavy-tail max 333.02 ms)
+  pfe   : ~n^2.84   (median wall at n=300: 384.18 ms)
+  pkiss : median wall 121->123 ms (n=30->150); BRANCH, startup-dominated at small n
+
+Honest read: match/uMFE/pfe within a small constant factor (all ~O(n^3)); the big jump is the pKiss BRANCH, not a strictness rung.

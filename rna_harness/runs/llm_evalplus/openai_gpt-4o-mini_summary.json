@@ -1,0 +1,68 @@
+{
+ "model": "openai/gpt-4o-mini",
+ "dataset": "humaneval",
+ "n_problems": 163,
+ "config": {
+  "model": "openai/gpt-4o-mini",
+  "dataset": "humaneval",
+  "limit": 0,
+  "n_max": 12,
+  "budgets": [
+   1,
+   4,
+   12
+  ],
+  "temperature": 0.8,
+  "gen_workers": 8,
+  "seed": 0,
+  "outdir": "/data/wenhui/openclaude_rna/rna_harness/experiments/../runs/llm_evalplus"
+ },
+ "agg": {
+  "k1": {
+   "survival": 88.3,
+   "cheap_accept": 1656,
+   "total": 1956,
+   "over_accept_pct": 11.7,
+   "byN": {
+    "1": {
+     "cheap_proxy": 85.9,
+     "cheap_robust": 77.3,
+     "strong_robust": 77.3
+    },
+    "4": {
+     "cheap_proxy": 89.6,
+     "cheap_robust": 79.8,
+     "strong_robust": 82.2
+    },
+    "12": {
+     "cheap_proxy": 91.4,
+     "cheap_robust": 81.0,
+     "strong_robust": 86.5
+    }
+   }
+  },
+  "kbase": {
+   "survival": 98.3,
+   "cheap_accept": 1489,
+   "total": 1956,
+   "over_accept_pct": 1.7,
+   "byN": {
+    "1": {
+     "cheap_proxy": 78.5,
+     "cheap_robust": 77.3,
+     "strong_robust": 77.3
+    },
+    "4": {
+     "cheap_proxy": 82.8,
+     "cheap_robust": 81.6,
+     "strong_robust": 82.2
+    },
+    "12": {
+     "cheap_proxy": 87.7,
+     "cheap_robust": 85.9,
+     "strong_robust": 86.5
+    }
+   }
+  }
+ }
+}

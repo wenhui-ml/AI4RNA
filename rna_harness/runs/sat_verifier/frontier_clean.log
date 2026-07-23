@@ -1,0 +1,9 @@
+E6' SAT frontier: n=60, alphas=[3.0, 3.5, 3.8, 4.0, 4.2, 4.267], k=20/alpha, theta=0.3, cheap-budget=60000 (median rho conditioned on SAT to avoid solve-failure contamination)
+  alpha=  3.0 | n_sat=20 | V0-accept=100% | median rho|sat=0.233 (nrho=20) | robust(rho>= 0.3)=  25%  fragile=  75%
+  alpha=  3.5 | n_sat=20 | V0-accept=100% | median rho|sat=0.167 (nrho=20) | robust(rho>= 0.3)=   0%  fragile= 100%
+  alpha=  3.8 | n_sat=20 | V0-accept=100% | median rho|sat=0.133 (nrho=20) | robust(rho>= 0.3)=   0%  fragile= 100%
+  alpha=  4.0 | n_sat=20 | V0-accept= 95% | median rho|sat=0.117 (nrho=19) | robust(rho>= 0.3)=   0%  fragile= 100%
+  alpha=  4.2 | n_sat=20 | V0-accept= 90% | median rho|sat=0.117 (nrho=18) | robust(rho>= 0.3)=   0%  fragile= 100%
+  alpha=4.267 | n_sat=20 | V0-accept= 85% | median rho|sat=0.100 (nrho=17) | robust(rho>= 0.3)=   0%  fragile= 100%
+
+Mirror of RNA E1': cheap V0 accepts ~all it SOLVES; robustness (median rho | SAT) DROPS as alpha -> threshold. V0-accept<100% at high alpha = cheap-solver reach limit (raise --budget), reported separately so it does not contaminate the fragility signal.

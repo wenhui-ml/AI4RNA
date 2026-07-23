@@ -1,0 +1,45 @@
+{
+ "config": {
+  "seeds": 5,
+  "batch": 32,
+  "budget": 20000,
+  "lr": 0.5,
+  "ent": 0.02,
+  "checkpoints": [
+   200,
+   1000,
+   5000,
+   20000
+  ],
+  "workers": 40,
+  "robust_theta": 0.9,
+  "outdir": "/data/wenhui/openclaude_rna/rna_harness/experiments/../runs/rl_goodhart"
+ },
+ "n_targets": 18,
+ "rows": [
+  {
+   "budget": 200,
+   "cheap_proxy": 10.0,
+   "cheap_robust": 5.555555555555555,
+   "strong_robust": 12.222222222222221
+  },
+  {
+   "budget": 1000,
+   "cheap_proxy": 20.0,
+   "cheap_robust": 11.11111111111111,
+   "strong_robust": 23.333333333333332
+  },
+  {
+   "budget": 5000,
+   "cheap_proxy": 26.666666666666668,
+   "cheap_robust": 23.333333333333332,
+   "strong_robust": 32.22222222222222
+  },
+  {
+   "budget": 20000,
+   "cheap_proxy": 36.666666666666664,
+   "cheap_robust": 26.666666666666668,
+   "strong_robust": 36.666666666666664
+  }
+ ]
+}

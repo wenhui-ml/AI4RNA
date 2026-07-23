@@ -1,0 +1,12 @@
+E5 Eterna budget curve: 20 hard residual targets x budgets [60, 600, 1800]s (DesiRNA, MFE-verify)
+  -t   60s : solved 7/20 of the hard set
+  -t  600s : solved 10/20 of the hard set
+  -t 1800s : solved 12/20 of the hard set
+
+=== E5 ETERNA 86->97 BUDGET CURVE (hard residual, n=20) ===
+  by -t 60s (cumulative): 7/20 hard residual solved
+  by -t 600s (cumulative): 10/20 hard residual solved
+  by -t 1800s (cumulative): 12/20 hard residual solved
+  still unsolved at 1800s: 8/20  [90, 91, 100, 96, 99, 86, 68, 81]
+  interpretation: if solves rise steadily with -t, the 86->97 gap is BUDGET; the 8 that resist even 1800s are the genuinely-hard tail (need hours, per DesiRNA's own 24h #97/#100).
+  wrote /data/wenhui/openclaude_rna/rna_harness/experiments/../runs/rssd_eterna_budget/budget_curve.json

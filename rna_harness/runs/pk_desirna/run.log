@@ -1,0 +1,31 @@
+PK head-to-head on 24 Pseudobase++ targets; DesiRNA R=10 -t=60s (workers=12); then pKiss re-verify. Oracle-vs-PK false-positive test.
+    pseudobase:0 n= 34 pk_pairs= 4 | MFE-oracle says solved=True | pKiss REAL bp=2 solved=False  <-- FALSE POSITIVE
+    pseudobase:1 n= 24 pk_pairs= 6 | MFE-oracle says solved=True | pKiss REAL bp=0 solved=True
+    pseudobase:2 n= 32 pk_pairs= 5 | MFE-oracle says solved=True | pKiss REAL bp=1 solved=False  <-- FALSE POSITIVE
+    pseudobase:3 n= 34 pk_pairs= 7 | MFE-oracle says solved=True | pKiss REAL bp=0 solved=True
+    pseudobase:4 n= 26 pk_pairs= 6 | MFE-oracle says solved=True | pKiss REAL bp=0 solved=True
+    pseudobase:5 n= 29 pk_pairs= 3 | MFE-oracle says solved=True | pKiss REAL bp=0 solved=True
+    pseudobase:6 n= 41 pk_pairs= 5 | MFE-oracle says solved=True | pKiss REAL bp=0 solved=True
+    pseudobase:7 n= 33 pk_pairs= 6 | MFE-oracle says solved=True | pKiss REAL bp=1 solved=False  <-- FALSE POSITIVE
+    pseudobase:8 n= 39 pk_pairs= 4 | MFE-oracle says solved=True | pKiss REAL bp=0 solved=True
+    pseudobase:9 n= 62 pk_pairs= 5 | MFE-oracle says solved=True | pKiss REAL bp=1 solved=False  <-- FALSE POSITIVE
+   pseudobase:10 n= 28 pk_pairs= 5 | MFE-oracle says solved=True | pKiss REAL bp=0 solved=True
+   pseudobase:11 n= 25 pk_pairs= 3 | MFE-oracle says solved=True | pKiss REAL bp=0 solved=True
+   pseudobase:12 n= 59 pk_pairs= 5 | MFE-oracle says solved=True | pKiss REAL bp=5 solved=False  <-- FALSE POSITIVE
+   pseudobase:13 n= 29 pk_pairs= 5 | MFE-oracle says solved=True | pKiss REAL bp=0 solved=True
+   pseudobase:14 n= 26 pk_pairs= 4 | MFE-oracle says solved=True | pKiss REAL bp=0 solved=True
+   pseudobase:15 n= 39 pk_pairs= 4 | MFE-oracle says solved=True | pKiss REAL bp=0 solved=True
+   pseudobase:16 n= 23 pk_pairs= 5 | MFE-oracle says solved=True | pKiss REAL bp=0 solved=True
+   pseudobase:17 n= 29 pk_pairs= 7 | MFE-oracle says solved=True | pKiss REAL bp=0 solved=True
+   pseudobase:18 n= 41 pk_pairs= 5 | MFE-oracle says solved=True | pKiss REAL bp=0 solved=True
+   pseudobase:19 n= 28 pk_pairs= 7 | MFE-oracle says solved=True | pKiss REAL bp=0 solved=True
+   pseudobase:20 n= 33 pk_pairs= 5 | MFE-oracle says solved=True | pKiss REAL bp=1 solved=False  <-- FALSE POSITIVE
+   pseudobase:21 n= 24 pk_pairs= 6 | MFE-oracle says solved=True | pKiss REAL bp=0 solved=True
+   pseudobase:22 n= 64 pk_pairs= 9 | MFE-oracle says solved=True | pKiss REAL bp=4 solved=False  <-- FALSE POSITIVE
+   pseudobase:23 n= 70 pk_pairs= 3 | MFE-oracle says solved=True | pKiss REAL bp=0 solved=True
+
+=== RESULT on 24 Pseudobase++ pseudoknot targets ===
+  MFE-oracle REPORTED solved : 24/24  (BOGUS -- scored vs pseudoknot-free reduction)
+  pKiss REAL solved          : 17/24  (pseudoknot-aware verification)
+  false positives            : 7/24  (MFE said solved, pKiss says NOT)
+  => DesiRNA (Turner-MFE) is NOT in-box on pseudoknots; the MFE harness's 'solved' is 29% false on the puzzles it claimed.

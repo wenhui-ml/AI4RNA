@@ -1,0 +1,13 @@
+RSSD-agent: split=parity train=126 held=125; self-revise on 24 TRAIN targets; DesiRNA cost=measured median of 8 runs ($4.34e-02); model=openai/gpt-4o
+  [round 0] TRAIN-subset: solved=11/24 cost=$0.8673 skill_solved=0 lost=2 code_err=0 budget_hit=0 policy_err=None
+  [round 1] TRAIN-subset: solved=12/24 cost=$0.9974 skill_solved=0 lost=1 code_err=0 budget_hit=0 policy_err=None
+  [round 2] TRAIN-subset: solved=12/24 cost=$0.8240 skill_solved=0 lost=1 code_err=0 budget_hit=0 policy_err=None
+  [round 3] TRAIN-subset: solved=12/24 cost=$0.8240 skill_solved=0 lost=1 code_err=0 budget_hit=0 policy_err=None
+
+  FROZEN authored procedure -> evaluating on 125 HELD-OUT targets ...
+
+=== RSSD v2 (agent-authored procedure, HELD-OUT = 125 targets, gaming-proof) ===
+  always_sota           solved= 96/125  cost=$5.4199
+  agent procedure       solved= 73/125  cost=$3.9899  -> 1x cheaper
+    (cheap skill solved 3; SOTA fired 92, abstained 30; REAL solves lost by abstaining: 23; real code exceptions: 0 targets; budget-exhausted (unsolvable): 0)
+  wrote rna_harness/runs/rssd_agent_openai_gpt-4o/agent_result.json + authored_skill.py
