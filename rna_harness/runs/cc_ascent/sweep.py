@@ -59,21 +59,32 @@ def _work(item):
     return rec
 
 
+def _npk(db):  # crossing-pair count from a dot-bracket string
+    return sum(1 for c in db if c in "[]{}<>") // 2
+
+
 def main(tag, offset, limit, seed, arms):
     out = os.path.join(HERE, tag); os.makedirs(out, exist_ok=True)
     nworkers = int(os.environ.get("NWORKERS", "48"))
-    tasks = load_pseudobase(limit=offset + limit)[offset:offset + limit]
-    items = [(t.task_id, t.meta.get("n_pk_pairs"), t.n, t.target) for t in tasks]
-    order = {t.task_id: i for i, t in enumerate(tasks)}
-    print(f"sweep[{tag}]: Pseudobase[{offset}:{offset+limit}] ({len(tasks)} targets) seed={seed} "
-          f"arms={arms} workers={nworkers}", flush=True)
+    tj = os.environ.get("TARGETS_JSON")
+    if tj:  # external cross-dataset pool (id,target) -- experiment C
+        src = json.load(open(tj))["rows"][offset:offset + limit] if limit else json.load(open(tj))["rows"]
+        items = [(r["id"], _npk(r["target"]), len(r["target"]), r["target"]) for r in src]
+        print(f"sweep[{tag}]: TARGETS_JSON={os.path.basename(tj)} ({len(items)} targets) seed={seed} "
+              f"arms={arms} workers={nworkers}", flush=True)
+    else:
+        tasks = load_pseudobase(limit=offset + limit)[offset:offset + limit]
+        items = [(t.task_id, t.meta.get("n_pk_pairs"), t.n, t.target) for t in tasks]
+        print(f"sweep[{tag}]: Pseudobase[{offset}:{offset+limit}] ({len(items)} targets) seed={seed} "
+              f"arms={arms} workers={nworkers}", flush=True)
+    order = {it[0]: i for i, it in enumerate(items)}
     results = {}
     with mp.Pool(nworkers, initializer=_init, initargs=(arms, seed)) as pool:
         for rec in pool.imap_unordered(_work, items):
             results[rec["id"]] = rec
             u = {k: (v.get("panel") or {}).get("unanimous") for k, v in rec["arms"].items()}
             print(f"  [{len(results):>3}/{len(items)}] {rec['id']:14} g={rec['n_pk_pairs']} unan={u}", flush=True)
-            rows = [results[t.task_id] for t in tasks if t.task_id in results]
+            rows = [results[it[0]] for it in items if it[0] in results]
             json.dump({"tag": tag, "offset": offset, "limit": limit, "seed": seed, "rows": rows},
                       open(os.path.join(out, "sweep.json"), "w"), indent=1)
     rows = [results[tid] for tid in sorted(results, key=lambda x: order[x])]
