@@ -1112,6 +1112,55 @@ Where an operator cannot cross at all, \textbf{E3} (a minimal-grammar-hint sweep
 buy above the floor---``the agent ascends only given a hint of size $k$''---so the outcome is informative
 even under a null, because the negative side and the panel are exact.
 
+\subsection{A second domain: the certificate ports to SAT constraint definability}\label{sec:sat}
+To show the two-sided certificate is not an artifact of RNA or the Chomsky hierarchy, we instantiate it on an
+unrelated formal hierarchy: the minimum CNF clause-\emph{width} needed to define a Boolean relation
+$R\subseteq\{0,1\}^n$. Width $\le2$ is the analog of the context-free (nested) class---by the
+Baker--Pixley/Schaefer characterization, $R$ is $2$-CNF-definable \emph{iff} it is closed under the ternary
+\emph{majority} operation \citep{schaefer1978,bakerpixley1975}---and higher width is the analog of a higher
+tier. The certificate transfers verbatim: the \emph{negative} side is the decidable theorem that a
+$2$-CNF-confined designer's solution set is \emph{always} majority-closed (so a non-majority-closed target is
+provably unrealizable, testable in $O(|R|^3)$---the SAT analog of Prop.~\ref{prop:confine}); the \emph{positive}
+side verifies a general-CNF designer's model set against $R$ \emph{exactly}, by enumerating $\{0,1\}^n$.
+
+On a graded pool of $48$ relations ($n{=}4$; Table~\ref{tab:sat}, Fig.~\ref{fig:sat}), the width-$2$ floor
+realizes exactly the $11$ majority-closed (width-$\le2$) targets and \emph{zero} of the $37$ higher-class ones,
+the ascent realizes all $48$, and the equivalence
+$\text{majority-closed}\Leftrightarrow\text{width}\le2\Leftrightarrow\text{$2$-CNF-realizable}$ holds for every
+target. Two lessons, one for each side. \emph{(i)~The decidable negative side}---our most transferable
+component---re-instantiates in a formalism (clone theory) with no connection to folding or grammars: the
+theorem-backed confinement is a \emph{general pattern}, not an RNA trick. \emph{(ii)~SAT has an exact
+verifier}, so its positive side is decidable and, here, trivial; the certificate is uniformly exact. This
+\emph{localizes} the model-relativity of the RNA positive side---it comes from the substrate's \emph{heuristic
+folding oracle}, not from the certificate's structure. The certificate ports; the model-relativity is a
+property of the domain's ground-truth instrument, and appears exactly when that instrument is a heuristic.
+
+\begin{table}[t]\centering\small
+\setlength{\tabcolsep}{6pt}\renewcommand{\arraystretch}{1.15}
+\caption{\textbf{The certificate in a second domain (SAT constraint definability, $n{=}4$, $48$ relations).}
+Class grade $=$ minimum CNF clause-width to define $R$ (grade $\le2$ $\Leftrightarrow$ majority-closed
+$\Leftrightarrow$ $2$-CNF-definable). The width-$2$ floor is confined below the boundary; the decidable
+negative theorem holds for all $48$.}\label{tab:sat}
+\begin{tabularx}{\linewidth}{@{}Lccc@{}}
+\toprule
+class (CNF-width) & \# relations & floor (2-CNF) realizes & ascent (general CNF) realizes\\
+\midrule
+width $\le2$ (majority-closed; \CF-analog) & $11$ & $11$ & $11$\\
+width $\ge3$ (higher class) & $37$ & $\mathbf{0}$ (theorem) & $37$\\
+\midrule
+all & $48$ & $11$ & $48$\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{figure}[t]\centering
+\includegraphics[width=0.8\linewidth]{fig_cc_sat.pdf}
+\caption{\textbf{Second domain (SAT).} By class grade (minimum CNF clause-width), the $2$-CNF floor is
+confined below the majority-closure boundary---it realizes nothing at width $\ge3$ (a decidable theorem)---while
+the general-CNF ascent realizes every relation. The negative-side certificate ports; the positive side is
+exact because SAT's verifier is exact.}\label{fig:sat}
+\end{figure}
+
 \section{Discussion, Related Work, and Conclusion}\label{sec:discussion}
 
 \subsection{Related Work}\label{sec:related}

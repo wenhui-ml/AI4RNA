@@ -258,6 +258,36 @@ def fig_stringency():
     ax.tick_params(length=3); _save(fig, "fig_cc_stringency.pdf"); print("  wrote fig_cc_stringency.pdf")
 
 
+def fig_sat():
+    """Second domain: SAT constraint-definability class ascent (floor confined vs ascent, by CNF-width)."""
+    import json
+    from collections import defaultdict
+    p = _cc("sat/sat_ascent.json")
+    if not os.path.exists(p):
+        print("  (skip fig_sat)"); return
+    d = json.load(open(p)); rows = d["rows"]
+    import numpy as np
+    tot, fl, asc = defaultdict(int), defaultdict(int), defaultdict(int)
+    for r in rows:
+        w = r["cnf_width"]; tot[w] += 1
+        fl[w] += int(r["floor_2cnf_realizes"]); asc[w] += int(r["ascent_realizes"])
+    grades = sorted(tot)
+    x = np.arange(len(grades)); w = 0.27
+    fig, ax = plt.subplots(figsize=(6.6, 2.8))
+    ax.bar(x - w, [tot[g] for g in grades], w, color=FAINT, ec="white", lw=0.5, label="targets")
+    ax.bar(x, [fl[g] for g in grades], w, color=MCF, ec="white", lw=0.5, label="floor (2-CNF) realizes")
+    ax.bar(x + w, [asc[g] for g in grades], w, color=CF, ec="white", lw=0.5, label="ascent (general CNF) realizes")
+    ax.axvline(1.5, color=NEG, ls=(0, (4, 3)), lw=0.9)
+    ax.text(1.55, ax.get_ylim()[1] * 0.86, "class boundary\n(width $>2$: not\nmajority-closed)", fontsize=6.5, color=NEG)
+    ax.set_xticks(x); ax.set_xticklabels(grades)
+    ax.set_xlabel("class grade: minimum CNF clause-width to define $R$", fontsize=8.5)
+    ax.set_ylabel("relations", fontsize=8.5)
+    ax.set_title("Second domain (SAT): floor is confined below the class boundary",
+                 fontsize=9.7, weight="bold", pad=8)
+    ax.legend(frameon=False, fontsize=6.8, loc="upper left"); ax.spines["top"].set_visible(False); ax.spines["right"].set_visible(False)
+    ax.tick_params(length=3); _save(fig, "fig_cc_sat.pdf"); print("  wrote fig_cc_sat.pdf")
+
+
 if __name__ == "__main__":
     fig_oracle()
     fig_collapse()
@@ -266,4 +296,5 @@ if __name__ == "__main__":
     fig_grades()
     fig_invent()
     fig_stringency()
+    fig_sat()
     print("wrote figs/fig_cc_*.pdf (data figs; appendix figs added when their run data is present)")
