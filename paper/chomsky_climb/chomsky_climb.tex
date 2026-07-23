@@ -847,6 +847,20 @@ oracle grows with the number of oracles optimized---from $\sim\!1/60$ (one predi
 held-out third, seed to seed. Optimizing agreement sharpens cross-oracle robustness without guaranteeing it;
 the honest ceiling is that more independent checks tighten the certificate, none makes the positive side exact.
 
+\paragraph{Is the ascent statistically separated from gaming?} The bar for a genuine (not gamed) ascent is
+that the panel-unanimous held-out rate exceed the single-oracle gaming baseline ($1/60$) with a confidence
+interval clear of it. Pooled over the three seeds the panel-optimizer scores $16/180$ panel-unanimous
+($8.9\%$); a percentile bootstrap ($B\!=\!20{,}000$ over the $60$ targets) gives a $95\%$ CI of
+$[5.0\%,13.3\%]$ that excludes the gamer's $1.7\%$, an exact binomial against the fixed gamer rate gives
+$p\!\approx\!8\times10^{-8}$, and on the strongest seed a \emph{paired} McNemar over the identical $60$ targets
+is significant ($b\!=\!7$ solved only by the panel-optimizer, $c\!=\!0$ only by the gamer, $p\!=\!0.016$). We
+are equally explicit about the limit of power: a \emph{single} $60$-target seed, with $3$--$5$ successes, is
+underpowered---seeds~1 and~2 are not individually significant (McNemar $p\!=\!0.50,\,0.22$; their bootstrap
+CIs touch $1.7\%$). The separation is thus real \emph{in aggregate} and on the strongest seed but requires
+pooling; one small held-out pool cannot carry it. This is the certificate behaving as designed: it reports a
+small effect \emph{as} small, with quantified uncertainty, not as a discovery (analysis:
+\texttt{runs/cc\_ascent/stats\_separation.py}).
+
 \begin{table}[t]\centering\small
 \setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.15}
 \caption{\textbf{Panel-robust autonomous crossings, by training objective} (held-out crossing pool, $n=60$).
@@ -1023,9 +1037,13 @@ ascent---the first for which all three sides hold at once---would need an operat
 \emph{panel agreement} rather than any single predictor: optimize the intersection of pKiss, ProbKnot, and
 ShapeKnots (or hold one predictor out of the loop and judge on it), so solutions are model-robust by
 construction, and require the panel-unanimous held-out rate to exceed the oracle-gaming baseline with a
-bootstrap CI clear of it. This is a concrete, falsifiable target; whether it is attainable on Pseudobase is
-open. The certificate does not make the ascent happen---it makes ``did it happen?'' decidable-plus-adjudicated
-rather than a matter of which oracle one chose to report.
+bootstrap CI clear of it. We now measure this target (\S\ref{sec:exp}): pooled over three seeds it is met---a
+percentile-bootstrap $95\%$ CI of $[5.0\%,13.3\%]$ clears the $1.7\%$ gaming baseline (exact binomial
+$p\!\approx\!8\times10^{-8}$; paired McNemar $p\!=\!0.016$ on the strongest seed)---but a single $60$-target
+seed is underpowered and not individually significant, so the separation presently requires pooling, and a
+larger held-out pool would be needed to certify it seed-by-seed. The certificate does not make the ascent
+happen---it makes ``did it happen?'' decidable-plus-adjudicated rather than a matter of which oracle one chose
+to report.
 
 \paragraph{What we mean by ``new'' (and what we do not).} We certify capability acquisition in the sense
 fixed in \S\ref{sec:intro}: the agent's prior self provably could not realize the target (a decidable fact),
