@@ -1082,6 +1082,24 @@ the self-improvement is \emph{demonstrated}, not assumed. (The loop is noisy---o
 compile and was discarded; we freeze the best round. The result inherits the Pseudobase-topology narrowness
 of the cross-source check above.)
 
+\paragraph{The positive verdict is thermodynamically dominant, not marginal.} Panel-unanimity already
+requires the target to \emph{be} each engine's predicted structure; we add and \emph{measure} one further rung
+of stringency (the ladder of App.~\ref{app:config}). For the certified panel-unanimous designs we enumerate
+pKiss suboptimals and take the free-energy gap $\Delta$ from the target (the MFE) to the best \emph{alternative}
+fold. The target is the pKiss MFE for \emph{all} $17$ designs whose enumeration completed within budget (eight
+longer designs timed out), and it is dominant by a median $\Delta{=}1.2$\,kcal/mol (mean $1.44$), with $14/17$
+clearing a $\ge1$\,kcal margin (Fig.~\ref{fig:stringency}). The positive verdict is thus not a marginal
+coincidence of pair sets: on the designs we could score, the target is the free-energy-minimum fold by a
+real---if modest---margin. This is as far as \emph{computation} pushes the positive side; it stays
+model-relative, and in-vitro probing is the only rung beyond it (App.~\ref{app:config}).
+
+\begin{figure}[t]\centering
+\includegraphics[width=0.72\linewidth]{fig_cc_stringency.pdf}
+\caption{\textbf{Positive-side stringency.} Free-energy gap from the target (pKiss MFE) to the best
+alternative fold, over the certified panel-unanimous designs. The target is the MFE for all scored designs and
+dominant by $\ge1$\,kcal/mol for $14/17$---a real if modest margin.}\label{fig:stringency}
+\end{figure}
+
 \paragraph{Where this leaves the ascent, and a bounded fallback.} The question we posed---can an operator
 optimizing \emph{panel agreement} beat the oracle-gamer's $1/60$?---is answered in the affirmative, if
 modestly: $3$--$8/60$ across five seeds (mean $5.0$; Table~\ref{tab:recovered}), and now also by an
@@ -1449,6 +1467,166 @@ $c=\#\{T:u^{(A)}_T{=}0,u^{(G)}_T{=}1\}$, the exact two-sided $p$-value is
 successes in $N$ trials is $\sum_{j=k}^{N}\binom{N}{j}p_0^{\,j}(1-p_0)^{N-j}$. The three columns of
 Table~\ref{tab:sep} are these tests; the analysis is \texttt{runs/cc\_ascent/stats\_separation.py}, run offline
 on the saved per-target adjudications (no live episodes).
+
+\section{Datasets, Intrinsic Grades, and Materials}\label{app:data}
+Every target's difficulty \emph{grade} is a property of the target fixed before design: its Chomsky class
+(nested vs.\ crossing) and, within crossing, its \emph{crossing-pair count} $g$---the number of base pairs
+that cross another, computed in $O(|P|^2)$ from the dot-bracket. Table~\ref{tab:appdata} lists the pools.
+\begin{table}[h]\centering\small
+\setlength{\tabcolsep}{4.5pt}\renewcommand{\arraystretch}{1.15}
+\caption{Datasets. Grade $g$ = crossing-pair count. EteRNA100 is the nested (\CF) competence baseline; the
+three crossing pools are the held-out capability sets.}\label{tab:appdata}
+\begin{tabularx}{\linewidth}{@{}lLlL@{}}
+\toprule
+pool & source & $n$ / length & grade $g$ distribution\\
+\midrule
+held-out (primary) & Pseudobase++ \citep{rnainvbench} idx $0$--$59$ & $60$ / $21$--$137$\,nt & $g$: $\{3{:}4,4{:}6,5{:}22,6{:}18,7{:}7,8{:}1,9{:}2\}$\\
+second pool & Pseudobase++ idx $60$--$109$ & $50$ / $21$--$137$\,nt & disjoint from primary\\
+cross-source & RNAInvBench \emph{inverse\_rna\_folding} (bpRNA/ArchiveII) & $60$ / $21$--$120$\,nt & $g$: $\{1{:}4,4{:}13,5{:}6,6{:}16,7{:}8,8{:}5,9{:}3,10{:}3,12{:}1,13{:}1\}$\\
+family $\mathcal L_{\mathrm H}$ & synthetic H-type (Eq.~\eqref{eq:family}) & $10$ / $24$--$44$\,nt & $n{=}m\in\{3..8\}$ $+$ asym\\
+EteRNA100-V2 & \citep{koodli2021eterna100v2} & $100$ / $12$--$400$\,nt & nested (\CF)\\
+\bottomrule
+\end{tabularx}
+\end{table}
+The cross-source pool is reconstructed to crossing dot-bracket from the pair list (crossing pairs are encoded
+as non-type-$0$; a greedy multi-bracket assignment yields $\le4$ bracket levels); multiplet structures are
+excluded so each base is in $\le1$ pair (\texttt{runs/cc\_ascent/bprna\_pk.py}). Figure~\ref{fig:grades}
+shows the two held-out pools span the same crossing-complexity range, so the cross-source drop
+(\S\ref{sec:exp}) is not an artifact of easier/harder grades.
+
+\begin{figure}[h]\centering
+\includegraphics[width=0.82\linewidth]{fig_cc_grades.pdf}
+\caption{Crossing-complexity spectrum (crossing-pair count $g$) of the primary Pseudobase++ held-out pool and
+the independent bpRNA cross-source pool---overlapping ranges, so cross-dataset comparison is
+grade-fair.}\label{fig:grades}
+\end{figure}
+
+\section{Full Experimental Results}\label{app:results}
+Table~\ref{tab:appfull} collects every arm on every pool. Table~\ref{tab:appfamily} is the per-size family
+sweep; Table~\ref{tab:appinvent} is the agent-invention trajectory.
+\begin{table}[h]\centering\small
+\setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.15}
+\caption{All arms $\times$ all pools. ``p-un.'' $=$ panel-unanimous (pKiss\,$\wedge$\,ProbKnot\,$\wedge$\,ShapeKnots,
+exact). Floor $=$ \CF-confined REMC; gamer $=$ single-oracle (pKiss) operator; DesiRNA $=$ borrowed SOTA;
+panel\_auto $=$ our two-oracle operator; agent $=$ the autonomously-written operator (App.~\ref{app:invent}).}\label{tab:appfull}
+\begin{tabularx}{\linewidth}{@{}lLl@{}}
+\toprule
+arm / pool & held-out primary ($n{=}60$) & other pools\\
+\midrule
+\CF{} floor & $0/60$ & $0/50$ (2nd), $0/60$ (cross), $0/10$ (family)\\
+gamer (pKiss) & $43/60$ pKiss; $2/43$ ProbKnot; $1/60$ p-un. & ---\\
+DesiRNA (borrowed) & $43/60$ pKiss; $26/43$ ProbKnot; $0/43$ p-un. & $2/10$ p-un. (family)\\
+panel\_auto (5 seeds) & pKiss$\wedge$ProbKnot $\{37,34,37,36,34\}$; p-un.\ $\{8,3,5,5,4\}$ (mean $5.0$) & $5/50$ p-un.\ (2nd); $2/60$ pk$\wedge$pb, $0/60$ p-un.\ (cross); $4/10$ p-un.\ (family)\\
+\textbf{agent-invented} & $35/60$ pKiss$\wedge$ProbKnot; \textbf{$9/60$ p-un.} & inherits cross-source narrowness\\
+\bottomrule
+\end{tabularx}
+\end{table}
+\begin{table}[h]\centering\small
+\setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.1}
+\caption{Family $\mathcal L_{\mathrm H}$ sweep (Fig.~\ref{fig:family}). $\times$ = not realized; pk$\wedge$pb =
+pKiss and ProbKnot; \textsc{u} = panel-unanimous.}\label{tab:appfamily}
+\begin{tabularx}{\linewidth}{@{}lcccccccccc@{}}
+\toprule
+$n{=}m$ & 3 & 4 & 5 & 6 & 7 & 8 & (3,6) & (6,3) & (4,8) & (8,4)\\
+\midrule
+\CF{} floor & $\times$ & $\times$ & $\times$ & $\times$ & $\times$ & $\times$ & $\times$ & $\times$ & $\times$ & $\times$\\
+DesiRNA & pk & pk & \textsc{u} & pk & \textsc{u} & pk & pk & pk & pk & pk\\
+panel\_auto & pk$\wedge$pb & pk$\wedge$pb & \textsc{u} & \textsc{u} & \textsc{u} & pk$\wedge$pb & \textsc{u} & pk$\wedge$pb & pk$\wedge$pb & pk$\wedge$pb\\
+\bottomrule
+\end{tabularx}
+\end{table}
+\begin{table}[h]\centering\small
+\setlength{\tabcolsep}{6pt}\renewcommand{\arraystretch}{1.1}
+\caption{Autonomous invention trajectory (GLM-5.2, training pool $=$ Pseudobase idx $110$--$125$, disjoint
+from held-out). Round $5$ failed to compile and was discarded; round $2$ (best) was frozen and
+certified.}\label{tab:appinvent}
+\begin{tabularx}{\linewidth}{@{}lccccccX@{}}
+\toprule
+round & 0 & 1 & 2 & 3 & 4 & 5 & frozen (round 2) on held-out $60$\\
+\midrule
+train solved $/16$ & 1 & 11 & \textbf{12} & 11 & 10 & --- & $35/60$ pKiss$\wedge$ProbKnot; $9/60$ panel-unanimous\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{The Autonomous Operator-Invention Protocol}\label{app:invent}
+\begin{figure}[h]\centering
+\includegraphics[width=0.99\linewidth]{fig_cc_invention.pdf}
+\caption{The autonomous invention loop. The agent receives only primitives and the folding oracles---no
+recipe, no external solver; each candidate is sandboxed and scored on a disjoint training pool; the score and
+failing targets are fed back for six revision rounds; the best round is frozen and \emph{certified} by the
+same panel used for the hand-built operators.}\label{fig:invention}
+\end{figure}
+An LLM agent (GLM-5.2, temperature $0.4$, no output cap) is given a documented \emph{primitive API}
+and asked to write one function \texttt{design(target,seed)}; it may not import anything or call an external
+pseudoknot solver. The primitives are: \texttt{fold\_cf} (ViennaRNA MFE, nested), \texttt{inverse\_fold\_cf}
+(nested inverse fold), \texttt{fold\_pkiss\_pairs} and \texttt{fold\_probknot\_pairs} (the two crossing-aware
+oracles, as pair sets), \texttt{target\_pairs} (parse a crossing dot-bracket), \texttt{rand\_seq}, and the
+complement map; plus \texttt{random}/\texttt{math}/\texttt{itertools}. Each candidate is (i) scanned for
+forbidden tokens (\texttt{import}, \texttt{os.}, \texttt{eval}, file/network, dunder access) and rejected if
+present, (ii) \texttt{exec}'d with a restricted \texttt{\_\_builtins\_\_} whitelist, and (iii) run per target
+under a \texttt{SIGALRM} wall-clock cap. It is scored on the disjoint training pool (solved $=$
+pKiss\,$\wedge$\,ProbKnot exact), and the score plus failing examples are fed back for revision over six
+rounds, carrying the full conversation. The best round is frozen and certified on the held-out $60$ under the
+full panel; autonomy is structural (no solver is exposed). The agent independently converged on: split the
+target into nested and crossing pairs; enforce Watson--Crick complementarity at paired positions; then greedily
+mutate error positions to minimize a $\lvert T\!\setminus\!P_{\mathrm{pKiss}}\rvert + \lvert T\!\setminus\!P_{\mathrm{ProbKnot}}\rvert
++ 2(\lvert P_{\mathrm{pKiss}}\!\setminus\!T\rvert + \lvert P_{\mathrm{ProbKnot}}\!\setminus\!T\rvert)$ panel-agreement cost.
+The invented source is archived at \texttt{runs/cc\_ascent/invent\_operator/invented\_design.py}.
+Figure~\ref{fig:invent} shows the learning curve: the agent's training solve rate rises as it folds oracle
+feedback into successive rewrites, and the frozen best round certifies at $9/60$ panel-unanimous on the
+held-out pool.
+
+\begin{figure}[h]\centering
+\includegraphics[width=0.78\linewidth]{fig_cc_invent.pdf}
+\caption{The autonomous-invention loop learns. Training solve rate ($/16$, disjoint pool) across rounds as an
+LLM agent writes, sandbox-runs, and revises a \texttt{design()} operator; the best round is frozen and
+certified on the held-out $60$.}\label{fig:invent}
+\end{figure}
+
+\section{Oracle Configurations, Hyperparameters, Compute, and Verifier Stringency}\label{app:config}
+\begin{table}[h]\centering\small
+\setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.15}
+\caption{Oracle configurations. All deterministic and replayable; DATAPATH pinned to the RNAstructure data
+tables.}\label{tab:appconfig}
+\begin{tabularx}{\linewidth}{@{}lLll@{}}
+\toprule
+oracle & engine / mode & environment & timeout\\
+\midrule
+$\Omega_{\mathrm{cf}}$ & ViennaRNA, Turner-2004 MFE, $37^\circ$C & \texttt{rna} & --\\
+pKiss (reference) & pKiss \texttt{mfe} \citep{janssen2015pkiss} & \texttt{pk} & $60$\,s\\
+ProbKnot & RNAstructure MEA over the partition ensemble \citep{bellaousov2010probknot} & \texttt{rnastr} & $60$\,s\\
+ShapeKnots & RNAstructure MFE-based, run \emph{de novo} (no SHAPE) \citep{hajdin2013shapeknots} & \texttt{rnastr} & $120$\,s\\
+\bottomrule
+\end{tabularx}
+\end{table}
+\noindent\textbf{Operator hyperparameters.} REMC floor: wall $30$\,s. Design operators (fixed across all
+targets $=$ a uniform procedure): skeleton budget $12$--$20$\,s, repair budget $90$--$120$\,s, $\le800$--$1500$
+repair iterations, ProbKnot gate at $\mathrm{pk\_bp}\le3$. \textbf{Compute.} A single $256$-core host;
+target-level parallelism at $\mathrm{NWORKERS}{=}60$ (the design operators are single-process, so this is
+safe); the entire sweep suite is search-only and incurs \emph{no} model-inference cost, except the invention
+agent (App.~\ref{app:invent}), a few dollars of GLM-5.2.
+
+\smallskip\noindent\textbf{Positive-side stringency (the verifier ladder).} The positive verdict is not
+``the target pairs appear somewhere'': panel-unanimous requires the target to \emph{equal} each method's
+predicted structure---the MFE under pKiss and ShapeKnots and the maximum-expected-accuracy structure over a
+partition-function ensemble under ProbKnot---so it sits at the ``unique/dominant fold'' rung of the
+exact\,$\subseteq$\,unique-MFE\,$\subseteq$\,dominance ladder of Fig.~\ref{fig:ladder}, agreed by three
+independent engines. We \emph{climb one rung further and measure it} (\S\ref{sec:exp},
+Fig.~\ref{fig:stringency}, \texttt{runs/cc\_ascent/positive\_stringency.py}): enumerating pKiss suboptimals for
+the certified designs, the target is the pKiss MFE for all $17$ that enumerated within budget and is dominant
+over the best alternative fold by a median $1.2$\,kcal/mol ($14/17$ clear $\ge1$\,kcal). The verdict remains
+\emph{model-relative}---all engines are thermodynamic secondary-structure predictors, not physical ground
+truth---and two further strengthenings are computable with the installed tooling (\texttt{partition},
+\texttt{ProbabilityPlot}, \texttt{pKiss\_probs}): a Boltzmann-probability threshold and a fourth,
+non-thermodynamic (learned) predictor. Physical confirmation (in-vitro probing, Fig.~\ref{fig:ladder} R4) is
+the only route past model-relativity and is out of scope here.
+
+\begin{figure}[h]\centering
+\includegraphics[width=0.66\linewidth]{fig_cc_ladder.pdf}
+\caption{The positive-side stringency ladder. Panel-unanimity certifies at R2; the measured energy-gap
+dominance (\S\ref{sec:exp}) is R3; R4 (physical formation) needs wet-lab and is out of scope.}\label{fig:ladder}
+\end{figure}
 
 \bibliographystyle{plainnat}
 \bibliography{references}

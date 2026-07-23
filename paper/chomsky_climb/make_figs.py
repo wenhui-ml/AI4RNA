@@ -183,9 +183,87 @@ def fig_grade():
     print("  wrote figs/fig_cc_grade.pdf")
 
 
+def _cc(rel):
+    return os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "rna_harness", "runs", "cc_ascent", rel))
+
+
+def fig_grades():
+    """Appendix C: crossing-complexity (crossing-pair count) distribution across the held-out pools."""
+    import json
+    from collections import Counter
+    gp = _cc("grade_frontier.json"); bp = _cc("bprna/sweep.json")
+    if not (os.path.exists(gp) and os.path.exists(bp)):
+        print("  (skip fig_grades)"); return
+    pb = {r["grade"]: r["n"] for r in json.load(open(gp))["by_grade"]}
+    br = Counter(sum(1 for c in r["target"] if c in "[]{}<>") // 2 for r in json.load(open(bp))["rows"])
+    grades = sorted(set(pb) | set(br))
+    import numpy as np
+    x = np.arange(len(grades)); w = 0.4
+    fig, ax = plt.subplots(figsize=(7.0, 2.7))
+    ax.bar(x - w / 2, [pb.get(g, 0) for g in grades], w, color=MCF, ec="white", lw=0.5, label="Pseudobase++ held-out ($n{=}60$)")
+    ax.bar(x + w / 2, [br.get(g, 0) for g in grades], w, color=CF, ec="white", lw=0.5, label="bpRNA cross-source ($n{=}60$)")
+    ax.set_xticks(x); ax.set_xticklabels(grades); ax.set_xlabel("crossing-pair count (intrinsic grade $g$)", fontsize=8.5)
+    ax.set_ylabel("targets", fontsize=8.5)
+    ax.set_title("Crossing-complexity spectrum of the held-out pools", fontsize=10, weight="bold", pad=8)
+    ax.legend(frameon=False, fontsize=7.2); ax.spines["top"].set_visible(False); ax.spines["right"].set_visible(False)
+    ax.tick_params(length=3); _save(fig, "fig_cc_grades.pdf"); print("  wrote fig_cc_grades.pdf")
+
+
+def fig_invent():
+    """Appendix E: autonomous-invention learning curve (training solve rate vs round)."""
+    import json
+    p = _cc("invent_operator/result.json")
+    if not os.path.exists(p):
+        print("  (skip fig_invent)"); return
+    d = json.load(open(p))
+    rds = [(r["round"], r["train_solved"]) for r in d["rounds"] if r.get("train_solved") is not None]
+    if not rds:
+        print("  (skip fig_invent: no rounds)"); return
+    xs, ys = zip(*rds)
+    fig, ax = plt.subplots(figsize=(6.6, 2.7))
+    ax.plot(xs, ys, "-o", color=MCF, lw=1.5, ms=6, mec="white", mew=0.7)
+    best = d.get("best_round")
+    if best in xs:
+        bi = xs.index(best); ax.plot([xs[bi]], [ys[bi]], "o", ms=10, mfc="none", mec=NEG, mew=1.5)
+        ax.annotate("frozen $\\to$ held-out\n$9/60$ panel-unanimous", xy=(xs[bi], ys[bi]),
+                    xytext=(xs[bi] + 0.3, ys[bi] - 4.5), fontsize=7.2, color=NEG,
+                    arrowprops=dict(arrowstyle="->", color=NEG, lw=0.9))
+    ax.set_xlabel("invention round (LLM writes $\\to$ sandbox-runs $\\to$ revises)", fontsize=8.5)
+    ax.set_ylabel("training targets solved ($/16$)", fontsize=8.5)
+    ax.set_ylim(0, 16); ax.set_xticks(list(xs))
+    ax.set_title("An agent learns to write the operator", fontsize=10, weight="bold", pad=8)
+    ax.spines["top"].set_visible(False); ax.spines["right"].set_visible(False)
+    ax.tick_params(length=3); _save(fig, "fig_cc_invent.pdf"); print("  wrote fig_cc_invent.pdf")
+
+
+def fig_stringency():
+    """Appendix F: thermodynamic-dominance (energy-gap) histogram of the certified positives."""
+    import json
+    p = _cc("positive_stringency.json")
+    if not os.path.exists(p):
+        print("  (skip fig_stringency: run positive_stringency.py first)"); return
+    d = json.load(open(p))
+    gaps = [r["gap"] for r in d["rows"] if "gap" in r]
+    if not gaps:
+        print("  (skip fig_stringency: no gaps)"); return
+    fig, ax = plt.subplots(figsize=(6.6, 2.7))
+    bins = [0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0]
+    ax.hist(gaps, bins=bins, color=CF, ec="white", lw=0.7)
+    ax.axvline(1.0, color=NEG, ls=(0, (4, 2)), lw=1.0)
+    ax.text(1.03, ax.get_ylim()[1] * 0.9, "dominance\nmargin $1$ kcal", fontsize=6.8, color=NEG)
+    ax.set_xlabel("free-energy gap to the best non-target fold (kcal/mol)", fontsize=8.5)
+    ax.set_ylabel("certified designs", fontsize=8.5)
+    ax.set_title("Positive-side stringency: the target is the dominant fold", fontsize=10, weight="bold", pad=8)
+    ax.spines["top"].set_visible(False); ax.spines["right"].set_visible(False)
+    ax.tick_params(length=3); _save(fig, "fig_cc_stringency.pdf"); print("  wrote fig_cc_stringency.pdf")
+
+
 if __name__ == "__main__":
     fig_oracle()
     fig_collapse()
     fig_family()
     fig_grade()
-    print("wrote figs/fig_cc_*.pdf (data figs; +family/grade if data present); 5 diagrams are TikZ in tikz/*.tex")
+    fig_grades()
+    fig_invent()
+    fig_stringency()
+    print("wrote figs/fig_cc_*.pdf (data figs; appendix figs added when their run data is present)")

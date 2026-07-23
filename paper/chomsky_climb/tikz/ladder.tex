@@ -1,0 +1,35 @@
+\documentclass[border=4pt]{standalone}
+\usepackage{amsmath,amssymb}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,calc}
+\definecolor{cfg}{HTML}{2E7D46}\definecolor{mcfb}{HTML}{2166AC}\definecolor{negr}{HTML}{B03A2E}
+\definecolor{inkc}{HTML}{1B1B1B}\definecolor{gy}{HTML}{6B7280}
+\begin{document}
+\hyphenpenalty=10000\exhyphenpenalty=10000
+\begin{tikzpicture}[
+  >={Stealth[length=5pt,width=3.6pt]},
+  r/.style={draw, line width=0.8pt, rounded corners=2pt, align=left, inner sep=5pt, text=inkc, font=\scriptsize, text width=62mm},
+  font=\scriptsize]
+
+% ascending rungs (each higher = stricter positive verdict)
+\node[r, fill=gy!12] (r1) at (0,0)
+  {\textbf{R1 \; exact-match} (single oracle): the target pair set appears in one predictor's fold.};
+\node[r, draw=mcfb, fill=mcfb!8] (r2) at (1.4,1.35)
+  {\textbf{R2 \; panel-unanimous}: target $=$ the predicted structure under \emph{three independent} engines (pKiss $\wedge$ ProbKnot $\wedge$ ShapeKnots).};
+\node[r, draw=cfg, fill=cfg!10] (r3) at (2.8,2.75)
+  {\textbf{R3 \; thermodynamic dominance}: target $=$ pKiss MFE with a free-energy \emph{gap} $\Delta$ to the best alternative fold.};
+\node[r, draw=negr, dashed, fill=negr!5] (r4) at (4.2,4.15)
+  {\textbf{R4 \; physical formation} (in-vitro probing / 3D): the only route past model-relativity.};
+
+\draw[->, line width=0.9pt] (r1.north) -- ($(r2.south west)+(6mm,0)$);
+\draw[->, line width=0.9pt] (r2.north) -- ($(r3.south west)+(6mm,0)$);
+\draw[->, line width=0.9pt, dashed, draw=negr] (r3.north) -- ($(r4.south west)+(6mm,0)$);
+
+% side bracket: what THIS paper certifies vs out of scope
+\draw[line width=1.1pt, cfg] ($(r2.east)+(3mm,-2mm)$) -- ($(r3.east)+(3mm,2mm)$)
+  node[midway, right=1mm, text=cfg, font=\scriptsize, align=left]{certified\\ here};
+\node[right=3mm of r4.east, text=negr, font=\scriptsize, align=left] {out of\\ scope\\ (wet-lab)};
+
+\node[font=\footnotesize\bfseries] at (3.0,5.15) {The positive-side stringency ladder};
+\end{tikzpicture}
+\end{document}
