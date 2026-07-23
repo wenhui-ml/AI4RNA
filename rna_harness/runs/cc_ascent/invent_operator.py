@@ -131,19 +131,23 @@ def extract_code(text):
     return (m.group(1) if m else text).strip()
 
 
-def main(rounds=6, n_train=16, n_heldout=60, model=None):
+def main(rounds=12, n_train=16, n_heldout=60, model=None, patience=3):
+    global OUT
     model = model or os.environ.get("OPENAI_MODEL", "anthropic/claude-opus-4.8")
+    slug = model.replace("/", "_").replace(".", "").replace("-", "")
+    OUT = os.path.join(HERE, "invent_operator", slug); os.makedirs(OUT, exist_ok=True)
     train = [t.target for t in load_pseudobase(limit=130)[110:126][:n_train]]
     held = [t.target for t in load_pseudobase(limit=n_heldout)]
     client = OpenRouterClient(model=model)
     rnastr = rnastructure_available()
-    print(f"INVENT: model={model} train={len(train)} held-out={len(held)} rnastr={rnastr}", flush=True)
+    print(f"INVENT: model={model} -> {slug}  rounds<={rounds} patience={patience} "
+          f"train={len(train)} held-out={len(held)} rnastr={rnastr}", flush=True)
 
     system = ("You are an expert RNA structural bioinformatics researcher. You invent a REUSABLE operator "
               "for designing sequences that fold into PSEUDOKNOTTED (crossing) RNA secondary structures. "
               "You are given only low-level primitives; you must compose the whole strategy yourself. "
               "Return ONLY a Python code block defining `design(target, seed=0)`.")
-    hist, best = [], {"code": None, "train_solved": -1, "round": -1}
+    hist, best, stale = [], {"code": None, "train_solved": -1, "round": -1}, 0
     # carry the full conversation so the LLM sees its own prior code + the feedback and can truly revise
     messages = [{"role": "user", "content":
                  f"{API_DOC}\n\nExample training targets (crossing dot-bracket):\n"
@@ -165,7 +169,9 @@ def main(rounds=6, n_train=16, n_heldout=60, model=None):
             rec.update({"train_solved": nsolved, "n_train": len(train), "errors": errs})
             print(f"  round {rd}: train solved {nsolved}/{len(train)}  errs={errs[:2]}", flush=True)
             if nsolved > best["train_solved"]:
-                best = {"code": code, "train_solved": nsolved, "round": rd}
+                best = {"code": code, "train_solved": nsolved, "round": rd}; stale = 0
+            else:
+                stale += 1
             fails = [train[i] for i, o in enumerate(okv) if not o][:3]
             fb = (f"Your operator solved {nsolved}/{len(train)} training targets (pKiss AND ProbKnot exact)."
                   + (f" Runtime errors: {errs}." if errs else "")
@@ -173,12 +179,19 @@ def main(rounds=6, n_train=16, n_heldout=60, model=None):
         except Exception as e:
             rec.update({"train_solved": None, "compile_error": repr(e)[:200]})
             print(f"  round {rd}: compile/sandbox error {repr(e)[:120]}", flush=True)
+            stale += 1
             fb = (f"Your code failed to load: {repr(e)[:200]}. Fix it. "
                   f"No imports; only the listed primitives + random/math/itertools. Return only the code block.")
         messages.append({"role": "user", "content": fb})
         hist.append(rec)
         json.dump({"model": model, "rounds": hist, "best_round": best["round"],
                    "best_train_solved": best["train_solved"]}, open(os.path.join(OUT, "invent_log.json"), "w"), indent=1)
+        # early stop: perfect, or no improvement for `patience` rounds (keep-best makes this safe)
+        if best["train_solved"] >= len(train):
+            print(f"  early stop: perfect train {best['train_solved']}/{len(train)}", flush=True); break
+        if stale >= patience and best["train_solved"] > 0:
+            print(f"  early stop: no improvement for {patience} rounds "
+                  f"(best {best['train_solved']}/{len(train)} @ round {best['round']})", flush=True); break
 
     # ---------- freeze best and CERTIFY on held-out under the full panel ----------
     result = {"model": model, "best_train_solved": best["train_solved"], "best_round": best["round"],
