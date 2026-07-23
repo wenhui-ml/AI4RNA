@@ -65,11 +65,15 @@ class DecomposePKTool(Tool):
     """Pseudoknot-only skill. Cheap-abstains on nested targets (nothing to add there)."""
 
     def __init__(self, skel_wall_s: float = 15.0, repair_wall_s: float = 60.0,
-                 max_repair_iters: int = 400, skel_restarts: int = 6, n_replicas: int = 1):
+                 max_repair_iters: int = 400, skel_restarts: int = 6, n_replicas: int = 1,
+                 ablate: str = "none"):
         self.skel_wall_s = float(skel_wall_s)
         self.repair_wall_s = float(repair_wall_s)
         self.max_repair_iters = int(max_repair_iters)
         self.skel_restarts = int(skel_restarts)
+        # P2 component ablation: 'none' (full) | 'norepair' (no pKiss-guided repair loop) |
+        # 'nocompose' (skip WC on crossing pairs) | 'nodecompose' (random init, no CF skeleton).
+        self.ablate = str(ablate)
         # single-core: the nested skeleton is solved by ViennaRNA inverse_fold (no process pool -> safe to
         # run MANY of these under an OUTER pool; n_replicas kept only for signature compatibility).
         self.cores = 1
@@ -114,22 +118,26 @@ class DecomposePKTool(Tool):
         #      this is exactly the right tool -- single-process, no pool, safe under an outer pool). A few
         #      random restarts; an approximate skeleton is fine since the pKiss repair below finishes the job.
         t0 = time.time()
-        best_skel, best_dist = "A" * n, float("inf")
-        for _ in range(max(1, self.skel_restarts)):
-            start = "".join(rng.choice("ACGU") for _ in range(n))
-            s, dist = RNA.inverse_fold(start, skeleton)
-            if dist < best_dist:
-                best_skel, best_dist = s, dist
-            if best_dist <= 0 or (time.time() - t0) > self.skel_wall_s:
-                break
+        if self.ablate == "nodecompose":
+            best_skel = "".join(rng.choice("ACGU") for _ in range(n))   # ablate: no CF-skeleton guidance
+        else:
+            best_skel, best_dist = "A" * n, float("inf")
+            for _ in range(max(1, self.skel_restarts)):
+                start = "".join(rng.choice("ACGU") for _ in range(n))
+                s, dist = RNA.inverse_fold(start, skeleton)
+                if dist < best_dist:
+                    best_skel, best_dist = s, dist
+                if best_dist <= 0 or (time.time() - t0) > self.skel_wall_s:
+                    break
         seq = list(best_skel)
         if len(seq) != n:                                              # defensive: pad/trim to length
             seq = (seq + ["A"] * n)[:n]
 
         # 3. compose: enforce Watson-Crick complementarity on every crossing pair (seed-varied choice)
-        for k, (i, j) in enumerate(cross_pairs):
-            a, b = _WC[(seed + k) % 4]
-            seq[i], seq[j] = a, b
+        if self.ablate not in ("nocompose", "nodecompose"):
+            for k, (i, j) in enumerate(cross_pairs):
+                a, b = _WC[(seed + k) % 4]
+                seq[i], seq[j] = a, b
         for p, base in fixed.items():                                  # E2: pin the IUPAC-fixed positions
             if 0 <= p < n:
                 seq[p] = base
@@ -154,8 +162,8 @@ class DecomposePKTool(Tool):
         it = 0
         t_rep = time.time()
         n_cross = len(cross_pairs)
-        while (not solved and cur_bp and cur_bp > 0 and it < self.max_repair_iters
-               and (time.time() - t_rep) < self.repair_wall_s):
+        while (self.ablate != "norepair" and not solved and cur_bp and cur_bp > 0
+               and it < self.max_repair_iters and (time.time() - t_rep) < self.repair_wall_s):
             it += 1
             cand = list(cur_seq)
             # occasional restart move: re-randomise ALL crossing-stem pairs (the pseudoknot-specific part)

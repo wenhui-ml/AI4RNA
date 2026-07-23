@@ -105,6 +105,40 @@ def build_policies(which):
         pol["always_cheap"] = FixedPolicy([RemcTool(wall_s=30)], name="always_cheap")
     if "always_sota" in which:
         pol["always_sota"] = FixedPolicy([DesirnaTool(timelimit_s=120)], name="always_sota")
+    if "autonomous" in which:
+        # The INVENTED MCF operator: decompose T -> CF skeleton -> compose crossing pairs -> pKiss-guided
+        # repair. It NEVER calls DesiRNA (nor any external pseudoknot solver), so autonomy is STRUCTURAL:
+        # a nonzero held-out solve rate here is a certified CF->MCF ascent by the agent's own procedure,
+        # not a borrowed one. Budgets are env-tunable for calibration (PKD_SKEL_S/PKD_REPAIR_S/PKD_ITERS).
+        from ..cognitive.skills.pk_decompose import DecomposePKTool
+        _sk = float(os.environ.get("PKD_SKEL_S", "12"))
+        _rp = float(os.environ.get("PKD_REPAIR_S", "60"))
+        _it = int(os.environ.get("PKD_ITERS", "400"))
+        _abl = os.environ.get("PKD_ABLATE", "none")   # P2: none|norepair|nocompose|nodecompose
+        pol["autonomous"] = FixedPolicy(
+            [DecomposePKTool(skel_wall_s=_sk, repair_wall_s=_rp, max_repair_iters=_it, ablate=_abl)],
+            name="autonomous")
+    if "panel_auto" in which:
+        # PANEL-OPTIMIZING operator: optimizes pKiss AND ProbKnot agreement (lexicographic), not a single
+        # oracle -> tests whether model-ROBUST autonomous ascent is attainable where pKiss-gaming (2/43) is not.
+        from ..cognitive.skills.pk_decompose_panel import DecomposePKPanelTool
+        _psk = float(os.environ.get("PKP_SKEL_S", "12"))
+        _prp = float(os.environ.get("PKP_REPAIR_S", "90"))
+        _pit = int(os.environ.get("PKP_ITERS", "800"))
+        _pgate = int(os.environ.get("PKP_GATE", "3"))
+        _pmpb = int(os.environ.get("PKP_MAXPB", "120"))
+        pol["panel_auto"] = FixedPolicy(
+            [DecomposePKPanelTool(skel_wall_s=_psk, repair_wall_s=_prp, max_repair_iters=_pit,
+                                  panel_gate=_pgate, max_probknot=_pmpb)], name="panel_auto")
+    if "probknot_auto" in which:
+        # P4 symmetry control: optimizes ProbKnot in-loop (analog of autonomous, which optimizes pKiss).
+        from ..cognitive.skills.pk_decompose_probknot import DecomposeProbKnotTool
+        _bsk = float(os.environ.get("PKB_SKEL_S", "12"))
+        _brp = float(os.environ.get("PKB_REPAIR_S", "90"))
+        _bit = int(os.environ.get("PKB_ITERS", "400"))
+        pol["probknot_auto"] = FixedPolicy(
+            [DecomposeProbKnotTool(skel_wall_s=_bsk, repair_wall_s=_brp, max_repair_iters=_bit)],
+            name="probknot_auto")
     return pol
 
 
@@ -130,7 +164,8 @@ def run(limit, which, outdir, seed=0):
             os_ = _oracle_s(r)
             rec["by_policy"][name] = {"solved": r["solved"], "cost_usd": r["cost_usd"],
                                       "n_actions": r["n_actions"], "oracle_s": os_,
-                                      "naive_mfe_solved": nm}
+                                      "naive_mfe_solved": nm,
+                                      "seq": r.get("seq")}   # saved for offline cross-oracle panel adjudication
             agg[name]["solved"] += int(r["solved"])
             agg[name]["cost_usd"] += r["cost_usd"]
             agg[name]["oracle_s"] += os_
@@ -154,6 +189,7 @@ if __name__ == "__main__":
     ap.add_argument("--timelimit-s", type=int, default=60)
     ap.add_argument("--policies", nargs="+", default=["cognitive", "always_cheap", "always_sota"])
     ap.add_argument("--outdir", default=OUT_DEFAULT)
+    ap.add_argument("--seed", type=int, default=0)      # P6: multi-seed for bootstrap CIs
     a = ap.parse_args()
     if a.list is not None:
         list_tasks(a.list)
@@ -162,6 +198,6 @@ if __name__ == "__main__":
     elif a.desirna_smoke is not None:
         desirna_smoke(a.desirna_smoke, a.timelimit_s)
     elif a.run is not None:
-        run(a.run, a.policies, a.outdir)
+        run(a.run, a.policies, a.outdir, seed=a.seed)
     else:
         ap.error("pass one of --list N | --fp-demo N | --desirna-smoke IDX | --run N")
