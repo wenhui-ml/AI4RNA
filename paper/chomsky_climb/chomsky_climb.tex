@@ -415,6 +415,38 @@ cases afterward. It is the design-time analogue of pre-registration, and of rece
 loops \citep{huang2025popper,liu2024aigs}, but with an \emph{exact} refuter on the negative side rather than
 a statistical one. Figure~\ref{fig:cert} summarizes the certificate.
 
+\paragraph{The certification procedure and its soundness.} Certifying an ascent on a held-out pool
+$\mathcal D_{\mathrm{ho}}$ runs five steps: \emph{(i)} pre-screen $\mathcal D_{\mathrm{ho}}$ for designability
+(\S\ref{sec:exp}), moving intrinsically unrealizable targets to the undesignability axis
+(\S\ref{sec:impossible}); \emph{(ii)} discharge the negative side offline by testing
+$\mathcal D_{\mathrm{ho}}\subseteq\PK$ (Prop.~\ref{prop:confine}), which fixes the \CF{} floor at $0$;
+\emph{(iii)} for each $T$, hash-commit $\pi_{\mathrm{after}}(T)$ (or an abstention) \emph{before} any oracle
+call; \emph{(iv)} adjudicate by the panel-unanimous rule with abstention (\S\ref{sec:oracle}); \emph{(v)}
+ablate---remove the external solver, then remove $\Delta\mathcal O$---and recompute. With $\mathbf 1[\cdot]$
+the indicator and $\pi^{-s},\pi^{\ominus\Delta\mathcal O}$ the solver-removed and component-ablated policies,
+the reported quantities are
+\begin{equation}\label{eq:metrics}
+  \widehat p_{\Omega}(\mathcal D)=\frac{1}{|\mathcal D|}\sum_{T\in\mathcal D}\mathbf 1\!\left[\Omega(\pi(T))=T\right],
+  \qquad
+  g_{\mathrm{aut}}=\widehat p_{\Opk}-\widehat p^{\,-s}_{\Opk},
+  \qquad
+  g_{\mathrm{tr}}=\widehat p_{\Opk}(\mathcal D_{\mathrm{train}})-\widehat p_{\Opk}(\mathcal D_{\mathrm{ho}}),
+\end{equation}
+the panel-unanimous held-out rate, the autonomy gap, and the transfer gap.
+
+\begin{proposition}[Soundness and minimality]\label{prop:sound}
+If Eq.~\eqref{eq:cert} holds under the sealed-commitment protocol, the four confounders are excluded jointly:
+\emph{search} and one-off \emph{luck} by a held-out, target-spread positive rate committed before adjudication;
+\emph{``could always have''} by the decidable emptiness $\Rze{\Ocf}{\pi_{\mathrm{before}}}\cap\PK=\varnothing$;
+\emph{benchmark overfitting} by transfer ($g_{\mathrm{tr}}$ small) to targets disjoint from those forming
+$\Delta\mathcal O$; and \emph{borrowing} by a near-zero autonomy gap $g_{\mathrm{aut}}\!\approx\!0$ with
+$\Delta\mathcal O$-decisiveness $\widehat p^{\,\ominus\Delta\mathcal O}\!=\!0$. The conjunction is
+\emph{minimal}: dropping~(2) readmits ``could always have'', dropping~(3) readmits borrowing, and dropping~(1)
+leaves nothing measured.
+\end{proposition}
+\noindent The verdict is a demarcation, not a probability: conjunct~(2) is a theorem, whereas (1) and~(3) are
+model-relative measurements whose uncertainty we quantify (\S\ref{sec:exp}, Table~\ref{tab:sep}).
+
 \begin{figure}[t]\centering
 \includegraphics[width=0.96\linewidth]{fig_cc_certificate.pdf}
 \caption{\textbf{The two-sided certificate.} Positive side (model-relative, panel-adjudicated): the oracle
@@ -464,15 +496,35 @@ realizes under an oracle}. Making this precise fixes a category error latent in 
 pairs'' account: an operator edits a \emph{sequence}, and whether the result is nested or crossing is a
 property of the \emph{fold}, decided by the oracle---not of the operator.
 
-\paragraph{Policies, oracles, realizable-target language.} A \emph{design policy} $\pi$ maps a target $T$ to
-a sequence $x=\pi(T)$ by searching sequence space with a repertoire of reusable components (skills/operators)
-$\mathcal{O}$. An \emph{oracle} $\Omega$ maps a sequence to a structure. The \emph{realizable-target
-language} of $\pi$ under $\Omega$ is
-\[
-  \Rze{\Omega}{\pi}\ =\ \bigl\{\,T\ :\ \Omega(\pi(T))=T\,\bigr\},
-\]
-the set of target structures the policy realizes \emph{and} has the oracle confirm. This is a language over
-dot-bracket strings---the correct object for a Chomsky-class statement.
+\paragraph{Policies, oracles, and the realizable-target language.}
+\begin{definition}[Structures, oracles, policies]\label{def:setup}
+Fix $\Sigma=\{\mathrm A,\mathrm C,\mathrm G,\mathrm U\}$ and let $\mathcal T=\bigcup_n\mathcal T_n$ be the
+dot-bracket structures, partitioned into the \emph{nested} language $\NESTED$ (no two base pairs cross) and
+the \emph{crossing} language $\PK=\mathcal T\setminus\NESTED$. A \emph{folding oracle} is a length-preserving
+map $\Omega:\Sigma^\ast\!\to\mathcal T$; a \emph{design policy} is a length-preserving map
+$\pi:\mathcal T\!\to\Sigma^\ast$, realized by a search over a repertoire of reusable components $\mathcal O$.
+The \emph{realizable-target language} of $\pi$ under $\Omega$ and the \emph{designable set} of $\Omega$ are
+\begin{equation}\label{eq:realizable}
+  \Rze{\Omega}{\pi}=\{\,T\in\mathcal T:\Omega(\pi(T))=T\,\},\qquad
+  \mathcal D_\Omega=\operatorname{im}\Omega=\{\,T:\exists\,x\in\Sigma^\ast,\ \Omega(x)=T\,\}.
+\end{equation}
+$\Rze{\Omega}{\pi}$ is a language over dot-bracket strings---the object a Chomsky-class statement must range
+over, since a pumping lemma constrains languages of \emph{structures}, not the sequence edits an operator
+performs.
+\end{definition}
+
+\begin{lemma}[Realizability is capped by the oracle range]\label{lem:bound}
+For every policy $\pi$ and oracle $\Omega$, $\ \Rze{\Omega}{\pi}\subseteq\mathcal D_\Omega=\operatorname{im}\Omega$,
+independently of the policy's search budget or repertoire.
+\end{lemma}
+\begin{proof}
+If $T\in\Rze{\Omega}{\pi}$ then $T=\Omega(\pi(T))$, so $T$ is in the image of $\Omega$; i.e.\
+$T\in\operatorname{im}\Omega=\mathcal D_\Omega$. The bound quantifies over \emph{all} $\pi$, so no amount of
+search enlarges $\Rze{\Omega}{\pi}$ beyond $\operatorname{im}\Omega$.
+\end{proof}
+\noindent Lemma~\ref{lem:bound} is the engine of the negative side: it makes confinement a property of the
+\emph{oracle's representation}, not of any operator, and reduces Prop.~\ref{prop:confine} to computing
+$\operatorname{im}\Ocf$.
 
 \paragraph{Where this object sits in designability theory.} $\Rze{\Omega}{\pi}$ is bounded above by the set
 of \emph{designable} structures under $\Omega$---those admitting at least one sequence that folds to
@@ -498,9 +550,10 @@ while undesignable crossing targets are pre-screened out.}\label{fig:lang}
 \end{figure}
 
 \begin{proposition}[Decidable \CF-confinement]\label{prop:confine}
-For \emph{any} policy $\pi$, $\Rze{\Ocf}{\pi}\subseteq\NESTED$, because the output space of the
-pseudoknot-free oracle \Ocf{} is exactly $\NESTED$. Consequently, for every crossing target $T\in\PK$,
-$T\notin\Rze{\Ocf}{\pi}$: a non-membership that is \emph{decidable} ($O(|P|^2)$ to test $T\in\PK$) and
+The pseudoknot-free oracle satisfies $\operatorname{im}\Ocf=\NESTED$ (its output ensemble admits no crossing
+pair). Hence, by Lemma~\ref{lem:bound}, $\Rze{\Ocf}{\pi}\subseteq\NESTED$ for \emph{every} policy $\pi$, and
+for every crossing target $T\in\PK$ we have $T\notin\Rze{\Ocf}{\pi}$. This non-membership is
+\emph{decidable} in $O(|P|^{2})$ (test whether any two pairs of $T$ cross; App.~\ref{app:proofs}) and is
 independent of the policy's search budget.
 \end{proposition}
 \noindent The proof (App.~\ref{app:proofs}) is immediate from the oracle's output space; its force is that
@@ -519,7 +572,22 @@ held-fixed crossing-aware oracle.
 \citep{rivaseddy2000,durbin1998}; $\PK$ is \emph{not} \citep{nebelweinberg} and is MCFG of dimension $\le 2$
 \citep{rivaseddy2000,katosekikasami2006}. We take these as established and tie the agent to them via
 Prop.~\ref{prop:confine}: ``could not before'' is $\Rze{\Ocf}{\pi_{\mathrm{before}}}\subseteq\NESTED\not\ni
-T$; ``can now'' is $T\in\Rze{\Opk}{\pi_{\mathrm{after}}}$ for a $T$ in the provably non-CF class $\PK$.
+T$; ``can now'' is $T\in\Rze{\Opk}{\pi_{\mathrm{after}}}$ for a $T$ in the non-CF class $\PK$.
+
+\begin{definition}[$\CF\!\to\!\MCF$ ascent under a fixed oracle]\label{def:ascent}
+Let $\mathcal D_{\mathrm{ho}}\subseteq\PK\cap\mathcal D_{\Opk}$ be a held-out pool of \emph{designable}
+crossing targets. A policy pair $(\pi_{\mathrm{before}},\pi_{\mathrm{after}})$ exhibits an ascent, adjudicated
+by the \emph{single, fixed} crossing-aware oracle $\Opk$, if
+\begin{equation}\label{eq:ascent}
+  \Rze{\Opk}{\pi_{\mathrm{before}}}\cap\mathcal D_{\mathrm{ho}}=\varnothing
+  \qquad\text{and}\qquad
+  \Rze{\Opk}{\pi_{\mathrm{after}}}\cap\mathcal D_{\mathrm{ho}}\neq\varnothing .
+\end{equation}
+Both sides are scored by the \emph{same} $\Opk$, so the ascent is not an artifact of exchanging oracles; the
+decidable Prop.~\ref{prop:confine} gives the stronger, oracle-independent
+$\Rze{\Ocf}{\pi_{\mathrm{before}}}\cap\PK=\varnothing$ as a pre-run bound. The empirical instance measured in
+\S\ref{sec:exp} is the left conjunct at $0/60$ (floor) against the right at $3$--$8/60$ (panel operator).
+\end{definition}
 
 \begin{definition}[Transferable ascent capability]\label{def:cap}
 The agent's \emph{ascent capability} is a set $\Delta\mathcal{O}=\mathcal{O}_{\mathrm{after}}\setminus
@@ -1163,6 +1231,15 @@ $\Rze{\Ocf}{\pi}\subseteq\NESTED$. If $T\in\PK$ then $T$ contains a crossing pai
 therefore $T\notin\Rze{\Ocf}{\pi}$. Testing $T\in\PK$ (a crossing pair among $|P|$ pairs) is $O(|P|^2)$ and
 independent of any search over sequences; the non-membership is thus decided offline.
 \end{proof}
+
+\smallskip\noindent\textbf{Decision procedure for the negative side (and its complexity).} Given $T$ with
+pair set $P(T)$, the crossing test returns \textsc{crossing} iff $\exists\,(i,j),(k,l)\in P(T)$ with
+$i<k<j<l$. The naive double loop is $O(|P|^2)$; sorting $P(T)$ by left endpoint and sweeping with a stack of
+open right-endpoints (pushing $j$ at $i$, popping at $j$, flagging a violation if a new pair opens inside an
+open interval but closes outside it) decides it in $O(|P|\log|P|)$. The verdict for the entire held-out pool
+is computed \emph{once, offline}, before any sequence is designed---no folding, search, or evaluation over
+$\Sigma^\ast$ is involved. This is the precise sense in which the negative side is a theorem discharged
+before any run (contrast the positive side, which requires folding each committed design).
 \noindent\textbf{Class boundary (invoked), and the grammar witness (worked).} That $\NESTED$ is context-free,
 and that the crossing families we treat are non-context-free yet admit MCFG grammars of dimension $\le2$, are
 established \citep{rivaseddy2000,nebelweinberg,katosekikasami2006}; we do not reproduce their proofs, and we
@@ -1198,6 +1275,51 @@ coordinates two substrings) is necessary and sufficient for one crossing stem---
 L_{\mathrm H}$ \emph{uniformly} is an \MCF{} capability: a finite-description operator that, for every $(n,m)$,
 returns a sequence whose fold is $S$'s yield stands in for the grammar itself---which no CF generator can.
 
+\smallskip\noindent\emph{Worked derivation ($n{=}m{=}2$, linker $\ell{=}\texttt{....}$).} Eq.~\eqref{eq:mcfg}
+derives $T_{2,2}=\texttt{((....[[....))....]]}$ by the steps of Table~\ref{tab:deriv}: two applications each
+build the stem pairs $(aa,cc)$ and $(bb,dd)$, then the start rule interleaves them across the four slots
+separated by $\ell$. A CFG cannot reproduce this table---its single-yield nonterminals cannot carry the two
+ends of a stem to separated, interleaved positions.
+
+\begin{table}[h]\centering\small
+\setlength{\tabcolsep}{6pt}\renewcommand{\arraystretch}{1.15}
+\caption{Dimension-2 MCFG derivation of the H-type $T_{2,2}$ (rules of Eq.~\eqref{eq:mcfg}). $R$ and $Q$ each
+carry a \emph{pair} of substrings---the two ends of one stem; $S$ interleaves them.}\label{tab:deriv}
+\begin{tabular}{cll}
+\toprule
+step & rule applied & value built\\
+\midrule
+1 & $R(\varepsilon,\varepsilon)$ & $R=(\varepsilon,\varepsilon)$\\
+2 & $R(a\,x_1,\,c\,x_2)\!\leftarrow\!R$ & $R=(a,c)$\\
+3 & $R(a\,x_1,\,c\,x_2)\!\leftarrow\!R$ & $R=(aa,cc)$\\
+4 & $Q(\varepsilon,\varepsilon)$, then $Q(b\,y_1,\,d\,y_2)\!\leftarrow\!Q$ twice & $Q=(bb,dd)$\\
+5 & $S(x_1\,\ell\,y_1\,\ell\,x_2\,\ell\,y_2)\!\leftarrow\!R,Q$ & $aa\,\ell\,bb\,\ell\,cc\,\ell\,dd=\texttt{((....[[....))....]]}$\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\smallskip\noindent\textbf{The folding oracles (models and output spaces).} Table~\ref{tab:oracles} fixes each
+oracle as a map $\Sigma^\ast\!\to\mathcal T$ with an explicit range. $\operatorname{im}\Ocf=\NESTED$ is exactly
+what Prop.~\ref{prop:confine} (via Lemma~\ref{lem:bound}) requires; the three panel predictors admit crossing
+outputs but model \emph{different} pseudoknot subclasses under different objectives---the mechanistic source
+of the $[15,60]\%$ cross-oracle envelope of \S\ref{sec:oracle} and hence of the abstention rule.
+
+\begin{table}[h]\centering\small
+\setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.2}
+\caption{The oracles as maps $\Sigma^\ast\!\to\mathcal T$: folding model, range, and pseudoknot subclass
+modeled.}\label{tab:oracles}
+\begin{tabularx}{\linewidth}{@{}lLll@{}}
+\toprule
+oracle & folding model & range $\operatorname{im}\Omega$ & subclass\\
+\midrule
+$\Ocf$ (ViennaRNA) & Turner-2004 MFE, pseudoknot-free ensemble & $\NESTED$ & none (nested)\\
+pKiss & heuristic min-energy folding with knot motifs \citep{janssen2015pkiss} & $\subseteq\mathcal T$ & H-type, kissing hairpin\\
+ProbKnot & max-expected-accuracy pairs from a partition function \citep{bellaousov2010probknot} & $\subseteq\mathcal T$ & pairs above a probability cut\\
+ShapeKnots & MFE under SHAPE restraints (here run \emph{de novo}) \citep{hajdin2013shapeknots} & $\subseteq\mathcal T$ & low-order pseudoknots\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
 \section{Reproducibility and Protocol Details}\label{app:repro}
 Oracles are computed and replayable under a fixed configuration; harness, target lists, intrinsic grades,
 and per-target JSON are released. The \CF{} ladder is ViennaRNA (Turner~2004, $37^\circ$C); the pseudoknot
@@ -1208,6 +1330,20 @@ sweep (E3), a planned minimal-hint probe, parameterizes how much of the target's
 revealed and reports the smallest hint certifying a class jump. Every measured number in this manuscript
 enters only from such a logged run (\S\ref{sec:exp}); the harness, target lists, intrinsic grades, and
 per-target JSON are released for replay.
+
+\smallskip\noindent\textbf{Statistical methodology (Table~\ref{tab:sep}).} Let $u^{(A)}_T\in\{0,1\}$ indicate
+whether arm $A$ realizes held-out target $T$ panel-unanimously, over the pool of size $N=|\mathcal D_{\mathrm{ho}}|=60$.
+\emph{(i) Percentile bootstrap.} A $95\%$ CI for a rate resamples the $N$ targets with replacement $B{=}20{,}000$
+times and takes the $2.5/97.5$ percentiles of $\frac1N\sum_T u^{(A)}_{T^\ast}$. \emph{(ii) Paired McNemar}
+(same targets, arms $A$ vs.\ gamer $G$): with $b=\#\{T:u^{(A)}_T{=}1,u^{(G)}_T{=}0\}$ and
+$c=\#\{T:u^{(A)}_T{=}0,u^{(G)}_T{=}1\}$, the exact two-sided $p$-value is
+\begin{equation}\label{eq:mcnemar}
+  p_{\mathrm{McN}}=2\!\!\sum_{k=0}^{\min(b,c)}\!\binom{b+c}{k}2^{-(b+c)} .
+\end{equation}
+\emph{(iii) Fixed-baseline binomial.} Against the gamer rate $p_0{=}1/60$, the one-sided $p$-value for $k$
+successes in $N$ trials is $\sum_{j=k}^{N}\binom{N}{j}p_0^{\,j}(1-p_0)^{N-j}$. The three columns of
+Table~\ref{tab:sep} are these tests; the analysis is \texttt{runs/cc\_ascent/stats\_separation.py}, run offline
+on the saved per-target adjudications (no live episodes).
 
 \bibliographystyle{plainnat}
 \bibliography{references}
