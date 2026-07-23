@@ -1347,6 +1347,19 @@ step & rule applied & value built\\
 \end{tabular}
 \end{table}
 
+\smallskip\noindent\textbf{The pseudoknot classes form an MCFG-dimension hierarchy.} The dimension-2 grammar
+above captures the H-type family (one crossing stem). Richer pseudoknots need more: the MCFG \emph{dimension}
+(how many substrings a nonterminal coordinates) grows with the number of \emph{mutually crossing} stems, so a
+kissing-hairpin interaction (two stems whose loops pair) and complex ($\ge3$ mutually entangled stems)
+topologies sit at successively higher tiers, and distinct pseudoknot classes are known to be included in, or
+incomparable to, one another as formal languages \citep{rivaseddy2000,nebelweinberg,katosekikasami2006}. Our
+held-out grades---H-type, kissing, complex (Table~\ref{tab:data})---are thus ordered by an intrinsic
+formal-language complexity, which is precisely why the empirical frontier organizes by grade
+(Fig.~\ref{fig:grade}); we assert the dimension-2 witness only for the H-type family we design against and
+make no precise per-class dimension claim beyond it. The $\CF\!\to\!\MCF$ boundary---the object of this
+paper---is crossed already at the first tier (one crossing stem); higher tiers are a finer hierarchy
+\emph{within} \MCF{} that we do not attempt to climb.
+
 \smallskip\noindent\textbf{The folding oracles (models and output spaces).} Table~\ref{tab:oracles} fixes each
 oracle as a map $\Sigma^\ast\!\to\mathcal T$ with an explicit range. $\operatorname{im}\Ocf=\NESTED$ is exactly
 what Prop.~\ref{prop:confine} (via Lemma~\ref{lem:bound}) requires; the three panel predictors admit crossing
