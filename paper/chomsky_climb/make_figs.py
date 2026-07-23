@@ -89,7 +89,103 @@ def fig_collapse():
     _save(fig, "fig_cc_collapse.pdf")
 
 
+def fig_family():
+    """Parameterized non-CF family L_H: capability vs crossing-stem size (n=m), by arm.
+    Reads runs/cc_ascent/family_ood/family_ood.json; classifies each cell as fail / pKiss-only / partial /
+    panel-unanimous. Honest binary-outcome matrix (a 'curve' would over-read binary data)."""
+    import json
+    jp = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..",
+         "rna_harness", "runs", "cc_ascent", "family_ood", "family_ood.json"))
+    if not os.path.exists(jp):
+        print("  (skip fig_family: %s not found)" % jp); return
+    d = json.load(open(jp))
+    diag = sorted([r for r in d["rows"] if r.get("regime") == "diag"], key=lambda r: r["n"])
+    if not diag:
+        print("  (skip fig_family: no diagonal rows yet)"); return
+    sizes = [r["n"] for r in diag]
+    arms = [("always_cheap", "CF floor (REMC, $\\Omega_{cf}$)", 0),
+            ("panel_auto", "invented operator (autonomous)", 1),
+            ("always_sota", "DesiRNA (SOTA, borrowed)", 2)]
+
+    def level(cell):
+        if not cell or not cell.get("solved"):
+            return 0                                   # fail
+        p = cell.get("panel") or {}
+        if p.get("unanimous"):
+            return 3                                   # panel-unanimous
+        if p.get("pkiss") and p.get("probknot"):
+            return 2                                   # 2/3 (pKiss & ProbKnot)
+        return 1                                       # pKiss-only
+
+    COLZ = {0: ("none", FAINT), 1: (MCF, "white"), 2: ("#c9b47e", "white"), 3: (CF, "white")}
+    MK = {0: "x", 1: "o", 2: "o", 3: "o"}
+    fig, ax = plt.subplots(figsize=(7.0, 2.9))
+    for aname, _, row in arms:
+        for r in diag:
+            lv = level(r["arms"].get(aname))
+            fc, ec = COLZ[lv]
+            if lv == 0:
+                ax.plot(r["n"], row, "x", ms=6, color=FAINT, mew=1.2, zorder=3)
+            else:
+                ax.plot(r["n"], row, MK[lv], ms=11, mfc=fc, mec=ec, mew=1.0, zorder=3)
+    ax.set_yticks([row for _, _, row in arms]); ax.set_yticklabels([lbl for _, lbl, _ in arms], fontsize=8)
+    ax.set_ylim(-0.6, 2.6); ax.set_xlim(min(sizes) - 0.6, max(sizes) + 0.6)
+    ax.set_xticks(sizes); ax.set_xlabel("crossing-stem size $n=m$ (bp) on the family $\\mathcal{L}_H$", fontsize=8.5)
+    ax.set_title("Capability vs.\\ stem size on the parameterized non-CF family",
+                 fontsize=10, weight="bold", pad=8)
+    ax.text(sizes[0], -0.42, "CF floor is $0$ for all $n,m$ (Prop.\\,1)", fontsize=6.6, color=FAINT)
+    # legend
+    from matplotlib.lines import Line2D
+    leg = [Line2D([0], [0], marker="x", color="w", mec=FAINT, mew=1.2, ms=7, label="not realized"),
+           Line2D([0], [0], marker="o", color="w", mfc=MCF, mec="white", ms=9, label="pKiss only"),
+           Line2D([0], [0], marker="o", color="w", mfc="#c9b47e", mec="white", ms=9, label="pKiss $\\cap$ ProbKnot"),
+           Line2D([0], [0], marker="o", color="w", mfc=CF, mec="white", ms=9, label="panel-unanimous")]
+    ax.legend(handles=leg, loc="upper center", bbox_to_anchor=(0.5, -0.28), ncol=4,
+              frameon=False, fontsize=7, handletextpad=0.2, columnspacing=1.1)
+    ax.spines["top"].set_visible(False); ax.spines["right"].set_visible(False)
+    ax.tick_params(length=3)
+    _save(fig, "fig_cc_family.pdf")
+    print("  wrote figs/fig_cc_family.pdf")
+
+
+def fig_grade():
+    """Grammar-graded capability frontier: solve rate vs intrinsic crossing complexity (crossing-pair count).
+    Reads runs/cc_ascent/grade_frontier.json. Shows formal complexity predicting the empirical frontier."""
+    import json
+    jp = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..",
+         "rna_harness", "runs", "cc_ascent", "grade_frontier.json"))
+    if not os.path.exists(jp):
+        print("  (skip fig_grade: %s not found)" % jp); return
+    R = json.load(open(jp))["by_grade"]
+    g = [r["grade"] for r in R]; nn = [r["n"] for r in R]
+
+    def rate(key):
+        return [100.0 * r[key] / r["n"] for r in R]
+    fig, ax = plt.subplots(figsize=(7.0, 3.1))
+    ax.plot(g, rate("gamer_pkiss"), "-o", color=GREY, lw=1.2, ms=5, mec="white", mew=0.6,
+            label="single-oracle operator (pKiss)")
+    ax.plot(g, rate("panel_pk_pb"), "-s", color=MCF, lw=1.4, ms=5, mec="white", mew=0.6,
+            label="panel operator (pKiss $\\cap$ ProbKnot)")
+    ax.plot(g, rate("panel_unanimous"), "-D", color=CF, lw=1.6, ms=5.5, mec="white", mew=0.6,
+            label="panel operator (panel-unanimous)")
+    ax.axhline(0, color=FAINT, lw=0.8, ls=(0, (4, 3)))
+    for gi, ni in zip(g, nn):
+        ax.text(gi, -9, f"$n{{=}}{ni}$", ha="center", fontsize=6.3, color=GREY)
+    ax.set_xlabel("intrinsic crossing complexity: crossing-pair count (exact grade)", fontsize=8.5)
+    ax.set_ylabel("held-out solve rate (\\%)", fontsize=8.5)
+    ax.set_ylim(-13, 100); ax.set_xticks(g); ax.set_yticks([0, 25, 50, 75, 100])
+    ax.set_title("Formal crossing complexity predicts the capability frontier",
+                 fontsize=10, weight="bold", pad=8)
+    ax.legend(loc="upper right", frameon=False, fontsize=7)
+    ax.spines["top"].set_visible(False); ax.spines["right"].set_visible(False)
+    ax.tick_params(length=3)
+    _save(fig, "fig_cc_grade.pdf")
+    print("  wrote figs/fig_cc_grade.pdf")
+
+
 if __name__ == "__main__":
     fig_oracle()
     fig_collapse()
-    print("wrote figs/fig_cc_{oracle,collapse}.pdf (data figures; the 5 diagrams are TikZ in tikz/*.tex)")
+    fig_family()
+    fig_grade()
+    print("wrote figs/fig_cc_*.pdf (data figs; +family/grade if data present); 5 diagrams are TikZ in tikz/*.tex")

@@ -994,6 +994,55 @@ Tables~\ref{tab:baselines},\ref{tab:panel}), and the three-seed panel-operator r
 separation test (above) are all measured from logged runs; per-grade transfer and the undesignability axis
 are out of scope here.
 
+\paragraph{Formal crossing complexity predicts the capability frontier.} Because each target's grade---its
+crossing-pair count, an exact $O(|P|^2)$ property fixed before design (\S\ref{sec:exp})---is a formal-language
+quantity, we can ask whether it \emph{predicts} where capability breaks down. Binning the $60$ held-out
+targets by grade (Fig.~\ref{fig:grade}) shows it does: both operators solve almost everything at low
+complexity and \emph{collapse} to $0$ at the highest grades ($8$--$9$ crossing pairs), while
+panel-unanimous robustness is not flat but concentrates in a \emph{mid-complexity window}---$6/22$ at grade
+$5$, tapering to $1/18$ and $1/7$ at grades $6$--$7$ and $0$ elsewhere. The frontier is thus organized by the
+grammar-theoretic grade, not by idiosyncratic targets: the formal difficulty axis and the empirical capability
+axis coincide, which is exactly what a substrate ``native to the Chomsky hierarchy'' should exhibit. (Grades
+$8$--$9$ have few members, $n{=}1,2$, so their collapse is indicative; the mid-window robustness is on the
+well-populated grades.)
+
+\begin{figure}[t]\centering
+\includegraphics[width=0.86\linewidth]{fig_cc_grade.pdf}
+\caption{\textbf{Formal complexity predicts the frontier.} Held-out solve rate vs.\ intrinsic crossing-pair
+count. Both operators fall to $0$ at the highest grades; panel-unanimous robustness concentrates in a
+mid-complexity window (grade $5$). The formal difficulty axis and the empirical capability axis
+coincide.}\label{fig:grade}
+\end{figure}
+
+\paragraph{The class claim, tested on an unbounded parameterized family.} A finite held-out set cannot by
+itself establish a Chomsky \emph{class} ascent---any finite language is regular (App.~\ref{app:proofs}); the
+class-level object is a \emph{uniform procedure} over the unbounded crossing family $\mathcal L_{\mathrm H}$
+(Eq.~\eqref{eq:family}). We therefore run the \emph{fixed} autonomous operator on $\mathcal L_{\mathrm H}$ at
+stem sizes $n{=}m\in\{3,\dots,8\}$ (plus asymmetric $(n,m)$), each target designability-screened by DesiRNA
+and adjudicated by the full panel (Fig.~\ref{fig:family}). Three findings. \emph{(i)} The \CF{} floor is $0$
+for \emph{every} member: the negative side (Prop.~\ref{prop:confine}) generalizes from the finite pool to the
+whole unbounded family, as the pumping argument predicts. \emph{(ii)} The \emph{same} finite-description
+operator returns panel-unanimous crossing designs across a \emph{range} of sizes it was not tuned
+for---$n{=}m\in\{5,6,7\}$ and asymmetric $(3,6)$, $4/10$ overall---a uniform procedure realizing multiple
+members of a non-CF family, which is the class-level evidence a single instance cannot give. \emph{(iii)}
+Autonomy is sharp here: the solver-free operator is panel-unanimous on $4/10$ versus $2/10$ for the borrowed
+SOTA solver. The honest limit is that panel-designability is \emph{non-monotone} and bounded to a window---very
+short ($n\!\le\!4$) and long/skewed stems clear pKiss and ProbKnot but drift off ShapeKnots, so the family is
+not \emph{uniformly} panel-realizable end-to-end; this is an oracle-\emph{agreement} ceiling, not a search
+failure (the operator meets its own two-oracle objective on every member in seconds). These clean synthetic
+H-types are easier to design than the messy Pseudobase targets, so $4/10$ is \emph{not} comparable to the
+$3$--$8/60$ of Table~\ref{tab:recovered}: it is a controlled test of \emph{uniformity across the class},
+complementary to the held-out-pool rate.
+
+\begin{figure}[t]\centering
+\includegraphics[width=0.9\linewidth]{fig_cc_family.pdf}
+\caption{\textbf{Capability across the unbounded non-CF family $\mathcal L_{\mathrm H}$}, by crossing-stem
+size $n{=}m$. The \CF{} floor never realizes a member (Prop.~\ref{prop:confine} generalizes to the entire
+family); the autonomous operator is panel-unanimous across a size \emph{range} ($n{=}m\!\in\!\{5,6,7\}$),
+matching or exceeding the borrowed SOTA solver, while short/long stems clear only pKiss$\,\cap\,$ProbKnot---an
+oracle-agreement window, not a search failure.}\label{fig:family}
+\end{figure}
+
 \paragraph{Where this leaves the ascent, and a bounded fallback.} The question we posed---can an operator
 optimizing \emph{panel agreement} beat the oracle-gamer's $1/60$?---is answered in the affirmative, if
 modestly: $3$--$8/60$ across three seeds (mean $5.3$; Table~\ref{tab:recovered}). The certificate fires with
