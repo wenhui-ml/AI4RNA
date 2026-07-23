@@ -2,7 +2,7 @@
 % Climbing the Chomsky Hierarchy --- MASTER MANUSCRIPT (InceptLabs self-improvement family).
 % Own foundation, PARALLEL to (not built on) the categorical self-revising-discovery line.
 % Build: tectonic chomsky_climb.tex . Figures from make_figs.py (figs/fig_cc_*.pdf).
-% Complete prose/figures/tables; ONLY numeric result cells are \pending -> filled from rna_harness/runs/*.
+% Results paper: every measured number comes from a logged run in rna_harness/runs/cc_ascent.
 % NEVER hand-enter a measured number. Anti-collision with family papers: see POSITIONING.md.
 % ============================================================================================
 \documentclass[11pt]{article}
@@ -33,11 +33,7 @@
 \renewcommand{\floatpagefraction}{0.72}
 \setcounter{topnumber}{4}\setcounter{bottomnumber}{3}\setcounter{totalnumber}{6}
 
-\newcommand{\pending}[1]{\fbox{\parbox{0.95\linewidth}{\small\itshape
-  [\textbf{Pending measurement}: filled from \texttt{rna\_harness/runs/*} via the protocol of
-  \S\ref{sec:exp}; no value is hand-entered]: #1}}}
-% Compact pending marker for narrow table cells (the full-width boxed \pending overflows there).
-\newcommand{\pendc}{{\small\itshape pending}}
+% (pending/pre-registration markers removed: this is a results paper.)
 
 \newtheorem{theorem}{Theorem}
 \newtheorem{proposition}{Proposition}
@@ -58,7 +54,7 @@
 \newcommand{\pfe}{\ensuremath{\mathcal{A}_{\mathrm{pfe}}}}
 
 \title{\textbf{Climbing the Chomsky Hierarchy}\\[3pt]
-\large A Two-Sided, Decidable Certificate of Genuine Capability-Class Acquisition\\
+\large A Two-Sided, Partly-Decidable Certificate for Capability-Class Acquisition\\
 by a Self-Improving RNA-Design Agent}
 \author[1]{Wenhui Chen\thanks{Corresponding author: \texttt{wenhui.chen@inceptlabs.ai}}}
 \author[1]{Qingqing Mao}
@@ -213,13 +209,13 @@ evidence and status.
 \begin{table}[t]\centering\small
 \setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.15}
 \caption{Claim--evidence--status. Theorems are proved in App.~\ref{app:proofs}; formal-language facts are
-\emph{invoked} from the cited literature; empirical claims are protocol-level and \emph{pending} a run.}
+\emph{invoked} from the cited literature; empirical claims are backed by logged runs (\S\ref{sec:exp}).}
 \label{tab:claims}
 \begin{tabularx}{\linewidth}{@{}p{0.40\linewidth}p{0.31\linewidth}p{0.22\linewidth}@{}}
 \toprule
 \textbf{Claim} & \textbf{Basis} & \textbf{Status}\\
 \midrule
-Nested$=$\CF, crossing$=$\MCF; RNA topology $\equiv$ the $\CF\!\to\!\MCF$ boundary &
+Nested $=$ \CF; crossing families non-\CF (low-dim MCFG); the nested/crossing split maps to the $\CF\!\to\!\MCF$ boundary &
  \citep{rivaseddy2000,nebelweinberg,katosekikasami2006} & invoked; cited\\
 A \CF-verified repertoire provably cannot realize a crossing target &
  Prop.~\ref{prop:confine} (oracle output space) & theorem (decidable)\\
@@ -306,10 +302,10 @@ verifier branches therefore \emph{coincides} with the $\CF\!\to\!\MCF$ boundary 
 
 \begin{figure}[t]\centering
 \includegraphics[width=0.86\linewidth]{fig_cc_hierarchy.pdf}
-\caption{\textbf{RNA topology \emph{is} the Chomsky hierarchy.} Nested base pairs $=$ context-free (SCFG);
-crossing pairs (pseudoknots) $=$ mildly context-sensitive (MCFG), provably above \CF. The climb is the
-$\CF\!\to\!\MCF$ jump; folding complexity (P$\to$NP-complete) is a corollary of the class, not the main
-line.}\label{fig:hierarchy}
+\caption{\textbf{RNA topology maps onto the Chomsky hierarchy.} Nested base pairs are context-free (SCFG);
+crossing pairs (pseudoknots) are, as unbounded families, non-\CF{} and admit mildly context-sensitive (MCFG)
+grammars, provably above \CF. The climb is the $\CF\!\to\!\MCF$ jump; folding complexity (P$\to$NP-complete)
+is a corollary of the class, not the main line.}\label{fig:hierarchy}
 \end{figure}
 
 \paragraph{Why one stack fails, concretely.} Reading a strand $5'\!\to\!3'$, the nested grammar
@@ -592,8 +588,9 @@ failed search; (ii) a naive operator crosses the boundary only by \emph{gaming} 
 exposes; and (iii) an operator optimizing cross-oracle agreement crosses it \emph{robustly} on $3$--$8/60$ (mean $5.3$, three seeds). Only
 (ii) touches verifier model-relativity---the object of our companion \citep{verifiereconomics}, not of this
 paper; here it is merely the hazard the panel disciplines, en route to the class-ascent certificate that is
-our contribution. Dataset facts (Table~\ref{tab:data}) are established and cited; the undesignability
-confusion matrix (Table~\ref{tab:confusion}) and multi-seed CIs remain pending.
+our contribution. Dataset facts (Table~\ref{tab:data}) are established and cited. Multi-seed panel results and a bootstrap
+separation test are reported below; the undesignability axis (\S\ref{sec:impossible}) is a distinct, optional
+predictive capability and is out of scope for this study.
 
 \begin{table}[t]\centering\small
 \setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.1}
@@ -657,38 +654,10 @@ its drop when the external solver is removed; the \emph{transfer gap} is train$-
 ascent needs a positive rate whose bootstrap CI excludes zero, near-zero autonomy gap, and non-trivial
 spread across targets.
 
-\begin{table}[t]\centering\small
-\setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.1}
-\caption{Experimental design matrix. Directions are \emph{hypotheses}; all result cells pending. ``$\approx0$''
-on the \CF{} floor is the empirical content of Prop.~\ref{prop:confine}; the \CF{} floor and $\pm$solver
-autonomy gap are now measured (Table~\ref{tab:baselines}).}\label{tab:design}
-\begin{tabularx}{\linewidth}{@{}llX@{}}
-\toprule
-\textbf{Experiment} & \textbf{Measures} & \textbf{Hypothesized direction (pending)}\\
-\midrule
-E0 verifier validity & panel soundness & natives high recall; skeletons $\approx0$\\
-E1 \CF{} floor & \Ocf-repertoire on \MCF{} & $\approx0$ (Prop.~\ref{prop:confine}); MFE false positives\\
-E1 frontier & solve rate vs.\ grade (held-out) & right-shift iff an ascent is certified; per-grade pending\\
-E2 positive$+$transfer & held-out \MCF{} confirm (panel) & CI excludes $0$; spread across targets\\
-E2 autonomy ($\pm$solver) & solver-removal gap & near-zero if autonomous; large if borrowed\\
-E3 semi-oracle & minimal grammar hint & smallest hint triggering a class jump\\
-\bottomrule
-\end{tabularx}
-\end{table}
+% (experimental design matrix removed: this is a results paper; measured outcomes are in
+%  Tables~\ref{tab:baselines}, \ref{tab:panel}, \ref{tab:ablate}, \ref{tab:recovered}.)
 
-\begin{table}[t]\centering\small
-\setlength{\tabcolsep}{6pt}\renewcommand{\arraystretch}{1.15}
-\caption{Certificate confusion matrix (held-out; panel-adjudicated positive side, undesignability-certified
-negative predictions). Template; cells pending E2.}\label{tab:confusion}
-\begin{tabular}{lcc}
-\toprule
-sealed prediction $\backslash$ oracle & realizes $T$ & does not\\
-\midrule
-\textsc{designable} ($+$ sequence) & \textsc{tp}: \pendc & \textsc{fp}: \pendc\\
-\textsc{undesignable} & \textsc{fn}: \pendc & \textsc{tn}: \pendc\\
-\bottomrule
-\end{tabular}
-\end{table}
+% (certificate confusion matrix removed: the undesignability axis is out of scope for this study.)
 
 \begin{table}[t]\centering\small
 \setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.15}
@@ -924,9 +893,10 @@ bootstrap $95\%$ CIs resampling targets, false-positive and
 undesignability rates carry one-sided Clopper--Pearson bounds, and autonomy and transfer gaps are paired
 contrasts over held-out targets.
 
-\noindent\pending{multi-seed bootstrap CIs, per-grade transfer, and the undesignability confusion matrix
-(Table~\ref{tab:confusion}); the \CF{} floor ($0/60$), the single-oracle rate ($43/60$), and the
-panel-unanimous rate ($1/60$) are measured (Tables~\ref{tab:baselines},\ref{tab:panel}).}
+\noindent The \CF{} floor ($0/60$), the single-oracle rate ($43/60$), the panel-unanimous rate ($1/60$;
+Tables~\ref{tab:baselines},\ref{tab:panel}), and the three-seed panel-operator rates with the bootstrap
+separation test (above) are all measured from logged runs; per-grade transfer and the undesignability axis
+are out of scope here.
 
 \paragraph{Where this leaves the ascent, and a bounded fallback.} The question we posed---can an operator
 optimizing \emph{panel agreement} beat the oracle-gamer's $1/60$?---is answered in the affirmative, if
@@ -1082,17 +1052,23 @@ alike.
 by the panel but not eliminated; only the negative side is exact---and our experiment shows this is not
 academic ($43/60$ vs.\ $1/60$). (ii) All (un)designability is relative to a declared energy model; complexity
 claims are corollaries. (iii) We define the certificate, not the invention algorithm (Rem.~\ref{rem:scope});
-our one operator is structurally autonomous yet fails the panel (it games pKiss), so a \emph{robust} ascent
-is still unbuilt, for which E3 provides a bounded fallback. (iv) The criterion certifies an ascent \emph{to
+our first operator is structurally autonomous yet games pKiss (it fails the panel), while re-optimizing its
+objective for cross-oracle \emph{agreement} recovers a small but panel-robust ascent ($3$--$8/60$,
+\S\ref{sec:exp})---so the honest state is a modest robust ascent, not none, and where no crossing is found at
+all E3 provides a bounded fallback. (iv) The criterion certifies an ascent \emph{to
 \MCF}; higher tiers are out of scope. (v) The empirical result covers one crossing pool ($n=60$, pKiss
 reference; the panel operator over three seeds); a second benchmark and the undesignability axis are not yet
 measured.
 
-\paragraph{Future work.} Build a \emph{panel-optimizing} operator---one that optimizes oracle agreement
-rather than a single predictor---and test whether it clears the panel where the present pKiss-gaming operator
-does not; add the multi-seed and undesignability arms; and, beyond RNA, port the two-sided certificate to any
-domain whose difficulty axis is a decidable formal hierarchy with an exact impossibility oracle. RNA is first
-because the hierarchy is native to it.
+\paragraph{Future work.} The decisive next test is a \emph{parameterized} non-\CF{} crossing family
+$\mathcal{L}_{\mathrm H}=\{T_{n,m}:n,m\ge1\}$ with out-of-distribution transfer---tune the operator on small
+stem lengths and test unbounded larger ones---so that success is evidence of a \emph{uniform, finite-description
+procedure} over the family rather than coverage of a finite instance set; this is what upgrades the class claim
+from held-out instances to a language-class ascent. Beyond it: a larger held-out pool to certify the
+gaming-separation seed-by-seed (not only pooled), a second pseudoknot benchmark, physical/3D validation beyond
+the predictor panel, and the undesignability axis. Beyond RNA, the two-sided certificate ports to any domain
+whose difficulty axis is a decidable formal hierarchy with an exact impossibility oracle; RNA is first because
+the hierarchy is native to it.
 
 \subsection{Conclusion}\label{sec:conclusion}
 We proposed a two-sided criterion for capability acquisition---certifying both that a capability was gained
@@ -1121,9 +1097,10 @@ $\Rze{\Ocf}{\pi}\subseteq\NESTED$. If $T\in\PK$ then $T$ contains a crossing pai
 therefore $T\notin\Rze{\Ocf}{\pi}$. Testing $T\in\PK$ (a crossing pair among $|P|$ pairs) is $O(|P|^2)$ and
 independent of any search over sequences; the non-membership is thus decided offline.
 \end{proof}
-\noindent\textbf{Class boundary (invoked).} $\NESTED$ context-free and $\PK$ non-context-free but MCFG of
-dimension $\le2$ are established \citep{rivaseddy2000,nebelweinberg,katosekikasami2006}; we do not reproduce their
-proofs. The MCFG-2 witness follows: a production generating a crossing stem coordinates two substrings at
+\noindent\textbf{Class boundary (invoked).} That $\NESTED$ is context-free, and that the crossing families we
+treat are non-context-free yet admit MCFG grammars of dimension $\le2$, are established
+\citep{rivaseddy2000,nebelweinberg,katosekikasami2006}; we do not reproduce their proofs, and we make no claim
+that every pseudoknot topology is captured at dimension~2. The MCFG-2 witness follows: a production generating a crossing stem coordinates two substrings at
 four interleaved positions---a two-component (dimension-2) rule, not a single-yield CFG production.
 
 \section{Reproducibility and Protocol Details}\label{app:repro}
@@ -1132,9 +1109,10 @@ and per-target JSON are released. The \CF{} ladder is ViennaRNA (Turner~2004, $3
 panel is pKiss (reference) with ProbKnot and ShapeKnots for the oracle-robustness envelope and abstention.
 The sealed-commitment step records a hash and timestamp of each prediction before any oracle call; the
 $\pm$solver ablation toggles the external pseudoknot solver while holding the agent fixed; the minimal-hint
-sweep (E3) parameterizes how much of the target's crossing structure is revealed and reports the smallest
-hint certifying a class jump. No measured number appears in this manuscript; each enters only from a logged
-run.
+sweep (E3), a planned minimal-hint probe, parameterizes how much of the target's crossing structure is
+revealed and reports the smallest hint certifying a class jump. Every measured number in this manuscript
+enters only from such a logged run (\S\ref{sec:exp}); the harness, target lists, intrinsic grades, and
+per-target JSON are released for replay.
 
 \bibliographystyle{plainnat}
 \bibliography{references}
