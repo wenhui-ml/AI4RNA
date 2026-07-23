@@ -29,8 +29,8 @@
 \node[text=negr, font=\scriptsize, fill=white, inner sep=1pt] at (7.2,1.95) {feedback: score $+$ failing targets \; ($\times 6$ rounds)};
 
 % ---- row 2 (centred under the figure): freeze then certify; score drops via a right-angle connector ----
-\node[b, draw=cfg, fill=cfg!8]                        (freeze) at (7.4,-2.7) {\textbf{freeze} best round\\ (train $12/16$)};
-\node[b, draw=negr, fill=negr!7, text width=34mm]     (cert)   at (3.4,-2.7)  {\textbf{certify} on held-out $60$ under the \textbf{panel}\\ $\Rightarrow$ \textbf{$9/60$ panel-unanimous}, autonomous};
+\node[b, draw=cfg, fill=cfg!8]                        (freeze) at (7.4,-1.95) {\textbf{freeze} best round\\ (train $12/16$)};
+\node[b, draw=negr, fill=negr!7, text width=34mm]     (cert)   at (3.4,-1.95)  {\textbf{certify} on held-out $60$ under the \textbf{panel}\\ $\Rightarrow$ \textbf{$9/60$ panel-unanimous}, autonomous};
 \draw[fl] (score.south) |- (freeze.east);
 \draw[fl] (freeze) -- (cert);
 \end{tikzpicture}
