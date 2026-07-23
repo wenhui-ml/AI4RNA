@@ -349,6 +349,18 @@ essentially unchanged, and the reusable components are \emph{learned} (reused wi
 \emph{decisive} (ablating them collapses the gain).
 \end{description}
 \end{definition}
+\noindent Writing $\widehat p^{\mathrm{panel}}_{\bullet}(\mathcal D_{\mathrm{ho}})$ for the held-out
+panel-unanimous rate, $\Delta\mathcal O=\mathcal O_{\mathrm{after}}\!\setminus\!\mathcal O_{\mathrm{before}}$
+for the reused components, and $\ominus$ for ablation, the three conditions are
+\begin{equation}\label{eq:cert}
+\underbrace{\widehat p^{\mathrm{panel}}_{\mathrm{after}}(\mathcal D_{\mathrm{ho}})>0}_{\text{(1) positive}+\text{transfer}}
+\ \wedge\
+\underbrace{\Rze{\Ocf}{\pi_{\mathrm{before}}}\cap\PK=\varnothing}_{\text{(2) negative: a theorem (Prop.~\ref{prop:confine})}}
+\ \wedge\
+\underbrace{\widehat p^{-\mathrm{solver}}_{\mathrm{after}}\!\approx\widehat p_{\mathrm{after}}
+\ \wedge\ \widehat p^{\,\ominus\Delta\mathcal O}_{\mathrm{after}}=0}_{\text{(3) autonomy: solver-free and $\Delta\mathcal O$-decisive}}\,.
+\end{equation}
+Only conjunct~(2) is decidable and discharged before any run; (1) and~(3) are measured and model-relative.
 
 \paragraph{What each side rules out.} The positive side alone is \emph{search} (a benchmark can rise from
 exploration) and does not exclude \emph{luck} (which the transfer/spread requirement addresses). The
@@ -816,19 +828,35 @@ oracle grows with the number of oracles optimized---from $\sim\!1/60$ (one predi
 held-out third, seed to seed. Optimizing agreement sharpens cross-oracle robustness without guaranteeing it;
 the honest ceiling is that more independent checks tighten the certificate, none makes the positive side exact.
 
-\paragraph{Is the ascent statistically separated from gaming?} The bar for a genuine (not gamed) ascent is
-that the panel-unanimous held-out rate exceed the single-oracle gaming baseline ($1/60$) with a confidence
-interval clear of it. Pooled over the three seeds the panel-optimizer scores $16/180$ panel-unanimous
-($8.9\%$); a percentile bootstrap ($B\!=\!20{,}000$ over the $60$ targets) gives a $95\%$ CI of
-$[5.0\%,13.3\%]$ that excludes the gamer's $1.7\%$, an exact binomial against the fixed gamer rate gives
-$p\!\approx\!8\times10^{-8}$, and on the strongest seed a \emph{paired} McNemar over the identical $60$ targets
-is significant ($b\!=\!7$ solved only by the panel-optimizer, $c\!=\!0$ only by the gamer, $p\!=\!0.016$). We
-are equally explicit about the limit of power: a \emph{single} $60$-target seed, with $3$--$5$ successes, is
-underpowered---seeds~1 and~2 are not individually significant (McNemar $p\!=\!0.50,\,0.22$; their bootstrap
-CIs touch $1.7\%$). The separation is thus real \emph{in aggregate} and on the strongest seed but requires
-pooling; one small held-out pool cannot carry it. This is the certificate behaving as designed: it reports a
-small effect \emph{as} small, with quantified uncertainty, not as a discovery (analysis:
-\texttt{runs/cc\_ascent/stats\_separation.py}).
+\paragraph{Is the ascent statistically separated from gaming?} The bar is that the panel-unanimous held-out
+rate exceed the single-oracle gaming baseline ($1/60$) with a confidence interval clear of it.
+Table~\ref{tab:sep} settles it with the honest nuance: \emph{pooled} over three seeds the separation is
+decisive (bootstrap $95\%$ CI $[5.0,13.3]\%$ excludes $1.7\%$; exact binomial $p\!\approx\!8{\times}10^{-8}$;
+paired McNemar $p{=}0.016$ on the strongest seed), but a \emph{single} $60$-target seed is
+underpowered---seeds~1--2 are not individually significant. The separation is real in aggregate and on the
+strongest seed yet requires pooling; one small held-out pool cannot carry it. The certificate reports the
+small effect \emph{as} small, with quantified uncertainty, not as a discovery.
+
+\begin{table}[t]\centering\small
+\setlength{\tabcolsep}{4.5pt}\renewcommand{\arraystretch}{1.15}
+\caption{\textbf{Separation of the panel-robust ascent from single-oracle gaming} (held-out $n{=}60$;
+panel-unanimous $=$ pKiss\,$\wedge$\,ProbKnot\,$\wedge$\,ShapeKnots, all exact). Percentile bootstrap
+($B{=}20{,}000$); paired McNemar over the identical $60$ targets ($b$ solved only by the panel-optimizer, $c$
+only by the gamer); exact one-sided binomial against the gamer's fixed $p_0{=}1/60$. Pooled clears the
+baseline decisively; single seeds are underpowered. (\texttt{runs/cc\_ascent/stats\_separation.py}.)}\label{tab:sep}
+\begin{tabularx}{\linewidth}{@{}Xccccc@{}}
+\toprule
+\textbf{arm} & \textbf{p-un./60} & \textbf{rate} & \textbf{boot.\ 95\% CI} & \textbf{McNemar vs.\ gamer} & \textbf{binom.\ vs.\ $1/60$}\\
+\midrule
+gamer (single-oracle, seed 0) & $1$ & $1.7\%$ & --- & --- & ---\\
+panel\_auto seed 0 & $8$ & $13.3\%$ & $[5.0,21.7]\%$ & $b{=}7,c{=}0,p{=}0.016$ & $7{\times}10^{-6}$\\
+panel\_auto seed 1 & $3$ & $5.0\%$ & $[0.0,11.7]\%$ & $b{=}2,c{=}0,p{=}0.50$ & $0.079$\\
+panel\_auto seed 2 & $5$ & $8.3\%$ & $[1.7,16.7]\%$ & $b{=}5,c{=}1,p{=}0.22$ & $3.3{\times}10^{-3}$\\
+\midrule
+panel\_auto pooled (3 seeds) & $16/180$ & $8.9\%$ & $[5.0,13.3]\%$ & --- & $8{\times}10^{-8}$\\
+\bottomrule
+\end{tabularx}
+\end{table}
 
 \begin{table}[t]\centering\small
 \setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.15}
@@ -1070,6 +1098,22 @@ binding/functional readouts rather than a structure predictor, automated theorem
 checker rather than a search heuristic. Trustworthy autonomous discovery needs not only agents that can
 generate, but a scientific discipline that can show they did not merely game the evaluator.
 
+\begin{table}[t]\centering\small
+\setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.2}
+\caption{\textbf{An AI4S discovery stack, and where each layer's tools sit.} The categorical self-revising
+line and this work occupy \emph{different, complementary} layers; neither subsumes the other.}\label{tab:layers}
+\begin{tabularx}{\linewidth}{@{}lXl@{}}
+\toprule
+\textbf{Layer} & \textbf{Question it answers / representative tools} & \textbf{Occupied by}\\
+\midrule
+Generation & Can the system produce candidates? (LLMs, search, evolution) & \citep{funsearch,alphaevolve}\\
+Self-revision & Can it change its own representations/operators? (schema/left-Kan transport, MDL gate, skill libraries) & \citep{selfrevising}\\
+\textbf{Audit} & \textbf{Is a gain the system's own}---not search, borrowing, or oracle-gaming? (sealed commitment, common independent adjudicator, autonomy ablation, decidable negative side) & \textbf{this work}\\
+Scientific confirmation & Does the candidate hold in the world? (exact checker, independent model, wet-lab assay) & (domain-specific)\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
 \paragraph{Limitations.} (i) The positive side is model-relative (heuristic pseudoknot oracles), addressed
 by the panel but not eliminated; only the negative side is exact---and our experiment shows this is not
 academic ($43/60$ vs.\ $1/60$). (ii) All (un)designability is relative to a declared energy model; complexity
@@ -1119,11 +1163,40 @@ $\Rze{\Ocf}{\pi}\subseteq\NESTED$. If $T\in\PK$ then $T$ contains a crossing pai
 therefore $T\notin\Rze{\Ocf}{\pi}$. Testing $T\in\PK$ (a crossing pair among $|P|$ pairs) is $O(|P|^2)$ and
 independent of any search over sequences; the non-membership is thus decided offline.
 \end{proof}
-\noindent\textbf{Class boundary (invoked).} That $\NESTED$ is context-free, and that the crossing families we
-treat are non-context-free yet admit MCFG grammars of dimension $\le2$, are established
-\citep{rivaseddy2000,nebelweinberg,katosekikasami2006}; we do not reproduce their proofs, and we make no claim
-that every pseudoknot topology is captured at dimension~2. The MCFG-2 witness follows: a production generating a crossing stem coordinates two substrings at
-four interleaved positions---a two-component (dimension-2) rule, not a single-yield CFG production.
+\noindent\textbf{Class boundary (invoked), and the grammar witness (worked).} That $\NESTED$ is context-free,
+and that the crossing families we treat are non-context-free yet admit MCFG grammars of dimension $\le2$, are
+established \citep{rivaseddy2000,nebelweinberg,katosekikasami2006}; we do not reproduce their proofs, and we
+make no claim that every pseudoknot topology is captured at dimension~2. We do make the witness explicit for
+the family the operator targets.
+
+\smallskip\noindent\emph{The parameterized crossing family.} Let
+\begin{equation}\label{eq:family}
+  \mathcal L_{\mathrm H}=\bigl\{\,\texttt{(}^{\,n}\,\ell\,\texttt{[}^{\,m}\,\ell\,\texttt{)}^{\,n}\,\ell\,\texttt{]}^{\,m}\ :\ n,m\ge 1\,\bigr\},
+\end{equation}
+the canonical H-type pseudoknots ($\ell$ a fixed unpaired linker): a nested round stem of $n$ pairs crossed by
+a square stem of $m$ pairs. Its pairing skeleton is the interleaving $\{a^{n}b^{m}c^{n}d^{m}\}$ under
+$a{=}\texttt{(},\,b{=}\texttt{[},\,c{=}\texttt{)},\,d{=}\texttt{]}$.
+
+\smallskip\noindent\emph{Non-context-freeness (pumping).} $\{a^nb^mc^nd^m\}$ is not context-free: for pumping
+length $p$, the word $a^pb^pc^pd^p$ has no decomposition $uvwxy$ with $|vwx|\le p,\ |vx|\ge1$ that stays in the
+language---any $vx$ spanning $\le p$ consecutive symbols meets at most two of the four blocks, so pumping
+breaks one of the equalities $\#a{=}\#c$ or $\#b{=}\#d$ \citep{ogden1968,hopcroftullman1979}. Thus
+$\mathcal L_{\mathrm H}$, inheriting both equalities from its two crossing stems, is non-CF, and no
+single-stack (CF) generator realizes it uniformly.
+
+\smallskip\noindent\emph{An MCFG of dimension~2 that does.} Two dimension-2 nonterminals each emit a
+\emph{pair} of substrings (the two ends of one stem), and the start rule interleaves them:
+\begin{align}\label{eq:mcfg}
+  R(a\,x_1,\ c\,x_2) &\leftarrow R(x_1,x_2), & R(\varepsilon,\varepsilon)&\ ; \nonumber\\
+  Q(b\,y_1,\ d\,y_2) &\leftarrow Q(y_1,y_2), & Q(\varepsilon,\varepsilon)&\ ; \\
+  S(x_1\,\ell\,y_1\,\ell\,x_2\,\ell\,y_2) &\leftarrow R(x_1,x_2),\,Q(y_1,y_2). && \nonumber
+\end{align}
+$R$ derives the round-stem pair $(a^n,c^n)$, $Q$ the square-stem pair $(b^m,d^m)$, and $S$ places them at four
+interleaved slots---exactly the crossing a single yield cannot produce. Dimension~$2$ (each nonterminal
+coordinates two substrings) is necessary and sufficient for one crossing stem---the minimal machinery above
+\CF{} \citep{seki1991mcfg,katosekikasami2006}. This is the precise sense in which realizing $\mathcal
+L_{\mathrm H}$ \emph{uniformly} is an \MCF{} capability: a finite-description operator that, for every $(n,m)$,
+returns a sequence whose fold is $S$'s yield stands in for the grammar itself---which no CF generator can.
 
 \section{Reproducibility and Protocol Details}\label{app:repro}
 Oracles are computed and replayable under a fixed configuration; harness, target lists, intrinsic grades,
