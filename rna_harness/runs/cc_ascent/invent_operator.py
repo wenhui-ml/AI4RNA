@@ -12,7 +12,8 @@ structural: no external solver is exposed. Everything (every round's code + scor
 Honest by construction: if the agent fails to invent a panel-robust operator, that is the reported result
 -- the certificate then audits an agent-written operator that games or underperforms, which is on-thesis.
 """
-import json, os, re, signal, sys, time
+import json, os, re, signal, sys
+import multiprocessing as mp, time
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
 import RNA
@@ -77,8 +78,17 @@ class _TO(Exception):
     pass
 
 
-def _alarm(signum, frame):
-    raise _TO()
+def _design_worker(fn, target, seed, q):
+    """Run one design() call in its OWN session/process-group so a hung oracle subprocess (e.g. pKiss on a
+    pathological sequence) can be reaped as a group by the parent -- no orphaned children."""
+    try:
+        os.setsid()  # new process group: pgid == this worker's pid
+    except Exception:
+        pass
+    try:
+        q.put(("ok", fn(target, seed)))
+    except Exception as e:
+        q.put(("err", repr(e)[:150]))
 
 
 def make_design(code, per_call_s=8):
@@ -99,11 +109,28 @@ def make_design(code, per_call_s=8):
         raise ValueError("no design() defined")
 
     def wrapped(target, seed=0):
-        signal.signal(signal.SIGALRM, _alarm); signal.alarm(per_call_s)
+        # run in a forked worker in its own process group; on timeout, SIGKILL the whole group
+        # (worker + any pKiss/RNAstructure descendants) so nothing is orphaned.
+        ctx = mp.get_context("fork")
+        q = ctx.Queue()
+        p = ctx.Process(target=_design_worker, args=(fn, target, seed, q))
+        p.start()
+        p.join(per_call_s)
+        if p.is_alive():
+            try:
+                os.killpg(p.pid, signal.SIGKILL)   # p.pid is the worker's pgid after setsid; never the parent's
+            except Exception:
+                try: p.kill()
+                except Exception: pass
+            p.join(3)
+            raise _TO()
         try:
-            return fn(target, seed)
-        finally:
-            signal.alarm(0)
+            tag, val = q.get_nowait()
+        except Exception:
+            raise _TO()
+        if tag == "ok":
+            return val
+        raise RuntimeError(val)
     return wrapped
 
 
