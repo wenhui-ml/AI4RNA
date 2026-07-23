@@ -256,8 +256,10 @@ language $\{\,w\,\#\,w : w\in\Sigma^\ast\}$ and the count language $\{\,a^{n}b^{
 interleaved $n\!\cdots\!n$ and $m\!\cdots\!m$ constraints force two substrings to grow in lockstep at
 separated positions \citep{hopcroftullman1979}. MCFG dimension~2 supplies exactly this: a nonterminal derives
 an \emph{ordered pair} of strings that a production may inject at two non-adjacent slots, so the two arms of a
-crossing advance together---the minimal machinery above \CF, and, as we show, exactly what a pseudoknot
-demands and no more.
+crossing advance together---the minimal machinery above \CF{} and what the crossing families we target
+demand. Specific pseudoknot classes are known to sit in low-dimension MCFG subclasses
+\citep{katosekikasami2006}; we make no claim that \emph{every} pseudoknot topology is captured at
+dimension~2.
 
 \paragraph{RNA secondary structure, folding, inverse design.} An RNA is $x\in\{A,C,G,U\}^n$; a
 \emph{secondary structure} is a set $P$ of base pairs (each index paired at most once) drawn as arcs. Pairs
@@ -497,7 +499,13 @@ independent of the policy's search budget.
 the negative side of Def.~\ref{def:cert} is a \emph{theorem discharged before any run}, not a failed search.
 We deliberately do \emph{not} rest confinement on properties of individual operators (an operator edits a
 sequence, so ``nesting-preserving operator'' is not well-typed); the oracle's representational limit is the
-clean and correct ground.
+clean and correct ground. Prop.~\ref{prop:confine} is, however, only the decidable \emph{pre-run instrument
+bound}. The capability-level negative claim---that the prior repertoire fails to realize crossings even when
+scored by the crossing-aware panel---is not this theorem but the empirical floor of \S\ref{sec:exp}: the
+\CF-confined repertoire, adjudicated by the \emph{same} panel $\Opk$ that certifies $\pi_{\mathrm{after}}$,
+scores $0/60$. \emph{Before} and \emph{after} are thus compared under one fixed adjudicator, so the ascent is
+not an artifact of exchanging $\Ocf$ for $\Opk$: it is a change in what the repertoire can realize under a
+held-fixed crossing-aware oracle.
 
 \paragraph{The boundary is a genuine class boundary (invoked, not re-proved).} $\NESTED$ is context-free
 \citep{rivaseddy2000,durbin1998}; $\PK$ is \emph{not} \citep{nebelweinberg} and is MCFG of dimension $\le 2$
@@ -523,12 +531,18 @@ the honest boundary between an instrument (ours) and a system (to be built and t
 \end{remark}
 
 \paragraph{Why the ascent is to \MCF, not a larger CFG.} We do not claim $\Rze{\Opk}{\pi_{\mathrm{after}}}$
-is exactly an MCFG language---\CF{} is closed under neither subset nor superset. We claim the sufficient
-fact: a realized held-out $T\in\PK$ is provably non-CF, so the capability that realizes it cannot be a CF
-process, and the minimal grammar for $T$'s crossing pattern is MCFG of dimension~2 \citep{katosekikasami2006}.
-The witness is structural and attaches to the \emph{target}: a crossing stem requires a derivation
-coordinating two substrings at four interleaved positions---a two-component (dimension-2) production, not a
-single-yield CFG rule.
+is exactly an MCFG language---\CF{} is closed under neither subset nor superset---and we are careful about the
+\emph{level} at which non-context-freeness lives. A single finite target $T$ is a regular (hence
+context-free) singleton, so ``$T$ is non-CF'' would be a category error; non-context-freeness is a property of
+the \emph{unbounded crossing family} $\PK$, witnessed by the pumping lemma exactly as for the count language
+$\{a^{n}b^{m}c^{n}d^{m}\}$ of \S\ref{sec:bg}, whose interleaved $n\!\cdots\!n$/$m\!\cdots\!m$ constraints a
+crossing stem of growing length reproduces. What the certificate therefore tests is not that any one $T$ is
+non-CF, but that a \emph{single finite-description operator} realizes \emph{held-out} members of $\PK$ at
+parameters it never saw (Def.~\ref{def:cap})---a uniform procedure over the family, which a memorized finite
+table is not and, by the confinement theorem, a \CF{} generator cannot supply. Each realized $T$ is then a
+structural \emph{witness}: its crossing stem forces a derivation coordinating two substrings at four
+interleaved positions---the two-component (dimension-2) production the count-language family demands and one
+stack cannot track \citep{katosekikasami2006}.
 
 \paragraph{Worked example (Fig.~\ref{fig:worked}).} The canonical H-type pseudoknot $(((([[[[))))]]]]$ has a
 nested round stem and a square stem that \emph{crosses} it. Its \CF{} skeleton (round brackets only) is
@@ -967,6 +981,12 @@ static characterization of models, not a dynamic certified ascent by a design ag
 \citep{rivaseddy2000,durbin1998}, non-context-freeness of pseudoknots \citep{nebelweinberg}, MCFG characterization
 \citep{katosekikasami2006}; this machinery has, to our knowledge, never been repurposed as an agent's certified
 climb. Grammar induction \citep{gold} concerns identifiability in the limit, not class-ascent-as-capability.
+A concurrent line maps an agent's \emph{memory architecture} to automaton classes---reflex to finite,
+task-decomposition to pushdown, read/write memory to Turing---to right-size and verify agent designs
+\citep{agentsautomata2025}; that taxonomy classifies the agent's \emph{computational substrate}, whereas we
+certify a change \emph{over time} in the formal-language class of what the agent's designs \emph{realize}
+($\CF\!\to\!\MCF$ in the target language). The axes are orthogonal: a Turing-complete control architecture is
+neither necessary nor sufficient for the output-language ascent we certify.
 (We monitor concurrent Chomsky-tier LLM benchmarks \citep{chomskybench}.)
 
 \paragraph{RNA design, complexity, undesignability.} Pseudoknot folding is NP-complete \citep{lyngso2000pknot},
@@ -986,6 +1006,16 @@ overturned if held-out \MCF{} performance is indistinguishable from the \CF{} fl
 holds only under a single lenient predictor (an oracle artifact---hence the panel). \emph{Autonomy}:
 overturned if performance collapses on solver removal (borrowed). \emph{Class claim}: overturned if realized
 crossings lie in a CF subclass---precluded for genuine crossing stems by the non-CF-ness of $\PK$.
+
+\paragraph{The capability floor is empirical, not a policy-structural theorem.} We keep two negative
+statements distinct. The \emph{decidable} one is Prop.~\ref{prop:confine}: a \CF-verified repertoire cannot
+realize a crossing, by the oracle's output space. The \emph{capability floor}---that the prior repertoire
+scores $0/60$ under the \emph{same} crossing-aware panel that certifies $\pi_{\mathrm{after}}$---is
+\emph{empirical} and holds at a fixed search budget; we do \emph{not} claim a theorem that the prior
+\emph{policy} structurally cannot generate a crossing, as that would require characterizing an arbitrary
+learned policy. The stronger, policy-structural negative certificate---deriving the empty realizable set from
+the repertoire's generative structure rather than from a finite-budget count---remains open. What we certify
+is the decidable oracle bound together with a measured, held-fixed-oracle $0/60$.
 
 \paragraph{What a robust ascent would require.} Our experiment (\S\ref{sec:exp}) shows the present operator
 is oracle-guided search that games pKiss: $43/60$ under one predictor, $1/60$ panel-unanimous. A robust
