@@ -603,7 +603,9 @@ We define the \emph{certificate} that recognizes a transferable, autonomous asce
 specify the algorithm that \emph{produces} $\Delta\mathcal{O}$ (how the agent invents reusable components).
 That algorithm is the \emph{object under test}: Def.~\ref{def:cap} is exactly what distinguishes a genuine
 invented capability from a memorized instance (fails transfer) or a borrowed one (fails autonomy). This is
-the honest boundary between an instrument (ours) and a system (to be built and then measured).
+the honest boundary between an instrument (ours) and a system (to be built and then measured)---a boundary we
+cross in \S\ref{sec:exp}, where an LLM agent, given only primitives, \emph{writes} a $\Delta\mathcal O$ that
+the certificate then audits.
 \end{remark}
 
 \paragraph{Why the ascent is to \MCF, not a larger CFG.} We do not claim $\Rze{\Opk}{\pi_{\mathrm{after}}}$
@@ -1049,18 +1051,41 @@ oracle-agreement window, not a search failure.}\label{fig:family}
 \emph{(i) Verifier validity (E0).} Designing each held-out target's \CF{} skeleton and folding it under the
 panel, the panel credits the crossing on $0/60$ skeletons (and recovers the nested skeleton on $57/60$)---versus
 the naive-MFE oracle's $80/80$ (above). The panel is a \emph{sound} discriminator, not a lenient one, so the
-positive-side verdicts are not skeleton false positives. \emph{(ii) Generalization.} On a \emph{second,
-disjoint} held-out pool (Pseudobase indices $60$--$110$, never used to tune anything) the \CF{} floor is again
-$0/50$ and the panel operator is panel-unanimous on $5/50$---the same rate regime as the first pool, so the
-capability is not overfit to one $60$-target sample. \emph{(iii) Budget.} Scaling the operator's repair budget
+positive-side verdicts are not skeleton false positives. \emph{(ii) Generalization---and its limit.} On a \emph{second,
+disjoint} Pseudobase pool (indices $60$--$110$, never used to tune anything) the \CF{} floor is again $0/50$
+and the panel operator is panel-unanimous on $5/50$---the same regime as the first pool, so it is not overfit
+to one $60$-target sample. On a genuinely \emph{cross-source} pool (an independent bpRNA/ArchiveII-derived
+crossing set, $60$ targets, size-matched; App.~\ref{app:repro}) the \CF{} floor is again $0/60$ but the operator
+\emph{collapses} to $2/60$ (pKiss\,$\wedge$\,ProbKnot) and $0/60$ panel-unanimous. This is an honest bound: the
+\emph{negative} side generalizes across datasets, but the \emph{positive} capability is specific to the
+Pseudobase pseudoknot topologies it was developed on---not a general pseudoknot-design capability. \emph{(iii) Budget.} Scaling the operator's repair budget
 over $\{60,180,300\}$\,s on a fixed $20$-target subset gives panel-unanimous $\{1,3,1\}/20$: \emph{no} clean
 budget trend at this scale---the outcome is dominated by search variance, consistent with the operator being
 oracle-guided \emph{search} rather than a budget-monotone capability. We report this null rather than a
 favorable point.
 
+\paragraph{An agent invents the operator---not just the certificate.} Rem.~\ref{rem:scope} deliberately left
+the \emph{invention} algorithm unspecified: the operator was ours, and the contribution was the certificate
+that audits it. We now close that gap. We gave an LLM agent (GLM-5.2) only low-level primitives (ViennaRNA
+fold/inverse-fold, the pKiss and ProbKnot oracles, sequence utilities) and the task---\emph{no}
+decompose/compose/repair recipe, \emph{no} external solver---and let it \emph{write}, sandbox-execute, and
+revise a reusable \texttt{design(target)} operator over six rounds against a training pool disjoint from the
+held-out (App.~\ref{app:repro}). Its training solve rate climbed $1\!\to\!11\!\to\!12/16$ as it incorporated
+oracle feedback, and it independently converged on the structure we had hand-built: split the target into
+nested and crossing pairs, enforce complementarity, and greedily repair against a
+\emph{pKiss}\,$\wedge$\,\emph{ProbKnot} cost. Frozen and certified on the held-out $60$ under the full panel,
+the \emph{agent-written} operator scores $35/60$ (pKiss\,$\wedge$\,ProbKnot) and \textbf{$9/60$
+panel-unanimous}---matching and slightly exceeding our hand-built \texttt{panel\_auto} ($34$--$37$; $3$--$8/60$),
+far above the decidable $0/60$ floor, and autonomous by construction (no solver was exposed). The certificate
+thus audits an operator the \emph{agent itself} produced, and the panel is what makes the audit trustworthy:
+the self-improvement is \emph{demonstrated}, not assumed. (The loop is noisy---one of six rounds failed to
+compile and was discarded; we freeze the best round. The result inherits the Pseudobase-topology narrowness
+of the cross-source check above.)
+
 \paragraph{Where this leaves the ascent, and a bounded fallback.} The question we posed---can an operator
 optimizing \emph{panel agreement} beat the oracle-gamer's $1/60$?---is answered in the affirmative, if
-modestly: $3$--$8/60$ across five seeds (mean $5.0$; Table~\ref{tab:recovered}). The certificate fires with
+modestly: $3$--$8/60$ across five seeds (mean $5.0$; Table~\ref{tab:recovered}), and now also by an
+\emph{agent-invented} operator at $9/60$. The certificate fires with
 all three sides intact on a few targets per seed---the first panel-robust, autonomous $\CF\!\to\!\MCF$
 crossings we observe---while the negative floor stays a decidable $0/60$. The remaining gap ($\sim\!5/60$, not
 most of $60$) is itself the honest finding: robust
@@ -1254,7 +1279,9 @@ claims are corollaries. (iii) We define the certificate, not the invention algor
 our first operator is structurally autonomous yet games pKiss (it fails the panel), while re-optimizing its
 objective for cross-oracle \emph{agreement} recovers a small but panel-robust ascent ($3$--$8/60$,
 \S\ref{sec:exp})---so the honest state is a modest robust ascent, not none, and where no crossing is found at
-all E3 provides a bounded fallback. (iv) The criterion certifies an ascent \emph{to
+all E3 provides a bounded fallback; an LLM agent also \emph{invents} such an operator autonomously ($9/60$,
+\S\ref{sec:exp}), so ``researcher-designed operator'' is no longer a limitation, though the invented operator
+inherits the same Pseudobase-topology narrowness. (iv) The criterion certifies an ascent \emph{to
 \MCF}; higher tiers are out of scope. (v) The empirical result covers one crossing pool ($n=60$, pKiss
 reference; the panel operator over five seeds); a second benchmark and the undesignability axis are not yet
 measured.
