@@ -266,7 +266,11 @@ def fig_stringency():
     bins = [0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0]
     ax.hist(gaps, bins=bins, facecolor=CF_F, ec=CF, lw=1.0)
     ax.axvline(1.0, color=NEG, ls=(0, (4, 2)), lw=1.0)
-    ax.text(1.03, ax.get_ylim()[1] * 0.9, "dominance\nmargin $1$ kcal", fontsize=6.8, color=NEG)
+    ax.set_ylim(0, 8.6)
+    # label parked top-right over the short bars, clear of the tall peak at 1.0-1.5
+    ax.annotate("dominance margin $1$ kcal", xy=(1.0, 7.4), xytext=(1.65, 8.0),
+                ha="left", va="top", fontsize=6.9, color=NEG,
+                arrowprops=dict(arrowstyle="->", color=NEG, lw=0.7))
     ax.set_xlabel("free-energy gap to the best non-target fold (kcal/mol)", fontsize=8.5)
     ax.set_ylabel("certified designs", fontsize=8.5)
     ax.set_title("Positive-side stringency: the target is the dominant fold", fontsize=10, weight="bold", pad=8)
@@ -333,11 +337,15 @@ def fig_models():
     for xi, v in zip(x, vals):
         ax.text(xi, v + 0.3, f"{v}", ha="center", fontsize=8, color=INK)
     ax.axhspan(3, 8, color=GREY, alpha=0.16, zorder=0)
-    ax.text(len(rows) - 0.5, 5.5, "hand-built\npanel_auto (3-8)", ha="right", fontsize=6.8, color=GREY)
+    # annotations parked in the right margin (beyond the last bar) so they never overlap bars/value labels
+    ax.text(len(rows) - 0.35, 6.6, "hand-built\npanel_auto ($3$-$8$)", ha="left", va="center",
+            fontsize=6.8, color=GREY)
     ax.axhline(1, color=NEG, ls=(0, (4, 2)), lw=0.9, zorder=1)
-    ax.text(len(rows) - 0.5, 1.2, "single-oracle gamer ($1$)", ha="right", fontsize=6.8, color=NEG)
+    ax.text(len(rows) - 0.35, 1.7, "single-oracle\ngamer ($1$)", ha="left", va="center",
+            fontsize=6.8, color=NEG)
     ax.set_xticks(x); ax.set_xticklabels(labels, rotation=18, ha="right", fontsize=7.4)
     ax.set_ylabel("held-out panel-unanimous ($/60$)", fontsize=8.5)
+    ax.set_xlim(-0.6, len(rows) + 1.25)
     ax.set_ylim(0, 19)
     ax.set_title("An agent invents a certificate-passing operator across the frontier",
                  fontsize=10, weight="bold", pad=8)
