@@ -1,516 +1,518 @@
 {
- "model": "google/gemini-3.1-pro-preview",
- "best_train_solved": 12,
- "best_round": 3,
- "rounds": [
-  {
-   "round": 0,
-   "prompt_tokens": 479,
-   "completion_tokens": 17745,
-   "train_solved": 6,
-   "n_train": 16,
-   "errors": [
-    "_TO()",
-    "_TO()",
-    "_TO()",
-    "_TO()",
-    "_TO()"
-   ]
-  },
-  {
-   "round": 1,
-   "prompt_tokens": 2458,
-   "completion_tokens": 12493,
-   "train_solved": null,
-   "compile_error": "ValueError('forbidden token in code: import')"
-  },
-  {
-   "round": 2,
-   "prompt_tokens": 4046,
-   "completion_tokens": 5138,
-   "train_solved": 5,
-   "n_train": 16,
-   "errors": [
-    "_TO()",
-    "_TO()",
-    "_TO()",
-    "_TO()",
-    "_TO()"
-   ]
-  },
-  {
-   "round": 3,
-   "prompt_tokens": 5695,
-   "completion_tokens": 22215,
-   "train_solved": 12,
-   "n_train": 16,
-   "errors": [
-    "_TO()",
-    "_TO()",
-    "_TO()",
-    "_TO()"
-   ]
-  },
-  {
-   "round": 4,
-   "prompt_tokens": 7555,
-   "completion_tokens": 9923,
-   "train_solved": 12,
-   "n_train": 16,
-   "errors": []
-  },
-  {
-   "round": 5,
-   "prompt_tokens": 9687,
-   "completion_tokens": 10590,
-   "train_solved": 12,
-   "n_train": 16,
-   "errors": [
-    "_TO()",
-    "_TO()",
-    "_TO()",
-    "_TO()"
-   ]
-  },
-  {
-   "round": 6,
-   "prompt_tokens": 12185,
-   "completion_tokens": 16898,
-   "train_solved": 10,
-   "n_train": 16,
-   "errors": [
-    "_TO()",
-    "_TO()",
-    "_TO()",
-    "_TO()",
-    "_TO()"
-   ]
-  }
- ],
- "best_code": "def design(target, seed=0):\n    random.seed(seed)\n    \n    t_pairs = set((min(i, j), max(i, j)) for i, j in target_pairs(target))\n    n = len(target)\n    \n    # Decompose into non-crossing sets\n    sets = []\n    for p in sorted(t_pairs):\n        placed = False\n        for s in sets:\n            if all(not ((p[0] < p1[0] < p[1] < p1[1]) or (p1[0] < p[0] < p1[1] < p[1])) for p1 in s):\n                s.add(p)\n                placed = True\n                break\n        if not placed:\n            sets.append({p})\n            \n    sets.sort(key=len, reverse=True)\n    \n    db_strs = []\n    for s in sets:\n        db = ['.'] * n\n        for i, j in s:\n            db[i] = '('\n            db[j] = ')'\n        db_strs.append(\"\".join(db))\n        \n    valid_pairs = [('A', 'U'), ('U', 'A'), ('C', 'G'), ('G', 'C'), ('G', 'U'), ('U', 'G')]\n    gc_pairs = [('G', 'C'), ('C', 'G')]\n    \n    evals = 0\n    max_evals = 60\n    \n    def evaluate(seq_str):\n        nonlocal evals\n        evals += 1\n        pkiss = set((min(i, j), max(i, j)) for i, j in fold_pkiss_pairs(seq_str))\n        diff1 = len(pkiss ^ t_pairs)\n        \n        # Only evaluate ProbKnot if pKiss is reasonably close to save time\n        if diff1 <= 15:\n            probknot = set((min(i, j), max(i, j)) for i, j in fold_probknot_pairs(seq_str))\n            diff2 = len(probknot ^ t_pairs)\n            return diff1 + diff2, pkiss, probknot\n        else:\n            return diff1 + 30, pkiss, set()\n\n    candidates = []\n    \n    # Strategy 1: GC pairs for stems, A for unpaired (minimizes misfolding)\n    for i in range(3):\n        seq = ['A'] * n\n        for u, v in t_pairs:\n            seq[u], seq[v] = random.choice(gc_pairs)\n        candidates.append(\"\".join(seq))\n        \n    # Strategy 2: Seed with inverse_fold_cf on the largest non-crossing set\n    if len(sets) > 0:\n        try:\n            seq = list(inverse_fold_cf(db_strs[0], seed=seed))\n            if len(seq) != n: seq = list(rand_seq(n, seed=seed))\n        except:\n            seq = list(rand_seq(n, seed=seed))\n        for s in sets[1:]:\n            for u, v in s:\n                seq[u], seq[v] = random.choice(gc_pairs)\n        candidates.append(\"\".join(seq))\n\n    best_seq = None\n    best_score = float('inf')\n    current_seq = None\n    current_score = float('inf')\n    current_pk = set()\n    current_pr = set()\n    \n    for seq_str in candidates:\n        if evals >= max_evals: break\n        score, pk, pr = evaluate(seq_str)\n        if score == 0: return seq_str\n        if score < current_score:\n            current_score = score\n            current_seq = list(seq_str)\n            current_pk = pk\n            current_pr = pr\n            best_score = score\n            best_seq = seq_str\n\n    if current_seq is None:\n        return rand_seq(n)\n\n    T = 5.0\n    alpha = 0.9\n    unpaired = set(range(n)) - set(i for p in t_pairs for i in p)\n    \n    # Simulated Annealing with targeted mutations\n    while evals < max_evals:\n        new_seq = current_seq.copy()\n        \n        extra = current_pk - t_pairs\n        missing = t_pairs - current_pk\n        if current_pr:\n            extra |= (current_pr - t_pairs)\n            missing |= (t_pairs - current_pr)\n            \n        mutated = False\n        \n        # 1. Try to break extra pairs\n        if extra and random.random() < 0.6:\n            i, j = random.choice(list(extra))\n            idx = random.choice([i, j])\n            if idx in unpaired:\n                new_seq[idx] = 'A'\n                mutated = True\n            else:\n                for u, v in t_pairs:\n                    if u == idx or v == idx:\n                        # Flip GC pair to break alternative pairing\n                        if new_seq[u] in 'GC' and new_seq[v] in 'GC':\n                            new_seq[u], new_seq[v] = new_seq[v], new_seq[u]\n                        else:\n                            new_seq[u], new_seq[v] = random.choice(gc_pairs)\n                        mutated = True\n                        break\n                        \n        # 2. Try to fix missing pairs\n        if not mutated and missing and random.random() < 0.6:\n            i, j = random.choice(list(missing))\n            if new_seq[i] in 'GC' and new_seq[j] in 'GC':\n                new_seq[i], new_seq[j] = new_seq[j], new_seq[i]\n            else:\n                new_seq[i], new_seq[j] = random.choice(gc_pairs)\n            mutated = True\n            \n        # 3. Random exploration\n        if not mutated:\n            if unpaired and random.random() < 0.3:\n                idx = random.choice(list(unpaired))\n                new_seq[idx] = random.choice(['A', 'C', 'U'])\n            elif t_pairs:\n                i, j = random.choice(list(t_pairs))\n                if new_seq[i] in 'GC' and new_seq[j] in 'GC' and random.random() < 0.7:\n                    new_seq[i], new_seq[j] = new_seq[j], new_seq[i]\n                else:\n                    new_seq[i], new_seq[j] = random.choice(valid_pairs)\n                    \n        new_seq_str = \"\".join(new_seq)\n        score, pk, pr = evaluate(new_seq_str)\n        \n        if score == 0:\n            return new_seq_str\n            \n        if score < current_score or random.random() < math.exp((current_score - score) / T):\n            current_score = score\n            current_seq = new_seq\n            current_pk = pk\n            current_pr = pr\n            if score < best_score:\n                best_score = score\n                best_seq = new_seq_str\n                \n        T *= alpha\n        \n    return best_seq",
- "heldout": [
-  {
-   "id": "pseudobase:0",
-   "pkiss": false,
-   "probknot": false,
-   "shapeknots": true,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:1",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:2",
-   "pkiss": false,
-   "probknot": false,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:3",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": true,
-   "unanimous": true
-  },
-  {
-   "id": "pseudobase:4",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:5",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:6",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": true,
-   "unanimous": true
-  },
-  {
-   "id": "pseudobase:7",
-   "pkiss": false,
-   "probknot": false,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:8",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:9",
-   "pkiss": false,
-   "probknot": true,
-   "shapeknots": true,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:10",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": true,
-   "unanimous": true
-  },
-  {
-   "id": "pseudobase:11",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:12",
-   "pkiss": false,
-   "probknot": false,
-   "shapeknots": true,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:13",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": true,
-   "unanimous": true
-  },
-  {
-   "id": "pseudobase:14",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": true,
-   "unanimous": true
-  },
-  {
-   "id": "pseudobase:15",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:16",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": true,
-   "unanimous": true
-  },
-  {
-   "id": "pseudobase:17",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:18",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": true,
-   "unanimous": true
-  },
-  {
-   "id": "pseudobase:19",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": true,
-   "unanimous": true
-  },
-  {
-   "id": "pseudobase:20",
-   "pkiss": false,
-   "probknot": false,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:21",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:22",
-   "pkiss": false,
-   "probknot": false,
-   "shapeknots": true,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:23",
-   "pkiss": true,
-   "probknot": false,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:24",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": true,
-   "unanimous": true
-  },
-  {
-   "id": "pseudobase:25",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": true,
-   "unanimous": true
-  },
-  {
-   "id": "pseudobase:26",
-   "pkiss": false,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:27",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:28",
-   "pkiss": false,
-   "probknot": false,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:29",
-   "pkiss": true,
-   "probknot": false,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:30",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:31",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:32",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:33",
-   "pkiss": false,
-   "probknot": false,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:34",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": true,
-   "unanimous": true
-  },
-  {
-   "id": "pseudobase:35",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:36",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": true,
-   "unanimous": true
-  },
-  {
-   "id": "pseudobase:37",
-   "pkiss": false,
-   "probknot": true,
-   "shapeknots": true,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:38",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:39",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:40",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:41",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:42",
-   "pkiss": true,
-   "probknot": false,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:43",
-   "pkiss": false,
-   "probknot": false,
-   "shapeknots": true,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:44",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:45",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:46",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:47",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": true,
-   "unanimous": true
-  },
-  {
-   "id": "pseudobase:48",
-   "pkiss": false,
-   "probknot": false,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:49",
-   "pkiss": false,
-   "probknot": true,
-   "shapeknots": true,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:50",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:51",
-   "pkiss": true,
-   "probknot": false,
-   "shapeknots": true,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:52",
-   "pkiss": false,
-   "probknot": true,
-   "shapeknots": true,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:53",
-   "pkiss": false,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:54",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": true,
-   "unanimous": true
-  },
-  {
-   "id": "pseudobase:55",
-   "pkiss": false,
-   "probknot": false,
-   "shapeknots": true,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:56",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": true,
-   "unanimous": true
-  },
-  {
-   "id": "pseudobase:57",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": true,
-   "unanimous": true
-  },
-  {
-   "id": "pseudobase:58",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": true,
-   "unanimous": true
-  },
-  {
-   "id": "pseudobase:59",
-   "pkiss": true,
-   "probknot": false,
-   "shapeknots": false,
-   "unanimous": false
-  }
- ],
- "heldout_pkiss": 43,
- "heldout_pk_and_pb": 44,
- "heldout_panel_unanimous": 17
+  "model": "google/gemini-3.1-pro-preview",
+  "best_train_solved": 12,
+  "best_round": 3,
+  "rounds": [
+    {
+      "round": 0,
+      "prompt_tokens": 479,
+      "completion_tokens": 17745,
+      "train_solved": 6,
+      "n_train": 16,
+      "errors": [
+        "_TO()",
+        "_TO()",
+        "_TO()",
+        "_TO()",
+        "_TO()"
+      ]
+    },
+    {
+      "round": 1,
+      "prompt_tokens": 2458,
+      "completion_tokens": 12493,
+      "train_solved": null,
+      "compile_error": "ValueError('forbidden token in code: import')"
+    },
+    {
+      "round": 2,
+      "prompt_tokens": 4046,
+      "completion_tokens": 5138,
+      "train_solved": 5,
+      "n_train": 16,
+      "errors": [
+        "_TO()",
+        "_TO()",
+        "_TO()",
+        "_TO()",
+        "_TO()"
+      ]
+    },
+    {
+      "round": 3,
+      "prompt_tokens": 5695,
+      "completion_tokens": 22215,
+      "train_solved": 12,
+      "n_train": 16,
+      "errors": [
+        "_TO()",
+        "_TO()",
+        "_TO()",
+        "_TO()"
+      ]
+    },
+    {
+      "round": 4,
+      "prompt_tokens": 7555,
+      "completion_tokens": 9923,
+      "train_solved": 12,
+      "n_train": 16,
+      "errors": []
+    },
+    {
+      "round": 5,
+      "prompt_tokens": 9687,
+      "completion_tokens": 10590,
+      "train_solved": 12,
+      "n_train": 16,
+      "errors": [
+        "_TO()",
+        "_TO()",
+        "_TO()",
+        "_TO()"
+      ]
+    },
+    {
+      "round": 6,
+      "prompt_tokens": 12185,
+      "completion_tokens": 16898,
+      "train_solved": 10,
+      "n_train": 16,
+      "errors": [
+        "_TO()",
+        "_TO()",
+        "_TO()",
+        "_TO()",
+        "_TO()"
+      ]
+    }
+  ],
+  "best_code": "def design(target, seed=0):\n    random.seed(seed)\n    \n    t_pairs = set((min(i, j), max(i, j)) for i, j in target_pairs(target))\n    n = len(target)\n    \n    # Decompose into non-crossing sets\n    sets = []\n    for p in sorted(t_pairs):\n        placed = False\n        for s in sets:\n            if all(not ((p[0] < p1[0] < p[1] < p1[1]) or (p1[0] < p[0] < p1[1] < p[1])) for p1 in s):\n                s.add(p)\n                placed = True\n                break\n        if not placed:\n            sets.append({p})\n            \n    sets.sort(key=len, reverse=True)\n    \n    db_strs = []\n    for s in sets:\n        db = ['.'] * n\n        for i, j in s:\n            db[i] = '('\n            db[j] = ')'\n        db_strs.append(\"\".join(db))\n        \n    valid_pairs = [('A', 'U'), ('U', 'A'), ('C', 'G'), ('G', 'C'), ('G', 'U'), ('U', 'G')]\n    gc_pairs = [('G', 'C'), ('C', 'G')]\n    \n    evals = 0\n    max_evals = 60\n    \n    def evaluate(seq_str):\n        nonlocal evals\n        evals += 1\n        pkiss = set((min(i, j), max(i, j)) for i, j in fold_pkiss_pairs(seq_str))\n        diff1 = len(pkiss ^ t_pairs)\n        \n        # Only evaluate ProbKnot if pKiss is reasonably close to save time\n        if diff1 <= 15:\n            probknot = set((min(i, j), max(i, j)) for i, j in fold_probknot_pairs(seq_str))\n            diff2 = len(probknot ^ t_pairs)\n            return diff1 + diff2, pkiss, probknot\n        else:\n            return diff1 + 30, pkiss, set()\n\n    candidates = []\n    \n    # Strategy 1: GC pairs for stems, A for unpaired (minimizes misfolding)\n    for i in range(3):\n        seq = ['A'] * n\n        for u, v in t_pairs:\n            seq[u], seq[v] = random.choice(gc_pairs)\n        candidates.append(\"\".join(seq))\n        \n    # Strategy 2: Seed with inverse_fold_cf on the largest non-crossing set\n    if len(sets) > 0:\n        try:\n            seq = list(inverse_fold_cf(db_strs[0], seed=seed))\n            if len(seq) != n: seq = list(rand_seq(n, seed=seed))\n        except:\n            seq = list(rand_seq(n, seed=seed))\n        for s in sets[1:]:\n            for u, v in s:\n                seq[u], seq[v] = random.choice(gc_pairs)\n        candidates.append(\"\".join(seq))\n\n    best_seq = None\n    best_score = float('inf')\n    current_seq = None\n    current_score = float('inf')\n    current_pk = set()\n    current_pr = set()\n    \n    for seq_str in candidates:\n        if evals >= max_evals: break\n        score, pk, pr = evaluate(seq_str)\n        if score == 0: return seq_str\n        if score < current_score:\n            current_score = score\n            current_seq = list(seq_str)\n            current_pk = pk\n            current_pr = pr\n            best_score = score\n            best_seq = seq_str\n\n    if current_seq is None:\n        return rand_seq(n)\n\n    T = 5.0\n    alpha = 0.9\n    unpaired = set(range(n)) - set(i for p in t_pairs for i in p)\n    \n    # Simulated Annealing with targeted mutations\n    while evals < max_evals:\n        new_seq = current_seq.copy()\n        \n        extra = current_pk - t_pairs\n        missing = t_pairs - current_pk\n        if current_pr:\n            extra |= (current_pr - t_pairs)\n            missing |= (t_pairs - current_pr)\n            \n        mutated = False\n        \n        # 1. Try to break extra pairs\n        if extra and random.random() < 0.6:\n            i, j = random.choice(list(extra))\n            idx = random.choice([i, j])\n            if idx in unpaired:\n                new_seq[idx] = 'A'\n                mutated = True\n            else:\n                for u, v in t_pairs:\n                    if u == idx or v == idx:\n                        # Flip GC pair to break alternative pairing\n                        if new_seq[u] in 'GC' and new_seq[v] in 'GC':\n                            new_seq[u], new_seq[v] = new_seq[v], new_seq[u]\n                        else:\n                            new_seq[u], new_seq[v] = random.choice(gc_pairs)\n                        mutated = True\n                        break\n                        \n        # 2. Try to fix missing pairs\n        if not mutated and missing and random.random() < 0.6:\n            i, j = random.choice(list(missing))\n            if new_seq[i] in 'GC' and new_seq[j] in 'GC':\n                new_seq[i], new_seq[j] = new_seq[j], new_seq[i]\n            else:\n                new_seq[i], new_seq[j] = random.choice(gc_pairs)\n            mutated = True\n            \n        # 3. Random exploration\n        if not mutated:\n            if unpaired and random.random() < 0.3:\n                idx = random.choice(list(unpaired))\n                new_seq[idx] = random.choice(['A', 'C', 'U'])\n            elif t_pairs:\n                i, j = random.choice(list(t_pairs))\n                if new_seq[i] in 'GC' and new_seq[j] in 'GC' and random.random() < 0.7:\n                    new_seq[i], new_seq[j] = new_seq[j], new_seq[i]\n                else:\n                    new_seq[i], new_seq[j] = random.choice(valid_pairs)\n                    \n        new_seq_str = \"\".join(new_seq)\n        score, pk, pr = evaluate(new_seq_str)\n        \n        if score == 0:\n            return new_seq_str\n            \n        if score < current_score or random.random() < math.exp((current_score - score) / T):\n            current_score = score\n            current_seq = new_seq\n            current_pk = pk\n            current_pr = pr\n            if score < best_score:\n                best_score = score\n                best_seq = new_seq_str\n                \n        T *= alpha\n        \n    return best_seq",
+  "heldout": [
+    {
+      "id": "pseudobase:0",
+      "pkiss": false,
+      "probknot": false,
+      "shapeknots": true,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:1",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:2",
+      "pkiss": false,
+      "probknot": false,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:3",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": true,
+      "unanimous": true
+    },
+    {
+      "id": "pseudobase:4",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:5",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:6",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": true,
+      "unanimous": true
+    },
+    {
+      "id": "pseudobase:7",
+      "pkiss": false,
+      "probknot": false,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:8",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:9",
+      "pkiss": false,
+      "probknot": true,
+      "shapeknots": true,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:10",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": true,
+      "unanimous": true
+    },
+    {
+      "id": "pseudobase:11",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:12",
+      "pkiss": false,
+      "probknot": false,
+      "shapeknots": true,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:13",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": true,
+      "unanimous": true
+    },
+    {
+      "id": "pseudobase:14",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": true,
+      "unanimous": true
+    },
+    {
+      "id": "pseudobase:15",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:16",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": true,
+      "unanimous": true
+    },
+    {
+      "id": "pseudobase:17",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:18",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": true,
+      "unanimous": true
+    },
+    {
+      "id": "pseudobase:19",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": true,
+      "unanimous": true
+    },
+    {
+      "id": "pseudobase:20",
+      "pkiss": false,
+      "probknot": false,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:21",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:22",
+      "pkiss": false,
+      "probknot": false,
+      "shapeknots": true,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:23",
+      "pkiss": true,
+      "probknot": false,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:24",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": true,
+      "unanimous": true
+    },
+    {
+      "id": "pseudobase:25",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": true,
+      "unanimous": true
+    },
+    {
+      "id": "pseudobase:26",
+      "pkiss": false,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:27",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:28",
+      "pkiss": false,
+      "probknot": false,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:29",
+      "pkiss": true,
+      "probknot": false,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:30",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:31",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:32",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:33",
+      "pkiss": false,
+      "probknot": false,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:34",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": true,
+      "unanimous": true
+    },
+    {
+      "id": "pseudobase:35",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:36",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": true,
+      "unanimous": true
+    },
+    {
+      "id": "pseudobase:37",
+      "pkiss": false,
+      "probknot": true,
+      "shapeknots": true,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:38",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:39",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:40",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:41",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:42",
+      "pkiss": true,
+      "probknot": false,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:43",
+      "pkiss": false,
+      "probknot": false,
+      "shapeknots": true,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:44",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:45",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:46",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:47",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": true,
+      "unanimous": true
+    },
+    {
+      "id": "pseudobase:48",
+      "pkiss": false,
+      "probknot": false,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:49",
+      "pkiss": false,
+      "probknot": true,
+      "shapeknots": true,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:50",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:51",
+      "pkiss": true,
+      "probknot": false,
+      "shapeknots": true,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:52",
+      "pkiss": false,
+      "probknot": true,
+      "shapeknots": true,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:53",
+      "pkiss": false,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:54",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": true,
+      "unanimous": true
+    },
+    {
+      "id": "pseudobase:55",
+      "pkiss": false,
+      "probknot": false,
+      "shapeknots": true,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:56",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": true,
+      "unanimous": true
+    },
+    {
+      "id": "pseudobase:57",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": true,
+      "unanimous": true
+    },
+    {
+      "id": "pseudobase:58",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": true,
+      "unanimous": true
+    },
+    {
+      "id": "pseudobase:59",
+      "pkiss": true,
+      "probknot": false,
+      "shapeknots": false,
+      "unanimous": false
+    }
+  ],
+  "heldout_pkiss": 43,
+  "heldout_pk_and_pb": 38,
+  "heldout_panel_unanimous": 17,
+  "heldout_probknot": 44,
+  "_correction_note": "heldout_pk_and_pb recomputed as true pKiss AND ProbKnot intersection; heldout_probknot added (was previously stored as pk_and_pb)."
 }

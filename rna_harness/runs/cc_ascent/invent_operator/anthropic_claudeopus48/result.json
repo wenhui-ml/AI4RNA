@@ -1,483 +1,485 @@
 {
- "model": "anthropic/claude-opus-4.8",
- "best_train_solved": 12,
- "best_round": 5,
- "rounds": [
-  {
-   "round": 0,
-   "prompt_tokens": 752,
-   "completion_tokens": 2021,
-   "train_solved": null,
-   "compile_error": "ValueError('forbidden token in code: import')"
-  },
-  {
-   "round": 1,
-   "prompt_tokens": 2831,
-   "completion_tokens": 1473,
-   "train_solved": 3,
-   "n_train": 16,
-   "errors": [
-    "_TO()",
-    "_TO()",
-    "_TO()",
-    "_TO()",
-    "_TO()"
-   ]
-  },
-  {
-   "round": 2,
-   "prompt_tokens": 4468,
-   "completion_tokens": 1319,
-   "train_solved": 9,
-   "n_train": 16,
-   "errors": [
-    "_TO()",
-    "_TO()",
-    "_TO()",
-    "_TO()",
-    "_TO()"
-   ]
-  },
-  {
-   "round": 3,
-   "prompt_tokens": 5962,
-   "completion_tokens": 1447,
-   "train_solved": 7,
-   "n_train": 16,
-   "errors": [
-    "_TO()",
-    "_TO()",
-    "_TO()",
-    "_TO()",
-    "_TO()"
-   ]
-  },
-  {
-   "round": 4,
-   "prompt_tokens": 7588,
-   "completion_tokens": 1047,
-   "train_solved": 9,
-   "n_train": 16,
-   "errors": [
-    "_TO()",
-    "_TO()",
-    "_TO()",
-    "_TO()",
-    "_TO()"
-   ]
-  },
-  {
-   "round": 5,
-   "prompt_tokens": 8810,
-   "completion_tokens": 1417,
-   "train_solved": 12,
-   "n_train": 16,
-   "errors": [
-    "_TO()",
-    "_TO()",
-    "_TO()",
-    "_TO()"
-   ]
-  },
-  {
-   "round": 6,
-   "prompt_tokens": 10402,
-   "completion_tokens": 1713,
-   "train_solved": 12,
-   "n_train": 16,
-   "errors": [
-    "_TO()",
-    "_TO()",
-    "_TO()",
-    "_TO()"
-   ]
-  },
-  {
-   "round": 7,
-   "prompt_tokens": 12290,
-   "completion_tokens": 1805,
-   "train_solved": null,
-   "compile_error": "ValueError('forbidden token in code: eval')"
-  },
-  {
-   "round": 8,
-   "prompt_tokens": 14154,
-   "completion_tokens": 1664,
-   "train_solved": 11,
-   "n_train": 16,
-   "errors": [
-    "_TO()",
-    "_TO()",
-    "_TO()",
-    "_TO()",
-    "_TO()"
-   ]
-  }
- ],
- "best_code": "def design(target, seed=0):\n    n = len(target)\n    pairs = target_pairs(target)\n\n    partner = {}\n    for (i, j) in pairs:\n        partner[i] = j\n        partner[j] = i\n\n    rng = random.Random(seed)\n\n    comp_pairs = [('G', 'C'), ('C', 'G')]\n    pair_options = [('G', 'C'), ('C', 'G'), ('A', 'U'), ('U', 'A')]\n\n    def build(flip=0, unp='A'):\n        s = [unp] * n\n        for idx, (i, j) in enumerate(sorted(pairs)):\n            gc = comp_pairs[(idx + flip) % 2]\n            s[i], s[j] = gc\n        return s\n\n    def score(seqlist):\n        s = \"\".join(seqlist)\n        try:\n            p1 = fold_pkiss_pairs(s)\n        except Exception:\n            return -10 ** 6, s\n        try:\n            p2 = fold_probknot_pairs(s)\n        except Exception:\n            return -10 ** 6, s\n        if p1 == pairs and p2 == pairs:\n            return 1000000, s\n        return -(len(p1 ^ pairs) + len(p2 ^ pairs)), s\n\n    pair_list = sorted(pairs)\n    unpaired = [i for i in range(n) if i not in partner]\n\n    best_score = None\n    best_seq = None\n\n    starts = [build(0, 'A'), build(1, 'A'), build(0, 'A')]\n    for i in range(n):\n        if i not in partner:\n            starts[2][i] = 'A'\n\n    for st in starts:\n        sc, sq = score(st)\n        if best_score is None or sc > best_score:\n            best_score, best_seq = sc, sq\n        if best_score >= 1000000:\n            return best_seq\n\n    cur = list(best_seq)\n    cur_score = best_score\n\n    total_budget = 160\n    used = 0\n    stagnation = 0\n\n    while used < total_budget:\n        trial = list(cur)\n        r = rng.random()\n        if r < 0.55 and pair_list:\n            (i, j) = rng.choice(pair_list)\n            a, b = rng.choice(pair_options)\n            trial[i], trial[j] = a, b\n        elif r < 0.75 and unpaired:\n            pos = rng.choice(unpaired)\n            trial[pos] = rng.choice('ACGU')\n        elif pair_list:\n            # mutate two pairs at once\n            for _ in range(2):\n                (i, j) = rng.choice(pair_list)\n                a, b = rng.choice(pair_options)\n                trial[i], trial[j] = a, b\n        elif unpaired:\n            pos = rng.choice(unpaired)\n            trial[pos] = rng.choice('ACGU')\n\n        sc, sq = score(trial)\n        used += 1\n        if sc >= cur_score:\n            if sc > cur_score:\n                stagnation = 0\n            else:\n                stagnation += 1\n            cur = trial\n            cur_score = sc\n            if sc > best_score:\n                best_score, best_seq = sc, sq\n            if best_score >= 1000000:\n                return best_seq\n        else:\n            stagnation += 1\n\n        # restart from a fresh alternate build on stagnation\n        if stagnation >= 30:\n            stagnation = 0\n            flip = rng.randint(0, 1)\n            fresh = build(flip, 'A')\n            # randomize some unpaired\n            for k in unpaired:\n                if rng.random() < 0.3:\n                    fresh[k] = rng.choice('ACGU')\n            sc2, sq2 = score(fresh)\n            used += 1\n            cur = fresh\n            cur_score = sc2\n            if sc2 > best_score:\n                best_score, best_seq = sc2, sq2\n            if best_score >= 1000000:\n                return best_seq\n\n    return best_seq",
- "heldout": [
-  {
-   "id": "pseudobase:0",
-   "error": "_TO()"
-  },
-  {
-   "id": "pseudobase:1",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:2",
-   "error": "_TO()"
-  },
-  {
-   "id": "pseudobase:3",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:4",
-   "error": "_TO()"
-  },
-  {
-   "id": "pseudobase:5",
-   "error": "_TO()"
-  },
-  {
-   "id": "pseudobase:6",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": true,
-   "unanimous": true
-  },
-  {
-   "id": "pseudobase:7",
-   "error": "_TO()"
-  },
-  {
-   "id": "pseudobase:8",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:9",
-   "error": "_TO()"
-  },
-  {
-   "id": "pseudobase:10",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": true,
-   "unanimous": true
-  },
-  {
-   "id": "pseudobase:11",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:12",
-   "error": "_TO()"
-  },
-  {
-   "id": "pseudobase:13",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": true,
-   "unanimous": true
-  },
-  {
-   "id": "pseudobase:14",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": true,
-   "unanimous": true
-  },
-  {
-   "id": "pseudobase:15",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:16",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:17",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:18",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": true,
-   "unanimous": true
-  },
-  {
-   "id": "pseudobase:19",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": true,
-   "unanimous": true
-  },
-  {
-   "id": "pseudobase:20",
-   "error": "_TO()"
-  },
-  {
-   "id": "pseudobase:21",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:22",
-   "error": "_TO()"
-  },
-  {
-   "id": "pseudobase:23",
-   "error": "_TO()"
-  },
-  {
-   "id": "pseudobase:24",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": true,
-   "unanimous": true
-  },
-  {
-   "id": "pseudobase:25",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": true,
-   "unanimous": true
-  },
-  {
-   "id": "pseudobase:26",
-   "error": "_TO()"
-  },
-  {
-   "id": "pseudobase:27",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:28",
-   "error": "_TO()"
-  },
-  {
-   "id": "pseudobase:29",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:30",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:31",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:32",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:33",
-   "error": "_TO()"
-  },
-  {
-   "id": "pseudobase:34",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:35",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:36",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:37",
-   "error": "_TO()"
-  },
-  {
-   "id": "pseudobase:38",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": true,
-   "unanimous": true
-  },
-  {
-   "id": "pseudobase:39",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:40",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:41",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:42",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:43",
-   "error": "_TO()"
-  },
-  {
-   "id": "pseudobase:44",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:45",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:46",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:47",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": true,
-   "unanimous": true
-  },
-  {
-   "id": "pseudobase:48",
-   "error": "_TO()"
-  },
-  {
-   "id": "pseudobase:49",
-   "error": "_TO()"
-  },
-  {
-   "id": "pseudobase:50",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:51",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": true,
-   "unanimous": true
-  },
-  {
-   "id": "pseudobase:52",
-   "error": "_TO()"
-  },
-  {
-   "id": "pseudobase:53",
-   "error": "_TO()"
-  },
-  {
-   "id": "pseudobase:54",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": true,
-   "unanimous": true
-  },
-  {
-   "id": "pseudobase:55",
-   "error": "_TO()"
-  },
-  {
-   "id": "pseudobase:56",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:57",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": true,
-   "unanimous": true
-  },
-  {
-   "id": "pseudobase:58",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": true,
-   "unanimous": true
-  },
-  {
-   "id": "pseudobase:59",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  }
- ],
- "heldout_pkiss": 40,
- "heldout_pk_and_pb": 40,
- "heldout_panel_unanimous": 14
+  "model": "anthropic/claude-opus-4.8",
+  "best_train_solved": 12,
+  "best_round": 5,
+  "rounds": [
+    {
+      "round": 0,
+      "prompt_tokens": 752,
+      "completion_tokens": 2021,
+      "train_solved": null,
+      "compile_error": "ValueError('forbidden token in code: import')"
+    },
+    {
+      "round": 1,
+      "prompt_tokens": 2831,
+      "completion_tokens": 1473,
+      "train_solved": 3,
+      "n_train": 16,
+      "errors": [
+        "_TO()",
+        "_TO()",
+        "_TO()",
+        "_TO()",
+        "_TO()"
+      ]
+    },
+    {
+      "round": 2,
+      "prompt_tokens": 4468,
+      "completion_tokens": 1319,
+      "train_solved": 9,
+      "n_train": 16,
+      "errors": [
+        "_TO()",
+        "_TO()",
+        "_TO()",
+        "_TO()",
+        "_TO()"
+      ]
+    },
+    {
+      "round": 3,
+      "prompt_tokens": 5962,
+      "completion_tokens": 1447,
+      "train_solved": 7,
+      "n_train": 16,
+      "errors": [
+        "_TO()",
+        "_TO()",
+        "_TO()",
+        "_TO()",
+        "_TO()"
+      ]
+    },
+    {
+      "round": 4,
+      "prompt_tokens": 7588,
+      "completion_tokens": 1047,
+      "train_solved": 9,
+      "n_train": 16,
+      "errors": [
+        "_TO()",
+        "_TO()",
+        "_TO()",
+        "_TO()",
+        "_TO()"
+      ]
+    },
+    {
+      "round": 5,
+      "prompt_tokens": 8810,
+      "completion_tokens": 1417,
+      "train_solved": 12,
+      "n_train": 16,
+      "errors": [
+        "_TO()",
+        "_TO()",
+        "_TO()",
+        "_TO()"
+      ]
+    },
+    {
+      "round": 6,
+      "prompt_tokens": 10402,
+      "completion_tokens": 1713,
+      "train_solved": 12,
+      "n_train": 16,
+      "errors": [
+        "_TO()",
+        "_TO()",
+        "_TO()",
+        "_TO()"
+      ]
+    },
+    {
+      "round": 7,
+      "prompt_tokens": 12290,
+      "completion_tokens": 1805,
+      "train_solved": null,
+      "compile_error": "ValueError('forbidden token in code: eval')"
+    },
+    {
+      "round": 8,
+      "prompt_tokens": 14154,
+      "completion_tokens": 1664,
+      "train_solved": 11,
+      "n_train": 16,
+      "errors": [
+        "_TO()",
+        "_TO()",
+        "_TO()",
+        "_TO()",
+        "_TO()"
+      ]
+    }
+  ],
+  "best_code": "def design(target, seed=0):\n    n = len(target)\n    pairs = target_pairs(target)\n\n    partner = {}\n    for (i, j) in pairs:\n        partner[i] = j\n        partner[j] = i\n\n    rng = random.Random(seed)\n\n    comp_pairs = [('G', 'C'), ('C', 'G')]\n    pair_options = [('G', 'C'), ('C', 'G'), ('A', 'U'), ('U', 'A')]\n\n    def build(flip=0, unp='A'):\n        s = [unp] * n\n        for idx, (i, j) in enumerate(sorted(pairs)):\n            gc = comp_pairs[(idx + flip) % 2]\n            s[i], s[j] = gc\n        return s\n\n    def score(seqlist):\n        s = \"\".join(seqlist)\n        try:\n            p1 = fold_pkiss_pairs(s)\n        except Exception:\n            return -10 ** 6, s\n        try:\n            p2 = fold_probknot_pairs(s)\n        except Exception:\n            return -10 ** 6, s\n        if p1 == pairs and p2 == pairs:\n            return 1000000, s\n        return -(len(p1 ^ pairs) + len(p2 ^ pairs)), s\n\n    pair_list = sorted(pairs)\n    unpaired = [i for i in range(n) if i not in partner]\n\n    best_score = None\n    best_seq = None\n\n    starts = [build(0, 'A'), build(1, 'A'), build(0, 'A')]\n    for i in range(n):\n        if i not in partner:\n            starts[2][i] = 'A'\n\n    for st in starts:\n        sc, sq = score(st)\n        if best_score is None or sc > best_score:\n            best_score, best_seq = sc, sq\n        if best_score >= 1000000:\n            return best_seq\n\n    cur = list(best_seq)\n    cur_score = best_score\n\n    total_budget = 160\n    used = 0\n    stagnation = 0\n\n    while used < total_budget:\n        trial = list(cur)\n        r = rng.random()\n        if r < 0.55 and pair_list:\n            (i, j) = rng.choice(pair_list)\n            a, b = rng.choice(pair_options)\n            trial[i], trial[j] = a, b\n        elif r < 0.75 and unpaired:\n            pos = rng.choice(unpaired)\n            trial[pos] = rng.choice('ACGU')\n        elif pair_list:\n            # mutate two pairs at once\n            for _ in range(2):\n                (i, j) = rng.choice(pair_list)\n                a, b = rng.choice(pair_options)\n                trial[i], trial[j] = a, b\n        elif unpaired:\n            pos = rng.choice(unpaired)\n            trial[pos] = rng.choice('ACGU')\n\n        sc, sq = score(trial)\n        used += 1\n        if sc >= cur_score:\n            if sc > cur_score:\n                stagnation = 0\n            else:\n                stagnation += 1\n            cur = trial\n            cur_score = sc\n            if sc > best_score:\n                best_score, best_seq = sc, sq\n            if best_score >= 1000000:\n                return best_seq\n        else:\n            stagnation += 1\n\n        # restart from a fresh alternate build on stagnation\n        if stagnation >= 30:\n            stagnation = 0\n            flip = rng.randint(0, 1)\n            fresh = build(flip, 'A')\n            # randomize some unpaired\n            for k in unpaired:\n                if rng.random() < 0.3:\n                    fresh[k] = rng.choice('ACGU')\n            sc2, sq2 = score(fresh)\n            used += 1\n            cur = fresh\n            cur_score = sc2\n            if sc2 > best_score:\n                best_score, best_seq = sc2, sq2\n            if best_score >= 1000000:\n                return best_seq\n\n    return best_seq",
+  "heldout": [
+    {
+      "id": "pseudobase:0",
+      "error": "_TO()"
+    },
+    {
+      "id": "pseudobase:1",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:2",
+      "error": "_TO()"
+    },
+    {
+      "id": "pseudobase:3",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:4",
+      "error": "_TO()"
+    },
+    {
+      "id": "pseudobase:5",
+      "error": "_TO()"
+    },
+    {
+      "id": "pseudobase:6",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": true,
+      "unanimous": true
+    },
+    {
+      "id": "pseudobase:7",
+      "error": "_TO()"
+    },
+    {
+      "id": "pseudobase:8",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:9",
+      "error": "_TO()"
+    },
+    {
+      "id": "pseudobase:10",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": true,
+      "unanimous": true
+    },
+    {
+      "id": "pseudobase:11",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:12",
+      "error": "_TO()"
+    },
+    {
+      "id": "pseudobase:13",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": true,
+      "unanimous": true
+    },
+    {
+      "id": "pseudobase:14",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": true,
+      "unanimous": true
+    },
+    {
+      "id": "pseudobase:15",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:16",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:17",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:18",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": true,
+      "unanimous": true
+    },
+    {
+      "id": "pseudobase:19",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": true,
+      "unanimous": true
+    },
+    {
+      "id": "pseudobase:20",
+      "error": "_TO()"
+    },
+    {
+      "id": "pseudobase:21",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:22",
+      "error": "_TO()"
+    },
+    {
+      "id": "pseudobase:23",
+      "error": "_TO()"
+    },
+    {
+      "id": "pseudobase:24",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": true,
+      "unanimous": true
+    },
+    {
+      "id": "pseudobase:25",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": true,
+      "unanimous": true
+    },
+    {
+      "id": "pseudobase:26",
+      "error": "_TO()"
+    },
+    {
+      "id": "pseudobase:27",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:28",
+      "error": "_TO()"
+    },
+    {
+      "id": "pseudobase:29",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:30",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:31",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:32",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:33",
+      "error": "_TO()"
+    },
+    {
+      "id": "pseudobase:34",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:35",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:36",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:37",
+      "error": "_TO()"
+    },
+    {
+      "id": "pseudobase:38",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": true,
+      "unanimous": true
+    },
+    {
+      "id": "pseudobase:39",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:40",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:41",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:42",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:43",
+      "error": "_TO()"
+    },
+    {
+      "id": "pseudobase:44",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:45",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:46",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:47",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": true,
+      "unanimous": true
+    },
+    {
+      "id": "pseudobase:48",
+      "error": "_TO()"
+    },
+    {
+      "id": "pseudobase:49",
+      "error": "_TO()"
+    },
+    {
+      "id": "pseudobase:50",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:51",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": true,
+      "unanimous": true
+    },
+    {
+      "id": "pseudobase:52",
+      "error": "_TO()"
+    },
+    {
+      "id": "pseudobase:53",
+      "error": "_TO()"
+    },
+    {
+      "id": "pseudobase:54",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": true,
+      "unanimous": true
+    },
+    {
+      "id": "pseudobase:55",
+      "error": "_TO()"
+    },
+    {
+      "id": "pseudobase:56",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:57",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": true,
+      "unanimous": true
+    },
+    {
+      "id": "pseudobase:58",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": true,
+      "unanimous": true
+    },
+    {
+      "id": "pseudobase:59",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    }
+  ],
+  "heldout_pkiss": 40,
+  "heldout_pk_and_pb": 40,
+  "heldout_panel_unanimous": 14,
+  "heldout_probknot": 40,
+  "_correction_note": "heldout_pk_and_pb recomputed as true pKiss AND ProbKnot intersection; heldout_probknot added (was previously stored as pk_and_pb)."
 }

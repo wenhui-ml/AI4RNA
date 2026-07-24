@@ -225,7 +225,10 @@ def main(rounds=12, n_train=16, n_heldout=60, model=None, patience=3):
               "rounds": hist, "best_code": best["code"], "heldout": []}
     if best["code"]:
         design = make_design(best["code"], per_call_s=20)
-        npk = npb = nunan = 0
+        # npk = pKiss-alone, npb = ProbKnot-alone, ninter = TRUE pKiss AND ProbKnot intersection.
+        # (Earlier revision stored ProbKnot-alone under 'heldout_pk_and_pb'; the intersection is the
+        #  correct quantity for the pKiss AND ProbKnot column, since an intersection cannot exceed either.)
+        npk = npb = ninter = nunan = 0
         for k, t in enumerate(held):
             try:
                 s = design(t, 0)
@@ -233,16 +236,17 @@ def main(rounds=12, n_train=16, n_heldout=60, model=None, patience=3):
                 pb = bool(forms_target(probknot_pairs(s), t)) if s else False
                 sk = bool(forms_target(shapeknots_pairs(s), t)) if (s and rnastr) else None
                 unan = (pk and pb and bool(sk)) if rnastr else None
-                npk += int(pk); npb += int(pb); nunan += int(bool(unan))
+                npk += int(pk); npb += int(pb); ninter += int(pk and pb); nunan += int(bool(unan))
                 result["heldout"].append({"id": f"pseudobase:{k}", "pkiss": pk, "probknot": pb,
                                           "shapeknots": sk, "unanimous": unan})
             except Exception as e:
                 result["heldout"].append({"id": f"pseudobase:{k}", "error": repr(e)[:120]})
             if k % 10 == 9:
-                print(f"  held-out {k+1}/{len(held)}: pKiss={npk} pk&pb={npb} unanimous={nunan}", flush=True)
-        result.update({"heldout_pkiss": npk, "heldout_pk_and_pb": npb, "heldout_panel_unanimous": nunan})
-        print(f"\nINVENTED operator on held-out {len(held)}: pKiss={npk}, pKiss&ProbKnot={npb}, "
-              f"panel-unanimous={nunan}. (hand-built panel_auto: 3-8/60; floor: 0/60.)", flush=True)
+                print(f"  held-out {k+1}/{len(held)}: pKiss={npk} ProbKnot={npb} pk&pb={ninter} unanimous={nunan}", flush=True)
+        result.update({"heldout_pkiss": npk, "heldout_probknot": npb,
+                       "heldout_pk_and_pb": ninter, "heldout_panel_unanimous": nunan})
+        print(f"\nINVENTED operator on held-out {len(held)}: pKiss={npk}, ProbKnot={npb}, "
+              f"pKiss&ProbKnot={ninter}, panel-unanimous={nunan}. (hand-built panel_auto: 3-8/60; floor: 0/60.)", flush=True)
     else:
         print("\nNo compilable operator was invented.", flush=True)
     json.dump(result, open(os.path.join(OUT, "result.json"), "w"), indent=1)

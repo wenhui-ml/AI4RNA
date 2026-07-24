@@ -1,434 +1,436 @@
 {
- "model": "z-ai/glm-5.2",
- "best_train_solved": 12,
- "best_round": 2,
- "rounds": [
-  {
-   "round": 0,
-   "prompt_tokens": 456,
-   "completion_tokens": 13704,
-   "train_solved": 1,
-   "n_train": 16,
-   "errors": [
-    "TypeError(\"'NoneType' object is not iterable\")",
-    "TypeError(\"'NoneType' object is not iterable\")",
-    "TypeError(\"'NoneType' object is not iterable\")",
-    "TypeError(\"'NoneType' object is not iterable\")",
-    "TypeError(\"'NoneType' object is not iterable\")"
-   ]
-  },
-  {
-   "round": 1,
-   "prompt_tokens": 2265,
-   "completion_tokens": 3513,
-   "train_solved": 11,
-   "n_train": 16,
-   "errors": [
-    "TypeError(\"'NoneType' object is not iterable\")",
-    "TypeError(\"'NoneType' object is not iterable\")",
-    "TypeError(\"'NoneType' object is not iterable\")",
-    "TypeError(\"'NoneType' object is not iterable\")",
-    "TypeError(\"'NoneType' object is not iterable\")"
-   ]
-  },
-  {
-   "round": 2,
-   "prompt_tokens": 3519,
-   "completion_tokens": 3901,
-   "train_solved": 12,
-   "n_train": 16,
-   "errors": [
-    "TypeError(\"'NoneType' object is not iterable\")",
-    "TypeError(\"'NoneType' object is not iterable\")",
-    "TypeError(\"'NoneType' object is not iterable\")",
-    "TypeError(\"'NoneType' object is not iterable\")"
-   ]
-  },
-  {
-   "round": 3,
-   "prompt_tokens": 5148,
-   "completion_tokens": 3967,
-   "train_solved": 11,
-   "n_train": 16,
-   "errors": [
-    "TypeError(\"'NoneType' object is not iterable\")",
-    "TypeError(\"'NoneType' object is not iterable\")",
-    "TypeError(\"'NoneType' object is not iterable\")",
-    "TypeError(\"'NoneType' object is not iterable\")",
-    "TypeError(\"'NoneType' object is not iterable\")"
-   ]
-  },
-  {
-   "round": 4,
-   "prompt_tokens": 6743,
-   "completion_tokens": 4271,
-   "train_solved": 10,
-   "n_train": 16,
-   "errors": [
-    "TypeError(\"'NoneType' object is not iterable\")",
-    "TypeError(\"'NoneType' object is not iterable\")",
-    "TypeError(\"'NoneType' object is not iterable\")",
-    "TypeError(\"'NoneType' object is not iterable\")",
-    "TypeError(\"'NoneType' object is not iterable\")"
-   ]
-  },
-  {
-   "round": 5,
-   "prompt_tokens": 8034,
-   "completion_tokens": 65536,
-   "train_solved": null,
-   "compile_error": "ValueError('no design() defined')"
-  }
- ],
- "best_code": "def design(target, seed=0):\n    random.seed(seed)\n    n = len(target)\n    T = target_pairs(target)\n    if T is None:\n        T = set()\n    T = set(tuple(p) for p in T)\n\n    def safe_fold(f, seq):\n        res = f(seq)\n        if res is None:\n            return set()\n        return set(tuple(p) for p in res)\n\n    def get_nested_pairs(pairs):\n        nested = set()\n        plist = sorted(pairs)\n        for (i, j) in plist:\n            crosses = False\n            for (k, l) in plist:\n                if (i, j) != (k, l):\n                    if (i < k < j < l) or (k < i < l < j):\n                        crosses = True\n                        break\n            if not crosses:\n                nested.add((i, j))\n        return nested\n\n    nested_pairs = get_nested_pairs(T)\n    crossing_pairs = T - nested_pairs\n\n    nested_db = ['.'] * n\n    for (i, j) in nested_pairs:\n        nested_db[i] = '('\n        nested_db[j] = ')'\n    nested_db = ''.join(nested_db)\n\n    def enforce_pairs(seq, pairs):\n        seq = list(seq)\n        for (i, j) in pairs:\n            a, b = random.choice([('A', 'U'), ('U', 'A'), ('G', 'C'), ('C', 'G')])\n            seq[i] = a\n            seq[j] = b\n        return ''.join(seq)\n\n    def cost(seq):\n        P1 = safe_fold(fold_pkiss_pairs, seq)\n        P2 = safe_fold(fold_probknot_pairs, seq)\n        c = len(T - P1) + len(T - P2) + len(P1 - T) * 2 + len(P2 - T) * 2\n        return c\n\n    def greedy_step(seq, current_cost):\n        best_seq = seq\n        best_cost = current_cost\n        P1 = safe_fold(fold_pkiss_pairs, seq)\n        P2 = safe_fold(fold_probknot_pairs, seq)\n        error_pairs = (T - P1) | (T - P2) | (P1 - T) | (P2 - T)\n        error_positions = set()\n        for i, j in error_pairs:\n            error_positions.add(i)\n            error_positions.add(j)\n        for pos in error_positions:\n            partner = None\n            for (i, j) in T:\n                if i == pos:\n                    partner = j\n                    break\n                if j == pos:\n                    partner = i\n                    break\n            current_base = seq[pos]\n            choices = ['A', 'U', 'G', 'C']\n            choices.remove(current_base)\n            for new_base in choices:\n                new_seq = list(seq)\n                new_seq[pos] = new_base\n                if partner is not None:\n                    new_seq[partner] = COMP[new_base]\n                new_seq = ''.join(new_seq)\n                c = cost(new_seq)\n                if c < best_cost:\n                    best_cost = c\n                    best_seq = new_seq\n        return best_seq, best_cost\n\n    best_seq = None\n    best_cost = float('inf')\n\n    max_restarts = 15\n    max_iter = 3000\n\n    for restart in range(max_restarts):\n        if restart == 0:\n            seq = enforce_pairs('A' * n, T)\n        elif restart == 1:\n            seq = enforce_pairs(rand_seq(n, seed + restart), T)\n        else:\n            base_seq = inverse_fold_cf(nested_db, seed + restart)\n            if base_seq is None:\n                base_seq = rand_seq(n, seed + restart)\n            seq = enforce_pairs(base_seq, T)\n\n        current_seq = seq\n        current_cost = cost(current_seq)\n        if current_cost == 0:\n            return current_seq\n\n        T_temp = 2.0\n        cooling = 0.997\n        no_improve = 0\n\n        for it in range(max_iter):\n            if it % 100 == 0 and current_cost <= 6:\n                current_seq, current_cost = greedy_step(current_seq, current_cost)\n                if current_cost == 0:\n                    return current_seq\n\n            P1 = safe_fold(fold_pkiss_pairs, current_seq)\n            P2 = safe_fold(fold_probknot_pairs, current_seq)\n            error_pairs = (T - P1) | (T - P2) | (P1 - T) | (P2 - T)\n            error_positions = set()\n            for i, j in error_pairs:\n                error_positions.add(i)\n                error_positions.add(j)\n\n            new_seq = list(current_seq)\n            if error_positions and random.random() < 0.85:\n                pos = random.choice(list(error_positions))\n            else:\n                pos = random.randint(0, n - 1)\n\n            partner = None\n            for (i, j) in T:\n                if i == pos:\n                    partner = j\n                    break\n                if j == pos:\n                    partner = i\n                    break\n\n            if partner is not None:\n                current = new_seq[pos]\n                choices = ['A', 'U', 'G', 'C']\n                choices.remove(current)\n                new_base = random.choice(choices)\n                new_seq[pos] = new_base\n                new_seq[partner] = COMP[new_base]\n            else:\n                current = new_seq[pos]\n                choices = ['A', 'U', 'G', 'C']\n                choices.remove(current)\n                new_seq[pos] = random.choice(choices)\n\n            new_seq = ''.join(new_seq)\n            new_cost = cost(new_seq)\n\n            if new_cost < current_cost:\n                current_seq = new_seq\n                current_cost = new_cost\n                no_improve = 0\n            elif new_cost == current_cost:\n                if random.random() < 0.3:\n                    current_seq = new_seq\n                    current_cost = new_cost\n                no_improve += 1\n            else:\n                delta = new_cost - current_cost\n                if random.random() < math.exp(-delta / max(T_temp, 0.01)):\n                    current_seq = new_seq\n                    current_cost = new_cost\n                no_improve += 1\n\n            T_temp *= cooling\n            if current_cost == 0:\n                return current_seq\n            if no_improve > 200:\n                T_temp = max(T_temp, 1.5)\n                no_improve = 0\n\n        if current_cost < best_cost:\n            best_cost = current_cost\n            best_seq = current_seq\n\n    # Final greedy polish\n    if best_seq is not None and best_cost > 0:\n        for _ in range(50):\n            best_seq, best_cost = greedy_step(best_seq, best_cost)\n            if best_cost == 0:\n                break\n    return best_seq if best_seq is not None else 'A' * n",
- "heldout": [
-  {
-   "id": "pseudobase:0",
-   "error": "TypeError(\"'NoneType' object is not iterable\")"
-  },
-  {
-   "id": "pseudobase:1",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:2",
-   "error": "TypeError(\"'NoneType' object is not iterable\")"
-  },
-  {
-   "id": "pseudobase:3",
-   "error": "TypeError(\"'NoneType' object is not iterable\")"
-  },
-  {
-   "id": "pseudobase:4",
-   "error": "TypeError(\"'NoneType' object is not iterable\")"
-  },
-  {
-   "id": "pseudobase:5",
-   "error": "TypeError(\"'NoneType' object is not iterable\")"
-  },
-  {
-   "id": "pseudobase:6",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": true,
-   "unanimous": true
-  },
-  {
-   "id": "pseudobase:7",
-   "error": "TypeError(\"'NoneType' object is not iterable\")"
-  },
-  {
-   "id": "pseudobase:8",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:9",
-   "error": "TypeError(\"'NoneType' object is not iterable\")"
-  },
-  {
-   "id": "pseudobase:10",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": true,
-   "unanimous": true
-  },
-  {
-   "id": "pseudobase:11",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:12",
-   "error": "TypeError(\"'NoneType' object is not iterable\")"
-  },
-  {
-   "id": "pseudobase:13",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": true,
-   "unanimous": true
-  },
-  {
-   "id": "pseudobase:14",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": true,
-   "unanimous": true
-  },
-  {
-   "id": "pseudobase:15",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:16",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:17",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:18",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:19",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:20",
-   "error": "TypeError(\"'NoneType' object is not iterable\")"
-  },
-  {
-   "id": "pseudobase:21",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:22",
-   "error": "TypeError(\"'NoneType' object is not iterable\")"
-  },
-  {
-   "id": "pseudobase:23",
-   "error": "TypeError(\"'NoneType' object is not iterable\")"
-  },
-  {
-   "id": "pseudobase:24",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": true,
-   "unanimous": true
-  },
-  {
-   "id": "pseudobase:25",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:26",
-   "error": "TypeError(\"'NoneType' object is not iterable\")"
-  },
-  {
-   "id": "pseudobase:27",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:28",
-   "error": "TypeError(\"'NoneType' object is not iterable\")"
-  },
-  {
-   "id": "pseudobase:29",
-   "error": "TypeError(\"'NoneType' object is not iterable\")"
-  },
-  {
-   "id": "pseudobase:30",
-   "error": "TypeError(\"'NoneType' object is not iterable\")"
-  },
-  {
-   "id": "pseudobase:31",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:32",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:33",
-   "error": "TypeError(\"'NoneType' object is not iterable\")"
-  },
-  {
-   "id": "pseudobase:34",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:35",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:36",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:37",
-   "error": "TypeError(\"'NoneType' object is not iterable\")"
-  },
-  {
-   "id": "pseudobase:38",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": true,
-   "unanimous": true
-  },
-  {
-   "id": "pseudobase:39",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:40",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:41",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:42",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:43",
-   "error": "TypeError(\"'NoneType' object is not iterable\")"
-  },
-  {
-   "id": "pseudobase:44",
-   "error": "TypeError(\"'NoneType' object is not iterable\")"
-  },
-  {
-   "id": "pseudobase:45",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:46",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:47",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:48",
-   "error": "TypeError(\"'NoneType' object is not iterable\")"
-  },
-  {
-   "id": "pseudobase:49",
-   "error": "TypeError(\"'NoneType' object is not iterable\")"
-  },
-  {
-   "id": "pseudobase:50",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:51",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": true,
-   "unanimous": true
-  },
-  {
-   "id": "pseudobase:52",
-   "error": "TypeError(\"'NoneType' object is not iterable\")"
-  },
-  {
-   "id": "pseudobase:53",
-   "error": "TypeError(\"'NoneType' object is not iterable\")"
-  },
-  {
-   "id": "pseudobase:54",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": true,
-   "unanimous": true
-  },
-  {
-   "id": "pseudobase:55",
-   "error": "TypeError(\"'NoneType' object is not iterable\")"
-  },
-  {
-   "id": "pseudobase:56",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:57",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": true,
-   "unanimous": true
-  },
-  {
-   "id": "pseudobase:58",
-   "pkiss": true,
-   "probknot": true,
-   "shapeknots": false,
-   "unanimous": false
-  },
-  {
-   "id": "pseudobase:59",
-   "error": "TypeError(\"'NoneType' object is not iterable\")"
-  }
- ],
- "heldout_pkiss": 35,
- "heldout_pk_and_pb": 35,
- "heldout_panel_unanimous": 9
+  "model": "z-ai/glm-5.2",
+  "best_train_solved": 12,
+  "best_round": 2,
+  "rounds": [
+    {
+      "round": 0,
+      "prompt_tokens": 456,
+      "completion_tokens": 13704,
+      "train_solved": 1,
+      "n_train": 16,
+      "errors": [
+        "TypeError(\"'NoneType' object is not iterable\")",
+        "TypeError(\"'NoneType' object is not iterable\")",
+        "TypeError(\"'NoneType' object is not iterable\")",
+        "TypeError(\"'NoneType' object is not iterable\")",
+        "TypeError(\"'NoneType' object is not iterable\")"
+      ]
+    },
+    {
+      "round": 1,
+      "prompt_tokens": 2265,
+      "completion_tokens": 3513,
+      "train_solved": 11,
+      "n_train": 16,
+      "errors": [
+        "TypeError(\"'NoneType' object is not iterable\")",
+        "TypeError(\"'NoneType' object is not iterable\")",
+        "TypeError(\"'NoneType' object is not iterable\")",
+        "TypeError(\"'NoneType' object is not iterable\")",
+        "TypeError(\"'NoneType' object is not iterable\")"
+      ]
+    },
+    {
+      "round": 2,
+      "prompt_tokens": 3519,
+      "completion_tokens": 3901,
+      "train_solved": 12,
+      "n_train": 16,
+      "errors": [
+        "TypeError(\"'NoneType' object is not iterable\")",
+        "TypeError(\"'NoneType' object is not iterable\")",
+        "TypeError(\"'NoneType' object is not iterable\")",
+        "TypeError(\"'NoneType' object is not iterable\")"
+      ]
+    },
+    {
+      "round": 3,
+      "prompt_tokens": 5148,
+      "completion_tokens": 3967,
+      "train_solved": 11,
+      "n_train": 16,
+      "errors": [
+        "TypeError(\"'NoneType' object is not iterable\")",
+        "TypeError(\"'NoneType' object is not iterable\")",
+        "TypeError(\"'NoneType' object is not iterable\")",
+        "TypeError(\"'NoneType' object is not iterable\")",
+        "TypeError(\"'NoneType' object is not iterable\")"
+      ]
+    },
+    {
+      "round": 4,
+      "prompt_tokens": 6743,
+      "completion_tokens": 4271,
+      "train_solved": 10,
+      "n_train": 16,
+      "errors": [
+        "TypeError(\"'NoneType' object is not iterable\")",
+        "TypeError(\"'NoneType' object is not iterable\")",
+        "TypeError(\"'NoneType' object is not iterable\")",
+        "TypeError(\"'NoneType' object is not iterable\")",
+        "TypeError(\"'NoneType' object is not iterable\")"
+      ]
+    },
+    {
+      "round": 5,
+      "prompt_tokens": 8034,
+      "completion_tokens": 65536,
+      "train_solved": null,
+      "compile_error": "ValueError('no design() defined')"
+    }
+  ],
+  "best_code": "def design(target, seed=0):\n    random.seed(seed)\n    n = len(target)\n    T = target_pairs(target)\n    if T is None:\n        T = set()\n    T = set(tuple(p) for p in T)\n\n    def safe_fold(f, seq):\n        res = f(seq)\n        if res is None:\n            return set()\n        return set(tuple(p) for p in res)\n\n    def get_nested_pairs(pairs):\n        nested = set()\n        plist = sorted(pairs)\n        for (i, j) in plist:\n            crosses = False\n            for (k, l) in plist:\n                if (i, j) != (k, l):\n                    if (i < k < j < l) or (k < i < l < j):\n                        crosses = True\n                        break\n            if not crosses:\n                nested.add((i, j))\n        return nested\n\n    nested_pairs = get_nested_pairs(T)\n    crossing_pairs = T - nested_pairs\n\n    nested_db = ['.'] * n\n    for (i, j) in nested_pairs:\n        nested_db[i] = '('\n        nested_db[j] = ')'\n    nested_db = ''.join(nested_db)\n\n    def enforce_pairs(seq, pairs):\n        seq = list(seq)\n        for (i, j) in pairs:\n            a, b = random.choice([('A', 'U'), ('U', 'A'), ('G', 'C'), ('C', 'G')])\n            seq[i] = a\n            seq[j] = b\n        return ''.join(seq)\n\n    def cost(seq):\n        P1 = safe_fold(fold_pkiss_pairs, seq)\n        P2 = safe_fold(fold_probknot_pairs, seq)\n        c = len(T - P1) + len(T - P2) + len(P1 - T) * 2 + len(P2 - T) * 2\n        return c\n\n    def greedy_step(seq, current_cost):\n        best_seq = seq\n        best_cost = current_cost\n        P1 = safe_fold(fold_pkiss_pairs, seq)\n        P2 = safe_fold(fold_probknot_pairs, seq)\n        error_pairs = (T - P1) | (T - P2) | (P1 - T) | (P2 - T)\n        error_positions = set()\n        for i, j in error_pairs:\n            error_positions.add(i)\n            error_positions.add(j)\n        for pos in error_positions:\n            partner = None\n            for (i, j) in T:\n                if i == pos:\n                    partner = j\n                    break\n                if j == pos:\n                    partner = i\n                    break\n            current_base = seq[pos]\n            choices = ['A', 'U', 'G', 'C']\n            choices.remove(current_base)\n            for new_base in choices:\n                new_seq = list(seq)\n                new_seq[pos] = new_base\n                if partner is not None:\n                    new_seq[partner] = COMP[new_base]\n                new_seq = ''.join(new_seq)\n                c = cost(new_seq)\n                if c < best_cost:\n                    best_cost = c\n                    best_seq = new_seq\n        return best_seq, best_cost\n\n    best_seq = None\n    best_cost = float('inf')\n\n    max_restarts = 15\n    max_iter = 3000\n\n    for restart in range(max_restarts):\n        if restart == 0:\n            seq = enforce_pairs('A' * n, T)\n        elif restart == 1:\n            seq = enforce_pairs(rand_seq(n, seed + restart), T)\n        else:\n            base_seq = inverse_fold_cf(nested_db, seed + restart)\n            if base_seq is None:\n                base_seq = rand_seq(n, seed + restart)\n            seq = enforce_pairs(base_seq, T)\n\n        current_seq = seq\n        current_cost = cost(current_seq)\n        if current_cost == 0:\n            return current_seq\n\n        T_temp = 2.0\n        cooling = 0.997\n        no_improve = 0\n\n        for it in range(max_iter):\n            if it % 100 == 0 and current_cost <= 6:\n                current_seq, current_cost = greedy_step(current_seq, current_cost)\n                if current_cost == 0:\n                    return current_seq\n\n            P1 = safe_fold(fold_pkiss_pairs, current_seq)\n            P2 = safe_fold(fold_probknot_pairs, current_seq)\n            error_pairs = (T - P1) | (T - P2) | (P1 - T) | (P2 - T)\n            error_positions = set()\n            for i, j in error_pairs:\n                error_positions.add(i)\n                error_positions.add(j)\n\n            new_seq = list(current_seq)\n            if error_positions and random.random() < 0.85:\n                pos = random.choice(list(error_positions))\n            else:\n                pos = random.randint(0, n - 1)\n\n            partner = None\n            for (i, j) in T:\n                if i == pos:\n                    partner = j\n                    break\n                if j == pos:\n                    partner = i\n                    break\n\n            if partner is not None:\n                current = new_seq[pos]\n                choices = ['A', 'U', 'G', 'C']\n                choices.remove(current)\n                new_base = random.choice(choices)\n                new_seq[pos] = new_base\n                new_seq[partner] = COMP[new_base]\n            else:\n                current = new_seq[pos]\n                choices = ['A', 'U', 'G', 'C']\n                choices.remove(current)\n                new_seq[pos] = random.choice(choices)\n\n            new_seq = ''.join(new_seq)\n            new_cost = cost(new_seq)\n\n            if new_cost < current_cost:\n                current_seq = new_seq\n                current_cost = new_cost\n                no_improve = 0\n            elif new_cost == current_cost:\n                if random.random() < 0.3:\n                    current_seq = new_seq\n                    current_cost = new_cost\n                no_improve += 1\n            else:\n                delta = new_cost - current_cost\n                if random.random() < math.exp(-delta / max(T_temp, 0.01)):\n                    current_seq = new_seq\n                    current_cost = new_cost\n                no_improve += 1\n\n            T_temp *= cooling\n            if current_cost == 0:\n                return current_seq\n            if no_improve > 200:\n                T_temp = max(T_temp, 1.5)\n                no_improve = 0\n\n        if current_cost < best_cost:\n            best_cost = current_cost\n            best_seq = current_seq\n\n    # Final greedy polish\n    if best_seq is not None and best_cost > 0:\n        for _ in range(50):\n            best_seq, best_cost = greedy_step(best_seq, best_cost)\n            if best_cost == 0:\n                break\n    return best_seq if best_seq is not None else 'A' * n",
+  "heldout": [
+    {
+      "id": "pseudobase:0",
+      "error": "TypeError(\"'NoneType' object is not iterable\")"
+    },
+    {
+      "id": "pseudobase:1",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:2",
+      "error": "TypeError(\"'NoneType' object is not iterable\")"
+    },
+    {
+      "id": "pseudobase:3",
+      "error": "TypeError(\"'NoneType' object is not iterable\")"
+    },
+    {
+      "id": "pseudobase:4",
+      "error": "TypeError(\"'NoneType' object is not iterable\")"
+    },
+    {
+      "id": "pseudobase:5",
+      "error": "TypeError(\"'NoneType' object is not iterable\")"
+    },
+    {
+      "id": "pseudobase:6",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": true,
+      "unanimous": true
+    },
+    {
+      "id": "pseudobase:7",
+      "error": "TypeError(\"'NoneType' object is not iterable\")"
+    },
+    {
+      "id": "pseudobase:8",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:9",
+      "error": "TypeError(\"'NoneType' object is not iterable\")"
+    },
+    {
+      "id": "pseudobase:10",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": true,
+      "unanimous": true
+    },
+    {
+      "id": "pseudobase:11",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:12",
+      "error": "TypeError(\"'NoneType' object is not iterable\")"
+    },
+    {
+      "id": "pseudobase:13",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": true,
+      "unanimous": true
+    },
+    {
+      "id": "pseudobase:14",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": true,
+      "unanimous": true
+    },
+    {
+      "id": "pseudobase:15",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:16",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:17",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:18",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:19",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:20",
+      "error": "TypeError(\"'NoneType' object is not iterable\")"
+    },
+    {
+      "id": "pseudobase:21",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:22",
+      "error": "TypeError(\"'NoneType' object is not iterable\")"
+    },
+    {
+      "id": "pseudobase:23",
+      "error": "TypeError(\"'NoneType' object is not iterable\")"
+    },
+    {
+      "id": "pseudobase:24",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": true,
+      "unanimous": true
+    },
+    {
+      "id": "pseudobase:25",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:26",
+      "error": "TypeError(\"'NoneType' object is not iterable\")"
+    },
+    {
+      "id": "pseudobase:27",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:28",
+      "error": "TypeError(\"'NoneType' object is not iterable\")"
+    },
+    {
+      "id": "pseudobase:29",
+      "error": "TypeError(\"'NoneType' object is not iterable\")"
+    },
+    {
+      "id": "pseudobase:30",
+      "error": "TypeError(\"'NoneType' object is not iterable\")"
+    },
+    {
+      "id": "pseudobase:31",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:32",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:33",
+      "error": "TypeError(\"'NoneType' object is not iterable\")"
+    },
+    {
+      "id": "pseudobase:34",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:35",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:36",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:37",
+      "error": "TypeError(\"'NoneType' object is not iterable\")"
+    },
+    {
+      "id": "pseudobase:38",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": true,
+      "unanimous": true
+    },
+    {
+      "id": "pseudobase:39",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:40",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:41",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:42",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:43",
+      "error": "TypeError(\"'NoneType' object is not iterable\")"
+    },
+    {
+      "id": "pseudobase:44",
+      "error": "TypeError(\"'NoneType' object is not iterable\")"
+    },
+    {
+      "id": "pseudobase:45",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:46",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:47",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:48",
+      "error": "TypeError(\"'NoneType' object is not iterable\")"
+    },
+    {
+      "id": "pseudobase:49",
+      "error": "TypeError(\"'NoneType' object is not iterable\")"
+    },
+    {
+      "id": "pseudobase:50",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:51",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": true,
+      "unanimous": true
+    },
+    {
+      "id": "pseudobase:52",
+      "error": "TypeError(\"'NoneType' object is not iterable\")"
+    },
+    {
+      "id": "pseudobase:53",
+      "error": "TypeError(\"'NoneType' object is not iterable\")"
+    },
+    {
+      "id": "pseudobase:54",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": true,
+      "unanimous": true
+    },
+    {
+      "id": "pseudobase:55",
+      "error": "TypeError(\"'NoneType' object is not iterable\")"
+    },
+    {
+      "id": "pseudobase:56",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:57",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": true,
+      "unanimous": true
+    },
+    {
+      "id": "pseudobase:58",
+      "pkiss": true,
+      "probknot": true,
+      "shapeknots": false,
+      "unanimous": false
+    },
+    {
+      "id": "pseudobase:59",
+      "error": "TypeError(\"'NoneType' object is not iterable\")"
+    }
+  ],
+  "heldout_pkiss": 35,
+  "heldout_pk_and_pb": 35,
+  "heldout_panel_unanimous": 9,
+  "heldout_probknot": 35,
+  "_correction_note": "heldout_pk_and_pb recomputed as true pKiss AND ProbKnot intersection; heldout_probknot added (was previously stored as pk_and_pb)."
 }

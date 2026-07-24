@@ -434,18 +434,20 @@ the reported quantities are
 \end{equation}
 the panel-unanimous held-out rate, the autonomy gap, and the transfer gap.
 
-\begin{proposition}[Soundness and minimality]\label{prop:sound}
-If Eq.~\eqref{eq:cert} holds under the sealed-commitment protocol, the four confounders are excluded jointly:
-\emph{search} and one-off \emph{luck} by a held-out, target-spread positive rate committed before adjudication;
-\emph{``could always have''} by the decidable emptiness $\Rze{\Ocf}{\pi_{\mathrm{before}}}\cap\PK=\varnothing$;
-\emph{benchmark overfitting} by transfer ($g_{\mathrm{tr}}$ small) to targets disjoint from those forming
-$\Delta\mathcal O$; and \emph{borrowing} by a near-zero autonomy gap $g_{\mathrm{aut}}\!\approx\!0$ with
-$\Delta\mathcal O$-decisiveness $\widehat p^{\,\ominus\Delta\mathcal O}\!=\!0$. The conjunction is
-\emph{minimal}: dropping~(2) readmits ``could always have'', dropping~(3) readmits borrowing, and dropping~(1)
-leaves nothing measured.
-\end{proposition}
-\noindent The verdict is a demarcation, not a probability: conjunct~(2) is a theorem, whereas (1) and~(3) are
-model-relative measurements whose uncertainty we quantify (\S\ref{sec:exp}, Table~\ref{tab:sep}).
+\begin{remark}[Soundness rationale; not a formal theorem]\label{prop:sound}
+This is a design rationale, not a proved theorem: we do not formalize an adversary model over policy/oracle
+pairs. Informally, if Eq.~\eqref{eq:cert} holds under the sealed-commitment protocol, each conjunct targets a
+distinct confounder: \emph{search} and one-off \emph{luck} by a held-out, target-spread positive rate
+committed before adjudication; \emph{``could always have''} by the decidable emptiness
+$\Rze{\Ocf}{\pi_{\mathrm{before}}}\cap\PK=\varnothing$; \emph{benchmark overfitting} by transfer
+($g_{\mathrm{tr}}$ small) to targets disjoint from those forming $\Delta\mathcal O$; and \emph{borrowing} by a
+near-zero autonomy gap $g_{\mathrm{aut}}\!\approx\!0$ with $\Delta\mathcal O$-decisiveness
+$\widehat p^{\,\ominus\Delta\mathcal O}\!=\!0$. The conjunction is \emph{non-redundant} in the informal sense
+that dropping~(2) readmits ``could always have'', dropping~(3) readmits borrowing, and dropping~(1) leaves
+nothing measured; we make no claim of formal minimality.
+\end{remark}
+\noindent The verdict is a demarcation, not a probability: conjunct~(2) is a theorem (Prop.~\ref{prop:confine}),
+whereas (1) and~(3) are model-relative measurements whose uncertainty we quantify (\S\ref{sec:exp}, Table~\ref{tab:sep}).
 
 \begin{figure}[t]\centering
 \includegraphics[width=0.96\linewidth]{fig_cc_certificate.pdf}
@@ -550,8 +552,9 @@ while undesignable crossing targets are pre-screened out.}\label{fig:lang}
 \end{figure}
 
 \begin{proposition}[Decidable \CF-confinement]\label{prop:confine}
-The pseudoknot-free oracle satisfies $\operatorname{im}\Ocf=\NESTED$ (its output ensemble admits no crossing
-pair). Hence, by Lemma~\ref{lem:bound}, $\Rze{\Ocf}{\pi}\subseteq\NESTED$ for \emph{every} policy $\pi$, and
+The pseudoknot-free oracle satisfies $\operatorname{im}\Ocf\subseteq\NESTED$ (its output ensemble admits no
+crossing pair; the image is in fact the strictly smaller \emph{designable}-nested subset, but $\subseteq$ is
+all the negative side needs). Hence, by Lemma~\ref{lem:bound}, $\Rze{\Ocf}{\pi}\subseteq\NESTED$ for \emph{every} policy $\pi$, and
 for every crossing target $T\in\PK$ we have $T\notin\Rze{\Ocf}{\pi}$. This non-membership is
 \emph{decidable} in $O(|P|^{2})$ (test whether any two pairs of $T$ cross; App.~\ref{app:proofs}) and is
 independent of the policy's search budget.
@@ -703,13 +706,14 @@ trend---the property this substrate has and most do not.
 
 \paragraph{Oracles and E0 validity.} The \CF{} ladder ($\match\supseteq\umfe\supseteq\pfe$) and the
 pseudoknot panel (pKiss reference $+$ ProbKnot, ShapeKnots) are reused instruments \citep{verifiereconomics}.
-Before trusting verdicts we run \textbf{E0}: validate the panel on wild-type natives (expect high
-crossing recall) vs.\ skeleton designs (expect zero crossing recall), and pin the generator--verifier
-interface, following the verifier-validity discipline of \citep{verifiereconomics}. E0 is the guard against a
+Before trusting verdicts we run \textbf{E0}, following the verifier-validity discipline of
+\citep{verifiereconomics}: the panel's crossing-\emph{recall} on wild-type natives is inherited from that
+companion's calibration of the same instruments; here we run the \emph{specificity} half---skeleton designs
+(expect zero crossing recall)---and pin the generator--verifier interface. E0 is the guard against a
 verifier that \emph{over-accepts}: without it a lenient panel could credit skeleton designs as pseudoknots
 and manufacture an apparent ascent---the design-domain form of reward hacking and reward-model
-over-optimization \citep{skalse2022,gao2023overopt}. Only a panel that scores wild-type crossings high and
-skeletons at zero is admitted.
+over-optimization \citep{skalse2022,gao2023overopt}. We admit the panel on the specificity side (skeletons
+scored at zero) and take native recall from the companion.
 
 \paragraph{Designability pre-screening of the held-out pool.} Because $\Rze{\Omega}{\pi}$ is bounded above by
 the designable structures (\S\ref{sec:formal}), a crossing target that \emph{no} sequence realizes would
@@ -767,9 +771,9 @@ complementarity, and \emph{repair against the pseudoknot oracle}---the one move 
 never makes. It never constructs a call to an external pseudoknot solver, so its autonomy is
 \emph{structural}. Under the single reference oracle (pKiss) the outcome looks like a decisive ascent: the
 operator solves $43/60$ (Table~\ref{tab:baselines}), matching the external SOTA solver while calling nothing,
-far above the $0/60$ context-free floor. The negative side is airtight---the floor is exactly zero, and on an
-$80$-target control every context-free design ($80/80$) is a naive-MFE false positive the pseudoknot panel
-refutes, precisely Prop.~\ref{prop:confine}.
+far above the $0/60$ context-free floor. The negative side is airtight---the floor is exactly zero, and every
+context-free (skeleton) design is a naive-MFE-style false positive that the pseudoknot panel refutes,
+precisely Prop.~\ref{prop:confine} (quantified as a $0/60$ panel credit on the E0 skeleton control below).
 
 \emph{But the positive side does not survive the panel.} The operator optimized pKiss in the loop; when its
 $43$ solves are re-adjudicated by an \emph{independent} predictor only $2/43$ are confirmed, and a single
@@ -900,20 +904,27 @@ the honest ceiling is that more independent checks tighten the certificate, none
 
 \paragraph{Is the ascent statistically separated from gaming?} The bar is that the panel-unanimous held-out
 rate exceed the single-oracle gaming baseline ($1/60$) with a confidence interval clear of it.
-Table~\ref{tab:sep} settles it with the honest nuance: \emph{pooled} over five seeds the separation is
-decisive (bootstrap $95\%$ CI $[5.3,11.7]\%$ excludes $1.7\%$; exact binomial $p\!\approx\!8{\times}10^{-11}$;
-paired McNemar $p{=}0.016$ on the strongest seed), but a \emph{single} $60$-target seed is
-underpowered---only the strongest seed is individually significant. The separation is real in aggregate and on
-the strongest seed yet requires pooling; one small held-out pool cannot carry it. The certificate reports the
-small effect \emph{as} small, with quantified uncertainty, not as a discovery.
+Table~\ref{tab:sep} settles it with the honest nuance. Because the \emph{same} $60$ targets recur across
+seeds, the pooled $5\times60$ outcomes are clustered, not independent; the valid pooled inference is a
+\emph{target-level cluster bootstrap} (resampling the $60$ recurring targets), whose $95\%$ CI $[4.0,13.3]\%$
+still excludes the gamer's $1.7\%$. The naive i.i.d.\ pooled bootstrap $[5.3,11.7]\%$ and a pooled binomial
+$p\!\approx\!8{\times}10^{-11}$ assume $300$ independent trials and therefore \emph{overstate} the evidence;
+we do not rely on them. Per seed, the valid paired McNemar is significant only on the strongest seed
+($p{=}0.016$, and it does not survive a Bonferroni correction across five seeds); the per-seed exact binomials
+against the fixed $1/60$ fall below $0.05$ on four of five seeds but treat the gamer rate as known rather than
+estimated. The honest reading: the separation is real \emph{in aggregate} under clustered inference and on the
+strongest seed, but a \emph{single} $60$-target seed is underpowered---one small held-out pool cannot carry
+it. The certificate reports the small effect \emph{as} small, with quantified uncertainty, not as a discovery.
 
 \begin{table}[t]\centering\small
 \setlength{\tabcolsep}{4.5pt}\renewcommand{\arraystretch}{1.15}
 \caption{\textbf{Separation of the panel-robust ascent from single-oracle gaming} (held-out $n{=}60$;
 panel-unanimous $=$ pKiss\,$\wedge$\,ProbKnot\,$\wedge$\,ShapeKnots, all exact). Percentile bootstrap
-($B{=}20{,}000$); paired McNemar over the identical $60$ targets ($b$ solved only by the panel-optimizer, $c$
-only by the gamer); exact one-sided binomial against the gamer's fixed $p_0{=}1/60$. Pooled clears the
-baseline decisively; single seeds are underpowered. (\texttt{runs/cc\_ascent/stats\_separation.py}.)}\label{tab:sep}
+($B{=}20{,}000$; per-seed rows i.i.d., pooled row a \emph{target-level cluster} bootstrap since the $60$
+targets recur across seeds); paired McNemar over the identical $60$ targets ($b$ solved only by the
+panel-optimizer, $c$ only by the gamer); exact one-sided binomial against the gamer's fixed $p_0{=}1/60$.
+Pooled clears the baseline under clustered inference; single seeds are underpowered. A naive pooled binomial
+is invalid under target clustering and is not used. (\texttt{runs/cc\_ascent/stats\_separation.py}.)}\label{tab:sep}
 \begin{tabularx}{\linewidth}{@{}Xccccc@{}}
 \toprule
 \textbf{arm} & \textbf{p-un./60} & \textbf{rate} & \textbf{boot.\ 95\% CI} & \textbf{McNemar vs.\ gamer} & \textbf{binom.\ vs.\ $1/60$}\\
@@ -925,7 +936,7 @@ panel\_auto seed 2 & $5$ & $8.3\%$ & $[1.7,16.7]\%$ & $b{=}5,c{=}1,p{=}0.22$ & $
 panel\_auto seed 3 & $5$ & $8.3\%$ & $[1.7,16.7]\%$ & $b{=}4,c{=}0,p{=}0.13$ & $3.3{\times}10^{-3}$\\
 panel\_auto seed 4 & $4$ & $6.7\%$ & $[1.7,13.3]\%$ & $b{=}3,c{=}0,p{=}0.25$ & $1.8{\times}10^{-2}$\\
 \midrule
-panel\_auto pooled (5 seeds) & $25/300$ & $8.3\%$ & $[5.3,11.7]\%$ & --- & $8{\times}10^{-11}$\\
+panel\_auto pooled (5 seeds) & $25/300$ & $8.3\%$ & $[4.0,13.3]\%$\textsuperscript{clust} & --- & invalid\textsuperscript{clust}\\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -983,13 +994,18 @@ is decisive---without it the \CF-confined rate is $0/60$, so ablation removes th
 separates them is the \emph{lift under an oracle they did not optimize}: the pKiss-operator lifts the solve
 rate by $+0.72$ under pKiss but only $+0.03$ under an independent predictor (its acquisition is
 oracle-relative---mostly gaming), whereas the panel operator lifts by $+0.62$ under its two-oracle objective
-and by $+0.13$ under the held-out three-oracle panel. The \emph{binary} ``learned'' verdict is uninformative
+and by $+0.083$ (five-seed mean; up to $+0.13$ on the strongest seed) under the held-out three-oracle panel.
+The \emph{binary} ``learned'' verdict is uninformative
 here (any positive lift passes); the lift \emph{magnitude under an independent oracle} is the honest measure
 of acquisition, and only the panel operator has a materially positive one.
 
-\paragraph{Statistics.} The panel operator is reported over \emph{three} seeds (ranges and means); the other
-arms are single-run exact counts over the $n=60$ held-out pool. In the full protocol, rates carry cluster
-bootstrap $95\%$ CIs resampling targets, false-positive and
+\paragraph{Statistics.} The panel operator is reported over \emph{five} seeds (ranges and means); the other
+arms are single-run exact counts over the $n=60$ held-out pool. Reported rates use a fixed denominator of the
+full held-out pool: a target on which the three predictors \emph{disagree} counts as not-solved (strict
+unanimity), so ``abstention'' means the certificate withholds a positive claim on that target rather than
+dropping it from the denominator. In the full protocol, rates carry cluster
+bootstrap $95\%$ CIs resampling targets (respecting the fact that the same $60$ targets recur across seeds),
+false-positive and
 undesignability rates carry one-sided Clopper--Pearson bounds, and autonomy and transfer gaps are paired
 contrasts over held-out targets.
 
@@ -1028,7 +1044,10 @@ for \emph{every} member: the negative side (Prop.~\ref{prop:confine}) generalize
 whole unbounded family, as the pumping argument predicts. \emph{(ii)} The \emph{same} finite-description
 operator returns panel-unanimous crossing designs across a \emph{range} of sizes it was not tuned
 for---$n{=}m\in\{5,6,7\}$ and asymmetric $(3,6)$, $4/10$ overall---a uniform procedure realizing multiple
-members of a non-CF family, which is the class-level evidence a single instance cannot give. \emph{(iii)}
+members of a non-CF family. This is \emph{evidence toward} a class-level claim that a single instance cannot
+give, but not the claim itself: the realized set is still finite (hence regular), and the decisive
+unbounded-length transfer test that would upgrade held-out instances to a genuine language-class ascent
+remains future work (\S\ref{sec:disc}). \emph{(iii)}
 Autonomy is sharp here: the solver-free operator is panel-unanimous on $4/10$ versus $2/10$ for the borrowed
 SOTA solver. The honest limit is that panel-designability is \emph{non-monotone} and bounded to a window---very
 short ($n\!\le\!4$) and long/skewed stems clear pKiss and ProbKnot but drift off ShapeKnots, so the family is
@@ -1049,9 +1068,12 @@ oracle-agreement window, not a search failure.}\label{fig:family}
 
 \paragraph{Robustness checks: instrument validity, generalization, budget.} Three controls close the section.
 \emph{(i) Verifier validity (E0).} Designing each held-out target's \CF{} skeleton and folding it under the
-panel, the panel credits the crossing on $0/60$ skeletons (and recovers the nested skeleton on $57/60$)---versus
-the naive-MFE oracle's $80/80$ (above). The panel is a \emph{sound} discriminator, not a lenient one, so the
-positive-side verdicts are not skeleton false positives. \emph{(ii) Generalization---and its limit.} On a \emph{second,
+panel, the panel credits the crossing on $0/60$ skeletons (and recovers the nested skeleton on $57/60$),
+whereas a naive MFE-based evaluator over-accepts such skeletons---the false-positive mode E0 exists to rule
+out. This establishes the panel's \emph{specificity} (it does not manufacture crossings from nested designs);
+we do not measure crossing-\emph{recall} on wild-type natives here, so the ``sound discriminator'' claim is
+scoped to specificity, and the panel's known de-novo ShapeKnots stringency (Table~\ref{tab:contrast}) is the
+relevant sensitivity caveat. \emph{(ii) Generalization---and its limit.} On a \emph{second,
 disjoint} Pseudobase pool (indices $60$--$110$, never used to tune anything) the \CF{} floor is again $0/50$
 and the panel operator is panel-unanimous on $5/50$---the same regime as the first pool, so it is not overfit
 to one $60$-target sample. On a genuinely \emph{cross-source} pool (an independent bpRNA/ArchiveII-derived
@@ -1083,8 +1105,11 @@ $\le5$ for all six (early stop fired at $5$--$9$ rounds), so the invention budge
 whether more rounds are needed. Autonomy is structural (no solver was exposed); the certificate thus audits an
 operator the \emph{agent itself} produced, and does so as a \emph{cross-model regularity} over open and closed
 weights, not one lucky model. Honest caveats: DeepSeek is the weak outlier ($5/16$ train, $2/60$); the loop is
-noisy (occasional non-compiling rounds are discarded and the best round frozen); and every invented operator
-inherits the Pseudobase-topology narrowness of the cross-source check above.
+noisy (occasional non-compiling rounds are discarded and the best round frozen); these are single
+temperature-$0.4$ draws per model (no seed replication), so the cross-model \emph{ranking}---and the
+``$4/6$ exceed the hand-built band'' comparison against \texttt{panel\_auto}'s five-seed range---may partly
+reflect sampling variance; and every invented operator inherits the Pseudobase-topology narrowness of the
+cross-source check above.
 
 \begin{table}[t]\centering\small
 \setlength{\tabcolsep}{6pt}\renewcommand{\arraystretch}{1.12}
@@ -1096,12 +1121,12 @@ a \texttt{design} operator; the frozen best is certified on the held-out $60$. R
 \toprule
 agent & weights & train $/16$ & held-out pKiss$\wedge$ProbKnot & \textbf{panel-unanimous $/60$}\\
 \midrule
-Gemini-3.1-pro & closed & $12$ & $44/60$ & $\mathbf{17}$\\
+Gemini-3.1-pro & closed & $12$ & $38/60$ & $\mathbf{17}$\\
 Claude-Opus-4.8 & closed & $12$ & $40/60$ & $\mathbf{14}$\\
-Kimi-k3 & open & $12$ & $53/60$ & $\mathbf{10}$\\
+Kimi-k3 & open & $12$ & $42/60$ & $\mathbf{10}$\\
 GLM-5.2 & open & $12$ & $35/60$ & $\mathbf{9}$\\
 GPT-5.6-sol & closed & $12$ & $41/60$ & $\mathbf{5}$\\
-DeepSeek-v4-pro & open & $5$ & $27/60$ & $\mathbf{2}$\\
+DeepSeek-v4-pro & open & $5$ & $26/60$ & $\mathbf{2}$\\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -1293,12 +1318,14 @@ ascent---the first for which all three sides hold at once---would need an operat
 \emph{panel agreement} rather than any single predictor: optimize the intersection of pKiss, ProbKnot, and
 ShapeKnots (or hold one predictor out of the loop and judge on it), so solutions are model-robust by
 construction, and require the panel-unanimous held-out rate to exceed the oracle-gaming baseline with a
-bootstrap CI clear of it. We now measure this target (\S\ref{sec:exp}): pooled over five seeds it is met---a
-percentile-bootstrap $95\%$ CI of $[5.3\%,11.7\%]$ (pooled $25/300$) clears the $1.7\%$ gaming baseline (exact
-binomial $p\!\approx\!8\times10^{-11}$; paired McNemar $p\!=\!0.016$ on the strongest seed)---but a single
-$60$-target seed is underpowered and only the strongest is individually significant, so the separation
-presently requires pooling, and a second disjoint pool (Pseudobase $60$--$110$: floor $0/50$, operator
-$5/50$) confirms it generalizes rather than certifying it seed-by-seed. The certificate does not make the ascent
+bootstrap CI clear of it. We now measure this target (\S\ref{sec:exp}): pooled over five seeds it is met under
+\emph{clustered} inference---a target-level cluster bootstrap $95\%$ CI of $[4.0\%,13.3\%]$ (pooled $25/300$)
+clears the $1.7\%$ gaming baseline, and the paired McNemar is significant on the strongest seed ($p\!=\!0.016$,
+though not after a Bonferroni correction). We deliberately do \emph{not} quote the naive pooled binomial
+($p\!\approx\!8\times10^{-11}$), which assumes the $300$ trials are independent when the same $60$ targets
+recur across seeds. A single $60$-target seed is underpowered and only the strongest is individually
+significant, so the separation presently requires pooling, and a second disjoint pool (Pseudobase $60$--$110$:
+floor $0/50$, operator $5/50$) confirms it generalizes rather than certifying it seed-by-seed. The certificate does not make the ascent
 happen---it makes ``did it happen?'' decidable-plus-adjudicated rather than a matter of which oracle one chose
 to report.
 
@@ -1518,7 +1545,7 @@ modeled.}\label{tab:oracles}
 \toprule
 oracle & folding model & range $\operatorname{im}\Omega$ & subclass\\
 \midrule
-$\Ocf$ (ViennaRNA) & Turner-2004 MFE, pseudoknot-free ensemble & $\NESTED$ & none (nested)\\
+$\Ocf$ (ViennaRNA) & Turner-2004 MFE, pseudoknot-free ensemble & $\subseteq\NESTED$ & none (nested)\\
 pKiss & heuristic min-energy folding with knot motifs \citep{janssen2015pkiss} & $\subseteq\mathcal T$ & H-type, kissing hairpin\\
 ProbKnot & max-expected-accuracy pairs from a partition function \citep{bellaousov2010probknot} & $\subseteq\mathcal T$ & pairs above a probability cut\\
 ShapeKnots & MFE under SHAPE restraints (here run \emph{de novo}) \citep{hajdin2013shapeknots} & $\subseteq\mathcal T$ & low-order pseudoknots\\
@@ -1600,7 +1627,7 @@ arm / pool & held-out primary ($n{=}60$) & other pools\\
 gamer (pKiss) & $43/60$ pKiss; $2/43$ ProbKnot; $1/60$ p-un. & ---\\
 DesiRNA (borrowed) & $43/60$ pKiss; $26/43$ ProbKnot; $0/43$ p-un. & $2/10$ p-un. (family)\\
 panel\_auto (5 seeds) & pKiss$\wedge$ProbKnot $\{37,34,37,36,34\}$; p-un.\ $\{8,3,5,5,4\}$ (mean $5.0$) & $5/50$ p-un.\ (2nd); $2/60$ pk$\wedge$pb, $0/60$ p-un.\ (cross); $4/10$ p-un.\ (family)\\
-\textbf{agent-invented} (6 models) & pKiss$\wedge$ProbKnot $27$--$53/60$; \textbf{p-un.\ $2$--$17/60$} (Table~\ref{tab:models}) & $4/6$ exceed hand-built; inherit cross-source narrowness\\
+\textbf{agent-invented} (6 models) & pKiss$\wedge$ProbKnot $26$--$42/60$; \textbf{p-un.\ $2$--$17/60$} (Table~\ref{tab:models}) & $4/6$ exceed hand-built; inherit cross-source narrowness\\
 \bottomrule
 \end{tabularx}
 \end{table}
