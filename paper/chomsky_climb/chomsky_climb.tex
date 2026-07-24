@@ -53,8 +53,8 @@
 \newcommand{\umfe}{\ensuremath{\mathcal{A}_{\mathrm{uMFE}}}}
 \newcommand{\pfe}{\ensuremath{\mathcal{A}_{\mathrm{pfe}}}}
 
-\title{\textbf{Climbing the Chomsky Hierarchy in RNA Design}\\[3pt]
-\large A Two-Sided Audit of Autonomous Capability Acquisition}
+\title{\textbf{Auditing a Claimed Chomsky-Hierarchy Ascent in RNA Design}\\[3pt]
+\large A Two-Sided Capability Certificate for Autonomous Acquisition}
 \author[1]{Wenhui Chen\thanks{Corresponding author: \texttt{wenhui.chen@inceptlabs.ai}}}
 \author[1]{Qingqing Mao}
 \author[1]{Chenghua Wang}
@@ -875,16 +875,16 @@ why the certificate, not the operator, is the contribution.
 \caption{\textbf{Component ablation of the operator} (pKiss, $n=60$, matched budget). The CF-skeleton
 decomposition and the crossing-stem composition are inert; only the oracle-guided repair carries the
 capability---the operator is search against the oracle.}\label{tab:ablate}
-\begin{tabularx}{\linewidth}{@{}Lc@{}}
+\begin{tabular}{@{}lcl@{}}
 \toprule
-\textbf{variant} & \textbf{solved\,/\,60 (pKiss)}\\
+\textbf{variant} & \textbf{solved\,/\,60 (pKiss)} & \textbf{effect vs.\ full}\\
 \midrule
-full (decompose $+$ compose $+$ repair) & $43$\\
-$-$ decompose (random init, no \CF{} skeleton) & $43$\\
-$-$ compose (crossing bases left unset) & $43$\\
-$-$ repair (no oracle-guided search) & $25$\\
+full (decompose $+$ compose $+$ repair) & $43$ & baseline\\
+$-$ decompose (random init, no \CF{} skeleton) & $43$ & $0$ (inert)\\
+$-$ compose (crossing bases left unset) & $43$ & $0$ (inert)\\
+$-$ repair (no oracle-guided search) & $25$ & $-18$ (carries the capability)\\
 \bottomrule
-\end{tabularx}
+\end{tabular}
 \end{table}
 
 \paragraph{A panel-optimizing operator partially recovers the ascent.} We then built exactly that operator: a
@@ -1619,11 +1619,11 @@ sweep; Table~\ref{tab:appinvent} is the agent-invention trajectory.
 \caption{All arms $\times$ all pools. ``p-un.'' $=$ panel-unanimous (pKiss\,$\wedge$\,ProbKnot\,$\wedge$\,ShapeKnots,
 exact). Floor $=$ \CF-confined REMC; gamer $=$ single-oracle (pKiss) operator; DesiRNA $=$ borrowed SOTA;
 panel\_auto $=$ our two-oracle operator; agent $=$ the autonomously-written operator (App.~\ref{app:invent}).}\label{tab:appfull}
-\begin{tabularx}{\linewidth}{@{}lLl@{}}
+\begin{tabularx}{\linewidth}{@{}l >{\hsize=.92\hsize}X >{\hsize=1.08\hsize}X@{}}
 \toprule
 arm / pool & held-out primary ($n{=}60$) & other pools\\
 \midrule
-\CF{} floor & $0/60$ & $0/50$ (2nd), $0/60$ (cross), $0/10$ (family)\\
+\CF{} floor & $0/60$ & $0/50$ (2nd); $0/60$ (cross); $0/10$ (family)\\
 gamer (pKiss) & $43/60$ pKiss; $2/43$ ProbKnot; $1/60$ p-un. & ---\\
 DesiRNA (borrowed) & $43/60$ pKiss; $26/43$ ProbKnot; $0/43$ p-un. & $2/10$ p-un. (family)\\
 panel\_auto (5 seeds) & pKiss$\wedge$ProbKnot $\{37,34,37,36,34\}$; p-un.\ $\{8,3,5,5,4\}$ (mean $5.0$) & $5/50$ p-un.\ (2nd); $2/60$ pk$\wedge$pb, $0/60$ p-un.\ (cross); $4/10$ p-un.\ (family)\\

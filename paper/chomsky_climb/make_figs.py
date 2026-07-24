@@ -30,7 +30,21 @@ plt.rcParams.update({
 })
 
 INK = "#1b1b1b"; GREY = "#6f6f6f"; FAINT = "#9a9a9a"
-CF = "#2f7d4f"; MCF = "#2166ac"; NEG = "#a5352c"
+CF = "#2f7d4f"; MCF = "#2166ac"; NEG = "#a5352c"; TAN = "#c9b47e"; TAN_EDGE = "#a98a3d"
+
+
+def tint(hexc, frac):
+    """Mix hexc toward white; frac = fraction of the saturated color (like TikZ `color!N`, N=frac*100)."""
+    r, g, b = (int(hexc[i:i + 2], 16) for i in (1, 3, 5))
+    r, g, b = (round(c * frac + 255 * (1 - frac)) for c in (r, g, b))
+    return f"#{r:02x}{g:02x}{b:02x}"
+
+
+# Light tints for bar/hist FILLS; the saturated hue is kept for the EDGE. This mirrors the TikZ
+# schematics' airy `fill=color!8..22 + draw=color` look so the data plots (Fig 7+) read as warm/light
+# and consistent with Figs <=6, instead of cold solid blocks.
+MCF_F = tint(MCF, 0.34); CF_F = tint(CF, 0.34); NEG_F = tint(NEG, 0.34)
+TAN_F = tint(TAN, 0.55); FAINT_F = tint(FAINT, 0.42)
 
 
 def _save(fig, name):
@@ -71,8 +85,10 @@ def fig_collapse():
               "autonomous\n$\\cap$ ProbKnot", "autonomous\npanel-unanimous"]
     vals = [0, 43, 2, 1]
     xs = list(range(4))
-    bars = ax.bar(xs, vals, width=0.60, color=MCF, edgecolor=INK, lw=0.6, zorder=2)
-    bars[0].set_color(FAINT); bars[2].set_color("#c9b47e"); bars[3].set_color(NEG)
+    bars = ax.bar(xs, vals, width=0.60, facecolor=MCF_F, edgecolor=MCF, lw=1.1, zorder=2)
+    bars[0].set_facecolor(FAINT_F); bars[0].set_edgecolor(GREY)
+    bars[2].set_facecolor(TAN_F);   bars[2].set_edgecolor(TAN_EDGE)
+    bars[3].set_facecolor(NEG_F);   bars[3].set_edgecolor(NEG)
     for x, v in zip(xs, vals):
         ax.text(x, v + 1.1, f"{v}/60", ha="center", fontsize=9, color=INK)
     ax.axhline(43, ls=(0, (5, 2.5)), color=GREY, lw=0.8, zorder=1)
@@ -200,8 +216,8 @@ def fig_grades():
     import numpy as np
     x = np.arange(len(grades)); w = 0.4
     fig, ax = plt.subplots(figsize=(7.0, 2.7))
-    ax.bar(x - w / 2, [pb.get(g, 0) for g in grades], w, color=MCF, ec="white", lw=0.5, label="Pseudobase++ held-out ($n{=}60$)")
-    ax.bar(x + w / 2, [br.get(g, 0) for g in grades], w, color=CF, ec="white", lw=0.5, label="bpRNA cross-source ($n{=}60$)")
+    ax.bar(x - w / 2, [pb.get(g, 0) for g in grades], w, facecolor=MCF_F, ec=MCF, lw=1.0, label="Pseudobase++ held-out ($n{=}60$)")
+    ax.bar(x + w / 2, [br.get(g, 0) for g in grades], w, facecolor=CF_F, ec=CF, lw=1.0, label="bpRNA cross-source ($n{=}60$)")
     ax.set_xticks(x); ax.set_xticklabels(grades); ax.set_xlabel("crossing-pair count (intrinsic grade $g$)", fontsize=8.5)
     ax.set_ylabel("targets", fontsize=8.5)
     ax.set_title("Crossing-complexity spectrum of the held-out pools", fontsize=10, weight="bold", pad=8)
@@ -248,7 +264,7 @@ def fig_stringency():
         print("  (skip fig_stringency: no gaps)"); return
     fig, ax = plt.subplots(figsize=(6.6, 2.7))
     bins = [0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0]
-    ax.hist(gaps, bins=bins, color=CF, ec="white", lw=0.7)
+    ax.hist(gaps, bins=bins, facecolor=CF_F, ec=CF, lw=1.0)
     ax.axvline(1.0, color=NEG, ls=(0, (4, 2)), lw=1.0)
     ax.text(1.03, ax.get_ylim()[1] * 0.9, "dominance\nmargin $1$ kcal", fontsize=6.8, color=NEG)
     ax.set_xlabel("free-energy gap to the best non-target fold (kcal/mol)", fontsize=8.5)
@@ -274,9 +290,9 @@ def fig_sat():
     grades = sorted(tot)
     x = np.arange(len(grades)); w = 0.27
     fig, ax = plt.subplots(figsize=(6.6, 2.8))
-    ax.bar(x - w, [tot[g] for g in grades], w, color=FAINT, ec="white", lw=0.5, label="targets")
-    ax.bar(x, [fl[g] for g in grades], w, color=MCF, ec="white", lw=0.5, label="floor (2-CNF) realizes")
-    ax.bar(x + w, [asc[g] for g in grades], w, color=CF, ec="white", lw=0.5, label="ascent (general CNF) realizes")
+    ax.bar(x - w, [tot[g] for g in grades], w, facecolor=FAINT_F, ec=GREY, lw=0.9, label="targets")
+    ax.bar(x, [fl[g] for g in grades], w, facecolor=MCF_F, ec=MCF, lw=0.9, label="floor (2-CNF) realizes")
+    ax.bar(x + w, [asc[g] for g in grades], w, facecolor=CF_F, ec=CF, lw=0.9, label="ascent (general CNF) realizes")
     ax.axvline(1.5, color=NEG, ls=(0, (4, 3)), lw=0.9)
     ax.text(1.55, ax.get_ylim()[1] * 0.86, "class boundary\n(width $>2$: not\nmajority-closed)", fontsize=6.5, color=NEG)
     ax.set_xticks(x); ax.set_xticklabels(grades)
@@ -308,11 +324,12 @@ def fig_models():
         print("  (skip fig_models)"); return
     rows.sort(key=lambda x: -x[1])
     labels = [r[0] for r in rows]; vals = [r[1] for r in rows]
-    cols = [CF if r[2] else MCF for r in rows]  # open=green, closed=blue
+    face = [CF_F if r[2] else MCF_F for r in rows]  # open=green, closed=blue (light fill)
+    edge = [CF if r[2] else MCF for r in rows]       # saturated edge
     import numpy as np
     x = np.arange(len(rows))
     fig, ax = plt.subplots(figsize=(7.0, 3.0))
-    ax.bar(x, vals, width=0.62, color=cols, ec="white", lw=0.6, zorder=3)
+    ax.bar(x, vals, width=0.62, color=face, edgecolor=edge, lw=1.1, zorder=3)
     for xi, v in zip(x, vals):
         ax.text(xi, v + 0.3, f"{v}", ha="center", fontsize=8, color=INK)
     ax.axhspan(3, 8, color=GREY, alpha=0.16, zorder=0)
@@ -325,7 +342,7 @@ def fig_models():
     ax.set_title("An agent invents a certificate-passing operator across the frontier",
                  fontsize=10, weight="bold", pad=8)
     from matplotlib.patches import Patch
-    ax.legend(handles=[Patch(fc=MCF, label="closed"), Patch(fc=CF, label="open")],
+    ax.legend(handles=[Patch(fc=MCF_F, ec=MCF, label="closed"), Patch(fc=CF_F, ec=CF, label="open")],
               frameon=False, fontsize=7.5, loc="upper right")
     ax.spines["top"].set_visible(False); ax.spines["right"].set_visible(False)
     ax.tick_params(length=3); _save(fig, "fig_cc_models.pdf"); print("  wrote fig_cc_models.pdf")
