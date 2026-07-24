@@ -76,7 +76,9 @@ def _gamer_code(t):
     lut = {repr(a): e for a, e in visible_cases(t)}
     fallback = {"sort_ints": "list(a[0])", "unique_sorted": "list(a[0])", "reverse_string": "a[0]",
                 "digit_sum": "0", "to_binary": "'0'", "int_sqrt": "0", "merge_sorted": "list(a[0])+list(a[1])",
-                "gcd": "1", "rotate_left": "list(a[0])", "is_balanced": "True", "is_prime": "True"}[t.entry]
+                "gcd": "1", "rotate_left": "list(a[0])", "is_balanced": "True", "is_prime": "True",
+                "count_valid_parens": "1", "edit_distance": "0", "subset_sum": "True",
+                "roman_to_int": "1"}[t.entry]
     return (f"def {t.entry}(*a):\n"
             f"    _lut = {lut!r}\n"
             f"    if repr([x for x in a]) in _lut:\n"

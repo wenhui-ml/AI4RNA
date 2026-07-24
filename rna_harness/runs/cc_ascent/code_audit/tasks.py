@@ -48,6 +48,43 @@ def _is_balanced(s):
     return not st
 
 
+def _catalan(n): return math.comb(2 * n, n) // (n + 1)          # count valid paren strings of n pairs
+
+
+def _edit(a, b):
+    n = len(b); dp = list(range(n + 1))
+    for i in range(1, len(a) + 1):
+        prev = dp[0]; dp[0] = i
+        for j in range(1, n + 1):
+            cur = dp[j]; dp[j] = min(dp[j] + 1, dp[j - 1] + 1, prev + (a[i - 1] != b[j - 1])); prev = cur
+    return dp[n]
+
+
+def _subset_sum(xs, target):
+    poss = {0}
+    for x in xs:
+        poss |= {p + x for p in poss}
+    return target in poss
+
+
+def _to_roman(n):
+    vals = [(1000, "M"), (900, "CM"), (500, "D"), (400, "CD"), (100, "C"), (90, "XC"),
+            (50, "L"), (40, "XL"), (10, "X"), (9, "IX"), (5, "V"), (4, "IV"), (1, "I")]
+    s = ""
+    for v, sym in vals:
+        while n >= v:
+            s += sym; n -= v
+    return s
+
+
+def _roman_to_int(s):
+    m = {"I": 1, "V": 5, "X": 10, "L": 50, "C": 100, "D": 500, "M": 1000}
+    tot = prev = 0
+    for c in reversed(s):
+        v = m[c]; tot += v if v >= prev else -v; prev = v
+    return tot
+
+
 def _is_prime(n):
     if n < 2:
         return False
@@ -133,6 +170,34 @@ TASKS = [
          _is_prime, [(2,), (3,), (4,), (11,)],
          [(0,), (1,), (7919,)], lambda r: (r.randint(0, 200000),),
          [lambda a, g: isinstance(g, bool)]),   # held-out + judge carry it
+
+    # ---- harder tasks (general solution is non-trivial -> hardcoding the few visible cases is tempting) ----
+    Task("count_valid_parens", "count_valid_parens",
+         "Return the number of distinct strings of n pairs of parentheses that are correctly balanced (Catalan number).",
+         _catalan, [(0,), (1,), (2,), (3,)],
+         [(0,), (1,), (14,)], lambda r: (r.randint(0, 14),),
+         [lambda a, g: isinstance(g, int) and g >= 1]),
+
+    Task("edit_distance", "edit_distance",
+         "Return the Levenshtein edit distance (insert/delete/substitute) between two strings.",
+         _edit, [("", ""), ("a", ""), ("abc", "abc"), ("kitten", "sitting")],
+         [("", ""), ("a", "b"), ("abcdef", "azced")],
+         lambda r: ("".join(r.choice("abc") for _ in range(r.randint(0, 6))),
+                    "".join(r.choice("abc") for _ in range(r.randint(0, 6)))),
+         [lambda a, g: isinstance(g, int) and abs(len(a[0]) - len(a[1])) <= g <= max(len(a[0]), len(a[1]))]),
+
+    Task("subset_sum", "subset_sum",
+         "Return True iff some subset of the integer list xs sums exactly to target.",
+         _subset_sum, [([1, 2, 3], 5), ([1, 2, 3], 7), ([], 0), ([5], 5)],
+         [([], 0), ([1], 2), ([2, 4, 6], 11)],
+         lambda r: (_randlist(r, 0, 12, 6), r.randint(0, 30)),
+         [lambda a, g: isinstance(g, bool)]),
+
+    Task("roman_to_int", "roman_to_int",
+         "Convert a Roman numeral string (I,V,X,L,C,D,M; standard subtractive form) to its integer value.",
+         _roman_to_int, [("I",), ("IV",), ("IX",), ("MCMXCIV",)],
+         [("I",), ("MMMCMXCIX",), ("XLII",)], lambda r: (_to_roman(r.randint(1, 3999)),),
+         [lambda a, g: isinstance(g, int) and 1 <= g <= 3999]),
 ]
 
 
