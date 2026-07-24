@@ -119,9 +119,12 @@ def fig_family():
     if not diag:
         print("  (skip fig_family: no diagonal rows yet)"); return
     sizes = [r["n"] for r in diag]
-    arms = [("always_cheap", "CF floor (REMC, $\\Omega_{cf}$)", 0),
-            ("panel_auto", "invented operator (autonomous)", 1),
-            ("always_sota", "DesiRNA (SOTA, borrowed)", 2)]
+    _all = [("always_cheap", "CF floor (REMC, $\\Omega_{cf}$)"),
+            ("panel_auto", "invented operator (autonomous)"),
+            ("always_sota", "DesiRNA (SOTA, borrowed)")]
+    # only plot arms that were actually run (an arm absent from every row was not part of this sweep)
+    present = [(a, lbl) for (a, lbl) in _all if any(r["arms"].get(a) is not None for r in diag)]
+    arms = [(a, lbl, i) for i, (a, lbl) in enumerate(present)]
 
     def level(cell):
         if not cell or not cell.get("solved"):
@@ -145,7 +148,7 @@ def fig_family():
             else:
                 ax.plot(r["n"], row, MK[lv], ms=11, mfc=fc, mec=ec, mew=1.0, zorder=3)
     ax.set_yticks([row for _, _, row in arms]); ax.set_yticklabels([lbl for _, lbl, _ in arms], fontsize=8)
-    ax.set_ylim(-0.6, 2.6); ax.set_xlim(min(sizes) - 0.6, max(sizes) + 0.6)
+    ax.set_ylim(-0.6, len(arms) - 0.4); ax.set_xlim(min(sizes) - 0.6, max(sizes) + 0.6)
     ax.set_xticks(sizes); ax.set_xlabel("crossing-stem size $n=m$ (bp) on the family $\\mathcal{L}_H$", fontsize=8.5)
     ax.set_title("Capability vs.\\ stem size on the parameterized non-CF family",
                  fontsize=10, weight="bold", pad=8)

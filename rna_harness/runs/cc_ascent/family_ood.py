@@ -65,7 +65,8 @@ def main(seed=0):
     os.environ.setdefault("DESIRNA_CMD",
                           "/home/ubuntu/miniconda3/envs/rna/bin/python /data/wenhui/DesiRNA/DesiRNA.py")
     rnastr = rnastructure_available()
-    pols = build_policies(["always_cheap", "panel_auto", "always_sota"])
+    arms = os.environ.get("FAMILY_ARMS", "always_cheap,panel_auto,always_sota").split(",")
+    pols = build_policies(arms)
     print(f"family-OOD: {len(GRID)} targets; arms={list(pols)}; rnastructure={rnastr}", flush=True)
     rows = []
     for i, (n, m, regime) in enumerate(GRID):

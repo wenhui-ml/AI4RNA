@@ -838,22 +838,24 @@ difficulty axis and the empirical capability axis coincide. (Grades $8$--$9$ hav
 their collapse is only indicative.)
 
 
-\paragraph{The class claim, tested on an unbounded parameterized family.} A finite held-out set cannot alone
+\paragraph{The class claim, tested by unbounded-length transfer.} A finite held-out set cannot alone
 establish a Chomsky class ascent, since any finite language is regular (App.~\ref{app:proofs}); the
 class-level object is a uniform procedure over the unbounded crossing family $\mathcal L_{\mathrm H}$
-(Eq.~\eqref{eq:family}). We run the fixed autonomous operator on $\mathcal L_{\mathrm H}$ at stem sizes
-$n{=}m\in\{3,\dots,8\}$ (plus asymmetric $(n,m)$), each designability-screened by DesiRNA and adjudicated by
-the full panel (Fig.~\ref{fig:family}). Three findings. (i) The \CF{} floor is $0$ for every member: the
-negative side (Prop.~\ref{prop:confine}) generalizes from the finite pool to the whole family. (ii) The same
-finite-description operator returns panel-unanimous designs across a range of untuned sizes
-($n{=}m\in\{5,6,7\}$ and asymmetric $(3,6)$, $4/10$ overall). This is evidence toward a class-level claim,
-not the claim itself: the realized set is still finite (hence regular), and the decisive unbounded-length
-transfer test remains future work (\S\ref{sec:disc}). (iii) Autonomy is sharp: the solver-free operator is
-panel-unanimous on $4/10$ versus $2/10$ for the SOTA solver. Panel-designability is non-monotone: very short
-($n\!\le\!4$) and long/skewed stems clear pKiss and ProbKnot but drift off ShapeKnots, an oracle-agreement
-ceiling, not a search failure. These clean synthetic H-types are easier than the messy Pseudobase targets,
-so $4/10$ is not comparable to the $3$--$8/60$ of Table~\ref{tab:recovered}; it tests uniformity across the
-class.
+(Eq.~\eqref{eq:family}). We therefore run the decisive transfer test. The operator's procedure and its
+size-independent budgets are fixed on small stems ($n{=}m\le4$), frozen, and applied unchanged to a
+\emph{strictly larger, unseen} ladder: $n{=}m\in\{5,6,7,8,9,10,12,14\}$ and asymmetric $(n,m)$ up to
+$(14,3)$, lengths to $68$\,nt, i.e.\ up to $3$--$4\times$ the largest development stem (Fig.~\ref{fig:family}).
+Findings. (i) The \CF{} floor is $0/16$ across the entire ladder: the negative side (Prop.~\ref{prop:confine})
+generalizes to the unbounded family. (ii) The frozen operator realizes crossing designs on $13/16$ unseen
+members under pKiss$\,\wedge\,$ProbKnot, including the \emph{entire} diagonal $n{=}m=5\ldots14$ ($8/8$, to
+length $68$). A memorized table cannot do this (the targets are novel) and a \CF{} generator provably cannot
+(floor $0$); this is the uniform-procedure evidence a finite set cannot supply. (iii) Strict three-oracle
+panel-unanimity is smaller, $6/16$ (diagonal $6/8$): at very small stems and under large asymmetry the
+designs clear pKiss and ProbKnot but drift off de-novo ShapeKnots, the oracle-agreement ceiling of
+Table~\ref{tab:contrast}, not a procedure failure; the three asymmetric-extreme misses
+($T_{3,14},T_{5,12},T_{14,3}$) exhaust the fixed repair budget, a search bound rather than a class bound. The
+uniform procedure over the unbounded non-CF family thus holds robustly at the two-oracle level, while the
+strict three-oracle rate is stringency-bounded.
 
 
 \paragraph{Robustness checks: instrument validity, generalization, budget.} Three controls close the
@@ -1157,11 +1159,13 @@ overfit unique to them (\S\ref{sec:exp}). (iv) The criterion certifies an ascent
 of scope. (v) The empirical result covers one crossing pool ($n=60$, pKiss reference; the panel operator over
 five seeds); a second benchmark and the undesignability axis are not yet measured.
 
-\paragraph{Future work.} The decisive next test is a parameterized non-\CF{} crossing family
-$\mathcal{L}_{\mathrm H}=\{T_{n,m}:n,m\ge1\}$ with out-of-distribution transfer: tune on small stem lengths, test
-unbounded larger ones, so success is evidence of a uniform, finite-description procedure over the family rather
-than coverage of a finite instance set, upgrading the class claim from held-out instances to a language-class
-ascent. Beyond it: a larger held-out pool to certify the gaming-separation seed-by-seed, a second pseudoknot
+\paragraph{Future work.} The decisive transfer test---tune on small stems, freeze, test on strictly larger
+unseen members of $\mathcal{L}_{\mathrm H}=\{T_{n,m}:n,m\ge1\}$---is now run (\S\ref{sec:exp}): the frozen
+operator realizes the family under pKiss$\,\wedge\,$ProbKnot across the diagonal $n{=}m=5\ldots14$ ($8/8$, to
+length $68$) above a $0/16$ \CF{} floor, uniform-procedure evidence a finite set cannot give, though strict
+three-oracle unanimity remains stringency-bounded ($6/16$). What remains: extend the ladder to still larger
+$n,m$ with a size-scaled budget to separate the search bound from a class bound, a larger held-out pool to
+certify the gaming-separation seed-by-seed, a second pseudoknot
 benchmark, physical/3D validation beyond the panel, and the undesignability axis. Beyond RNA, the certificate
 ports to any domain whose difficulty axis is a decidable formal hierarchy with an exact impossibility oracle;
 RNA is first because the hierarchy is native to it.
@@ -1588,11 +1592,12 @@ coincide.}\label{fig:grade}
 \end{figure}
 \begin{figure}[t]\centering
 \includegraphics[width=0.9\linewidth]{fig_cc_family.pdf}
-\caption{\textbf{Capability across the unbounded non-CF family $\mathcal L_{\mathrm H}$}, by crossing-stem
-size $n{=}m$. The \CF{} floor never realizes a member (Prop.~\ref{prop:confine} generalizes to the entire
-family); the autonomous operator is panel-unanimous across a size range ($n{=}m\!\in\!\{5,6,7\}$),
-matching or exceeding the borrowed SOTA solver, while short/long stems clear only pKiss$\,\cap\,$ProbKnot, an
-oracle-agreement window, not a search failure.}\label{fig:family}
+\caption{\textbf{Unbounded-length transfer over the non-CF family $\mathcal L_{\mathrm H}$}, by crossing-stem
+size. A frozen operator (fixed on $n{=}m\le4$) is applied to strictly larger unseen members to length
+$68$\,nt. The \CF{} floor never realizes a member ($0/16$; Prop.~\ref{prop:confine} generalizes to the whole
+family); the operator realizes crossings under pKiss$\,\cap\,$ProbKnot on the entire diagonal $n{=}m=5\ldots14$
+($8/8$). Strict three-oracle unanimity is smaller and stringency-bounded (diagonal $6/8$): at the extremes
+designs drift off de-novo ShapeKnots, an oracle-agreement ceiling, not a search failure.}\label{fig:family}
 \end{figure}
 \begin{figure}[t]\centering
 \includegraphics[width=0.72\linewidth]{fig_cc_stringency.pdf}
