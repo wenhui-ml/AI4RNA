@@ -1,0 +1,26 @@
+[qa:qa_deepseek_deepseek-v4-flash] model=deepseek/deepseek-v4-flash tasks=12 rounds=3
+  q1   reward  help=1.00 single_accept=True panel_correct=True gold=True (ans=460422837 gold=460422837)
+Traceback (most recent call last):
+  File "/data/wenhui/openclaude_rna/rna_harness/runs/cc_ascent/code_audit/qa.py", line 169, in <module>
+    main(tag, rounds)
+  File "/data/wenhui/openclaude_rna/rna_harness/runs/cc_ascent/code_audit/qa.py", line 120, in main
+    best, traj = run_qa_agent(client, q, arm=arm, rounds=rounds)
+  File "/data/wenhui/openclaude_rna/rna_harness/runs/cc_ascent/code_audit/qa.py", line 93, in run_qa_agent
+    r = client.chat(msgs, temperature=0.5, max_tokens=None, system=_ARM_SYS[arm])
+  File "/data/wenhui/openclaude_rna/rna_harness/llm/openrouter.py", line 94, in chat
+    d = json.loads(resp.read().decode())
+  File "/home/ubuntu/miniconda3/envs/rna/lib/python3.10/http/client.py", line 465, in read
+    return self._read_chunked(amt)
+  File "/home/ubuntu/miniconda3/envs/rna/lib/python3.10/http/client.py", line 588, in _read_chunked
+    chunk_left = self._get_chunk_left()
+  File "/home/ubuntu/miniconda3/envs/rna/lib/python3.10/http/client.py", line 571, in _get_chunk_left
+    chunk_left = self._read_next_chunk_size()
+  File "/home/ubuntu/miniconda3/envs/rna/lib/python3.10/http/client.py", line 531, in _read_next_chunk_size
+    line = self.fp.readline(_MAXLINE + 1)
+  File "/home/ubuntu/miniconda3/envs/rna/lib/python3.10/socket.py", line 717, in readinto
+    return self._sock.recv_into(b)
+  File "/home/ubuntu/miniconda3/envs/rna/lib/python3.10/ssl.py", line 1307, in recv_into
+    return self.read(nbytes, buffer)
+  File "/home/ubuntu/miniconda3/envs/rna/lib/python3.10/ssl.py", line 1163, in read
+    return self._sslobj.read(len, buffer)
+KeyboardInterrupt

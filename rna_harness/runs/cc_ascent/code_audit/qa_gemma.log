@@ -1,0 +1,36 @@
+[qa:qa_gemma] model=google/gemma-4-31b-it tasks=12 rounds=3
+  q1   reward  help=0.00 single_accept=False panel_correct=False gold=False (ans=49 gold=460422837)
+Traceback (most recent call last):
+  File "/data/wenhui/openclaude_rna/rna_harness/runs/cc_ascent/code_audit/qa.py", line 173, in <module>
+    main(tag, rounds)
+  File "/data/wenhui/openclaude_rna/rna_harness/runs/cc_ascent/code_audit/qa.py", line 124, in main
+    best, traj = run_qa_agent(client, q, arm=arm, rounds=rounds)
+  File "/data/wenhui/openclaude_rna/rna_harness/runs/cc_ascent/code_audit/qa.py", line 97, in run_qa_agent
+    r = client.chat(msgs, temperature=0.5, max_tokens=_TOK, system=_ARM_SYS[arm])
+  File "/data/wenhui/openclaude_rna/rna_harness/llm/openrouter.py", line 93, in chat
+    with urllib.request.urlopen(req, timeout=self.timeout) as resp:
+  File "/home/ubuntu/miniconda3/envs/rna/lib/python3.10/urllib/request.py", line 216, in urlopen
+    return opener.open(url, data, timeout)
+  File "/home/ubuntu/miniconda3/envs/rna/lib/python3.10/urllib/request.py", line 519, in open
+    response = self._open(req, data)
+  File "/home/ubuntu/miniconda3/envs/rna/lib/python3.10/urllib/request.py", line 536, in _open
+    result = self._call_chain(self.handle_open, protocol, protocol +
+  File "/home/ubuntu/miniconda3/envs/rna/lib/python3.10/urllib/request.py", line 496, in _call_chain
+    result = func(*args)
+  File "/home/ubuntu/miniconda3/envs/rna/lib/python3.10/urllib/request.py", line 1391, in https_open
+    return self.do_open(http.client.HTTPSConnection, req,
+  File "/home/ubuntu/miniconda3/envs/rna/lib/python3.10/urllib/request.py", line 1352, in do_open
+    r = h.getresponse()
+  File "/home/ubuntu/miniconda3/envs/rna/lib/python3.10/http/client.py", line 1395, in getresponse
+    response.begin()
+  File "/home/ubuntu/miniconda3/envs/rna/lib/python3.10/http/client.py", line 323, in begin
+    version, status, reason = self._read_status()
+  File "/home/ubuntu/miniconda3/envs/rna/lib/python3.10/http/client.py", line 284, in _read_status
+    line = str(self.fp.readline(_MAXLINE + 1), "iso-8859-1")
+  File "/home/ubuntu/miniconda3/envs/rna/lib/python3.10/socket.py", line 717, in readinto
+    return self._sock.recv_into(b)
+  File "/home/ubuntu/miniconda3/envs/rna/lib/python3.10/ssl.py", line 1307, in recv_into
+    return self.read(nbytes, buffer)
+  File "/home/ubuntu/miniconda3/envs/rna/lib/python3.10/ssl.py", line 1163, in read
+    return self._sslobj.read(len, buffer)
+KeyboardInterrupt

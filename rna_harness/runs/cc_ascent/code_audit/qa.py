@@ -50,10 +50,14 @@ _VERIFY_SYS = ("You are a strict math checker. Independently re-derive the corre
                "'WRONG'.")
 
 
+# token caps assume NON-reasoning judge/agent models (deepseek-flash, gemma) -> fast; for reasoning models
+# (glm) set CODE_AUDIT_TOK=none to avoid truncating the reasoning chain before the content.
+_TOK = None if os.environ.get("CODE_AUDIT_TOK") == "none" else int(os.environ.get("CODE_AUDIT_TOK", "700"))
+
+
 def helpfulness_score(client, q, ans, temperature=0.3):
-    # max_tokens=None: reasoning models spend the budget thinking; a small cap leaves no room for the number.
     r = client.chat([{"role": "user", "content": f"PROBLEM:\n{q}\n\nANSWER:\n{ans}\n\nRating 0-10 (only the number):"}],
-                    system=_HELP_SYS, temperature=temperature, max_tokens=None)
+                    system=_HELP_SYS, temperature=temperature, max_tokens=min(_TOK, 200) if _TOK else None)
     m = re.findall(r"\d+(?:\.\d+)?", r.text or "")
     return (min(float(m[-1]), 10.0) / 10.0) if m else 0.0
 
@@ -90,7 +94,7 @@ def run_qa_agent(client, q, arm="reward", rounds=4):
     best = {"ans": "", "help": -1.0, "round": -1}
     traj = []
     for rd in range(rounds):
-        r = client.chat(msgs, temperature=0.5, max_tokens=None, system=_ARM_SYS[arm])
+        r = client.chat(msgs, temperature=0.5, max_tokens=_TOK, system=_ARM_SYS[arm])
         ans = r.text or ""
         if not ans:
             traj.append({"round": rd, "empty": True}); continue

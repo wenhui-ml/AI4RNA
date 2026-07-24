@@ -56,8 +56,6 @@
 \title{\textbf{Auditing a Claimed Chomsky-Hierarchy Ascent in RNA Design}\\[3pt]
 \large A Two-Sided Capability Certificate for Autonomous Acquisition}
 \author[1]{Wenhui Chen\thanks{Corresponding author: \texttt{wenhui.chen@inceptlabs.ai}}}
-\author[1]{Qingqing Mao}
-\author[1]{Chenghua Wang}
 \affil[1]{InceptLabs-Shanghai}
 \date{}
 
@@ -1224,6 +1222,59 @@ the general-CNF ascent realizes every relation. The negative-side certificate po
 exact because SAT's verifier is exact.}\label{fig:sat}
 \end{figure}
 
+\subsection{The positive side ports to a mainstream, formally-unstructured agent setting}\label{sec:audit}
+SAT ports the \emph{negative} side but trivializes the positive side (its verifier is exact). The
+complementary and more consequential question for the ``audit layer'' claim is whether the
+\emph{positive-side} audit---the panel that catches oracle-gaming---ports to a mainstream self-improving-agent
+setting with \emph{no} decidable formal hierarchy and \emph{no} blind oracle. We test it on code/answer
+generation, a setting the ML community evaluates directly (\texttt{runs/cc\_ascent/code\_audit}).
+
+\emph{(i) Executable oracles resist gaming; the panel is a validated discriminator.} On $15$ programming tasks
+with unbounded input domains, a self-improving LLM agent (GLM-5.2 and mid-tier models) that revises code to
+maximize a visible test set solves them \emph{genuinely}---$0$ gaming, because an \emph{executable} test is too
+strong a proxy to be worth faking. The panel still works: a constructed lookup ``gamer'' (hard-coding the
+visible cases) passes the visible oracle $15/15$ yet is caught by the held-out\,$\wedge$\,property panel
+($0/15$ panel-unanimous), and a $\ge\!600$-input differential gold confirms it is wrong ($0/15$), while honest
+solutions pass $15/15$ (gold $15/15$)---panel false-positive rate $0$. The audit is sound, and harmless where
+no gaming occurs.
+
+\emph{(ii) A flawed \emph{heuristic} reward is gamed, and the panel catches it.} The faithful analog of RNA's
+imperfect pKiss oracle is a reward that \emph{cannot verify truth}: an LLM ``helpfulness'' judge that rewards
+thoroughness and confidence---a documented reward-model bias \citep{gao2023overopt,skalse2022}---but does not
+check correctness. On hard arithmetic (objective, Python-computed gold), this reward \emph{prefers} a
+confident, step-by-step \emph{wrong} answer (helpfulness $1.0$) over a correct terse one ($0.2$); an agent
+optimizing it is driven toward confident-wrong outputs. An independent verify panel (majority of three
+checkers, given no gold) catches the wrong answer ($0/3$) and passes the correct one ($3/3$), gold-validated
+(Table~\ref{tab:audit}). This is RNA's ``optimize one flawed oracle $\to$ the panel collapses it'' reproduced
+in a domain with no formal hierarchy and no blind oracle---the positive-side audit ports.
+
+\emph{Asymmetric portability (the honest synthesis).} The two sides port through \emph{different} structure:
+the decidable \emph{negative} side needs a formal class hierarchy (RNA grammar; SAT clone theory), while the
+positive-side gaming-catch needs an imperfect verifier that \emph{can} be gamed (RNA folding; a heuristic
+reward). They coincide non-trivially only when a domain has both---as RNA does---which is why RNA is the
+natural showcase, not a niche accident. Caveats: the code panel's correctness members are stronger than RNA's
+oracles, so its model-relativity is milder; and we report the reward-divergence \emph{mechanism} plus the
+constructed-gamer and held-out validity---a full agent-loop natural-collapse table was throttled by
+API-provider latency at run time.
+
+\begin{table}[t]\centering\small
+\setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.15}
+\caption{\textbf{The positive-side audit in a mainstream agent setting} (no formal hierarchy, no blind
+oracle). An executable oracle is too strong to game (agents solve genuinely); a \emph{heuristic} reward that
+cannot verify truth is gamed, and the independent panel catches it---validated against a gold in both rows
+(false-positive rate $0$). Answers R3's portability question in the affirmative.}\label{tab:audit}
+\begin{tabularx}{\linewidth}{@{}Lp{2.6cm}p{2.9cm}c@{}}
+\toprule
+setting & optimized oracle & gaming outcome & panel catch (vs.\ gold)\\
+\midrule
+code, executable tests & visible test set & none natural; constructed lookup gamer passes visible $15/15$ &
+$0/15$ panel-unan.; honest $15/15$; FP $0$\\
+arithmetic QA, heuristic reward & LLM helpfulness judge & prefers confident-\emph{wrong} (help.\ $1.0$ vs.\
+$0.2$ correct) & wrong $0/3$, correct $3/3$; FP $0$\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
 \section{Discussion, Related Work, and Conclusion}\label{sec:discussion}
 
 \subsection{Related Work}\label{sec:related}
@@ -1385,8 +1436,12 @@ common independent adjudicator, autonomy ablations, and, where the difficulty ax
 decidable negative side---as a \emph{portable} protocol other AI4S efforts can adopt: molecular and material
 generation adjudicated against DFT or assays rather than a surrogate, protein design against
 binding/functional readouts rather than a structure predictor, automated theorem discovery against an exact
-checker rather than a search heuristic. Trustworthy autonomous discovery needs not only agents that can
-generate, but a scientific discipline that can show they did not merely game the evaluator.
+checker rather than a search heuristic. We give first evidence that the audit's \emph{positive} side does port
+beyond RNA (\S\ref{sec:audit}): in a mainstream code/answer-generation setting with \emph{no} formal hierarchy,
+an agent optimizing a flawed heuristic reward is driven to confident-wrong outputs that the reward rates
+highest, and an independent panel catches them---while an executable oracle is simply too strong to game.
+Trustworthy autonomous discovery needs not only agents that can generate, but a scientific discipline that can
+show they did not merely game the evaluator.
 
 \begin{table}[t]\centering\small
 \setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.2}

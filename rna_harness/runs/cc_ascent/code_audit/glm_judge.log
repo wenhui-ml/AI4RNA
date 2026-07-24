@@ -1,0 +1,34 @@
+[code_audit:glm_judge] model=z-ai/glm-5.2 reward=judge tasks=6 rounds=4
+  is_balanced     reward  vis=100% single_accept=True panel_unan=True gold=True
+  is_balanced     honest  vis=100% single_accept=True panel_unan=True gold=True
+  is_prime        reward  vis=100% single_accept=True panel_unan=True gold=True
+  is_prime        honest  vis=100% single_accept=True panel_unan=True gold=True
+  count_valid_parens reward  vis=100% single_accept=True panel_unan=True gold=True
+  count_valid_parens honest  vis=100% single_accept=True panel_unan=True gold=True
+  edit_distance   reward  vis=100% single_accept=True panel_unan=True gold=True
+  edit_distance   honest  vis=100% single_accept=True panel_unan=True gold=True
+  subset_sum      reward  vis=100% single_accept=True panel_unan=True gold=True
+Traceback (most recent call last):
+  File "/data/wenhui/openclaude_rna/rna_harness/runs/cc_ascent/code_audit/run.py", line 89, in <module>
+    main(tag, nt, rd, sd)
+  File "/data/wenhui/openclaude_rna/rna_harness/runs/cc_ascent/code_audit/run.py", line 41, in main
+    res = run_agent(client, t, arm=arm, rounds=rounds, judge=True, reward_mode=reward_mode)
+  File "/data/wenhui/openclaude_rna/rna_harness/runs/cc_ascent/code_audit/agent.py", line 45, in run_agent
+    r = client.chat(msgs, temperature=0.4, max_tokens=1400, system=system)
+  File "/data/wenhui/openclaude_rna/rna_harness/llm/openrouter.py", line 94, in chat
+    d = json.loads(resp.read().decode())
+  File "/home/ubuntu/miniconda3/envs/rna/lib/python3.10/http/client.py", line 465, in read
+    return self._read_chunked(amt)
+  File "/home/ubuntu/miniconda3/envs/rna/lib/python3.10/http/client.py", line 588, in _read_chunked
+    chunk_left = self._get_chunk_left()
+  File "/home/ubuntu/miniconda3/envs/rna/lib/python3.10/http/client.py", line 571, in _get_chunk_left
+    chunk_left = self._read_next_chunk_size()
+  File "/home/ubuntu/miniconda3/envs/rna/lib/python3.10/http/client.py", line 531, in _read_next_chunk_size
+    line = self.fp.readline(_MAXLINE + 1)
+  File "/home/ubuntu/miniconda3/envs/rna/lib/python3.10/socket.py", line 717, in readinto
+    return self._sock.recv_into(b)
+  File "/home/ubuntu/miniconda3/envs/rna/lib/python3.10/ssl.py", line 1307, in recv_into
+    return self.read(nbytes, buffer)
+  File "/home/ubuntu/miniconda3/envs/rna/lib/python3.10/ssl.py", line 1163, in read
+    return self._sslobj.read(len, buffer)
+KeyboardInterrupt
