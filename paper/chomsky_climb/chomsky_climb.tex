@@ -194,7 +194,7 @@ Nested $=$ \CF; crossing families non-\CF (low-dim MCFG); the nested/crossing sp
  \citep{rivaseddy2000,nebelweinberg,katosekikasami2006} & invoked; cited\\
 A \CF-verified repertoire provably cannot realize a crossing target &
  Prop.~\ref{prop:confine} (oracle output space) & theorem (decidable)\\
-The ascent is to \MCF, not a larger CFG & $\PK$ non-CF $+$ MCFG-2 witness
+The ascent is to \MCF, not a larger CFG & $\mathcal L_{\mathrm H}\!\subseteq\!\PK$ non-CF $+$ MCFG-2 witness
  \citep{nebelweinberg,katosekikasami2006} & theorem $+$ invoked\\
 Positive side is model-relative, not exact & oracle-dependence of PK predictors \citep{verifiereconomics}
  & acknowledged; panel+abstain\\
@@ -528,10 +528,15 @@ exchanging $\Ocf$ for $\Opk$: it is a change in what the repertoire can realize 
 crossing-aware oracle.
 
 \paragraph{The boundary is a genuine class boundary (invoked, not re-proved).} $\NESTED$ is context-free
-\citep{rivaseddy2000,durbin1998}; $\PK$ is not \citep{nebelweinberg} and is MCFG of dimension $\le 2$
-\citep{rivaseddy2000,katosekikasami2006}. We take these as established and tie the agent to them via
-Prop.~\ref{prop:confine}: ``could not before'' is $\Rze{\Ocf}{\pi_{\mathrm{before}}}\subseteq\NESTED\not\ni
-T$; ``can now'' is $T\in\Rze{\Opk}{\pi_{\mathrm{after}}}$ for a $T$ in the non-CF class $\PK$.
+\citep{rivaseddy2000,durbin1998}. We use $\PK=\mathcal T\setminus\NESTED$ for \emph{all} crossing structures
+(a structural set, used as such on the negative side). The formal-language claim is scoped to the specific
+unbounded family: the H-type family $\mathcal L_{\mathrm H}\subseteq\PK$ is non-context-free
+\citep{nebelweinberg} and MCFG of dimension $2$ \citep{rivaseddy2000,katosekikasami2006}; we do \emph{not}
+claim the whole crossing set $\PK$ is uniformly MCFG-$2$ (richer topologies may need higher dimension,
+\S\ref{sec:bg}). We take these as established and tie the agent to them via Prop.~\ref{prop:confine}:
+``could not before'' is $\Rze{\Ocf}{\pi_{\mathrm{before}}}\subseteq\NESTED\not\ni T$; ``can now'' is
+$T\in\Rze{\Opk}{\pi_{\mathrm{after}}}$ for a crossing $T\in\PK$ (the class-level claim, \S\ref{sec:formal},
+concerns the non-CF family $\mathcal L_{\mathrm H}$).
 
 \begin{definition}[$\CF\!\to\!\MCF$ ascent under a fixed oracle]\label{def:ascent}
 Let $\mathcal D_{\mathrm{ho}}\subseteq\PK\cap\mathcal D_{\Opk}$ be a held-out pool of \emph{designable}
@@ -571,10 +576,11 @@ the certificate then audits.
 is exactly an MCFG language, since \CF{} is closed under neither subset nor superset, and we are careful
 about the level at which non-context-freeness lives. A single finite target $T$ is a regular (hence
 context-free) singleton, so ``$T$ is non-CF'' would be a category error; non-context-freeness is a property
-of the unbounded crossing family $\PK$, witnessed by the pumping lemma as for the count language
-$\{a^{n}b^{m}c^{n}d^{m}\}$ of \S\ref{sec:bg}, whose interleaved $n\!\cdots\!n$/$m\!\cdots\!m$ constraints a
-crossing stem of growing length reproduces. The certificate therefore tests not that any one $T$ is non-CF,
-but that a single finite-description operator realizes held-out members of $\PK$ at parameters it never saw
+of an unbounded crossing family, here the H-type $\mathcal L_{\mathrm H}\subseteq\PK$, witnessed by the pumping
+lemma as for the count language $\{a^{n}b^{m}c^{n}d^{m}\}$ of \S\ref{sec:bg}, whose interleaved
+$n\!\cdots\!n$/$m\!\cdots\!m$ constraints a crossing stem of growing length reproduces. The certificate
+therefore tests not that any one $T$ is non-CF, but that a single finite-description operator realizes held-out
+members of $\mathcal L_{\mathrm H}$ at parameters it never saw
 (Def.~\ref{def:cap}): a uniform procedure over the family, which a memorized finite table is not and, by the
 confinement theorem, a \CF{} generator cannot supply. Each realized $T$ is then a structural witness: its
 crossing stem forces a derivation coordinating two substrings at four interleaved positions, the
@@ -880,12 +886,15 @@ On a second, disjoint Pseudobase pool (indices
 $60$--$110$) the \CF{} floor is again $0/50$ and the panel operator panel-unanimous on $5/50$, the same
 regime, so it is not overfit to one $60$-target sample. On a cross-source pool (an independent
 bpRNA/ArchiveII-derived set, $60$ targets, size-matched; App.~\ref{app:repro}) the \CF{} floor is again
-$0/60$, and both our operator and the SOTA solver reach $0/60$ panel-unanimous: ours forms $1$--$2/60$
-crossings, DesiRNA $9/60$ under pKiss but $3/60$ under ProbKnot and none under the full panel; a larger
-repair budget ($240$\,s, $2500$ iters) does not change this. So the negative side generalizes across
-datasets, while cross-source panel-unanimous design hits a designability / panel-stringency wall (chiefly
-de-novo ShapeKnots) that the SOTA solver also hits; the positive ceiling is the in-distribution
-$3$--$8/60$. \emph{(iii) Budget.} Over $\{60,180,300\}$\,s on a fixed $20$-target subset, panel-unanimous is
+$0/60$, and both our operator and the SOTA solver reach $0/60$ panel-unanimous. The per-oracle breakdown does
+\emph{not} let us blame the strictest predictor alone: DesiRNA forms $9/60$ crossings under pKiss but only
+$3/60$ survive ProbKnot (ours $1/60$), and $0/60$ pass ShapeKnots---so ProbKnot, not just de-novo ShapeKnots,
+already rejects most, for the SOTA solver as much as for ours. A larger repair budget ($240$\,s, $2500$ iters)
+does not change this. We therefore do not attribute the cross-source $0$ to verifier stringency: separating
+verifier false-negatives from out-of-distribution failure would need native-sequence recall on these targets,
+which the design benchmark masks. The negative side generalizes across datasets; the \emph{positive} claim we
+support is limited to the Pseudobase++ distribution and its H-type family (in-distribution $3$--$8/60$), not
+general cross-source pseudoknot design. \emph{(iii) Budget.} Over $\{60,180,300\}$\,s on a fixed $20$-target subset, panel-unanimous is
 $\{1,3,1\}/20$: no clean budget trend, dominated by search variance, consistent with oracle-guided search
 rather than a budget-monotone capability.
 
