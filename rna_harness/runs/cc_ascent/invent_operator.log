@@ -1,0 +1,16 @@
+INVENT: model=z-ai/glm-5.2 train=16 held-out=60 rnastr=True
+  round 0: train solved 1/16  errs=['TypeError("\'NoneType\' object is not iterable")', 'TypeError("\'NoneType\' object is not iterable")']
+  round 1: train solved 11/16  errs=['TypeError("\'NoneType\' object is not iterable")', 'TypeError("\'NoneType\' object is not iterable")']
+  round 2: train solved 12/16  errs=['TypeError("\'NoneType\' object is not iterable")', 'TypeError("\'NoneType\' object is not iterable")']
+  round 3: train solved 11/16  errs=['TypeError("\'NoneType\' object is not iterable")', 'TypeError("\'NoneType\' object is not iterable")']
+  round 4: train solved 10/16  errs=['TypeError("\'NoneType\' object is not iterable")', 'TypeError("\'NoneType\' object is not iterable")']
+  round 5: compile/sandbox error ValueError('no design() defined')
+  held-out 10/60: pKiss=3 pk&pb=3 unanimous=1
+  held-out 20/60: pKiss=12 pk&pb=12 unanimous=4
+  held-out 30/60: pKiss=16 pk&pb=16 unanimous=5
+  held-out 40/60: pKiss=23 pk&pb=23 unanimous=6
+  held-out 50/60: pKiss=29 pk&pb=29 unanimous=6
+  held-out 60/60: pKiss=35 pk&pb=35 unanimous=9
+
+INVENTED operator on held-out 60: pKiss=35, pKiss&ProbKnot=35, panel-unanimous=9. (hand-built panel_auto: 3-8/60; floor: 0/60.)
+-> invent_operator/result.json

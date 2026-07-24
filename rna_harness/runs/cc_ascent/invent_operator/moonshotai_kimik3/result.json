@@ -1,0 +1,510 @@
+{
+ "model": "moonshotai/kimi-k3",
+ "best_train_solved": 12,
+ "best_round": 4,
+ "rounds": [
+  {
+   "round": 0,
+   "prompt_tokens": 534,
+   "completion_tokens": 16971,
+   "train_solved": 9,
+   "n_train": 16,
+   "errors": [
+    "_TO()",
+    "_TO()",
+    "_TO()",
+    "_TO()",
+    "_TO()"
+   ]
+  },
+  {
+   "round": 1,
+   "prompt_tokens": 2855,
+   "completion_tokens": 35541,
+   "train_solved": 10,
+   "n_train": 16,
+   "errors": []
+  },
+  {
+   "round": 2,
+   "prompt_tokens": 5201,
+   "completion_tokens": 26717,
+   "train_solved": 11,
+   "n_train": 16,
+   "errors": [
+    "RuntimeError('KeyError(30)')"
+   ]
+  },
+  {
+   "round": 3,
+   "prompt_tokens": 7655,
+   "completion_tokens": 13548,
+   "train_solved": 10,
+   "n_train": 16,
+   "errors": []
+  },
+  {
+   "round": 4,
+   "prompt_tokens": 10071,
+   "completion_tokens": 15704,
+   "train_solved": 12,
+   "n_train": 16,
+   "errors": []
+  },
+  {
+   "round": 5,
+   "prompt_tokens": 12510,
+   "completion_tokens": 14829,
+   "train_solved": 9,
+   "n_train": 16,
+   "errors": []
+  },
+  {
+   "round": 6,
+   "prompt_tokens": 14951,
+   "completion_tokens": 4759,
+   "train_solved": 10,
+   "n_train": 16,
+   "errors": [
+    "_TO()",
+    "_TO()",
+    "_TO()",
+    "_TO()"
+   ]
+  },
+  {
+   "round": 7,
+   "prompt_tokens": 17403,
+   "completion_tokens": 8715,
+   "train_solved": 12,
+   "n_train": 16,
+   "errors": []
+  }
+ ],
+ "best_code": "def design(target, seed=0):\n    random.seed(seed)\n    n = len(target)\n    if n == 0:\n        return ''\n    P = set()\n    for ij in target_pairs(target):\n        try:\n            i, j = ij\n        except Exception:\n            continue\n        if i > j:\n            i, j = j, i\n        if 0 <= i < j < n:\n            P.add((i, j))\n    if not P:\n        return 'A' * n\n\n    stems = []\n    for i, j in sorted(P):\n        if (i - 1, j + 1) not in P:\n            ps = []\n            a, b = i, j\n            while (a, b) in P:\n                ps.append((a, b))\n                a += 1\n                b -= 1\n            stems.append(ps)\n    stems.sort(key=lambda ps: ps[0][0])\n    m = len(stems)\n    pos_stem = [-1] * n\n    for si, ps in enumerate(stems):\n        for (i, j) in ps:\n            pos_stem[i] = si\n            pos_stem[j] = si\n    xst = [set() for _ in range(m)]\n    for a in range(m):\n        for b in range(a + 1, m):\n            cr = False\n            for (i, j) in stems[a]:\n                for (k, l) in stems[b]:\n                    if (i < k < j < l) or (k < i < l < j):\n                        cr = True\n                        break\n                if cr:\n                    break\n            if cr:\n                xst[a].add(b)\n                xst[b].add(a)\n\n    def rc(s):\n        return ''.join(COMP.get(ch, 'A') for ch in reversed(s))\n\n    def lcs(a, b):\n        lb = len(b)\n        prev = [0] * (lb + 1)\n        best = 0\n        for ch in a:\n            cur = [0] * (lb + 1)\n            for k in range(lb):\n                if ch == b[k]:\n                    v = prev[k] + 1\n                    cur[k + 1] = v\n                    if v > best:\n                        best = v\n            prev = cur\n        return best\n\n    def shift_match(a, b):\n        L = len(a)\n        best = 0\n        for sh in range(1, L):\n            r1 = 0\n            r2 = 0\n            for i in range(L - sh):\n                if a[i + sh] == b[i]:\n                    r1 += 1\n                    if r1 > best:\n                        best = r1\n                else:\n                    r1 = 0\n                if a[i] == b[i + sh]:\n                    r2 += 1\n                    if r2 > best:\n                        best = r2\n                else:\n                    r2 = 0\n        return best\n\n    def max_run(c):\n        r = 1\n        b = 1\n        for k in range(1, len(c)):\n            if c[k] == c[k - 1]:\n                r += 1\n                if r > b:\n                    b = r\n            else:\n                r = 1\n        return b\n\n    def rand_code(L, rng):\n        if L <= 2:\n            return ''.join(rng.choice('GC') for _ in range(L))\n        for _ in range(60):\n            g = (L + 1) // 2\n            arr = ['G'] * g + ['C'] * (L - g)\n            rng.shuffle(arr)\n            c = ''.join(arr)\n            if max_run(c) <= 2:\n                return c\n        return ''.join(rng.choice('GC') for _ in range(L))\n\n    def self_pen(c):\n        pen = 0\n        if c == rc(c):\n            pen += 500\n        sl = shift_match(c, rc(c))\n        if sl > 1:\n            pen += (sl - 1) ** 3 * 12\n        return pen\n\n    def cross_pen(q1, e1, s2, q2):\n        d = lcs(q1, rc(q2))\n        if d <= 1:\n            return 0\n        gap = s2 - e1 - 1\n        w = (d - 1) ** 3\n        if d >= 4:\n            w *= 8\n        if gap < 4:\n            w *= (4 - gap)\n        return w\n\n    def segs(c, si):\n        ps = stems[si]\n        return ((ps[0][0], ps[-1][0], c, si), (ps[-1][1], ps[0][1], rc(c), si))\n\n    def partial_pen(codes, si):\n        c = codes[si]\n        if not c:\n            return 0\n        pen = self_pen(c)\n        A = segs(c, si)\n        for sj in range(m):\n            if sj == si:\n                continue\n            cj = codes[sj]\n            if not cj:\n                continue\n            B = segs(cj, sj)\n            for (s1, e1, q1, _x) in A:\n                for (s2, e2, q2, _y) in B:\n                    if e1 < s2:\n                        pen += cross_pen(q1, e1, s2, q2)\n                    if e2 < s1:\n                        pen += cross_pen(q2, e2, s1, q1)\n        return pen\n\n    def opt_code(si, codes, rng, trials):\n        L = len(stems[si])\n        old = codes[si]\n        bc = None\n        bp = None\n        for _ in range(trials):\n            c = rand_code(L, rng)\n            if L >= 4 and shift_match(c, rc(c)) >= L - 1:\n                continue\n            codes[si] = c\n            p = partial_pen(codes, si) + rng.random() * 0.01\n            if bp is None or p < bp:\n                bp = p\n                bc = c\n        codes[si] = old\n        return bc if bc is not None else (old if old else rand_code(L, rng))\n\n    def make_codes(tag):\n        rng = random.Random((seed + 3) * 10000019 + tag * 7919 + 11)\n        codes = [None] * m\n        order = sorted(range(m), key=lambda si: (-len(stems[si]), stems[si][0][0]))\n        for si in order:\n            codes[si] = opt_code(si, codes, rng, 140 if len(stems[si]) > 3 else 26)\n        for _ in range(2):\n            improved = False\n            for si in order:\n                old = codes[si]\n                op = partial_pen(codes, si)\n                c = opt_code(si, codes, rng, 60)\n                codes[si] = c\n                npp = partial_pen(codes, si)\n                if npp < op - 1e-9:\n                    improved = True\n                elif npp > op + 1e-9:\n                    codes[si] = old\n            if not improved:\n                break\n        return tuple(codes)\n\n    def balance_au(extra):\n        au = {}\n        for a in range(m):\n            for b in xst[a]:\n                if a > b:\n                    continue\n                la = len(stems[a])\n                lb = len(stems[b])\n                d = abs(la - lb) + extra\n                if d <= 0:\n                    continue\n                big = a if la >= lb else b\n                L = len(stems[big])\n                ks = [0, L - 1, 1, L - 2][:min(d, 2)]\n                for t, k in enumerate(ks):\n                    if 0 <= k < L:\n                        au[(big, k)] = 'A' if t % 2 == 0 else 'U'\n        return au\n\n    def build(codes, au=None):\n        s = ['A'] * n\n        for si, ps in enumerate(stems):\n            c = codes[si]\n            for k, (i, j) in enumerate(ps):\n                ch = c[k]\n                if au and (si, k) in au:\n                    ch = au[(si, k)]\n                s[i] = ch\n                s[j] = COMP.get(ch, 'C')\n        return ''.join(s)\n\n    def nested_keep():\n        Pl = sorted(P)\n        cc = {}\n        for p in Pl:\n            cc[p] = 0\n        for a in range(len(Pl)):\n            i, j = Pl[a]\n            for b in range(a + 1, len(Pl)):\n                k, l = Pl[b]\n                if (i < k < j < l) or (k < i < l < j):\n                    cc[Pl[a]] += 1\n                    cc[Pl[b]] += 1\n        kept = set()\n        for p in sorted(Pl, key=lambda x: (cc.get(x, 0), -(x[1] - x[0]), x[0])):\n            ok = True\n            for q in kept:\n                if (p[0] < q[0] < p[1] < q[1]) or (q[0] < p[0] < q[1] < p[1]):\n                    ok = False\n                    break\n            if ok:\n                kept.add(p)\n        return kept\n\n    def inverse_candidate():\n        kept = nested_keep()\n        if not kept:\n            return None\n        db = ['.'] * n\n        for i, j in kept:\n            db[i] = '('\n            db[j] = ')'\n        try:\n            base = inverse_fold_cf(''.join(db), seed=seed * 97 + 5)\n        except Exception:\n            base = rand_seq(n, seed=seed + 13)\n        s = [ch if ch in 'ACGU' else 'A' for ch in str(base).upper()]\n        if len(s) < n:\n            s += ['A'] * (n - len(s))\n        s = s[:n]\n        for idx, (i, j) in enumerate(sorted(P - kept)):\n            if idx % 2 == 0:\n                s[i] = 'G'\n                s[j] = 'C'\n            else:\n                s[i] = 'C'\n                s[j] = 'G'\n        for k in range(n):\n            if pos_stem[k] < 0:\n                s[k] = 'A'\n        return ''.join(s)\n\n    def norm(F):\n        out = set()\n        for ij in F:\n            try:\n                i, j = ij\n            except Exception:\n                continue\n            if i > j:\n                i, j = j, i\n            if 0 <= i < j < n:\n                out.add((i, j))\n        return out\n\n    cache = {}\n    budget = [30]\n    best = [None]\n    best_key = [None]\n\n    def ev(s):\n        if not s or len(s) != n:\n            return None\n        if s in cache:\n            return cache[s]\n        if budget[0] <= 0:\n            return None\n        budget[0] -= 1\n        try:\n            Fp = norm(fold_pkiss_pairs(s))\n        except Exception:\n            Fp = set()\n        try:\n            Fq = norm(fold_probknot_pairs(s))\n        except Exception:\n            Fq = set()\n        both = Fp & Fq\n        uni = Fp | Fq\n        err = len(P - Fp) + len(Fp - P) + len(P - Fq) + len(Fq - P)\n        key = (err, len(uni - P), -len(both & P))\n        solved = (Fp == P and Fq == P)\n        st = (Fp, Fq, err, key, solved)\n        cache[s] = st\n        if best_key[0] is None or key < best_key[0]:\n            best_key[0] = key\n            best[0] = s\n        return st\n\n    def pGC(s, i, j):\n        if random.random() < 0.5:\n            s[i] = 'G'\n            s[j] = 'C'\n        else:\n            s[i] = 'C'\n            s[j] = 'G'\n\n    def pAU(s, i, j):\n        if random.random() < 0.5:\n            s[i] = 'A'\n            s[j] = 'U'\n        else:\n            s[i] = 'U'\n            s[j] = 'A'\n\n    def pGU(s, i, j):\n        if random.random() < 0.5:\n            s[i] = 'G'\n            s[j] = 'U'\n        else:\n            s[i] = 'U'\n            s[j] = 'G'\n\n    def sa():\n        if best[0] is None:\n            return\n        cur = list(best[0])\n        st = cache.get(''.join(cur))\n        ckey = st[3] if st else (10 ** 9, 0, 0)\n        it = 0\n        while budget[0] > 0 and it < 70:\n            it += 1\n            st = ev(''.join(cur))\n            if st is None:\n                break\n            Fp, Fq, err, key, solved = st\n            if solved:\n                return\n            ckey = key\n            missP = (P - Fp) | (P - Fq)\n            extra = (Fp - P) | (Fq - P)\n            ms = set()\n            for (i, j) in missP:\n                si = pos_stem[i]\n                if si >= 0:\n                    ms.add(si)\n            old = list(cur)\n            r = random.random()\n            if ms and r < 0.72:\n                S = random.choice(sorted(ms))\n                if random.random() < 0.42:\n                    for (i, j) in stems[S]:\n                        pGC(cur, i, j)\n                else:\n                    comps = sorted(xst[S])\n                    pres = [t for t in comps if any((p in Fp) or (p in Fq) for p in stems[t])]\n                    pool = pres if pres else comps\n                    if pool:\n                        T = random.choice(pool)\n                        L = len(stems[T])\n                        ends = [0, L - 1]\n                        random.shuffle(ends)\n                        for k in ends[:(1 if random.random() < 0.6 else 2)]:\n                            i2, j2 = stems[T][k]\n                            pAU(cur, i2, j2)\n                    else:\n                        for (i, j) in stems[S]:\n                            pGC(cur, i, j)\n            elif extra and r < 0.88:\n                (i, j) = random.choice(sorted(extra))\n                done = False\n                for x in (i, j):\n                    if pos_stem[x] < 0:\n                        cur[x] = 'A'\n                        done = True\n                        break\n                if not done:\n                    pAU(cur, i, j)\n            else:\n                si = random.randrange(m)\n                i, j = stems[si][random.randrange(len(stems[si]))]\n                rr = random.random()\n                if rr < 0.4:\n                    pGC(cur, i, j)\n                elif rr < 0.8:\n                    pAU(cur, i, j)\n                else:\n                    pGU(cur, i, j)\n            st2 = ev(''.join(cur))\n            if st2 is None:\n                break\n            if st2[4]:\n                return\n            if st2[3] <= ckey:\n                ckey = st2[3]\n            else:\n                if random.random() < 0.7:\n                    cur = old\n                else:\n                    ckey = st2[3]\n            if it % 8 == 0 and best[0] is not None:\n                cur = list(best[0])\n\n    c0 = make_codes(0)\n    cand = [build(c0)]\n    c1 = make_codes(1)\n    cand.append(build(c1, balance_au(0)))\n    cand.append(build(c1, balance_au(1)))\n    c2 = make_codes(2)\n    cand.append(build(c2, balance_au(0)))\n    cand.append(build(c2, balance_au(2)))\n    inv = inverse_candidate()\n    if inv:\n        cand.append(inv)\n    for s in cand:\n        if budget[0] <= 0:\n            break\n        st = ev(s)\n        if st and st[4]:\n            return s\n    sa()\n    if best[0] is not None:\n        return best[0]\n    return build(c0)",
+ "heldout": [
+  {
+   "id": "pseudobase:0",
+   "pkiss": false,
+   "probknot": false,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:1",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:2",
+   "pkiss": false,
+   "probknot": false,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:3",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": true,
+   "unanimous": true
+  },
+  {
+   "id": "pseudobase:4",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:5",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:6",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:7",
+   "pkiss": false,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:8",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:9",
+   "pkiss": false,
+   "probknot": true,
+   "shapeknots": true,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:10",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": true,
+   "unanimous": true
+  },
+  {
+   "id": "pseudobase:11",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:12",
+   "pkiss": false,
+   "probknot": false,
+   "shapeknots": true,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:13",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": true,
+   "unanimous": true
+  },
+  {
+   "id": "pseudobase:14",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": true,
+   "unanimous": true
+  },
+  {
+   "id": "pseudobase:15",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:16",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:17",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:18",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:19",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:20",
+   "pkiss": false,
+   "probknot": false,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:21",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:22",
+   "pkiss": false,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:23",
+   "pkiss": true,
+   "probknot": false,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:24",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": true,
+   "unanimous": true
+  },
+  {
+   "id": "pseudobase:25",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:26",
+   "pkiss": false,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:27",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:28",
+   "pkiss": false,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:29",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:30",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:31",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:32",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:33",
+   "pkiss": false,
+   "probknot": false,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:34",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:35",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:36",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": true,
+   "unanimous": true
+  },
+  {
+   "id": "pseudobase:37",
+   "pkiss": false,
+   "probknot": true,
+   "shapeknots": true,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:38",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:39",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:40",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:41",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:42",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:43",
+   "pkiss": false,
+   "probknot": false,
+   "shapeknots": true,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:44",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:45",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:46",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:47",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": true,
+   "unanimous": true
+  },
+  {
+   "id": "pseudobase:48",
+   "pkiss": false,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:49",
+   "pkiss": false,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:50",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:51",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": true,
+   "unanimous": true
+  },
+  {
+   "id": "pseudobase:52",
+   "pkiss": false,
+   "probknot": true,
+   "shapeknots": true,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:53",
+   "pkiss": false,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:54",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": true,
+   "unanimous": true
+  },
+  {
+   "id": "pseudobase:55",
+   "pkiss": false,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:56",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:57",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:58",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": true,
+   "unanimous": true
+  },
+  {
+   "id": "pseudobase:59",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  }
+ ],
+ "heldout_pkiss": 43,
+ "heldout_pk_and_pb": 53,
+ "heldout_panel_unanimous": 10
+}

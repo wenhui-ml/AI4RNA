@@ -288,6 +288,49 @@ def fig_sat():
     ax.tick_params(length=3); _save(fig, "fig_cc_sat.pdf"); print("  wrote fig_cc_sat.pdf")
 
 
+def fig_models():
+    """Cross-model (open vs closed) distribution of held-out panel-unanimous rate for the agent-invented operator."""
+    import json, glob
+    paths = [_cc("invent_operator/result.json")] + sorted(glob.glob(_cc("invent_operator/*/result.json")))
+    OPEN = {"z-ai/glm-5.2", "deepseek/deepseek-v4-pro", "moonshotai/kimi-k3"}
+    short = {"z-ai/glm-5.2": "GLM-5.2", "deepseek/deepseek-v4-pro": "DeepSeek-v4-pro", "moonshotai/kimi-k3": "Kimi-k3",
+             "anthropic/claude-opus-4.8": "Claude-Opus-4.8", "openai/gpt-5.6-sol": "GPT-5.6-sol",
+             "google/gemini-3.1-pro-preview": "Gemini-3.1-pro"}
+    seen, rows = set(), []
+    for p in paths:
+        if not os.path.exists(p):
+            continue
+        r = json.load(open(p)); m = r["model"]
+        if m in seen or r.get("heldout_panel_unanimous") is None:
+            continue
+        seen.add(m); rows.append((short.get(m, m), r["heldout_panel_unanimous"], m in OPEN))
+    if not rows:
+        print("  (skip fig_models)"); return
+    rows.sort(key=lambda x: -x[1])
+    labels = [r[0] for r in rows]; vals = [r[1] for r in rows]
+    cols = [CF if r[2] else MCF for r in rows]  # open=green, closed=blue
+    import numpy as np
+    x = np.arange(len(rows))
+    fig, ax = plt.subplots(figsize=(7.0, 3.0))
+    ax.bar(x, vals, width=0.62, color=cols, ec="white", lw=0.6, zorder=3)
+    for xi, v in zip(x, vals):
+        ax.text(xi, v + 0.3, f"{v}", ha="center", fontsize=8, color=INK)
+    ax.axhspan(3, 8, color=GREY, alpha=0.16, zorder=0)
+    ax.text(len(rows) - 0.5, 5.5, "hand-built\npanel_auto (3-8)", ha="right", fontsize=6.8, color=GREY)
+    ax.axhline(1, color=NEG, ls=(0, (4, 2)), lw=0.9, zorder=1)
+    ax.text(len(rows) - 0.5, 1.2, "single-oracle gamer ($1$)", ha="right", fontsize=6.8, color=NEG)
+    ax.set_xticks(x); ax.set_xticklabels(labels, rotation=18, ha="right", fontsize=7.4)
+    ax.set_ylabel("held-out panel-unanimous ($/60$)", fontsize=8.5)
+    ax.set_ylim(0, 19)
+    ax.set_title("An agent invents a certificate-passing operator across the frontier",
+                 fontsize=10, weight="bold", pad=8)
+    from matplotlib.patches import Patch
+    ax.legend(handles=[Patch(fc=MCF, label="closed"), Patch(fc=CF, label="open")],
+              frameon=False, fontsize=7.5, loc="upper right")
+    ax.spines["top"].set_visible(False); ax.spines["right"].set_visible(False)
+    ax.tick_params(length=3); _save(fig, "fig_cc_models.pdf"); print("  wrote fig_cc_models.pdf")
+
+
 if __name__ == "__main__":
     fig_oracle()
     fig_collapse()
@@ -297,4 +340,5 @@ if __name__ == "__main__":
     fig_invent()
     fig_stringency()
     fig_sat()
+    fig_models()
     print("wrote figs/fig_cc_*.pdf (data figs; appendix figs added when their run data is present)")

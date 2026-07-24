@@ -1,0 +1,16 @@
+INVENT: model=openai/gpt-5.6-sol -> openai_gpt56sol  rounds<=12 patience=3 train=16 held-out=60 rnastr=True
+  round 0: train solved 11/16  errs=['_TO()', '_TO()']
+  round 1: train solved 12/16  errs=['_TO()', '_TO()']
+  round 2: train solved 8/16  errs=['_TO()', '_TO()']
+  round 3: train solved 6/16  errs=['_TO()', '_TO()']
+  round 4: train solved 7/16  errs=['_TO()', '_TO()']
+  early stop: no improvement for 3 rounds (best 12/16 @ round 1)
+  held-out 10/60: pKiss=6 pk&pb=6 unanimous=1
+  held-out 20/60: pKiss=15 pk&pb=15 unanimous=1
+  held-out 30/60: pKiss=19 pk&pb=19 unanimous=1
+  held-out 40/60: pKiss=27 pk&pb=27 unanimous=3
+  held-out 50/60: pKiss=34 pk&pb=34 unanimous=3
+  held-out 60/60: pKiss=41 pk&pb=41 unanimous=5
+
+INVENTED operator on held-out 60: pKiss=41, pKiss&ProbKnot=41, panel-unanimous=5. (hand-built panel_auto: 3-8/60; floor: 0/60.)
+-> invent_operator/result.json

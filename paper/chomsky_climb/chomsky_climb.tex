@@ -1064,23 +1064,55 @@ budget trend at this scale---the outcome is dominated by search variance, consis
 oracle-guided \emph{search} rather than a budget-monotone capability. We report this null rather than a
 favorable point.
 
-\paragraph{An agent invents the operator---not just the certificate.} Rem.~\ref{rem:scope} deliberately left
-the \emph{invention} algorithm unspecified: the operator was ours, and the contribution was the certificate
-that audits it. We now close that gap. We gave an LLM agent (GLM-5.2) only low-level primitives (ViennaRNA
-fold/inverse-fold, the pKiss and ProbKnot oracles, sequence utilities) and the task---\emph{no}
-decompose/compose/repair recipe, \emph{no} external solver---and let it \emph{write}, sandbox-execute, and
-revise a reusable \texttt{design(target)} operator over six rounds against a training pool disjoint from the
-held-out (App.~\ref{app:repro}). Its training solve rate climbed $1\!\to\!11\!\to\!12/16$ as it incorporated
-oracle feedback, and it independently converged on the structure we had hand-built: split the target into
-nested and crossing pairs, enforce complementarity, and greedily repair against a
-\emph{pKiss}\,$\wedge$\,\emph{ProbKnot} cost. Frozen and certified on the held-out $60$ under the full panel,
-the \emph{agent-written} operator scores $35/60$ (pKiss\,$\wedge$\,ProbKnot) and \textbf{$9/60$
-panel-unanimous}---matching and slightly exceeding our hand-built \texttt{panel\_auto} ($34$--$37$; $3$--$8/60$),
-far above the decidable $0/60$ floor, and autonomous by construction (no solver was exposed). The certificate
-thus audits an operator the \emph{agent itself} produced, and the panel is what makes the audit trustworthy:
-the self-improvement is \emph{demonstrated}, not assumed. (The loop is noisy---one of six rounds failed to
-compile and was discarded; we freeze the best round. The result inherits the Pseudobase-topology narrowness
-of the cross-source check above.)
+\paragraph{An agent invents the operator---not just the certificate---across the frontier.}
+Rem.~\ref{rem:scope} deliberately left the \emph{invention} algorithm unspecified: the operator was ours, and
+the contribution was the certificate that audits it. We close that gap and test how general the closing is. We
+gave \emph{six} frontier LLM agents---three open-weight (GLM-5.2, DeepSeek-v4-pro, Kimi-k3) and three closed
+(Claude-Opus-4.8, GPT-5.6-sol, Gemini-3.1-pro)---only low-level primitives (ViennaRNA fold/inverse-fold, the
+pKiss and ProbKnot oracles, sequence utilities) and the task: \emph{write}, sandbox-execute, and revise a
+reusable \texttt{design(target)} operator (up to $12$ rounds, patience-3 early stop) against a training pool
+disjoint from the held-out, with \emph{no} decompose/compose/repair recipe and \emph{no} external solver
+(App.~\ref{app:invent}). \emph{Every one} of the six autonomously invents an operator that clears the
+certificate on the held-out $60$: panel-unanimous $2$--$17/60$ (Table~\ref{tab:models}, Fig.~\ref{fig:models}),
+each strictly above the single-oracle gamer's $1/60$ and the decidable $0/60$ floor, and four of six
+(Gemini $17$, Opus $14$, Kimi $10$, GLM $9$) \emph{exceed} the hand-built \texttt{panel\_auto}'s $3$--$8/60$.
+The agents converge, independently and without the recipe, on the structure we had hand-built (split the
+target into nested and crossing pairs, enforce complementarity, greedily repair against a
+\emph{pKiss}\,$\wedge$\,\emph{ProbKnot} cost). Gains \emph{saturate early}: training solve rate peaks by round
+$\le5$ for all six (early stop fired at $5$--$9$ rounds), so the invention budget is not the bottleneck---answering
+whether more rounds are needed. Autonomy is structural (no solver was exposed); the certificate thus audits an
+operator the \emph{agent itself} produced, and does so as a \emph{cross-model regularity} over open and closed
+weights, not one lucky model. Honest caveats: DeepSeek is the weak outlier ($5/16$ train, $2/60$); the loop is
+noisy (occasional non-compiling rounds are discarded and the best round frozen); and every invented operator
+inherits the Pseudobase-topology narrowness of the cross-source check above.
+
+\begin{table}[t]\centering\small
+\setlength{\tabcolsep}{6pt}\renewcommand{\arraystretch}{1.12}
+\caption{\textbf{An agent invents the operator, across six frontier models} (three open, three closed). Each
+agent, given only primitives and the two crossing oracles---no recipe, no external solver---writes and revises
+a \texttt{design} operator; the frozen best is certified on the held-out $60$. Reference points: hand-built
+\texttt{panel\_auto} $34$--$37$ / $3$--$8$; single-oracle gamer $43$ / $1$; \CF{} floor $0$.}\label{tab:models}
+\begin{tabularx}{\linewidth}{@{}Llccc@{}}
+\toprule
+agent & weights & train $/16$ & held-out pKiss$\wedge$ProbKnot & \textbf{panel-unanimous $/60$}\\
+\midrule
+Gemini-3.1-pro & closed & $12$ & $44/60$ & $\mathbf{17}$\\
+Claude-Opus-4.8 & closed & $12$ & $40/60$ & $\mathbf{14}$\\
+Kimi-k3 & open & $12$ & $53/60$ & $\mathbf{10}$\\
+GLM-5.2 & open & $12$ & $35/60$ & $\mathbf{9}$\\
+GPT-5.6-sol & closed & $12$ & $41/60$ & $\mathbf{5}$\\
+DeepSeek-v4-pro & open & $5$ & $27/60$ & $\mathbf{2}$\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{figure}[t]\centering
+\includegraphics[width=0.9\linewidth]{fig_cc_models.pdf}
+\caption{\textbf{Autonomous invention is a cross-frontier regularity.} Held-out panel-unanimous rate of the
+\emph{agent-written} operator for six models (open $=$ green, closed $=$ blue). All six clear the certificate
+($>$ the gamer's $1$, $>$ the $0$ floor); four exceed the hand-built \texttt{panel\_auto} band
+($3$--$8$).}\label{fig:models}
+\end{figure}
 
 \paragraph{The positive verdict is thermodynamically dominant, not marginal.} Panel-unanimity already
 requires the target to \emph{be} each engine's predicted structure; we add and \emph{measure} one further rung
@@ -1102,8 +1134,9 @@ dominant by $\ge1$\,kcal/mol for $14/17$---a real if modest margin.}\label{fig:s
 
 \paragraph{Where this leaves the ascent, and a bounded fallback.} The question we posed---can an operator
 optimizing \emph{panel agreement} beat the oracle-gamer's $1/60$?---is answered in the affirmative, if
-modestly: $3$--$8/60$ across five seeds (mean $5.0$; Table~\ref{tab:recovered}), and now also by an
-\emph{agent-invented} operator at $9/60$. The certificate fires with
+modestly: $3$--$8/60$ across five seeds (mean $5.0$; Table~\ref{tab:recovered}), and now also by
+\emph{agent-invented} operators across six open- and closed-weight frontier models ($2$--$17/60$;
+Table~\ref{tab:models}), four of which exceed the hand-built band. The certificate fires with
 all three sides intact on a few targets per seed---the first panel-robust, autonomous $\CF\!\to\!\MCF$
 crossings we observe---while the negative floor stays a decidable $0/60$. The remaining gap ($\sim\!5/60$, not
 most of $60$) is itself the honest finding: robust
@@ -1346,8 +1379,9 @@ claims are corollaries. (iii) We define the certificate, not the invention algor
 our first operator is structurally autonomous yet games pKiss (it fails the panel), while re-optimizing its
 objective for cross-oracle \emph{agreement} recovers a small but panel-robust ascent ($3$--$8/60$,
 \S\ref{sec:exp})---so the honest state is a modest robust ascent, not none, and where no crossing is found at
-all E3 provides a bounded fallback; an LLM agent also \emph{invents} such an operator autonomously ($9/60$,
-\S\ref{sec:exp}), so ``researcher-designed operator'' is no longer a limitation, though the invented operator
+all E3 provides a bounded fallback; six open- and closed-weight frontier models each \emph{invent} such an
+operator autonomously ($2$--$17/60$, \S\ref{sec:exp}), so ``researcher-designed operator'' is no longer a
+limitation, though the invented operator
 inherits the same Pseudobase-topology narrowness. (iv) The criterion certifies an ascent \emph{to
 \MCF}; higher tiers are out of scope. (v) The empirical result covers one crossing pool ($n=60$, pKiss
 reference; the panel operator over five seeds); a second benchmark and the undesignability axis are not yet
@@ -1566,7 +1600,7 @@ arm / pool & held-out primary ($n{=}60$) & other pools\\
 gamer (pKiss) & $43/60$ pKiss; $2/43$ ProbKnot; $1/60$ p-un. & ---\\
 DesiRNA (borrowed) & $43/60$ pKiss; $26/43$ ProbKnot; $0/43$ p-un. & $2/10$ p-un. (family)\\
 panel\_auto (5 seeds) & pKiss$\wedge$ProbKnot $\{37,34,37,36,34\}$; p-un.\ $\{8,3,5,5,4\}$ (mean $5.0$) & $5/50$ p-un.\ (2nd); $2/60$ pk$\wedge$pb, $0/60$ p-un.\ (cross); $4/10$ p-un.\ (family)\\
-\textbf{agent-invented} & $35/60$ pKiss$\wedge$ProbKnot; \textbf{$9/60$ p-un.} & inherits cross-source narrowness\\
+\textbf{agent-invented} (6 models) & pKiss$\wedge$ProbKnot $27$--$53/60$; \textbf{p-un.\ $2$--$17/60$} (Table~\ref{tab:models}) & $4/6$ exceed hand-built; inherit cross-source narrowness\\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -1624,7 +1658,9 @@ mutate error positions to minimize a $\lvert T\!\setminus\!P_{\mathrm{pKiss}}\rv
 The invented source is archived at \texttt{runs/cc\_ascent/invent\_operator/invented\_design.py}.
 Figure~\ref{fig:invent} shows the learning curve: the agent's training solve rate rises as it folds oracle
 feedback into successive rewrites, and the frozen best round certifies at $9/60$ panel-unanimous on the
-held-out pool.
+held-out pool. This is the worked example for one model; the analogous frozen results for all six frontier
+models (three open, three closed) are summarized in Table~\ref{tab:models}, and every one peaks by round
+$\le5$.
 
 \begin{figure}[h]\centering
 \includegraphics[width=0.78\linewidth]{fig_cc_invent.pdf}

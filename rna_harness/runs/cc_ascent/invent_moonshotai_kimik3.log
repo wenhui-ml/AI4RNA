@@ -1,0 +1,19 @@
+INVENT: model=moonshotai/kimi-k3 -> moonshotai_kimik3  rounds<=12 patience=3 train=16 held-out=60 rnastr=True
+  round 0: train solved 9/16  errs=['_TO()', '_TO()']
+  round 1: train solved 10/16  errs=[]
+  round 2: train solved 11/16  errs=["RuntimeError('KeyError(30)')"]
+  round 3: train solved 10/16  errs=[]
+  round 4: train solved 12/16  errs=[]
+  round 5: train solved 9/16  errs=[]
+  round 6: train solved 10/16  errs=['_TO()', '_TO()']
+  round 7: train solved 12/16  errs=[]
+  early stop: no improvement for 3 rounds (best 12/16 @ round 4)
+  held-out 10/60: pKiss=6 pk&pb=8 unanimous=1
+  held-out 20/60: pKiss=15 pk&pb=17 unanimous=4
+  held-out 30/60: pKiss=21 pk&pb=25 unanimous=5
+  held-out 40/60: pKiss=29 pk&pb=34 unanimous=6
+  held-out 50/60: pKiss=36 pk&pb=43 unanimous=7
+  held-out 60/60: pKiss=43 pk&pb=53 unanimous=10
+
+INVENTED operator on held-out 60: pKiss=43, pKiss&ProbKnot=53, panel-unanimous=10. (hand-built panel_auto: 3-8/60; floor: 0/60.)
+-> invent_operator/result.json

@@ -1,0 +1,445 @@
+{
+ "model": "openai/gpt-5.6-sol",
+ "best_train_solved": 12,
+ "best_round": 1,
+ "rounds": [
+  {
+   "round": 0,
+   "prompt_tokens": 450,
+   "completion_tokens": 5504,
+   "train_solved": 11,
+   "n_train": 16,
+   "errors": [
+    "_TO()",
+    "_TO()",
+    "_TO()",
+    "_TO()",
+    "_TO()"
+   ]
+  },
+  {
+   "round": 1,
+   "prompt_tokens": 2769,
+   "completion_tokens": 4722,
+   "train_solved": 12,
+   "n_train": 16,
+   "errors": [
+    "_TO()",
+    "_TO()",
+    "_TO()",
+    "_TO()"
+   ]
+  },
+  {
+   "round": 2,
+   "prompt_tokens": 4973,
+   "completion_tokens": 4319,
+   "train_solved": 8,
+   "n_train": 16,
+   "errors": [
+    "_TO()",
+    "_TO()",
+    "_TO()",
+    "_TO()",
+    "_TO()"
+   ]
+  },
+  {
+   "round": 3,
+   "prompt_tokens": 7166,
+   "completion_tokens": 3537,
+   "train_solved": 6,
+   "n_train": 16,
+   "errors": [
+    "_TO()",
+    "_TO()",
+    "_TO()",
+    "_TO()",
+    "_TO()"
+   ]
+  },
+  {
+   "round": 4,
+   "prompt_tokens": 9368,
+   "completion_tokens": 3431,
+   "train_solved": 7,
+   "n_train": 16,
+   "errors": [
+    "_TO()",
+    "_TO()",
+    "_TO()",
+    "_TO()",
+    "_TO()"
+   ]
+  }
+ ],
+ "best_code": "def design(target, seed=0):\n    rng = random.Random(seed)\n    n = len(target)\n    wanted = set(target_pairs(target))\n\n    if n == 0:\n        return \"\"\n\n    pairs = sorted((min(i, j), max(i, j)) for i, j in wanted)\n    partner = {}\n    for i, j in pairs:\n        partner[i] = j\n        partner[j] = i\n\n    units = []\n    unit_of = {}\n    for i, j in pairs:\n        unit_of[i] = len(units)\n        unit_of[j] = len(units)\n        units.append((i, j))\n    for i in range(n):\n        if i not in partner:\n            unit_of[i] = len(units)\n            units.append((i,))\n\n    canonical = ((\"G\", \"C\"), (\"C\", \"G\"), (\"A\", \"U\"), (\"U\", \"A\"))\n    all_pair_types = canonical + ((\"G\", \"U\"), (\"U\", \"G\"))\n\n    def crosses(p, q):\n        a, b = p\n        c, d = q\n        return (a < c < b < d) or (c < a < d < b)\n\n    def is_nested(ps):\n        ps = list(ps)\n        for x in range(len(ps)):\n            for y in range(x + 1, len(ps)):\n                if crosses(ps[x], ps[y]):\n                    return False\n        return True\n\n    def nested_db(ps):\n        out = [\".\"] * n\n        for i, j in ps:\n            out[i] = \"(\"\n            out[j] = \")\"\n        return \"\".join(out)\n\n    # Bracket alphabets usually encode the target's crossing stem families.\n    families = {}\n    for p in pairs:\n        families.setdefault(target[p[0]], []).append(p)\n    family_lists = list(families.values())\n\n    projections = []\n    projection_seen = set()\n\n    def add_projection(ps):\n        ps = frozenset(ps)\n        if ps not in projection_seen and is_nested(ps):\n            projection_seen.add(ps)\n            projections.append(ps)\n\n    if is_nested(pairs):\n        add_projection(pairs)\n\n    for f in family_lists:\n        add_projection(f)\n\n    # Enumerate compatible combinations of bracket families.\n    if len(family_lists) <= 7:\n        combinations = []\n        for mask in range(1, 1 << len(family_lists)):\n            ps = []\n            for k in range(len(family_lists)):\n                if mask & (1 << k):\n                    ps.extend(family_lists[k])\n            if is_nested(ps):\n                combinations.append(ps)\n        combinations.sort(key=lambda x: -len(x))\n        for ps in combinations[:8]:\n            add_projection(ps)\n\n    # Additional maximal nested projections independent of bracket notation.\n    for mode in range(8):\n        order = list(pairs)\n        if mode == 0:\n            order.sort(key=lambda p: (p[1] - p[0], p[0]))\n        elif mode == 1:\n            order.sort(key=lambda p: (-(p[1] - p[0]), p[0]))\n        elif mode == 2:\n            order.sort()\n        elif mode == 3:\n            order.sort(reverse=True)\n        else:\n            rng.shuffle(order)\n        selected = []\n        for p in order:\n            if all(not crosses(p, q) for q in selected):\n                selected.append(p)\n        add_projection(selected)\n\n    if not projections:\n        add_projection([])\n\n    pair_rank = {}\n    for fam in family_lists:\n        fam = sorted(fam)\n        for k, p in enumerate(fam):\n            pair_rank[p] = k\n\n    def compatible_from_raw(raw, projection, style):\n        if raw is None or len(raw) != n:\n            raw = rand_seq(n, rng.randrange(1 << 30))\n        s = list(raw)\n        for i in range(n):\n            if s[i] not in \"ACGU\":\n                s[i] = \"ACGU\"[rng.randrange(4)]\n\n        for k, (i, j) in enumerate(pairs):\n            current = (s[i], s[j])\n            if (i, j) in projection and current in all_pair_types:\n                continue\n\n            rank = pair_rank.get((i, j), k)\n            if style == 0:\n                choice = (rank + k) % 4\n            elif style == 1:\n                choice = (2 * rank + k + 1) % 4\n            elif style == 2:\n                choice = (rank // 2 + k) & 1\n            else:\n                choice = rng.randrange(4)\n            s[i], s[j] = canonical[choice]\n        return \"\".join(s)\n\n    starts = []\n    start_seen = set()\n\n    def add_start(seq):\n        if (seq is not None and len(seq) == n and\n                all(c in \"ACGU\" for c in seq) and seq not in start_seen):\n            start_seen.add(seq)\n            starts.append(seq)\n\n    # Inverse-fold the strongest nested views of the pseudoknot.\n    for k, projection in enumerate(projections[:8]):\n        raw = inverse_fold_cf(\n            nested_db(projection),\n            seed=(seed * 1000003 + k * 9176 + 41) & 0x7fffffff\n        )\n        add_start(compatible_from_raw(raw, projection, k % 3))\n\n    # Fully compatible patterned sequences provide useful independent basins.\n    for style in range(5):\n        if style < 4:\n            s = [\"A\" if ((i + style) & 1) == 0 else \"C\" for i in range(n)]\n        else:\n            s = list(rand_seq(\n                n, (seed * 65537 + style * 104729 + 73) & 0x7fffffff\n            ))\n        for k, (i, j) in enumerate(pairs):\n            rank = pair_rank.get((i, j), k)\n            if style == 0:\n                t = (rank + k) % 4\n            elif style == 1:\n                t = (2 * rank + k + 1) % 4\n            elif style == 2:\n                t = (rank // 2 + k) & 1\n            elif style == 3:\n                t = 2 + ((rank + k) & 1)\n            else:\n                t = rng.randrange(4)\n            s[i], s[j] = canonical[t]\n        add_start(\"\".join(s))\n\n    cache = {}\n    evaluations = [0]\n    solved = [None]\n\n    def evaluate(seq):\n        old = cache.get(seq)\n        if old is not None:\n            return old\n\n        pk = set(fold_pkiss_pairs(seq))\n        pr = set(fold_probknot_pairs(seq))\n        evaluations[0] += 1\n\n        if pk == wanted and pr == wanted:\n            solved[0] = seq\n\n        miss_pk = wanted - pk\n        miss_pr = wanted - pr\n        extra_pk = pk - wanted\n        extra_pr = pr - wanted\n\n        total = (len(miss_pk) + len(miss_pr) +\n                 len(extra_pk) + len(extra_pr))\n        worst = max(len(miss_pk) + len(extra_pk),\n                    len(miss_pr) + len(extra_pr))\n        disagreement = len(pk ^ pr)\n        missing = len(miss_pk) + len(miss_pr)\n        extra = len(extra_pk) + len(extra_pr)\n\n        energy = (12 * total + 4 * worst + 2 * disagreement +\n                  2 * missing + extra)\n        result = (energy, total, worst, disagreement,\n                  miss_pk, miss_pr, extra_pk, extra_pr)\n        cache[seq] = result\n        return result\n\n    ranked = []\n    for seq in starts:\n        value = evaluate(seq)\n        if solved[0] is not None:\n            return solved[0]\n        ranked.append((value[:4], seq, value))\n\n    ranked.sort(key=lambda x: x[0])\n    best_seq = ranked[0][1]\n    best_value = ranked[0][2]\n\n    # Keep several distinct search chains, since the two predictors often\n    # prefer different local optima.\n    chain_count = min(8, len(ranked))\n    chains = []\n    for k in range(chain_count):\n        chains.append([ranked[k][1], ranked[k][2], 0])\n\n    def discrepancy_units(value):\n        miss = value[4] | value[5]\n        extra = value[6] | value[7]\n        weighted = []\n\n        for i, j in miss:\n            if i in unit_of:\n                weighted.extend((unit_of[i],) * 5)\n            if j in unit_of:\n                weighted.extend((unit_of[j],) * 5)\n\n        for i, j in extra:\n            if 0 <= i < n:\n                weighted.extend((unit_of[i],) * 3)\n            if 0 <= j < n:\n                weighted.extend((unit_of[j],) * 3)\n\n        # Disagreements are especially informative when both folds are close.\n        for i, j in ((value[4] | value[6]) ^ (value[5] | value[7])):\n            if 0 <= i < n:\n                weighted.append(unit_of[i])\n            if 0 <= j < n:\n                weighted.append(unit_of[j])\n\n        return weighted, miss, extra\n\n    def mutate(seq, value, large=False):\n        s = list(seq)\n        weighted, missing, extra = discrepancy_units(value)\n\n        if large:\n            changes = 2 + rng.randrange(3)\n        else:\n            r = rng.random()\n            changes = 1 if r < 0.80 else (2 if r < 0.96 else 3)\n\n        chosen = []\n        for z in range(changes):\n            # Directly strengthen a missing target pair when possible.\n            if missing and rng.random() < 0.48:\n                mp = list(missing)\n                i, j = mp[rng.randrange(len(mp))]\n                u = unit_of[i]\n            elif weighted and rng.random() < 0.90:\n                u = weighted[rng.randrange(len(weighted))]\n            else:\n                u = rng.randrange(len(units))\n            if u not in chosen:\n                chosen.append(u)\n\n        if not chosen:\n            chosen.append(rng.randrange(len(units)))\n\n        missing_units = set()\n        for i, j in missing:\n            missing_units.add(unit_of[i])\n\n        for u in chosen:\n            item = units[u]\n            if len(item) == 1:\n                i = item[0]\n                choices = [c for c in \"ACGU\" if c != s[i]]\n                # A/C are less prone than G/U to unintended stable pairing.\n                if rng.random() < 0.65:\n                    preferred = [c for c in choices if c in \"AC\"]\n                    if preferred:\n                        choices = preferred\n                s[i] = choices[rng.randrange(len(choices))]\n            else:\n                i, j = item\n                old = (s[i], s[j])\n                if u in missing_units:\n                    choices = [(\"G\", \"C\"), (\"C\", \"G\"),\n                               (\"A\", \"U\"), (\"U\", \"A\")]\n                    if rng.random() < 0.65:\n                        choices = choices[:2]\n                else:\n                    choices = list(canonical)\n                    if rng.random() < 0.08:\n                        choices.extend(((\"G\", \"U\"), (\"U\", \"G\")))\n                choices = [p for p in choices if p != old]\n                a, b = choices[rng.randrange(len(choices))]\n                s[i], s[j] = a, b\n        return \"\".join(s)\n\n    # Expensive crossing-aware folds dominate runtime, so use a length-aware\n    # budget and spend it mainly on discrepancy-directed mutations.\n    if n <= 42:\n        budget = 560\n    elif n <= 55:\n        budget = 470\n    else:\n        budget = 390\n\n    iteration = 0\n    while evaluations[0] < budget and solved[0] is None:\n        cidx = iteration % len(chains)\n        seq, value, stale = chains[cidx]\n\n        large = (stale > 24 and iteration % 3 == 0) or (iteration % 41 == 40)\n        candidate = mutate(seq, value, large)\n        candidate_value = evaluate(candidate)\n\n        if solved[0] is not None:\n            return solved[0]\n\n        delta = candidate_value[0] - value[0]\n        temperature = 5.0 + 18.0 * ((iteration % 70) / 69.0)\n        accept = delta <= 0\n        if not accept and delta < 80:\n            accept = rng.random() < math.exp(-delta / temperature)\n\n        if accept:\n            if candidate_value[:4] < value[:4]:\n                stale = 0\n            else:\n                stale += 1\n            chains[cidx] = [candidate, candidate_value, stale]\n        else:\n            chains[cidx][2] += 1\n\n        if candidate_value[:4] < best_value[:4]:\n            best_seq = candidate\n            best_value = candidate_value\n\n        # Re-seed a stagnant chain from the global best, with a multi-site\n        # perturbation to escape sequence-level local minima.\n        if chains[cidx][2] > 45:\n            jump = mutate(best_seq, best_value, True)\n            jump_value = evaluate(jump)\n            if solved[0] is not None:\n                return solved[0]\n            chains[cidx] = [jump, jump_value, 0]\n            if jump_value[:4] < best_value[:4]:\n                best_seq, best_value = jump, jump_value\n\n        iteration += 1\n\n    return solved[0] if solved[0] is not None else best_seq",
+ "heldout": [
+  {
+   "id": "pseudobase:0",
+   "error": "_TO()"
+  },
+  {
+   "id": "pseudobase:1",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:2",
+   "error": "_TO()"
+  },
+  {
+   "id": "pseudobase:3",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": true,
+   "unanimous": true
+  },
+  {
+   "id": "pseudobase:4",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:5",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:6",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:7",
+   "error": "_TO()"
+  },
+  {
+   "id": "pseudobase:8",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:9",
+   "error": "_TO()"
+  },
+  {
+   "id": "pseudobase:10",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:11",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:12",
+   "error": "_TO()"
+  },
+  {
+   "id": "pseudobase:13",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:14",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:15",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:16",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:17",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:18",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:19",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:20",
+   "error": "_TO()"
+  },
+  {
+   "id": "pseudobase:21",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:22",
+   "error": "_TO()"
+  },
+  {
+   "id": "pseudobase:23",
+   "error": "_TO()"
+  },
+  {
+   "id": "pseudobase:24",
+   "error": "_TO()"
+  },
+  {
+   "id": "pseudobase:25",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:26",
+   "error": "_TO()"
+  },
+  {
+   "id": "pseudobase:27",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:28",
+   "error": "_TO()"
+  },
+  {
+   "id": "pseudobase:29",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:30",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:31",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:32",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:33",
+   "error": "_TO()"
+  },
+  {
+   "id": "pseudobase:34",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:35",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": true,
+   "unanimous": true
+  },
+  {
+   "id": "pseudobase:36",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:37",
+   "error": "_TO()"
+  },
+  {
+   "id": "pseudobase:38",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": true,
+   "unanimous": true
+  },
+  {
+   "id": "pseudobase:39",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:40",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:41",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:42",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:43",
+   "error": "_TO()"
+  },
+  {
+   "id": "pseudobase:44",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:45",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:46",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:47",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:48",
+   "error": "_TO()"
+  },
+  {
+   "id": "pseudobase:49",
+   "error": "_TO()"
+  },
+  {
+   "id": "pseudobase:50",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:51",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:52",
+   "error": "_TO()"
+  },
+  {
+   "id": "pseudobase:53",
+   "error": "_TO()"
+  },
+  {
+   "id": "pseudobase:54",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": true,
+   "unanimous": true
+  },
+  {
+   "id": "pseudobase:55",
+   "error": "_TO()"
+  },
+  {
+   "id": "pseudobase:56",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": true,
+   "unanimous": true
+  },
+  {
+   "id": "pseudobase:57",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:58",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:59",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  }
+ ],
+ "heldout_pkiss": 41,
+ "heldout_pk_and_pb": 41,
+ "heldout_panel_unanimous": 5
+}

@@ -1,0 +1,441 @@
+{
+ "model": "deepseek/deepseek-v4-pro",
+ "best_train_solved": 5,
+ "best_round": 4,
+ "rounds": [
+  {
+   "round": 0,
+   "prompt_tokens": 476,
+   "completion_tokens": 8174,
+   "train_solved": 0,
+   "n_train": 16,
+   "errors": [
+    "_TO()",
+    "_TO()",
+    "_TO()",
+    "_TO()",
+    "_TO()"
+   ]
+  },
+  {
+   "round": 1,
+   "prompt_tokens": 974,
+   "completion_tokens": 1057,
+   "train_solved": 4,
+   "n_train": 16,
+   "errors": [
+    "_TO()",
+    "_TO()",
+    "_TO()",
+    "_TO()",
+    "_TO()"
+   ]
+  },
+  {
+   "round": 2,
+   "prompt_tokens": 2149,
+   "completion_tokens": 2776,
+   "train_solved": 4,
+   "n_train": 16,
+   "errors": [
+    "_TO()",
+    "_TO()",
+    "_TO()",
+    "_TO()",
+    "_TO()"
+   ]
+  },
+  {
+   "round": 3,
+   "prompt_tokens": 3518,
+   "completion_tokens": 5148,
+   "train_solved": 0,
+   "n_train": 16,
+   "errors": [
+    "_TO()",
+    "_TO()",
+    "_TO()",
+    "_TO()",
+    "_TO()"
+   ]
+  },
+  {
+   "round": 4,
+   "prompt_tokens": 5382,
+   "completion_tokens": 3891,
+   "train_solved": 5,
+   "n_train": 16,
+   "errors": [
+    "_TO()",
+    "_TO()",
+    "_TO()",
+    "_TO()",
+    "_TO()"
+   ]
+  },
+  {
+   "round": 5,
+   "prompt_tokens": 6294,
+   "completion_tokens": 5662,
+   "train_solved": 1,
+   "n_train": 16,
+   "errors": []
+  },
+  {
+   "round": 6,
+   "prompt_tokens": 6538,
+   "completion_tokens": 5983,
+   "train_solved": 2,
+   "n_train": 16,
+   "errors": [
+    "_TO()",
+    "_TO()",
+    "_TO()"
+   ]
+  },
+  {
+   "round": 7,
+   "prompt_tokens": 8297,
+   "completion_tokens": 4723,
+   "train_solved": 0,
+   "n_train": 16,
+   "errors": [
+    "RuntimeError('NameError(\"name \\'comp_dict\\' is not defined\")')",
+    "RuntimeError('NameError(\"name \\'comp_dict\\' is not defined\")')",
+    "RuntimeError('NameError(\"name \\'comp_dict\\' is not defined\")')",
+    "RuntimeError('NameError(\"name \\'comp_dict\\' is not defined\")')",
+    "RuntimeError('NameError(\"name \\'comp_dict\\' is not defined\")')"
+   ]
+  }
+ ],
+ "best_code": "def design(target, seed=0):\n    random.seed(seed)\n    n = len(target)\n    tp = target_pairs(target)\n    pairs = [(i, j) for i, j in tp if i < j]\n    partner = {}\n    for i, j in pairs:\n        partner[i] = j\n        partner[j] = i\n    unpaired = [i for i in range(n) if i not in partner]\n    bases = ['A', 'C', 'G', 'U']\n\n    eval_count = 0\n    max_evals = 100\n\n    def safe_eval(seq):\n        nonlocal eval_count\n        if eval_count >= max_evals:\n            return None, False\n        eval_count += 1\n        try:\n            pk = fold_pkiss_pairs(seq)\n            pb = fold_probknot_pairs(seq)\n        except BaseException:\n            return None, False\n        if pk == tp and pb == tp:\n            return (seq, 0), True\n        diff = len(pk ^ tp) + len(pb ^ tp)\n        return (seq, diff), False\n\n    # initial sequence: G-C pairs, A for unpaired\n    seq_list = ['A'] * n\n    for i, j in pairs:\n        seq_list[i] = 'G'\n        seq_list[j] = 'C'\n    seq = ''.join(seq_list)\n    res, success = safe_eval(seq)\n    if success:\n        return seq\n    best_seq = seq\n    best_diff = res[1] if res else 1e9\n\n    # try random assignments of pair types and unpaired bases\n    for _ in range(20):\n        if eval_count >= max_evals:\n            break\n        seq_list2 = ['A'] * n\n        for i, j in pairs:\n            b = random.choice(bases)\n            seq_list2[i] = b\n            seq_list2[j] = COMP[b]\n        for i in unpaired:\n            seq_list2[i] = random.choice(bases)\n        seq2 = ''.join(seq_list2)\n        res, success = safe_eval(seq2)\n        if success:\n            return seq2\n        if res and res[1] < best_diff:\n            best_diff = res[1]\n            best_seq = seq2\n\n    # mutate unpaired positions one by one\n    for i in unpaired:\n        if eval_count >= max_evals:\n            break\n        for new_base in bases:\n            if new_base == best_seq[i]:\n                continue\n            new_seq = best_seq[:i] + new_base + best_seq[i+1:]\n            res, success = safe_eval(new_seq)\n            if success:\n                return new_seq\n            if res and res[1] < best_diff:\n                best_diff = res[1]\n                best_seq = new_seq\n\n    # try swapping pair types (keep complementarity)\n    for i, j in pairs:\n        if eval_count >= max_evals:\n            break\n        old_i = best_seq[i]\n        old_j = best_seq[j]\n        for new_i in bases:\n            new_j = COMP[new_i]\n            if new_i == old_i and new_j == old_j:\n                continue\n            new_seq_list = list(best_seq)\n            new_seq_list[i] = new_i\n            new_seq_list[j] = new_j\n            new_seq = ''.join(new_seq_list)\n            res, success = safe_eval(new_seq)\n            if success:\n                return new_seq\n            if res and res[1] < best_diff:\n                best_diff = res[1]\n                best_seq = new_seq\n\n    return best_seq",
+ "heldout": [
+  {
+   "id": "pseudobase:0",
+   "error": "_TO()"
+  },
+  {
+   "id": "pseudobase:1",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:2",
+   "error": "_TO()"
+  },
+  {
+   "id": "pseudobase:3",
+   "error": "_TO()"
+  },
+  {
+   "id": "pseudobase:4",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": true,
+   "unanimous": true
+  },
+  {
+   "id": "pseudobase:5",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:6",
+   "error": "_TO()"
+  },
+  {
+   "id": "pseudobase:7",
+   "error": "_TO()"
+  },
+  {
+   "id": "pseudobase:8",
+   "error": "_TO()"
+  },
+  {
+   "id": "pseudobase:9",
+   "error": "_TO()"
+  },
+  {
+   "id": "pseudobase:10",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": true,
+   "unanimous": true
+  },
+  {
+   "id": "pseudobase:11",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:12",
+   "error": "_TO()"
+  },
+  {
+   "id": "pseudobase:13",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:14",
+   "pkiss": false,
+   "probknot": false,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:15",
+   "error": "_TO()"
+  },
+  {
+   "id": "pseudobase:16",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:17",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:18",
+   "error": "_TO()"
+  },
+  {
+   "id": "pseudobase:19",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:20",
+   "error": "_TO()"
+  },
+  {
+   "id": "pseudobase:21",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:22",
+   "error": "_TO()"
+  },
+  {
+   "id": "pseudobase:23",
+   "error": "_TO()"
+  },
+  {
+   "id": "pseudobase:24",
+   "error": "_TO()"
+  },
+  {
+   "id": "pseudobase:25",
+   "error": "_TO()"
+  },
+  {
+   "id": "pseudobase:26",
+   "error": "_TO()"
+  },
+  {
+   "id": "pseudobase:27",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:28",
+   "error": "_TO()"
+  },
+  {
+   "id": "pseudobase:29",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:30",
+   "error": "_TO()"
+  },
+  {
+   "id": "pseudobase:31",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:32",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:33",
+   "error": "_TO()"
+  },
+  {
+   "id": "pseudobase:34",
+   "error": "_TO()"
+  },
+  {
+   "id": "pseudobase:35",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:36",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:37",
+   "error": "_TO()"
+  },
+  {
+   "id": "pseudobase:38",
+   "error": "_TO()"
+  },
+  {
+   "id": "pseudobase:39",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:40",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:41",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:42",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:43",
+   "error": "_TO()"
+  },
+  {
+   "id": "pseudobase:44",
+   "pkiss": false,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:45",
+   "error": "_TO()"
+  },
+  {
+   "id": "pseudobase:46",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:47",
+   "error": "_TO()"
+  },
+  {
+   "id": "pseudobase:48",
+   "error": "_TO()"
+  },
+  {
+   "id": "pseudobase:49",
+   "error": "_TO()"
+  },
+  {
+   "id": "pseudobase:50",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:51",
+   "error": "_TO()"
+  },
+  {
+   "id": "pseudobase:52",
+   "error": "_TO()"
+  },
+  {
+   "id": "pseudobase:53",
+   "error": "_TO()"
+  },
+  {
+   "id": "pseudobase:54",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:55",
+   "error": "_TO()"
+  },
+  {
+   "id": "pseudobase:56",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:57",
+   "error": "_TO()"
+  },
+  {
+   "id": "pseudobase:58",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  },
+  {
+   "id": "pseudobase:59",
+   "pkiss": true,
+   "probknot": true,
+   "shapeknots": false,
+   "unanimous": false
+  }
+ ],
+ "heldout_pkiss": 26,
+ "heldout_pk_and_pb": 27,
+ "heldout_panel_unanimous": 2
+}

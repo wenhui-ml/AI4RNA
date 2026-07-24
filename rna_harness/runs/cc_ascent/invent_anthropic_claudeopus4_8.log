@@ -1,0 +1,20 @@
+INVENT: model=anthropic/claude-opus-4.8 -> anthropic_claudeopus48  rounds<=12 patience=3 train=16 held-out=60 rnastr=True
+  round 0: compile/sandbox error ValueError('forbidden token in code: import')
+  round 1: train solved 3/16  errs=['_TO()', '_TO()']
+  round 2: train solved 9/16  errs=['_TO()', '_TO()']
+  round 3: train solved 7/16  errs=['_TO()', '_TO()']
+  round 4: train solved 9/16  errs=['_TO()', '_TO()']
+  round 5: train solved 12/16  errs=['_TO()', '_TO()']
+  round 6: train solved 12/16  errs=['_TO()', '_TO()']
+  round 7: compile/sandbox error ValueError('forbidden token in code: eval')
+  round 8: train solved 11/16  errs=['_TO()', '_TO()']
+  early stop: no improvement for 3 rounds (best 12/16 @ round 5)
+  held-out 10/60: pKiss=4 pk&pb=4 unanimous=1
+  held-out 20/60: pKiss=13 pk&pb=13 unanimous=6
+  held-out 30/60: pKiss=18 pk&pb=18 unanimous=8
+  held-out 40/60: pKiss=26 pk&pb=26 unanimous=9
+  held-out 50/60: pKiss=33 pk&pb=33 unanimous=10
+  held-out 60/60: pKiss=40 pk&pb=40 unanimous=14
+
+INVENTED operator on held-out 60: pKiss=40, pKiss&ProbKnot=40, panel-unanimous=14. (hand-built panel_auto: 3-8/60; floor: 0/60.)
+-> invent_operator/result.json
