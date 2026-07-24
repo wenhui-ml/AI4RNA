@@ -113,3 +113,52 @@ kk = sum(pooled); nn = len(pooled)
 print(f"\n  [NOT USED] naive pooled binomial P(X>={kk}/{nn} | p0=1/60) = {binom_tail_ge(kk, nn, GAMER_BASELINE):.2e}")
 print( "  -> INVALID as a p-value: the 5x60 pooled trials are clustered (same 60 targets recur), not 300")
 print( "     independent Bernoulli draws. We rely on the per-seed binomials/McNemar + the cluster-bootstrap CI above.")
+
+
+# ---- (4) matched-seed paired difference: gamer vs panel operator on the SAME 5 seeds + targets ----
+# Absorbs the 2nd external review (new-6): run the gamer on matched seeds and report the paired
+# Delta = p_panel - p_gamer with a target-level cluster bootstrap, instead of treating 1/60 as a fixed baseline.
+def _uni(rows, arm=None):
+    d = {}
+    for r in rows:
+        u = (((r.get("arms", {}) or {}).get(arm) or {}).get("panel") or {}).get("unanimous") if arm else r.get("unanimous")
+        d[r["id"]] = 1 if u else 0
+    return d
+
+
+def matched_seed_paired(B=20000):
+    PA = {0: _uni(json.load(open(os.path.join(HERE, "panel_auto/panel_panel_auto.json")))["rows"]),
+          1: _uni(json.load(open(os.path.join(HERE, "seed1/panel/panel_panel_auto.json")))["rows"]),
+          2: _uni(json.load(open(os.path.join(HERE, "seed2/panel/panel_panel_auto.json")))["rows"]),
+          3: _uni(json.load(open(os.path.join(HERE, "seed3/sweep.json")))["rows"], "panel_auto"),
+          4: _uni(json.load(open(os.path.join(HERE, "seed4/sweep.json")))["rows"], "panel_auto")}
+    GA = {s: _uni(json.load(open(os.path.join(HERE, f"gamer_s{s}/sweep.json")))["rows"], "autonomous") for s in range(5)}
+    print("\n(4) MATCHED-SEED paired difference (gamer vs panel operator, same seeds+targets):")
+    per_t = {t: [] for t in IDS}
+    for s in range(5):
+        pc = sum(PA[s].get(t, 0) for t in IDS); gc = sum(GA[s].get(t, 0) for t in IDS)
+        b = sum(1 for t in IDS if PA[s].get(t, 0) and not GA[s].get(t, 0))
+        c = sum(1 for t in IDS if GA[s].get(t, 0) and not PA[s].get(t, 0))
+        print(f"  seed {s}: gamer={gc}/60  panel={pc}/60  McNemar b={b},c={c},p={mcnemar_exact(b,c):.4f}")
+        for t in IDS:
+            per_t[t].append(PA[s].get(t, 0) - GA[s].get(t, 0))
+    diffs = [d for v in per_t.values() for d in v]; mean_d = sum(diffs) / len(diffs)
+    rates = []
+    for _ in range(B):
+        tot = n = 0
+        for _ in range(len(IDS)):
+            v = per_t[IDS[random.randrange(len(IDS))]]; tot += sum(v); n += len(v)
+        rates.append(tot / n)
+    rates.sort()
+    lo, hi = rates[int(0.025 * B)], rates[int(0.975 * B)]
+    gp = sum(sum(GA[s].get(t, 0) for t in IDS) for s in range(5))
+    pp = sum(sum(PA[s].get(t, 0) for t in IDS) for s in range(5))
+    print(f"  pooled: gamer={gp}/300  panel={pp}/300  Delta=p_panel-p_gamer={mean_d:+.4f}  "
+          f"cluster-boot 95% CI [{lo:+.4f},{hi:+.4f}]")
+
+
+if __name__ == "__main__":
+    try:
+        matched_seed_paired()
+    except Exception as e:
+        print("  (matched-seed section skipped:", repr(e)[:100], ")")

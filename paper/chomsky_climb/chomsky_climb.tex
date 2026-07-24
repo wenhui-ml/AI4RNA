@@ -782,15 +782,17 @@ Generalization grows with the number of oracles optimized, from $\sim\!1/60$ (on
 but only $3$--$8$ of the $\sim\!36$ two-oracle solves clear the held-out third. More distinct checks
 tighten the certificate; none makes it exact.
 
-\paragraph{Is the ascent statistically separated from gaming?} The bar is that the panel-unanimous held-out
-rate exceed the gaming baseline ($1/60$) with a CI clear of it (Table~\ref{tab:sep}). Because the same $60$
-targets recur across seeds, the pooled $5\times60$ outcomes are clustered; the valid pooled inference is a
-target-level cluster bootstrap, whose $95\%$ CI $[4.0,13.3]\%$ still excludes the gamer's $1.7\%$. The naive
-i.i.d.\ pooled bootstrap $[5.3,11.7]\%$ and a pooled binomial $p\!\approx\!8{\times}10^{-11}$ assume $300$
-independent trials and overstate the evidence. Per seed, the paired McNemar is significant only on the
-strongest seed ($p{=}0.016$, not surviving Bonferroni); the per-seed exact binomials against $1/60$ fall
-below $0.05$ on four of five seeds but treat the gamer rate as known. So the separation is real in aggregate
-and on the strongest seed, but a single $60$-target seed is underpowered.
+\paragraph{Is the ascent statistically separated from gaming?} We run the gamer on the \emph{same} five seeds
+and $60$ targets as the panel operator and compare by a matched, paired analysis, rather than treating the
+gamer's rate as a known constant (Table~\ref{tab:sep}). The gamer is panel-unanimous on $\{1,0,0,0,0\}/60$
+(pooled $1/300$), the panel operator on $\{8,3,5,5,4\}/60$ (pooled $25/300$). The paired difference
+$\Delta=p_{\mathrm{panel}}-p_{\mathrm{gamer}}$, over matched seeds and targets with a target-level cluster
+bootstrap, is $+0.080$ with $95\%$ CI $[+0.040,+0.127]$, excluding zero. Per seed the paired McNemar has
+$c=0$---the gamer never solves a target the panel operator misses---significant on the strongest seed
+($p{=}0.016$) and directionally clean but underpowered on the others. We deliberately avoid a pooled binomial
+against a fixed $1/60$: the seeds share targets and the gamer rate is itself estimated. The separation from
+gaming is thus carried by the matched paired difference (CI clear of zero), while any single $60$-target seed
+remains underpowered.
 
 
 \begin{table}[t]\centering\small
@@ -1106,10 +1108,11 @@ held-fixed-oracle $0/60$.
 (\S\ref{sec:exp}): $43/60$ under one predictor, $1/60$ panel-unanimous. A robust ascent needs an operator whose
 objective is panel agreement, not any single predictor: optimize the intersection of pKiss, ProbKnot, and
 ShapeKnots (or hold one out and judge on it), with the panel-unanimous held-out rate clearing the gaming
-baseline by a bootstrap CI. Pooled over five seeds (\S\ref{sec:exp}) this holds under clustered inference: a
-target-level cluster bootstrap $95\%$ CI of $[4.0\%,13.3\%]$ (pooled $25/300$) clears the $1.7\%$ baseline, and
-the paired McNemar is significant on the strongest seed ($p\!=\!0.016$, not after Bonferroni). We do not quote
-the naive pooled binomial ($p\!\approx\!8\times10^{-11}$), which wrongly treats the $300$ trials as independent
+baseline by a matched, paired comparison. Running the gamer on the same five seeds (\S\ref{sec:exp}), the
+paired difference $\Delta{=}p_{\mathrm{panel}}{-}p_{\mathrm{gamer}}$ is $+0.080$ with a target-level
+cluster-bootstrap $95\%$ CI $[+0.040,+0.127]$ that clears zero (pooled $25/300$ vs.\ $1/300$); the paired
+McNemar is significant on the strongest seed ($p\!=\!0.016$) with $c{=}0$ throughout. We do not quote a
+pooled binomial against a fixed $1/60$, which wrongly treats the $300$ trials as independent
 when the same $60$ targets recur. A single seed is underpowered, so separation requires pooling; a second
 disjoint pool (Pseudobase $60$--$110$: floor $0/50$, operator $5/50$) confirms it generalizes. The certificate
 makes ``did it happen?'' decidable rather than a matter of which oracle one reports.
@@ -1571,25 +1574,24 @@ $-$ repair (no oracle-guided search) & $25$ & $-18$ (carries the capability)\\
 \end{table}
 \begin{table}[t]\centering\small
 \setlength{\tabcolsep}{4.5pt}\renewcommand{\arraystretch}{1.15}
-\caption{\textbf{Separation of the panel-robust ascent from single-oracle gaming} (held-out $n{=}60$;
-panel-unanimous $=$ pKiss\,$\wedge$\,ProbKnot\,$\wedge$\,ShapeKnots, all exact). Percentile bootstrap
-($B{=}20{,}000$; per-seed rows i.i.d., pooled row a target-level cluster bootstrap since the $60$
-targets recur across seeds); paired McNemar over the identical $60$ targets ($b$ solved only by the
-panel-optimizer, $c$ only by the gamer); exact one-sided binomial against the gamer's fixed $p_0{=}1/60$.
-Pooled clears the baseline under clustered inference; single seeds are underpowered. A naive pooled binomial
-is invalid under target clustering and is not used. (\texttt{runs/cc\_ascent/stats\_separation.py}.)}\label{tab:sep}
-\begin{tabularx}{\linewidth}{@{}Xccccc@{}}
+\caption{\textbf{Separation of the panel-robust ascent from single-oracle gaming}, matched design (held-out
+$n{=}60$; panel-unanimous $=$ pKiss\,$\wedge$\,ProbKnot\,$\wedge$\,ShapeKnots, all exact). The gamer
+(single-oracle pKiss operator) and the panel operator run on the \emph{same} five seeds and targets. We report
+the paired McNemar per seed ($b$ solved only by the panel operator, $c$ only by the gamer) and the pooled
+paired difference $\Delta{=}p_{\mathrm{panel}}{-}p_{\mathrm{gamer}}$ with a target-level cluster bootstrap
+($B{=}20{,}000$), not a binomial against a fixed baseline. The paired $\Delta$ CI clears zero; single seeds
+are underpowered. (\texttt{runs/cc\_ascent/stats\_separation.py}.)}\label{tab:sep}
+\begin{tabularx}{\linewidth}{@{}Xccc@{}}
 \toprule
-\textbf{arm} & \textbf{p-un./60} & \textbf{rate} & \textbf{boot.\ 95\% CI} & \textbf{McNemar vs.\ gamer} & \textbf{binom.\ vs.\ $1/60$}\\
+\textbf{seed} & \textbf{gamer p-un./60} & \textbf{panel p-un./60} & \textbf{paired McNemar ($b,c,p$)}\\
 \midrule
-gamer (single-oracle, seed 0) & $1$ & $1.7\%$ & --- & --- & ---\\
-panel\_auto seed 0 & $8$ & $13.3\%$ & $[5.0,21.7]\%$ & $b{=}7,c{=}0,p{=}0.016$ & $7{\times}10^{-6}$\\
-panel\_auto seed 1 & $3$ & $5.0\%$ & $[0.0,11.7]\%$ & $b{=}2,c{=}0,p{=}0.50$ & $0.079$\\
-panel\_auto seed 2 & $5$ & $8.3\%$ & $[1.7,16.7]\%$ & $b{=}5,c{=}1,p{=}0.22$ & $3.3{\times}10^{-3}$\\
-panel\_auto seed 3 & $5$ & $8.3\%$ & $[1.7,16.7]\%$ & $b{=}4,c{=}0,p{=}0.13$ & $3.3{\times}10^{-3}$\\
-panel\_auto seed 4 & $4$ & $6.7\%$ & $[1.7,13.3]\%$ & $b{=}3,c{=}0,p{=}0.25$ & $1.8{\times}10^{-2}$\\
+seed 0 & $1$ & $8$ & $b{=}7,c{=}0,p{=}0.016$\\
+seed 1 & $0$ & $3$ & $b{=}3,c{=}0,p{=}0.25$\\
+seed 2 & $0$ & $5$ & $b{=}5,c{=}0,p{=}0.0625$\\
+seed 3 & $0$ & $5$ & $b{=}5,c{=}0,p{=}0.0625$\\
+seed 4 & $0$ & $4$ & $b{=}4,c{=}0,p{=}0.125$\\
 \midrule
-panel\_auto pooled (5 seeds) & $25/300$ & $8.3\%$ & $[4.0,13.3]\%$\textsuperscript{clust} & --- & invalid\textsuperscript{clust}\\
+pooled & $1/300$ & $25/300$ & $\Delta{=}{+}0.080$, cluster-boot $95\%$ CI $[{+}0.040,{+}0.127]$\\
 \bottomrule
 \end{tabularx}
 \end{table}
