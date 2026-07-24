@@ -38,10 +38,18 @@ def htype(n, m, L=4):
     return "(" * n + "." * L + "[" * m + "." * L + ")" * n + "." * L + "]" * m
 
 
-# Diagonal n=m in {3..8} (2bp stems are panel-undesignable even for SOTA -- dropped), plus asymmetric cases.
-# The scaling axis is stem size; success-vs-size for CF-floor / DesiRNA / panel_auto is the OOD-transfer curve.
-GRID = ([(n, n, "diag") for n in (3, 4, 5, 6, 7, 8)]
-        + [(3, 6, "asym"), (6, 3, "asym"), (4, 8, "asym"), (8, 4, "asym")])
+# DECISIVE unbounded-transfer protocol (reviewer concern 2, option B):
+#   dev/validation set (NOT tested here): small stems n=m in {2,3,4}. The operator's procedure and its
+#   size-INDEPENDENT budgets (PKP_*) were fixed on that regime and are FROZEN -- no per-size tuning below.
+#   test set (this GRID): strictly LARGER, unseen (n,m), spanning several length regimes and asymmetric
+#   combinations, up to ~3-4x the largest dev stem. A single finite-description operator succeeding across a
+#   growing ladder it never saw is uniform-procedure evidence over the unbounded non-CF family {T_{n,m}}; a
+#   memorized table cannot (targets are novel), and a CF generator provably cannot (Prop.1). We report the
+#   success-vs-size curve AND the compute per size, and use DesiRNA as a designability reference so an
+#   operator failure at a size where DesiRNA succeeds reads as a search/budget gap, not undesignability.
+GRID = ([(n, n, "diag") for n in (5, 6, 7, 8, 9, 10, 12, 14)]
+        + [(4, 10, "asym"), (10, 4, "asym"), (5, 12, "asym"), (12, 5, "asym"),
+           (3, 14, "asym"), (14, 3, "asym"), (6, 12, "asym"), (12, 6, "asym")])
 
 
 def panel(seq, target, rnastr):
