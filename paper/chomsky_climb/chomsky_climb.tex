@@ -150,7 +150,7 @@ versus target-undesignability (a distinct, optional predictive capability).
 generative power (main line) from folding complexity (corollary) (\S\ref{sec:cf}).
 \item An empirical demonstration that the criterion catches oracle-gaming (\S\ref{sec:exp}): an invented,
 DesiRNA-free operator scores $43/60$ on held-out crossing targets under a single pseudoknot oracle but only
-$1/60$ panel-unanimous, a $43\times$ inflation the panel exposes, above a context-free floor of $0/60$.
+$1/60$ panel-unanimous, a collapse from $43/60$ to $1/60$ ($\sim\!43\times$ at a small denominator) the panel exposes, above a context-free floor of $0/60$.
 Re-optimizing for cross-oracle agreement recovers a small panel-robust ascent ($3$--$8/60$ over five seeds,
 mean $5.0$, unanimous across three distinct predictors).
 \end{enumerate}
@@ -299,8 +299,9 @@ grade into a training pool and a frozen held-out pool.
 A capability gain is a \emph{certified ascent} iff all three hold:
 \begin{description}[leftmargin=1.4em,itemsep=1pt]
 \item[\textnormal{(1) Positive $+$ transfer.}] On \emph{held-out} \MCF{} targets, the agent produces designs
-that a pseudoknot-aware oracle panel confirms fold to the target's crossing pair set, at a rate above zero
-and spread across targets (not concentrated on one).
+that a pseudoknot-aware oracle panel confirms fold to the target's crossing pair set. We report this positive
+rate with its uncertainty against the gaming baseline, require it to be spread across grades rather than
+concentrated on one target, and set no single pass/fail threshold.
 \item[\textnormal{(2) Negative (decidable).}] The agent's \emph{prior} repertoire, verified under the
 pseudoknot-free oracle \Ocf, provably cannot realize those targets: \Ocf's output space is exactly the
 nested structures (Prop.~\ref{prop:confine}), so its realizable-target language contains no crossing target.
@@ -645,11 +646,11 @@ as pseudoknots and manufacture an apparent ascent, the design-domain form of rew
 
 \paragraph{Designability pre-screening of the held-out pool.} Because $\Rze{\Omega}{\pi}$ is bounded above
 by the designable structures (\S\ref{sec:formal}), a crossing target that no sequence realizes would depress
-the positive rate for reasons unrelated to the agent's repertoire. We therefore pre-screen: targets that
-resist all solvers and admit an undesignability certificate by rival-structure construction
-\citep{zhou2024rigende,zhou2025motifs} move to the \textsc{undesignable} set (\S\ref{sec:impossible}) rather
-than the capability pool. This keeps the positive rate a measurement of capability, not realizability; it is
-frozen before any sealed prediction.
+the positive rate for reasons unrelated to the agent's repertoire. We therefore pre-screen, but only on an
+\emph{exact} undesignability certificate by rival-structure construction \citep{zhou2024rigende,zhou2025motifs},
+not on mere solver failure: a target is excluded only if it provably admits no design, so hard-but-designable
+targets stay in the pool and the screen cannot bias toward easy ones. Excluded targets move to the
+\textsc{undesignable} set (\S\ref{sec:impossible}); the screen is frozen before any sealed prediction.
 
 \paragraph{Positive-side adjudication under oracle-dependence.} Because the pseudoknot verdict is
 oracle-dependent (\S\ref{sec:bg}), a target counts as realized only under an explicit rule: (i)
@@ -728,7 +729,7 @@ panel-unanimous (pKiss $\wedge$ ProbKnot $\wedge$ ShapeKnots) & $\mathbf{1/43}$ 
 \includegraphics[width=0.78\linewidth]{fig_cc_collapse.pdf}
 \caption{\textbf{The panel exposes oracle-gaming (measured, $n=60$).} The invented operator's single-oracle
 solve rate ($43/60$, matching the borrowed DesiRNA ceiling) collapses to $2$ under a held-out predictor
-and to $1$ panel-unanimous, a $\sim\!43\times$ inflation invisible to a one-sided criterion, above the
+and to $1$ panel-unanimous, a collapse from $43/60$ to $1/60$ (a $\sim\!43\times$ ratio at a small denominator) invisible to a one-sided criterion, above the
 decidable context-free floor of $0/60$.}\label{fig:collapse}
 \end{figure}
 
@@ -815,8 +816,11 @@ matters: a single lax verifier is more easily mistaken for ground truth than a s
 
 
 \paragraph{Acquisition, made measurable.} To keep the ``acquisition'' sense of \S\ref{sec:intro}
-falsifiable, we score each operator on a reuse-and-lift ledger: a capability is learned if its component is
-reused across held-out episodes and lifts the solve rate, decisive if removing it collapses the gain. Every
+falsifiable, we score each operator on a reuse-and-lift ledger: a component is \emph{load-bearing} if it is
+reused across held-out episodes and lifts the solve rate, and \emph{decisive} if removing it collapses the
+gain. This ledger sense (reuse-and-lift) is distinct from being acquired by learning: the hand-built operator
+is engineered, and only the six agent-written operators (App.~\ref{app:invent}) are learned in the
+acquisition sense. Every
 operator is reused on all $60$ targets and is decisive (the \CF-confined rate is $0/60$). What separates
 them is the lift under an oracle they did not optimize: the pKiss-operator lifts $+0.72$ under pKiss but only
 $+0.03$ under a held-out predictor (mostly gaming), whereas the panel operator lifts $+0.62$ under its
@@ -892,9 +896,12 @@ closed (Claude-Opus-4.8, GPT-5.6-sol, Gemini-3.1-pro), only low-level primitives
 fold/inverse-fold, the pKiss and ProbKnot oracles, sequence utilities) and the task: write, sandbox-execute,
 and revise a reusable \texttt{design(target)} operator (up to $12$ rounds, patience-3 early stop) against a
 training pool disjoint from the held-out, with no recipe and no external solver (App.~\ref{app:invent}). All
-six invent an operator that clears the certificate on the held-out $60$: panel-unanimous $2$--$17/60$
-(Table~\ref{tab:models}, Fig.~\ref{fig:models}), each above the gamer's $1/60$ and the $0/60$ floor, and four
-(Gemini $17$, Opus $14$, Kimi $10$, GLM $9$) exceed the hand-built \texttt{panel\_auto}'s $3$--$8/60$.
+six invent an operator with a nonzero panel-unanimous rate on the held-out $60$: $2$--$17/60$
+(Table~\ref{tab:models}, Fig.~\ref{fig:models}), each above the single observed gamer count ($1/60$) and the
+$0/60$ floor, and four (Gemini $17$, Opus $14$, Kimi $10$, GLM $9$) exceed the hand-built
+\texttt{panel\_auto}'s $3$--$8/60$. These are single temperature-$0.4$ draws per model, so the comparison is
+descriptive (against the observed gamer), not a per-model significance test, and does not support a strict
+model ranking.
 Without the recipe the agents converge on the structure we hand-built: split the target into nested and
 crossing pairs, enforce complementarity, greedily repair against a pKiss\,$\wedge$\,ProbKnot cost. Gains
 saturate early (training rate peaks by round $\le5$; early stop at $5$--$9$), so invention budget is not the
@@ -926,8 +933,8 @@ DeepSeek-v4-pro & open & $5$ & $26/60$ & $\mathbf{2}$\\
 \begin{figure}[t]\centering
 \includegraphics[width=0.9\linewidth]{fig_cc_models.pdf}
 \caption{\textbf{Autonomous invention is a cross-frontier regularity.} Held-out panel-unanimous rate of the
-agent-written operator for six models (open $=$ green, closed $=$ blue). All six clear the certificate
-($>$ the gamer's $1$, $>$ the $0$ floor); four exceed the hand-built \texttt{panel\_auto} band
+agent-written operator for six models (open $=$ green, closed $=$ blue). All six exceed the single observed gamer count
+($1$) and the $0$ floor; four exceed the hand-built \texttt{panel\_auto} band
 ($3$--$8$).}\label{fig:models}
 \end{figure}
 
