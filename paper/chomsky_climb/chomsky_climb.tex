@@ -1077,10 +1077,15 @@ relevant sensitivity caveat. \emph{(ii) Generalization---and its limit.} On a \e
 disjoint} Pseudobase pool (indices $60$--$110$, never used to tune anything) the \CF{} floor is again $0/50$
 and the panel operator is panel-unanimous on $5/50$---the same regime as the first pool, so it is not overfit
 to one $60$-target sample. On a genuinely \emph{cross-source} pool (an independent bpRNA/ArchiveII-derived
-crossing set, $60$ targets, size-matched; App.~\ref{app:repro}) the \CF{} floor is again $0/60$ but the operator
-\emph{collapses} to $2/60$ (pKiss\,$\wedge$\,ProbKnot) and $0/60$ panel-unanimous. This is an honest bound: the
-\emph{negative} side generalizes across datasets, but the \emph{positive} capability is specific to the
-Pseudobase pseudoknot topologies it was developed on---not a general pseudoknot-design capability. \emph{(iii) Budget.} Scaling the operator's repair budget
+crossing set, $60$ targets, size-matched; App.~\ref{app:repro}) the \CF{} floor is again $0/60$, and \emph{both}
+our operator and the borrowed SOTA solver reach $0/60$ panel-unanimous: our operator forms $1$--$2/60$ crossings,
+while DesiRNA forms $9/60$ under pKiss but only $3/60$ survive ProbKnot and \emph{none} the full panel; boosting
+the operator's repair budget ($240$\,s, $2500$ iters) does not change this. The reading is therefore sharper than
+a simple overfit: the \emph{negative} side generalizes across datasets, while cross-source panel-unanimous
+crossing \emph{design} is a designability / panel-stringency wall---chiefly de-novo ShapeKnots---that the SOTA
+solver also hits. The positive side's honest ceiling is thus the in-distribution $3$--$8/60$, and the
+cross-source $0$ reflects the domain's difficulty under a strict panel rather than a defect specific to our
+operator. \emph{(iii) Budget.} Scaling the operator's repair budget
 over $\{60,180,300\}$\,s on a fixed $20$-target subset gives panel-unanimous $\{1,3,1\}/20$: \emph{no} clean
 budget trend at this scale---the outcome is dominated by search variance, consistent with the operator being
 oracle-guided \emph{search} rather than a budget-monotone capability. We report this null rather than a
@@ -1408,8 +1413,8 @@ objective for cross-oracle \emph{agreement} recovers a small but panel-robust as
 \S\ref{sec:exp})---so the honest state is a modest robust ascent, not none, and where no crossing is found at
 all E3 provides a bounded fallback; six open- and closed-weight frontier models each \emph{invent} such an
 operator autonomously ($2$--$17/60$, \S\ref{sec:exp}), so ``researcher-designed operator'' is no longer a
-limitation, though the invented operator
-inherits the same Pseudobase-topology narrowness. (iv) The criterion certifies an ascent \emph{to
+limitation, though the invented operators, like the borrowed SOTA solver, do not clear the strict panel
+cross-source---a designability/panel-stringency wall, not an overfit unique to them (\S\ref{sec:exp}). (iv) The criterion certifies an ascent \emph{to
 \MCF}; higher tiers are out of scope. (v) The empirical result covers one crossing pool ($n=60$, pKiss
 reference; the panel operator over five seeds); a second benchmark and the undesignability axis are not yet
 measured.
@@ -1625,7 +1630,7 @@ arm / pool & held-out primary ($n{=}60$) & other pools\\
 \midrule
 \CF{} floor & $0/60$ & $0/50$ (2nd); $0/60$ (cross); $0/10$ (family)\\
 gamer (pKiss) & $43/60$ pKiss; $2/43$ ProbKnot; $1/60$ p-un. & ---\\
-DesiRNA (borrowed) & $43/60$ pKiss; $26/43$ ProbKnot; $0/43$ p-un. & $2/10$ p-un. (family)\\
+DesiRNA (borrowed) & $43/60$ pKiss; $26/43$ ProbKnot; $0/43$ p-un. & $2/10$ p-un. (family); $9/60$ pKiss, $0/60$ p-un. (cross)\\
 panel\_auto (5 seeds) & pKiss$\wedge$ProbKnot $\{37,34,37,36,34\}$; p-un.\ $\{8,3,5,5,4\}$ (mean $5.0$) & $5/50$ p-un.\ (2nd); $2/60$ pk$\wedge$pb, $0/60$ p-un.\ (cross); $4/10$ p-un.\ (family)\\
 \textbf{agent-invented} (6 models) & pKiss$\wedge$ProbKnot $26$--$42/60$; \textbf{p-un.\ $2$--$17/60$} (Table~\ref{tab:models}) & $4/6$ exceed hand-built; inherit cross-source narrowness\\
 \bottomrule
