@@ -1569,6 +1569,13 @@ revealed and reports the smallest hint certifying a class jump. Every measured n
 enters only from such a logged run (\S\ref{sec:exp}); the harness, target lists, intrinsic grades, and
 per-target JSON are released for replay.
 
+\smallskip\noindent\textbf{\CF{} floor measurement.} The floor (the \CF-confined REMC optimizer, \texttt{always\_cheap})
+is run \emph{at top level} (\texttt{runs/cc\_ascent/xsrc\_floor.py}): its replica-exchange pool cannot be spawned
+inside the parallel sweep's worker processes (nested multiprocessing), so the floor for the second and
+cross-source pools is measured by a serial top-level runner rather than the parallel sweep. It confirms the
+theorem-guaranteed $0$ empirically---floor panel-unanimous $0/50$ (second pool) and $0/60$ (cross-source),
+$0$ pKiss crossings formed on all $110$ targets---consistent with Prop.~\ref{prop:confine} and the E0 control.
+
 \smallskip\noindent\textbf{Statistical methodology (Table~\ref{tab:sep}).} Let $u^{(A)}_T\in\{0,1\}$ indicate
 whether arm $A$ realizes held-out target $T$ panel-unanimously, over the pool of size $N=|\mathcal D_{\mathrm{ho}}|=60$.
 \emph{(i) Percentile bootstrap.} A $95\%$ CI for a rate resamples the $N$ targets with replacement $B{=}20{,}000$
