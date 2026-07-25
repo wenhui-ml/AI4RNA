@@ -509,7 +509,7 @@ panel-adjudicated, abstaining positive side.
 
 \paragraph{Conservative scoring, and the adjudicator's role.} The abstention rule is scored
 \emph{conservatively}: a target whose design the predictors do not unanimously confirm counts as not-solved in
-the full-$60$ denominator, so the panel-unanimous rate is a lower bound, not a selective-prediction accuracy.
+the full-$60$ denominator, so the panel-unanimous rate is a high-stringency consistency measure, not a selective-prediction accuracy.
 Concretely, on the primary seed the operator produces $37$ pKiss-designs; on $29$ the other predictors
 disagree with pKiss (abstained) and on $8$ all three agree---the $8/60$ headline---so conditional on
 non-abstention agreement is high while the abstention rate is large, which is exactly why we report the
@@ -519,8 +519,10 @@ $n{=}251$ test, in lieu of a full hierarchical model. The held-out adjudicator S
 \citep{hajdin2013shapeknots} is run \emph{de novo} (no SHAPE probing data)---a supported RNAstructure mode in
 which it is a pseudoknot-aware free-energy fold, distinct from ProbKnot's maximum-expected-accuracy
 objective---but because all three predictors share thermodynamic parameters their errors are correlated, so
-unanimity is cross-predictor \emph{consistency}, not ground truth, and every positive rate is a model-relative
-lower bound (native crossing recall $\sim\!1\%$, App.~\ref{app:data}).
+unanimity is cross-predictor \emph{consistency}, not ground truth. Because we do not establish the panel's
+false-positive rate (the skeleton control shows specificity on one negative class only), we describe positive
+rates as high-stringency computational-consistency measures rather than calibrated lower bounds on true
+capability (native crossing recall $\sim\!1\%$, App.~\ref{app:data}).
 
 \section{Formalization: the Realizable-Target Language}\label{sec:formal}
 A pumping lemma constrains languages of structures; an agent manipulates sequences. The object the lemma acts
@@ -763,9 +765,14 @@ trigger abstention; we never treat a single predictor as ground truth.
 \paragraph{Certificate metrics (formal).} For a held-out target and its sealed prediction:
 \textsc{tp} (design predicted, panel confirms), \textsc{fp} (design predicted, panel refutes),
 \textsc{tn} (undesignable predicted, certificate confirms), \textsc{fn} (undesignable predicted, a design
-exists). The positive rate is the held-out \MCF{} confirm rate by grade; the autonomy gap its drop when the
-external solver is removed; the transfer gap train$-$held-out. A certified ascent needs a positive rate
-whose bootstrap CI excludes zero, a near-zero autonomy gap, and non-trivial spread across targets.
+exists). The positive rate is the held-out crossing confirm rate by grade; the autonomy gap its drop when the
+external solver is removed; the transfer gap train$-$held-out. Rather than a single pass/fail threshold we
+report a \emph{graded} verdict: (a) a \emph{target-level} certified event---at least one panel-confirmed
+held-out crossing with the verifier-range bound discharged; (b) \emph{pool-level} evidence---a positive rate
+separated from the gamer baseline with the separation's uncertainty quantified; and (c) \emph{replicated}
+pool-level acquisition---the separation holding per seed on the enlarged pool (\S\ref{sec:exp}). Levels
+(b)--(c) additionally require a near-zero autonomy gap and non-trivial spread across targets. We state which
+level each result reaches rather than collapsing them into one certificate bit.
 
 % (experimental design matrix removed: this is a results paper; measured outcomes are in
 %  Tables~\ref{tab:baselines}, \ref{tab:panel}, \ref{tab:ablate}, \ref{tab:recovered}.)
@@ -1065,9 +1072,11 @@ $57/60$), whereas a naive MFE evaluator over-accepts them: high \emph{specificit
 whether the panel recovers its known crossing; \texttt{native\_calib.py}): per-predictor crossing recall is
 pKiss $20\%$, ProbKnot $4\%$, ShapeKnots $11\%$, and \emph{panel-unanimous only $1\%$} ($1/80$). The panel is
 thus a high-specificity, \emph{low-recall} instrument, and the AND-rule trades away almost all recall. Two
-consequences we carry throughout: panel-unanimous positive rates are conservative \emph{lower bounds} on
-capability (the instrument misses most genuine crossings), and a low or zero panel rate is weak evidence of
-\emph{absence} of capability. \emph{(ii) Generalization and its limit.}
+consequences we carry throughout: because recall is so low, a low or zero panel rate is weak evidence of
+\emph{absence} of capability; and while low recall makes the rate \emph{conservative}, reading it as a strict
+lower bound on true capability would additionally require a calibrated near-zero false-positive rate, which
+the skeleton control alone does not establish---so we treat panel-unanimity as a high-stringency consistency
+measure, not a bound. \emph{(ii) Generalization and its limit.}
 On a second, disjoint Pseudobase pool (indices
 $60$--$110$) the \CF{} floor is again $0/50$ and the panel operator panel-unanimous on $5/50$, the same
 regime, so it is not overfit to one $60$-target sample. On a cross-source pool (an independent
@@ -1101,7 +1110,9 @@ model ranking.
 Without the recipe the agents converge on the structure we hand-built: split the target into nested and
 crossing pairs, enforce complementarity, greedily repair against a pKiss\,$\wedge$\,ProbKnot cost. Gains
 saturate early (training rate peaks by round $\le5$; early stop at $5$--$9$), so invention budget is not the
-bottleneck; the effect is a cross-model regularity over open and closed weights. Caveats: DeepSeek is the
+bottleneck; across these six single draws the effect recurs over open and closed weights, though shared
+prompt, primitives, training pool, and oracle objective could induce similar strategies, so we do not claim
+model-independent ``invention.'' Caveats: DeepSeek is the
 weak outlier ($5/16$ train, $2/60$); the loop is noisy; these are single temperature-$0.4$ draws per model
 (no seed replication), so the cross-model ranking may partly reflect sampling variance; and every invented
 operator inherits the Pseudobase-topology narrowness noted above.
@@ -1128,7 +1139,7 @@ DeepSeek-v4-pro & open & $5$ & $26/60$ & $\mathbf{2}$\\
 
 \begin{figure}[t]\centering
 \includegraphics[width=0.9\linewidth]{fig_cc_models.pdf}
-\caption{\textbf{Autonomous invention is a cross-frontier regularity.} Held-out panel-unanimous rate of the
+\caption{\textbf{Autonomously invented operators across six frontier models (one draw each).} Held-out panel-unanimous rate of the
 agent-written operator for six models (open $=$ green, closed $=$ blue). All six exceed the single observed gamer count
 ($1$) and the $0$ floor; four exceed the hand-built \texttt{panel\_auto} band
 ($3$--$8$).}\label{fig:models}
@@ -1452,8 +1463,9 @@ and a cross-source bpRNA pool on which even the borrowed SOTA solver does not cl
 and hyperparameters were fixed on the $n=60$ pool; the additional $191$ targets of the $n=251$ run were
 untouched during development and act as the nearest held-out confirmation, but a pre-registered, never-examined
 final set---the gold standard against researcher-level adaptivity---was not run. (vi) The positive panel has
-low native recall ($\sim\!1\%$, App.~\ref{app:data}); positive rates are therefore conservative,
-model-relative lower bounds, and physical (wet-lab) confirmation is out of scope.
+low native recall ($\sim\!1\%$, App.~\ref{app:data}); positive rates are therefore reported as
+high-stringency, model-relative computational-consistency measures, not calibrated capability bounds, and
+physical (wet-lab) confirmation is out of scope.
 
 \paragraph{Future work.} The decisive transfer test---tune on small stems, freeze, test on strictly larger
 unseen members of $\mathcal{L}_{\mathrm H}=\{T_{n,m}:n,m\ge1\}$---is now run (\S\ref{sec:exp}): the frozen
@@ -1562,15 +1574,15 @@ step & rule applied & value built\\
 \end{table}
 
 \smallskip\noindent\textbf{The pseudoknot classes form an MCFG-dimension hierarchy.} The dimension-2 grammar
-above captures the H-type family (one crossing stem). Richer pseudoknots need more: the MCFG \emph{dimension}
-(how many substrings a nonterminal coordinates) grows with the number of \emph{mutually crossing} stems, so a
-kissing-hairpin interaction (two stems whose loops pair) and complex ($\ge3$ mutually entangled stems)
-topologies sit at successively higher tiers, and distinct pseudoknot classes are known to be included in, or
-incomparable to, one another as formal languages \citep{rivaseddy2000,nebelweinberg,katosekikasami2006}. Our
-held-out grades---H-type, kissing, complex (Table~\ref{tab:data})---are thus ordered by an intrinsic
-formal-language complexity, which is precisely why the empirical frontier organizes by grade
-(Fig.~\ref{fig:grade}); we assert the dimension-2 witness only for the H-type family we design against and
-make no precise per-class dimension claim beyond it. The $\CF\!\to\!\MCF$ boundary---the object of this
+above captures the H-type family (one crossing stem). Richer pseudoknots (kissing-hairpin interactions,
+complex $\ge3$-stem entanglements) are widely expected to require higher MCFG fan-out, but the minimal fan-out
+for each specific class, and the inclusion/incomparability relations among pseudoknot classes as formal
+languages, are delicate questions we do not settle here \citep{rivaseddy2000,nebelweinberg,katosekikasami2006}.
+We therefore assert the dimension-2 witness \emph{only} for the H-type family we design against and make
+\emph{no} per-class dimension-hierarchy claim: in particular we do not claim that MCFG dimension grows with
+the crossing-stem count. The held-out grades order targets by a structural difficulty statistic
+(crossing-stem count), which is why the empirical frontier organizes by grade (Fig.~\ref{fig:grade}), without
+asserting that statistic is a formal grammar grade. The $\CF\!\to\!\MCF$ boundary---the object of this
 paper---is crossed already at the first tier (one crossing stem); higher tiers are a finer hierarchy
 \emph{within} \MCF{} that we do not attempt to climb.
 
@@ -1621,7 +1633,7 @@ times and takes the $2.5/97.5$ percentiles of $\frac1N\sum_T u^{(A)}_{T^\ast}$. 
 (same targets, arms $A$ vs.\ gamer $G$): with $b=\#\{T:u^{(A)}_T{=}1,u^{(G)}_T{=}0\}$ and
 $c=\#\{T:u^{(A)}_T{=}0,u^{(G)}_T{=}1\}$, the exact two-sided $p$-value is
 \begin{equation}\label{eq:mcnemar}
-  p_{\mathrm{McN}}=2\!\!\sum_{k=0}^{\min(b,c)}\!\binom{b+c}{k}2^{-(b+c)} .
+  p_{\mathrm{McN}}=\min\!\Big\{1,\ 2\!\!\sum_{k=0}^{\min(b,c)}\!\binom{b+c}{k}2^{-(b+c)}\Big\} .
 \end{equation}
 \emph{(iii) Fixed-baseline binomial.} Against the gamer rate $p_0{=}1/60$, the one-sided $p$-value for $k$
 successes in $N$ trials is $\sum_{j=k}^{N}\binom{N}{j}p_0^{\,j}(1-p_0)^{N-j}$. The three columns of
