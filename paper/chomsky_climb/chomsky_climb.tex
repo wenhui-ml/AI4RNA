@@ -178,7 +178,10 @@ is exact; the positive side is model-relative.}\label{fig:arch}
 \paragraph{Scope: what is claimed, demonstrated, and open.} We contribute the foundation, the criterion, its
 formalization, the protocol, and one empirical result: on $60$ held-out crossing targets the criterion catches
 an invented operator gaming its oracle, $43/60$ solves collapsing to $1/60$ panel-unanimous above a $0/60$
-context-free floor (\S\ref{sec:exp}, Fig.~\ref{fig:collapse}). Two things are not claimed. (i) A robust
+context-free floor (\S\ref{sec:exp}, Fig.~\ref{fig:collapse}). This RNA oracle-gaming audit---and the small
+panel-robust ascent it recovers ($3$--$8/60$)---is the \emph{primary} contribution. The SAT second domain
+(\S\ref{sec:sat}) and the three-channel LLM-gaming protocol (\S\ref{sec:audit}) are \emph{corroborating}
+portability evidence for the audit pattern, not independent headline claims. Two things are not claimed. (i) A robust
 autonomous ascent: at a panel-surviving rate of $1/60$ we do not claim a transferable, model-robust \MCF{}
 capability, only that the instrument exposes when an apparent acquisition is an oracle artifact;
 \S\ref{sec:disc} states what a robust ascent would require. The algorithm by which an agent invents reusable
@@ -486,6 +489,21 @@ envelope $[\min,\max]$. Targets on which predictors disagree are abstained rathe
 The certificate is thus asymmetric by construction: a decidable, exact negative side and a model-relative,
 panel-adjudicated, abstaining positive side.
 
+\paragraph{Conservative scoring, and the adjudicator's role.} The abstention rule is scored
+\emph{conservatively}: a target whose design the predictors do not unanimously confirm counts as not-solved in
+the full-$60$ denominator, so the panel-unanimous rate is a lower bound, not a selective-prediction accuracy.
+Concretely, on the primary seed the operator produces $37$ pKiss-designs; on $29$ the other predictors
+disagree with pKiss (abstained) and on $8$ all three agree---the $8/60$ headline---so conditional on
+non-abstention agreement is high while the abstention rate is large, which is exactly why we report the
+unconditional rate. The target-level cluster bootstrap (Table~\ref{tab:sep}) quantifies target-sampling
+uncertainty; seed-to-seed algorithm variance is reported separately as the five-seed spread and the per-seed
+$n{=}251$ test, in lieu of a full hierarchical model. The held-out adjudicator ShapeKnots
+\citep{hajdin2013shapeknots} is run \emph{de novo} (no SHAPE probing data)---a supported RNAstructure mode in
+which it is a pseudoknot-aware free-energy fold, distinct from ProbKnot's maximum-expected-accuracy
+objective---but because all three predictors share thermodynamic parameters their errors are correlated, so
+unanimity is cross-predictor \emph{consistency}, not ground truth, and every positive rate is a model-relative
+lower bound (native crossing recall $\sim\!1\%$, App.~\ref{app:data}).
+
 \section{Formalization: the Realizable-Target Language}\label{sec:formal}
 A pumping lemma constrains languages of structures; an agent manipulates sequences. The object the lemma acts
 on is therefore not the agent's operators but the set of target structures the agent realizes under an
@@ -708,8 +726,14 @@ by the designable structures (\S\ref{sec:formal}), a crossing target that no seq
 the positive rate for reasons unrelated to the agent's repertoire. We therefore pre-screen, but only on an
 \emph{exact} undesignability certificate by rival-structure construction \citep{zhou2024rigende,zhou2025motifs},
 not on mere solver failure: a target is excluded only if it provably admits no design, so hard-but-designable
-targets stay in the pool and the screen cannot bias toward easy ones. Excluded targets move to the
-\textsc{undesignable} set (\S\ref{sec:impossible}); the screen is frozen before any sealed prediction.
+targets stay in the pool and the screen cannot bias toward easy ones. The certificate is relative to the
+declared energy model (Turner~2004, as used by the folding tools) and is a \emph{soundness} filter, not a
+complete designability decision procedure: it excludes only the provably undesignable, leaving hard-but-undecided
+targets in the pool. Because the Pseudobase(++) crossing targets are native-derived---each realized by at least
+its natural sequence---the exact certificate excludes \emph{none} of the primary pool; the step is present so
+that a synthetic or intrinsically unrealizable target could not silently depress the positive rate. Any excluded
+target would move to the \textsc{undesignable} set (\S\ref{sec:impossible}); the screen is frozen before any
+sealed prediction.
 
 \paragraph{Positive-side adjudication under oracle-dependence.} Because the pseudoknot verdict is
 oracle-dependent (\S\ref{sec:bg}), a target counts as realized only under an explicit rule: (i)
@@ -843,7 +867,13 @@ optimizing a single oracle does exploit it, which is why $43/60$ under pKiss is 
 separates a genuine $\mathcal{A}_\theta$ from oracle-guided search is not avoiding the oracle (the positive
 side must consult one) but model-robustness: confirmation by predictors it did not optimize, and transfer to
 held-out targets. By that standard this operator has not earned the title; a capability clearing the panel
-would optimize oracle agreement, not a single predictor (\S\ref{sec:disc}).
+would optimize oracle agreement, not a single predictor (\S\ref{sec:disc}). Two comparisons keep the
+attribution honest: the prior-to-after step crosses the verifier boundary (a change of feedback channel, from
+the pseudoknot-free oracle to a crossing-aware one), while the gamer and the panel-optimizing operator run
+with \emph{identical} oracle access and search budget---both may query pKiss and ProbKnot in the repair
+loop---and differ only in the objective (single-predictor vs panel-agreement). The panel-robust gap between
+them ($\sim\!1/60$ vs.\ $3$--$8/60$, per-seed significant at $n{=}251$, \S\ref{sec:exp}) is therefore
+attributable to the operator, not to added crossing-aware feedback.
 
 \paragraph{What the operator's capability actually is (ablation).} Ablation localizes the capability
 (Table~\ref{tab:ablate}). Removing the structured decomposition (the \CF{} skeleton and the
@@ -1109,8 +1139,9 @@ third only partially. Where an operator cannot cross, \textbf{E3} (a minimal-gra
 a hint would buy above the floor, so the outcome is informative even under a null.
 
 \subsection{A second domain: the certificate ports to SAT constraint definability}\label{sec:sat}
-To show the two-sided certificate is not an artifact of RNA or the Chomsky hierarchy, we instantiate it on
-an unrelated formal hierarchy: the minimum CNF clause-width needed to define a Boolean relation
+The next two subsections are \emph{corroborating portability evidence}, secondary to the RNA audit of
+\S\ref{sec:exp}; readers seeking only the primary result may skip them. To show the two-sided certificate is
+not an artifact of RNA or the Chomsky hierarchy, we instantiate it on an unrelated formal hierarchy: the minimum CNF clause-width needed to define a Boolean relation
 $R\subseteq\{0,1\}^n$. Width $\le2$ is the analog of the context-free (nested) class: by the
 Baker--Pixley/Schaefer characterization, $R$ is $2$-CNF-definable iff it is closed under the ternary
 majority operation \citep{schaefer1978,bakerpixley1975}, and higher width is a higher tier. The certificate
