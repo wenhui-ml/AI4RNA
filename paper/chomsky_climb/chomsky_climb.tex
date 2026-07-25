@@ -1327,7 +1327,7 @@ trustworthy acquisition is the more decision-relevant object.
 oracles a self-improving system optimizes against are not ground truth but fallible surrogates (a docking score,
 a force field, a learned reward, a structure predictor, a theorem-search heuristic), so a closed loop can
 improve the oracle's score without improving the capability, as our operator drove pKiss to $43/60$ while a
-multi-predictor panel saw $1/60$. An autonomous discovery system spans four layers:
+multi-predictor panel saw $1/60$. An autonomous discovery system spans four layers (Table~\ref{tab:layers}):
 generation (produce candidates), self-revision (change one's own representations and operators), audit
 (establish a gain is the system's own, not search, borrowing, or oracle-gaming), and scientific confirmation (a
 candidate holds in the world, via an exact checker, independent model, or wet-lab assay). Self-revising
@@ -1336,7 +1336,7 @@ boundary an unusually clean instance. The two-sided audit (sealed commitment, a 
 autonomy ablations, and, where the difficulty axis is a formal hierarchy, a decidable negative side) is a
 portable protocol: molecular and material generation adjudicated against DFT or assays, protein design against
 binding readouts, theorem discovery against an exact checker, each rather than a surrogate. First evidence that
-the positive side ports beyond RNA (\S\ref{sec:audit}): a domain-agnostic instance of the audit protocol
+the positive side ports beyond RNA (App.~\ref{sec:audit}): a domain-agnostic instance of the audit protocol
 catches agent gaming across three mechanistically distinct channels with no formal hierarchy---an
 answer-property-biased judge, test-set leakage, and sycophancy---each with $0$ observed false positives (not a calibrated rate).
 
@@ -1654,7 +1654,7 @@ recipe, no external solver; each candidate is sandboxed and scored on a disjoint
 failing targets are fed back for six revision rounds; the best round is frozen and \emph{certified} by the
 same panel used for the hand-built operators.}\label{fig:invention}
 \end{figure}
-An LLM agent (GLM-5.2, temperature $0.4$, no output cap) is given a documented \emph{primitive API}
+The invention loop is sketched in Fig.~\ref{fig:invention}. An LLM agent (GLM-5.2, temperature $0.4$, no output cap) is given a documented \emph{primitive API}
 and asked to write one function \texttt{design(target,seed)}; it may not import anything or call an external
 pseudoknot solver. The primitives are: \texttt{fold\_cf} (ViennaRNA MFE, nested), \texttt{inverse\_fold\_cf}
 (nested inverse fold), \texttt{fold\_pkiss\_pairs} and \texttt{fold\_probknot\_pairs} (the two crossing-aware
@@ -1699,7 +1699,7 @@ ShapeKnots & RNAstructure MFE-based, run \emph{de novo} (no SHAPE) \citep{hajdin
 \bottomrule
 \end{tabularx}
 \end{table}
-\noindent\textbf{Operator hyperparameters.} REMC floor: wall $30$\,s. Design operators (fixed across all
+\noindent\textbf{Operator hyperparameters} (oracle configurations in Table~\ref{tab:appconfig}). REMC floor: wall $30$\,s. Design operators (fixed across all
 targets $=$ a uniform procedure): skeleton budget $12$--$20$\,s, repair budget $90$--$120$\,s, $\le800$--$1500$
 repair iterations, ProbKnot gate at $\mathrm{pk\_bp}\le3$. \textbf{Compute.} A single $256$-core host;
 target-level parallelism at $\mathrm{NWORKERS}{=}60$ (the design operators are single-process, so this is
