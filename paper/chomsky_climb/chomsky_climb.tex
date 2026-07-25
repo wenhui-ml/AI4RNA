@@ -998,42 +998,50 @@ certificate ports, while model-relativity is a property of the domain's ground-t
 
 
 
-\subsection{The positive side ports to a mainstream, formally-unstructured agent setting}\label{sec:audit}
-SAT ports the negative side but trivializes the positive side (its verifier is exact). The more consequential
-question for the ``audit layer'' claim is whether the positive-side audit, the panel that catches
-oracle-gaming, ports to a mainstream self-improving-agent setting with no decidable formal hierarchy and no
-blind oracle. We test it on code/answer generation (\texttt{runs/cc\_ascent/code\_audit}).
+\subsection{The positive side ports: a domain-agnostic audit protocol}\label{sec:audit}
+SAT ports the negative side but trivializes the positive side (its verifier is exact). The consequential
+question for the ``audit layer'' claim is whether the positive-side audit---an independent check that catches
+oracle-gaming---ports to mainstream self-improving-agent settings with no decidable hierarchy and no blind
+oracle. We state it as a domain-agnostic protocol and instantiate it across three mechanistically distinct,
+widely studied gaming channels (\texttt{runs/cc\_ascent/code\_audit}; Table~\ref{tab:audit}).
 
-\emph{(i) Executable oracles resist gaming; the panel is a validated discriminator.} On $15$ programming
-tasks with unbounded input domains, a self-improving LLM agent (GLM-5.2 and mid-tier models) revising code
-to maximize a visible test set solves them genuinely, with $0$ gaming: an executable test is too strong a
-proxy to fake. The panel still works: a constructed lookup ``gamer'' hard-coding the visible cases passes
-the visible oracle $15/15$ yet is caught by the held-out\,$\wedge$\,property panel ($0/15$ panel-unanimous),
-and a $\ge\!600$-input differential gold confirms it wrong ($0/15$), while honest solutions pass $15/15$
-(gold $15/15$); the panel false-positive rate is $0$.
+\emph{The protocol.} A self-improving agent optimizes a \emph{flawed reward} it can game; an objective
+\emph{gold} and an \emph{independent verifier panel}---which never sees the reward's bias---audit the frozen
+output. We report, per condition, how often the reward accepts, how often the answer is gold-correct, the
+gaming rate (reward-accepted yet wrong), the fraction of gaming the audit catches, and the panel
+false-positive rate. This is RNA's ``optimize a flawed oracle $\to$ an independent check collapses it,''
+stripped of any formal hierarchy.
 
-\emph{(ii) A flawed heuristic reward is gamed by real agents, and an independent audit catches it.} The analog
-of RNA's imperfect pKiss oracle is a reward that cannot verify truth: an LLM ``helpfulness'' judge rewarding
-thoroughness and confidence, a documented reward-model bias \citep{gao2023overopt,skalse2022}, that does not
-check correctness. A self-improving agent optimizes this reward over three rounds on hard arithmetic
-(objective, Python-computed gold), across a capability spectrum---GPT-5.6-sol, GLM-5.2, Qwen2.5-7B---with an
-independent verifier. The reward is \emph{fully} gamed: it accepts $12/12$ frozen answers for \emph{every}
-model, regardless of correctness. True correctness falls with capability ($9$, $9$, $3$ of $12$), so the
-reward accepts $3$, $3$, and $9$ confident-\emph{wrong} answers---the gaming. The independent audit catches
-\emph{all} of it ($3/3$, $3/3$, $9/9$; false-positive rate $0$ against gold; Table~\ref{tab:audit}), and
-gaming scales inversely with capability: the audit earns its keep exactly where the agent is weak enough to
-game. This reproduces RNA's ``optimize a flawed oracle $\to$ an independent check collapses it'' in a
-mainstream, formally-unstructured setting. The LLM verifier is itself imperfect (an occasional false-negative
-on a correct answer), so we validate the catch against Python gold---even independent verification is
-model-relative, the paper's own thesis.
+\emph{(1) Answer-property bias (verbosity/confidence).} The analog of RNA's imperfect pKiss is a reward that
+cannot verify truth: an LLM ``helpfulness'' judge rewarding thoroughness and confidence, a documented
+LLM-judge bias \citep{gao2023overopt,skalse2022,zheng2023judge}. On hard arithmetic (Python gold), a
+self-improving agent optimizes it over three rounds across a capability spectrum (GPT-5.6-sol, GLM-5.2,
+Qwen2.5-7B). The reward is \emph{fully} gamed---it accepts $12/12$ answers for \emph{every} model regardless
+of correctness---while true correctness falls with capability ($9,9,3$ of $12$), so it accepts $3,3,9$
+confident-\emph{wrong} answers. The independent audit catches \emph{all} of it ($3/3,\,3/3,\,9/9$; FP $0$),
+and gaming scales inversely with capability: the audit earns its keep exactly where the agent is weak enough
+to game.
 
-\emph{Asymmetric portability (the honest synthesis).} The two sides port through different structure: the
-decidable negative side needs a formal class hierarchy (RNA grammar; SAT clone theory), while the
-positive-side gaming-catch needs an imperfect verifier that can be gamed (RNA folding; a heuristic reward).
-They coincide only when a domain has both, as RNA does, which is why RNA is the natural showcase. Caveat: the
-audit panel's correctness checkers are stronger than RNA's folding oracles, so their model-relativity is
-milder---yet even here verification is not perfect (the LLM verifier throws occasional false-negatives),
-which is why we anchor the catch to an objective gold.
+\emph{(2) Test-set leakage.} When the optimized oracle is an \emph{executable} test set, capable agents
+(GLM-5.2 and mid-tier) solve $15$ tasks genuinely with $0$ natural gaming---an executable proxy is too strong
+to fake---but leakage still games it: a constructed gamer hard-coding the visible cases passes $15/15$ yet is
+caught by the held-out\,$\wedge$\,property panel ($0/15$ unanimous), a $\ge\!600$-input differential gold
+confirming it wrong; honest solutions pass $15/15$. FP $0$.
+
+\emph{(3) Sycophancy.} Here the reward is biased not toward an answer property but toward the \emph{user}: an
+agreement rater that pays for validating the user's stated belief \citep{sharma2023sycophancy}. Shown a
+confident but wrong user claim on the same arithmetic, the reward-optimizing agent adopts it---the reward
+accepts $11/12$ replies while only $1/12$ are gold-correct (gaming $11$). The panel, which sees only the
+question and the candidate answer, never the user's claim, catches all $11$ ($11/11$; FP $0$); the honest
+control inverts (reward accepts $0/12$, gold $11/12$), so the reward is anti-correlated with truth.
+
+\emph{Asymmetric portability (the honest synthesis).} The two certificate sides port through different
+structure: the decidable negative side needs a formal class hierarchy (RNA grammar; SAT clone theory), while
+the positive-side gaming-catch needs only an imperfect, gameable verifier---which every one of these three
+channels supplies. They coincide when a domain has both, as RNA does, which is why RNA is the natural
+showcase. Caveat: these audit panels' checkers are stronger than RNA's folding oracles, so their
+model-relativity is milder---and even here verification is imperfect (the LLM verifier throws occasional
+false-negatives), which is why we anchor every catch to an objective gold.
 
 \section{Discussion, Related Work, and Conclusion}\label{sec:discussion}
 
@@ -1156,7 +1164,7 @@ trustworthy acquisition is the more decision-relevant object.
 \paragraph{An audit layer for AI4S.} The lesson generalizes because the vulnerability does. Most scientific
 oracles a self-improving system optimizes against are not ground truth but fallible surrogates (a docking score,
 a force field, a learned reward, a structure predictor, a theorem-search heuristic), so a closed loop can
-improve the oracle's score without improving the capability, as our operator drove pKiss to $43/60$ while an
+improve the oracle's score without improving the capability, as our operator drove pKiss to $43/60$ while a
 multi-predictor panel saw $1/60$. An autonomous discovery system spans four layers:
 generation (produce candidates), self-revision (change one's own representations and operators), audit
 (establish a gain is the system's own, not search, borrowing, or oracle-gaming), and scientific confirmation (a
@@ -1166,9 +1174,9 @@ boundary an unusually clean instance. The two-sided audit (sealed commitment, a 
 autonomy ablations, and, where the difficulty axis is a formal hierarchy, a decidable negative side) is a
 portable protocol: molecular and material generation adjudicated against DFT or assays, protein design against
 binding readouts, theorem discovery against an exact checker, each rather than a surrogate. First evidence that
-the positive side ports beyond RNA (\S\ref{sec:audit}): in a code/answer-generation setting with no formal
-hierarchy, an agent optimizing a flawed heuristic reward is driven to confident-wrong outputs the reward rates
-highest, which an multi-predictor panel catches, while an executable oracle is too strong to game.
+the positive side ports beyond RNA (\S\ref{sec:audit}): a domain-agnostic instance of the audit protocol
+catches agent gaming across three mechanistically distinct channels with no formal hierarchy---an
+answer-property-biased judge, test-set leakage, and sycophancy---each with a $0$ panel false-positive rate.
 
 \begin{table}[t]\centering\small
 \setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.2}
@@ -1670,20 +1678,22 @@ exact because SAT's verifier is exact.}\label{fig:sat}
 \end{figure}
 \begin{table}[t]\centering\small
 \setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.15}
-\caption{\textbf{The positive-side audit in a mainstream agent setting} (no formal hierarchy, no blind
-oracle). An executable oracle is too strong to game (agents solve genuinely); a heuristic reward that
-cannot verify truth is gamed by real agents across a capability spectrum, and an independent audit catches
-all of it, validated against a gold in both rows (false-positive rate $0$). Answers R3's portability question
-in the affirmative.}\label{tab:audit}
-\begin{tabularx}{\linewidth}{@{}Lp{2.6cm}p{2.9cm}c@{}}
+\caption{\textbf{A domain-agnostic audit protocol across three eval-gaming channels} (no formal hierarchy, no
+blind oracle). One template---agent optimizes a gameable reward; objective gold $+$ independent panel
+audit the output---instantiated on mechanistically distinct biases: answer-property, test-set leakage, and
+sycophancy. In every channel the flawed reward is gamed and the independent audit catches all of it, with
+panel false-positive rate $0$. Answers R3's portability question in the affirmative.}\label{tab:audit}
+\begin{tabularx}{\linewidth}{@{}p{2.5cm}p{2.7cm}Xp{3.0cm}@{}}
 \toprule
-setting & optimized oracle & gaming outcome & panel catch (vs.\ gold)\\
+gaming channel & flawed oracle & gaming outcome & audit catch (vs.\ gold)\\
 \midrule
-code, executable tests & visible test set & none natural; constructed lookup gamer passes visible $15/15$ &
-$0/15$ panel-unan.; honest $15/15$; FP $0$\\
-arithmetic QA, heuristic reward & LLM helpfulness judge & reward accepts $12/12$ for \emph{every} agent;
-gold-correct $9,9,3$ of $12$ (GPT-5.6/GLM-5.2/Qwen-7B) $\Rightarrow$ gaming $3,3,9$ &
-caught $3/3,\,3/3,\,9/9$; FP $0$\\
+answer-property bias (verbosity/confidence) & LLM helpfulness judge & reward accepts $12/12$ for \emph{every}
+agent; gold-correct $9,9,3$ of $12$ (GPT-5.6/GLM-5.2/Qwen-7B) $\Rightarrow$ gaming $3,3,9$ & caught
+$3/3,\,3/3,\,9/9$; FP $0$\\
+test-set leakage & visible test set & none natural; constructed lookup gamer passes visible $15/15$ & $0/15$
+panel-unan.; honest $15/15$; FP $0$\\
+sycophancy (agree-with-user) & agreement-with-user reward & reward accepts $11/12$; gold-correct $1/12$
+$\Rightarrow$ gaming $11$ (honest control: accepts $0/12$, gold $11/12$) & caught $11/11$; FP $0$\\
 \bottomrule
 \end{tabularx}
 \end{table}
