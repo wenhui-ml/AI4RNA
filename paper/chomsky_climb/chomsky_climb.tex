@@ -152,7 +152,7 @@ than overclaimed as uniformly ``exact.''
 \item A separation of two impossibilities (\S\ref{sec:impossible}): repertoire-confinement (the negative side)
 versus target-undesignability (a distinct, optional predictive capability).
 \item The observation, made precise, that RNA topology is native to the Chomsky hierarchy, separating
-generative power (main line) from folding complexity (corollary) (\S\ref{sec:cf}).
+generative power (main line) from folding complexity (a distinct axis) (\S\ref{sec:cf}).
 \item An empirical demonstration that the criterion catches oracle-gaming (\S\ref{sec:exp}): an invented,
 DesiRNA-free operator scores $43/60$ on held-out crossing targets under a single pseudoknot oracle but only
 $1/60$ panel-unanimous---a collapse from $43/60$ to $1/60$ the panel exposes---above a context-free floor of $0/60$.
@@ -278,7 +278,8 @@ as two verifier branches therefore coincides with the $\CF\!\to\!\MCF$ boundary 
 \caption{\textbf{RNA topology maps onto the Chomsky hierarchy.} Nested base pairs are context-free (SCFG);
 crossing pairs (pseudoknots) are, as unbounded families, non-\CF{} and admit mildly context-sensitive (MCFG)
 grammars, provably above \CF. The climb is the $\CF\!\to\!\MCF$ jump; folding complexity (P$\to$NP-complete)
-is a corollary of the class, not the main line.}\label{fig:hierarchy}
+is a distinct computational axis (topology-, model-, and objective-dependent), not implied by the generative
+class.}\label{fig:hierarchy}
 \end{figure}
 
 \paragraph{Why one stack fails, concretely.} Reading a strand $5'\!\to\!3'$, the nested grammar
@@ -289,17 +290,18 @@ square-bracket stem opens while the round-bracket pairs are still unclosed and m
 closing of the round stem, requiring a second, independent stack. This is the copy-language pattern, not the
 Dyck pattern: an Ogden-lemma argument rules out every CFG \citep{nebelweinberg}, whereas an MCFG carrying the
 two stems as a coordinated pair of substrings generates it at dimension~2 \citep{katosekikasami2006}. The two
-verifier branches a design pipeline already maintains thus straddle a generative-class boundary, developed
-formally in \S\ref{sec:formal} as the smallest target that certifies the ascent.
+verifier branches a design pipeline already maintains thus straddle a generative-class boundary between the
+nested family and the non-CF H-type family, developed formally in \S\ref{sec:formal}.
 
-\paragraph{Generative power is the main line; complexity is a corollary.} The Chomsky hierarchy measures
-generative power (which structures a grammar produces); computational complexity measures the cost of parsing
-and folding. Pseudoknotted folding is NP-complete and inverse design is NP-hard
-\citep{lyngso2000pknot,bonnet2020hard}, but that hardness is a downstream corollary of the language class, not
-our object. Our sole main-line quantity is the generative jump $\CF\!\to\!\MCF$; complexity claims appear only
-as consequences, with their energy-model qualifier.
+\paragraph{Generative power is the main line; folding complexity is a distinct axis.} The Chomsky hierarchy
+measures generative power (which structures a grammar produces); computational complexity measures the cost of
+parsing and folding. Pseudoknotted folding is NP-complete and inverse design is NP-hard
+\citep{lyngso2000pknot,bonnet2020hard}, but that hardness is a \emph{distinct} axis---it depends on the
+allowed pseudoknot topology, energy model, and optimization objective, and is not implied by the generative
+class (fixed fan-out MCFGs, for instance, parse in polynomial time). Our sole main-line quantity is the
+generative jump $\CF\!\to\!\MCF$; we treat the two axes as related but independent.
 \section{The Two-Sided Ascent Certificate}\label{sec:cert}
-Each target receives an intrinsic difficulty grade (crossing-stem count and Chomsky class), fixed
+Each target receives an intrinsic difficulty grade (crossing-stem count and nested-vs-crossing type), fixed
 independently of what the agent solves, which avoids survivorship bias. Crossing (\MCF) targets split by
 grade into a training pool and a frozen held-out pool.
 
@@ -309,7 +311,7 @@ difficulty axis; certification is a per-target, verified capability event, not a
 realizable-target \emph{language} changed Chomsky class---a finite set of realized targets, being regular,
 cannot establish that (\S\ref{sec:formal}).
 \begin{description}[leftmargin=1.4em,itemsep=1pt]
-\item[\textnormal{(1) Positive $+$ transfer.}] On \emph{held-out} \MCF{} targets, the agent produces designs
+\item[\textnormal{(1) Positive $+$ transfer.}] On \emph{held-out} crossing targets, the agent produces designs
 that a pseudoknot-aware oracle panel confirms fold to the target's crossing pair set. We report this positive
 rate with its uncertainty against the gaming baseline, require it to be spread across grades rather than
 concentrated on one target, and set no single pass/fail threshold.
@@ -655,8 +657,9 @@ members of $\mathcal L_{\mathrm H}$ at parameters it never saw
 confinement theorem, a \CF{} generator cannot supply. Each realized $T$ instantiates the family's defining
 crossing: its stem forces a derivation coordinating two substrings at four interleaved positions, the
 two-component (dimension-2) production the count-language family demands and one stack cannot track
-\citep{katosekikasami2006}. The class claim rests on this uniform coverage of $\mathcal L_{\mathrm H}$, not on
-any single $T$, which as a finite object is regular.
+\citep{katosekikasami2006}. The family-level claim rests on a uniform procedure over members of
+$\mathcal L_{\mathrm H}$, tested by transfer to unseen parameters (\S\ref{sec:exp}), not on any single $T$,
+which as a finite object is regular.
 
 \paragraph{Worked example (Fig.~\ref{fig:worked}).} The canonical H-type pseudoknot $(((([[[[))))]]]]$ has a
 nested round stem and a square stem that crosses it. Its \CF{} skeleton (round brackets only) is realized
@@ -669,10 +672,10 @@ or a solver call.
 
 \begin{figure}[t]\centering
 \includegraphics[width=0.96\linewidth]{fig_cc_worked.pdf}
-\caption{\textbf{Worked example: a canonical H-type pseudoknot.} The round stem is nested (\CF); the square
-stem crosses it (\MCF). A \Ocf-verified repertoire yields only the skeleton---the pseudoknot-aware oracle
-reports the crossing stem absent (negative side). The full target lies in the non-CF class and needs a
-two-component (MCFG-2) derivation.}\label{fig:worked}
+\caption{\textbf{Worked example: a canonical H-type pseudoknot.} The round stem is nested; the square
+stem crosses it (a pseudoknot stem). A \Ocf-verified repertoire yields only the skeleton---the pseudoknot-aware
+oracle reports the crossing stem absent (negative side). This target is a member of the non-CF H-type family
+$\mathcal L_{\mathrm H}$, whose members need a two-component (MCFG-2) derivation.}\label{fig:worked}
 \end{figure}
 
 \subsection{Two Impossibilities, Kept Separate}\label{sec:impossible}
@@ -1021,9 +1024,9 @@ $8$--$9$ have $n{=}1,2$ members.}\label{fig:grade}
 \end{figure}
 
 
-\paragraph{The class claim, tested by growing unseen-length transfer.} A finite held-out set cannot alone
+\paragraph{Growing-parameter extrapolation within the H-type family.} A finite held-out set cannot alone
 establish a Chomsky class ascent, since any finite language is regular (App.~\ref{app:proofs}); the
-class-level object is a uniform procedure over the unbounded crossing family $\mathcal L_{\mathrm H}$
+class-level object of interest is a uniform procedure over the unbounded crossing family $\mathcal L_{\mathrm H}$
 (Eq.~\eqref{eq:family}). We therefore run the decisive transfer test. The operator's procedure and its
 size-independent budgets are fixed on small stems ($n{=}m\le4$), frozen, and applied unchanged to a
 \emph{strictly larger, unseen} ladder: $n{=}m\in\{5,6,7,8,9,10,12,14\}$ and asymmetric $(n,m)$ up to
@@ -1031,14 +1034,17 @@ $(14,3)$, lengths to $68$\,nt, i.e.\ up to $3$--$4\times$ the largest developmen
 Findings. (i) The \CF{} floor is $0/16$ across the entire ladder: the negative side (Prop.~\ref{prop:confine})
 generalizes to the unbounded family. (ii) The frozen operator realizes crossing designs on $13/16$ unseen
 members under pKiss$\,\wedge\,$ProbKnot, including the \emph{entire} diagonal $n{=}m=5\ldots14$ ($8/8$, to
-length $68$). A memorized table cannot do this (the targets are novel) and a \CF{} generator provably cannot
-(floor $0$); this is the uniform-procedure evidence a finite set cannot supply. (iii) Strict three-oracle
+length $68$). A memorized lookup of the development targets cannot do this (the tested targets are novel) and
+a \CF{} generator provably cannot (floor $0$); this is finite-parameter extrapolation beyond the development
+range---though a finite program with length-parameterized templates could also pass, so it is evidence
+consistent with, not proof of, unbounded-family coverage. (iii) Strict three-oracle
 panel-unanimity is smaller, $6/16$ (diagonal $6/8$): at very small stems and under large asymmetry the
 designs clear pKiss and ProbKnot but drift off de-novo ShapeKnots, the oracle-agreement ceiling of
 Table~\ref{tab:contrast}, not a procedure failure; the three asymmetric-extreme misses
 ($T_{3,14},T_{5,12},T_{14,3}$) exhaust the fixed repair budget, a search bound rather than a class bound. The
-uniform procedure over the unbounded non-CF family thus holds robustly at the two-oracle level, while the
-strict three-oracle rate is stringency-bounded.
+frozen operator thus transfers to tested family members with parameters well beyond the development range at
+the two-oracle level (finite extrapolation, not proof of unbounded coverage), while the strict three-oracle
+rate is stringency-bounded.
 
 \begin{figure}[t]\centering
 \includegraphics[width=0.9\linewidth]{fig_cc_family.pdf}
@@ -1323,9 +1329,11 @@ certified ascent by a design agent. RNA's formal-language structure is classical
 \citep{katosekikasami2006}; to our knowledge this has never been repurposed as an agent's certified climb, and
 grammar induction \citep{gold} concerns identifiability in the limit, not class-ascent-as-capability. A
 concurrent line maps an agent's memory architecture to automaton classes (reflex to finite, decomposition to
-pushdown, read/write to Turing) \citep{agentsautomata2025}; that classifies the computational substrate,
-whereas we certify a change over time in the class of what the designs realize ($\CF\!\to\!\MCF$). The axes are
-orthogonal: a Turing-complete architecture is neither necessary nor sufficient for the output-language ascent.
+pushdown, read/write to Turing) \citep{agentsautomata2025}; that classifies the computational substrate.
+We instead use the Chomsky hierarchy to classify the \emph{target family} the designs realize---the
+$\CF\!\to\!\MCF$ difficulty axis---\emph{not} the agent's architecture or a formally proven change in its own
+realizable language, which our audit does not establish. The two uses are orthogonal: a Turing-complete
+architecture is neither necessary nor sufficient for producing crossing designs.
 
 \paragraph{RNA design, complexity, undesignability.} Pseudoknot folding is NP-complete \citep{lyngso2000pknot},
 inverse design NP-hard \citep{bonnet2020hard}, and undesignability admits exact certificates \citep{zhou2024rigende}.
