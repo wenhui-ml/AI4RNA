@@ -75,7 +75,7 @@ established theorem for those families. Our capability-acquisition audit has thr
 crossing designs); a negative side combining an exact result (the pseudoknot-free oracle provably
 cannot represent crossing pairs) with an empirical prior-policy floor ($0/60$) under a shared crossing-aware
 panel; and an autonomy side ($\pm$solver ablation; autonomy is solver-free, not oracle-free---the operator
-still queries crossing-aware folding oracles). Novelty is relative to the agent's prior self, not the base model. The negative side is exact; the positive side rests
+still queries crossing-aware folding oracles). Novelty is relative to the agent's prior self, not the base model. The negative side combines an exact verifier-range bound with an empirical prior-policy floor---only the former is a theorem; the positive side rests
 on heuristic, model-relative predictors, adjudicated by a three-predictor panel abstaining on disagreement
 under a sealed-commitment protocol. The audit complements categorical accounts of self-revising discovery
 \citep{selfrevising} and is distinct from Chomsky-hierarchy evaluation of neural architectures
@@ -146,7 +146,8 @@ that the unbounded crossing \emph{family} we target is mildly context-sensitive-
 being finite, is regular and carries no class claim on its own (\S\ref{sec:formal},
 App.~\ref{app:proofs}).
 \item An explicit treatment of the certificate's asymmetry (\S\ref{sec:cert},\ref{sec:oracle}): the
-\CF/negative side is exact, the \MCF/positive side heuristic and oracle-dependent, adjudicated as such rather
+\CF/negative side has an \emph{exact} verifier-range component and a \emph{separate} empirical prior-policy
+floor, the \MCF/positive side is heuristic and oracle-dependent, adjudicated as such rather
 than overclaimed as uniformly ``exact.''
 \item A separation of two impossibilities (\S\ref{sec:impossible}): repertoire-confinement (the negative side)
 versus target-undesignability (a distinct, optional predictive capability).
@@ -318,28 +319,35 @@ $\operatorname{im}\Ocf$ is confined to nested structures ($\subseteq\NESTED$; Pr
 crossing target lies in the range its verifier can confirm. This bounds the verifier's range, not the policy's
 capability; the complementary statement that the prior policy produces no crossing design is a \emph{separate}
 empirical floor ($0/60$, \S\ref{sec:exp}).
-\item[\textnormal{(3) Autonomy.}] The capability is carried by the agent's own reusable components, not by
-delegating to an external pseudoknot solver: removing the external solver leaves held-out performance
-essentially unchanged, and the reusable components are \emph{learned} (reused with positive lift) and
-\emph{decisive} (ablating them collapses the gain).
+\item[\textnormal{(3) Empirical prior-policy floor.}] Under the \emph{same} crossing-aware panel that
+adjudicates the after-policy, the prior policy realizes a strictly lower held-out rate:
+$\widehat p^{\mathrm{panel}}_{\mathrm{before}}<\widehat p^{\mathrm{panel}}_{\mathrm{after}}$. This is the
+prior-versus-after capability comparison proper (conjunct (2) only bounds the verifier's range); it is
+empirical, not decidable.
+\item[\textnormal{(4) Autonomy.}] The capability is not delegated to an external inverse-design solver:
+removing the packaged solver leaves held-out performance essentially unchanged (solver-free, not oracle-free).
+Holding oracle access and search budget fixed, a matched-access comparison isolates the operator's contribution
+from the mere availability of crossing-aware feedback (\S\ref{sec:exp}); we do \emph{not} claim a
+decompose/compose component is load-bearing---ablation attributes the gain to oracle-guided repair.
 \end{description}
 \end{definition}
 \noindent Writing $\widehat p^{\mathrm{panel}}_{\bullet}(\mathcal D_{\mathrm{ho}})$ for the held-out
-panel-unanimous rate, $\Delta\mathcal O=\mathcal O_{\mathrm{after}}\!\setminus\!\mathcal O_{\mathrm{before}}$
-for the reused components, and $\ominus$ for ablation, the three conditions are
+panel-unanimous rate and ``$-$solver'' for solver removal, the conditions are
 \begin{equation}\label{eq:cert}
 \underbrace{\widehat p^{\mathrm{panel}}_{\mathrm{after}}(\mathcal D_{\mathrm{ho}})>0}_{\text{(1) positive}+\text{transfer}}
 \ \wedge\
-\underbrace{\Rze{\Ocf}{\pi_{\mathrm{before}}}\cap\PK=\varnothing}_{\text{(2) negative: a theorem (Prop.~\ref{prop:confine})}}
+\underbrace{\Rze{\Ocf}{\pi_{\mathrm{before}}}\cap\PK=\varnothing}_{\text{(2) verifier-range: a theorem (Prop.~\ref{prop:confine})}}
 \ \wedge\
-\underbrace{\widehat p^{-\mathrm{solver}}_{\mathrm{after}}\!\approx\widehat p_{\mathrm{after}}
-\ \wedge\ \widehat p^{\,\ominus\Delta\mathcal O}_{\mathrm{after}}=0}_{\text{(3) autonomy: solver-free and $\Delta\mathcal O$-decisive}}\,.
+\underbrace{\widehat p^{\mathrm{panel}}_{\mathrm{before}}<\widehat p^{\mathrm{panel}}_{\mathrm{after}}}_{\text{(3) empirical prior}<\text{after (shared panel)}}
+\ \wedge\
+\underbrace{\widehat p^{-\mathrm{solver}}_{\mathrm{after}}\!\approx\widehat p_{\mathrm{after}}}_{\text{(4) autonomy: solver-free}}\,.
 \end{equation}
-Only conjunct~(2) is decidable and discharged before any run; (1) and~(3) are measured and model-relative.
+Only conjunct~(2) is decidable and discharged before any run; (1), (3), and~(4) are measured and model-relative.
 
 \paragraph{What each side rules out.} The positive side alone is \emph{search} and admits \emph{luck},
-addressed by the transfer/spread requirement. The negative side turns ``can now'' into ``could not
-before''. The autonomy side excludes \emph{borrowing}: ``solved a pseudoknot'' must not mean ``called a
+addressed by the transfer/spread requirement. Conjunct~(2) turns ``can now'' into ``could not be
+\emph{certified} before'' (a theorem about the verifier), and conjunct~(3) adds the empirical fact that the
+prior policy did not in practice reach the targets under the shared panel. The autonomy side excludes \emph{borrowing}: ``solved a pseudoknot'' must not mean ``called a
 solver.'' Only the conjunction certifies acquisition. These four alternatives (search, luck, benchmark
 overfitting, borrowing) are what soft, one-sided evidence leaves open: a rising reward score is consistent
 with over-optimization and specification gaming \citep{skalse2022,gao2023overopt,amodei2016concrete}, and a
@@ -359,16 +367,20 @@ Side & Neutralizes & Instrument & Verdict \\
 \midrule
 (1) Positive $+$ transfer & search; one-off luck & pseudoknot-aware oracle panel on \emph{held-out} \MCF{}
 targets, spread across targets & model-relative \\
-(2) Negative & ``could always have'' (target already in reach) & Prop.~\ref{prop:confine}: output space of
-\Ocf{} $=$ nested structures, contains no crossing target & exact, decidable \\
-(3) Autonomy & borrowing an external solver & $\pm$solver ablation; reuse that is \emph{learned}
-(lift${}>{}0$) and \emph{decisive} (ablation collapses the gain) & empirical \\
+(2a) Negative: verifier-range & ``could already be certified before'' & Prop.~\ref{prop:confine}:
+$\operatorname{im}\Ocf\subseteq$ nested, so no crossing target is in its certifiable range & exact, decidable \\
+(2b) Negative: prior-policy floor & ``the prior policy already produces crossings'' & $\pi_{\mathrm{before}}$
+scores $0/60$ under the \emph{shared} crossing-aware panel & empirical \\
+(3) Autonomy & borrowing an external solver & $\pm$solver ablation; matched-access gamer-vs-operator
+comparison isolates the operator's contribution & empirical \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
-\paragraph{The certificate is asymmetric.} The negative side is exact and decidable, resting on the
-representational limit of \Ocf{} (Prop.~\ref{prop:confine}). The positive side is not: \Opk{} is a
+\paragraph{The certificate is asymmetric.} The negative side has two components of different epistemic status:
+an \emph{exact}, decidable verifier-range bound (the representational limit of \Ocf{}, Prop.~\ref{prop:confine})
+and a \emph{separate}, empirical prior-policy floor ($0/60$ under the shared crossing-aware panel). Only the
+first is a theorem. The positive side is also not exact: \Opk{} is a
 heuristic, model-relative predictor whose verdict is oracle-dependent (\S\ref{sec:bg},\ref{sec:oracle}). We
 therefore claim a decidable negative side and a model-relative, panel-adjudicated positive side, not a
 uniformly ``exact'' certificate, and report the positive rate with its cross-oracle envelope
@@ -391,8 +403,10 @@ statistical one. Figure~\ref{fig:cert} summarizes the certificate.
 \paragraph{The certification procedure and its soundness.} Certifying an ascent on a held-out pool
 $\mathcal D_{\mathrm{ho}}$ runs five steps: (i) pre-screen $\mathcal D_{\mathrm{ho}}$ for designability
 (\S\ref{sec:exp}), moving intrinsically unrealizable targets to the undesignability axis
-(\S\ref{sec:impossible}); (ii) discharge the negative side offline by testing
-$\mathcal D_{\mathrm{ho}}\subseteq\PK$ (Prop.~\ref{prop:confine}), fixing the \CF{} floor at $0$;
+(\S\ref{sec:impossible}); (ii) discharge the verifier-range bound offline by testing
+$\mathcal D_{\mathrm{ho}}\subseteq\PK$ (Prop.~\ref{prop:confine}), which fixes the \emph{$\Ocf$-certification}
+floor at exactly $0$ (a decidable fact about the verifier's range, not about the prior policy's reach under a
+crossing-aware oracle---that is the separate empirical floor, step (v));
 (iii) for each $T$, hash-commit $\pi_{\mathrm{after}}(T)$ (or an abstention) before the held-out adjudicator;
 (iv) adjudicate by the panel-unanimous rule with abstention (\S\ref{sec:oracle}); (v) ablate the external
 solver, then $\Delta\mathcal O$, and recompute. With $\mathbf 1[\cdot]$ the indicator and
@@ -451,13 +465,15 @@ pooled & $1/300$ & $25/300$ & $\Delta{=}{+}0.080$, cluster-boot $95\%$ CI $[{+}0
 \begin{figure}[t]\centering
 \includegraphics[width=0.96\linewidth]{fig_cc_certificate.pdf}
 \caption{\textbf{The two-sided certificate.} Positive side (model-relative, panel-adjudicated): the oracle
-panel confirms held-out \MCF{} designs and transfer. Negative side (exact, decidable): the pseudoknot-free
-oracle cannot represent crossings (Prop.~\ref{prop:confine}). Autonomy: reusable components survive solver
-removal and ablation. Sealed commitment freezes predictions.}\label{fig:cert}
+panel confirms held-out crossing designs and transfer. Negative side (exact verifier-range bound $+$ empirical
+floor): the pseudoknot-free oracle cannot represent crossings (Prop.~\ref{prop:confine}), and the prior policy
+scores $0/60$ under the shared panel. Autonomy: solver-free, with the operator's contribution isolated by a
+matched-access gamer-vs-operator comparison. Sealed commitment freezes predictions.}\label{fig:cert}
 \end{figure}
 
 \subsection{The Positive Side Is Model-Relative}\label{sec:oracle}
-The negative side is exact (Prop.~\ref{prop:confine}); the positive side is not. A ``formed pseudoknot''
+Only the negative side's verifier-range bound is exact (Prop.~\ref{prop:confine}); its prior-policy floor is
+empirical, and the positive side is neither. A ``formed pseudoknot''
 verdict comes from a heuristic predictor over a restricted pseudoknot class, not biophysical ground truth,
 and is oracle-dependent: our companion measured that the fraction of state-of-the-art pseudoknot designs
 judged to form their target swings across predictors, a $[\,15,60\,]\%$ envelope over pKiss, ProbKnot, and
@@ -796,9 +812,9 @@ complementarity, and repair against the pseudoknot oracle, the one move the \{RE
 makes. It never calls an external pseudoknot solver, so its autonomy is structural. Under the single
 reference oracle (pKiss) the outcome looks like a decisive ascent: $43/60$ solved
 (Table~\ref{tab:baselines}), matching the external SOTA solver while calling nothing, far above the $0/60$
-floor. The negative side is airtight: the floor is exactly zero, and every skeleton design is a
-naive-MFE-style false positive the panel refutes (Prop.~\ref{prop:confine}; a $0/60$ panel credit on the E0
-skeleton control below).
+floor. The negative side is firm on both its components: the $\Ocf$-certification bound is exact (Prop.~\ref{prop:confine})
+and the empirical \CF-confined floor is $0/60$, with every skeleton design a naive-MFE-style false positive the
+panel refutes (a $0/60$ panel credit on the E0 skeleton control below).
 
 The positive side does not survive the panel. The operator optimized pKiss in the loop; re-adjudicated by an
 a held-out predictor, only $2/43$ of its solves are confirmed and one is panel-unanimous
@@ -1412,7 +1428,7 @@ Scientific confirmation & Does the candidate hold in the world? (exact checker, 
 \end{table}
 
 \paragraph{Limitations.} (i) The positive side is model-relative (heuristic pseudoknot oracles), addressed by
-the panel but not eliminated; only the negative side is exact, and this is not academic ($43/60$ vs.\ $1/60$).
+the panel but not eliminated; only the negative side's verifier-range bound is exact, and this is not academic ($43/60$ vs.\ $1/60$).
 (ii) All (un)designability is relative to a declared energy model; complexity claims are corollaries. (iii) We
 define the certificate, not the invention algorithm (Rem.~\ref{rem:scope}); our first operator is autonomous yet
 games pKiss, while re-optimizing for cross-oracle agreement recovers a small but panel-robust ascent
@@ -1452,11 +1468,12 @@ confinement theorem for the negative side, defined the transferable, autonomous 
 recognize it, separated repertoire-confinement from target-undesignability, and were explicit that the positive
 side is model-relative. On $60$ held-out crossing targets the criterion earned its keep: a solver-free operator
 scoring $43/60$ under a single pseudoknot oracle survives a multi-predictor panel only $1/60$ of the time, above a
-decidable context-free floor of $0/60$, catching a $43\times$ oracle inflation a one-sided criterion would have
-reported as an autonomous discovery. The contribution is a demarcation instrument whose negative side is a
-theorem, not a statistic, and whose positive side is panel-adjudicated, not oracle-chosen; re-optimized for
-cross-oracle agreement, an autonomous operator recovers a small but genuine set of panel-robust crossing
-designs ($3$--$8/60$ across five seeds, mean $5.0$, unanimous across three distinct predictors), the first crossings we observe
+context-free floor of $0/60$, catching the collapse from $43/60$ to $1/60$ that a one-sided criterion would have
+reported as an autonomous discovery. The contribution is a demarcation instrument whose negative side combines
+an exact verifier-range theorem with an empirical prior-policy floor, and whose positive side is
+panel-adjudicated, not oracle-chosen; re-optimized for cross-oracle agreement, an autonomous operator recovers
+a small set of panel-robust crossing designs ($3$--$8/60$ across five seeds, mean $5.0$, unanimous across three
+distinct predictors), the first crossings we observe
 with all three sides intact.
 
 \appendix
