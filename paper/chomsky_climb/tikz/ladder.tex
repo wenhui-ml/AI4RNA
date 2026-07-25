@@ -13,9 +13,9 @@
   up/.style={->, line width=1pt}, font=\scriptsize]
 
 % vertical, left-aligned stack; stringency increases upward
-\node[r, fill=gy!12] (r1) {\textbf{R1\quad exact-match} (single oracle): the target pair set appears in one predictor's fold.};
-\node[r, draw=mcfb, fill=mcfb!8, above=7mm of r1] (r2) {\textbf{R2\quad panel-unanimous}: target $=$ the predicted structure under \emph{three independent} engines (pKiss $\wedge$ ProbKnot $\wedge$ ShapeKnots).};
-\node[r, draw=cfg, fill=cfg!10, above=7mm of r2] (r3) {\textbf{R3\quad thermodynamic dominance}: target $=$ pKiss MFE with a free-energy gap $\Delta$ to the best alternative fold (median $1.2$\,kcal/mol).};
+\node[r, fill=gy!12] (r1) {\textbf{R1\quad exact-match} (single oracle): target $=$ one predictor's predicted structure (full pair set).};
+\node[r, draw=mcfb, fill=mcfb!8, above=7mm of r1] (r2) {\textbf{R2\quad panel-unanimous}: target $=$ the predicted structure under \emph{three distinct} predictors (pKiss $\wedge$ ProbKnot $\wedge$ ShapeKnots).};
+\node[r, draw=cfg, fill=cfg!10, above=7mm of r2] (r3) {\textbf{R3\quad within-pKiss dominance}: target $=$ pKiss MFE with a free-energy gap $\Delta$ to the best alternative fold (median $1.2$\,kcal/mol, pKiss model).};
 \node[r, draw=negr, dashed, fill=negr!5, above=7mm of r3] (r4) {\textbf{R4\quad physical formation} (in-vitro probing / 3D): the only route past model-relativity.};
 
 \draw[up] (r1) -- (r2);
