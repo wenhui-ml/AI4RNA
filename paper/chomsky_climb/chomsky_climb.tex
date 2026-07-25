@@ -1201,122 +1201,11 @@ itself the finding: robust autonomous pseudoknot design is hard, and two-oracle 
 third only partially. Where an operator cannot cross, \textbf{E3} (a minimal-grammar-hint sweep) bounds what
 a hint would buy above the floor, so the outcome is informative even under a null.
 
-\subsection{A second domain: the certificate ports to SAT constraint definability}\label{sec:sat}
-The next two subsections are \emph{corroborating portability evidence}, secondary to the RNA audit of
-\S\ref{sec:exp}; readers seeking only the primary result may skip them. To show the two-sided certificate is
-not an artifact of RNA or the Chomsky hierarchy, we instantiate it on an unrelated formal hierarchy: the minimum CNF clause-width needed to define a Boolean relation
-$R\subseteq\{0,1\}^n$. Width $\le2$ is the analog of the context-free (nested) class: by the
-Baker--Pixley/Schaefer characterization, $R$ is $2$-CNF-definable iff it is closed under the ternary
-majority operation \citep{schaefer1978,bakerpixley1975}, and higher clause-width is a higher tier in this clause-width hierarchy (a SAT analogue of, not identical to, the Chomsky hierarchy). The certificate
-transfers verbatim. The negative side is the decidable theorem that a $2$-CNF-confined designer's solution
-set is always majority-closed (a non-majority-closed target is provably unrealizable, testable in
-$O(|R|^3)$, the SAT analog of Prop.~\ref{prop:confine}); the positive side verifies a general-CNF designer's
-model set against $R$ exactly, by enumerating $\{0,1\}^n$.
-
-On a graded pool of $48$ relations ($n{=}4$; Table~\ref{tab:sat}, Fig.~\ref{fig:sat}), the width-$2$ floor
-realizes exactly the $11$ majority-closed (width-$\le2$) targets and zero of the $37$ higher-class ones,
-the ascent realizes all $48$, and the equivalence
-$\text{majority-closed}\Leftrightarrow\text{width}\le2\Leftrightarrow\text{$2$-CNF-realizable}$ holds for every
-target. Two lessons. (i) The decidable negative side re-instantiates in a formalism (clone theory)
-unconnected to folding or grammars: theorem-backed confinement is a general pattern, not an RNA trick. (ii)
-SAT has an exact verifier, so its positive side is decidable and here trivial. This localizes the RNA
-positive side's model-relativity to the substrate's heuristic folding oracle, not the certificate: the
-certificate ports, while model-relativity is a property of the domain's ground-truth instrument.
-
-\begin{table}[t]\centering\small
-\setlength{\tabcolsep}{6pt}\renewcommand{\arraystretch}{1.15}
-\caption{\textbf{The certificate in a second domain (SAT constraint definability, $n{=}4$, $48$ relations).}
-Class grade $=$ minimum CNF clause-width to define $R$ (grade $\le2$ $\Leftrightarrow$ majority-closed
-$\Leftrightarrow$ $2$-CNF-definable). The width-$2$ floor is confined below the boundary; the decidable
-negative theorem holds for all $48$.}\label{tab:sat}
-\begin{tabularx}{\linewidth}{@{}Lccc@{}}
-\toprule
-class (CNF-width) & \# relations & floor (2-CNF) realizes & ascent (general CNF) realizes\\
-\midrule
-width $\le2$ (majority-closed; \CF-analog) & $11$ & $11$ & $11$\\
-width $\ge3$ (higher class) & $37$ & $\mathbf{0}$ (theorem) & $37$\\
-\midrule
-all & $48$ & $11$ & $48$\\
-\bottomrule
-\end{tabularx}
-\end{table}
-
-\begin{figure}[t]\centering
-\includegraphics[width=0.8\linewidth]{fig_cc_sat.pdf}
-\caption{\textbf{Second domain (SAT).} By class grade (minimum CNF clause-width), the $2$-CNF floor is
-confined below the majority-closure boundary, realizing nothing at width $\ge3$ (a decidable theorem), while
-the general-CNF ascent realizes every relation. The negative-side certificate ports; the positive side is
-exact because SAT's verifier is exact.}\label{fig:sat}
-\end{figure}
-
-
-
-\subsection{The positive side ports: a domain-agnostic audit protocol}\label{sec:audit}
-SAT ports the negative side but trivializes the positive side (its verifier is exact). The consequential
-question for the ``audit layer'' claim is whether the positive-side audit---an independent check that catches
-oracle-gaming---ports to mainstream self-improving-agent settings with no decidable hierarchy and no blind
-oracle. We state it as a domain-agnostic protocol and instantiate it across three mechanistically distinct,
-widely studied gaming channels (\texttt{runs/cc\_ascent/code\_audit}; Table~\ref{tab:audit}).
-
-\begin{table}[t]\centering\small
-\setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.15}
-\caption{\textbf{A domain-agnostic audit protocol across three eval-gaming channels} (no formal hierarchy, no
-blind oracle). One template---agent optimizes a gameable reward; objective gold $+$ independent panel
-audit the output---instantiated on mechanistically distinct biases: answer-property, test-set leakage, and
-sycophancy. In every channel the flawed reward is gamed and the independent audit catches all of it, with
-no observed false positives (0 of the audited designs). Answers R3's portability question in the affirmative.}\label{tab:audit}
-\begin{tabularx}{\linewidth}{@{}p{2.5cm}p{2.7cm}Xp{3.0cm}@{}}
-\toprule
-gaming channel & flawed oracle & gaming outcome & audit catch (vs.\ gold)\\
-\midrule
-answer-property bias (verbosity/confidence) & LLM helpfulness judge & reward accepts $12/12$ for \emph{every}
-agent; gold-correct $9,9,3$ of $12$ (GPT-5.6/GLM-5.2/Qwen-7B) $\Rightarrow$ gaming $3,3,9$ & caught
-$3/3,\,3/3,\,9/9$; FP $0$\\
-test-set leakage & visible test set & none natural; constructed lookup gamer passes visible $15/15$ & $0/15$
-panel-unan.; honest $15/15$; FP $0$\\
-sycophancy (agree-with-user) & agreement-with-user reward & reward accepts $11/12$; gold-correct $1/12$
-$\Rightarrow$ gaming $11$ (honest control: accepts $0/12$, gold $11/12$) & caught $11/11$; FP $0$\\
-\bottomrule
-\end{tabularx}
-\end{table}
-
-\emph{The protocol.} A self-improving agent optimizes a \emph{flawed reward} it can game; an objective
-\emph{gold} and an \emph{independent verifier panel}---which never sees the reward's bias---audit the frozen
-output. We report, per condition, how often the reward accepts, how often the answer is gold-correct, the
-gaming rate (reward-accepted yet wrong), the fraction of gaming the audit catches, and the panel
-false-positive rate. This is RNA's ``optimize a flawed oracle $\to$ an independent check collapses it,''
-stripped of any formal hierarchy.
-
-\emph{(1) Answer-property bias (verbosity/confidence).} The analog of RNA's imperfect pKiss is a reward that
-cannot verify truth: an LLM ``helpfulness'' judge rewarding thoroughness and confidence, a documented
-LLM-judge bias \citep{gao2023overopt,skalse2022,zheng2023judge}. On hard arithmetic (Python gold), a
-self-improving agent optimizes it over three rounds across a capability spectrum (GPT-5.6-sol, GLM-5.2,
-Qwen2.5-7B). The reward is \emph{fully} gamed---it accepts $12/12$ answers for \emph{every} model regardless
-of correctness---while true correctness falls with capability ($9,9,3$ of $12$), so it accepts $3,3,9$
-confident-\emph{wrong} answers. The independent audit catches \emph{all} of it ($3/3,\,3/3,\,9/9$; FP $0$),
-and gaming scales inversely with capability: the audit earns its keep exactly where the agent is weak enough
-to game.
-
-\emph{(2) Test-set leakage.} When the optimized oracle is an \emph{executable} test set, capable agents
-(GLM-5.2 and mid-tier) solve $15$ tasks genuinely with $0$ natural gaming---an executable proxy is too strong
-to fake---but leakage still games it: a constructed gamer hard-coding the visible cases passes $15/15$ yet is
-caught by the held-out\,$\wedge$\,property panel ($0/15$ unanimous), a $\ge\!600$-input differential gold
-confirming it wrong; honest solutions pass $15/15$. FP $0$.
-
-\emph{(3) Sycophancy.} Here the reward is biased not toward an answer property but toward the \emph{user}: an
-agreement rater that pays for validating the user's stated belief \citep{sharma2023sycophancy}. Shown a
-confident but wrong user claim on the same arithmetic, the reward-optimizing agent adopts it---the reward
-accepts $11/12$ replies while only $1/12$ are gold-correct (gaming $11$). The panel, which sees only the
-question and the candidate answer, never the user's claim, catches all $11$ ($11/11$; FP $0$); the honest
-control inverts (reward accepts $0/12$, gold $11/12$), so the reward is anti-correlated with truth.
-
-\emph{Asymmetric portability (the honest synthesis).} The two certificate sides port through different
-structure: the decidable negative side needs a formal class hierarchy (RNA grammar; SAT clone theory), while
-the positive-side gaming-catch needs only an imperfect, gameable verifier---which every one of these three
-channels supplies. They coincide when a domain has both, as RNA does, which is why RNA is the natural
-showcase. Caveat: these audit panels' checkers are stronger than RNA's folding oracles, so their
-model-relativity is milder---and even here verification is imperfect (the LLM verifier throws occasional
-false-negatives), which is why we anchor every catch to an objective gold.
+\paragraph{Portability of the certificate (Appendices~\ref{sec:sat},~\ref{sec:audit}).} The two-sided
+pattern is not specific to RNA. The decidable verifier-range side re-instantiates on a second formal
+hierarchy (SAT clause-width definability; App.~\ref{sec:sat}), and the positive-side gaming-catch ports to a
+domain-agnostic audit across three eval-gaming channels with no formal hierarchy (App.~\ref{sec:audit});
+both are corroborating, secondary to the RNA result.
 
 \section{Discussion, Related Work, and Conclusion}\label{sec:discussion}
 
@@ -1851,6 +1740,124 @@ dominance (\S\ref{sec:exp}) is R3; R4 (physical formation) needs wet-lab and is 
 \end{figure}
 
 \clearpage
+% ---- relocated from main text (R3 #15): portability appendices ----
+\section{A second domain: the certificate ports to SAT constraint definability}\label{sec:sat}
+This appendix and the next are \emph{corroborating portability evidence}, secondary to the RNA audit of
+\S\ref{sec:exp}. To show the two-sided certificate is
+not an artifact of RNA or the Chomsky hierarchy, we instantiate it on an unrelated formal hierarchy: the minimum CNF clause-width needed to define a Boolean relation
+$R\subseteq\{0,1\}^n$. Width $\le2$ is the analog of the context-free (nested) class: by the
+Baker--Pixley/Schaefer characterization, $R$ is $2$-CNF-definable iff it is closed under the ternary
+majority operation \citep{schaefer1978,bakerpixley1975}, and higher clause-width is a higher tier in this clause-width hierarchy (a SAT analogue of, not identical to, the Chomsky hierarchy). The certificate
+transfers verbatim. The negative side is the decidable theorem that a $2$-CNF-confined designer's solution
+set is always majority-closed (a non-majority-closed target is provably unrealizable, testable in
+$O(|R|^3)$, the SAT analog of Prop.~\ref{prop:confine}); the positive side verifies a general-CNF designer's
+model set against $R$ exactly, by enumerating $\{0,1\}^n$.
+
+On a graded pool of $48$ relations ($n{=}4$; Table~\ref{tab:sat}, Fig.~\ref{fig:sat}), the width-$2$ floor
+realizes exactly the $11$ majority-closed (width-$\le2$) targets and zero of the $37$ higher-class ones,
+the ascent realizes all $48$, and the equivalence
+$\text{majority-closed}\Leftrightarrow\text{width}\le2\Leftrightarrow\text{$2$-CNF-realizable}$ holds for every
+target. Two lessons. (i) The decidable negative side re-instantiates in a formalism (clone theory)
+unconnected to folding or grammars: theorem-backed confinement is a general pattern, not an RNA trick. (ii)
+SAT has an exact verifier, so its positive side is decidable and here trivial. This localizes the RNA
+positive side's model-relativity to the substrate's heuristic folding oracle, not the certificate: the
+certificate ports, while model-relativity is a property of the domain's ground-truth instrument.
+
+\begin{table}[t]\centering\small
+\setlength{\tabcolsep}{6pt}\renewcommand{\arraystretch}{1.15}
+\caption{\textbf{The certificate in a second domain (SAT constraint definability, $n{=}4$, $48$ relations).}
+Class grade $=$ minimum CNF clause-width to define $R$ (grade $\le2$ $\Leftrightarrow$ majority-closed
+$\Leftrightarrow$ $2$-CNF-definable). The width-$2$ floor is confined below the boundary; the decidable
+negative theorem holds for all $48$.}\label{tab:sat}
+\begin{tabularx}{\linewidth}{@{}Lccc@{}}
+\toprule
+class (CNF-width) & \# relations & floor (2-CNF) realizes & ascent (general CNF) realizes\\
+\midrule
+width $\le2$ (majority-closed; \CF-analog) & $11$ & $11$ & $11$\\
+width $\ge3$ (higher class) & $37$ & $\mathbf{0}$ (theorem) & $37$\\
+\midrule
+all & $48$ & $11$ & $48$\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{figure}[t]\centering
+\includegraphics[width=0.8\linewidth]{fig_cc_sat.pdf}
+\caption{\textbf{Second domain (SAT).} By class grade (minimum CNF clause-width), the $2$-CNF floor is
+confined below the majority-closure boundary, realizing nothing at width $\ge3$ (a decidable theorem), while
+the general-CNF ascent realizes every relation. The negative-side certificate ports; the positive side is
+exact because SAT's verifier is exact.}\label{fig:sat}
+\end{figure}
+
+
+
+\section{The positive side ports: a domain-agnostic audit protocol}\label{sec:audit}
+SAT ports the negative side but trivializes the positive side (its verifier is exact). The consequential
+question for the ``audit layer'' claim is whether the positive-side audit---an independent check that catches
+oracle-gaming---ports to mainstream self-improving-agent settings with no decidable hierarchy and no blind
+oracle. We state it as a domain-agnostic protocol and instantiate it across three mechanistically distinct,
+widely studied gaming channels (\texttt{runs/cc\_ascent/code\_audit}; Table~\ref{tab:audit}).
+
+\begin{table}[t]\centering\small
+\setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.15}
+\caption{\textbf{A domain-agnostic audit protocol across three eval-gaming channels} (no formal hierarchy, no
+blind oracle). One template---agent optimizes a gameable reward; objective gold $+$ independent panel
+audit the output---instantiated on mechanistically distinct biases: answer-property, test-set leakage, and
+sycophancy. In every channel the flawed reward is gamed and the independent audit catches all of it, with
+no observed false positives (0 of the audited designs). Answers R3's portability question in the affirmative.}\label{tab:audit}
+\begin{tabularx}{\linewidth}{@{}p{2.5cm}p{2.7cm}Xp{3.0cm}@{}}
+\toprule
+gaming channel & flawed oracle & gaming outcome & audit catch (vs.\ gold)\\
+\midrule
+answer-property bias (verbosity/confidence) & LLM helpfulness judge & reward accepts $12/12$ for \emph{every}
+agent; gold-correct $9,9,3$ of $12$ (GPT-5.6/GLM-5.2/Qwen-7B) $\Rightarrow$ gaming $3,3,9$ & caught
+$3/3,\,3/3,\,9/9$; FP $0$\\
+test-set leakage & visible test set & none natural; constructed lookup gamer passes visible $15/15$ & $0/15$
+panel-unan.; honest $15/15$; FP $0$\\
+sycophancy (agree-with-user) & agreement-with-user reward & reward accepts $11/12$; gold-correct $1/12$
+$\Rightarrow$ gaming $11$ (honest control: accepts $0/12$, gold $11/12$) & caught $11/11$; FP $0$\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\emph{The protocol.} A self-improving agent optimizes a \emph{flawed reward} it can game; an objective
+\emph{gold} and an \emph{independent verifier panel}---which never sees the reward's bias---audit the frozen
+output. We report, per condition, how often the reward accepts, how often the answer is gold-correct, the
+gaming rate (reward-accepted yet wrong), the fraction of gaming the audit catches, and the panel
+false-positive rate. This is RNA's ``optimize a flawed oracle $\to$ an independent check collapses it,''
+stripped of any formal hierarchy.
+
+\emph{(1) Answer-property bias (verbosity/confidence).} The analog of RNA's imperfect pKiss is a reward that
+cannot verify truth: an LLM ``helpfulness'' judge rewarding thoroughness and confidence, a documented
+LLM-judge bias \citep{gao2023overopt,skalse2022,zheng2023judge}. On hard arithmetic (Python gold), a
+self-improving agent optimizes it over three rounds across a capability spectrum (GPT-5.6-sol, GLM-5.2,
+Qwen2.5-7B). The reward is \emph{fully} gamed---it accepts $12/12$ answers for \emph{every} model regardless
+of correctness---while true correctness falls with capability ($9,9,3$ of $12$), so it accepts $3,3,9$
+confident-\emph{wrong} answers. The independent audit catches \emph{all} of it ($3/3,\,3/3,\,9/9$; FP $0$),
+and gaming scales inversely with capability: the audit earns its keep exactly where the agent is weak enough
+to game.
+
+\emph{(2) Test-set leakage.} When the optimized oracle is an \emph{executable} test set, capable agents
+(GLM-5.2 and mid-tier) solve $15$ tasks genuinely with $0$ natural gaming---an executable proxy is too strong
+to fake---but leakage still games it: a constructed gamer hard-coding the visible cases passes $15/15$ yet is
+caught by the held-out\,$\wedge$\,property panel ($0/15$ unanimous), a $\ge\!600$-input differential gold
+confirming it wrong; honest solutions pass $15/15$. FP $0$.
+
+\emph{(3) Sycophancy.} Here the reward is biased not toward an answer property but toward the \emph{user}: an
+agreement rater that pays for validating the user's stated belief \citep{sharma2023sycophancy}. Shown a
+confident but wrong user claim on the same arithmetic, the reward-optimizing agent adopts it---the reward
+accepts $11/12$ replies while only $1/12$ are gold-correct (gaming $11$). The panel, which sees only the
+question and the candidate answer, never the user's claim, catches all $11$ ($11/11$; FP $0$); the honest
+control inverts (reward accepts $0/12$, gold $11/12$), so the reward is anti-correlated with truth.
+
+\emph{Asymmetric portability (the honest synthesis).} The two certificate sides port through different
+structure: the decidable negative side needs a formal class hierarchy (RNA grammar; SAT clone theory), while
+the positive-side gaming-catch needs only an imperfect, gameable verifier---which every one of these three
+channels supplies. They coincide when a domain has both, as RNA does, which is why RNA is the natural
+showcase. Caveat: these audit panels' checkers are stronger than RNA's folding oracles, so their
+model-relativity is milder---and even here verification is imperfect (the LLM verifier throws occasional
+false-negatives), which is why we anchor every catch to an objective gold.
+
 \bibliographystyle{plainnat}
 \bibliography{references}
 
