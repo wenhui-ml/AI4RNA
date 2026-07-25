@@ -89,17 +89,32 @@ def main():
           f"Delta=p_panel-p_gamer={mean_d:+.4f}  cluster-boot 95% CI [{lo:+.4f},{hi:+.4f}]")
     print("  -> per-seed McNemar/binomial now individually significant (n=251 powers the test the n=60 pool could not).")
 
-    # ---- TRULY-UNTOUCHED confirmatory subset (reviewer R2 #9): exclude development [0:60] and the
-    # previously-inspected second pool [60:110]; report per-seed on the never-examined ids 110..250 only. ----
-    untouched = set(f"pseudobase:{i}" for i in range(110, 251))
-    print("\ntruly-untouched confirmatory subset (ids 110-250; dev [0:60] and inspected pool2 [60:110] excluded):")
-    for s in SEEDS:
-        ids = [t for t in seeds[s] if t in untouched]
-        kp = sum(seeds[s][t][0] for t in ids); kg = sum(seeds[s][t][1] for t in ids)
-        b = sum(1 for t in ids if seeds[s][t][0] and not seeds[s][t][1])
-        c = sum(1 for t in ids if seeds[s][t][1] and not seeds[s][t][0])
-        print(f"  seed {s}: n={len(ids)}  panel_auto={kp}  gamer={kg}  McNemar b={b},c={c} p={mcnemar_exact(b,c):.2e}")
-    print("  -> per-seed significant on genuinely untouched targets (not relying on the development pool).")
+    # ---- STRICT confirmatory subset (reviewer R2 #9 + R3 #3): exclude development [0:60], the previously-
+    # inspected second pool [60:110], AND the agent-invention training targets [110:126]; report per-seed on
+    # the never-used ids 126..250. Report BOTH the unanimity metric and the ShapeKnots-ONLY held-out metric
+    # (R3 #2: 2/3 of the unanimity conjuncts are in the panel operator's objective, so the genuinely held-out
+    # oracle is ShapeKnots alone). ----
+    def load_full(path):
+        d = json.load(open(path)); out = {}
+        for r in d["rows"]:
+            pa, au = r["arms"].get("panel_auto", {}), r["arms"].get("autonomous", {})
+            if pa.get("error") or au.get("error"):
+                continue
+            pp, ap = pa.get("panel") or {}, au.get("panel") or {}
+            out[r["id"]] = {"pa_un": bool(pp.get("unanimous")), "ga_un": bool(ap.get("unanimous")),
+                            "pa_sk": bool(pp.get("shapeknots")), "ga_sk": bool(ap.get("shapeknots"))}
+        return out
+    full = {s: load_full(os.path.join(HERE, f"bigpool_s{s}", "sweep.json")) for s in SEEDS}
+    strict = set(f"pseudobase:{i}" for i in range(126, 251))
+    for metric, kp_key, kg_key in [("UNANIMITY (pKiss AND ProbKnot AND ShapeKnots)", "pa_un", "ga_un"),
+                                   ("ShapeKnots-ONLY (the single genuinely held-out oracle)", "pa_sk", "ga_sk")]:
+        print(f"\nstrict confirmatory subset ids 126-250 (dev+pool2+agent-training excluded), {metric}:")
+        for s in SEEDS:
+            ids = [t for t in full[s] if t in strict]
+            kp = sum(full[s][t][kp_key] for t in ids); kg = sum(full[s][t][kg_key] for t in ids)
+            b = sum(1 for t in ids if full[s][t][kp_key] and not full[s][t][kg_key])
+            c = sum(1 for t in ids if full[s][t][kg_key] and not full[s][t][kp_key])
+            print(f"  seed {s}: n={len(ids)}  panel_auto={kp}  gamer={kg}  McNemar b={b},c={c} p={mcnemar_exact(b,c):.3f}")
 
 
 if __name__ == "__main__":

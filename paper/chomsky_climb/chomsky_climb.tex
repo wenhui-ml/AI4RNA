@@ -115,7 +115,7 @@ distinction the Chomsky hierarchy is founded on is the one separating ordinary R
 pseudoknots.
 
 \paragraph{Thesis.} \emph{Under a pseudoknot-aware oracle, a self-improving design agent realizes held-out
-crossing (\MCF) targets via reusable components that survive ablation, while its prior \CF-verified repertoire
+crossing targets via a reusable, solver-free procedure, while its prior \CF-verified repertoire
 is confined by its pseudoknot-free verifier to nested (\CF) structures and does not realize the targets
 empirically ($0/60$). We audit this as a certified capability-acquisition event; the class-level $\CF\to\MCF$
 reading is evidence from an unbounded crossing family, not a language-class proof, since any finite target set
@@ -430,10 +430,10 @@ distinct confounder: \emph{search} and one-off \emph{luck} by a held-out, target
 committed before adjudication; \emph{``could always have''} by the decidable emptiness
 $\Rze{\Ocf}{\pi_{\mathrm{before}}}\cap\PK=\varnothing$; \emph{benchmark overfitting} by transfer
 ($g_{\mathrm{tr}}$ small) to targets disjoint from those forming $\Delta\mathcal O$; and \emph{borrowing} by a
-near-zero autonomy gap $g_{\mathrm{aut}}\!\approx\!0$ with $\Delta\mathcal O$-decisiveness
-$\widehat p^{\,\ominus\Delta\mathcal O}\!=\!0$. The conjunction is \emph{non-redundant} in the informal sense
-that dropping~(2) readmits ``could always have'', dropping~(3) readmits borrowing, and dropping~(1) leaves
-nothing measured; we make no claim of formal minimality.
+near-zero autonomy gap $g_{\mathrm{aut}}\!\approx\!0$ on solver removal. The conjunction is
+\emph{non-redundant} in the informal sense that dropping~(2) readmits ``could already be certified'',
+dropping~(3) readmits ``the prior policy already reached the targets'', dropping~(4) readmits borrowing, and
+dropping~(1) leaves nothing measured; we make no claim of formal minimality.
 \end{remark}
 \noindent The verdict is a demarcation, not a probability: conjunct~(2) is a theorem (Prop.~\ref{prop:confine}),
 whereas (1) and~(3) are model-relative measurements whose uncertainty we quantify (\S\ref{sec:exp}, Table~\ref{tab:sep}).
@@ -446,8 +446,8 @@ $n{=}60$; panel-unanimous $=$ pKiss\,$\wedge$\,ProbKnot\,$\wedge$\,ShapeKnots, a
 the paired McNemar per seed ($b$ solved only by the panel operator, $c$ only by the gamer) and the pooled
 paired difference $\Delta{=}p_{\mathrm{panel}}{-}p_{\mathrm{gamer}}$ with a target-level cluster bootstrap
 ($B{=}20{,}000$), not a binomial against a fixed baseline. The paired $\Delta$ CI clears zero; single $60$-target
-seeds are underpowered, but on the $141$ never-examined targets (ids $110$--$250$) every seed is individually
-significant (paired McNemar $p\le0.039$; \S\ref{sec:exp}).
+seeds are underpowered, but on the $125$ strictly-untouched targets (ids $126$--$250$) the unanimity
+separation is significant in $2/3$ seeds (paired McNemar $p\le2.0\!\times\!10^{-3}$; \S\ref{sec:exp}).
 (\texttt{runs/cc\_ascent/stats\_separation.py}, \texttt{large\_pool\_stats.py}.)}\label{tab:sep}
 \begin{tabularx}{\linewidth}{@{}Xccc@{}}
 \toprule
@@ -669,8 +669,8 @@ under \Ocf{} and would be scored ``solved'' by a pseudoknot-blind check, yet \Op
 absent (a naive-MFE false positive; the negative side, Prop.~\ref{prop:confine}). The full target needs a
 design whose \Opk-fold forms both stems, with a target in the non-CF class $\PK$ (the two-component witness).
 The certificate reads: ($-$) the \Ocf-verified repertoire yields only the skeleton; (+) the panel confirms
-the full crossing target once the capability exists; autonomy asks whether that capability is the agent's own
-or a solver call.
+the full crossing target once the capability exists; autonomy asks whether that capability needs an external
+solver.
 
 \begin{figure}[t]\centering
 \includegraphics[width=0.96\linewidth]{fig_cc_worked.pdf}
@@ -842,13 +842,16 @@ and $1$ is what a one-sided criterion cannot see.
 \setlength{\tabcolsep}{6pt}\renewcommand{\arraystretch}{1.15}
 \caption{\textbf{Cross-oracle panel adjudication of the invented operator's $43$ pKiss-solves}
 (\S\ref{sec:oracle}). The operator optimized pKiss in-loop; a held-out predictor confirms almost none of
-its solves, and one design is panel-unanimous: the apparent ascent is an oracle artifact.}\label{tab:panel}
+its solves, and one design is panel-unanimous: the apparent ascent is an oracle artifact. All $43$ are
+full-structure exact matches under pKiss (\texttt{pk\_bp\_distance}$=0$); the $4$ ``blind-MFE'' cases are still
+exact pKiss matches but happen to be reproduced without a pseudoknot, so the genuine-crossing count is
+$39$.}\label{tab:panel}
 \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{4.8cm}X@{}}
 \toprule
 \textbf{adjudicator} & \textbf{confirms (of the $43$ pKiss-solves)}\\
 \midrule
-pKiss (the oracle the operator optimized) & $43/43$\\
-crossing-pair check on the $43$ pKiss-solves & $39$ contain the target's crossing pairs; $4$ are skeleton-only (nested skeleton present, crossing stem absent)\\
+pKiss (the oracle the operator optimized), full-structure exact match & $43/43$\\
+of those $43$, also solved by a pseudoknot-\emph{free} MFE & $4/43$ (a blind MFE already reproduces the target, so these require no crossing); the other $39$ genuinely require pKiss\\
 ProbKnot (held-out predictor) & $2/43$\\
 panel-unanimous (pKiss $\wedge$ ProbKnot $\wedge$ ShapeKnots) & $\mathbf{1/43}$ \;\; ($1/60$ overall)\\
 \bottomrule
@@ -902,7 +905,7 @@ attribution honest: the prior-to-after step crosses the verifier boundary (a cha
 the pseudoknot-free oracle to a crossing-aware one), while the gamer and the panel-optimizing operator run
 with \emph{identical} oracle access and search budget---both may query pKiss and ProbKnot in the repair
 loop---and differ only in the objective (single-predictor vs panel-agreement). The panel-robust gap between
-them ($\sim\!1/60$ vs.\ $3$--$8/60$, per-seed significant on $141$ untouched targets, \S\ref{sec:exp}) is therefore
+them ($\sim\!1/60$ vs.\ $3$--$8/60$ unanimity, $2/3$ seeds significant on strictly-untouched targets, \S\ref{sec:exp}) is therefore
 attributable to the operator, not to added crossing-aware feedback.
 
 \paragraph{What the operator's capability actually is (ablation).} Ablation localizes the capability
@@ -917,17 +920,21 @@ but a change of verifier---optimizing against a crossing-aware (\MCF) oracle rat
 the gain must be read through the panel, not the optimized oracle.
 
 
-\paragraph{A panel-optimizing operator partially recovers the ascent.} We built that operator: a variant
-whose repair loop optimizes agreement between two predictors (pKiss and ProbKnot, lexicographically), never
-one, still autonomous. On its two oracles it solves $34$--$37/60$ across five seeds (mean $36$), far above
-the pKiss-gamer's ProbKnot-robust $2/60$. The decisive test is a held-out oracle it did not optimize,
-ShapeKnots: $3$--$8$ of those solves (mean $5.0$ over five seeds) are also confirmed, i.e.\ panel-unanimous
-across all three predictors (Table~\ref{tab:recovered}), versus $\sim\!1/60$ for the pKiss-only operator and
-$0/60$ for the SOTA solver. This is a modest but genuine result: an autonomous, panel-robust
-$\CF\!\to\!\MCF$ crossing above the decidable $0/60$ floor, robust to an oracle outside its objective.
-Generalization grows with the number of oracles optimized, from $\sim\!1/60$ (one) to mean $5.0/60$ (two),
-but only $3$--$8$ of the $\sim\!36$ two-oracle solves clear the held-out third. More distinct checks
-tighten the certificate; none makes it exact.
+\paragraph{A panel-optimizing operator improves the multi-oracle conjunction; held-out-oracle generalization
+is weak.} We built that operator: a variant whose repair loop optimizes agreement between two predictors
+(pKiss and ProbKnot, lexicographically), never one, still autonomous. On its two oracles it solves
+$34$--$37/60$ across five seeds (mean $36$), far above the pKiss-gamer's ProbKnot-robust $2/60$; and $3$--$8$
+of those solves (mean $5.0$) are also panel-unanimous across all three predictors (Table~\ref{tab:recovered}),
+versus $\sim\!1/60$ for the pKiss-only operator and $0/60$ for the SOTA solver. But panel-unanimity puts two
+of its three conjuncts (pKiss, ProbKnot) \emph{inside} the operator's objective, so it cannot by itself show
+generalization to the one \emph{genuinely held-out} oracle, ShapeKnots. Comparing the two operators on the
+\emph{ShapeKnots-only} exact-match rate at a fixed denominator (strictly-untouched targets, ids $126$--$250$)
+is far less decisive: the panel operator scores $8,11,11$ and the pKiss-gamer $7,4,3$ over three seeds---higher
+each time but small, and significant by paired McNemar in only one seed ($p=1.0,\,0.09,\,0.02$). The honest
+statement is therefore narrow: optimizing a two-oracle conjunction improves the three-oracle conjunction rate
+(from $\sim\!1/60$ to mean $5.0/60$) and nudges the single-held-out-oracle rate upward, but not by enough to
+claim robust generalization to an unoptimized predictor. More distinct checks tighten the certificate; none
+makes it exact.
 
 Read as an ablation \emph{under the panel-unanimous metric}: the one load-bearing component is the
 panel-agreement objective---removing it (the pKiss-only operator, at \emph{identical} oracle access and search
@@ -941,19 +948,21 @@ and $60$ targets as the panel operator and compare by a matched, paired analysis
 gamer's rate as a known constant (Table~\ref{tab:sep}). The gamer is panel-unanimous on $\{1,0,0,0,0\}/60$
 (pooled $1/300$), the panel operator on $\{8,3,5,5,4\}/60$ (pooled $25/300$). The paired difference
 $\Delta=p_{\mathrm{panel}}-p_{\mathrm{gamer}}$, over matched seeds and targets with a target-level cluster
-bootstrap, is $+0.080$ with $95\%$ CI $[+0.040,+0.127]$, excluding zero. Per seed the paired McNemar has
+bootstrap, is $+0.080$ with $95\%$ CI $[+0.040,+0.127]$ (conditional on the five observed seeds), excluding zero. Per seed the paired McNemar has
 $c=0$---the gamer never solves a target the panel operator misses---significant on the strongest seed
 ($p{=}0.016$) but underpowered on the others at $n{=}60$. To power the per-seed test we re-run both arms on a
-larger crossing pool at three seeds. The full Pseudobase crossing set ($n{=}251$) \emph{mixes} the development
-targets ($[0{:}60]$) and the previously-inspected second pool ($[60{:}110]$) with $141$ never-examined targets,
-so for a clean confirmatory statistic we restrict to those \emph{truly untouched} $141$ (ids $110$--$250$,
-never used in development---the operator is a fixed hand-built procedure): the panel operator is unanimous on
-$10,11,13$ against the gamer's $2,0,1$, and \emph{every} seed is individually significant---paired McNemar
-$p=0.039,\,9.8\!\times\!10^{-4},\,4.9\!\times\!10^{-4}$. On the full $n{=}251$ (reported for power, not as
-clean confirmation) the counts are $15,16,20$ vs.\ $3,0,1$ ($p\le7.5\!\times\!10^{-3}$), pooled
-$\Delta=+0.062$, cluster-bootstrap $95\%$ CI $[+0.041,+0.086]$; the \CF-confined floor is $0/251$. The
-separation from gaming, only pooled-significant at $n{=}60$, is per-seed significant on genuinely untouched
-targets, and we avoid a pooled binomial against a fixed rate since seeds share targets.
+larger crossing pool at three seeds. For a clean confirmatory statistic we use the \emph{strictly untouched}
+targets: excluding development ($[0{:}60]$), the previously-inspected second pool ($[60{:}110]$), \emph{and}
+the $16$ agent-invention training targets ($[110{:}126]$, \S\ref{sec:exp}) leaves $125$ targets (ids
+$126$--$250$) used in no development, tuning, or model feedback. There the panel operator is unanimous on
+$8,11,11$ against the gamer's $2,0,1$, significant by paired McNemar in \emph{two} of three seeds
+($p=0.109,\,1.0\!\times\!10^{-3},\,2.0\!\times\!10^{-3}$; seed~0 the exception). On the full $n{=}251$
+(reported for power, and mixing development data) the counts are $15,16,20$ vs.\ $3,0,1$
+($p\le7.5\!\times\!10^{-3}$), pooled $\Delta=+0.062$, cluster-bootstrap $95\%$ CI $[+0.041,+0.086]$
+conditional on the five observed seeds; the \CF-confined floor is $0/251$. So the unanimity separation from
+gaming, only pooled-significant at $n{=}60$, is per-seed significant on strictly-untouched targets in $2/3$
+seeds; the single-held-out-ShapeKnots separation is weaker (above). We avoid a pooled binomial against a fixed
+rate since seeds share targets.
 
 
 \begin{table}[t]\centering\small
@@ -1002,12 +1011,13 @@ pKiss $\wedge$ ProbKnot & ShapeKnots & $8/37$ & $3$--$8$\\
 
 \paragraph{Acquisition, made measurable.} To keep the ``acquisition'' sense of \S\ref{sec:intro}
 falsifiable, we score each operator on a reuse-and-lift ledger: a component is \emph{load-bearing} if it is
-reused across held-out episodes and lifts the solve rate, and \emph{decisive} if removing it collapses the
-gain. This ledger sense (reuse-and-lift) is distinct from being acquired by learning: the hand-built operator
-is engineered, and only the six agent-written operators (App.~\ref{app:invent}) are learned in the
-acquisition sense. Every
-operator is reused on all $60$ targets and is decisive (the \CF-confined rate is $0/60$). What separates
-them is the lift under an oracle they did not optimize: the pKiss-operator lifts $+0.72$ under pKiss but only
+reused across held-out episodes and lifts the solve rate. This ledger sense (reuse-and-lift) is distinct from
+being acquired by learning: the hand-built operator is engineered, and only the six agent-written operators
+(App.~\ref{app:invent}) are learned in the acquisition sense. Every operator is reused on all $60$ targets and
+lifts the rate over the \CF-confined floor ($0/60$); we do \emph{not} read that floor as a per-component
+ablation (it reflects the verifier's range, not removal of a component from the same after-policy), so we
+report reuse-and-lift, not component-decisiveness. What separates the operators is the lift under an oracle
+they did not optimize: the pKiss-operator lifts $+0.72$ under pKiss but only
 $+0.03$ under a held-out predictor (mostly gaming), whereas the panel operator lifts $+0.62$ under its
 two-oracle objective and $+0.083$ (five-seed mean; up to $+0.13$ on the strongest seed) under the held-out
 three-oracle panel. So the lift magnitude under an independent oracle is the honest measure, and only the
@@ -1399,11 +1409,12 @@ paired difference $\Delta{=}p_{\mathrm{panel}}{-}p_{\mathrm{gamer}}$ is $+0.080$
 cluster-bootstrap $95\%$ CI $[+0.040,+0.127]$ that clears zero (pooled $25/300$ vs.\ $1/300$); the paired
 McNemar is significant on the strongest seed ($p\!=\!0.016$) with $c{=}0$ throughout. We do not quote a
 pooled binomial against a fixed $1/60$, which wrongly treats the $300$ trials as independent
-when the same $60$ targets recur. A single $60$-target seed is underpowered; enlarging the held-out pool and restricting to the
-$141$ \emph{never-examined} targets (ids $110$--$250$, excluding development $[0{:}60]$ and the inspected
-second pool $[60{:}110]$) makes the paired McNemar significant on \emph{every} seed ($p\le0.039$; operator
-$10,11,13$ vs.\ gamer $2,0,1$; floor $0$), so the separation holds per seed on genuinely untouched targets,
-not only pooled. The certificate makes ``did it happen?'' decidable rather than a matter of which
+when the same $60$ targets recur. A single $60$-target seed is underpowered; on the $125$ \emph{strictly-untouched} targets (ids $126$--$250$,
+excluding development $[0{:}60]$, the inspected second pool $[60{:}110]$, and the agent-training set
+$[110{:}126]$) the unanimity separation is significant in $2/3$ seeds ($p=0.109,\,1.0\!\times\!10^{-3},\,2.0\!\times\!10^{-3}$;
+operator $8,11,11$ vs.\ gamer $2,0,1$; floor $0$), while the single-held-out-ShapeKnots separation is
+significant in only $1/3$---so we claim per-seed unanimity separation on untouched targets, not held-out-oracle
+generalization. The certificate makes ``did it happen?'' decidable rather than a matter of which
 oracle one reports.
 
 \paragraph{What we mean by ``new'' (and what we do not).} We certify capability acquisition in the sense of
@@ -1476,11 +1487,12 @@ SOTA solver, do not clear the strict panel cross-source, a designability/panel-s
 overfit unique to them (\S\ref{sec:exp}). (iv) The certificate is a per-target capability event on the $\CF\!\to\!\MCF$ axis; the family-level class
 reading is evidential (\S\ref{sec:formal}) and higher MCFG tiers are out of scope. (v) All empirical results
 sit within the Pseudobase(++) crossing distribution: a development pool ($n=60$, pKiss reference), a disjoint
-second pool ($[60{:}110]$), the $141$ never-examined targets ($[110{:}250]$) on which the gamer/operator
-separation is per-seed significant, and a cross-source bpRNA pool on which even the borrowed SOTA solver does
-not clear the strict panel. Method and hyperparameters were fixed on the $n=60$ pool; the $141$ targets
-$[110{:}250]$ were untouched during development and serve as the nearest held-out confirmation, but a
-pre-registered, never-examined final set---the gold standard against researcher-level adaptivity---was not run. (vi) The positive panel has
+second pool ($[60{:}110]$), the $125$ strictly-untouched targets ($[126{:}250]$) on which the unanimity
+separation is per-seed significant in $2/3$ seeds, and a cross-source bpRNA pool on which even the borrowed
+SOTA solver does not clear the strict panel. Method and hyperparameters were fixed on the $n=60$ pool and the
+agent-invention training used $[110{:}126]$; the $125$ targets $[126{:}250]$ were untouched by all development,
+tuning, and model feedback and serve as the nearest held-out confirmation, but a pre-registered, never-examined
+final set---the gold standard against researcher-level adaptivity---was not run. (vi) The positive panel has
 low native recall ($\sim\!1\%$, App.~\ref{app:data}); positive rates are therefore reported as
 high-stringency, model-relative computational-consistency measures, not calibrated capability bounds, and
 physical (wet-lab) confirmation is out of scope.
@@ -1511,8 +1523,7 @@ reported as an autonomous discovery. The contribution is a demarcation instrumen
 an exact verifier-range theorem with an empirical prior-policy floor, and whose positive side is
 panel-adjudicated, not oracle-chosen; re-optimized for cross-oracle agreement, an autonomous operator recovers
 a small set of panel-robust crossing designs ($3$--$8/60$ across five seeds, mean $5.0$, unanimous across three
-distinct predictors), the first crossings we observe
-with all three sides intact.
+distinct predictors), the first autonomous crossings we observe that clear the panel.
 
 \appendix
 \section{Proofs}\label{app:proofs}

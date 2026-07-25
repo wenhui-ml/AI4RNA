@@ -18,7 +18,7 @@
 \node[b, draw=negr, fill=negr!6, text width=56mm] (negb) at (3.45,1.3)
   {\textbf{($-$) NEGATIVE (decidable)}\\[1pt]the CF oracle's output space is nested, so the prior repertoire cannot represent a crossing (Prop.~1)};
 \node[b, draw=mcfb, fill=mcfb!7, text width=124mm] (auto) at (0,-0.9)
-  {\textbf{AUTONOMY}\ \ carried by the agent's own reusable components\\(learned: reused on $\geq\!3$ targets with positive lift; decisive: ablation removes the gain) --- not an external solver};
+  {\textbf{AUTONOMY}\ \ solver-free: performance survives removing the packaged solver; the gain is objective-dependent (a matched-access comparison isolates the operator), not a solver call};
 \draw[fl, draw=cfg] (pos.south) -- (pos.south|-auto.north);
 \draw[fl, draw=negr] (negb.south) -- (negb.south|-auto.north);
 \node[b, draw=gy, fill=black!2, text=gy, text width=104mm] (seal) at (0,-2.55)
