@@ -789,10 +789,14 @@ gamer's rate as a known constant (Table~\ref{tab:sep}). The gamer is panel-unani
 $\Delta=p_{\mathrm{panel}}-p_{\mathrm{gamer}}$, over matched seeds and targets with a target-level cluster
 bootstrap, is $+0.080$ with $95\%$ CI $[+0.040,+0.127]$, excluding zero. Per seed the paired McNemar has
 $c=0$---the gamer never solves a target the panel operator misses---significant on the strongest seed
-($p{=}0.016$) and directionally clean but underpowered on the others. We deliberately avoid a pooled binomial
-against a fixed $1/60$: the seeds share targets and the gamer rate is itself estimated. The separation from
-gaming is thus carried by the matched paired difference (CI clear of zero), while any single $60$-target seed
-remains underpowered.
+($p{=}0.016$) but underpowered on the others at $n{=}60$. To power the per-seed test we re-run both arms on
+the \emph{full} Pseudobase crossing set ($n{=}251$, four times larger; the operator is a fixed hand-built
+procedure, so every target is held-out) at three seeds: the panel operator is unanimous on $15,16,20$ of
+$251$ against the gamer's $3,0,1$, and now \emph{every} seed is individually significant---paired McNemar
+$p=7.5\!\times\!10^{-3},\,3.0\!\times\!10^{-5},\,3.8\!\times\!10^{-6}$; the \CF-confined floor stays $0/251$.
+The pooled paired difference is $\Delta=+0.062$, cluster-bootstrap $95\%$ CI $[+0.041,+0.086]$. The separation
+from gaming, only pooled-significant at $n{=}60$, becomes per-seed significant once the held-out pool is
+enlarged---and we still avoid a pooled binomial against a fixed rate, since seeds share targets.
 
 
 \begin{table}[t]\centering\small
@@ -1133,9 +1137,11 @@ paired difference $\Delta{=}p_{\mathrm{panel}}{-}p_{\mathrm{gamer}}$ is $+0.080$
 cluster-bootstrap $95\%$ CI $[+0.040,+0.127]$ that clears zero (pooled $25/300$ vs.\ $1/300$); the paired
 McNemar is significant on the strongest seed ($p\!=\!0.016$) with $c{=}0$ throughout. We do not quote a
 pooled binomial against a fixed $1/60$, which wrongly treats the $300$ trials as independent
-when the same $60$ targets recur. A single seed is underpowered, so separation requires pooling; a second
-disjoint pool (Pseudobase $60$--$110$: floor $0/50$, operator $5/50$) confirms it generalizes. The certificate
-makes ``did it happen?'' decidable rather than a matter of which oracle one reports.
+when the same $60$ targets recur. A single $60$-target seed is underpowered; enlarging the held-out pool to
+the full Pseudobase crossing set ($n{=}251$) makes the paired McNemar significant on \emph{every} seed
+($p\le7.5\!\times\!10^{-3}$; operator $15,16,20/251$ vs.\ gamer $3,0,1/251$; floor $0/251$), so the separation
+no longer requires pooling. The certificate makes ``did it happen?'' decidable rather than a matter of which
+oracle one reports.
 
 \paragraph{What we mean by ``new'' (and what we do not).} We certify capability acquisition in the sense of
 \S\ref{sec:intro}: the prior self provably could not realize the target, the boundary is a real frontier, and
@@ -1599,8 +1605,10 @@ $n{=}60$; panel-unanimous $=$ pKiss\,$\wedge$\,ProbKnot\,$\wedge$\,ShapeKnots, a
 (single-oracle pKiss operator) and the panel operator run on the \emph{same} five seeds and targets. We report
 the paired McNemar per seed ($b$ solved only by the panel operator, $c$ only by the gamer) and the pooled
 paired difference $\Delta{=}p_{\mathrm{panel}}{-}p_{\mathrm{gamer}}$ with a target-level cluster bootstrap
-($B{=}20{,}000$), not a binomial against a fixed baseline. The paired $\Delta$ CI clears zero; single seeds
-are underpowered. (\texttt{runs/cc\_ascent/stats\_separation.py}.)}\label{tab:sep}
+($B{=}20{,}000$), not a binomial against a fixed baseline. The paired $\Delta$ CI clears zero; single $60$-target
+seeds are underpowered, but on the full Pseudobase crossing set ($n{=}251$) every seed is individually
+significant (paired McNemar $p\le7.5\!\times\!10^{-3}$; \S\ref{sec:exp}).
+(\texttt{runs/cc\_ascent/stats\_separation.py}, \texttt{large\_pool\_stats.py}.)}\label{tab:sep}
 \begin{tabularx}{\linewidth}{@{}Xccc@{}}
 \toprule
 \textbf{seed} & \textbf{gamer p-un./60} & \textbf{panel p-un./60} & \textbf{paired McNemar ($b,c,p$)}\\

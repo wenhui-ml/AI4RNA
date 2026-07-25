@@ -26,6 +26,9 @@ def load_pool(name):
     if name == "pool2":
         tasks = load_pseudobase(limit=110)[60:110]
         return [(t.task_id, t.target) for t in tasks]
+    if name == "bigpool":                                  # lever-b enlarged pool: full 251 crossing set
+        tasks = load_pseudobase(limit=251)[0:251]
+        return [(t.task_id, t.target) for t in tasks]
     raise ValueError(f"unknown pool {name!r}")
 
 
