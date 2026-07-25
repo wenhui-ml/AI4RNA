@@ -12,11 +12,11 @@
   fl/.style={->, line width=0.9pt},
 ]
 \node[font=\large\bfseries] at (0,3.55) {The two-sided ascent certificate};
-\node[font=\small\itshape, text=gy] at (0,2.95) {negative side decidable\ \ $|$\ \ positive side model-relative};
+\node[font=\small\itshape, text=gy] at (0,2.95) {negative: exact bound $+$ empirical floor\ \ $|$\ \ positive: model-relative};
 \node[b, draw=cfg, fill=cfg!7, text width=56mm] (pos) at (-3.45,1.3)
   {\textbf{(+) POSITIVE $+$ TRANSFER}\\[1pt]a pseudoknot-aware oracle panel confirms held-out crossing designs; abstain on disagreement};
 \node[b, draw=negr, fill=negr!6, text width=56mm] (negb) at (3.45,1.3)
-  {\textbf{($-$) NEGATIVE (decidable)}\\[1pt]the CF oracle's output space is nested, so the prior repertoire cannot represent a crossing (Prop.~1)};
+  {\textbf{($-$) NEGATIVE (verifier-range, exact)}\\[1pt]the CF oracle's output space is nested, so it cannot \emph{certify} a crossing (Prop.~1); the prior policy's empirical floor is separate};
 \node[b, draw=mcfb, fill=mcfb!7, text width=124mm] (auto) at (0,-0.9)
   {\textbf{AUTONOMY}\ \ solver-free: performance survives removing the packaged solver; the gain is objective-dependent (a matched-access comparison isolates the operator), not a solver call};
 \draw[fl, draw=cfg] (pos.south) -- (pos.south|-auto.north);
