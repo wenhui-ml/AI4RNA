@@ -409,6 +409,32 @@ nothing measured; we make no claim of formal minimality.
 \noindent The verdict is a demarcation, not a probability: conjunct~(2) is a theorem (Prop.~\ref{prop:confine}),
 whereas (1) and~(3) are model-relative measurements whose uncertainty we quantify (\S\ref{sec:exp}, Table~\ref{tab:sep}).
 
+\begin{table}[t]\centering\small
+\setlength{\tabcolsep}{4.5pt}\renewcommand{\arraystretch}{1.15}
+\caption{\textbf{Separation of the panel-robust ascent from single-oracle gaming}, matched design (held-out
+$n{=}60$; panel-unanimous $=$ pKiss\,$\wedge$\,ProbKnot\,$\wedge$\,ShapeKnots, all exact). The gamer
+(single-oracle pKiss operator) and the panel operator run on the \emph{same} five seeds and targets. We report
+the paired McNemar per seed ($b$ solved only by the panel operator, $c$ only by the gamer) and the pooled
+paired difference $\Delta{=}p_{\mathrm{panel}}{-}p_{\mathrm{gamer}}$ with a target-level cluster bootstrap
+($B{=}20{,}000$), not a binomial against a fixed baseline. The paired $\Delta$ CI clears zero; single $60$-target
+seeds are underpowered, but on the full Pseudobase crossing set ($n{=}251$) every seed is individually
+significant (paired McNemar $p\le7.5\!\times\!10^{-3}$; \S\ref{sec:exp}).
+(\texttt{runs/cc\_ascent/stats\_separation.py}, \texttt{large\_pool\_stats.py}.)}\label{tab:sep}
+\begin{tabularx}{\linewidth}{@{}Xccc@{}}
+\toprule
+\textbf{seed} & \textbf{gamer p-un./60} & \textbf{panel p-un./60} & \textbf{paired McNemar ($b,c,p$)}\\
+\midrule
+seed 0 & $1$ & $8$ & $b{=}7,c{=}0,p{=}0.016$\\
+seed 1 & $0$ & $3$ & $b{=}3,c{=}0,p{=}0.25$\\
+seed 2 & $0$ & $5$ & $b{=}5,c{=}0,p{=}0.0625$\\
+seed 3 & $0$ & $5$ & $b{=}5,c{=}0,p{=}0.0625$\\
+seed 4 & $0$ & $4$ & $b{=}4,c{=}0,p{=}0.125$\\
+\midrule
+pooled & $1/300$ & $25/300$ & $\Delta{=}{+}0.080$, cluster-boot $95\%$ CI $[{+}0.040,{+}0.127]$\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
 \begin{figure}[t]\centering
 \includegraphics[width=0.96\linewidth]{fig_cc_certificate.pdf}
 \caption{\textbf{The two-sided certificate.} Positive side (model-relative, panel-adjudicated): the oracle
@@ -632,6 +658,22 @@ operator optimizing cross-oracle agreement crosses robustly on $3$--$8/60$ (mean
 (ii) touches verifier model-relativity, the object of our companion \citep{verifiereconomics}. Dataset facts
 (Table~\ref{tab:data}) are cited; the undesignability axis (\S\ref{sec:impossible}) is out of scope here.
 
+\begin{table}[t]\centering\small
+\setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.1}
+\caption{Datasets and intrinsic grading (established facts; counts from \citep{andersonlee2016eterna100,koodli2021eterna100v2,rnainvbench,
+verifiereconomics}). The train/held-out split is a protocol choice (by target; no target or seed
+crosses).}\label{tab:data}
+\begin{tabularx}{\linewidth}{@{}llLL@{}}
+\toprule
+\textbf{Set} & \textbf{Class} & \textbf{Size / length} & \textbf{Intrinsic grade}\\
+\midrule
+EteRNA100-V2 & nested (\CF) & 100 targets, $12$--$400$\,nt & establishes \CF-competence baseline\\
+Pseudobase & crossing (\MCF) & 251 targets, $21$--$137$\,nt & crossing-stem count: H-type $216$,
+ kissing $33$, complex($\ge3$) $2$\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
 
 \paragraph{The difficulty axis is intrinsic and exactly computed.} Two features make RNA inverse design a
 clean testbed for a capability-class claim. First, each target's grade is a property of the target, fixed
@@ -673,6 +715,23 @@ whose bootstrap CI excludes zero, a near-zero autonomy gap, and non-trivial spre
 
 % (experimental design matrix removed: this is a results paper; measured outcomes are in
 %  Tables~\ref{tab:baselines}, \ref{tab:panel}, \ref{tab:ablate}, \ref{tab:recovered}.)
+
+\begin{table}[t]\centering\small
+\setlength{\tabcolsep}{6pt}\renewcommand{\arraystretch}{1.15}
+\caption{\textbf{Component ablation of the operator} (pKiss, $n=60$, matched budget). The CF-skeleton
+decomposition and the crossing-stem composition are inert; only the oracle-guided repair carries the
+capability: the operator is search against the oracle.}\label{tab:ablate}
+\begin{tabular}{@{}lcl@{}}
+\toprule
+\textbf{variant} & \textbf{solved\,/\,60 (pKiss)} & \textbf{effect vs.\ full}\\
+\midrule
+full (decompose $+$ compose $+$ repair) & $43$ & baseline\\
+$-$ decompose (random init, no \CF{} skeleton) & $43$ & $0$ (inert)\\
+$-$ compose (crossing bases left unset) & $43$ & $0$ (inert)\\
+$-$ repair (no oracle-guided search) & $25$ & $-18$ (carries the capability)\\
+\bottomrule
+\end{tabular}
+\end{table}
 
 % (certificate confusion matrix removed: the undesignability axis is out of scope for this study.)
 
@@ -750,6 +809,22 @@ the cleaner comparison is the two de-novo predictors ($\text{pKiss}\wedge\text{P
 $2$-vs-$26$ gap stands. And that even a SOTA solver is only $\sim\!60\%$ cross-predictor-robust confirms the
 thesis: ``forms the pseudoknot'' is deeply model-relative.
 
+\begin{table}[t]\centering\small
+\setlength{\tabcolsep}{6pt}\renewcommand{\arraystretch}{1.15}
+\caption{\textbf{Oracle-gaming vs.\ oracle-robustness} (each arm's $43$ pKiss-solves, re-adjudicated). The
+pKiss-optimizing operator is $12\times$ less ProbKnot-robust than the MFE-optimizing external solver: the
+gaming localizes to the method trained on the oracle. Under the full unanimous panel neither is robust
+(ShapeKnots, run de novo without probing data, is stringent).}\label{tab:contrast}
+\begin{tabularx}{\linewidth}{@{}Lcccc@{}}
+\toprule
+\textbf{method (objective)} & \textbf{pKiss} & \textbf{ProbKnot} & \textbf{ShapeKnots} & \textbf{unanimous}\\
+\midrule
+DesiRNA (minimum free energy) & $43/43$ & $\mathbf{26/43}$ & $1/43$ & $0/43$\\
+invented operator (pKiss in-loop) & $43/43$ & $\mathbf{2/43}$ & $\sim\!1/43$ & $1/43$\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
 
 \paragraph{Is this capability, or oracle-guided search?} Perhaps the ``capability'' lives in the in-loop
 oracle signal, not the agent (the retrieval/search/discovery worry, \S\ref{sec:cert}). An operator
@@ -826,6 +901,22 @@ unanimous rate rises with the number and stringency of the optimized oracles ($1
 ProbKnot only, $3$--$8$ for both across five seeds). A panel is necessary, and which oracles compose it
 matters: a single lax verifier is more easily mistaken for ground truth than a strict one.
 
+\begin{table}[t]\centering\small
+\setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.15}
+\caption{\textbf{Leave-one-oracle-out.} Single-oracle gaming is asymmetric (pKiss is more gameable than
+ProbKnot), and full-panel robustness grows with the number and stringency of the optimized oracles. Single-run
+values; the pKiss$\wedge$ProbKnot row is $3$--$8$ across five seeds (Table~\ref{tab:recovered}).}\label{tab:looo}
+\begin{tabularx}{\linewidth}{@{}Lccc@{}}
+\toprule
+\textbf{optimized in-loop} & \textbf{held-out} & \textbf{held-out agreement} & \textbf{unanimous\,/\,60}\\
+\midrule
+pKiss & ProbKnot & $2/43$ & $1$\\
+ProbKnot & pKiss & $26/51$ & $5$\\
+pKiss $\wedge$ ProbKnot & ShapeKnots & $8/37$ & $3$--$8$\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
 
 \paragraph{Acquisition, made measurable.} To keep the ``acquisition'' sense of \S\ref{sec:intro}
 falsifiable, we score each operator on a reuse-and-lift ledger: a component is \emph{load-bearing} if it is
@@ -862,6 +953,14 @@ grades $6$--$7$ and $0$ elsewhere. The frontier is organized by the grammar-theo
 difficulty axis and the empirical capability axis coincide. (Grades $8$--$9$ have few members, $n{=}1,2$, so
 their collapse is only indicative.)
 
+\begin{figure}[t]\centering
+\includegraphics[width=0.86\linewidth]{fig_cc_grade.pdf}
+\caption{\textbf{Formal complexity predicts the frontier.} Held-out solve rate vs.\ intrinsic crossing-pair
+count. Both operators fall to $0$ at the highest grades; panel-unanimous robustness concentrates in a
+mid-complexity window (grade $5$). The formal difficulty axis and the empirical capability axis
+coincide.}\label{fig:grade}
+\end{figure}
+
 
 \paragraph{The class claim, tested by growing unseen-length transfer.} A finite held-out set cannot alone
 establish a Chomsky class ascent, since any finite language is regular (App.~\ref{app:proofs}); the
@@ -881,6 +980,16 @@ Table~\ref{tab:contrast}, not a procedure failure; the three asymmetric-extreme 
 ($T_{3,14},T_{5,12},T_{14,3}$) exhaust the fixed repair budget, a search bound rather than a class bound. The
 uniform procedure over the unbounded non-CF family thus holds robustly at the two-oracle level, while the
 strict three-oracle rate is stringency-bounded.
+
+\begin{figure}[t]\centering
+\includegraphics[width=0.9\linewidth]{fig_cc_family.pdf}
+\caption{\textbf{Growing unseen-length transfer over the non-CF family $\mathcal L_{\mathrm H}$}, by crossing-stem
+size. A frozen operator (fixed on $n{=}m\le4$) is applied to strictly larger unseen members to length
+$68$\,nt. The \CF{} floor never realizes a member ($0/16$; Prop.~\ref{prop:confine} generalizes to the whole
+family); the operator realizes crossings under pKiss$\,\cap\,$ProbKnot on the entire diagonal $n{=}m=5\ldots14$
+($8/8$). Strict three-oracle unanimity is smaller and stringency-bounded (diagonal $6/8$): at the extremes
+designs drift off de-novo ShapeKnots, an oracle-agreement ceiling, not a search failure.}\label{fig:family}
+\end{figure}
 
 
 \paragraph{Robustness checks: instrument validity, generalization, budget.} Three controls close the
@@ -970,6 +1079,13 @@ not a marginal coincidence of pair sets: the target is the free-energy-minimum f
 margin. This is as far as computation goes; the verdict stays model-relative, and in-vitro probing is the
 only rung beyond it (App.~\ref{app:config}).
 
+\begin{figure}[t]\centering
+\includegraphics[width=0.72\linewidth]{fig_cc_stringency.pdf}
+\caption{\textbf{Positive-side stringency.} Free-energy gap from the target (pKiss MFE) to the best
+alternative fold, over the certified panel-unanimous designs. The target is the MFE for all scored designs and
+dominant by $\ge1$\,kcal/mol for $14/17$, a real if modest margin.}\label{fig:stringency}
+\end{figure}
+
 
 \paragraph{Where this leaves the ascent, and a bounded fallback.} Can an operator optimizing panel agreement
 beat the gamer's $1/60$? Yes, if modestly: $3$--$8/60$ across five seeds (Table~\ref{tab:recovered}) and
@@ -1000,6 +1116,32 @@ SAT has an exact verifier, so its positive side is decidable and here trivial. T
 positive side's model-relativity to the substrate's heuristic folding oracle, not the certificate: the
 certificate ports, while model-relativity is a property of the domain's ground-truth instrument.
 
+\begin{table}[t]\centering\small
+\setlength{\tabcolsep}{6pt}\renewcommand{\arraystretch}{1.15}
+\caption{\textbf{The certificate in a second domain (SAT constraint definability, $n{=}4$, $48$ relations).}
+Class grade $=$ minimum CNF clause-width to define $R$ (grade $\le2$ $\Leftrightarrow$ majority-closed
+$\Leftrightarrow$ $2$-CNF-definable). The width-$2$ floor is confined below the boundary; the decidable
+negative theorem holds for all $48$.}\label{tab:sat}
+\begin{tabularx}{\linewidth}{@{}Lccc@{}}
+\toprule
+class (CNF-width) & \# relations & floor (2-CNF) realizes & ascent (general CNF) realizes\\
+\midrule
+width $\le2$ (majority-closed; \CF-analog) & $11$ & $11$ & $11$\\
+width $\ge3$ (higher class) & $37$ & $\mathbf{0}$ (theorem) & $37$\\
+\midrule
+all & $48$ & $11$ & $48$\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{figure}[t]\centering
+\includegraphics[width=0.8\linewidth]{fig_cc_sat.pdf}
+\caption{\textbf{Second domain (SAT).} By class grade (minimum CNF clause-width), the $2$-CNF floor is
+confined below the majority-closure boundary, realizing nothing at width $\ge3$ (a decidable theorem), while
+the general-CNF ascent realizes every relation. The negative-side certificate ports; the positive side is
+exact because SAT's verifier is exact.}\label{fig:sat}
+\end{figure}
+
 
 
 \subsection{The positive side ports: a domain-agnostic audit protocol}\label{sec:audit}
@@ -1008,6 +1150,28 @@ question for the ``audit layer'' claim is whether the positive-side audit---an i
 oracle-gaming---ports to mainstream self-improving-agent settings with no decidable hierarchy and no blind
 oracle. We state it as a domain-agnostic protocol and instantiate it across three mechanistically distinct,
 widely studied gaming channels (\texttt{runs/cc\_ascent/code\_audit}; Table~\ref{tab:audit}).
+
+\begin{table}[t]\centering\small
+\setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.15}
+\caption{\textbf{A domain-agnostic audit protocol across three eval-gaming channels} (no formal hierarchy, no
+blind oracle). One template---agent optimizes a gameable reward; objective gold $+$ independent panel
+audit the output---instantiated on mechanistically distinct biases: answer-property, test-set leakage, and
+sycophancy. In every channel the flawed reward is gamed and the independent audit catches all of it, with
+panel false-positive rate $0$. Answers R3's portability question in the affirmative.}\label{tab:audit}
+\begin{tabularx}{\linewidth}{@{}p{2.5cm}p{2.7cm}Xp{3.0cm}@{}}
+\toprule
+gaming channel & flawed oracle & gaming outcome & audit catch (vs.\ gold)\\
+\midrule
+answer-property bias (verbosity/confidence) & LLM helpfulness judge & reward accepts $12/12$ for \emph{every}
+agent; gold-correct $9,9,3$ of $12$ (GPT-5.6/GLM-5.2/Qwen-7B) $\Rightarrow$ gaming $3,3,9$ & caught
+$3/3,\,3/3,\,9/9$; FP $0$\\
+test-set leakage & visible test set & none natural; constructed lookup gamer passes visible $15/15$ & $0/15$
+panel-unan.; honest $15/15$; FP $0$\\
+sycophancy (agree-with-user) & agreement-with-user reward & reward accepts $11/12$; gold-correct $1/12$
+$\Rightarrow$ gaming $11$ (honest control: accepts $0/12$, gold $11/12$) & caught $11/11$; FP $0$\\
+\bottomrule
+\end{tabularx}
+\end{table}
 
 \emph{The protocol.} A self-improving agent optimizes a \emph{flawed reward} it can game; an objective
 \emph{gold} and an \emph{independent verifier panel}---which never sees the reward's bias---audit the frozen
@@ -1545,164 +1709,6 @@ the only route past model-relativity and is out of scope here.
 \caption{The positive-side stringency ladder. Panel-unanimity certifies at R2; the measured energy-gap
 dominance (\S\ref{sec:exp}) is R3; R4 (physical formation) needs wet-lab and is out of scope.}\label{fig:ladder}
 \end{figure}
-
-\clearpage
-\section{Supplementary Tables and Figures}\label{app:supp}
-The following tables and figures are deferred from the main text for brevity; each is referenced in place.
-
-\begin{table}[t]\centering\small
-\setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.1}
-\caption{Datasets and intrinsic grading (established facts; counts from \citep{andersonlee2016eterna100,koodli2021eterna100v2,rnainvbench,
-verifiereconomics}). The train/held-out split is a protocol choice (by target; no target or seed
-crosses).}\label{tab:data}
-\begin{tabularx}{\linewidth}{@{}llLL@{}}
-\toprule
-\textbf{Set} & \textbf{Class} & \textbf{Size / length} & \textbf{Intrinsic grade}\\
-\midrule
-EteRNA100-V2 & nested (\CF) & 100 targets, $12$--$400$\,nt & establishes \CF-competence baseline\\
-Pseudobase & crossing (\MCF) & 251 targets, $21$--$137$\,nt & crossing-stem count: H-type $216$,
- kissing $33$, complex($\ge3$) $2$\\
-\bottomrule
-\end{tabularx}
-\end{table}
-\begin{table}[t]\centering\small
-\setlength{\tabcolsep}{6pt}\renewcommand{\arraystretch}{1.15}
-\caption{\textbf{Oracle-gaming vs.\ oracle-robustness} (each arm's $43$ pKiss-solves, re-adjudicated). The
-pKiss-optimizing operator is $12\times$ less ProbKnot-robust than the MFE-optimizing external solver: the
-gaming localizes to the method trained on the oracle. Under the full unanimous panel neither is robust
-(ShapeKnots, run de novo without probing data, is stringent).}\label{tab:contrast}
-\begin{tabularx}{\linewidth}{@{}Lcccc@{}}
-\toprule
-\textbf{method (objective)} & \textbf{pKiss} & \textbf{ProbKnot} & \textbf{ShapeKnots} & \textbf{unanimous}\\
-\midrule
-DesiRNA (minimum free energy) & $43/43$ & $\mathbf{26/43}$ & $1/43$ & $0/43$\\
-invented operator (pKiss in-loop) & $43/43$ & $\mathbf{2/43}$ & $\sim\!1/43$ & $1/43$\\
-\bottomrule
-\end{tabularx}
-\end{table}
-\begin{table}[t]\centering\small
-\setlength{\tabcolsep}{6pt}\renewcommand{\arraystretch}{1.15}
-\caption{\textbf{Component ablation of the operator} (pKiss, $n=60$, matched budget). The CF-skeleton
-decomposition and the crossing-stem composition are inert; only the oracle-guided repair carries the
-capability: the operator is search against the oracle.}\label{tab:ablate}
-\begin{tabular}{@{}lcl@{}}
-\toprule
-\textbf{variant} & \textbf{solved\,/\,60 (pKiss)} & \textbf{effect vs.\ full}\\
-\midrule
-full (decompose $+$ compose $+$ repair) & $43$ & baseline\\
-$-$ decompose (random init, no \CF{} skeleton) & $43$ & $0$ (inert)\\
-$-$ compose (crossing bases left unset) & $43$ & $0$ (inert)\\
-$-$ repair (no oracle-guided search) & $25$ & $-18$ (carries the capability)\\
-\bottomrule
-\end{tabular}
-\end{table}
-\begin{table}[t]\centering\small
-\setlength{\tabcolsep}{4.5pt}\renewcommand{\arraystretch}{1.15}
-\caption{\textbf{Separation of the panel-robust ascent from single-oracle gaming}, matched design (held-out
-$n{=}60$; panel-unanimous $=$ pKiss\,$\wedge$\,ProbKnot\,$\wedge$\,ShapeKnots, all exact). The gamer
-(single-oracle pKiss operator) and the panel operator run on the \emph{same} five seeds and targets. We report
-the paired McNemar per seed ($b$ solved only by the panel operator, $c$ only by the gamer) and the pooled
-paired difference $\Delta{=}p_{\mathrm{panel}}{-}p_{\mathrm{gamer}}$ with a target-level cluster bootstrap
-($B{=}20{,}000$), not a binomial against a fixed baseline. The paired $\Delta$ CI clears zero; single $60$-target
-seeds are underpowered, but on the full Pseudobase crossing set ($n{=}251$) every seed is individually
-significant (paired McNemar $p\le7.5\!\times\!10^{-3}$; \S\ref{sec:exp}).
-(\texttt{runs/cc\_ascent/stats\_separation.py}, \texttt{large\_pool\_stats.py}.)}\label{tab:sep}
-\begin{tabularx}{\linewidth}{@{}Xccc@{}}
-\toprule
-\textbf{seed} & \textbf{gamer p-un./60} & \textbf{panel p-un./60} & \textbf{paired McNemar ($b,c,p$)}\\
-\midrule
-seed 0 & $1$ & $8$ & $b{=}7,c{=}0,p{=}0.016$\\
-seed 1 & $0$ & $3$ & $b{=}3,c{=}0,p{=}0.25$\\
-seed 2 & $0$ & $5$ & $b{=}5,c{=}0,p{=}0.0625$\\
-seed 3 & $0$ & $5$ & $b{=}5,c{=}0,p{=}0.0625$\\
-seed 4 & $0$ & $4$ & $b{=}4,c{=}0,p{=}0.125$\\
-\midrule
-pooled & $1/300$ & $25/300$ & $\Delta{=}{+}0.080$, cluster-boot $95\%$ CI $[{+}0.040,{+}0.127]$\\
-\bottomrule
-\end{tabularx}
-\end{table}
-\begin{table}[t]\centering\small
-\setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.15}
-\caption{\textbf{Leave-one-oracle-out.} Single-oracle gaming is asymmetric (pKiss is more gameable than
-ProbKnot), and full-panel robustness grows with the number and stringency of the optimized oracles. Single-run
-values; the pKiss$\wedge$ProbKnot row is $3$--$8$ across five seeds (Table~\ref{tab:recovered}).}\label{tab:looo}
-\begin{tabularx}{\linewidth}{@{}Lccc@{}}
-\toprule
-\textbf{optimized in-loop} & \textbf{held-out} & \textbf{held-out agreement} & \textbf{unanimous\,/\,60}\\
-\midrule
-pKiss & ProbKnot & $2/43$ & $1$\\
-ProbKnot & pKiss & $26/51$ & $5$\\
-pKiss $\wedge$ ProbKnot & ShapeKnots & $8/37$ & $3$--$8$\\
-\bottomrule
-\end{tabularx}
-\end{table}
-\begin{figure}[t]\centering
-\includegraphics[width=0.86\linewidth]{fig_cc_grade.pdf}
-\caption{\textbf{Formal complexity predicts the frontier.} Held-out solve rate vs.\ intrinsic crossing-pair
-count. Both operators fall to $0$ at the highest grades; panel-unanimous robustness concentrates in a
-mid-complexity window (grade $5$). The formal difficulty axis and the empirical capability axis
-coincide.}\label{fig:grade}
-\end{figure}
-\begin{figure}[t]\centering
-\includegraphics[width=0.9\linewidth]{fig_cc_family.pdf}
-\caption{\textbf{Growing unseen-length transfer over the non-CF family $\mathcal L_{\mathrm H}$}, by crossing-stem
-size. A frozen operator (fixed on $n{=}m\le4$) is applied to strictly larger unseen members to length
-$68$\,nt. The \CF{} floor never realizes a member ($0/16$; Prop.~\ref{prop:confine} generalizes to the whole
-family); the operator realizes crossings under pKiss$\,\cap\,$ProbKnot on the entire diagonal $n{=}m=5\ldots14$
-($8/8$). Strict three-oracle unanimity is smaller and stringency-bounded (diagonal $6/8$): at the extremes
-designs drift off de-novo ShapeKnots, an oracle-agreement ceiling, not a search failure.}\label{fig:family}
-\end{figure}
-\begin{figure}[t]\centering
-\includegraphics[width=0.72\linewidth]{fig_cc_stringency.pdf}
-\caption{\textbf{Positive-side stringency.} Free-energy gap from the target (pKiss MFE) to the best
-alternative fold, over the certified panel-unanimous designs. The target is the MFE for all scored designs and
-dominant by $\ge1$\,kcal/mol for $14/17$, a real if modest margin.}\label{fig:stringency}
-\end{figure}
-\begin{table}[t]\centering\small
-\setlength{\tabcolsep}{6pt}\renewcommand{\arraystretch}{1.15}
-\caption{\textbf{The certificate in a second domain (SAT constraint definability, $n{=}4$, $48$ relations).}
-Class grade $=$ minimum CNF clause-width to define $R$ (grade $\le2$ $\Leftrightarrow$ majority-closed
-$\Leftrightarrow$ $2$-CNF-definable). The width-$2$ floor is confined below the boundary; the decidable
-negative theorem holds for all $48$.}\label{tab:sat}
-\begin{tabularx}{\linewidth}{@{}Lccc@{}}
-\toprule
-class (CNF-width) & \# relations & floor (2-CNF) realizes & ascent (general CNF) realizes\\
-\midrule
-width $\le2$ (majority-closed; \CF-analog) & $11$ & $11$ & $11$\\
-width $\ge3$ (higher class) & $37$ & $\mathbf{0}$ (theorem) & $37$\\
-\midrule
-all & $48$ & $11$ & $48$\\
-\bottomrule
-\end{tabularx}
-\end{table}
-\begin{figure}[t]\centering
-\includegraphics[width=0.8\linewidth]{fig_cc_sat.pdf}
-\caption{\textbf{Second domain (SAT).} By class grade (minimum CNF clause-width), the $2$-CNF floor is
-confined below the majority-closure boundary, realizing nothing at width $\ge3$ (a decidable theorem), while
-the general-CNF ascent realizes every relation. The negative-side certificate ports; the positive side is
-exact because SAT's verifier is exact.}\label{fig:sat}
-\end{figure}
-\begin{table}[t]\centering\small
-\setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.15}
-\caption{\textbf{A domain-agnostic audit protocol across three eval-gaming channels} (no formal hierarchy, no
-blind oracle). One template---agent optimizes a gameable reward; objective gold $+$ independent panel
-audit the output---instantiated on mechanistically distinct biases: answer-property, test-set leakage, and
-sycophancy. In every channel the flawed reward is gamed and the independent audit catches all of it, with
-panel false-positive rate $0$. Answers R3's portability question in the affirmative.}\label{tab:audit}
-\begin{tabularx}{\linewidth}{@{}p{2.5cm}p{2.7cm}Xp{3.0cm}@{}}
-\toprule
-gaming channel & flawed oracle & gaming outcome & audit catch (vs.\ gold)\\
-\midrule
-answer-property bias (verbosity/confidence) & LLM helpfulness judge & reward accepts $12/12$ for \emph{every}
-agent; gold-correct $9,9,3$ of $12$ (GPT-5.6/GLM-5.2/Qwen-7B) $\Rightarrow$ gaming $3,3,9$ & caught
-$3/3,\,3/3,\,9/9$; FP $0$\\
-test-set leakage & visible test set & none natural; constructed lookup gamer passes visible $15/15$ & $0/15$
-panel-unan.; honest $15/15$; FP $0$\\
-sycophancy (agree-with-user) & agreement-with-user reward & reward accepts $11/12$; gold-correct $1/12$
-$\Rightarrow$ gaming $11$ (honest control: accepts $0/12$, gold $11/12$) & caught $11/11$; FP $0$\\
-\bottomrule
-\end{tabularx}
-\end{table}
 
 \clearpage
 \bibliographystyle{plainnat}
