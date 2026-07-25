@@ -446,8 +446,8 @@ $n{=}60$; panel-unanimous $=$ pKiss\,$\wedge$\,ProbKnot\,$\wedge$\,ShapeKnots, a
 the paired McNemar per seed ($b$ solved only by the panel operator, $c$ only by the gamer) and the pooled
 paired difference $\Delta{=}p_{\mathrm{panel}}{-}p_{\mathrm{gamer}}$ with a target-level cluster bootstrap
 ($B{=}20{,}000$), not a binomial against a fixed baseline. The paired $\Delta$ CI clears zero; single $60$-target
-seeds are underpowered, but on the full Pseudobase crossing set ($n{=}251$) every seed is individually
-significant (paired McNemar $p\le7.5\!\times\!10^{-3}$; \S\ref{sec:exp}).
+seeds are underpowered, but on the $141$ never-examined targets (ids $110$--$250$) every seed is individually
+significant (paired McNemar $p\le0.039$; \S\ref{sec:exp}).
 (\texttt{runs/cc\_ascent/stats\_separation.py}, \texttt{large\_pool\_stats.py}.)}\label{tab:sep}
 \begin{tabularx}{\linewidth}{@{}Xccc@{}}
 \toprule
@@ -902,7 +902,7 @@ attribution honest: the prior-to-after step crosses the verifier boundary (a cha
 the pseudoknot-free oracle to a crossing-aware one), while the gamer and the panel-optimizing operator run
 with \emph{identical} oracle access and search budget---both may query pKiss and ProbKnot in the repair
 loop---and differ only in the objective (single-predictor vs panel-agreement). The panel-robust gap between
-them ($\sim\!1/60$ vs.\ $3$--$8/60$, per-seed significant at $n{=}251$, \S\ref{sec:exp}) is therefore
+them ($\sim\!1/60$ vs.\ $3$--$8/60$, per-seed significant on $141$ untouched targets, \S\ref{sec:exp}) is therefore
 attributable to the operator, not to added crossing-aware feedback.
 
 \paragraph{What the operator's capability actually is (ablation).} Ablation localizes the capability
@@ -929,6 +929,13 @@ Generalization grows with the number of oracles optimized, from $\sim\!1/60$ (on
 but only $3$--$8$ of the $\sim\!36$ two-oracle solves clear the held-out third. More distinct checks
 tighten the certificate; none makes it exact.
 
+Read as an ablation \emph{under the panel-unanimous metric}: the one load-bearing component is the
+panel-agreement objective---removing it (the pKiss-only operator, at \emph{identical} oracle access and search
+budget) drops the panel-unanimous rate from $3$--$8/60$ to $\sim\!1/60$---while the decompose/compose
+scaffolding is inert (Table~\ref{tab:ablate}). We therefore claim no decisive reusable structure beyond the
+agreement objective. A matched-budget random-search control and a full per-component ablation of the panel
+operator (removing the ProbKnot term, the repair loop) under the panel metric we leave to future work.
+
 \paragraph{Is the ascent statistically separated from gaming?} We run the gamer on the \emph{same} five seeds
 and $60$ targets as the panel operator and compare by a matched, paired analysis, rather than treating the
 gamer's rate as a known constant (Table~\ref{tab:sep}). The gamer is panel-unanimous on $\{1,0,0,0,0\}/60$
@@ -936,14 +943,17 @@ gamer's rate as a known constant (Table~\ref{tab:sep}). The gamer is panel-unani
 $\Delta=p_{\mathrm{panel}}-p_{\mathrm{gamer}}$, over matched seeds and targets with a target-level cluster
 bootstrap, is $+0.080$ with $95\%$ CI $[+0.040,+0.127]$, excluding zero. Per seed the paired McNemar has
 $c=0$---the gamer never solves a target the panel operator misses---significant on the strongest seed
-($p{=}0.016$) but underpowered on the others at $n{=}60$. To power the per-seed test we re-run both arms on
-the \emph{full} Pseudobase crossing set ($n{=}251$, four times larger; the operator is a fixed hand-built
-procedure, so every target is held-out) at three seeds: the panel operator is unanimous on $15,16,20$ of
-$251$ against the gamer's $3,0,1$, and now \emph{every} seed is individually significant---paired McNemar
-$p=7.5\!\times\!10^{-3},\,3.0\!\times\!10^{-5},\,3.8\!\times\!10^{-6}$; the \CF-confined floor stays $0/251$.
-The pooled paired difference is $\Delta=+0.062$, cluster-bootstrap $95\%$ CI $[+0.041,+0.086]$. The separation
-from gaming, only pooled-significant at $n{=}60$, becomes per-seed significant once the held-out pool is
-enlarged---and we still avoid a pooled binomial against a fixed rate, since seeds share targets.
+($p{=}0.016$) but underpowered on the others at $n{=}60$. To power the per-seed test we re-run both arms on a
+larger crossing pool at three seeds. The full Pseudobase crossing set ($n{=}251$) \emph{mixes} the development
+targets ($[0{:}60]$) and the previously-inspected second pool ($[60{:}110]$) with $141$ never-examined targets,
+so for a clean confirmatory statistic we restrict to those \emph{truly untouched} $141$ (ids $110$--$250$,
+never used in development---the operator is a fixed hand-built procedure): the panel operator is unanimous on
+$10,11,13$ against the gamer's $2,0,1$, and \emph{every} seed is individually significant---paired McNemar
+$p=0.039,\,9.8\!\times\!10^{-4},\,4.9\!\times\!10^{-4}$. On the full $n{=}251$ (reported for power, not as
+clean confirmation) the counts are $15,16,20$ vs.\ $3,0,1$ ($p\le7.5\!\times\!10^{-3}$), pooled
+$\Delta=+0.062$, cluster-bootstrap $95\%$ CI $[+0.041,+0.086]$; the \CF-confined floor is $0/251$. The
+separation from gaming, only pooled-significant at $n{=}60$, is per-seed significant on genuinely untouched
+targets, and we avoid a pooled binomial against a fixed rate since seeds share targets.
 
 
 \begin{table}[t]\centering\small
@@ -1389,10 +1399,11 @@ paired difference $\Delta{=}p_{\mathrm{panel}}{-}p_{\mathrm{gamer}}$ is $+0.080$
 cluster-bootstrap $95\%$ CI $[+0.040,+0.127]$ that clears zero (pooled $25/300$ vs.\ $1/300$); the paired
 McNemar is significant on the strongest seed ($p\!=\!0.016$) with $c{=}0$ throughout. We do not quote a
 pooled binomial against a fixed $1/60$, which wrongly treats the $300$ trials as independent
-when the same $60$ targets recur. A single $60$-target seed is underpowered; enlarging the held-out pool to
-the full Pseudobase crossing set ($n{=}251$) makes the paired McNemar significant on \emph{every} seed
-($p\le7.5\!\times\!10^{-3}$; operator $15,16,20/251$ vs.\ gamer $3,0,1/251$; floor $0/251$), so the separation
-no longer requires pooling. The certificate makes ``did it happen?'' decidable rather than a matter of which
+when the same $60$ targets recur. A single $60$-target seed is underpowered; enlarging the held-out pool and restricting to the
+$141$ \emph{never-examined} targets (ids $110$--$250$, excluding development $[0{:}60]$ and the inspected
+second pool $[60{:}110]$) makes the paired McNemar significant on \emph{every} seed ($p\le0.039$; operator
+$10,11,13$ vs.\ gamer $2,0,1$; floor $0$), so the separation holds per seed on genuinely untouched targets,
+not only pooled. The certificate makes ``did it happen?'' decidable rather than a matter of which
 oracle one reports.
 
 \paragraph{What we mean by ``new'' (and what we do not).} We certify capability acquisition in the sense of
@@ -1465,11 +1476,11 @@ SOTA solver, do not clear the strict panel cross-source, a designability/panel-s
 overfit unique to them (\S\ref{sec:exp}). (iv) The certificate is a per-target capability event on the $\CF\!\to\!\MCF$ axis; the family-level class
 reading is evidential (\S\ref{sec:formal}) and higher MCFG tiers are out of scope. (v) All empirical results
 sit within the Pseudobase(++) crossing distribution: a development pool ($n=60$, pKiss reference), a disjoint
-second pool, the full crossing set ($n=251$) on which the gamer/operator separation is per-seed significant,
-and a cross-source bpRNA pool on which even the borrowed SOTA solver does not clear the strict panel. Method
-and hyperparameters were fixed on the $n=60$ pool; the additional $191$ targets of the $n=251$ run were
-untouched during development and act as the nearest held-out confirmation, but a pre-registered, never-examined
-final set---the gold standard against researcher-level adaptivity---was not run. (vi) The positive panel has
+second pool ($[60{:}110]$), the $141$ never-examined targets ($[110{:}250]$) on which the gamer/operator
+separation is per-seed significant, and a cross-source bpRNA pool on which even the borrowed SOTA solver does
+not clear the strict panel. Method and hyperparameters were fixed on the $n=60$ pool; the $141$ targets
+$[110{:}250]$ were untouched during development and serve as the nearest held-out confirmation, but a
+pre-registered, never-examined final set---the gold standard against researcher-level adaptivity---was not run. (vi) The positive panel has
 low native recall ($\sim\!1\%$, App.~\ref{app:data}); positive rates are therefore reported as
 high-stringency, model-relative computational-consistency measures, not calibrated capability bounds, and
 physical (wet-lab) confirmation is out of scope.

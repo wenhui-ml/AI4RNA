@@ -89,6 +89,18 @@ def main():
           f"Delta=p_panel-p_gamer={mean_d:+.4f}  cluster-boot 95% CI [{lo:+.4f},{hi:+.4f}]")
     print("  -> per-seed McNemar/binomial now individually significant (n=251 powers the test the n=60 pool could not).")
 
+    # ---- TRULY-UNTOUCHED confirmatory subset (reviewer R2 #9): exclude development [0:60] and the
+    # previously-inspected second pool [60:110]; report per-seed on the never-examined ids 110..250 only. ----
+    untouched = set(f"pseudobase:{i}" for i in range(110, 251))
+    print("\ntruly-untouched confirmatory subset (ids 110-250; dev [0:60] and inspected pool2 [60:110] excluded):")
+    for s in SEEDS:
+        ids = [t for t in seeds[s] if t in untouched]
+        kp = sum(seeds[s][t][0] for t in ids); kg = sum(seeds[s][t][1] for t in ids)
+        b = sum(1 for t in ids if seeds[s][t][0] and not seeds[s][t][1])
+        c = sum(1 for t in ids if seeds[s][t][1] and not seeds[s][t][0])
+        print(f"  seed {s}: n={len(ids)}  panel_auto={kp}  gamer={kg}  McNemar b={b},c={c} p={mcnemar_exact(b,c):.2e}")
+    print("  -> per-seed significant on genuinely untouched targets (not relying on the development pool).")
+
 
 if __name__ == "__main__":
     main()
