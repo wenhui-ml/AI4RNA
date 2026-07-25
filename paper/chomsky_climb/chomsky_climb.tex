@@ -176,18 +176,13 @@ via Prop.~\ref{prop:confine}, and autonomy under $\pm$solver ablation) issues th
 pairs an exact verifier-range bound with an empirical floor; the positive side is model-relative.}\label{fig:arch}
 \end{figure}
 
-\paragraph{Scope: what is claimed, demonstrated, and open.} We contribute the foundation, the criterion, its
-formalization, the protocol, and one empirical result: on $60$ held-out crossing targets the criterion catches
-an invented operator gaming its oracle, $43/60$ solves collapsing to $1/60$ panel-unanimous above a $0/60$
-context-free floor (\S\ref{sec:exp}, Fig.~\ref{fig:collapse}). This RNA oracle-gaming audit---and the small
-panel-robust ascent it recovers ($3$--$8/60$)---is the \emph{primary} contribution. The SAT second domain
-(\S\ref{sec:sat}) and the three-channel LLM-gaming protocol (\S\ref{sec:audit}) are \emph{corroborating}
-portability evidence for the audit pattern, not independent headline claims. Two things are not claimed. (i) A robust
-autonomous ascent: at a panel-surviving rate of $1/60$ we do not claim a transferable, model-robust \MCF{}
-capability, only that the instrument exposes when an apparent acquisition is an oracle artifact;
-\S\ref{sec:disc} states what a robust ascent would require. The algorithm by which an agent invents reusable
-components remains the object under test. (ii) Any claim of scientific discovery of a new design principle.
-Table~\ref{tab:claims} maps each claim to its evidence and status.
+\paragraph{Scope: what is claimed, demonstrated, and open.} The primary contribution is the RNA oracle-gaming
+audit: on $60$ held-out crossing targets a $43/60$ single-oracle rate collapses to $1/60$ panel-unanimous
+above a $0/60$ context-free floor (\S\ref{sec:exp}). The SAT domain (App.~\ref{sec:sat}) and the three-channel
+LLM-gaming protocol (App.~\ref{sec:audit}) are corroborating portability evidence, not headline claims. Two
+things are \emph{not} claimed: (i) a robust autonomous ascent---at $1/60$ panel-unanimous the instrument only
+exposes an oracle artifact, and the invention algorithm remains the object under test; (ii) any scientific
+discovery of a new design principle. Table~\ref{tab:claims} maps each claim to its evidence and status.
 
 \begin{table}[t]\centering\small
 \setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.15}
@@ -583,8 +578,8 @@ while undesignable crossing targets are pre-screened out.}\label{fig:lang}
 \end{figure}
 
 \begin{proposition}[Decidable \CF-confinement]\label{prop:confine}
-The pseudoknot-free oracle satisfies $\operatorname{im}\Ocf\subseteq\NESTED$ (its output ensemble admits no
-crossing pair; the image is in fact the strictly smaller \emph{designable}-nested subset, but $\subseteq$ is
+The pseudoknot-free oracle satisfies $\operatorname{im}\Ocf\subseteq\NESTED$ (every single-structure output it
+returns is nested, admitting no crossing pair; the image is in fact the strictly smaller \emph{designable}-nested subset, but $\subseteq$ is
 all the negative side needs). Hence, by Lemma~\ref{lem:bound}, $\Rze{\Ocf}{\pi}\subseteq\NESTED$ for \emph{every} policy $\pi$, and
 for every crossing target $T\in\PK$ we have $T\notin\Rze{\Ocf}{\pi}$. This non-membership is
 \emph{decidable} in $O(|P|^{2})$ (test whether any two pairs of $T$ cross; App.~\ref{app:proofs}) and is
@@ -958,7 +953,8 @@ larger crossing pool at three seeds. For a clean confirmatory statistic we use t
 targets: excluding development ($[0{:}60]$), the previously-inspected second pool ($[60{:}110]$), \emph{and}
 the $16$ agent-invention training targets ($[110{:}126]$, \S\ref{sec:exp}) leaves $125$ targets (ids
 $126$--$250$) used in no development, tuning, or model feedback. There the panel operator is unanimous on
-$8,11,11$ against the gamer's $2,0,1$, significant by paired McNemar in \emph{two} of three seeds
+$8,11,11$ against the gamer's $2,0,1$ (discordant $(b,c)=(8,2),(11,0),(10,0)$ for panel-only vs.\ gamer-only,
+so the McNemar statistic is reconstructable), significant in \emph{two} of three seeds
 ($p=0.109,\,1.0\!\times\!10^{-3},\,2.0\!\times\!10^{-3}$; seed~0 the exception). On the full $n{=}251$
 (reported for power, and mixing development data) the counts are $15,16,20$ vs.\ $3,0,1$
 ($p\le7.5\!\times\!10^{-3}$), pooled $\Delta=+0.062$, cluster-bootstrap $95\%$ CI $[+0.041,+0.086]$
@@ -1283,14 +1279,11 @@ MCFG-2 witness. We do \emph{not} claim any individual realized crossing is non-C
 always regular, so the class claim is about $\mathcal L_{\mathrm H}$, never a single design (and a non-CF
 $\PK$ can still contain CF subsets).
 
-\paragraph{The capability floor is empirical, not a policy-structural theorem.} We keep two negative statements
-distinct. The decidable one is Prop.~\ref{prop:confine}: a \CF-verified repertoire cannot realize a crossing.
-The capability floor, that the prior repertoire scores $0/60$ under the same panel that certifies
-$\pi_{\mathrm{after}}$, is empirical and holds at a fixed budget; we do not claim the prior policy structurally
-cannot generate a crossing, which would require characterizing an arbitrary learned policy. That stronger
-structural certificate, deriving the empty realizable set from the repertoire's generative structure rather
-than a finite-budget count, remains open. We certify the decidable oracle bound plus a measured,
-held-fixed-oracle $0/60$.
+\paragraph{The capability floor is empirical, not a policy-structural theorem.} The two negative statements of
+Eq.~\eqref{eq:cert} stay distinct: the decidable verifier-range bound (Prop.~\ref{prop:confine}) and the
+empirical, fixed-budget $0/60$ floor under the shared panel. We do \emph{not} claim the prior policy
+structurally cannot generate a crossing; deriving an empty realizable set from a learned policy's generative
+structure, rather than a finite-budget count, remains open.
 
 \paragraph{What a robust ascent would require.} The present operator is oracle-guided search that games pKiss
 (\S\ref{sec:exp}): $43/60$ under one predictor, $1/60$ panel-unanimous. A robust ascent needs an operator whose
@@ -1309,17 +1302,12 @@ significant in only $1/3$---so we claim per-seed unanimity separation on untouch
 generalization. The certificate makes ``did it happen?'' decidable rather than a matter of which
 oracle one reports.
 
-\paragraph{What we mean by ``new'' (and what we do not).} We certify capability acquisition in the sense of
-\S\ref{sec:intro}: the prior self could not be certified to realize the target through its pseudoknot-free
-channel (and does not realize it empirically, $0/60$), the boundary is a real frontier, and the crossing is
-robust and autonomous. We do not claim the capability is new to the base model, absent from its
-training: that is unauditable and beside the point, since even paradigm results are judged by advancing a
-frontier, not by provable absence from a corpus. Our operator is oracle-guided search over known design moves;
-its value, when it clears the panel, is a verified autonomous crossing, not an original thought. At $1/60$
-panel-unanimous we have not certified even a robust acquisition on this pool, and the certificate says so. A
-``discovery''-grade claim would require, beyond a robust crossing, that the procedure be a transferable design
-principle (cross-grade held-out transfer, reusable components); even then it is a discovery of procedure,
-adjudicated, never asserted.
+\paragraph{What we mean by ``new'' (and what we do not).} As in \S\ref{sec:intro}, ``new'' is relative to the
+prior self, not the base model (whose latent competence is unauditable and beside the point). Our operator is
+oracle-guided search over known moves; its value, when it clears the panel, is a verified autonomous crossing,
+not an original thought. At $1/60$ panel-unanimous we have not certified even a robust acquisition on this
+pool, and the certificate says so; a discovery-grade claim would additionally require a transferable design
+principle, adjudicated, never asserted.
 
 \paragraph{Complementary to the categorical self-revising line.} The nearest programme is categorical
 self-revising discovery \citep{selfrevising}, which formalizes discovery as the residual beyond a functorial
@@ -1466,7 +1454,8 @@ single-stack (CF) generator realizes it uniformly.
 \end{align}
 $R$ derives the round-stem pair $(a^n,c^n)$, $Q$ the square-stem pair $(b^m,d^m)$, and $S$ places them at four
 interleaved slots---exactly the crossing a single yield cannot produce. Dimension~$2$ (each nonterminal
-coordinates two substrings) is necessary and sufficient for one crossing stem---the minimal machinery above
+coordinates two substrings) is sufficient (the grammar above) and necessary for this family (dimension~$1$ is
+exactly \CF, excluded by the pumping argument), i.e.\ the minimal machinery above
 \CF{} \citep{seki1991mcfg,katosekikasami2006}. This is the precise sense in which realizing $\mathcal
 L_{\mathrm H}$ \emph{uniformly} is an \MCF{} capability: a finite-description operator that, for every $(n,m)$,
 returns a sequence whose fold is $S$'s yield stands in for the grammar itself---which no CF generator can.
