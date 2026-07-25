@@ -193,7 +193,7 @@ def fig_grade():
     ax.set_xlabel("intrinsic crossing complexity: crossing-pair count (exact grade)", fontsize=8.5)
     ax.set_ylabel("held-out solve rate (\\%)", fontsize=8.5)
     ax.set_ylim(-13, 100); ax.set_xticks(g); ax.set_yticks([0, 25, 50, 75, 100])
-    ax.set_title("Formal crossing complexity predicts the capability frontier",
+    ax.set_title("Solve rates stratified by crossing-pair count",
                  fontsize=10, weight="bold", pad=8)
     ax.legend(loc="upper right", frameon=False, fontsize=7)
     ax.spines["top"].set_visible(False); ax.spines["right"].set_visible(False)
