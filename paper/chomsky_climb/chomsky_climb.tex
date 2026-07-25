@@ -758,9 +758,13 @@ sealed prediction.
 
 \paragraph{Positive-side adjudication under oracle-dependence.} Because the pseudoknot verdict is
 oracle-dependent (\S\ref{sec:bg}), a target counts as realized only under an explicit rule: (i)
-panel-unanimous (all three predictors confirm the exact crossing pair set), the primary rate; (ii)
-reference (pKiss) and (iii) envelope $[\min,\max]$ across predictors, reported alongside. Disagreements
-trigger abstention; we never treat a single predictor as ground truth.
+panel-unanimous, the primary rate; (ii) reference (pKiss); and (iii) envelope $[\min,\max]$ across predictors,
+reported alongside. The match predicate is \emph{full-structure exact equality}: a predictor confirms iff its
+predicted pair set equals the target's \emph{entire} pair set---nested \emph{and} crossing pairs, after
+bracket-type normalization, with no extra or missing pairs (\texttt{forms\_target}); panel-unanimous requires
+this of all three. (The $\sim\!1\%$ native recall of \S\ref{sec:oracle} is measured under the \emph{laxer}
+crossing-pair-\emph{recovery} predicate, so the panel's recall under this stricter full-match rule is no
+higher.) Disagreements trigger abstention; we never treat a single predictor as ground truth.
 
 \paragraph{Certificate metrics (formal).} For a held-out target and its sealed prediction:
 \textsc{tp} (design predicted, panel confirms), \textsc{fp} (design predicted, panel refutes),
@@ -828,7 +832,7 @@ panel refutes (a $0/60$ panel credit on the E0 skeleton control below).
 
 The positive side does not survive the panel. The operator optimized pKiss in the loop; re-adjudicated by an
 a held-out predictor, only $2/43$ of its solves are confirmed and one is panel-unanimous
-(Table~\ref{tab:panel}, Fig.~\ref{fig:collapse}). The apparent $43/60$ ascent collapses $\sim\!43\times$ to
+(Table~\ref{tab:panel}, Fig.~\ref{fig:collapse}). The apparent $43/60$ ascent collapses to
 $1/60$: an oracle artifact, the operator having learned the blind spots of the predictor it was scored on
 \citep{skalse2022,gao2023overopt}. A single-oracle evaluation would have reported a new autonomous
 capability; under the abstaining panel (\S\ref{sec:oracle}) almost nothing survives. The gap between $43$
@@ -844,7 +848,7 @@ its solves, and one design is panel-unanimous: the apparent ascent is an oracle 
 \textbf{adjudicator} & \textbf{confirms (of the $43$ pKiss-solves)}\\
 \midrule
 pKiss (the oracle the operator optimized) & $43/43$\\
-naive MFE (genuine-crossing check) & $39$ genuine crossings; $4$ skeleton false positives\\
+crossing-pair check on the $43$ pKiss-solves & $39$ contain the target's crossing pairs; $4$ are skeleton-only (nested skeleton present, crossing stem absent)\\
 ProbKnot (held-out predictor) & $2/43$\\
 panel-unanimous (pKiss $\wedge$ ProbKnot $\wedge$ ShapeKnots) & $\mathbf{1/43}$ \;\; ($1/60$ overall)\\
 \bottomrule
@@ -855,7 +859,7 @@ panel-unanimous (pKiss $\wedge$ ProbKnot $\wedge$ ShapeKnots) & $\mathbf{1/43}$ 
 \includegraphics[width=0.78\linewidth]{fig_cc_collapse.pdf}
 \caption{\textbf{The panel exposes oracle-gaming (measured, $n=60$).} The invented operator's single-oracle
 solve rate ($43/60$, matching the borrowed DesiRNA ceiling) collapses to $2$ under a held-out predictor
-and to $1$ panel-unanimous, a collapse from $43/60$ to $1/60$ (a $\sim\!43\times$ ratio at a small denominator) invisible to a one-sided criterion, above the
+and to $1$ panel-unanimous, a collapse from $43/60$ to $1/60$ invisible to a one-sided criterion, above the
 decidable context-free floor of $0/60$.}\label{fig:collapse}
 \end{figure}
 
@@ -1145,21 +1149,24 @@ agent-written operator for six models (open $=$ green, closed $=$ blue). All six
 ($3$--$8$).}\label{fig:models}
 \end{figure}
 
-\paragraph{The positive verdict is thermodynamically dominant.} Panel-unanimity already requires the target
-to be each engine's predicted structure; we add one further rung (App.~\ref{app:config}). For the certified
-panel-unanimous designs we enumerate pKiss suboptimals and take the free-energy gap $\Delta$ from the target
-(the MFE) to the best alternative fold. The target is the pKiss MFE for all $17$ designs whose enumeration
-completed within budget (eight longer designs timed out), dominant by median $\Delta{=}1.2$\,kcal/mol (mean
-$1.44$), with $14/17$ clearing a $\ge1$\,kcal margin (Fig.~\ref{fig:stringency}). So the positive verdict is
-not a marginal coincidence of pair sets: the target is the free-energy-minimum fold by a real if modest
-margin. This is as far as computation goes; the verdict stays model-relative, and in-vitro probing is the
+\paragraph{The positive verdict is dominant under the pKiss energy model (completed cases).} Panel-unanimity
+already requires the target to be each engine's predicted structure; we add one further rung
+(App.~\ref{app:config}). For the certified panel-unanimous designs we enumerate pKiss suboptimals and take the
+free-energy gap $\Delta$ from the target (the MFE) to the best alternative fold. The target is the pKiss MFE
+for all $17$ designs whose enumeration completed within budget, dominant by median $\Delta{=}1.2$\,kcal/mol
+(mean $1.44$), with $14/17$ clearing a $\ge1$\,kcal margin (Fig.~\ref{fig:stringency}). Eight longer designs
+timed out; since timeout correlates with length, this rung covers the shorter certified designs only, and the
+gap is a property of the pKiss energy model, not a model-independent thermodynamic fact. Within that scope the
+positive verdict is not a marginal coincidence of pair sets: the target is the free-energy-minimum fold by a
+real if modest margin. This is as far as computation goes; the verdict stays model-relative, and in-vitro probing is the
 only rung beyond it (App.~\ref{app:config}).
 
 \begin{figure}[t]\centering
 \includegraphics[width=0.72\linewidth]{fig_cc_stringency.pdf}
 \caption{\textbf{Positive-side stringency.} Free-energy gap from the target (pKiss MFE) to the best
-alternative fold, over the certified panel-unanimous designs. The target is the MFE for all scored designs and
-dominant by $\ge1$\,kcal/mol for $14/17$, a real if modest margin.}\label{fig:stringency}
+alternative fold, over the certified panel-unanimous designs. The target is the MFE for all $17$ completed
+designs (eight longer designs timed out) and dominant by $\ge1$\,kcal/mol for $14/17$, under the pKiss energy
+model.}\label{fig:stringency}
 \end{figure}
 
 
