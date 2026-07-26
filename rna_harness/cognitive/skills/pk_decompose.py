@@ -204,5 +204,12 @@ class DecomposePKTool(Tool):
                     solved = bool(v2.get("solved"))
 
         cost = solver_cost_usd(solver_wall, self.cores) + solver_cost_usd(oracle_s, cores=1)
+        # Realized-budget accounting, mirroring DecomposePKPanelTool, so the gamer-vs-panel head-to-head
+        # can report realized compute per arm and not just the matched nominal cap.
+        stats = {"n_pkiss": n_pkiss, "n_probknot": 0, "n_iters": it,
+                 "n_candidates": it + 1, "n_screened": n_screened,
+                 "oracle_s": round(oracle_s, 3), "repair_wall_s": round(time.time() - t_rep, 1),
+                 "skel_wall_s": round(solver_wall, 2), "ablate": self.ablate}
         return ToolResult(self.name, solved, int(best_bp), round(solver_wall, 3), self.cores,
-                          cost, "pkiss", best_seq if solved else None, oracle_s=round(oracle_s, 3))
+                          cost, "pkiss", best_seq if solved else None, oracle_s=round(oracle_s, 3),
+                          stats=stats)

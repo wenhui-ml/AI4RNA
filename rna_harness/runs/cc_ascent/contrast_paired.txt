@@ -1,0 +1,31 @@
+=== (A) are the two '43 pKiss-solves' the same targets? ===
+  DesiRNA pKiss-solved            : 43/60
+  our pKiss-trained operator      : 43/60
+  INTERSECTION (common subset)    : 43
+  DesiRNA-only / ours-only        : 0 / 0
+  Jaccard overlap                 : 1.000
+  -> the two denominators are identical; an unpaired 26/43-vs-2/43 ratio therefore mixes method with target composition.
+
+=== (B) PAIRED ProbKnot carry-over on the COMMON pKiss-solved subset ===
+  n(common) = 43
+  DesiRNA ProbKnot-confirmed      : 26/43 = 0.605
+  ours    ProbKnot-confirmed      : 2/43 = 0.047
+  paired McNemar: b(DesiRNA only)=25, c(ours only)=1, exact two-sided p=8.05e-07
+  paired risk difference          : +0.558  bootstrap 95% CI [+0.395,+0.721]
+
+=== (C) same comparison at the FULL n=60 denominator (composition-free) ===
+  DesiRNA pKiss AND ProbKnot      : 26/60 = 0.433
+  ours    pKiss AND ProbKnot      : 2/60 = 0.033
+  paired McNemar: b=25, c=1, exact two-sided p=8.05e-07
+  paired risk difference          : +0.400  bootstrap 95% CI [+0.267,+0.533]
+
+=== (D) difficulty profile of each solved set (crossing-pair count) ===
+  DesiRNA pKiss-solved               n=43 mean crossing pairs=5.26 min/max=3/7
+  ours pKiss-solved                  n=43 mean crossing pairs=5.26 min/max=3/7
+  common subset                      n=43 mean crossing pairs=5.26 min/max=3/7
+  whole pool                         n=60 mean crossing pairs=5.48 min/max=3/9
+
+  -> Read (B) and (C), not the unpaired ratio, as the evidence. The design is observational in
+     the arms (two different methods, not a randomized intervention), so even the paired form is
+     an ASSOCIATION between 'was trained on pKiss' and 'loses ProbKnot agreement', not a causal
+     localization of gaming.

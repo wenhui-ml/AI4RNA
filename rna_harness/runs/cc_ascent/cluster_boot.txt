@@ -1,0 +1,21 @@
+=== (1) structural clustering of the primary n=60 pool ===
+  single linkage at normalized dot-bracket distance <= 0.15
+  60 targets -> 18 clusters (14 singletons; largest 29; sizes [29, 12, 3, 2, 1, 1, 1, 1, 1, 1, 1, 1]...)
+  effective sample size for a cluster bootstrap is 18, not 60.
+
+=== cluster-robust interval for the headline Delta_gamer (5 seeds, n=60) ===
+  target-level, seeds fixed        Delta=+0.0800  95% CI [+0.0400,+0.1267]  clears 0
+  target-level + seeds (two-way)   Delta=+0.0800  95% CI [+0.0300,+0.1400]  clears 0
+  CLUSTER-level, seeds fixed       Delta=+0.0800  95% CI [+0.0333,+0.1355]  clears 0
+  CLUSTER-level + seeds            Delta=+0.0800  95% CI [+0.0238,+0.1486]  clears 0
+
+=== (2) near-duplicate contrast on the 125 untouched targets, with intervals ===
+  stratum definition: nearest-neighbour normalized dot-bracket distance to the TOUCHED set
+  exact    (d=0):  39 targets, panel-operator r_mix 2/117 = 0.0171   mean crossing pairs=5.41
+  near     (d<=.15):  55 targets, panel-operator r_mix 19/165 = 0.1152   mean crossing pairs=5.35
+  distant  (d>.15):  31 targets, panel-operator r_mix 9/93 = 0.0968   mean crossing pairs=5.55
+
+  near-or-exact (n=94, 18 structural clusters): p = 0.0745
+  distant       (n=31, 28 structural clusters): p = 0.0968
+  Delta_duplicate = p_distant - p_near = +0.0223  cluster bootstrap 95% CI [-0.0476,+0.1080]
+  -> the interval SPANS zero: this sample can exclude neither a substantial positive nor a substantial negative difference, so the correct statement is that no CONCENTRATION of success on near-duplicates was OBSERVED, not that the failure mode is absent
