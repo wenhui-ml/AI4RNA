@@ -53,7 +53,7 @@ def _work(item):
             seq = r.get("seq")
             adj = _panel(seq, target) if (r.get("solved") and seq) else None
             rec["arms"][name] = {"solved": bool(r.get("solved")), "seq": seq, "panel": adj,
-                                 "s": round(time.time() - t0, 1)}
+                                 "s": round(time.time() - t0, 1), "stats": r.get("stats")}
         except Exception as e:
             rec["arms"][name] = {"solved": None, "error": repr(e)[:200], "s": round(time.time() - t0, 1)}
     return rec

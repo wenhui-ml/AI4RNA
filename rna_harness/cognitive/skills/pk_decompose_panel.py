@@ -182,7 +182,15 @@ class DecomposePKPanelTool(Tool):
 
         best_pk, best_pb, best_seq = best
         cost = solver_cost_usd(solver_wall, self.cores) + solver_cost_usd(oracle_s, cores=1)
+        # Budget accounting (reviewer R5 §4): "identical wall-clock + identical iteration cap" does NOT
+        # imply identical realized compute, because arms differ in how many oracle calls they actually make
+        # and therefore in how many candidates they explore inside the same wall. Report the realized budget
+        # per attempt so matched-NOMINAL-budget can be told apart from matched-REALIZED-budget.
+        stats = {"n_pkiss": n_pkiss, "n_probknot": n_pb, "n_iters": it,
+                 "n_candidates": it + 1,           # initial evaluation + one proposal per iteration
+                 "oracle_s": round(oracle_s, 3), "repair_wall_s": round(time.time() - t_rep, 1),
+                 "skel_wall_s": round(solver_wall, 2), "ablate": self.ablate}
         # 'bp' reported is the panel distance pk_bp+pb_bp (0 iff both oracles exact)
         return ToolResult(self.name, solved, int(best_pk + best_pb), round(solver_wall, 3), self.cores,
                           cost, "panel:pkiss+probknot", best_seq if solved else None,
-                          oracle_s=round(oracle_s, 3))
+                          oracle_s=round(oracle_s, 3), stats=stats)

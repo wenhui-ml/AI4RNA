@@ -57,9 +57,10 @@ class FixedPolicy:
             r = tool.attempt(target, seed=seed)
             total_cost += r.cost_usd
             trace.append({"tool": tool.name, "solved": r.solved, "bp": r.bp,
-                          "cost_usd": round(r.cost_usd, 8), "oracle": r.oracle, "oracle_s": r.oracle_s})
+                          "cost_usd": round(r.cost_usd, 8), "oracle": r.oracle, "oracle_s": r.oracle_s,
+                          "stats": r.stats})
             if r.solved:
                 return {"solved": True, "cost_usd": total_cost, "seq": r.seq,
-                        "n_actions": len(trace), "trace": trace}
+                        "n_actions": len(trace), "trace": trace, "stats": r.stats}
         return {"solved": False, "cost_usd": total_cost, "seq": None,
-                "n_actions": len(trace), "trace": trace}
+                "n_actions": len(trace), "trace": trace, "stats": r.stats}

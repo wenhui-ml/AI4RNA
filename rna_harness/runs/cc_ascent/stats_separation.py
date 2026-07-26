@@ -197,9 +197,63 @@ def two_way_bootstrap(B=20000):
           f"(sd/sqrt(5) = {sd/5**0.5:.4f})")
 
 
+# ---- (6) INFLUENCE + CONCENTRATION (reviewer R5 §5.4) ----
+# r_mix is a low-base-rate conjunction (~5/60), so one or two targets can move the effect size materially.
+# Report (a) leave-one-target-out recomputation of the paired Delta, (b) how concentrated the successes are
+# across targets and seeds, and (c) whether they sit on structurally easy (low-crossing-count) targets.
+def influence_and_concentration():
+    PA = {0: _uni(json.load(open(os.path.join(HERE, "panel_auto/panel_panel_auto.json")))["rows"]),
+          1: _uni(json.load(open(os.path.join(HERE, "seed1/panel/panel_panel_auto.json")))["rows"]),
+          2: _uni(json.load(open(os.path.join(HERE, "seed2/panel/panel_panel_auto.json")))["rows"]),
+          3: _uni(json.load(open(os.path.join(HERE, "seed3/sweep.json")))["rows"], "panel_auto"),
+          4: _uni(json.load(open(os.path.join(HERE, "seed4/sweep.json")))["rows"], "panel_auto")}
+    GA = {s: _uni(json.load(open(os.path.join(HERE, f"gamer_s{s}/sweep.json")))["rows"], "autonomous")
+          for s in range(5)}
+    S = list(range(5))
+    D = {(s, t): PA[s].get(t, 0) - GA[s].get(t, 0) for s in S for t in IDS}
+    full = sum(D.values()) / len(D)
+
+    print("\n(6) influence and concentration of the r_mix successes (n=60 pool, 5 seeds):")
+    loo = []
+    for t in IDS:
+        kept = [D[(s, u)] for s in S for u in IDS if u != t]
+        loo.append((sum(kept) / len(kept), t))
+    loo.sort()
+    print(f"  full Delta {full:+.4f}; leave-one-target-out range "
+          f"[{loo[0][0]:+.4f} (drop {loo[0][1]}), {loo[-1][0]:+.4f} (drop {loo[-1][1]})]")
+    print(f"  most influential single target: {loo[0][1]} (dropping it moves Delta by {loo[0][0]-full:+.4f})")
+
+    # concentration: how many DISTINCT targets carry the panel operator's successes?
+    hits = {}
+    for s in S:
+        for t in IDS:
+            if PA[s].get(t, 0):
+                hits.setdefault(t, []).append(s)
+    tot = sum(len(v) for v in hits.values())
+    print(f"  panel-operator successes: {tot} target-seed hits on {len(hits)} distinct targets "
+          f"(of {len(IDS)}); {sum(1 for v in hits.values() if len(v) >= 3)} targets hit in >=3/5 seeds")
+    order = sorted(hits.items(), key=lambda kv: -len(kv[1]))
+    print("  per-target hit counts (target: seeds): " +
+          ", ".join(f"{t.split(':')[1]}:{len(v)}" for t, v in order))
+    top = sum(len(v) for _, v in order[:3])
+    print(f"  top-3 targets account for {top}/{tot} = {top/tot:.0%} of all successes")
+
+    # are the successes on structurally easy targets? (crossing-pair count from the sweep rows)
+    g = {}
+    for s in (3, 4):
+        for r in json.load(open(os.path.join(HERE, f"seed{s}/sweep.json")))["rows"]:
+            g[r["id"]] = r.get("n_pk_pairs")
+    gh = [g[t] for t in hits if g.get(t) is not None]
+    ga = [v for v in g.values() if v is not None]
+    if gh and ga:
+        print(f"  crossing-pair count: successes mean {sum(gh)/len(gh):.2f} vs pool mean {sum(ga)/len(ga):.2f} "
+              f"(lower = successes sit on structurally simpler targets)")
+
+
 if __name__ == "__main__":
     try:
         matched_seed_paired()
         two_way_bootstrap()
+        influence_and_concentration()
     except Exception as e:
         print("  (matched-seed section skipped:", repr(e)[:100], ")")

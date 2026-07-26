@@ -31,6 +31,7 @@ class ToolResult:
     seq: Optional[str]          # only set when solved (verified)
     available: bool = True
     oracle_s: float = 0.0       # wall spent in verification (negligible for MFE; can dominate for pKiss)
+    stats: Optional[dict] = None  # optional per-attempt budget accounting (oracle calls, iterations, ...)
 
 
 def verify(seq: Optional[str], target: str, strictness: str = "match"):
