@@ -216,7 +216,7 @@ discovery of a new design principle. Table~\ref{tab:claims} maps each claim to i
 \caption{Claim--evidence--status. Theorems are proved in App.~\ref{app:proofs}; formal-language facts are
 \emph{invoked} from the cited literature; empirical claims are backed by logged runs (\S\ref{sec:exp}).}
 \label{tab:claims}
-\begin{tabularx}{\linewidth}{@{}p{0.40\linewidth}p{0.31\linewidth}p{0.22\linewidth}@{}}
+\begin{tabularx}{\linewidth}{@{}>{\hsize=1.32\hsize}L>{\hsize=1.00\hsize}L>{\hsize=0.68\hsize}L@{}}
 \toprule
 \textbf{Claim} & \textbf{Basis} & \textbf{Status}\\
 \midrule
@@ -372,13 +372,14 @@ optional strengthening (Rem.~\ref{rem:attrib}), reported where run.
 \noindent Writing $\widehat p^{\mathrm{panel}}_{\bullet}(\mathcal D_{\mathrm{ho}})$ for the held-out
 panel-unanimous rate and ``$-$solver'' for solver removal, the conditions are
 \begin{equation}\label{eq:cert}
-\underbrace{\widehat p^{\mathrm{panel}}_{\mathrm{after}}(\mathcal D_{\mathrm{ho}})>0}_{\text{(1) positive}+\text{transfer}}
-\ \wedge\
-\underbrace{\Rze{\Ocf}{\pi_{\mathrm{before}}}\cap\PK=\varnothing}_{\text{(2) verifier-range: a theorem (Prop.~\ref{prop:confine})}}
-\ \wedge\
-\underbrace{\widehat p^{\mathrm{panel}}_{\mathrm{before}}<\widehat p^{\mathrm{panel}}_{\mathrm{after}}}_{\text{(3) empirical prior}<\text{after (shared panel)}}
-\ \wedge\
-\underbrace{\widehat p^{-\mathrm{solver}}_{\mathrm{after}}\!\approx\widehat p_{\mathrm{after}}}_{\text{(4) autonomy: solver-free}}\,.
+\begin{aligned}
+&\underbrace{\widehat p^{\mathrm{panel}}_{\mathrm{after}}(\mathcal D_{\mathrm{ho}})>0}_{\text{(1) empirical gain}+\text{transfer}}
+&&\wedge&&
+\underbrace{\Rze{\Ocf}{\pi_{\mathrm{before}}}\cap\PK=\varnothing}_{\text{(2) verifier-range: a theorem (Prop.~\ref{prop:confine})}}\\[4pt]
+&\wedge\ \underbrace{\widehat p^{\mathrm{panel}}_{\mathrm{before}}<\widehat p^{\mathrm{panel}}_{\mathrm{after}}}_{\text{(3) empirical prior}<\text{after (shared panel)}}
+&&\wedge&&
+\underbrace{\widehat p^{-\mathrm{solver}}_{\mathrm{after}}\!\approx\widehat p_{\mathrm{after}}}_{\text{(4) autonomy w.r.t.\ solver class }\mathcal T}\,.
+\end{aligned}
 \end{equation}
 Only conjunct~(2) is decidable and discharged before any run; (1), (3), and~(4) are measured and model-relative.
 
@@ -411,16 +412,16 @@ conjunction is load-bearing. Note what is \emph{absent}: no side rules out ``sea
 capability. The nearest available control is matched-budget \emph{undirected} search
 (Table~\ref{tab:pablate}), which is what row~(1b) reports.}
 \label{tab:anatomy}
-\begin{tabularx}{\linewidth}{@{}l L L l@{}}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{2.95cm}LL>{\raggedright\arraybackslash}p{1.7cm}@{}}
 \toprule
 Side & Controls for & Instrument & Verdict \\
 \midrule
 (1a) Empirical gain $+$ transfer & target memorization; one-off luck; benchmark-specific fitting &
-crossing-aware predictor panel on \emph{held-out} crossing targets, spread across targets, sealed before
-held-out adjudication & model-relative \\
-(1b) Matched-budget control & ``any search with this budget and this oracle access would do as well'' &
-undirected walk at identical budget, oracle access, initialization and proposal distribution
-(\S\ref{sec:exp}, Table~\ref{tab:pablate}) & empirical \\
+crossing-aware predictor panel on \emph{held-out} targets, spread across targets, sealed before held-out
+adjudication & model-relative \\
+(1b) Matched-budget control & ``any search at this budget with this oracle access would do as well'' &
+undirected walk at identical budget, oracle access, initialization, proposal distribution
+(Table~\ref{tab:pablate}) & empirical \\
 (2a) Exact exclusion: verifier-range & ``could already be certified before'' & Prop.~\ref{prop:confine}:
 $\operatorname{im}\Ocf\subseteq$ nested, so no crossing target is in its certifiable range & exact, decidable \\
 (2b) Empirical prior-policy floor & ``the prior policy already produces crossings'' & $\pi_{\mathrm{before}}$
@@ -447,11 +448,14 @@ measures agreement with a stringent computational panel, not robustness across i
 \paragraph{Three metrics, named and kept apart.} A single ``panel'' number conflates quantities of different
 evidential value, so we name all three and report them separately throughout:
 \begin{equation}\label{eq:metricnames}
-  \underbrace{r_{\mathrm{in}}}_{\text{pKiss}\,\wedge\,\text{ProbKnot}}\!\!:\ \text{in-objective consistency}
-  \qquad
-  \underbrace{r_{\mathrm{ho}}}_{\text{ShapeKnots only}}\!\!:\ \text{held-out-oracle generalization}
-  \qquad
-  \underbrace{r_{\mathrm{mix}}}_{\text{all three}}\!\!:\ \text{mixed in-loop/held-out}.
+\begin{aligned}
+  r_{\mathrm{in}}  &:\ \text{pKiss}\wedge\text{ProbKnot \ (both \emph{in} the objective)}
+                   &&\Rightarrow\ \text{in-objective consistency}\\
+  r_{\mathrm{ho}}  &:\ \text{ShapeKnots alone \ (the one oracle held out)}
+                   &&\Rightarrow\ \text{held-out-oracle generalization}\\
+  r_{\mathrm{mix}} &:\ \text{all three \ (two in-loop, one held out)}
+                   &&\Rightarrow\ \text{mixed in-loop/held-out}.
+\end{aligned}
 \end{equation}
 For the panel operator, $r_{\mathrm{in}}$ scores its own objective and so cannot evidence generalization;
 $r_{\mathrm{ho}}$ is the only genuine held-out-oracle rate and is \emph{weak} (Table~\ref{tab:sknots});
@@ -545,7 +549,7 @@ seed 2 & $0$ & $5$ & $b{=}5,c{=}0,p{=}0.0625$ & $+0.083$\\
 seed 3 & $0$ & $5$ & $b{=}5,c{=}0,p{=}0.0625$ & $+0.083$\\
 seed 4 & $0$ & $4$ & $b{=}4,c{=}0,p{=}0.125$ & $+0.067$\\
 \midrule
-pooled & $1/300$ & $25/300$ & \multicolumn{2}{l}{$\Delta{=}{+}0.080$; target-only CI $[{+}0.040,{+}0.127]$, two-way CI $[{+}0.030,{+}0.140]$}\\
+pooled & $1/300$ & $25/300$ & \multicolumn{2}{l}{$\Delta{=}{+}.080$; CI $[{+}.040,{+}.127]$ / two-way $[{+}.030,{+}.140]$}\\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -999,7 +1003,7 @@ $43$ targets are genuinely crossing ($3$--$9$ crossing pairs each), so \emph{non
 pseudoknot-free fold---consistent with Prop.~\ref{prop:confine}. The $4$ ``blind-accept'' cases are cases
 where the \emph{pseudoknot-blind} predicate $A_{\mathrm{nest}}$ would \emph{falsely accept} the design, not
 targets that require no crossing.}\label{tab:panel}
-\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{5.2cm}X@{}}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{5.2cm}L@{}}
 \toprule
 \textbf{adjudicator / predicate} & \textbf{confirms (of the $43$ pKiss-solves)}\\
 \midrule
@@ -1934,10 +1938,12 @@ three crossing pools are the held-out capability sets.}\label{tab:appdata}
 \toprule
 pool & source & $n$ / length & grade $g$ distribution\\
 \midrule
-held-out (primary) & Pseudobase++ \citep{rnainvbench} idx $0$--$59$ & $60$ / $21$--$137$\,nt & $g$: $\{3{:}4,4{:}6,5{:}22,6{:}18,7{:}7,8{:}1,9{:}2\}$\\
+held-out (primary) & Pseudobase++ \citep{rnainvbench} idx $0$--$59$ & $60$ / $21$--$137$\,nt & $g{:}n$ ---
+ $3{:}4$, $4{:}6$, $5{:}22$, $6{:}18$, $7{:}7$, $8{:}1$, $9{:}2$\\
 second pool & Pseudobase++ idx $60$--$109$ & $50$ / $21$--$137$\,nt & disjoint from primary\\
-cross-source & RNAInvBench \emph{inverse\_rna\_folding} (bpRNA/ArchiveII) & $60$ / $21$--$120$\,nt & $g$: $\{1{:}4,4{:}13,5{:}6,6{:}16,7{:}8,8{:}5,9{:}3,10{:}3,12{:}1,13{:}1\}$\\
-family $\mathcal L_{\mathrm H}$ & synthetic H-type (Eq.~\eqref{eq:family}) & $10$ / $24$--$44$\,nt & $n{=}m\in\{3..8\}$ $+$ asym\\
+cross-source & RNAInvBench \emph{inverse\_rna\_folding} (bpRNA/ArchiveII) & $60$ / $21$--$120$\,nt & $g{:}n$ ---
+ $1{:}4$, $4{:}13$, $5{:}6$, $6{:}16$, $7{:}8$, $8{:}5$, $9{:}3$, $10{:}3$, $12{:}1$, $13{:}1$\\
+family $\mathcal L_{\mathrm H}$ & synthetic H-type (Eq.~\eqref{eq:family}) & $10$ / $24$--$44$\,nt & $n{=}m\in\{3,\dots,8\}$ $+$ asym\\
 EteRNA100-V2 & \citep{koodli2021eterna100v2} & $100$ / $12$--$400$\,nt & nested (\CF)\\
 \bottomrule
 \end{tabularx}
@@ -1963,7 +1969,7 @@ sweep; Table~\ref{tab:appinvent} is the agent-invention trajectory.
 \caption{All arms $\times$ all pools. ``p-un.'' $=$ panel-unanimous (pKiss\,$\wedge$\,ProbKnot\,$\wedge$\,ShapeKnots,
 exact). Floor $=$ \CF-confined REMC; gamer $=$ single-oracle (pKiss) operator; DesiRNA $=$ borrowed SOTA;
 panel\_auto $=$ our two-oracle operator; agent $=$ the autonomously-written operator (App.~\ref{app:invent}).}\label{tab:appfull}
-\begin{tabularx}{\linewidth}{@{}l >{\hsize=.92\hsize}X >{\hsize=1.08\hsize}X@{}}
+\begin{tabularx}{\linewidth}{@{}l >{\hsize=.92\hsize}L >{\hsize=1.08\hsize}L@{}}
 \toprule
 arm / pool & held-out primary ($n{=}60$) & other pools\\
 \midrule
@@ -1979,7 +1985,7 @@ panel\_auto (5 seeds) & pKiss$\wedge$ProbKnot $\{37,34,37,36,34\}$; p-un.\ $\{8,
 \setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.1}
 \caption{Family $\mathcal L_{\mathrm H}$ sweep (Fig.~\ref{fig:family}). $\times$ = not realized; pk$\wedge$pb =
 pKiss and ProbKnot; \textsc{u} = panel-unanimous.}\label{tab:appfamily}
-\begin{tabularx}{\linewidth}{@{}lcccccccccc@{}}
+\begin{tabular}{@{}l*{10}{>{\centering\arraybackslash}p{1.02cm}}@{}}
 \toprule
 $n{=}m$ & 3 & 4 & 5 & 6 & 7 & 8 & (3,6) & (6,3) & (4,8) & (8,4)\\
 \midrule
@@ -1987,7 +1993,7 @@ $n{=}m$ & 3 & 4 & 5 & 6 & 7 & 8 & (3,6) & (6,3) & (4,8) & (8,4)\\
 DesiRNA & pk & pk & \textsc{u} & pk & \textsc{u} & pk & pk & pk & pk & pk\\
 panel\_auto & pk$\wedge$pb & pk$\wedge$pb & \textsc{u} & \textsc{u} & \textsc{u} & pk$\wedge$pb & \textsc{u} & pk$\wedge$pb & pk$\wedge$pb & pk$\wedge$pb\\
 \bottomrule
-\end{tabularx}
+\end{tabular}
 \end{table}
 \begin{table}[h]\centering\small
 \setlength{\tabcolsep}{6pt}\renewcommand{\arraystretch}{1.1}
@@ -2163,17 +2169,17 @@ blind oracle). One template---agent optimizes a gameable reward; objective gold 
 audit the output---instantiated on mechanistically distinct biases: answer-property, test-set leakage, and
 sycophancy. In every channel the flawed reward is gamed and the independent audit catches all of it, with
 no observed false positives (0 of the audited designs). Answers R3's portability question in the affirmative.}\label{tab:audit}
-\begin{tabularx}{\linewidth}{@{}p{2.5cm}p{2.7cm}Xp{3.0cm}@{}}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{2.5cm}>{\raggedright\arraybackslash}p{2.7cm}L>{\raggedright\arraybackslash}p{3.0cm}@{}}
 \toprule
 gaming channel & flawed oracle & gaming outcome & audit catch (vs.\ gold)\\
 \midrule
-answer-property bias (verbosity/confidence) & LLM helpfulness judge & reward accepts $12/12$ for \emph{every}
-agent; gold-correct $9,9,3$ of $12$ (GPT-5.6/GLM-5.2/Qwen-7B) $\Rightarrow$ gaming $3,3,9$ & caught
+answer-property bias (verbosity\slash confidence) & LLM helpfulness judge & reward accepts $12/12$ for \emph{every}
+agent; gold-correct $9,9,3$ of $12$ (GPT-5.6\slash GLM-5.2\slash Qwen-7B) $\Rightarrow$ gaming $3,3,9$ & caught
 $3/3,\,3/3,\,9/9$; FP $0$\\
 test-set leakage & visible test set & none natural; constructed lookup gamer passes visible $15/15$ & $0/15$
 panel-unan.; honest $15/15$; FP $0$\\
-sycophancy (agree-with-user) & agreement-with-user reward & reward accepts $11/12$; gold-correct $1/12$
-$\Rightarrow$ gaming $11$ (honest control: accepts $0/12$, gold $11/12$) & caught $11/11$; FP $0$\\
+sycophancy (agree-with-user) & agreement-with-user reward & accepts $11/12$, gold-correct $1/12$
+$\Rightarrow$ gaming $11$; honest control inverts ($0/12$, $11/12$) & caught $11/11$; FP $0$\\
 \bottomrule
 \end{tabularx}
 \end{table}
