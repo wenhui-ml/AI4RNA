@@ -92,8 +92,8 @@ so only the third (ShapeKnots) is genuinely held out, and its held-out-only sepa
 $1/3$ seeds). The audit complements categorical accounts of self-revising discovery \citep{selfrevising} and
 is distinct from Chomsky-hierarchy evaluation of neural architectures \citep{deletang2023} and exact-verifier
 construction search \citep{funsearch,alphaevolve,alphatensor}. Our central result is cautionary: an invented
-operator (context-free skeleton, crossing-stem completion, pseudoknot-oracle repair) solves $43/60$ held-out
-crossing targets with no external solver, over a \CF{} floor of $0/60$; under the panel only $2/43$ survive a
+operator (context-free skeleton, crossing-stem completion, pseudoknot-oracle repair) solves $43/60$ crossing
+targets with no external solver, over a \CF{} floor of $0/60$; under the panel only $2/43$ survive a
 held-out predictor and $1/60$ is panel-unanimous, so the apparent crossing was largely an oracle artifact the
 audit exposes as gaming rather than ``discovery.'' Re-optimizing for panel agreement then yields
 $3$--$8/60$ (mean $5.0$, five seeds) consistent across all three predictors, versus $\sim\!1/60$ for the gamer
@@ -254,7 +254,7 @@ one.}\label{tab:verdict}
 $E_{\mathrm{range}}$ (exact exclusion) & \textbf{exact} &
 Prop.~\ref{prop:confine}, discharged offline. Bounds the prior \emph{verifier's} range; says nothing about the
 prior policy's generative capacity\\
-$\Delta_{\mathrm{prior}}$ (prior floor) & \textbf{established}, ${+}0.05$--${+}0.13$ &
+$\Delta_{\mathrm{prior}}$ (prior floor) & \textbf{established}, ${+}0.017$--${+}0.15$ &
 prior policy $0/60$ vs.\ after $1$--$9/60$ over all $18$ independent executions (mean $3.5$; $3$--$8$ on the
 five original single-execution seeds) under the shared panel. Finite-budget count, not a structural theorem\\
 $\Delta_{\mathrm{gamer}}$ (vs.\ single-oracle gaming) & \textbf{established, narrowly}, ${+}0.056$ &
@@ -363,7 +363,7 @@ generative jump $\CF\!\to\!\MCF$; we treat the two axes as related but independe
 \section{The Two-Sided Capability Audit}\label{sec:cert}
 Each target receives an intrinsic difficulty grade (crossing-stem count and nested-vs-crossing type), fixed
 independently of what the agent solves, which avoids survivorship bias. Crossing targets---members of the MCFG-characterized crossing families---split by
-grade into a training pool and a frozen held-out pool.
+grade into the pools named in Table~\ref{tab:pools}.
 
 \begin{definition}[Audited capability acquisition]\label{def:cert}
 \emph{The audit returns a vector of six findings, not a bit.} A pass/fail conjunction would be the wrong
@@ -1684,11 +1684,22 @@ and strict
 three-oracle unanimity remains stringency-bounded ($6/16$). The matched-nominal-cap undirected-search control and the
 panel operator's component ablation are also run
 (Table~\ref{tab:pablate})---with the negative outcome that component attribution under $r_{\mathrm{mix}}$ is
-unresolvable at $n{=}60$. That failure sets the most useful next experiment: a pool large enough to resolve
-one- or two-target differences in cross-predictor consistency, which at these rates means several hundred
-targets and $\ge10$ seeds, not a cleverer statistic. Also remaining: extend the ladder to still larger
-$n,m$ with a size-scaled budget to separate the search bound from a class bound, a bit-reproducible
-(iteration-budgeted rather than wall-clock-budgeted) re-run, a second pseudoknot
+unresolvable at $n{=}60$.
+
+\emph{The four experiments this study owes, in priority order.} \textbf{(1) A structurally disjoint benchmark}:
+cluster the crossing pools by normalized dot-bracket structure, motif family or homology and assign whole
+clusters to train or test, so that ``transfer'' can be claimed rather than downgraded to an ID-held-out
+evaluation (\S\ref{sec:exp}, App.~\ref{app:data}). This is the single change that would most raise the paper's
+external validity. \textbf{(2) A bit-reproducible operator}: cap iterations and oracle calls instead of
+wall-clock, so a nominal seed fixes the run and execution variance---currently $5.3/60$, larger than the method
+effect---stops dominating every interval. \textbf{(3) A compute-matched control}: fix oracle calls or candidate
+evaluations per target, keep running past the first success to a common cap, and report a time-to-first-success
+survival curve or a success-versus-compute frontier, which is what would license ``equivalent at equal
+compute'' instead of our present ``did not win by spending more'' (Table~\ref{tab:budget}). \textbf{(4) Power}:
+a pool large enough to resolve one- or two-target differences in cross-predictor consistency, which at these
+rates means several hundred targets and $\ge10$ seeds \emph{with} execution replicates, not a cleverer
+statistic. Also remaining: extend the ladder to still larger
+$n,m$ with a size-scaled budget to separate the search bound from a class bound, a second pseudoknot
 benchmark, physical/3D validation beyond the panel, and the undesignability axis. Beyond RNA, the audit
 ports to any domain whose difficulty axis is a decidable formal hierarchy with an exact impossibility oracle;
 RNA is first because the hierarchy is native to it.
@@ -1828,7 +1839,7 @@ for each specific class, and the inclusion/incomparability relations among pseud
 languages, are delicate questions we do not settle here \citep{rivaseddy2000,nebelweinberg,katosekikasami2006}.
 We therefore assert the dimension-2 witness \emph{only} for the H-type family we design against and make
 \emph{no} per-class dimension-hierarchy claim: in particular we do not claim that MCFG dimension grows with
-the crossing-stem count. The held-out grades order targets by a structural difficulty statistic
+the crossing-stem count. The grades order targets by a structural difficulty statistic
 (crossing-stem count), which is why the empirical frontier organizes by grade (Fig.~\ref{fig:grade}), without
 asserting that statistic is a formal grammar grade. The $\CF\!\to\!\MCF$ boundary---the object of this
 paper---is crossed already at the first tier (one crossing stem); higher tiers are a finer hierarchy
@@ -2090,7 +2101,7 @@ pKiss $\wedge$ ProbKnot & ShapeKnots & $8/37$ & $3$--$8$\\
 \paragraph{Crossing-pair count tracks the capability frontier.} Each target's crossing-pair count (an exact
 $O(|P|^2)$ property fixed before design; \S\ref{sec:exp}) is a structural covariate, not a proven
 grammar-dimension grade---more crossing pairs need not raise MCFG fan-out or the language class. We treat it
-as a covariate and ask whether it tracks where capability breaks down. Binning the $60$ held-out targets by
+as a covariate and ask whether it tracks where capability breaks down. Binning the $60$ development/evaluation targets by
 count (Fig.~\ref{fig:grade}) shows a clear association: both operators solve almost everything at
 low counts and collapse to $0$ at the highest ($8$--$9$ crossing pairs), while panel-unanimous
 robustness concentrates in a mid-complexity window: $6/22$ at grade $5$, tapering to $1/18$ and $1/7$ at
@@ -2215,7 +2226,7 @@ designs drift off de-novo ShapeKnots. That is consistent with \emph{either} an o
 
 \subsection{Robustness checks in full}\label{app:robust}
 \paragraph{Robustness checks: instrument validity, generalization, budget.} Three controls close the
-section. \emph{(i) Verifier validity: one negative control, and recall.} Folding each held-out target's \CF{}
+section. \emph{(i) Verifier validity: one negative control, and recall.} Folding each target's \CF{}
 skeleton under the panel, the panel credits the crossing on $0/60$ skeletons (recovering the nested skeleton on
 $57/60$), whereas a naive $A_{\mathrm{nest}}$ evaluator over-accepts them. We deliberately do \emph{not} call
 this ``high specificity'': skeletons are a single, narrow negative class (the target with its crossing stem
@@ -2303,8 +2314,8 @@ optimization and before held-out adjudication.}\label{fig:cert}
 \begin{table}[t]\centering\small
 \setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.1}
 \caption{Datasets and intrinsic grading (established facts; counts from \citep{andersonlee2016eterna100,koodli2021eterna100v2,rnainvbench,
-verifiereconomics}). The train/held-out split is a protocol choice (by target; no target or seed
-crosses).}\label{tab:data}
+verifiereconomics}). The pool split is a protocol choice, by target index; it is \emph{not} a structural
+split (Table~\ref{tab:pools}).}\label{tab:data}
 \begin{tabularx}{\linewidth}{@{}llLL@{}}
 \toprule
 \textbf{Set} & \textbf{Class} & \textbf{Size / length} & \textbf{Intrinsic grade}\\
@@ -2392,7 +2403,8 @@ that cross another, computed in $O(|P|^2)$ from the dot-bracket. Table~\ref{tab:
 \begin{table}[h]\centering\small
 \setlength{\tabcolsep}{4.5pt}\renewcommand{\arraystretch}{1.15}
 \caption{Datasets. Grade $g$ = crossing-pair count. EteRNA100 is the nested (\CF) competence baseline; the
-three crossing pools are the held-out capability sets.}\label{tab:appdata}
+three crossing pools are the crossing capability sets; see Table~\ref{tab:pools} for what each
+supports.}\label{tab:appdata}
 \begin{tabularx}{\linewidth}{@{}lLlL@{}}
 \toprule
 pool & source & $n$ / length & grade $g$ distribution\\
@@ -2474,7 +2486,7 @@ exact). Floor $=$ \CF-confined REMC; gamer $=$ single-oracle (pKiss) operator; D
 panel\_auto $=$ our two-oracle operator; agent $=$ the autonomously-written operator (App.~\ref{app:invent}).}\label{tab:appfull}
 \begin{tabularx}{\linewidth}{@{}l >{\hsize=.92\hsize}L >{\hsize=1.08\hsize}L@{}}
 \toprule
-arm / pool & held-out primary ($n{=}60$) & other pools\\
+arm / pool & development/evaluation ($n{=}60$) & other pools\\
 \midrule
 \CF{} floor & $0/60$ & $0/50$ (2nd); $0/60$ (cross); $0/10$ (family)\\
 gamer (pKiss) & $43/60$ pKiss; $2/43$ ProbKnot; $1/60$ p-un. & ---\\
