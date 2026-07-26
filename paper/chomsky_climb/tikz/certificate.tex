@@ -11,17 +11,17 @@
   b/.style={draw, line width=0.8pt, rounded corners=2pt, align=center, inner sep=6pt, text=inkc, font=\footnotesize},
   fl/.style={->, line width=0.9pt},
 ]
-\node[font=\large\bfseries] at (0,3.55) {The two-sided ascent certificate};
-\node[font=\small\itshape, text=gy] at (0,2.95) {negative: exact bound $+$ empirical floor\ \ $|$\ \ positive: model-relative};
+\node[font=\large\bfseries] at (0,3.55) {The two-sided capability audit};
+\node[font=\small\itshape, text=gy] at (0,2.95) {negative: exact verifier-range exclusion $+$ empirical prior floor\ \ $|$\ \ positive: model-relative};
 \node[b, draw=cfg, fill=cfg!7, text width=56mm] (pos) at (-3.45,1.3)
-  {\textbf{(+) POSITIVE $+$ TRANSFER}\\[1pt]a pseudoknot-aware oracle panel confirms held-out crossing designs; abstain on disagreement};
+  {\textbf{(+) EMPIRICAL GAIN $+$ TRANSFER}\\[1pt]a crossing-aware predictor panel confirms held-out crossing designs; abstain on disagreement. Only ShapeKnots is held out of the loop};
 \node[b, draw=negr, fill=negr!6, text width=56mm] (negb) at (3.45,1.3)
-  {\textbf{($-$) NEGATIVE (verifier-range, exact)}\\[1pt]the CF oracle's output space is nested, so it cannot \emph{certify} a crossing (Prop.~1); the prior policy's empirical floor is separate};
+  {\textbf{($-$) EXACT EXCLUSION (verifier-range)}\\[1pt]the CF oracle's output space is nested, so it cannot \emph{certify} a crossing (Prop.~1). This bounds the \emph{verifier}, not the prior policy; that floor is a separate empirical $0/60$};
 \node[b, draw=mcfb, fill=mcfb!7, text width=124mm] (auto) at (0,-0.9)
-  {\textbf{AUTONOMY}\ \ solver-free: performance survives removing the packaged solver; the gain is objective-dependent (a matched-access comparison isolates the operator), not a solver call};
+  {\textbf{AUTONOMY EVIDENCE (relative to the tool class $\mathcal T$ of packaged inverse-design solvers)}\ \ performance survives removing the solver; the system is solver-free but \emph{not} oracle-free---it still queries crossing-aware predictors};
 \draw[fl, draw=cfg] (pos.south) -- (pos.south|-auto.north);
 \draw[fl, draw=negr] (negb.south) -- (negb.south|-auto.north);
-\node[b, draw=gy, fill=black!2, text=gy, text width=104mm] (seal) at (0,-2.55)
-  {sealed commitment: predictions hash-frozen before the oracle is consulted};
+\node[b, draw=gy, fill=black!2, text=gy, text width=118mm] (seal) at (0,-2.65)
+  {sealed commitment: predictions hash-frozen \emph{after} in-loop optimization against pKiss/ProbKnot and \emph{before} the held-out adjudicator is run. Sealing forecloses post-hoc selection on the held-out oracle; it does \emph{not} prevent overfitting to the in-loop ones};
 \end{tikzpicture}
 \end{document}

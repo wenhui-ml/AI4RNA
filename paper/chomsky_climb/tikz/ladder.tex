@@ -14,7 +14,7 @@
 
 % vertical, left-aligned stack; stringency increases upward
 \node[r, fill=gy!12] (r1) {\textbf{R1\quad exact-match} (single oracle): target $=$ one predictor's predicted structure (full pair set).};
-\node[r, draw=mcfb, fill=mcfb!8, above=7mm of r1] (r2) {\textbf{R2\quad panel-unanimous}: target $=$ the predicted structure under \emph{three distinct} predictors (pKiss $\wedge$ ProbKnot $\wedge$ ShapeKnots).};
+\node[r, draw=mcfb, fill=mcfb!8, above=7mm of r1] (r2) {\textbf{R2\quad mixed-panel-consistent}: target $=$ the predicted structure under all \emph{three} predictors (two in-loop, one held out) (pKiss $\wedge$ ProbKnot $\wedge$ ShapeKnots).};
 \node[r, draw=cfg, fill=cfg!10, above=7mm of r2] (r3) {\textbf{R3\quad within-pKiss dominance}: target $=$ pKiss MFE with a free-energy gap $\Delta$ to the best alternative fold (median $1.2$\,kcal/mol, pKiss model).};
 \node[r, draw=negr, dashed, fill=negr!5, above=7mm of r3] (r4) {\textbf{R4\quad physical formation} (in-vitro probing / 3D): the only route past model-relativity.};
 
@@ -25,7 +25,7 @@
 % right-side brace spanning the two certified rungs (R2..R3)
 \draw[decorate, decoration={brace, amplitude=6pt}, cfg, line width=0.9pt]
   ($(r3.north east)+(3mm,0)$) -- ($(r2.south east)+(3mm,0)$)
-  node[midway, right=8pt, text=cfg, align=left, font=\scriptsize]{\textbf{certified}\\\textbf{here}};
+  node[midway, right=8pt, text=cfg, align=left, font=\scriptsize]{\textbf{measured}\\\textbf{here}};
 \node[right=4mm of r4.east, text=negr, align=left, font=\scriptsize] {out of scope\\(wet-lab)};
 
 \node[above=3.5mm of r4, font=\footnotesize\bfseries] {The positive-side stringency ladder};

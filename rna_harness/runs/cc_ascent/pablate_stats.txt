@@ -1,0 +1,47 @@
+panel-operator ablation: n=60 targets common to seeds [0, 1, 2], all six arms paired per target
+
+=== r_in: pKiss AND ProbKnot (in-objective) ===
+  arm                                                      s0  s1  s2   mean   McNemar vs full (b,c,p)
+  full operator (reference)                                39  35  37   37.00  --
+  - objective (undirected walk, oracle-informed proposals) 25  27  29   27.00  b=34,c=4,p=0.000
+  - objective, - proposal bias (oracle-blind random search) 23  23  27   24.33  b=39,c=1,p=0.000
+  - repair loop entirely                                    0   1  10    3.67  b=101,c=1,p=0.000
+  - CF-skeleton decomposition (random init)                32  36  31   33.00  b=19,c=7,p=0.029
+  - complementarity composition                            34  36  37   35.67  b=13,c=9,p=0.523
+    two-way (target+seed) bootstrap 95% CI on Delta = full - ablation:
+      vs panel_randwalk       Delta=+0.1667  CI [+0.0667,+0.2722]  SEPARATED
+      vs panel_blindrand      Delta=+0.2111  CI [+0.1167,+0.3167]  SEPARATED
+      vs panel_norepair       Delta=+0.5556  CI [+0.4056,+0.7000]  SEPARATED
+      vs panel_nodecompose    Delta=+0.0667  CI [-0.0333,+0.1667]  not separated (CI spans 0)
+      vs panel_nocompose      Delta=+0.0222  CI [-0.0556,+0.1056]  not separated (CI spans 0)
+
+=== r_ho: ShapeKnots only (held out) ===
+  arm                                                      s0  s1  s2   mean   McNemar vs full (b,c,p)
+  full operator (reference)                                 6   1   2    3.00  --
+  - objective (undirected walk, oracle-informed proposals)  4   2   1    2.33  b=7,c=5,p=0.774
+  - objective, - proposal bias (oracle-blind random search)  2   2   1    1.67  b=7,c=3,p=0.344
+  - repair loop entirely                                    0   0   1    0.33  b=9,c=1,p=0.021
+  - CF-skeleton decomposition (random init)                 4   4   5    4.33  b=5,c=9,p=0.424
+  - complementarity composition                             5   5   1    3.67  b=5,c=7,p=0.774
+    two-way (target+seed) bootstrap 95% CI on Delta = full - ablation:
+      vs panel_randwalk       Delta=+0.0111  CI [-0.0389,+0.0667]  not separated (CI spans 0)
+      vs panel_blindrand      Delta=+0.0222  CI [-0.0222,+0.0944]  not separated (CI spans 0)
+      vs panel_norepair       Delta=+0.0444  CI [-0.0056,+0.1167]  not separated (CI spans 0)
+      vs panel_nodecompose    Delta=-0.0222  CI [-0.0889,+0.0444]  not separated (CI spans 0)
+      vs panel_nocompose      Delta=-0.0111  CI [-0.0833,+0.0500]  not separated (CI spans 0)
+
+=== r_mix: all three (mixed) ===
+  arm                                                      s0  s1  s2   mean   McNemar vs full (b,c,p)
+  full operator (reference)                                 6   1   2    3.00  --
+  - objective (undirected walk, oracle-informed proposals)  4   2   1    2.33  b=7,c=5,p=0.774
+  - objective, - proposal bias (oracle-blind random search)  2   2   1    1.67  b=7,c=3,p=0.344
+  - repair loop entirely                                    0   0   1    0.33  b=9,c=1,p=0.021
+  - CF-skeleton decomposition (random init)                 4   4   5    4.33  b=5,c=9,p=0.424
+  - complementarity composition                             5   5   1    3.67  b=5,c=7,p=0.774
+    two-way (target+seed) bootstrap 95% CI on Delta = full - ablation:
+      vs panel_randwalk       Delta=+0.0111  CI [-0.0389,+0.0667]  not separated (CI spans 0)
+      vs panel_blindrand      Delta=+0.0222  CI [-0.0222,+0.0889]  not separated (CI spans 0)
+      vs panel_norepair       Delta=+0.0444  CI [-0.0056,+0.1167]  not separated (CI spans 0)
+      vs panel_nodecompose    Delta=-0.0222  CI [-0.0944,+0.0500]  not separated (CI spans 0)
+      vs panel_nocompose      Delta=-0.0111  CI [-0.0833,+0.0500]  not separated (CI spans 0)
+

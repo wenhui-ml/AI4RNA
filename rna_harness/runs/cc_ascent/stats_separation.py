@@ -157,8 +157,49 @@ def matched_seed_paired(B=20000):
           f"cluster-boot 95% CI [{lo:+.4f},{hi:+.4f}]")
 
 
+# ---- (5) TWO-WAY bootstrap: resample BOTH targets and seeds (reviewer R4 statistics item 3) ----
+# The cluster bootstrap of (4) resamples targets but treats the 5 seeds as fixed, so its CI is conditional on
+# the observed seeds and understates algorithmic variance. A hierarchical (crossed random-effects) model is the
+# principled fix but 5 seeds cannot stabilise a seed-variance component; the two-way bootstrap is the
+# distribution-free stand-in: independently resample the 60 targets AND the 5 seeds with replacement, so both
+# sources of sampling error enter the interval. Reported alongside the target-only CI, never instead of it.
+def two_way_bootstrap(B=20000):
+    PA = {0: _uni(json.load(open(os.path.join(HERE, "panel_auto/panel_panel_auto.json")))["rows"]),
+          1: _uni(json.load(open(os.path.join(HERE, "seed1/panel/panel_panel_auto.json")))["rows"]),
+          2: _uni(json.load(open(os.path.join(HERE, "seed2/panel/panel_panel_auto.json")))["rows"]),
+          3: _uni(json.load(open(os.path.join(HERE, "seed3/sweep.json")))["rows"], "panel_auto"),
+          4: _uni(json.load(open(os.path.join(HERE, "seed4/sweep.json")))["rows"], "panel_auto")}
+    GA = {s: _uni(json.load(open(os.path.join(HERE, f"gamer_s{s}/sweep.json")))["rows"], "autonomous")
+          for s in range(5)}
+    S, T = list(range(5)), IDS
+    D = {(s, t): PA[s].get(t, 0) - GA[s].get(t, 0) for s in S for t in T}
+    obs = sum(D.values()) / len(D)
+
+    def resample(seeds_too):
+        ss = [S[random.randrange(len(S))] for _ in range(len(S))] if seeds_too else S
+        ts = [T[random.randrange(len(T))] for _ in range(len(T))]
+        return sum(D[(s, t)] for s in ss for t in ts) / (len(ss) * len(ts))
+
+    out = {}
+    for label, seeds_too in (("target-only", False), ("two-way (targets+seeds)", True)):
+        r = sorted(resample(seeds_too) for _ in range(B))
+        out[label] = (r[int(0.025 * B)], r[int(0.975 * B)])
+    print("\n(5) bootstrap CIs for the paired difference Delta = p_panel - p_gamer (n=60 pool, 5 seeds):")
+    print(f"  observed Delta = {obs:+.4f}")
+    for label, (lo, hi) in out.items():
+        clears = "clears 0" if lo > 0 else "does NOT clear 0"
+        print(f"  {label:24s} 95% CI [{lo:+.4f},{hi:+.4f}]  ({clears})")
+    # seed-level spread of the per-seed difference: the quantity the target-only CI conditions away
+    per_seed = [sum(D[(s, t)] for t in T) / len(T) for s in S]
+    mean = sum(per_seed) / len(per_seed)
+    sd = (sum((x - mean) ** 2 for x in per_seed) / (len(per_seed) - 1)) ** 0.5
+    print(f"  per-seed Delta: {['%+.4f' % x for x in per_seed]}  mean {mean:+.4f}  sd {sd:.4f}  "
+          f"(sd/sqrt(5) = {sd/5**0.5:.4f})")
+
+
 if __name__ == "__main__":
     try:
         matched_seed_paired()
+        two_way_bootstrap()
     except Exception as e:
         print("  (matched-seed section skipped:", repr(e)[:100], ")")

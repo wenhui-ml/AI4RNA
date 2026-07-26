@@ -14,6 +14,23 @@ model-robust crossing designs that survive the panel, where the single-oracle op
 
 Autonomy is still structural: it never calls an external pseudoknot SOLVER (DesiRNA); it uses the two
 predictors only as verifiers/fitness. Cost = skeleton CPU + pKiss + ProbKnot oracle-seconds.
+
+ABLATION MODES (reviewer R4: the panel operator's own per-component attribution + a matched-budget
+undirected-search control, previously left to future work). `ablate` selects:
+  none        -- the full operator (default; unchanged behaviour)
+  randwalk    -- MATCHED-BUDGET UNDIRECTED SEARCH. Identical initialization, identical mutation proposal
+                 distribution, identical iteration/wall/oracle-call budgets and identical ProbKnot gating,
+                 but the lexicographic acceptance test is REMOVED: every proposal is accepted, so the walk
+                 is undirected. The verifier still recognizes a hit (that is what "solved" means), but it
+                 no longer GUIDES. This isolates the panel-agreement objective from the mere availability
+                 of the same budget and the same crossing-aware oracle access.
+  blindrand   -- as randwalk, and additionally the proposal distribution is made ORACLE-BLIND: mutation
+                 sites are drawn uniformly instead of being biased toward positions where the current fold
+                 disagrees with the target. This is the fully undirected matched-budget random search: the
+                 oracles are consulted only to recognize a hit, never to steer.
+  norepair    -- skeleton sub-solve + complementarity composition only; no repair walk at all.
+  nodecompose -- random initial sequence instead of the CF-skeleton inverse fold (keeps composition+repair).
+  nocompose   -- crossing positions left as the skeleton left them (keeps decomposition+repair).
 """
 from __future__ import annotations
 
@@ -29,18 +46,23 @@ from .pk_decompose import _WC, _partner_map, _wrong_positions
 class DecomposePKPanelTool(Tool):
     """Panel-optimizing pseudoknot operator. Cheap-abstains on nested targets."""
 
+    ABLATIONS = ("none", "randwalk", "blindrand", "norepair", "nodecompose", "nocompose")
+
     def __init__(self, skel_wall_s: float = 12.0, repair_wall_s: float = 90.0,
                  max_repair_iters: int = 800, skel_restarts: int = 6,
-                 panel_gate: int = 3, max_probknot: int = 120):
+                 panel_gate: int = 3, max_probknot: int = 120, ablate: str = "none"):
         self.skel_wall_s = float(skel_wall_s)
         self.repair_wall_s = float(repair_wall_s)
         self.max_repair_iters = int(max_repair_iters)
         self.skel_restarts = int(skel_restarts)
         self.panel_gate = int(panel_gate)        # evaluate ProbKnot only when pKiss bp <= gate
         self.max_probknot = int(max_probknot)     # per-target ProbKnot call budget
+        if ablate not in self.ABLATIONS:
+            raise ValueError(f"ablate must be one of {self.ABLATIONS}, got {ablate!r}")
+        self.ablate = ablate
         self.cores = 1
         self.budget_s = self.skel_wall_s + self.repair_wall_s
-        self.name = f"pkpanel@{int(self.repair_wall_s)}s"
+        self.name = f"pkpanel@{int(self.repair_wall_s)}s" + ("" if ablate == "none" else f"-{ablate}")
 
     def _abstain(self, target: str) -> ToolResult:
         return ToolResult(self.name, False, len(target), 0.0, 1, 0.0, "none", None, available=True)
@@ -91,22 +113,26 @@ class DecomposePKPanelTool(Tool):
 
         # 1-2. skeleton sub-solve (pure nested -> ViennaRNA inverse_fold)
         t0 = time.time()
-        best_skel, best_dist = "A" * n, float("inf")
-        for _ in range(max(1, self.skel_restarts)):
-            start = "".join(rng.choice("ACGU") for _ in range(n))
-            s, dist = RNA.inverse_fold(start, skeleton)
-            if dist < best_dist:
-                best_skel, best_dist = s, dist
-            if best_dist <= 0 or (time.time() - t0) > self.skel_wall_s:
-                break
-        seq = list(best_skel)
-        if len(seq) != n:
-            seq = (seq + ["A"] * n)[:n]
+        if self.ablate == "nodecompose":
+            seq = [rng.choice("ACGU") for _ in range(n)]      # random init: no CF skeleton
+        else:
+            best_skel, best_dist = "A" * n, float("inf")
+            for _ in range(max(1, self.skel_restarts)):
+                start = "".join(rng.choice("ACGU") for _ in range(n))
+                s, dist = RNA.inverse_fold(start, skeleton)
+                if dist < best_dist:
+                    best_skel, best_dist = s, dist
+                if best_dist <= 0 or (time.time() - t0) > self.skel_wall_s:
+                    break
+            seq = list(best_skel)
+            if len(seq) != n:
+                seq = (seq + ["A"] * n)[:n]
 
         # 3. compose crossing pairs (WC, seed-varied)
-        for k, (i, j) in enumerate(cross_pairs):
-            a, b = _WC[(seed + k) % 4]
-            seq[i], seq[j] = a, b
+        if self.ablate != "nocompose":
+            for k, (i, j) in enumerate(cross_pairs):
+                a, b = _WC[(seed + k) % 4]
+                seq[i], seq[j] = a, b
         cur_seq = "".join(seq)
         solver_wall = time.time() - t0
 
@@ -115,12 +141,17 @@ class DecomposePKPanelTool(Tool):
         best = (cur_pk, cur_pb, cur_seq)
         solved = pk_solved and cur_pb == 0
 
-        # 5. lexicographic (pk_bp, pb_bp) best-frontier repair walk
+        # 5. lexicographic (pk_bp, pb_bp) best-frontier repair walk.
+        # Under `randwalk`/`blindrand` the acceptance test is dropped (every proposal is accepted), so the
+        # walk is undirected at a MATCHED budget; under `blindrand` the proposal sites are additionally
+        # drawn oracle-blind. `norepair` skips the loop entirely.
+        undirected = self.ablate in ("randwalk", "blindrand")
+        blind = self.ablate == "blindrand"
         it = 0
         t_rep = time.time()
         n_cross = len(cross_pairs)
-        while (not solved and (cur_pk > 0 or cur_pb > 0) and it < self.max_repair_iters
-               and (time.time() - t_rep) < self.repair_wall_s):
+        while (self.ablate != "norepair" and not solved and (cur_pk > 0 or cur_pb > 0)
+               and it < self.max_repair_iters and (time.time() - t_rep) < self.repair_wall_s):
             it += 1
             cand = list(cur_seq)
             if n_cross and rng.random() < 0.10:
@@ -128,8 +159,11 @@ class DecomposePKPanelTool(Tool):
                     a, b = rng.choice(_WC)
                     cand[i], cand[j] = a, b
             else:
-                fpairs = pk_pairs(cur_folded) if cur_folded else set()
-                wrong = _wrong_positions(fpairs, target_pairs, n) or list(range(n))
+                if blind:
+                    wrong = list(range(n))          # oracle-blind: uniform site choice
+                else:
+                    fpairs = pk_pairs(cur_folded) if cur_folded else set()
+                    wrong = _wrong_positions(fpairs, target_pairs, n) or list(range(n))
                 pos = rng.choice(wrong) if rng.random() < 0.85 else rng.randrange(n)
                 if pos in partner:
                     j = partner[pos]
@@ -140,7 +174,7 @@ class DecomposePKPanelTool(Tool):
             cand_seq = "".join(cand)
             cpk, cpb, cfolded, cpk_solved = panel_eval(cand_seq)
             # accept on lexicographic non-worsening of (pk_bp, pb_bp): drive pKiss to 0, then ProbKnot
-            if (cpk, cpb) <= (cur_pk, cur_pb):
+            if undirected or (cpk, cpb) <= (cur_pk, cur_pb):
                 cur_seq, cur_pk, cur_pb, cur_folded = cand_seq, cpk, cpb, cfolded
                 if (cpk, cpb) < (best[0], best[1]):
                     best = (cpk, cpb, cand_seq)

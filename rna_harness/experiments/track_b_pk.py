@@ -130,6 +130,19 @@ def build_policies(which):
         pol["panel_auto"] = FixedPolicy(
             [DecomposePKPanelTool(skel_wall_s=_psk, repair_wall_s=_prp, max_repair_iters=_pit,
                                   panel_gate=_pgate, max_probknot=_pmpb)], name="panel_auto")
+    # R4: per-component ablation of the PANEL operator + a matched-budget undirected-search control, each
+    # scored under the same panel. Arm name 'panel_<mode>' => DecomposePKPanelTool(ablate=<mode>) at
+    # IDENTICAL budgets/oracle access/initialization as panel_auto; only the named component is removed.
+    for _mode in ("randwalk", "blindrand", "norepair", "nodecompose", "nocompose"):
+        if f"panel_{_mode}" in which:
+            from ..cognitive.skills.pk_decompose_panel import DecomposePKPanelTool
+            pol[f"panel_{_mode}"] = FixedPolicy(
+                [DecomposePKPanelTool(skel_wall_s=float(os.environ.get("PKP_SKEL_S", "12")),
+                                      repair_wall_s=float(os.environ.get("PKP_REPAIR_S", "90")),
+                                      max_repair_iters=int(os.environ.get("PKP_ITERS", "800")),
+                                      panel_gate=int(os.environ.get("PKP_GATE", "3")),
+                                      max_probknot=int(os.environ.get("PKP_MAXPB", "120")),
+                                      ablate=_mode)], name=f"panel_{_mode}")
     if "probknot_auto" in which:
         # P4 symmetry control: optimizes ProbKnot in-loop (analog of autonomous, which optimizes pKiss).
         from ..cognitive.skills.pk_decompose_probknot import DecomposeProbKnotTool

@@ -22,27 +22,32 @@
   df/.style={->, line width=0.7pt, draw=gy},
   cmt/.style={->, line width=0.9pt, draw=negr},
 ]
-% ================= Step 1 : design & sealed commit =================
-\node[bx, text width=19mm] (t) at (3.50,7.4) {target $T$\\(dot-bracket)};
-\node[cf, text width=25mm] (g) at (6.55,7.4) {intrinsic grading\\Chomsky class,\\crossing count};
-\node[mc, text width=23mm] (a) at (9.60,7.4) {design agent\\policy $\pi$,\\operators $\mathcal{O}$};
-\node[ng, text width=24mm] (s) at (12.65,7.4) {sealed commit\\$x=\pi(T)$,\\hash-frozen};
+% ================= Step 1 : design (WITH in-loop oracle access) & sealed commit =================
+\node[bx, text width=19mm] (t) at (3.50,8.75) {target $T$\\(dot-bracket)};
+\node[cf, text width=25mm] (g) at (6.55,8.75) {intrinsic grading\\family type,\\crossing count};
+\node[mc, text width=23mm] (a) at (9.60,8.75) {design agent\\policy $\pi$,\\operators $\mathcal{O}$};
+\node[ng, text width=24mm] (s) at (12.65,8.75) {candidate selection\\$\to$ sealed commit\\$x=\pi(T)$, hash-frozen};
 \draw[df] (t.east)--(g.west);\draw[df] (g.east)--(a.west);\draw[df] (a.east)--(s.west);
-\node[rt, text=negr] (st1) at (8.10,8.55) {Step 1\ \ $\cdot$\ \ design \& sealed commit (before any oracle)};
+% the IN-LOOP optimization oracles the operator queries BEFORE committing
+\node[mc, text width=40mm, minimum height=7mm, fill=mcfb!7] (inl) at (6.90,7.05)
+  {\textbf{in-loop} optimization oracles: pKiss\\($+$ ProbKnot for the panel operator)};
+\draw[df, <->] (a.south) to[out=250,in=0] (inl.east);
+\node[font=\scriptsize\itshape, text=gy, anchor=west, align=left] at (10.30,7.05) {repair loop:\\many queries};
+\node[rt, text=negr] (st1) at (8.10,9.95) {Step 1\ \ $\cdot$\ \ design against \emph{in-loop} oracles, then seal};
 \begin{scope}[on background layer]
-  \node[reg, draw=negr!45, fill=negr!5, fit=(st1)(t)(g)(a)(s)] (P1) {};
+  \node[reg, draw=negr!45, fill=negr!5, fit=(st1)(t)(g)(a)(s)(inl)] (P1) {};
 \end{scope}
 
 % ================= Step 2 : adjudication & certificate =================
-% left column: the two adjudicating oracles, each level with the certificate side it feeds
-\node[mc, text width=44mm, minimum height=8mm] (opk) at (2.30,4.1) {$\Omega_{\mathrm{pk}}$ panel: pKiss,\\ProbKnot, ShapeKnots};
-\node[cf, text width=44mm, minimum height=8mm] (ocf) at (2.30,3.0) {$\Omega_{\mathrm{cf}}$ ladder (ViennaRNA):\\nested only};
-% middle column: the three certificate conditions
-\node[rw, draw=cfg]  (r1) at (8.90,4.1) {(+) positive $+$ transfer (panel-confirmed)};
-\node[rw, draw=negr] (r2) at (8.90,3.0) {($-$) negative (decidable): confinement (Prop.~1)};
-\node[rw, draw=mcfb] (r3) at (8.90,1.9) {autonomy: $\pm$solver ablation (solver-free)};
+% left column: the adjudicators. ShapeKnots is the ONLY genuinely held-out one.
+\node[mc, text width=44mm, minimum height=9mm] (opk) at (2.30,3.35) {$\Omega_{\mathrm{pk}}$ mixed panel: pKiss, ProbKnot (\emph{both in-loop}) $+$ \textbf{ShapeKnots (held out)}};
+\node[cf, text width=44mm, minimum height=8mm] (ocf) at (2.30,2.2) {$\Omega_{\mathrm{cf}}$ ladder (ViennaRNA):\\nested only};
+% middle column: the three audit conditions
+\node[rw, draw=cfg]  (r1) at (8.90,3.35) {(+) positive $+$ transfer (panel-confirmed)};
+\node[rw, draw=negr] (r2) at (8.90,2.2) {($-$) exact exclusion (decidable): verifier-range (Prop.~1)};
+\node[rw, draw=mcfb] (r3) at (8.90,1.1) {autonomy w.r.t.\ packaged solvers ($\pm$solver ablation)};
 % right: verdict
-\node[cf, text width=27mm, fill=cfg!9] (v) at (14.70,3.0) {$\mathbf{CF\!\rightarrow\!MCF}$\\\textbf{audit}\\\textbf{verdict}};
+\node[cf, text width=27mm, fill=cfg!9] (v) at (14.70,2.2) {\textbf{graded audit}\\\textbf{verdict} on the\\$\mathrm{CF}\!\rightarrow\!\mathrm{MCF}$ axis};
 % correspondence (horizontal): the panel confirms (+); the CF-oracle confinement is (-)
 \draw[df] (opk.east) -- (r1.west);
 \draw[df] (ocf.east) -- (r2.west);
@@ -51,7 +56,7 @@
 \draw[gy, line width=0.6pt] (r1.east)--(r1.east-|jx)  (r2.east)--(r2.east-|jx)  (r3.east)--(r3.east-|jx);
 \draw[gy, line width=0.6pt] (r1.east-|jx)--(r3.east-|jx);
 \draw[df] (r2.east-|jx) -- (v.west);
-\node[rt, text=mcfb] (st2) at (8.05,5.05) {Step 2\ \ $\cdot$\ \ oracle adjudication\ $\rightarrow$\ two-sided certificate\ $\rightarrow$\ verdict};
+\node[rt, text=mcfb] (st2) at (8.05,4.25) {Step 2\ \ $\cdot$\ \ \emph{held-out} adjudication\ $\rightarrow$\ two-sided audit\ $\rightarrow$\ graded verdict};
 \begin{scope}[on background layer]
   \node[reg, draw=mcfb!45, fill=mcfb!5, fit=(st2)(opk)(ocf)(r1)(r2)(r3)(v)] (P2) {};
 \end{scope}
@@ -59,6 +64,6 @@
 % ---- inter-phase commit arrow (centred, region to region) ----
 \draw[cmt] (P1.south) -- (P1.south|-P2.north);
 \node[font=\scriptsize\itshape, text=negr, anchor=west, align=left] at ($(P1.south)!0.5!(P1.south|-P2.north)+(2.5mm,0)$)
-  {sealed commit,\\before any oracle};
+  {sealed commit --- \emph{after} in-loop optimization,\\\emph{before} any held-out adjudication};
 \end{tikzpicture}
 \end{document}
