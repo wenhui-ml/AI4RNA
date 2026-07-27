@@ -1,0 +1,58 @@
+=== 1. is the relation non-monotone in Delta rank? (stored 15-cell sweep) ===
+    pKiss = target ever solved in-loop; panel = panel-unanimous wins out of 15 executions
+  ids 0-29 (fit)
+      rank bin   n  median Delta  pKiss-solvable  panel wins  wins/target/cell
+           1-6   6         0.000          6/6             11            0.1222
+          7-12   6         0.050          6/6             10            0.1111
+         13-18   6         0.204          3/6              5            0.0556
+         19-24   6         0.367          2/6              0            0.0000
+         25-30   6         0.946          4/6              1            0.0111
+  ids 30-59 (held)
+      rank bin   n  median Delta  pKiss-solvable  panel wins  wins/target/cell
+           1-6   6         0.000          6/6              5            0.0556
+          7-12   6         0.000          6/6             14            0.1556
+         13-18   6         0.125          5/6              1            0.0111
+         19-24   6         0.254          2/6              0            0.0000
+         25-30   6         0.744          3/6              1            0.0111
+
+=== 2. the mechanism, tested directly on the fit split ===
+  bottom 6 by Delta    n= 6  pKiss-solvable 6/6  panel ever 5/6  panel wins  11/90
+  ranks 7-18           n=12  pKiss-solvable 9/12  panel ever 5/12  panel wins  15/180
+  Fisher exact, ever-panel   bottom-6 vs ranks 7-18: p = 0.1516  [[5, 1], [5, 7]]
+
+=== 3. fit the band on ids 0-29, by expected panel wins per call ===
+          band   n  panel wins    calls  wins/1000 calls
+           1-6   6          11     2743             4.01
+          1-13  13          21     8140             2.58
+          1-18  18          26    22689             1.15
+          1-25  25          27    45692             0.59
+          1-30  30          27    59965             0.45
+          7-18  12          15    19946             0.75
+           4-7   4          10     1818             5.50   <== fitted optimum
+  fitted band on ids 0-29: ranks 4-7  (4 of 30 targets)
+
+=== 4. APPLY ranks 4-7 to ids 30-59 and compare with what was measured ===
+  band targets: ['32', '35', '40', '46']
+
+  what the already-run arms did, restricted to the band's targets
+  (the delta arm at m>=HI funded all of them, so this is a re-scoring, not a prediction)
+    arm       B/B0   m | all funded: calls  solves | band subset: calls  solves
+    uniform   0.10  30 |               325    0.33 |                 41    0.07
+    delta     0.10   6 |               157    0.07 |                 91    0.07
+    uniform   0.20  30 |               606    0.53 |                 72    0.07
+    delta     0.20  13 |               367    0.93 |                118    0.07
+    uniform   0.50  30 |              1291    1.33 |                122    0.07
+    delta     0.50  18 |               790    1.47 |                136    0.07
+    uniform   1.00  30 |              2101    1.73 |                142    0.07
+    delta     1.00  25 |              1796    1.60 |                148    0.07
+
+=== 5. the claim to be tested by a new run ===
+  measured so far, on realised calls:
+    B/B0=0.10  uniform  0.33 @    325   delta  0.07 @    157
+    B/B0=0.20  uniform  0.53 @    606   delta  0.93 @    367
+    B/B0=0.50  uniform  1.33 @   1291   delta  1.47 @    790
+    B/B0=1.00  uniform  1.73 @   2101   delta  1.60 @   1796
+    band arm at the m=4 scale, frac 0.2: ~113 calls/cell if per-target cost holds (delta spent 367 on 13)
+    band arm at the m=4 scale, frac 0.5: ~175 calls/cell if per-target cost holds (delta spent 790 on 18)
+
+  PREDICTION to test: funding ranks 4-7 of ids 30-59 reaches at least the delta arm's solve count at strictly fewer realised calls, because the 3 dropped targets are pKiss-solvable and panel-dead and their calls are pure waste.

@@ -1,0 +1,44 @@
+=== DECLARED ON ids 0-29 (stored sweep only; no held-out outcome used) ===
+  budget/replicate 2101 calls, max_pkiss 122 (kept high on purpose)
+    k  cost/traj  trajectories each  E[solves]  sum p (=1 traj each)
+    3       29.2              23.98       2.43                  0.20
+    4       28.3              18.56       2.89                  0.27
+    5       30.2              13.91       2.47                  0.27
+    6       30.5              11.49       3.19                  0.73
+    7       29.8              10.06       3.76                  0.87
+    8       32.0               8.19       3.84                  0.93
+    9       38.5               6.06       4.01                  1.13
+   10       38.9               5.40       3.76                  1.13
+   11       42.5               4.49       4.13                  1.40   <== chosen
+   12       44.0               3.98       3.85                  1.40
+   13       41.7               3.87       3.79                  1.40
+   14       56.4               2.66       2.98                  1.40
+   15       71.8               1.95       2.39                  1.40
+   16       73.4               1.79       2.75                  1.73
+   17       85.8               1.44       2.33                  1.73
+   18       84.0               1.39       2.27                  1.73
+   19       94.6               1.17       1.97                  1.73
+   20      104.1               1.01       1.75                  1.73
+   21      108.5               0.92       1.62                  1.73
+   22      116.6               0.82       1.46                  1.73
+   23      123.3               0.74       1.34                  1.73
+   24      122.5               0.71       1.30                  1.73
+   25      121.8               0.69       1.30                  1.80
+   26      129.6               0.62       1.19                  1.80
+   27      129.0               0.60       1.16                  1.80
+   28      128.5               0.58       1.12                  1.80
+   29      128.0               0.57       1.09                  1.80
+   30      133.3               0.53       1.02                  1.80
+  -> k = 11, 4 trajectories each (real-valued optimum 4.49)
+
+  applied to ids 30-59: fund ['56', '41', '31', '32', '35', '40', '46', '44', '36', '42', '54']
+
+=== arms (dose-response; seeds nested across the delta arms) ===
+  depth1    30 targets x  1 trajectories =  30 trajectories, ~3998 calls (1.90x budget)
+  delta_S2  11 targets x  2 trajectories =  22 trajectories, ~936 calls (0.45x budget)
+  delta_S4  11 targets x  4 trajectories =  44 trajectories, ~1871 calls (0.89x budget)
+  delta_S8  11 targets x  8 trajectories =  88 trajectories, ~3743 calls (1.78x budget)
+  rand_S4    11 random targets x 4 trajectories  (control: is it Delta, or just fewer-targets-more-seeds?)
+
+3420 trajectories total, 3420 to run (~9.4 core-h at 45 calls each)
+  200/3420  1.6 min  eta 25.5 min

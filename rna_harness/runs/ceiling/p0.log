@@ -1,0 +1,49 @@
+=== 0. how much of the population does the minimum fail to rank? ===
+  ids 0-29: 9/30 targets have min-Delta = 0 at N = 8; 8 of them ever win in the stored sweep (17 of 27 total wins)
+  ids 30-59: 13/30 targets have min-Delta = 0 at N = 8; 8 of them ever win in the stored sweep (19 of 21 total wins)
+
+=== 1. p0 vs the minimum, whole held-out set, both outcomes ===
+    coordinate  AUC vs new-run win  AUC vs stored win  Spearman(new)  Spearman(stored)
+  min-Delta(8)               0.585              0.785          0.155             0.501
+      p0 (N=8)               0.525              0.800          0.047             0.556
+    p0 (N=200)               0.562              0.775          0.099             0.484
+
+=== 2. THE TEST: inside the min-Delta = 0 group, does p0 separate winners from zeros? ===
+  ids 30-59, new run: n=13 at Delta=0, 5 winners / 8 zeros   AUC(p0) = 0.450   one-sided MWU p = 0.6438
+    winners p0: [0.045, 0.11, 0.125, 0.2, 0.2]
+    zeros   p0: [0.02, 0.065, 0.13, 0.175, 0.195, 0.195, 0.2, 0.25]
+  ids 30-59, stored: n=13 at Delta=0, 8 winners / 5 zeros   AUC(p0) = 0.625   one-sided MWU p = 0.2536
+    winners p0: [0.045, 0.125, 0.13, 0.175, 0.195, 0.195, 0.2, 0.25]
+    zeros   p0: [0.02, 0.065, 0.11, 0.2, 0.2]
+  ids 0-29, stored: n=9 at Delta=0, 8 winners / 1 zeros   AUC(p0) = 1.000   one-sided MWU p = 0.1111
+    winners p0: [0.05, 0.065, 0.11, 0.115, 0.2, 0.21, 0.245, 0.36]
+    zeros   p0: [0.025]
+
+=== 3. the cost model p0 implies: expected trajectories to a win ~ 1/p0? ===
+    id rank  p0(200)    1/p0  stored wins/15  new wins/15  per-traj rate
+    46    7    0.250     4.0               1            0          0.000
+    42   10    0.200     5.0               0            0          0.000
+    44    8    0.200     5.0               0            1          0.067
+    58   12    0.200     5.0               5            3          0.200
+    31    3    0.195     5.1               1            0          0.000
+    40    6    0.195     5.1               1            0          0.000
+    32    4    0.175     5.7               1            0          0.000
+    56    1    0.130     7.7               2            0          0.000
+    54   11    0.125     8.0               7           10          0.667
+    35    5    0.110     9.1               0            1          0.067
+    41    2    0.065    15.4               0            0          0.000
+    36    9    0.045    22.2               1            1          0.067
+    39   17    0.030    33.3               0            0          0.000
+    59   13    0.020    50.0               0            0          0.000
+    34   15    0.015    66.7               0            1          0.067
+    38   16    0.015    66.7               0            0          0.000
+  Spearman(p0, new wins) over the 18 targets with p0 > 0: rho = +0.004, p = 0.9887
+
+=== 4. what a trajectory budget buys, from the measured per-trajectory costs ===
+  uniform at full budget: 2101 calls/cell for 30 trajectories = 70.0 calls per trajectory
+  the same 2101 calls spent as trajectories on the best target by p0:
+      46 p0=0.250 cost/traj  31.5 ->  66.6 trajectories, per-traj win rate 0.000 -> E[wins]  0.00   (uniform gets 1.73)
+      42 p0=0.200 cost/traj  21.8 ->  96.4 trajectories, per-traj win rate 0.000 -> E[wins]  0.00   (uniform gets 1.73)
+      44 p0=0.200 cost/traj  33.5 ->  62.7 trajectories, per-traj win rate 0.067 -> E[wins]  4.18   (uniform gets 1.73)
+      58 p0=0.200 cost/traj  32.9 ->  63.8 trajectories, per-traj win rate 0.200 -> E[wins] 12.76   (uniform gets 1.73)
+      31 p0=0.195 cost/traj  31.5 ->  66.6 trajectories, per-traj win rate 0.000 -> E[wins]  0.00   (uniform gets 1.73)

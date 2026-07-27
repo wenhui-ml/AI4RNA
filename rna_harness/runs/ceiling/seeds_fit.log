@@ -1,0 +1,14 @@
+   29      128.0               0.57       1.09                  1.80
+   30      133.3               0.53       1.02                  1.80
+  -> k = 11, 4 trajectories each (real-valued optimum 4.49)
+
+  applied to ids 30-59: fund ['56', '41', '31', '32', '35', '40', '46', '44', '36', '42', '54']
+
+=== arms (dose-response; seeds nested across the delta arms) ===
+  depth1    30 targets x  1 trajectories =  30 trajectories, ~3998 calls (1.90x budget)
+  delta_S2  11 targets x  2 trajectories =  22 trajectories, ~936 calls (0.45x budget)
+  delta_S4  11 targets x  4 trajectories =  44 trajectories, ~1871 calls (0.89x budget)
+  delta_S8  11 targets x  8 trajectories =  88 trajectories, ~3743 calls (1.78x budget)
+  rand_S4    11 random targets x 4 trajectories  (control: is it Delta, or just fewer-targets-more-seeds?)
+
+Declaration only. Re-run with GO=1 to execute.
