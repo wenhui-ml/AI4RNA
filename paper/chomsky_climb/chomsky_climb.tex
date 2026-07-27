@@ -49,6 +49,19 @@
 \newcommand{\Ocf}{\ensuremath{\Omega_{\mathrm{cf}}}}
 \newcommand{\Opk}{\ensuremath{\Omega_{\mathrm{pk}}}}
 \newcommand{\Rze}[2]{\ensuremath{\mathcal{R}_{#1}(#2)}}
+% Verdict chips for the at-a-glance scorecard (Fig. 1). Colour is redundant with the word, so the
+% figure survives greyscale printing.
+\definecolor{vExact}{HTML}{1B5E20}
+\definecolor{vEst}{HTML}{2E7D32}
+\definecolor{vNarrow}{HTML}{6B8E23}
+\definecolor{vWeak}{HTML}{C55A11}
+\definecolor{vNone}{HTML}{9E2A2B}
+\newcommand{\chip}[2]{\colorbox{#1}{\textcolor{white}{\footnotesize\textbf{\strut #2}}}}
+
+% Wide count tables set at their natural width, with the statistics note below them typeset to exactly
+% the same width so the block reads as one unit instead of spilling to the full text measure.
+\newsavebox{\tblbox}
+
 \newcommand{\match}{\ensuremath{\mathcal{A}_{\mathrm{match}}}}
 \newcommand{\umfe}{\ensuremath{\mathcal{A}_{\mathrm{uMFE}}}}
 \newcommand{\pfe}{\ensuremath{\mathcal{A}_{\mathrm{pfe}}}}
@@ -127,6 +140,42 @@ fallible oracle can dress a $1/60$ cross-predictor-consistent result as a $43/60
 \noindent\textbf{Keywords:} automated scientific discovery; self-improving agents; capability acquisition;
 formal language theory; Chomsky hierarchy; RNA inverse design; decidable verification.
 
+\begin{figure}[!t]\centering
+\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.25}
+\footnotesize
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{3.05cm}l L@{}}
+\toprule
+\textbf{audit component} & \textbf{verdict} & \textbf{the qualification that goes with it}\\
+\midrule
+$E_{\mathrm{range}}$ \newline verifier-range exclusion
+& \chip{vExact}{exact}
+& proved offline; bounds the prior \emph{verifier}, not the prior policy\\
+$\Delta_{\mathrm{prior}}$ \newline vs.\ the prior policy
+& \chip{vEst}{established}
+& ${+}0.017$--${+}0.15$; a finite-budget floor of $0/60$, not a theorem\\
+$\Delta_{\mathrm{gamer}}$ \newline vs.\ single-oracle gaming
+& \chip{vNarrow}{established, narrowly}
+& ${+}0.048$; fell as replication was added; conservative variant touches $0$\\
+$\Delta_{\mathrm{undirected}}$ \newline vs.\ matched-cap undirected search
+& \chip{vNone}{not established}
+& ${+}0.013$, interval $[{-}.039,{+}.067]$: the objective is not shown load-bearing\\
+$\Delta_{\mathrm{held\text{-}out}}$ \newline held-out predictor
+& \chip{vWeak}{weak}
+& higher every seed, significant in $1$ of $3$; the panel separation rides on the in-loop oracles\\
+$g_{\mathrm{aut}}$ \newline solver non-use
+& \chip{vEst}{established}
+& by \emph{verified non-use}, a structural fact; solver-free is not oracle-free\\
+\bottomrule
+\end{tabularx}
+\caption{\textbf{The verdict, up front.} The audit returns a six-component evidence vector, never a single
+bit, and for this study the vector is mostly negative: \textbf{one exact, three established (one of them
+narrowly, one of them structurally), one weak, one not established}. The headline measurement we do stand
+behind is separate and stronger---a $43/60$ single-oracle success rate collapses to $1/60$ under three
+predictors---so the instrument is the contribution and the system built to survive it is the secondary
+result. Expanded, with the classification rule and every interval, in
+Table~\ref{tab:verdict}.}\label{fig:verdict}
+\end{figure}
+
 \section{Introduction}\label{sec:intro}
 Self-improving agents claiming new scientific or design capabilities are proliferating, but the field
 adjudicates the claim with soft statistics: a reward-model score, a held-out accuracy delta, a compression/MDL
@@ -174,7 +223,7 @@ the $\CF\!\to\!\MCF$ boundary, with no packaged inverse-design solver called. We
 ``robustly'': the one genuinely held-out predictor separates weakly, matched undirected search is not
 separated, cross-source consistency is $0/60$, execution-level noise ($4.4/60$) \emph{exceeds} the method
 effect ($2.9/60$), and the
-evaluation split is not structurally disjoint (Table~\ref{tab:verdict}). Verified, gaming-resistant capability
+evaluation split is not structurally disjoint (Fig.~\ref{fig:verdict}). Verified, gaming-resistant capability
 acquisition is the decision-relevant quantity, not metaphysical originality---and this study establishes only
 part of it.
 
@@ -252,7 +301,8 @@ evidence and status.
 \begin{table}[t]\centering\small
 \setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.2}
 \caption{\textbf{The audit's output for this study: the evidence vector $\mathcal A$ of Eq.~\eqref{eq:vector},
-filled in.} All rates are $r_{\mathrm{mix}}$ (Eq.~\eqref{eq:metricnames}) unless stated. This is the verdict:
+filled in.} The expanded form of Fig.~\ref{fig:verdict}. All rates are $r_{\mathrm{mix}}$
+(Eq.~\eqref{eq:metricnames}) unless stated. This is the verdict:
 \emph{partial audit success---diagnostic crossing evidence, not robust capability acquisition}.
 How to read a mostly-negative vector is discussed in the text immediately preceding this table.
 \textbf{Classification rule, applied uniformly throughout the paper.} \emph{Exact}: proved, discharged offline.
@@ -1057,7 +1107,7 @@ pKiss-training and lost ProbKnot agreement---consistent with substantially stron
 over-optimization by the pKiss-trained method---not as a causal localization of gaming. Under the full unanimous
 panel neither arm is robust (ShapeKnots, run de novo without probing data, is
 stringent).}\label{tab:contrast}
-\begin{tabularx}{\linewidth}{@{}Lccccc@{}}
+\begin{tabular}{@{}lccccc@{}}
 \toprule
 \textbf{method (objective)} & \textbf{pKiss} & \textbf{ProbKnot} & \textbf{ShapeKnots} & \textbf{unanimous}
 & \textbf{ProbKnot\,/\,60}\\
@@ -1065,10 +1115,10 @@ stringent).}\label{tab:contrast}
 DesiRNA (minimum free energy) & $43/43$ & $\mathbf{26/43}$ & $1/43$ & $0/43$ & $26/60$\\
 invented operator (pKiss in-loop) & $43/43$ & $\mathbf{2/43}$ & $3/43$ & $1/43$ & $2/60$\\
 \midrule
-\multicolumn{6}{@{}L@{}}{\emph{paired, same $43$ targets}: $b{=}25$, $c{=}1$, exact McNemar
+\multicolumn{6}{@{}l@{}}{\footnotesize\emph{paired, same $43$ targets}: $b{=}25$, $c{=}1$, exact McNemar
 $p{=}8.1\!\times\!10^{-7}$, $\widehat\Delta{=}{+}0.558$ $[{+}0.395,{+}0.721]$}\\
 \bottomrule
-\end{tabularx}
+\end{tabular}
 \end{table}
 
 
@@ -1270,15 +1320,13 @@ $-$ complementarity composition & $135.8$ & $64.6$ & $134.8$ & $135.8$ & $52.0$ 
 \begin{table}[t]\centering\small
 \setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.15}
 \caption{\textbf{Held-out-oracle (ShapeKnots-only) separation}, ID-disjoint targets (ids $126$--$250$,
-$n{=}125$). The panel operator scores higher than the pKiss-gamer on the genuinely held-out ShapeKnots
-predictor each seed, but the separation is significant in only $1/3$ seeds: held-out-oracle generalization is
-weak, and the mixed-panel separation of Table~\ref{tab:sep} is driven by the two in-loop predictors, not
-by the held-out one. $b,c$ are the discordant counts on this ShapeKnots-only outcome and $p$ is the exact
-two-sided McNemar of Eq.~\eqref{eq:mcnemar}; unlike the unanimity outcome of Table~\ref{tab:sep}, here
-$c\neq0$---the gamer wins some targets the panel operator loses---which is why the separation is weak
-(\texttt{runs/cc\_ascent/large\_pool\_stats.py}). Effect size: the paired risk difference
-$\widehat\Delta=(b-c)/125$.}\label{tab:sknots}
-\begin{tabularx}{\linewidth}{@{}Xcccc@{}}
+$n{=}125$). The panel operator scores higher on the genuinely held-out predictor each seed, but significantly
+in only $1/3$: held-out generalization is weak, and the mixed-panel separation of Table~\ref{tab:sep} is
+driven by the two in-loop predictors, not by the held-out one. $b,c$ are the discordant counts and $p$ the
+exact McNemar of Eq.~\eqref{eq:mcnemar}; unlike the unanimity outcome of Table~\ref{tab:sep}, here $c\neq0$
+---the gamer wins some targets the panel operator loses---which is why the separation is weak.
+$\widehat\Delta=(b-c)/125$. (\texttt{runs/cc\_ascent/large\_pool\_stats.py}.)}\label{tab:sknots}
+\begin{tabular}{@{}lcccc@{}}
 \toprule
 \textbf{seed} & \textbf{gamer SK/125} & \textbf{panel SK/125} & \textbf{paired McNemar ($b,c,p$)} & $\widehat\Delta$\\
 \midrule
@@ -1286,7 +1334,7 @@ seed 0 & $7$ & $8$ & $b{=}8,c{=}7,\ p{=}1.000$ & $+0.008$\\
 seed 1 & $4$ & $11$ & $b{=}10,c{=}3,\ p{=}0.092$ & $+0.056$\\
 seed 2 & $3$ & $11$ & $b{=}9,c{=}1,\ p{=}0.021$ & $+0.064$\\
 \bottomrule
-\end{tabularx}
+\end{tabular}
 \end{table}
 
 \noindent Applying the naming of Eq.~\eqref{eq:metricnames} to these results: $r_{\mathrm{in}}$ scores the
@@ -1362,7 +1410,7 @@ the system search $2.3\times$ longer''. Both are consequences of the interventio
 $\Delta_{\mathrm{gamer}}$ measures their sum.
 
 \begin{table}[t]\centering\small
-\setlength{\tabcolsep}{3.4pt}\renewcommand{\arraystretch}{1.15}
+\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.15}
 \caption{\textbf{Execution-level replication of the headline comparison} ($\Delta_{\mathrm{gamer}}$; $n{=}60$
 development/evaluation pool, $5$ nominal seeds $\times$ $3$ independent executions $=15$ paired cells, both arms
 scored inside the same worker call so pairing holds at the (target, seed, execution) level). Counts are
@@ -1372,7 +1420,7 @@ report as such. Intervals are nested percentile bootstraps (seeds, then executio
 structural clusters, resampled synchronously across both arms; $B{=}20{,}000$; App.~\ref{app:repro} states the
 procedure in full). Execution spread \emph{exceeds} the method effect for the panel operator, which is why only
 the \emph{within-cell paired} reading is interpretable.}\label{tab:gvp}
-\begin{tabularx}{\linewidth}{@{}Lccccccccccccccccc@{}}
+\sbox{\tblbox}{\begin{tabular}{@{}lccccccccccccccccc@{}}
 \toprule
 & \multicolumn{3}{c}{seed 0} & \multicolumn{3}{c}{seed 1} & \multicolumn{3}{c}{seed 2}
 & \multicolumn{3}{c}{seed 3} & \multicolumn{3}{c}{seed 4} & &\\
@@ -1384,8 +1432,12 @@ gamer (pKiss only) & $1$ & $1$ & $0$ & $0$ & $0$ & $0$ & $0$ & $0$ & $0$ & $0$ &
 & $0.33$ & $0.46$\\
 panel operator & $2$ & $5$ & $6$ & $2$ & $5$ & $1$ & $9$ & $1$ & $1$ & $2$ & $5$ & $3$ & $4$ & $1$ & $1$
 & $3.20$ & $2.41$\\
-\midrule
-\multicolumn{17}{@{}p{\linewidth}@{}}{\smallskip
+\bottomrule
+\end{tabular}}%
+\usebox{\tblbox}
+
+\smallskip
+\begin{minipage}{\wd\tblbox}\footnotesize\raggedright
 paired $\Delta_{\mathrm{gamer}}={+}0.048$ ($2.9$ targets in $60$); pooled discordance $b{=}46$ panel-only
 against $c{=}3$ gamer-only; the panel operator is strictly higher in $14$ of $15$ executions (cell-level sign
 test $p{=}0.0010$), the exception being seed~4/e1. $95\%$ intervals: targets $[{+}.014,{+}.091]$,
@@ -1393,9 +1445,8 @@ test $p{=}0.0010$), the exception being seed~4/e1. $95\%$ intervals: targets $[{
 $[{+}.000,{+}.109]$. Realized budget per target: gamer $55.2$ pKiss and $0$ ProbKnot, panel operator $128.0$
 pKiss and $63.5$ ProbKnot---matched \emph{access}, unmatched \emph{use}. On the in-objective metric
 $r_{\mathrm{in}}$ the same $15$ cells give $\Delta={+}0.553$, $15/15$ executions, and $b{=}498$ against
-$c{=}\mathbf{0}$: there the gamer wins no target in any cell.}\\
-\bottomrule
-\end{tabularx}
+$c{=}\mathbf{0}$: there the gamer wins no target in any cell.
+\end{minipage}
 \end{table}
 
 \paragraph{Which pool is which, and what each can support.} The pools have accumulated different histories of
@@ -1440,7 +1491,7 @@ $\Delta_{\mathrm{gamer}}$'s \emph{sign} now has a structurally disjoint replicat
 remains unestimable on any pool this benchmark can supply.
 
 \begin{table}[t]\centering\small
-\setlength{\tabcolsep}{3.4pt}\renewcommand{\arraystretch}{1.15}
+\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.15}
 \caption{\textbf{Structurally disjoint evaluation} ($27$ targets in $24$ clean structural clusters; every target
 $>15\%$ normalized dot-bracket distance from every target used in any stage of development, minimum realized
 distance $0.167$). $5$ nominal seeds $\times$ $3$ executions, both arms in the same worker call. Counts are
@@ -1449,7 +1500,7 @@ $r_{\mathrm{mix}}$/27. The gamer scores zero in every one of the $15$ executions
 and is underpowered by construction: Pseudobase++ contains just $24$ development-disjoint clusters, so the
 expected count at the development base rate is $\approx\!1.4$. (\texttt{build\_struct\_split.py},
 \texttt{struct\_split\_run.sh}, \texttt{sdis\_stats.py}.)}\label{tab:sdis}
-\begin{tabularx}{\linewidth}{@{}Lccccccccccccccccc@{}}
+\sbox{\tblbox}{\begin{tabular}{@{}lccccccccccccccccc@{}}
 \toprule
 & \multicolumn{3}{c}{seed 0} & \multicolumn{3}{c}{seed 1} & \multicolumn{3}{c}{seed 2}
 & \multicolumn{3}{c}{seed 3} & \multicolumn{3}{c}{seed 4} & &\\
@@ -1461,14 +1512,17 @@ gamer (pKiss only) & $0$ & $0$ & $0$ & $0$ & $0$ & $0$ & $0$ & $0$ & $0$ & $0$ &
 & $\mathbf{0.00}$ & $0.000$\\
 panel operator & $2$ & $1$ & $1$ & $1$ & $2$ & $1$ & $1$ & $4$ & $1$ & $1$ & $5$ & $2$ & $1$ & $2$ & $3$
 & $1.87$ & $0.069$\\
-\midrule
-\multicolumn{17}{@{}p{\linewidth}@{}}{\smallskip
+\bottomrule
+\end{tabular}}%
+\usebox{\tblbox}
+
+\smallskip
+\begin{minipage}{\wd\tblbox}\footnotesize\raggedright
 paired $\Delta={+}0.069$; pooled discordance $b{=}28$ panel-only against $c{=}\mathbf{0}$ gamer-only, exact
 McNemar $p{=}7.5\!\times\!10^{-9}$; cell-level sign test $15/15$, $p{=}6.1\!\times\!10^{-5}$; target bootstrap
 $[{+}.030,{+}.116]$ (underpowered, not the primary statistic). On $r_{\mathrm{in}}$ the same cells give
-$8.60/27$ vs.\ $0.27/27$, $\Delta={+}0.309$, $b{=}127$ against $c{=}2$, $15/15$ executions.}\\
-\bottomrule
-\end{tabularx}
+$8.60/27$ vs.\ $0.27/27$, $\Delta={+}0.309$, $b{=}127$ against $c{=}2$, $15/15$ executions.
+\end{minipage}
 \end{table}
 
 
@@ -2241,7 +2295,7 @@ matters: a single lax verifier is more easily mistaken for ground truth than a s
 \caption{\textbf{Leave-one-oracle-out.} Single-oracle gaming is asymmetric (pKiss is more gameable than
 ProbKnot), and full-panel agreement grows with the number and stringency of the optimized oracles. Single-run
 values; the pKiss$\wedge$ProbKnot row is $3$--$8$ across five seeds (Table~\ref{tab:recovered}).}\label{tab:looo}
-\begin{tabularx}{\linewidth}{@{}Lccc@{}}
+\begin{tabular}{@{}lccc@{}}
 \toprule
 \textbf{optimized in-loop} & \textbf{held-out} & \textbf{held-out agreement} & \textbf{unanimous\,/\,60}\\
 \midrule
@@ -2249,7 +2303,7 @@ pKiss & ProbKnot & $2/43$ & $1$\\
 ProbKnot & pKiss & $26/51$ & $5$\\
 pKiss $\wedge$ ProbKnot & ShapeKnots & $8/37$ & $3$--$8$\\
 \bottomrule
-\end{tabularx}
+\end{tabular}
 \end{table}
 
 \subsection{Crossing-pair count as a structural covariate}\label{app:grade}
@@ -2930,7 +2984,7 @@ all & $48$ & $11$ & $48$\\
 \end{tabularx}
 \end{table}
 
-\section{Supplement: the positive-side gaming-catch in three non-hierarchy settings}\label{sec:audit}
+\section{Supplement: the gaming-catch in three non-hierarchy settings}\label{sec:audit}
 \emph{Supplementary, as \S\ref{sec:sat}: no claim outside this appendix rests on it.} SAT ports the exclusion
 side but trivializes the positive side (its verifier is exact). The question recorded here is whether the
 positive-side audit---an independent check that catches oracle-gaming---ports to settings with no decidable
