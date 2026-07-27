@@ -372,7 +372,7 @@ operating over the mildly context-sensitive class \citep{reedergiegerich2004}. C
 context-free (an Ogden-lemma argument on the interleaved dependencies rules out any CFG \citep{nebelweinberg})
 and are captured by an MCFG of dimension $\le 2$; the canonical pseudoknot grammar of \citet{rivaseddy2000} is
 exactly such \citep{katosekikasami2006}. The pseudoknot-free/pseudoknot split a design pipeline already treats
-as two verifier branches therefore straddles the $\CF\!\to\!\MCF$ boundary \emph{for the families we treat}; we do not claim the whole crossing set $\PK$ falls in one
+as two verifier branches therefore straddles the $\CF\!\to\!\MCF$ boundary \emph{for the families we treat} (Fig.~\ref{fig:hierarchy}); we do not claim the whole crossing set $\PK$ falls in one
 fixed low-dimension MCFG
 class.
 
@@ -591,6 +591,17 @@ pooled & $1/300$ & $25/300$ & \multicolumn{2}{l}{$\Delta{=}{+}.080$; CI $[{+}.04
 \end{tabularx}
 \end{table}
 
+
+\begin{figure}[t]\centering
+\includegraphics[width=0.82\linewidth]{fig_cc_oracle.pdf}
+\caption{\textbf{The positive side is model-relative.} The fraction of state-of-the-art pseudoknot designs
+judged to ``form'' their target swings across predictors---a $[\,15,60\,]\%$ envelope over ProbKnot, pKiss,
+and ShapeKnots (Fig.~\ref{fig:oracle}), measured in the companion \citep{verifiereconomics} on \emph{published} state-of-the-art
+designs. The ordering within that envelope does not carry over to the designs adjudicated in this paper, and we
+do not use it as one---see the reconciliation in \S\ref{sec:exp}. We report the conservative
+panel-unanimous rate as primary, pKiss as reference, and the full envelope, abstaining where predictors
+disagree. Values are companion-measured; no rate is fixed in this manuscript.}\label{fig:oracle}
+\end{figure}
 
 \subsection{The Positive Side Is Model-Relative}\label{sec:oracle}
 Only the negative side's verifier-range bound is exact (Prop.~\ref{prop:confine}); its prior-policy floor is
@@ -890,7 +901,7 @@ panel refutes (a $0/60$ panel credit on the E0 skeleton control below).
 The positive side does not survive the panel. The operator optimized pKiss in the loop; re-adjudicated by
 a held-out predictor, only $2/43$ of its solves are confirmed and one is panel-unanimous
 (Table~\ref{tab:panel}). The apparent $43/60$ ascent collapses to
-$1/60$: an oracle artifact, the operator having learned the blind spots of the predictor it was scored on
+$1/60$ (Fig.~\ref{fig:collapse}): an oracle artifact, the operator having learned the blind spots of the predictor it was scored on
 \citep{skalse2022,gao2023overopt}. A single-oracle evaluation would have reported a new autonomous
 capability; under the abstaining panel (\S\ref{sec:oracle}) almost nothing survives. The gap between $43$
 and $1$ is what a one-sided criterion cannot see.
@@ -924,6 +935,14 @@ pseudoknot-free MFE, \emph{blind} $A_{\mathrm{nest}}$ & $4/43$ & designs the nes
 \bottomrule
 \end{tabularx}
 \end{table}
+
+\begin{figure}[t]\centering
+\includegraphics[width=0.78\linewidth]{fig_cc_collapse.pdf}
+\caption{\textbf{The panel exposes oracle-gaming (measured, $n=60$).} The invented operator's single-oracle
+solve rate ($43/60$, matching the borrowed DesiRNA ceiling) collapses to $2$ under a held-out predictor
+and to $1$ panel-unanimous, a collapse from $43/60$ to $1/60$ invisible to a one-sided criterion, above the
+decidable context-free floor of $0/60$.}\label{fig:collapse}
+\end{figure}
 
 \paragraph{Oracle-gaming vs.\ oracle-robustness: a contrast with the borrowed solver.} Is the collapse
 specific to our operator? Re-adjudicating the external solver's $43$ pKiss-solves under the same panel
@@ -1382,6 +1401,14 @@ targets, and rates there are recorded in App.~\ref{app:invent} and used for noth
 had no runtime failures; the other four time out on $19$--$32$ of $60$ targets, and that exclusion is itself a
 selection we cannot fully audit.
 
+\begin{figure}[t]\centering
+\includegraphics[width=0.9\linewidth]{fig_cc_models.pdf}
+\caption{\textbf{Agent-written operators, one temperature-$0.4$ draw per model.} $r_{\mathrm{mix}}$ of the
+agent-written operator for six models (open $=$ green, closed $=$ blue). All six exceed the single observed gamer
+count ($1$) and the $0$ floor; four exceed the hand-built \texttt{panel\_auto} band ($3$--$8$). One draw per model,
+so the ordering is not a ranking.}\label{fig:models}
+\end{figure}
+
 \paragraph{Which pool is which, and what each can support.} The pools have accumulated different histories of
 contact with our development, and the words ``held-out'' and ``transfer'' have been doing too much work across
 them, so we name them once (Table~\ref{tab:pools}) and use those names for the rest of the paper. Two
@@ -1571,7 +1598,7 @@ dominated by search variance.
 \paragraph{Agent-written operators, and positive-side stringency.} \emph{(a)} Six frontier LLM agents, given
 only primitives and the two crossing oracles, each write an operator with a nonzero $r_{\mathrm{mix}}$ on the
 development/evaluation $60$ ($2$--$17/60$), four of them above the hand-built operator's band---one
-temperature-$0.4$ draw per model, so this supports no model ranking (App.~\ref{app:invent}, Table~\ref{tab:models}). We previously filed this as descriptive support for the single
+temperature-$0.4$ draw per model, so this supports no model ranking (App.~\ref{app:invent}, Table~\ref{tab:models}, Fig.~\ref{fig:models}). We previously filed this as descriptive support for the single
 objection that the audited operator was researcher-designed. It carries more weight than that, and we have
 promoted the part that does: replicated on the conditional carry-over statistic, two of these operators supply
 the positive control that establishes the panel is not merely insensitive (\S\ref{sec:exp}). What stays
@@ -1867,7 +1894,7 @@ languages, are delicate questions we do not settle here \citep{rivaseddy2000,neb
 We therefore assert the dimension-2 witness \emph{only} for the H-type family we design against and make
 \emph{no} per-class dimension-hierarchy claim: in particular we do not claim that MCFG dimension grows with
 the crossing-stem count. The grades order targets by a structural difficulty statistic
-(crossing-stem count), which is why the empirical frontier organizes by grade, without
+(crossing-stem count), which is why the empirical frontier organizes by grade (Fig.~\ref{fig:grade}), without
 asserting that statistic is a formal grammar grade. The $\CF\!\to\!\MCF$ boundary---the object of this
 paper---is crossed already at the first tier (one crossing stem); higher tiers are a finer hierarchy
 \emph{within} \MCF{} that we do not attempt to climb.
@@ -2097,8 +2124,25 @@ pool-level acquisition---the separation holding per seed on the enlarged pool (\
 (b)--(c) additionally require a near-zero autonomy gap and non-trivial spread across targets. We state which
 level each result reaches rather than collapsing them into one pass/fail bit.
 
+\begin{figure}[t]\centering
+\includegraphics[width=0.86\linewidth]{fig_cc_hierarchy.pdf}
+\caption{\textbf{RNA topology maps onto the Chomsky hierarchy.} Nested base pairs are context-free (SCFG);
+crossing pairs (pseudoknots) are, as unbounded families, non-\CF{} and admit mildly context-sensitive (MCFG)
+grammars, provably above \CF. The boundary is the $\CF\!\to\!\MCF$ jump; folding complexity (P$\to$NP-complete)
+is a distinct computational axis (topology-, model-, and objective-dependent), not implied by the generative
+class.}\label{fig:hierarchy}
+\end{figure}
+
 \subsection{Worked example: a canonical H-type pseudoknot}\label{app:worked}
-\paragraph{Worked example.} The canonical H-type pseudoknot $(((([[[[))))]]]]$ has a
+\begin{figure}[t]\centering
+\includegraphics[width=0.96\linewidth]{fig_cc_worked.pdf}
+\caption{\textbf{Worked example: a canonical H-type pseudoknot.} The round stem is nested; the square
+stem crosses it (a pseudoknot stem). A \Ocf-verified repertoire yields only the skeleton---the pseudoknot-aware
+oracle reports the crossing stem absent (negative side). This target is a member of the non-CF H-type family
+$\mathcal L_{\mathrm H}$, whose members need a two-component (MCFG-2) derivation.}\label{fig:worked}
+\end{figure}
+
+\paragraph{Worked example (Fig.~\ref{fig:worked}).} The canonical H-type pseudoknot $(((([[[[))))]]]]$ has a
 nested round stem and a square stem that crosses it. Its \CF{} skeleton (round brackets only) is realized
 under \Ocf{} and would be scored ``solved'' by a pseudoknot-blind check, yet \Opk{} finds the crossing stem
 absent (a naive-MFE false positive; the negative side, Prop.~\ref{prop:confine}). The full target needs a
@@ -2118,11 +2162,19 @@ unanimous rate rises with the number and stringency of the optimized oracles ($1
 ProbKnot only, $3$--$8$ for both across five seeds). A panel is necessary, and which oracles compose it
 matters: a single lax verifier is more easily mistaken for ground truth than a strict one.
 
+\begin{figure}[t]\centering
+\includegraphics[width=0.86\linewidth]{fig_cc_grade.pdf}
+\caption{\textbf{Association between crossing-pair count and solve rate.} Solve rate vs.\ intrinsic
+crossing-pair count (a structural covariate, not a formal grammar grade). Both operators fall to $0$ at the
+highest counts; panel-unanimous robustness concentrates in a mid-complexity window (count $5$). Counts
+$8$--$9$ have $n{=}1,2$ members.}\label{fig:grade}
+\end{figure}
+
 \subsection{Crossing-pair count as a structural covariate}\label{app:grade}
 \paragraph{Crossing-pair count tracks the capability frontier.} Each target's crossing-pair count (an exact
 $O(|P|^2)$ property fixed before design; \S\ref{sec:exp}) is a structural covariate, not a proven
 grammar-dimension grade---more crossing pairs need not raise MCFG fan-out or the language class. We treat it
-as a covariate and ask whether it tracks where capability breaks down. Binning the $60$ development/evaluation targets by count shows a clear association: both operators solve almost everything at
+as a covariate and ask whether it tracks where capability breaks down. Binning the $60$ development/evaluation targets by count (Fig.~\ref{fig:grade}) shows a clear association: both operators solve almost everything at
 low counts and collapse to $0$ at the highest ($8$--$9$ crossing pairs), while panel-unanimous
 robustness concentrates in a mid-complexity window: $6/22$ at grade $5$, tapering to $1/18$ and $1/7$ at
 grades $6$--$7$ and $0$ elsewhere. Capability thus declines as the crossing-pair count grows---an association
@@ -2465,6 +2517,14 @@ development/evaluation pool. This is the worked example for one model; the analo
 models (three open, three closed) are summarized in Table~\ref{tab:models}, and every one peaks by round
 $\le5$.
 
+\begin{figure}[t]\centering
+\includegraphics[width=0.72\linewidth]{fig_cc_stringency.pdf}
+\caption{\textbf{Positive-side stringency.} Free-energy gap from the target (pKiss MFE) to the best
+alternative fold, over the mixed-panel-consistent designs. The target is the MFE for all $17$ completed
+designs (eight longer designs timed out) and dominant by $\ge1$\,kcal/mol for $14/17$, under the pKiss energy
+model.}\label{fig:stringency}
+\end{figure}
+
 \section{Oracle Configurations, Hyperparameters, Compute, and Verifier Stringency}\label{app:config}
 \noindent\textbf{Oracle configurations}, all deterministic and replayable with \texttt{DATAPATH} pinned to
 the RNAstructure data tables: $\Omega_{\mathrm{cf}}$ is ViennaRNA Turner-2004 MFE at $37^\circ$C (env
@@ -2486,7 +2546,7 @@ already requires the target to be each engine's predicted structure; we add one 
 (App.~\ref{app:config}). For the mixed-panel-consistent designs we enumerate pKiss suboptimals and take the
 free-energy gap $\Delta$ from the target (the MFE) to the best alternative fold. The target is the pKiss MFE
 for all $17$ designs whose enumeration completed within budget, dominant by median $\Delta{=}1.2$\,kcal/mol
-(mean $1.44$), with $14/17$ clearing a $\ge1$\,kcal margin. Eight longer designs
+(mean $1.44$), with $14/17$ clearing a $\ge1$\,kcal margin (Fig.~\ref{fig:stringency}). Eight longer designs
 timed out; since timeout correlates with length, this rung covers the shorter adjudicated designs only, and the
 gap is a property of the pKiss energy model, not a model-independent thermodynamic fact. Within that scope the
 positive verdict is not a marginal coincidence of pair sets: the target is the free-energy-minimum fold by a
