@@ -1,5 +1,19 @@
 #!/usr/bin/env python3
-"""Where does the difficulty live? A multi-scale decomposition of the designability margin.
+"""DOES NOT WORK -- DO NOT USE THIS SCRIPT'S OUTPUT. Kept as a record of the second failed attempt.
+
+Two independent problems, both fatal. (a) The recursive multiloop frontier shrinks too slowly: the
+largest piece is still 0.52-0.95 of the target at depth 6, so the scale sweep barely sweeps. (b) More
+fundamentally, X(d) swings between -5 and +8 kcal/mol -- negative as often as positive -- on targets
+whose Delta(T) is only 2-7, because a fragment folded IN ISOLATION is a different folding problem from
+the same fragment in context. sum_i Delta(piece_i) is therefore not a decomposition of Delta(T) at all,
+and no amount of fixing the frontier repairs that.
+
+The Deng-Hani-Ma cumulant expansion works because it expands around a free baseline (non-interacting
+streaming particles). "The fragment on its own" is not the RNA analogue of that baseline. A working
+instrument would need a MEAN-FIELD reference: fold each fragment with the rest of the molecule present
+but its sequence randomised, so the piece keeps its context and loses only its identity.
+
+Where does the difficulty live? A multi-scale decomposition of the designability margin.
 
 Supersedes compositional_excess.py, whose unit decomposition was void: "maximal disjoint helix-closed
 units" returns the whole target (0.86-1.00 of its length for every long target checked), so

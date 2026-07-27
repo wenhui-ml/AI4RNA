@@ -1,5 +1,14 @@
 #!/usr/bin/env python3
-"""Compositional excess: the cumulant-expansion analogue for RNA inverse design.
+"""VOID -- DO NOT USE THIS SCRIPT'S OUTPUT. Kept only as a record of the error.
+
+The unit decomposition below ("maximal disjoint helix-closed units") returns the whole target: on every
+long target checked the largest unit is 0.86-1.00 of the target's length (Teslagon 0.97, Hoglafractal
+0.86, Bug 18 0.96, multilooping fun 1.00). So X = Delta(T) - sum_i Delta(u_i) ~ 0 is an identity built
+into the decomposition, not a measurement, and the reading it appeared to support -- "the difficulty is
+already additive over units" -- is an artifact. See scale_excess.py, which replaced it and also failed,
+and the commit message of 9f40785 for what a working instrument would need.
+
+Compositional excess: the cumulant-expansion analogue for RNA inverse design.
 
 Deng-Hani-Ma derive an irreversible kinetic equation from reversible dynamics by carrying the FULL
 collision history in a cumulant expansion and then proving that the correlation-creating terms
