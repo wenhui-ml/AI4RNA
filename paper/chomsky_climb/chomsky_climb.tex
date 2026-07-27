@@ -1038,22 +1038,29 @@ and $1$ is what a one-sided criterion cannot see.
 \begin{table}[t]\centering\small
 \setlength{\tabcolsep}{6pt}\renewcommand{\arraystretch}{1.15}
 \caption{\textbf{Cross-oracle panel adjudication of the invented operator's $43$ pKiss-solves}
-(\S\ref{sec:oracle}). The operator optimized pKiss in-loop; a held-out predictor confirms almost none of
-its solves, and one design is mixed-panel-consistent: the apparent ascent is an oracle artifact. Predicates are those of Eq.~\eqref{eq:predicates}. All $43$
-satisfy the full-structure predicate $A_{\mathrm{full}}$ under pKiss (\texttt{pk\_bp\_distance}$=0$), and all
-$43$ targets are genuinely crossing ($3$--$9$ crossing pairs each), so \emph{none} is realized by a
-pseudoknot-free fold---consistent with Prop.~\ref{prop:confine}. The $4$ ``blind-accept'' cases are cases
-where the \emph{pseudoknot-blind} predicate $A_{\mathrm{nest}}$ would \emph{falsely accept} the design, not
-targets that require no crossing.}\label{tab:panel}
-\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{5.2cm}L@{}}
+(\S\ref{sec:oracle}). Read the top block down the count column: $43\to2\to1$ as adjudication moves from the
+oracle the operator optimized to predictors it never saw. That collapse is the paper's headline measurement.
+The lower block is the \emph{other} side of the audit and its two numbers are not confirmations of the design:
+all $43$ targets are genuinely crossing ($3$--$9$ crossing pairs each), so a pseudoknot-free fold realizes none
+of them, and the $4$ counts how often the pseudoknot-\emph{blind} predicate would have been fooled. Predicates
+are those of Eq.~\eqref{eq:predicates}; all $43$ satisfy $A_{\mathrm{full}}$ under pKiss
+(\texttt{pk\_bp\_distance}$=0$).}\label{tab:panel}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{5.0cm}cL@{}}
 \toprule
-\textbf{adjudicator / predicate} & \textbf{confirms (of the $43$ pKiss-solves)}\\
+\textbf{adjudicator / predicate} & \textbf{count\,/\,43} & \textbf{what the number counts}\\
 \midrule
-pKiss, full-structure $A_{\mathrm{full}}$ (the oracle the operator optimized) & $43/43$\\
-pseudoknot-free MFE, full-structure $A_{\mathrm{full}}$ & $\mathbf{0/43}$ (a theorem, Prop.~\ref{prop:confine}: $\operatorname{im}\Ocf\subseteq\NESTED$)\\
-pseudoknot-free MFE, \emph{blind} $A_{\mathrm{nest}}$ (nested projection only) & $4/43$ \emph{falsely accepted}---the blind rule's own error rate on crossing targets, not a property of those targets\\
-ProbKnot, $A_{\mathrm{full}}$ (held out \emph{from this gamer}; in-loop for the panel operator) & $2/43$\\
-all three predictors, $A_{\mathrm{full}}$ (mixed panel: $2$ in-loop $+\,1$ held out) & $\mathbf{1/43}$ \;\; ($1/60$ overall)\\
+\multicolumn{3}{@{}l}{\emph{crossing-aware adjudicators: the collapse}}\\
+pKiss, $A_{\mathrm{full}}$ & $43/43$ & the in-loop oracle---the rate the operator was optimized to produce\\
+ProbKnot, $A_{\mathrm{full}}$ & $2/43$ & first crossing-aware predictor the gamer never saw (in-loop for the
+panel operator)\\
+all three predictors, $A_{\mathrm{full}}$ & $\mathbf{1/43}$ & mixed panel, $2$ in-loop $+\,1$ held out;
+$1/60$ of the pool---the audited outcome\\
+\addlinespace[2pt]
+\multicolumn{3}{@{}l}{\emph{pseudoknot-free adjudicators: the exclusion side---not confirmations of the design}}\\
+pseudoknot-free MFE, $A_{\mathrm{full}}$ & $\mathbf{0/43}$ & a theorem, not a measurement
+(Prop.~\ref{prop:confine}: $\operatorname{im}\Ocf\subseteq\NESTED$)\\
+pseudoknot-free MFE, \emph{blind} $A_{\mathrm{nest}}$ & $4/43$ & designs the nested-projection rule would
+\emph{falsely accept}: that rule's own error rate, not a property of the targets\\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -1348,7 +1355,8 @@ and $60$ targets as the panel operator and compare by a matched, paired analysis
 gamer's rate as a known constant (Table~\ref{tab:sep}). The gamer is panel-unanimous on $\{1,0,0,0,0\}/60$
 (pooled $1/300$), the panel operator on $\{8,3,5,5,4\}/60$ (pooled $25/300$). The paired difference
 $\Delta=p_{\mathrm{panel}}-p_{\mathrm{gamer}}$, over matched seeds and targets with a target-level cluster
-bootstrap, is $+0.080$ with $95\%$ CI $[+0.040,+0.127]$ (conditional on the five observed seeds), excluding zero. Per seed the paired McNemar has
+bootstrap, is $+0.080$ with $95\%$ CI $[+0.040,+0.127]$ (conditional on the five observed seeds, and superseded below by
+the execution-replicated ${+}0.048$ of Table~\ref{tab:gvp}), excluding zero. Per seed the paired McNemar has
 $c=0$---the gamer never solves a target the panel operator misses---significant on the strongest seed
 ($p{=}0.016$) but underpowered on the others at $n{=}60$. To power the per-seed test we re-run both arms on a
 larger crossing pool at three seeds, the \emph{ID-disjoint} pool of Table~\ref{tab:pools}. There the panel
@@ -1420,7 +1428,7 @@ report as such. Intervals are nested percentile bootstraps (seeds, then executio
 structural clusters, resampled synchronously across both arms; $B{=}20{,}000$; App.~\ref{app:repro} states the
 procedure in full). Execution spread \emph{exceeds} the method effect for the panel operator, which is why only
 the \emph{within-cell paired} reading is interpretable.}\label{tab:gvp}
-\sbox{\tblbox}{\begin{tabular}{@{}lccccccccccccccccc@{}}
+\sbox{\tblbox}{\begin{tabular}{@{}l*{15}{c}@{\hspace{9pt}}cc@{}}
 \toprule
 & \multicolumn{3}{c}{seed 0} & \multicolumn{3}{c}{seed 1} & \multicolumn{3}{c}{seed 2}
 & \multicolumn{3}{c}{seed 3} & \multicolumn{3}{c}{seed 4} & &\\
@@ -1432,6 +1440,9 @@ gamer (pKiss only) & $1$ & $1$ & $0$ & $0$ & $0$ & $0$ & $0$ & $0$ & $0$ & $0$ &
 & $0.33$ & $0.46$\\
 panel operator & $2$ & $5$ & $6$ & $2$ & $5$ & $1$ & $9$ & $1$ & $1$ & $2$ & $5$ & $3$ & $4$ & $1$ & $1$
 & $3.20$ & $2.41$\\
+\addlinespace[1pt]\cmidrule(l{-2pt}r){1-18}\addlinespace[1pt]
+\emph{paired} $\Delta$ \emph{within cell} & $1$ & $4$ & $6$ & $2$ & $5$ & $1$ & $9$ & $1$ & $1$ & $2$ & $5$
+& $2$ & $4$ & $\mathbf{-1}$ & $1$ & $+2.87$ & $2.59$\\
 \bottomrule
 \end{tabular}}%
 \usebox{\tblbox}
@@ -1440,7 +1451,9 @@ panel operator & $2$ & $5$ & $6$ & $2$ & $5$ & $1$ & $9$ & $1$ & $1$ & $2$ & $5$
 \begin{minipage}{\wd\tblbox}\footnotesize\raggedright
 paired $\Delta_{\mathrm{gamer}}={+}0.048$ ($2.9$ targets in $60$); pooled discordance $b{=}46$ panel-only
 against $c{=}3$ gamer-only; the panel operator is strictly higher in $14$ of $15$ executions (cell-level sign
-test $p{=}0.0010$), the exception being seed~4/e1. $95\%$ intervals: targets $[{+}.014,{+}.091]$,
+test $p{=}0.0010$), the exception being seed~4/e1. The $\Delta$ row \emph{is} the statistic---within a cell both
+arms see the same targets, so that row is the paired difference, its mean is the effect and its signs are what
+the sign test counts. $95\%$ intervals: targets $[{+}.014,{+}.091]$,
 \emph{structural clusters} $[{+}.005,{+}.093]$, conservative one-execution-per-seed variant on clusters
 $[{+}.000,{+}.109]$. Realized budget per target: gamer $55.2$ pKiss and $0$ ProbKnot, panel operator $128.0$
 pKiss and $63.5$ ProbKnot---matched \emph{access}, unmatched \emph{use}. On the in-objective metric
@@ -1500,7 +1513,7 @@ $r_{\mathrm{mix}}$/27. The gamer scores zero in every one of the $15$ executions
 and is underpowered by construction: Pseudobase++ contains just $24$ development-disjoint clusters, so the
 expected count at the development base rate is $\approx\!1.4$. (\texttt{build\_struct\_split.py},
 \texttt{struct\_split\_run.sh}, \texttt{sdis\_stats.py}.)}\label{tab:sdis}
-\sbox{\tblbox}{\begin{tabular}{@{}lccccccccccccccccc@{}}
+\sbox{\tblbox}{\begin{tabular}{@{}l*{15}{c}@{\hspace{9pt}}cc@{}}
 \toprule
 & \multicolumn{3}{c}{seed 0} & \multicolumn{3}{c}{seed 1} & \multicolumn{3}{c}{seed 2}
 & \multicolumn{3}{c}{seed 3} & \multicolumn{3}{c}{seed 4} & &\\
@@ -1512,6 +1525,9 @@ gamer (pKiss only) & $0$ & $0$ & $0$ & $0$ & $0$ & $0$ & $0$ & $0$ & $0$ & $0$ &
 & $\mathbf{0.00}$ & $0.000$\\
 panel operator & $2$ & $1$ & $1$ & $1$ & $2$ & $1$ & $1$ & $4$ & $1$ & $1$ & $5$ & $2$ & $1$ & $2$ & $3$
 & $1.87$ & $0.069$\\
+\addlinespace[1pt]\cmidrule(l{-2pt}r){1-18}\addlinespace[1pt]
+\emph{paired} $\Delta$ \emph{within cell} & $2$ & $1$ & $1$ & $1$ & $2$ & $1$ & $1$ & $4$ & $1$ & $1$ & $5$
+& $2$ & $1$ & $2$ & $3$ & $+1.87$ & $+0.069$\\
 \bottomrule
 \end{tabular}}%
 \usebox{\tblbox}
@@ -1569,9 +1585,13 @@ execution at a fixed nominal seed---and they are not interchangeable, because ex
 the largest of the three (App.~\ref{app:repro}). We therefore treat the \emph{deepest} interval we ran for a
 given comparison as its primary one, and label every interval with what was resampled. For
 $\Delta_{\mathrm{gamer}}$ that is the three-level, structural-cluster interval of Table~\ref{tab:gvp}
-($[{+}0.006,{+}0.115]$); the target-only ($[{+}0.040,{+}0.127]$) and target-and-seed ($[{+}0.030,{+}0.140]$)
-intervals computed on the five original seeds are reported alongside it as shallower sensitivity analyses, not
-as the headline, since each conditions away a level of variation the study has since measured. For
+($[{+}0.005,{+}0.093]$ around ${+}0.048$); its target-level counterpart ($[{+}0.014,{+}0.091]$) and the
+conservative one-execution-per-seed cluster variant ($[{+}0.000,{+}0.109]$) are the two sensitivities we quote
+beside it. The wider intervals that appear later in this section---target-only $[{+}0.040,{+}0.127]$,
+target-and-seed $[{+}0.030,{+}0.140]$, cluster-and-seed $[{+}0.024,{+}0.149]$---belong to the
+\emph{pre-replication} analysis of the five original single-execution seeds, where the point estimate was
+${+}0.080$; they are retained because they isolate the effect of the resampling unit, not as the headline,
+since each conditions away a level of variation the study has since measured. For
 Table~\ref{tab:pablate} it is the three-level interval in that table. App.~\ref{app:repro} specifies the
 nesting, the pairing, the resampling unit and the interval type in full.
 
@@ -1600,11 +1620,14 @@ targets, their mean crossing-pair count ($5.46$) matching the pool mean ($5.48$)
 as independent draws, which they are not: single-linkage clustering of the pool at the same $15\%$
 normalized-dot-bracket threshold the split audit uses collapses the $60$ targets into $18$ structural clusters,
 of which one contains $29$ targets and another $12$ (\texttt{cluster\_boot.py}). The effective sample size is
-$18$, not $60$, so the target-level interval is optimistic. We therefore recompute the headline
-$\Delta_{\mathrm{gamer}}$ with the \emph{cluster} as the resampling unit, each drawn cluster contributing all of
-its targets. The interval widens as expected and still excludes zero: $[{+}0.033,{+}0.136]$ with seeds fixed and
-$[{+}0.024,{+}0.149]$ resampling clusters and seeds together, against the target-level $[{+}0.040,{+}0.127]$ and
-the two-way $[{+}0.030,{+}0.140]$. Cluster structure inflates the uncertainty on this component by roughly a
+$18$, not $60$, so the target-level interval is optimistic. We therefore recompute $\Delta_{\mathrm{gamer}}$
+with the \emph{cluster} as the resampling unit, each drawn cluster contributing all of its targets. This
+comparison is run on the five original single-execution seeds, where the point estimate is ${+}0.080$, so that
+changing the resampling unit is the \emph{only} thing that changes; the execution-replicated estimate of
+Table~\ref{tab:gvp} (${+}0.048$, $[{+}0.005,{+}0.093]$ on clusters) supersedes it as the headline. The interval
+widens as expected and still excludes zero: $[{+}0.033,{+}0.136]$ with seeds fixed and $[{+}0.024,{+}0.149]$
+resampling clusters and seeds together, against the target-level $[{+}0.040,{+}0.127]$ and the two-way
+$[{+}0.030,{+}0.140]$. Cluster structure inflates the uncertainty on this component by roughly a
 fifth without overturning it, and every interval we report for $\Delta_{\mathrm{gamer}}$ is stated with which
 unit was resampled.
 
