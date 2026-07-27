@@ -134,7 +134,7 @@ three levels, at both the target ($[{+}.014,{+}.091]$) and structural-cluster ($
 the conservative one-execution-per-seed variant reaches $0.000$ (Table~\ref{tab:gvp}). The estimate fell
 monotonically as replication was added (${+}0.080\!\to\!{+}0.056\!\to\!{+}0.048$), which suggests the estimator
 has not converged and that a fourth level of variation (the target set) could carry it to zero. It survives the
-change to a metric-neutral statistic (${+}0.049$, $p{=}6.9\!\times\!10^{-4}$, Table~\ref{tab:carry}), though one
+change to a metric-neutral statistic (${+}0.049$, $p{=}6.9\!\times\!10^{-4}$, Fig.~\ref{fig:carry}), though one
 stricter conditioning disagrees. A search-free target-side probe bounds what it measures: $36$ of the $43$
 discordant wins that constitute it ($84\%$) fall on targets a random compatible sequence already solves, and on
 the $30$ targets random sampling cannot reach the paired difference is ${+}0.016$ ($7$ against $0$,
@@ -147,7 +147,7 @@ ${+}0.013$, three-level interval $[{-}.039,{+}.067]$ over $9$ runs/arm (Table~\r
 objective does not measurably lower $r_{\mathrm{mix}}$; only removing the repair loop entirely does
 (${+}0.056$), so a search is necessary but its \emph{guidance} is not shown load-bearing---confirmed on the
 metric-neutral statistic, where the undirected and oracle-blind walks match the full operator
-(Table~\ref{tab:carry}). Matched on nominal
+(Fig.~\ref{fig:carry}). Matched on nominal
 caps, \emph{not} on realized compute (Table~\ref{tab:budget})\\
 $\Delta_{\mathrm{held\text{-}out}}$ (held-out oracle) & \chip{vWeak}{weak} &
 $r_{\mathrm{ho}}$ higher each seed but significant in $1$ of $3$ (Table~\ref{tab:sknots}); adjudicator run in an
@@ -944,6 +944,18 @@ the cleaner comparison is the two de-novo predictors ($\text{pKiss}\wedge\text{P
 $2$-vs-$26$ gap stands. And that even a SOTA solver is only $\sim\!60\%$ cross-predictor-robust confirms the
 thesis: ``forms the pseudoknot'' is deeply model-relative.
 
+\begin{figure}[t]\centering
+\includegraphics[width=0.78\linewidth]{fig_cc_contrast.pdf}
+\caption{\textbf{The discriminating measurement.} Both arms solve the \emph{same} $43$ targets under pKiss
+(intersection $43$, Jaccard $1.000$, matched mean crossing-pair count $5.26$), so target composition and
+difficulty cannot explain what happens next: re-adjudicated by ProbKnot, which neither arm optimized, the
+minimum-free-energy solver retains $26$ and the pKiss-trained operator $2$. Paired McNemar $b{=}25$, $c{=}1$,
+exact $p{=}8.1\!\times\!10^{-7}$. Because the arms are two different methods rather than a randomized
+manipulation of one method's training oracle, we read the gap as an \emph{association} between pKiss-training
+and lost ProbKnot agreement, not as a causal localization of gaming
+(Table~\ref{tab:contrast}).}\label{fig:contrast}
+\end{figure}
+
 \begin{table}[t]\centering\small
 \setlength{\tabcolsep}{6pt}\renewcommand{\arraystretch}{1.15}
 \caption{\textbf{Oracle-gaming vs.\ cross-predictor carry-over} (each arm's $43$ pKiss-solves, re-adjudicated).
@@ -1242,7 +1254,7 @@ report as such. Intervals are nested percentile bootstraps (seeds, then executio
 structural clusters, resampled synchronously across both arms; $B{=}20{,}000$; App.~\ref{app:repro} states the
 procedure in full). Execution noise is of the same order as the method effect for the panel operator, which is
 why only the \emph{within-cell paired} reading is interpretable. $r_{\mathrm{mix}}$ is not metric-neutral
-between these arms; Table~\ref{tab:carry} redoes the comparison on a statistic that is.}\label{tab:gvp}
+between these arms; Fig.~\ref{fig:carry} redoes the comparison on a statistic that is.}\label{tab:gvp}
 \sbox{\tblbox}{\begin{tabular}{@{}l*{15}{c}@{\hspace{9pt}}cc@{}}
 \toprule
 & \multicolumn{3}{c}{seed 0} & \multicolumn{3}{c}{seed 1} & \multicolumn{3}{c}{seed 2}
@@ -1255,9 +1267,6 @@ gamer (pKiss only) & $1$ & $1$ & $0$ & $0$ & $0$ & $0$ & $0$ & $0$ & $0$ & $0$ &
 & $0.33$ & $0.46$\\
 panel operator & $2$ & $5$ & $6$ & $2$ & $5$ & $1$ & $9$ & $1$ & $1$ & $2$ & $5$ & $3$ & $4$ & $1$ & $1$
 & $3.20$ & $2.41$\\
-\addlinespace[1pt]\cmidrule(l{-2pt}r){1-18}\addlinespace[1pt]
-\emph{paired} $\Delta$ \emph{within cell} & $1$ & $4$ & $6$ & $2$ & $5$ & $1$ & $9$ & $1$ & $1$ & $2$ & $5$
-& $2$ & $4$ & $\mathbf{-1}$ & $1$ & $+2.87$ & $2.59$\\
 \bottomrule
 \end{tabular}}%
 \usebox{\tblbox}
@@ -1277,6 +1286,15 @@ $c{=}\mathbf{0}$: there the gamer wins no target in any cell.
 \end{minipage}
 \end{table}
 
+\begin{figure}[t]\centering
+\includegraphics[width=0.92\linewidth]{fig_cc_paired.pdf}
+\caption{\textbf{The paired difference, cell by cell.} Within a cell both arms see the same $60$ targets, so
+the difference of the two rows of Table~\ref{tab:gvp} \emph{is} the paired statistic: its mean is the effect
+(${+}2.87/60={+}0.048$) and its signs are what the cell-level sign test counts. Fourteen of $15$ point one
+way; the exception is seed~$4$/e1. This is the quantity the intervals are computed on, and a row of fifteen
+numbers does not show that it has a consistent sign.}\label{fig:paired}
+\end{figure}
+
 \paragraph{$r_{\mathrm{mix}}$ is not metric-neutral, so we redo the comparison on a statistic that is.}
 $r_{\mathrm{mix}}=r_{\mathrm{in}}\wedge\text{ShapeKnots}$, and $r_{\mathrm{in}}$ is \emph{the panel operator's
 own success predicate}. Scoring both arms on $r_{\mathrm{mix}}$ therefore scores one of them on its objective
@@ -1291,7 +1309,7 @@ statistic:
 \end{equation}
 $C$ is neutral because every arm is scored on how far \emph{its own} successes carry to a predictor \emph{it}
 never optimized, with its own predicate as the denominator. ShapeKnots is in no arm's loop, so carry-over to
-ShapeKnots is defined identically for all of them (Table~\ref{tab:carry}). Three readings follow, and they do
+ShapeKnots is defined identically for all of them (Fig.~\ref{fig:carry}). Three readings follow, and they do
 not all point the same way.
 
 \emph{The gamer comparison survives the change of metric.} Difficulty-matched to the $528$ (target, seed,
@@ -1314,39 +1332,28 @@ $r_{\mathrm{mix}}$, now on a metric that cannot be accused of favouring either a
 
 \emph{Cross-predictor robustness is pairwise, not global.} DesiRNA carries over to ProbKnot at $26/43$ against
 our gamer's $2/43$ (\S\ref{sec:exp}, Table~\ref{tab:contrast}), and to ShapeKnots at $1/43$, the
-\emph{lowest} rate of any arm in Table~\ref{tab:carry}. An arm can be $13\times$ more robust under one
+\emph{lowest} rate of any arm in Fig.~\ref{fig:carry}. An arm can be $13\times$ more robust under one
 un-optimized predictor and the least robust under another. ProbKnot and DesiRNA's minimum-free-energy
 objective are both built on the same nearest-neighbour thermodynamic parameters, and ShapeKnots run de novo is
 not; the natural reading is that ``robustness'' here tracks shared model family rather than
 correctness. That is a limitation of the whole panel, not of one arm, and it is the strongest argument in this
 paper for adding a predictor from a different model class (\S\ref{sec:disc}).
 
-\begin{table}[t]\centering\small
-\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.15}
-\caption{\textbf{Conditional carry-over $C$ (Eq.~\eqref{eq:carry}): the metric-neutral comparison.} Each arm is
-scored on the fraction of \emph{its own} successes that a predictor never in \emph{its} loop confirms.
-ShapeKnots is in no arm's loop, so that column is comparable across every row; the ProbKnot column is
-meaningful only for the two arms that do not optimize it. Denominators are each arm's own successes, so they
-differ by design, and that is what makes the statistic neutral. Intervals are exact binomial (Clopper--Pearson);
-the paired, difficulty-matched contrasts are in the text. Agent-written operators optimize
-pKiss\,$\wedge$\,ProbKnot as well (\texttt{invent\_operator.py}); the row pools six single runs, and the two
-models with no runtime failures were subsequently replicated at $5$ seeds $\times$ $3$ executions, giving
-$0.302$ $[0.275,0.330]$ and serving as this section's positive control. (\texttt{runs/cc\_ascent/carryover.py}.)}\label{tab:carry}
-\begin{tabular}{@{}llcccc@{}}
-\toprule
-\textbf{arm} & \textbf{in-loop objective} & \textbf{own} & \textbf{ProbKnot} & \textbf{ShapeKnots}
-& \textbf{95\% CI}\\
-& & \textbf{successes} & \textbf{carry-over} & \textbf{carry-over} & \textbf{(ShapeKnots)}\\
-\midrule
-DesiRNA & min.\ free energy & $43$ & $\mathbf{0.605}$ & $0.023$ & $[.001,.123]$\\
-gamer & pKiss & $643$ & $0.047$ & $0.034$ & $[.022,.051]$\\
-panel operator & pKiss\,$\wedge$\,ProbKnot & $530$ & in-loop & $0.091$ & $[.068,.118]$\\
-$-$ objective (undirected) & pKiss\,$\wedge$\,ProbKnot & $253$ & in-loop & $0.095$ & $[.062,.138]$\\
-$-$ objective, $-$ bias & pKiss\,$\wedge$\,ProbKnot & $209$ & in-loop & $0.110$ & $[.071,.161]$\\
-agent-written (6 models) & pKiss\,$\wedge$\,ProbKnot & $222$ & in-loop & $\mathbf{0.257}$ & $[.201,.319]$\\
-\bottomrule
-\end{tabular}
-\end{table}
+\begin{figure}[t]\centering
+\includegraphics[width=\linewidth]{fig_cc_carry.pdf}
+\caption{\textbf{Conditional carry-over $C$ (Eq.~\eqref{eq:carry}): the metric-neutral comparison.} Each arm
+is scored on the fraction of \emph{its own} successes that a predictor never in \emph{its} loop confirms, so
+the denominators differ by design and that is what makes the statistic neutral. ShapeKnots is in no arm's
+loop, so every row is comparable. Bars are exact binomial (Clopper--Pearson) intervals; counts are
+successes\,/\,own successes. The two rows in colour are the comparison the figure exists to make: the
+hand-built panel operator against the frozen agent-written operators of App.~\ref{app:invent}, which optimize
+the same pKiss\,$\wedge$\,ProbKnot predicate and whose interval does not reach the panel operator's. The
+ProbKnot direction is meaningful only for the two arms that do not optimize it and is reported in
+Table~\ref{tab:contrast} ($26/43$ for DesiRNA against $2/43$ for the gamer). The agent row pools six single
+runs; its two zero-failure models were replicated at $5$ seeds $\times$ $3$ executions, giving
+$0.302$ $[0.275,0.330]$, and serve as this section's positive control.
+(\texttt{runs/cc\_ascent/carryover.py}.)}\label{fig:carry}
+\end{figure}
 
 \paragraph{Does the instrument discriminate, or is it merely insensitive? A positive control.} We have said
 more than once that nothing we build saturates the panel and offered that as evidence of stringency. It is
@@ -1411,6 +1418,16 @@ concentrated on zero-margin targets. The consistent reading is that the dimensio
 on is not the one that decides the outcome. What this does \emph{not} touch is the oracle-gaming measurement:
 $43\!\to\!1$ and the paired $2/43$ versus $26/43$ carry-over are statements about adjudication, and whether a
 design survives a second predictor is a different question from whether its target was easy to hit.
+
+\begin{figure}[t]\centering
+\includegraphics[width=0.92\linewidth]{fig_cc_margin.pdf}
+\caption{\textbf{Where $\Delta_{\mathrm{gamer}}$ actually sits.} The $60$ development/evaluation targets split
+in half by whether a search-free probe reaches them at all (Eq.~\eqref{eq:margin}), and the headline effect
+does not divide evenly between the halves. On the $30$ targets a random compatible sequence already solves,
+the panel operator takes $41$ discordant wins to the gamer's $5$; on the $30$ it never reaches, $7$ to $0$
+(exact McNemar $p{=}0.016$). The second number, not the pooled ${+}0.048$, is what the operator buys where
+search is required. (\texttt{runs/cc\_ascent/pk\_margin.py}.)}\label{fig:margin}
+\end{figure}
 
 \paragraph{Which pool is which, and what each can support.} The pools have accumulated different histories of
 contact with our development, and the words ``held-out'' and ``transfer'' have been doing too much work across
@@ -1581,7 +1598,7 @@ native bpRNA pseudoknots, folding each native's own sequence, per-predictor cros
 ProbKnot $4\%$, ShapeKnots $11\%$, and the three-way conjunction only $\mathbf{1\%}$ ($1/80$).
 \emph{The predictors have no fixed stringency order, and we should not have implied one.} On natives the
 order is pKiss\,$>$\,ShapeKnots\,$>$\,ProbKnot; on designs it inverts (DesiRNA's designs are confirmed by
-ProbKnot $60\%$ of the time and by ShapeKnots $2.3\%$, Table~\ref{tab:carry}); the companion's envelope over
+ProbKnot $60\%$ of the time and by ShapeKnots $2.3\%$, Fig.~\ref{fig:carry}); the companion's envelope over
 published designs orders them a third way. These reconcile once the populations are distinguished. On natives
 no design objective is in play, so the order reflects intrinsic crossing recall; on designs it is dominated by
 \emph{model-family sharing} between the predictor and the objective that produced the design, since ProbKnot
@@ -1755,7 +1772,7 @@ split it admits has $27$ targets in $24$ clusters, so directions replicate but m
 cross-source bpRNA pool gives $0/60$ for our operator and for the SOTA solver alike. \emph{(ii) The positive
 side is model-relative and the panel is mechanistically narrow.} All three predictors share
 nearest-neighbour thermodynamic parameters, and carry-over tracks that shared family rather than correctness
-(Table~\ref{tab:carry}); no wet-lab confirmation is attempted. \emph{(iii) The component attribution is
+(Fig.~\ref{fig:carry}); no wet-lab confirmation is attempted. \emph{(iii) The component attribution is
 partial, and much of the effect is target-side.} The objective is load-bearing on the metric it optimizes and
 not distinguishable from an undirected walk on the metrics it does not, so we report association rather than
 causal attribution, and a search-free margin probe puts $84\%$ of $\Delta_{\mathrm{gamer}}$ on targets a

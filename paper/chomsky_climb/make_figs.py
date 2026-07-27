@@ -9,7 +9,10 @@ Build everything with build_figs.sh. Non-math text uses plain characters; LaTeX 
 import os
 
 import matplotlib
-matplotlib.use("Agg")
+# PGF, not Agg: the text is typeset by LaTeX itself, so the data figures carry the same Computer Modern
+# as the body text and the TikZ schematics. Output is still vector PDF. Agg's "serif + mathtext cm" is
+# a near-miss that shows when a matplotlib figure sits next to a TikZ one.
+matplotlib.use("pgf")
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 
@@ -17,8 +20,11 @@ FIGS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "figs")
 os.makedirs(FIGS, exist_ok=True)
 
 plt.rcParams.update({
+    "pgf.texsystem": "pdflatex",
+    "text.usetex": True,
+    "pgf.rcfonts": False,
+    "pgf.preamble": r"\usepackage[T1]{fontenc}\usepackage[utf8]{inputenc}\usepackage{amsmath,amssymb}",
     "font.family": "serif",
-    "mathtext.fontset": "cm",
     "font.size": 9,
     "axes.linewidth": 0.7,
     "axes.edgecolor": "#3a3a3a",
@@ -62,17 +68,17 @@ def fig_oracle():
     ax.plot([0, 100], [1.0, 1.0], color=INK, lw=0.9)
     for t in (0, 25, 50, 75, 100):
         ax.plot([t, t], [0.95, 1.05], color=INK, lw=0.7)
-        ax.text(t, 0.68, f"{t}%", ha="center", fontsize=7, color=GREY)
+        ax.text(t, 0.68, f"{t}\\%", ha="center", fontsize=7, color=GREY)
     ax.add_patch(Rectangle((15, 0.94), 45, 0.12, ec="none", fc="#e8dcda"))
     ax.annotate("", xy=(60, 1.78), xytext=(15, 1.78), arrowprops=dict(arrowstyle="<->", color=NEG, lw=1.0))
     ax.text(37.5, 1.92, "cross-predictor envelope $[15,60]\\%$ (disagreement $\\Rightarrow$ abstain)",
             ha="center", fontsize=7.3, color=NEG)
     ax.plot([15], [1.0], "o", ms=6, color=MCF, mec="white", mew=0.6, zorder=3)
-    ax.text(15, 1.24, "ProbKnot 15%", ha="center", fontsize=7.1, color=MCF)
+    ax.text(15, 1.24, "ProbKnot 15\\%", ha="center", fontsize=7.1, color=MCF)
     ax.plot([28], [1.0], "o", ms=6, color=MCF, mec="white", mew=0.6, zorder=3)
-    ax.text(30, 1.44, "pKiss 28% (ref.)", ha="left", fontsize=7.1, color=MCF)
+    ax.text(30, 1.44, "pKiss 28\\% (ref.)", ha="left", fontsize=7.1, color=MCF)
     ax.plot([60], [1.0], "o", ms=6, color=MCF, mec="white", mew=0.6, zorder=3)
-    ax.text(60, 1.24, "ShapeKnots 60%", ha="center", fontsize=7.1, color=MCF)
+    ax.text(60, 1.24, "ShapeKnots 60\\%", ha="center", fontsize=7.1, color=MCF)
     ax.plot([9], [1.0], "s", ms=6, color=CF, mec="white", mew=0.6, zorder=3)
     ax.text(9, 0.36, "panel-unanimous\n(conservative)", ha="center", fontsize=6.7, color=CF)
     _save(fig, "fig_cc_oracle.pdf")
@@ -357,6 +363,123 @@ def fig_models():
     ax.tick_params(length=3); _save(fig, "fig_cc_models.pdf"); print("  wrote fig_cc_models.pdf")
 
 
+
+def fig_carry():
+    """Conditional carry-over with exact binomial intervals. A forest plot because the reading is
+    'which intervals overlap', and six bracket pairs in a table make the reader do that by eye."""
+    rows = [("agent-written operators", 57, 222, 0.257, 0.201, 0.319),
+            ("$-$ objective, $-$ bias", 23, 209, 0.110, 0.071, 0.161),
+            ("$-$ objective (undirected)", 24, 253, 0.095, 0.062, 0.138),
+            ("panel operator", 48, 530, 0.091, 0.068, 0.118),
+            ("gamer (pKiss)", 22, 643, 0.034, 0.022, 0.051),
+            ("DesiRNA (min. free energy)", 1, 43, 0.023, 0.001, 0.123)]
+    fig, ax = plt.subplots(figsize=(7.0, 2.5))
+    for y, (lab, k, n, p, lo, hi) in enumerate(rows):
+        hot = lab.startswith(("agent", "panel"))
+        col = MCF if hot else GREY
+        ax.plot([lo, hi], [y, y], color=col, lw=1.7 if hot else 1.1, solid_capstyle="butt", zorder=2)
+        for e in (lo, hi):
+            ax.plot([e, e], [y - 0.13, y + 0.13], color=col, lw=1.0, zorder=2)
+        ax.plot([p], [y], "o", ms=7 if hot else 5.5, mfc=col, mec="white", mew=0.9, zorder=3)
+        ax.text(hi + 0.011, y, f"{k}/{n}", va="center", fontsize=7.2, color=GREY)
+    ax.set_yticks(range(len(rows))); ax.set_yticklabels([r[0] for r in rows], fontsize=8)
+    for t, r in zip(ax.get_yticklabels(), rows):
+        if r[0].startswith(("agent", "panel")):
+            t.set_color(MCF)
+    ax.set_xlim(-0.005, 0.40); ax.set_ylim(-0.6, len(rows) - 0.4)
+    ax.set_xlabel("carry-over to ShapeKnots, the predictor in no arm's loop "
+                  "(fraction of that arm's own successes)", fontsize=8)
+    ax.grid(axis="x", color=FAINT, lw=0.4, alpha=0.45, zorder=0)
+    for sp in ("top", "right", "left"):
+        ax.spines[sp].set_visible(False)
+    ax.tick_params(axis="y", length=0)
+    _save(fig, "fig_cc_carry.pdf")
+
+
+def fig_margin():
+    """Where the headline effect sits once targets are split by whether random search reaches them."""
+    fig, ax = plt.subplots(figsize=(7.0, 2.6))
+    groups = [("$\\Delta_{bp}=0$: 30 targets a random\ncompatible sequence already solves",
+               41, 5, "paired $\\Delta=+0.080$"),
+              ("$\\Delta_{bp}>0$: 30 targets random\nsampling never lands on",
+               7, 0, "paired $\\Delta=+0.016$")]
+    w = 0.30
+    for i, (lab, panel, gamer, dlab) in enumerate(groups):
+        ax.bar(i - w / 2, panel, width=w, facecolor=MCF_F, edgecolor=MCF, lw=1.1, zorder=2)
+        ax.bar(i + w / 2, gamer, width=w, facecolor=NEG_F, edgecolor=NEG, lw=1.1, zorder=2)
+        ax.text(i - w / 2, panel + 1.0, str(panel), ha="center", fontsize=9, color=INK)
+        ax.text(i + w / 2, gamer + 1.0, str(gamer), ha="center", fontsize=9, color=INK)
+        ax.text(i, max(panel, gamer) + 5.4, dlab, ha="center", fontsize=7.8, color=GREY)
+    ax.text(-0.15, 36.5, "84\\% of the\nheadline effect", ha="center", va="top",
+            fontsize=7.8, color=NEG)
+    ax.set_xticks([0, 1]); ax.set_xticklabels([g[0] for g in groups], fontsize=7.8)
+    ax.tick_params(axis="x", length=0, pad=5)
+    ax.set_xlim(-0.55, 1.55); ax.set_ylim(0, 52)
+    ax.set_ylabel("discordant wins,\n15 executions", fontsize=8)
+    ax.grid(axis="y", color=FAINT, lw=0.4, alpha=0.45, zorder=0)
+    for sp in ("top", "right"):
+        ax.spines[sp].set_visible(False)
+    leg = [Rectangle((0, 0), 1, 1, facecolor=MCF_F, edgecolor=MCF, lw=1.0, label="panel operator"),
+           Rectangle((0, 0), 1, 1, facecolor=NEG_F, edgecolor=NEG, lw=1.0, label="gamer (pKiss only)")]
+    ax.legend(handles=leg, loc="upper right", frameon=False, fontsize=7.8, handlelength=1.3)
+    _save(fig, "fig_cc_margin.pdf")
+
+
+def fig_paired():
+    """The 15 within-cell paired differences. The sign test counts these signs; a row of 15 numbers
+    in a table does not show that 14 of them point one way."""
+    d = [1, 4, 6, 2, 5, 1, 9, 1, 1, 2, 5, 2, 4, -1, 1]
+    fig, ax = plt.subplots(figsize=(7.0, 2.2))
+    for i, v in enumerate(d):
+        col = MCF if v > 0 else NEG
+        ax.plot([i, i], [0, v], color=col, lw=1.4, solid_capstyle="round", zorder=2)
+        ax.plot([i], [v], "o", ms=5.2, mfc=col, mec="white", mew=0.8, zorder=3)
+    ax.axhline(0, color=INK, lw=0.8, zorder=1)
+    ax.axhline(sum(d) / len(d), color=GREY, lw=0.8, ls=(0, (4, 2.5)), zorder=1)
+    ax.text(14.6, sum(d) / len(d) + 0.3, "mean $+2.87$", fontsize=7.2, color=GREY, ha="right")
+    for s in range(5):
+        ax.text(3 * s + 1, 9.4, f"seed {s}", ha="center", fontsize=7.2, color=GREY)
+        if s:
+            ax.axvline(3 * s - 0.5, color=FAINT, lw=0.4, alpha=0.6, zorder=0)
+    ax.annotate("the one execution the gamer wins", xy=(13, -1.3), xytext=(12.6, -5.2),
+                fontsize=7.0, color=NEG, ha="right",
+                arrowprops=dict(arrowstyle="-|>", color=NEG, lw=0.8))
+    ax.set_xlim(-0.8, 14.9); ax.set_ylim(-6.6, 10.8)
+    ax.set_xticks([])
+    ax.set_ylabel("panel $-$ gamer,\nwithin cell ($r_{\\mathrm{mix}}$/60)", fontsize=8)
+    for sp in ("top", "right", "bottom"):
+        ax.spines[sp].set_visible(False)
+    _save(fig, "fig_cc_paired.pdf")
+
+
+
+def fig_contrast():
+    """The paper's most discriminative measurement: the same 43 targets, two objectives, and what
+    survives an un-optimized predictor. A slope plot, because the reading is the divergence."""
+    fig, ax = plt.subplots(figsize=(5.4, 2.6))
+    arms = [("DesiRNA (min.\\ free energy)", 43, 26, MCF),
+            ("invented operator (pKiss in-loop)", 43, 2, NEG)]
+    for lab, a, b, col in arms:
+        ax.plot([0, 1], [a, b], color=col, lw=1.8, solid_capstyle="round", zorder=2)
+        ax.plot([0, 1], [a, b], "o", ms=7, mfc=col, mec="white", mew=1.0, zorder=3)
+        ax.text(1.05, b, f"{b}/43", va="center", fontsize=8.5, color=col)
+        ax.text(1.05, b - 3.2, lab, va="center", fontsize=7.4, color=GREY)
+    ax.text(0.0, 46.0, "43/43", ha="center", fontsize=8.5, color=INK)
+    # the "same 43 targets" caveat lives in the caption; the plot area belongs to the data
+
+    ax.annotate("", xy=(0.5, 2.5), xytext=(0.5, 25.0),
+                arrowprops=dict(arrowstyle="<->", color=GREY, lw=0.8))
+    ax.text(0.53, 13.5, "$13\\times$", fontsize=8.5, color=GREY, va="center")
+    ax.set_xlim(-0.18, 1.62); ax.set_ylim(-3, 50)
+    ax.set_xticks([0, 1])
+    ax.set_xticklabels(["pKiss\n(optimized by one arm)", "ProbKnot\n(optimized by neither)"], fontsize=8)
+    ax.tick_params(axis="x", length=0, pad=4)
+    ax.set_ylabel("designs the predictor confirms", fontsize=8)
+    ax.grid(axis="y", color=FAINT, lw=0.4, alpha=0.4, zorder=0)
+    for sp in ("top", "right", "bottom"):
+        ax.spines[sp].set_visible(False)
+    _save(fig, "fig_cc_contrast.pdf")
+
 if __name__ == "__main__":
     fig_oracle()
     fig_collapse()
@@ -367,4 +490,8 @@ if __name__ == "__main__":
     fig_stringency()
     fig_sat()
     fig_models()
+    fig_carry()
+    fig_contrast()
+    fig_margin()
+    fig_paired()
     print("wrote figs/fig_cc_*.pdf (data figs; appendix figs added when their run data is present)")
