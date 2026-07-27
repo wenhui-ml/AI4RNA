@@ -462,7 +462,8 @@ def fig_contrast():
     for lab, a, b, col in arms:
         ax.plot([0, 1], [a, b], color=col, lw=1.8, solid_capstyle="round", zorder=2)
         ax.plot([0, 1], [a, b], "o", ms=7, mfc=col, mec="white", mew=1.0, zorder=3)
-        ax.text(1.05, b, f"{b}/43", va="center", fontsize=8.5, color=col)
+        ax.text(1.05, b, f"{b}/43" + ("  ($13\\times$ fewer)" if b == 2 else ""),
+                va="center", fontsize=8.5, color=col)
         ax.text(1.05, b - 3.2, lab, va="center", fontsize=7.4, color=GREY)
     ax.text(0.0, 46.0, "43/43", ha="center", fontsize=8.5, color=INK)
     # the "same 43 targets" caveat lives in the caption; the plot area belongs to the data
