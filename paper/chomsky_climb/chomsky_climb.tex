@@ -1813,6 +1813,7 @@ never the prior policy's capacity. The evidence vector for this study reads one 
 weak, one not established; the instrument, not the system, is what we ask readers to take away, and the
 positive control shows the instrument discriminates even though our system does not clear it by much.
 
+\appendix
 \section{Proofs}\label{app:proofs}
 \begin{proof}[Proof of Proposition~\ref{prop:confine}]
 The pseudoknot-free oracle \Ocf{} returns a minimum-free-energy secondary structure in the pseudoknot-free
@@ -2199,7 +2200,9 @@ panel operator has a materially positive one.
 
 
 
-\subsection{Additional result tables and schematics}\label{app:moretab}
+\subsection{Additional result tables}\label{app:moretab}
+Per-arm, per-pool counts for every sweep are released with the run logs, and per-size family results are in
+Fig.~\ref{fig:family}. The table below records the mixed-panel-consistent rate by success predicate.
 \begin{table}[t]\centering\small
 \setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.15}
 \caption{\textbf{Mixed-panel-consistent autonomous crossings, by success predicate} (development/evaluation pool,
@@ -2300,9 +2303,6 @@ $3$--$8/60$), not general cross-source pseudoknot design. \emph{(iii) Budget.} O
 $\{1,3,1\}/20$: no clean budget trend, dominated by search variance, consistent with oracle-guided search
 rather than a budget-monotone capability.
 
-\subsection{Claim--evidence--status table}\label{app:claims}
-\subsection{Schematic of the two-sided audit}\label{app:certfig}
-\subsection{Dataset summary (main-text version)}\label{app:datatab}
 \subsection{Adjudicator choice, abstention scoring, and what ShapeKnots costs}\label{app:adjud}
 \paragraph{Conservative scoring, and the adjudicator's role.} The abstention rule is scored
 \emph{conservatively}: a target whose design the predictors do not unanimously confirm counts as not-solved in
@@ -2355,7 +2355,6 @@ two-component (dimension-2) production the count-language family demands and one
 $\mathcal L_{\mathrm H}$, tested by transfer to unseen parameters (\S\ref{sec:exp}), not on any single $T$,
 which as a finite object is regular.
 
-\subsection{Where the audit layer sits in an AI4S stack}\label{app:layers}
 \section{Datasets, Intrinsic Grades, and Materials}\label{app:data}
 Every target's difficulty \emph{grade} is a property of the target fixed before design: its \emph{formal-family
 type} (nested vs.\ crossing) and, within crossing, its \emph{crossing-pair count} $g$---the number of base pairs
@@ -2438,8 +2437,6 @@ mixed-panel-consistent on $1.87/27$ ($6.9\%$, i.e.\ \emph{above} its $5.3\%$ dev
 gamer's $0.00/27$ in all fifteen executions, $b{=}28$ against $c{=}0$. The near-duplicate concern the audit
 raised is thus tested directly and does not materialize---but on $27$ targets that settles direction, not size.
 
-\section{Full Experimental Results}\label{app:results}
-Per-arm, per-pool counts are released with the run logs; per-size family results are in Fig.~\ref{fig:family}.
 \section{The Autonomous Operator-Invention Protocol}\label{app:invent}
 An LLM agent (GLM-5.2, temperature $0.4$, no output cap) is given a documented \emph{primitive API}
 and asked to write one function \texttt{design(target,seed)}; it may not import anything or call an external
