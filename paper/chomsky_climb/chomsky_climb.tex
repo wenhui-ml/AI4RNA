@@ -254,14 +254,7 @@ evidence and status.
 \caption{\textbf{The audit's output for this study: the evidence vector $\mathcal A$ of Eq.~\eqref{eq:vector},
 filled in.} All rates are $r_{\mathrm{mix}}$ (Eq.~\eqref{eq:metricnames}) unless stated. This is the verdict:
 \emph{partial audit success---diagnostic crossing evidence, not robust capability acquisition}.
-\textbf{How to read a mostly-negative vector.} It is tempting to read this table as a report card our system
-failed, and that reading would be wrong in a way worth naming. The system audited here was \emph{built to pass
-this audit}---it optimizes a two-oracle conjunction precisely because a single oracle is gameable---and it
-still leaves two of six components unestablished or weak. That is the table's main evidential function: an
-instrument that its own designers' best attempt cannot saturate is an instrument with discriminating power,
-which is what makes the $43/60\!\to\!1/60$ collapse of \S\ref{sec:exp} a measurement rather than an anecdote.
-A vector of six components that all read ``established'' on the first system anyone points it at would be the
-worrying outcome.
+How to read a mostly-negative vector is discussed in the text immediately preceding this table.
 \textbf{Classification rule, applied uniformly throughout the paper.} \emph{Exact}: proved, discharged offline.
 \emph{Established}: the effect's $95\%$ interval excludes zero at the deepest resampling level run for that
 component, where ``deepest'' is fixed in advance as \emph{every} level of variation the component's design
@@ -475,6 +468,15 @@ model-relative, and each is reported with an effect size and an interval. \textb
 components and fail to establish others---as ours does}---and the audit's job is to say which, not to collapse
 them. Table~\ref{tab:verdict} is this paper's own filled-in $\mathcal A$, stated up front so no reader has to
 reconstruct it from the results section.
+
+\paragraph{How to read a mostly-negative vector.} It is tempting to read Table~\ref{tab:verdict} as a report
+card our system failed, and that reading would be wrong in a way worth naming. The system audited here was
+\emph{built to pass this audit}---it optimizes a two-oracle conjunction precisely because a single oracle is
+gameable---and it still leaves two of six components unestablished or weak. That is the table's main evidential
+function: an instrument that its own designers' best attempt cannot saturate is an instrument with
+discriminating power, which is what makes the $43/60\!\to\!1/60$ collapse of \S\ref{sec:exp} a measurement
+rather than an anecdote. A vector of six components all reading ``established'' on the first system anyone
+points it at would be the worrying outcome.
 
 
 \paragraph{What each side controls for---and what none of them does.} We state the limit first, because it is
@@ -863,7 +865,7 @@ capability: per held-out target the agent commits either a design (\textsc{desig
 certificate. We report this as an additional axis, delineated from the crossing axis, and note that a committed
 undesignability claim is a computation (running the certificate) under sealed commitment, not a hypothesis in
 the usual empirical sense.
-\section{Experiment: Auditing a Claimed Class Ascent, and the Gaming It Rules Out}\label{sec:exp}
+\section{Experiment: Measuring Oracle-Gaming, and Auditing the Crossing Claim It Inflates}\label{sec:exp}
 \textbf{The result of this section is a measurement of how far a single fallible oracle can inflate an
 agentic-science claim: $\mathbf{43/60}$ under the optimized predictor, $\mathbf{1/60}$ across three.} Everything
 else here is the apparatus that makes that number trustworthy, or the consequence of turning the same apparatus
