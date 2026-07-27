@@ -82,7 +82,10 @@ and verified non-use of a declared tool class ($\pm$solver ablation; solver-free
 still queries crossing-aware folding oracles). Reporting them separately is the point: this study returns
 \emph{one exact, three established, one weak, one not established} (Table~\ref{tab:verdict} fixes that
 classification rule and the whole paper uses it), and we state the verdict as \emph{partial audit
-success---diagnostic crossing evidence, not robust capability acquisition}. \emph{The exact negative side proves that the prior verification regime
+success---diagnostic crossing evidence, not robust capability acquisition}. That a system we built
+\emph{specifically to pass this audit} cannot saturate it is the evidence that the instrument
+discriminates rather than rubber-stamps; a vector reading ``established'' six times on the first system it is
+pointed at would be the worrying outcome. \emph{The exact negative side proves that the prior verification regime
 cannot certify crossings; it does not prove that the prior policy is computationally incapable of generating
 them.} Novelty is relative to the system's prior self, not the base model, and the subject throughout is the
 \emph{oracle-augmented} system rather than a bare policy (Rem.~\ref{rem:subject}). The positive side rests on
@@ -232,8 +235,13 @@ model-relative.}\label{fig:arch}
 \end{figure}
 
 \paragraph{Scope: what is claimed, demonstrated, and open.} The primary contribution is the RNA oracle-gaming
-audit: on the $60$-target development/evaluation pool a $43/60$ single-oracle rate collapses to $1/60$ under the
-three-predictor panel, above a $0/60$ context-free floor (\S\ref{sec:exp}). The SAT domain
+audit and its measurement: on the $60$-target development/evaluation pool a $43/60$ single-oracle rate collapses
+to $1/60$ under the three-predictor panel, above a $0/60$ context-free floor (\S\ref{sec:exp}). We ask the
+reader to weight the two halves of this paper accordingly. The \emph{instrument and that $43\!\to\!1$
+measurement} are what we are confident in and what a reader should take away. The \emph{system} we then build to
+survive the instrument is secondary: it separates from the gamer, but narrowly, and the audit's own verdict on
+it is two components unestablished or weak (Table~\ref{tab:verdict}). We regard that as the instrument working,
+not as a result withheld. The SAT domain
 (App.~\ref{sec:sat}) and the three-channel LLM-gaming protocol (App.~\ref{sec:audit}) are \emph{supplements}
 that no claim here depends on. Two
 things are \emph{not} claimed: (i) a robust autonomous ascent---at $1/60$ panel-unanimous the instrument only
@@ -246,10 +254,25 @@ evidence and status.
 \caption{\textbf{The audit's output for this study: the evidence vector $\mathcal A$ of Eq.~\eqref{eq:vector},
 filled in.} All rates are $r_{\mathrm{mix}}$ (Eq.~\eqref{eq:metricnames}) unless stated. This is the verdict:
 \emph{partial audit success---diagnostic crossing evidence, not robust capability acquisition}.
+\textbf{How to read a mostly-negative vector.} It is tempting to read this table as a report card our system
+failed, and that reading would be wrong in a way worth naming. The system audited here was \emph{built to pass
+this audit}---it optimizes a two-oracle conjunction precisely because a single oracle is gameable---and it
+still leaves two of six components unestablished or weak. That is the table's main evidential function: an
+instrument that its own designers' best attempt cannot saturate is an instrument with discriminating power,
+which is what makes the $43/60\!\to\!1/60$ collapse of \S\ref{sec:exp} a measurement rather than an anecdote.
+A vector of six components that all read ``established'' on the first system anyone points it at would be the
+worrying outcome.
 \textbf{Classification rule, applied uniformly throughout the paper.} \emph{Exact}: proved, discharged offline.
-\emph{Established}: the effect's $95\%$ interval, at the deepest resampling level we ran for that component,
-excludes zero. \emph{Weak}: the effect is directionally consistent but its interval or its replication does not
-support it. \emph{Not established}: the interval spans zero. By that rule this study returns \textbf{one exact,
+\emph{Established}: the effect's $95\%$ interval excludes zero at the deepest resampling level run for that
+component, where ``deepest'' is fixed in advance as \emph{every} level of variation the component's design
+contains, resampled by the estimator that matches that design. Where a component admits more than one nesting
+variant we name which is which rather than choosing after seeing the answer: for $\Delta_{\mathrm{gamer}}$ the
+primary estimator draws all three executions inside each drawn seed, because that is the design that was run;
+the one-execution-per-seed variant estimates the uncertainty of a \emph{different, smaller} study and is
+reported as a conservative sensitivity, not as the classifier. We state both intervals in every case, so a
+reader who prefers the conservative variant can reclassify $\Delta_{\mathrm{gamer}}$ as weak and nothing else in
+the paper changes. \emph{Weak}: the effect is directionally consistent but its interval or its replication does
+not support it. \emph{Not established}: the interval spans zero. By that rule this study returns \textbf{one exact,
 three established, one weak, one not established}---and one of the three established components
 ($g_{\mathrm{aut}}$) is established by \emph{verified non-use}, a structural fact about the system, not by a
 counterfactual ablation. Every count of components stated elsewhere in this paper is this
@@ -841,16 +864,25 @@ certificate. We report this as an additional axis, delineated from the crossing 
 undesignability claim is a computation (running the certificate) under sealed commitment, not a hypothesis in
 the usual empirical sense.
 \section{Experiment: Auditing a Claimed Class Ascent, and the Gaming It Rules Out}\label{sec:exp}
-We ask the paper's defining question: can a self-improving agent realize crossing targets its \CF-verified
-prior self could not be certified to realize---targets on the far side of the $\CF\!\to\!\MCF$ difficulty
-axis---consistently across predictors and without a packaged solver? Fixing the protocol (oracles, grading,
-adjudication, metrics), we report three findings: (i)
-the verifier-range bound is a decidable theorem (Prop.~\ref{prop:confine}) and the prior repertoire scores an
-empirical $0/60$ under the shared panel---confinement of the verifier's range is the theorem, the $0/60$ is
-measured, not a failed search; (ii) a naive operator crosses only by gaming its oracle, which the panel exposes; (iii) an
-operator optimizing cross-oracle agreement achieves $3$--$8/60$ mixed-panel-consistent outcomes (mean $5.0$,
-five seeds)---a small positive rate, not a robust crossing. Only
-(ii) touches verifier model-relativity, the object of our companion \citep{verifiereconomics}. Dataset facts (Table~\ref{tab:appdata}) are cited; the undesignability axis (\S\ref{sec:impossible}) is out of scope here.
+\textbf{The result of this section is a measurement of how far a single fallible oracle can inflate an
+agentic-science claim: $\mathbf{43/60}$ under the optimized predictor, $\mathbf{1/60}$ across three.} Everything
+else here is the apparatus that makes that number trustworthy, or the consequence of turning the same apparatus
+on a system built to survive it.
+
+We fix the protocol (oracles, grading, adjudication, metrics) and then report, in order of how much each
+carries: (i) the collapse itself---a naive operator crosses only by gaming its oracle, which the panel exposes,
+and a paired contrast against a solver \emph{not} trained on that oracle shows the loss is specific to the
+trained-on predictor; (ii) what happens when the audit is turned on our own improved system, which optimizes a
+two-oracle conjunction precisely to defeat single-oracle gaming and still leaves two of six components
+unestablished or weak---the evidence that the instrument discriminates rather than rubber-stamps; and (iii) the
+negative side, where the verifier-range bound is a decidable theorem (Prop.~\ref{prop:confine}) and the prior
+repertoire scores an empirical $0/60$ under the shared panel---confinement of the verifier's range is the
+theorem, the $0/60$ is measured, not a failed search. The panel-optimizing operator's own rate, $3$--$8/60$
+across five single-execution seeds and $1$--$9/60$ once executions are replicated, is a small positive number we
+report for completeness and lean on nowhere. Of the three, only
+(i) and (ii) touch verifier model-relativity, the object of our companion \citep{verifiereconomics}; the
+negative side (iii) is independent of it. Dataset facts (Table~\ref{tab:appdata}) are cited; the undesignability
+axis (\S\ref{sec:impossible}) is out of scope here.
 
 
 
@@ -1397,7 +1429,11 @@ $c{=}\mathbf{0}$, exact McNemar $p{=}7.5\!\times\!10^{-9}$, and the cell-level s
 ($6.9\%$) is \emph{not lower} than on the development pool ($3.20/60=5.3\%$), so the separation is not explained
 by structural overlap with development---the failure mode the split audit was built to detect does not appear
 when tested directly. We deliberately do \emph{not} lean on the interval ($[{+}0.030,{+}0.116]$ at $n{=}27$):
-it is underpowered by construction and we quote the sign test instead. The honest summary is that
+it is underpowered by construction and we quote the sign test instead. That sign test carries the same scope
+limit as its counterpart on the development pool: the $15$ executions are independent \emph{runs} but share one
+fixed $27$-target set, so it licenses ``a fresh execution on \emph{these} structurally novel targets would again
+favour the panel operator'', not ``on a fresh structurally novel target set''---the latter is exactly what a
+second corpus would buy. The honest summary is that
 $\Delta_{\mathrm{gamer}}$'s \emph{sign} now has a structurally disjoint replication, while its \emph{magnitude}
 remains unestimable on any pool this benchmark can supply.
 
@@ -1846,6 +1882,17 @@ robust formal-language capability transition. What we take to be the contributio
 sentence: without an audit that separately reports verifier range, prior floor, gaming baseline, search
 control, held-out oracle and tool non-use, a $1/60$ cross-predictor-consistent result is perfectly reportable
 as a $43/60$ discovery.
+
+\smallskip\noindent We close on how the two halves should be weighted, because a reader could take the mostly
+negative vector as the paper conceding it has no result. The instrument and the $43\!\to\!1$ measurement are
+the result. The system is the test case, and it is a demanding one: we built it \emph{in order to} pass this
+audit---a two-oracle conjunction exists precisely because one oracle is gameable---and after execution-level
+replication, structural-cluster resampling, a matched-nominal-cap ablation and a structurally disjoint
+evaluation, it separates from the gamer narrowly and leaves two of six components unestablished or weak. An
+audit that the motivated best effort of its own authors cannot saturate is one whose verdicts carry
+information. We would have been more worried by six green cells. The open problem this leaves is not a better
+objective but a second, structurally independent crossing benchmark: Pseudobase++'s $251$ targets contain $60$
+structural clusters and $24$ untouched ones, and no statistic recovers the power that arithmetic removes.
 
 \appendix
 \section{Proofs}\label{app:proofs}
