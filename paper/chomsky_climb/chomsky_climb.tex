@@ -105,41 +105,51 @@ measures.
 \noindent\textbf{Keywords:} automated scientific discovery; self-improving agents; capability acquisition;
 formal language theory; Chomsky hierarchy; RNA inverse design; decidable verification.
 
-\begin{figure}[!t]\centering
-\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.25}
-\footnotesize
-\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{3.05cm}l L@{}}
+\begin{table}[!t]\centering\small
+\setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.2}
+\caption{\textbf{The audit's output for this study: the evidence vector $\mathcal A$ of Eq.~\eqref{eq:vector},
+filled in.} All rates are $r_{\mathrm{mix}}$
+(Eq.~\eqref{eq:metricnames}) unless stated. This is the verdict:
+\emph{partial audit success---diagnostic crossing evidence, not robust capability acquisition}.
+The classification rule, how to count the components, and how to read a mostly-negative vector are stated in
+\S\ref{sec:cert} and applied uniformly throughout.}\label{tab:verdict}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{3.0cm}l L@{}}
 \toprule
-\textbf{audit component} & \textbf{verdict} & \textbf{the qualification that goes with it}\\
+\textbf{component} & \textbf{verdict} & \textbf{basis, and what it does \emph{not} show}\\
 \midrule
-$E_{\mathrm{range}}$ \newline verifier-range exclusion
-& \chip{vExact}{exact}
-& proved offline; bounds the prior \emph{verifier}, not the prior policy\\
-$\Delta_{\mathrm{prior}}$ \newline vs.\ the prior policy
-& \chip{vEst}{established}
-& ${+}0.017$--${+}0.15$; a finite-budget floor of $0/60$, not a theorem\\
-$\Delta_{\mathrm{gamer}}$ \newline vs.\ single-oracle gaming
-& \chip{vNarrow}{established, narrowly}
-& ${+}0.048$; fell as replication was added; conservative variant touches $0$\\
-$\Delta_{\mathrm{undirected}}$ \newline vs.\ matched-cap undirected search
-& \chip{vNone}{not established}
-& ${+}0.013$, interval $[{-}.039,{+}.067]$: the objective is not shown load-bearing\\
-$\Delta_{\mathrm{held\text{-}out}}$ \newline held-out predictor
-& \chip{vWeak}{weak}
-& higher every seed, significant in $1$ of $3$; the panel separation rides on the in-loop oracles\\
-$g_{\mathrm{aut}}$ \newline solver non-use
-& \chip{vEst}{established}
-& by \emph{verified non-use}, a structural fact; solver-free is not oracle-free\\
+$E_{\mathrm{range}}$ (exact exclusion) & \chip{vExact}{exact} &
+\textsc{no counterfactual.} Prop.~\ref{prop:confine}, discharged offline. Bounds the prior \emph{verifier's} range; says nothing about the
+prior policy's generative capacity\\
+$\Delta_{\mathrm{prior}}$ (prior floor) & \chip{vEst}{established} & \textsc{weak counterfactual.}
+${+}0.017$--${+}0.15$: prior policy $0/60$ vs.\ after $1$--$9/60$ over all $24$ independent executions (mean $3.29$; $3$--$8$ on the
+five original single-execution seeds) under the shared panel. Finite-budget count, not a structural theorem\\
+$\Delta_{\mathrm{gamer}}$ (vs.\ single-oracle gaming) & \chip{vNarrow}{established, narrowly} &
+${+}0.048$, paired at the (target, seed, execution) level over $15$ executions; interval excludes zero when resampling all
+three levels, at both the target ($[{+}.014,{+}.091]$) and structural-cluster ($[{+}.005,{+}.093]$) unit, but
+the conservative one-execution-per-seed variant reaches $0.000$ (Table~\ref{tab:gvp}). The estimate fell
+monotonically as replication was added (${+}0.080\!\to\!{+}0.056\!\to\!{+}0.048$), which suggests the estimator
+has not converged and that a fourth level of variation (the target set) could carry it to zero. It survives the
+change to a metric-neutral statistic (${+}0.049$, $p{=}6.9\!\times\!10^{-4}$, Table~\ref{tab:carry}), though one
+stricter conditioning disagrees. A \emph{between-system}
+association; does not attribute the gain to any component; and the arms are matched on oracle \emph{access},
+not oracle \emph{use} ($2.3\times$ realized calls)\\
+$\Delta_{\mathrm{undirected}}$ (vs.\ matched nominal-cap undirected search) & \chip{vNone}{not established} &
+${+}0.013$, three-level interval $[{-}.039,{+}.067]$ over $9$ runs/arm (Table~\ref{tab:pablate}). Deleting the
+objective does not measurably lower $r_{\mathrm{mix}}$; only removing the repair loop entirely does
+(${+}0.056$), so a search is necessary but its \emph{guidance} is not shown load-bearing---confirmed on the
+metric-neutral statistic, where the undirected and oracle-blind walks match the full operator
+(Table~\ref{tab:carry}). Matched on nominal
+caps, \emph{not} on realized compute (Table~\ref{tab:budget})\\
+$\Delta_{\mathrm{held\text{-}out}}$ (held-out oracle) & \chip{vWeak}{weak} &
+$r_{\mathrm{ho}}$ higher each seed but significant in $1$ of $3$ (Table~\ref{tab:sknots}); adjudicator run in an
+unvalidated de-novo mode\\
+$g_{\mathrm{aut}}$ (verified non-use of packaged inverse-design solvers) & \chip{vEst}{established} &
+\textsc{no counterfactual.} No solver is ever called, so removing it changes nothing. This is a \emph{structural} fact---the ablation
+carries no counterfactual information, because the solver was never on the method path. Solver-free, \emph{not}
+oracle-free, and \emph{not} evidence that the gain is the system's own\\
 \bottomrule
 \end{tabularx}
-\caption{\textbf{The verdict, up front.} The audit returns a six-component evidence vector, never a single
-bit, and for this study the vector is mostly negative: \textbf{one exact, three established (one of them
-narrowly, one of them structurally), one weak, one not established}. The headline measurement we do stand
-behind is separate and stronger---a $43/60$ single-oracle success rate collapses to $1/60$ under three
-predictors---so the instrument is the contribution and the system built to survive it is the secondary
-result. Expanded, with the classification rule and every interval, in
-Table~\ref{tab:verdict}.}\label{fig:verdict}
-\end{figure}
+\end{table}
 
 \section{Introduction}\label{sec:intro}
 Self-improving agents claiming new scientific or design capabilities are proliferating, but the field
@@ -177,7 +187,7 @@ whose repertoire provably could not be \emph{certified} to realize the target th
 regime and does not realize it empirically, with no packaged solver called. We do \emph{not} write
 ``robustly'': the one genuinely held-out predictor separates weakly, matched undirected search is not
 separated, cross-source consistency is $0/60$, execution noise is of the same order as the method effect, and
-the evaluation split is not structurally disjoint (Fig.~\ref{fig:verdict}).
+the evaluation split is not structurally disjoint (Table~\ref{tab:verdict}).
 
 \paragraph{Contributions.}
 \begin{enumerate}[leftmargin=1.3em,itemsep=1.5pt]
@@ -268,54 +278,6 @@ data---and $\Delta_{\mathrm{prior}}$ is weak in this sense because the prior arm
 objective. Only $\Delta_{\mathrm{gamer}}$, $\Delta_{\mathrm{undirected}}$ and
 $\Delta_{\mathrm{held\text{-}out}}$ are counterfactual contrasts, and of those one is narrow, one is null and
 one is weak.
-
-\begin{table}[t]\centering\small
-\setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.2}
-\caption{\textbf{The audit's output for this study: the evidence vector $\mathcal A$ of Eq.~\eqref{eq:vector},
-filled in.} The expanded form of Fig.~\ref{fig:verdict}. All rates are $r_{\mathrm{mix}}$
-(Eq.~\eqref{eq:metricnames}) unless stated. This is the verdict:
-\emph{partial audit success---diagnostic crossing evidence, not robust capability acquisition}.
-How to read a mostly-negative vector is discussed in the text immediately preceding this table.
-The classification rule and how to count the components are stated in the text immediately preceding this
-table, and applied uniformly throughout the paper.}\label{tab:verdict}
-\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{3.3cm}>{\raggedright\arraybackslash}p{2.35cm}L@{}}
-\toprule
-\textbf{component} & \textbf{finding} & \textbf{basis, and what it does \emph{not} show}\\
-\midrule
-$E_{\mathrm{range}}$ (exact exclusion) & \textbf{exact} &
-\textsc{no counterfactual.} Prop.~\ref{prop:confine}, discharged offline. Bounds the prior \emph{verifier's} range; says nothing about the
-prior policy's generative capacity\\
-$\Delta_{\mathrm{prior}}$ (prior floor) & \textbf{established}, ${+}0.017$--${+}0.15$ & \textsc{weak counterfactual.}
-prior policy $0/60$ vs.\ after $1$--$9/60$ over all $24$ independent executions (mean $3.29$; $3$--$8$ on the
-five original single-execution seeds) under the shared panel. Finite-budget count, not a structural theorem\\
-$\Delta_{\mathrm{gamer}}$ (vs.\ single-oracle gaming) & \textbf{established, narrowly}, ${+}0.048$ &
-paired at the (target, seed, execution) level over $15$ executions; interval excludes zero when resampling all
-three levels, at both the target ($[{+}.014,{+}.091]$) and structural-cluster ($[{+}.005,{+}.093]$) unit, but
-the conservative one-execution-per-seed variant reaches $0.000$ (Table~\ref{tab:gvp}). The estimate fell
-monotonically as replication was added (${+}0.080\!\to\!{+}0.056\!\to\!{+}0.048$), which suggests the estimator
-has not converged and that a fourth level of variation (the target set) could carry it to zero. It survives the
-change to a metric-neutral statistic (${+}0.049$, $p{=}6.9\!\times\!10^{-4}$, Table~\ref{tab:carry}), though one
-stricter conditioning disagrees. A \emph{between-system}
-association; does not attribute the gain to any component; and the arms are matched on oracle \emph{access},
-not oracle \emph{use} ($2.3\times$ realized calls)\\
-$\Delta_{\mathrm{undirected}}$ (vs.\ matched nominal-cap undirected search) & \textbf{not established} &
-${+}0.013$, three-level interval $[{-}.039,{+}.067]$ over $9$ runs/arm (Table~\ref{tab:pablate}). Deleting the
-objective does not measurably lower $r_{\mathrm{mix}}$; only removing the repair loop entirely does
-(${+}0.056$), so a search is necessary but its \emph{guidance} is not shown load-bearing---confirmed on the
-metric-neutral statistic, where the undirected and oracle-blind walks match the full operator
-(Table~\ref{tab:carry}). Matched on nominal
-caps, \emph{not} on realized compute (Table~\ref{tab:budget})\\
-$\Delta_{\mathrm{held\text{-}out}}$ (held-out oracle) & \textbf{weak} &
-$r_{\mathrm{ho}}$ higher each seed but significant in $1$ of $3$ (Table~\ref{tab:sknots}); adjudicator run in an
-unvalidated de-novo mode\\
-$g_{\mathrm{aut}}$ (verified non-use of packaged inverse-design solvers) & \textbf{established}, $\approx0$ &
-\textsc{no counterfactual.} No solver is ever called, so removing it changes nothing. This is a \emph{structural} fact---the ablation
-carries no counterfactual information, because the solver was never on the method path. Solver-free, \emph{not}
-oracle-free, and \emph{not} evidence that the gain is the system's own\\
-\bottomrule
-\end{tabularx}
-\end{table}
-
 
 \section{Background and the Chomsky--RNA Correspondence}\label{sec:bg}
 \paragraph{Formal languages and the Chomsky hierarchy.} A grammar generates a language of strings; the
