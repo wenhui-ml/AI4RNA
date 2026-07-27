@@ -120,7 +120,8 @@ targets, $5$ seeds $\times$ $3$ executions, paired inside each run---gives
 $\Delta{=}{+}0.048$ with a structural-cluster interval of $[{+}0.005,{+}0.093]$, narrowly clear of zero, and the
 estimate falls monotonically as replication is added (${+}0.080\!\to\!{+}0.056\!\to\!{+}0.048$). What is robust
 there is the \emph{sign}---the panel operator is higher in $14$ of $15$ executions---not the magnitude:
-execution spread at a fixed seed ($4.4/60$) exceeds the effect itself ($2.9/60$). Building the structure-aware
+execution noise is of the same order as the effect (execution s.d.\ $2.04/60$ at a fixed seed against a
+paired effect of $2.87/60$), so only the paired reading is interpretable. Building the structure-aware
 split the evaluation owes (whole clusters assigned, every test target $>15\%$ from every developed-on target)
 leaves only $27$ targets in $24$ clusters, because these $251$ targets contain just $60$ structural
 clusters---a limit of the benchmark we report as a finding; there the direction replicates cleanly ($15/15$
@@ -221,8 +222,8 @@ pseudoknot-free regime (a decidable instrument bound, \S\ref{sec:formal}) and do
 ($0/60$ under the shared panel), yielding \emph{limited mixed-panel consistency} on a difficulty axis fixed by
 the $\CF\!\to\!\MCF$ boundary, with no packaged inverse-design solver called. We do \emph{not} write
 ``robustly'': the one genuinely held-out predictor separates weakly, matched undirected search is not
-separated, cross-source consistency is $0/60$, execution-level noise ($4.4/60$) \emph{exceeds} the method
-effect ($2.9/60$), and the
+separated, cross-source consistency is $0/60$, execution noise is of the same order as the method effect
+(s.d.\ $2.04/60$ against $2.87/60$), and the
 evaluation split is not structurally disjoint (Fig.~\ref{fig:verdict}). Verified, gaming-resistant capability
 acquisition is the decision-relevant quantity, not metaphysical originality---and this study establishes only
 part of it.
@@ -319,34 +320,46 @@ not support it. \emph{Not established}: the interval spans zero. By that rule th
 three established, one weak, one not established}---and one of the three established components
 ($g_{\mathrm{aut}}$) is established by \emph{verified non-use}, a structural fact about the system, not by a
 counterfactual ablation. Every count of components stated elsewhere in this paper is this
-one.}\label{tab:verdict}
+one---but that count should not be read without the second question the rows also answer, flagged
+\textsc{no counterfactual} and \textsc{weak counterfactual} where it applies: whether a component is a contrast
+against an arm that could have come out otherwise. Two are not. $E_{\mathrm{range}}$ is a theorem about the
+instrument's range and $g_{\mathrm{aut}}$ records that a solver was never on the method path, so neither can be
+surprised by data; $\Delta_{\mathrm{prior}}$ is weak in this sense because the prior arm optimizes a
+\emph{different} objective, so its $0/60$ is partly a statement about that objective. Only
+$\Delta_{\mathrm{gamer}}$, $\Delta_{\mathrm{undirected}}$ and $\Delta_{\mathrm{held\text{-}out}}$ are
+counterfactual contrasts, and of those one is narrow, one is null and one is weak.}\label{tab:verdict}
 \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{3.3cm}>{\raggedright\arraybackslash}p{2.35cm}L@{}}
 \toprule
 \textbf{component} & \textbf{finding} & \textbf{basis, and what it does \emph{not} show}\\
 \midrule
 $E_{\mathrm{range}}$ (exact exclusion) & \textbf{exact} &
-Prop.~\ref{prop:confine}, discharged offline. Bounds the prior \emph{verifier's} range; says nothing about the
+\textsc{no counterfactual.} Prop.~\ref{prop:confine}, discharged offline. Bounds the prior \emph{verifier's} range; says nothing about the
 prior policy's generative capacity\\
-$\Delta_{\mathrm{prior}}$ (prior floor) & \textbf{established}, ${+}0.017$--${+}0.15$ &
-prior policy $0/60$ vs.\ after $1$--$9/60$ over all $18$ independent executions (mean $3.5$; $3$--$8$ on the
+$\Delta_{\mathrm{prior}}$ (prior floor) & \textbf{established}, ${+}0.017$--${+}0.15$ & \textsc{weak counterfactual.}
+prior policy $0/60$ vs.\ after $1$--$9/60$ over all $24$ independent executions (mean $3.29$; $3$--$8$ on the
 five original single-execution seeds) under the shared panel. Finite-budget count, not a structural theorem\\
 $\Delta_{\mathrm{gamer}}$ (vs.\ single-oracle gaming) & \textbf{established, narrowly}, ${+}0.048$ &
 paired at the (target, seed, execution) level over $15$ executions; interval excludes zero when resampling all
 three levels, at both the target ($[{+}.014,{+}.091]$) and structural-cluster ($[{+}.005,{+}.093]$) unit, but
 the conservative one-execution-per-seed variant reaches $0.000$ (Table~\ref{tab:gvp}). The estimate fell
-monotonically as replication was added (${+}0.080\!\to\!{+}0.056\!\to\!{+}0.048$). A \emph{between-system}
+monotonically as replication was added (${+}0.080\!\to\!{+}0.056\!\to\!{+}0.048$), which suggests the estimator
+has not converged and that a fourth level of variation (the target set) could carry it to zero. It survives the
+change to a metric-neutral statistic (${+}0.049$, $p{=}6.9\!\times\!10^{-4}$, Table~\ref{tab:carry}), though one
+stricter conditioning disagrees. A \emph{between-system}
 association; does not attribute the gain to any component; and the arms are matched on oracle \emph{access},
 not oracle \emph{use} ($2.3\times$ realized calls)\\
 $\Delta_{\mathrm{undirected}}$ (vs.\ matched nominal-cap undirected search) & \textbf{not established} &
 ${+}0.013$, three-level interval $[{-}.039,{+}.067]$ over $9$ runs/arm (Table~\ref{tab:pablate}). Deleting the
 objective does not measurably lower $r_{\mathrm{mix}}$; only removing the repair loop entirely does
-(${+}0.056$), so a search is necessary but its \emph{guidance} is not shown load-bearing. Matched on nominal
+(${+}0.056$), so a search is necessary but its \emph{guidance} is not shown load-bearing---confirmed on the
+metric-neutral statistic, where the undirected and oracle-blind walks match the full operator
+(Table~\ref{tab:carry}). Matched on nominal
 caps, \emph{not} on realized compute (Table~\ref{tab:budget})\\
 $\Delta_{\mathrm{held\text{-}out}}$ (held-out oracle) & \textbf{weak} &
 $r_{\mathrm{ho}}$ higher each seed but significant in $1$ of $3$ (Table~\ref{tab:sknots}); adjudicator run in an
 unvalidated de-novo mode\\
 $g_{\mathrm{aut}}$ (verified non-use of packaged inverse-design solvers) & \textbf{established}, $\approx0$ &
-no solver is ever called, so removing it changes nothing. This is a \emph{structural} fact---the ablation
+\textsc{no counterfactual.} No solver is ever called, so removing it changes nothing. This is a \emph{structural} fact---the ablation
 carries no counterfactual information, because the solver was never on the method path. Solver-free, \emph{not}
 oracle-free, and \emph{not} evidence that the gain is the system's own\\
 \bottomrule
@@ -698,7 +711,9 @@ consistency under the declared computational panel, not independent physical con
 \includegraphics[width=0.82\linewidth]{fig_cc_oracle.pdf}
 \caption{\textbf{The positive side is model-relative.} The fraction of state-of-the-art pseudoknot designs
 judged to ``form'' their target swings across predictors---a $[\,15,60\,]\%$ envelope over ProbKnot, pKiss,
-and ShapeKnots, measured in the companion \citep{verifiereconomics}. We report the conservative
+and ShapeKnots, measured in the companion \citep{verifiereconomics} on \emph{published} state-of-the-art
+designs. The ordering within that envelope does not carry over to the designs adjudicated in this paper, and we
+do not use it as one---see the reconciliation in \S\ref{sec:exp}. We report the conservative
 panel-unanimous rate as primary, pKiss as reference, and the full envelope, abstaining where predictors
 disagree. Values are companion-measured; no rate is fixed in this manuscript.}\label{fig:oracle}
 \end{figure}
@@ -1185,7 +1200,7 @@ versus $\sim\!1/60$ for the pKiss-only operator and $0/60$ for the SOTA solver.
 \emph{Those bands are single-execution draws, and the replicated bands are wider.} We quote $34$--$37$ and
 $3$--$8$ because they are what the five original seeds gave, but they understate the spread: pooling all $18$
 independent executions we later ran (Table~\ref{tab:gvp}, App.~\ref{app:repro}) the two-oracle rate ranges
-$30$--$39/60$ and the three-predictor rate $1$--$9/60$ with mean $\approx\!3.5$. Every band of this form in
+$30$--$39/60$ and the three-predictor rate $1$--$9/60$ with mean $\approx\!3.29$. Every band of this form in
 this paper should be read as the range of the runs named beside it, never as a stable interval for the
 operator; the evidential units are the paired differences and their intervals. But panel-unanimity puts two
 of its three conjuncts (pKiss, ProbKnot) \emph{inside} the operator's objective, so it cannot by itself show
@@ -1395,9 +1410,14 @@ we say so wherever we cite it.
 
 \emph{What is robust here is the sign, not the magnitude.} Pooling every independent execution
 (\texttt{exec\_spread.py}), the panel operator's $r_{\mathrm{mix}}$ at a \emph{fixed} nominal seed ranges
-$2$--$6$, $1$--$5$, $1$--$9$, $2$--$5$ and $1$--$4$ across the five seeds: a mean spread of $4.4/60$, which
-\emph{exceeds} the method effect of $2.9/60$. Two separately-reported counts at this noise level would be
-uninterpretable. What makes the comparison readable is that the noise is common-mode and the gamer is nearly
+$2$--$6$, $1$--$5$, $1$--$9$, $2$--$5$ and $1$--$4$ across the five seeds, a pooled within-seed s.d.\ of
+$2.04/60$. We compare that s.d.\ against the effect and not the mean \emph{range} of $4.4/60$ that an earlier
+revision quoted: a range grows with the number of observations, and these seeds contribute six executions each
+for seeds~$0$--$2$ but three for seeds~$3$--$4$, so ranges are not comparable across them and a range is not
+commensurable with a mean difference. On the like-for-like comparison, single-arm execution noise ($2.04/60$)
+is of the same order as---not larger than---the method effect ($2.87/60$), which is enough to make two
+separately-reported counts uninterpretable but not enough to swamp the paired reading: across the $15$ cells
+the paired difference is $2.87/60$ with s.d.\ $2.59$, i.e.\ $4.3$ standard errors from zero. What makes the comparison readable is that the noise is common-mode and the gamer is nearly
 deterministic ($0$--$2$, mean spread $0.8/60$): the panel operator is strictly higher in $14$ of the $15$
 executions (sign test $p{=}0.0010$) and the pooled discordance is $b{=}46$ panel-only against $c{=}3$
 gamer-only. \textbf{We correct a stronger statement the three-seed data appeared to support}: at $15$ cells the
@@ -1426,8 +1446,9 @@ $r_{\mathrm{mix}}$/60. The paired difference is ${+}0.048$, against ${+}0.056$ a
 with no execution replication at all---the estimate has fallen monotonically as replication was added, which we
 report as such. Intervals are nested percentile bootstraps (seeds, then executions within seed, then targets or
 structural clusters, resampled synchronously across both arms; $B{=}20{,}000$; App.~\ref{app:repro} states the
-procedure in full). Execution spread \emph{exceeds} the method effect for the panel operator, which is why only
-the \emph{within-cell paired} reading is interpretable.}\label{tab:gvp}
+procedure in full). Execution noise is of the same order as the method effect for the panel operator, which is
+why only the \emph{within-cell paired} reading is interpretable. $r_{\mathrm{mix}}$ is not metric-neutral
+between these arms; Table~\ref{tab:carry} redoes the comparison on a statistic that is.}\label{tab:gvp}
 \sbox{\tblbox}{\begin{tabular}{@{}l*{15}{c}@{\hspace{9pt}}cc@{}}
 \toprule
 & \multicolumn{3}{c}{seed 0} & \multicolumn{3}{c}{seed 1} & \multicolumn{3}{c}{seed 2}
@@ -1460,6 +1481,76 @@ pKiss and $63.5$ ProbKnot---matched \emph{access}, unmatched \emph{use}. On the 
 $r_{\mathrm{in}}$ the same $15$ cells give $\Delta={+}0.553$, $15/15$ executions, and $b{=}498$ against
 $c{=}\mathbf{0}$: there the gamer wins no target in any cell.
 \end{minipage}
+\end{table}
+
+\paragraph{$r_{\mathrm{mix}}$ is not metric-neutral, so we redo the comparison on a statistic that is.}
+$r_{\mathrm{mix}}=r_{\mathrm{in}}\wedge\text{ShapeKnots}$, and $r_{\mathrm{in}}$ is \emph{the panel operator's
+own success predicate}. Scoring both arms on $r_{\mathrm{mix}}$ therefore scores one of them on its objective
+plus one term, which by our own argument in \S\ref{sec:oracle} cannot by itself evidence generalization. The
+information $r_{\mathrm{mix}}$ adds over $r_{\mathrm{in}}$ is the conditional term, so we make that term the
+statistic:
+\begin{equation}\label{eq:carry}
+\begin{aligned}
+  C(\text{arm}) \;=\; \Pr\bigl[\,&\text{a predictor never in \emph{that arm's} loop confirms the design}\\[-1pt]
+  &\;\big|\; \text{the arm's own success predicate is satisfied}\,\bigr].
+\end{aligned}
+\end{equation}
+$C$ is neutral because every arm is scored on how far \emph{its own} successes carry to a predictor \emph{it}
+never optimized, with its own predicate as the denominator. ShapeKnots is in no arm's loop, so carry-over to
+ShapeKnots is defined identically for all of them (Table~\ref{tab:carry}). Three readings follow, and they do
+not all point the same way.
+
+\emph{The gamer comparison survives the change of metric.} Difficulty-matched to the $528$ (target, seed,
+execution) cells where both arms satisfy their own predicate, ShapeKnots confirms $48$ of the panel operator's
+designs against $22$ of the gamer's ($b{=}41$, $c{=}15$, exact $p{=}6.9\!\times\!10^{-4}$, difference
+${+}0.049$). That the neutral statistic reproduces the $r_{\mathrm{mix}}$ value of ${+}0.048$ almost exactly is
+reassuring rather than circular: the two are computed from different denominators. One conditioning does
+\emph{not} agree and we report it: if both arms are instead held to the panel operator's bar
+($r_{\mathrm{in}}$ for both), the gamer's rate is nominally higher ($5/32$ against $48/530$). That comparison
+conditions the gamer on having passed ProbKnot---the very carry-over at issue---and retains $32$ of its $643$
+designs, so we do not treat it as primary; but with an interval of $[0.053,0.328]$ it does not refute the
+primary reading either, and a reader who prefers it should read $\Delta_{\mathrm{gamer}}$ as unestablished.
+
+\emph{The objective ablations do not survive it.} The undirected walk and the oracle-blind walk share the panel
+operator's success predicate and differ only in guidance, and on $C$ they are indistinguishable from it
+($0.095$ and $0.110$ against $0.094$; paired $p{=}0.57$ and $p{=}0.29$, both point estimates \emph{against}
+the full operator). So what the two-oracle conjunction buys is bought by the \emph{predicate}, not by the
+search that pursues it---which is the same conclusion $\Delta_{\mathrm{undirected}}$ reached on
+$r_{\mathrm{mix}}$, now on a metric that cannot be accused of favouring either arm.
+
+\emph{Cross-predictor robustness is pairwise, not global.} DesiRNA carries over to ProbKnot at $26/43$ against
+our gamer's $2/43$ (\S\ref{sec:exp}, Table~\ref{tab:contrast})---and to ShapeKnots at $1/43$, the
+\emph{lowest} rate of any arm in Table~\ref{tab:carry}. An arm can be $13\times$ more robust under one
+un-optimized predictor and the least robust under another. ProbKnot and DesiRNA's minimum-free-energy
+objective are both built on the same nearest-neighbour thermodynamic parameters, and ShapeKnots run de novo is
+not; the natural reading is that ``robustness'' here tracks shared model family rather than
+correctness. That is a limitation of the whole panel, not of one arm, and it is the strongest argument in this
+paper for adding a predictor from a different model class (\S\ref{sec:disc}).
+
+\begin{table}[t]\centering\small
+\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.15}
+\caption{\textbf{Conditional carry-over $C$ (Eq.~\eqref{eq:carry}): the metric-neutral comparison.} Each arm is
+scored on the fraction of \emph{its own} successes that a predictor never in \emph{its} loop confirms.
+ShapeKnots is in no arm's loop, so that column is comparable across every row; the ProbKnot column is
+meaningful only for the two arms that do not optimize it. Denominators are each arm's own successes, so they
+differ by design---that is what makes the statistic neutral. Intervals are exact binomial (Clopper--Pearson);
+the paired, difficulty-matched contrasts are in the text. Agent-written operators optimize
+pKiss\,$\wedge$\,ProbKnot as well (\texttt{invent\_operator.py}), pooled over six models and reported here as a
+single-run observation pending replication. (\texttt{runs/cc\_ascent/carryover.py}.)}\label{tab:carry}
+\begin{tabular}{@{}llcccc@{}}
+\toprule
+\textbf{arm} & \textbf{in-loop objective} & \textbf{own} & \textbf{ProbKnot} & \textbf{ShapeKnots}
+& \textbf{95\% CI}\\
+& & \textbf{successes} & \textbf{carry-over} & \textbf{carry-over} & \textbf{(ShapeKnots)}\\
+\midrule
+DesiRNA & min.\ free energy & $43$ & $\mathbf{0.605}$ & $0.023$ & $[.001,.123]$\\
+gamer & pKiss & $643$ & $0.047$ & $0.034$ & $[.022,.051]$\\
+panel operator & pKiss\,$\wedge$\,ProbKnot & $530$ & in-loop & $0.091$ & $[.068,.118]$\\
+$-$ objective (undirected) & pKiss\,$\wedge$\,ProbKnot & $253$ & in-loop & $0.095$ & $[.062,.138]$\\
+$-$ objective, $-$ bias & pKiss\,$\wedge$\,ProbKnot & $209$ & in-loop & $0.110$ & $[.071,.161]$\\
+agent-written (6 models) & pKiss\,$\wedge$\,ProbKnot & $222$ & in-loop & $\mathbf{0.257}$ & $[.201,.319]$\\
+\bottomrule
+\end{tabular}
 \end{table}
 
 \paragraph{Which pool is which, and what each can support.} The pools have accumulated different histories of
@@ -1674,8 +1765,21 @@ asymmetric-extreme misses exhaust the repair budget rather than revealing a clas
 \paragraph{Robustness checks: instrument validity, generalization, budget.} Three controls close the
 section; App.~\ref{app:robust} gives each in full. \emph{(i) The panel is a low-recall instrument.} On $80$
 native bpRNA pseudoknots, folding each native's own sequence, per-predictor crossing recall is pKiss $20\%$,
-ProbKnot $4\%$, ShapeKnots $11\%$---and the three-way conjunction only $\mathbf{1\%}$ ($1/80$). On the
-skeleton negative control the panel credits the crossing on $0/60$, but skeletons are one narrow negative
+ProbKnot $4\%$, ShapeKnots $11\%$---and the three-way conjunction only $\mathbf{1\%}$ ($1/80$).
+\emph{The predictors do not have a fixed stringency order, and we should not have implied one.} On these
+natives the order is pKiss\,$>$\,ShapeKnots\,$>$\,ProbKnot; on designs it inverts, with DesiRNA's designs
+confirmed by ProbKnot $60\%$ of the time and by ShapeKnots $2.3\%$ (Table~\ref{tab:carry}); and the
+companion's envelope over published state-of-the-art designs orders them a third way
+(Fig.~\ref{fig:oracle}). The three are not in contradiction once the populations are distinguished. On
+natives no design objective is in play, so the order reflects each predictor's intrinsic crossing recall. On
+designs it is dominated instead by \emph{model-family sharing} between the predictor and the objective that
+produced the design: ProbKnot and a minimum-free-energy designer are both built on the same nearest-neighbour
+thermodynamic parameters, so their agreement on MFE-optimized designs is inflated relative to their agreement
+on nature's own sequences, while de-novo ShapeKnots shares no such coupling and is roughly as harsh on both.
+The practical consequence, which we now apply: \emph{cross-predictor agreement measured on designs is not a
+property of the predictors alone}, so the companion's envelope calibrates the natives axis and must not be
+read as a stringency ranking for design adjudication. Nothing in \S\ref{sec:exp} rests on such a ranking.
+On the skeleton negative control the panel credits the crossing on $0/60$, but skeletons are one narrow negative
 class, so the false-positive rate is \emph{uncalibrated}. Two consequences we carry throughout: a low or zero
 panel rate is weak evidence of \emph{absence} of capability, and $r_{\mathrm{mix}}$ is a high-stringency
 consistency measure rather than a lower bound on true capability. \emph{(ii) Generalization, and its limit.}
@@ -1702,7 +1806,7 @@ Fig.~\ref{fig:stringency}).
 
 
 \paragraph{Where this leaves the ascent, and a bounded fallback.} Can an operator optimizing panel agreement
-beat the gamer's $1/60$? Yes, if modestly: $3$--$8/60$ across five seeds, $1$--$9/60$ over all $18$ executions
+beat the gamer's $1/60$? Yes, if modestly: $3$--$8/60$ across five seeds, $1$--$9/60$ over all $24$ executions
 (Table~\ref{tab:recovered}, App.~\ref{app:support}) and
 $2$--$17/60$ for agent-invented operators (Table~\ref{tab:models}), above a decidable $0/60$ floor. These are
 mixed-panel-consistent, autonomous crossings on the Pseudobase++ distribution---we do not claim they are
@@ -1866,8 +1970,8 @@ $9$ runs per arm, the only ablation distinguishable from the full operator under
 the repair loop outright (${+}0.056$); deleting the \emph{objective} that guides it is not (${+}0.013$), nor is
 making the search oracle-blind (Table~\ref{tab:pablate}). Directedness is decisive only on the operator's own
 objective $r_{\mathrm{in}}$. \emph{(iii) The operators are not bit-reproducible, and the noise is large.}
-Execution-level spread at a \emph{fixed} nominal seed is $4.4/60$ on $r_{\mathrm{mix}}$, which \emph{exceeds}
-the method effect of $2.9/60$; only the within-execution paired reading is interpretable, and a
+Execution-level s.d.\ at a \emph{fixed} nominal seed is $2.04/60$ on $r_{\mathrm{mix}}$, the same order as
+the method effect of $2.87/60$; only the within-execution paired reading is interpretable, and a
 wall-clock-budgeted operator's result depends on machine load (App.~\ref{app:repro}). \emph{(iv) The controls
 are matched on nominal caps, not realized compute}, and realized compute is outcome-dependent: the panel
 operator makes $2.3\times$ the gamer's oracle calls, so $\Delta_{\mathrm{gamer}}$ measures the sum of ``better
@@ -1909,8 +2013,8 @@ by structure cluster from the start}: Pseudobase++'s $251$ targets collapse to $
 well-powered clean transfer test at a $\sim\!5\%$ base rate, so more targets from the \emph{same} source will
 not help---this needs a structurally independent corpus. It remains the single change that would most raise the
 paper's external validity. \textbf{(2) A bit-reproducible operator}: cap iterations and oracle calls instead of
-wall-clock, so a nominal seed fixes the run and execution variance---currently $4.4/60$, larger than the method
-effect---stops dominating every interval. \textbf{(3) A compute-matched control}: fix oracle calls or candidate
+wall-clock, so a nominal seed fixes the run and execution variance---currently an s.d.\ of $2.04/60$, the same
+order as the method effect---stops dominating every interval. \textbf{(3) A compute-matched control}: fix oracle calls or candidate
 evaluations per target, keep running past the first success to a common cap, and report a time-to-first-success
 survival curve or a success-versus-compute frontier, which is what would license ``equivalent at equal
 compute'' instead of our present ``did not win by spending more'' (Table~\ref{tab:budget}). \textbf{(4) Power}:
@@ -1943,8 +2047,8 @@ survives replication at the execution level ($\Delta={+}0.048$, structural-clust
 $[{+}0.005,{+}0.093]$; the panel operator is higher in $14$ of $15$ executions), while shrinking each time
 replication is added. But the association is
 \emph{not yet robustly attributed to the agreement objective}: objective ablation moves the in-objective
-metric and not the mixed-panel metric; execution-level variability at a fixed seed ($4.4/60$) exceeds the
-method effect itself ($2.9/60$); the arms are matched on nominal caps rather than realized compute, which
+metric and not the mixed-panel metric; execution-level variability at a fixed seed (s.d.\ $2.04/60$) is of the
+same order as the method effect ($2.87/60$); the arms are matched on nominal caps rather than realized compute, which
 differs by $2.3\times$; genuinely held-out ShapeKnots generalization is weak; cross-source agreement is $0/60$
 for our system and the SOTA solver alike; and the primary evaluation split is not structurally disjoint
 ($39/125$ exact duplicates). On the structure-aware split we built to answer that last point the direction does
@@ -2016,8 +2120,9 @@ single-stack (CF) generator realizes it uniformly.
 \smallskip\noindent\emph{An MCFG of dimension~2 that does.} Two dimension-2 nonterminals each emit a
 \emph{pair} of substrings (the two ends of one stem), and the start rule interleaves them:
 \begin{align}\label{eq:mcfg}
-  R(a\,x_1,\ c\,x_2) &\leftarrow R(x_1,x_2), & R(\varepsilon,\varepsilon)&\ ; \nonumber\\
-  Q(b\,y_1,\ d\,y_2) &\leftarrow Q(y_1,y_2), & Q(\varepsilon,\varepsilon)&\ ; \\
+  R(a\,x_1,\ c\,x_2) &\leftarrow R(x_1,x_2); &  R(\varepsilon,\varepsilon) &\leftarrow \ \ \text{(base)};
+  \nonumber\\
+  Q(b\,y_1,\ d\,y_2) &\leftarrow Q(y_1,y_2); &  Q(\varepsilon,\varepsilon) &\leftarrow \ \ \text{(base)};\\
   S(x_1\,\ell\,y_1\,\ell\,x_2\,\ell\,y_2) &\leftarrow R(x_1,x_2),\,Q(y_1,y_2). && \nonumber
 \end{align}
 $R$ derives the round-stem pair $(a^n,c^n)$, $Q$ the square-stem pair $(b^m,d^m)$, and $S$ places them at four
@@ -2127,9 +2232,13 @@ in a separate paired sweep (\texttt{gamer\_vs\_panel\_replicate.sh}; Table~\ref{
 Pooling all six independent executions per nominal seed (\texttt{exec\_spread.py}), the panel operator's
 $r_{\mathrm{mix}}$ is $\{6,5,4,2,5,6\}$ at seed~$0$, $\{1,3,3,2,5,1\}$ at seed~$1$ and $\{2,4,3,9,1,1\}$ at
 seed~$2$, and $\{2,5,3\}$, $\{4,1,1\}$ at seeds~$3$ and~$4$---ranges $2$--$6$, $1$--$5$, $1$--$9$, $2$--$5$ and
-$1$--$4$, a mean spread of $\mathbf{4.4/60}$ at a \emph{fixed} nominal
-seed. Against the execution-replicated method effect of $+0.048=2.9/60$, single-execution noise is therefore
-\emph{larger} than the signal. The gamer, by contrast, is nearly deterministic ($0$--$1$, mean spread
+$1$--$4$. The summary we use is the pooled within-seed s.d., $\mathbf{2.04/60}$, not the mean range of
+$4.4/60$: seeds~$0$--$2$ contribute six executions and seeds~$3$--$4$ three, and a range grows with the number of
+observations, so the mean range mixes unequal sample sizes and is not commensurable with a mean difference.
+Against the execution-replicated method effect of $+0.048=2.87/60$, single-execution noise is therefore of the
+\emph{same order} as the signal---enough to make an unpaired comparison of two separately-reported counts
+meaningless, not enough to swamp the paired one (paired difference $2.87$, s.d.\ $2.59$ over $15$ cells,
+$4.3$ standard errors from zero). The gamer, by contrast, is nearly deterministic ($0$--$1$, mean spread
 $0.3/60$), which is why the paired design rescues the comparison even though neither arm's count is
 individually stable. Two mechanisms drive the spread and both are worth naming: subprocess timing jitter under
 a fixed wall-clock cap, and---visible in the realized budgets---\emph{sweep composition}, since the ablation

@@ -1,0 +1,63 @@
+====================================================================================================
+CONDITIONAL CARRY-OVER  C = P(held-out predictor | the arm's own in-loop success)
+====================================================================================================
+
+(1) gamer vs panel operator -- 15 (seed, execution) cells x 60 targets, both arms same worker call
+    cells loaded: 15
+
+  carry-over to ShapeKnots (held out from BOTH), each on its own successes:
+  gamer          (in-loop: pKiss)          22/643   =  0.034   95% CP [0.022,0.051]
+  panel operator (in-loop: pKiss+ProbKnot)   48/530   =  0.091   95% CP [0.068,0.118]
+
+  difficulty-matched (targets where BOTH arms satisfy their own predicate), n=528:
+  gamer                                    22/528   =  0.042   95% CP [0.026,0.062]
+  panel operator                           48/528   =  0.091   95% CP [0.068,0.119]
+  paired McNemar b=41 (panel only), c=15 (gamer only), exact p=0.0006856; risk difference +0.0492
+
+(2) panel-family arms -- 9 cells x 60; identical success predicate, different guidance
+    cells loaded: 9
+
+  carry-over to ShapeKnots (the only predictor held out from all six):
+  panel operator (full)                    31/331   =  0.094   95% CP [0.065,0.130]
+  - objective (undirected walk)            24/253   =  0.095   95% CP [0.062,0.138]
+  - objective, - bias (oracle-blind)       23/209   =  0.110   95% CP [0.071,0.161]
+  - repair loop entirely                    1/21    =  0.048   95% CP [0.001,0.238]
+  - CF decomposition (random init)         39/299   =  0.130   95% CP [0.094,0.174]
+  - complementarity composition            40/322   =  0.124   95% CP [0.090,0.165]
+  paired full vs - objective (undirected walk): n=236, b=12 (full only), c=16 (other only), p=0.5716, diff -0.0169
+  paired full vs - objective, - bias (oracle-blind): n=198, b=8 (full only), c=14 (other only), p=0.2863, diff -0.0303
+
+(3) DesiRNA vs gamer -- the two arms that do NOT optimize ProbKnot (single run, same 43 targets)
+
+  DesiRNA (in-loop: MFE): 43 pKiss-confirmed designs
+    -> ProbKnot (held out from both)       26/43    =  0.605   95% CP [0.444,0.750]
+    -> ShapeKnots (held out from both)      1/43    =  0.023   95% CP [0.001,0.123]
+
+  gamer   (in-loop: pKiss): 43 pKiss-confirmed designs
+    -> ProbKnot (held out from both)        2/43    =  0.047   95% CP [0.006,0.158]
+    -> ShapeKnots (held out from both)      3/43    =  0.070   95% CP [0.015,0.191]
+  paired on the same 43 targets, probknot: b=25 (DesiRNA only), c=1 (gamer only), exact p=8.047e-07, diff +0.5581
+  paired on the same 43 targets, shapeknots: b=0 (DesiRNA only), c=2 (gamer only), exact p=0.5, diff -0.0465
+
+(4) agent-written operators -- in-loop predicate is pKiss AND ProbKnot (invent_operator.py:70),
+    so ShapeKnots is their only held-out predictor. Single run each, n=60 pool.
+  anthropic/claude-opus-4.8 (err 20/60)    14/40    =  0.350   95% CP [0.206,0.517]
+  deepseek/deepseek-v4-pro (err 32/60)      2/26    =  0.077   95% CP [0.009,0.251]
+  google/gemini-3.1-pro-preview (err 0/60)   17/38    =  0.447   95% CP [0.286,0.617]
+  moonshotai/kimi-k3 (err 0/60)            10/42    =  0.238   95% CP [0.121,0.395]
+  openai/gpt-5.6-sol (err 19/60)            5/41    =  0.122   95% CP [0.041,0.262]
+  z-ai/glm-5.2 (err 25/60)                  9/35    =  0.257   95% CP [0.125,0.433]
+  ALL agent operators pooled               57/222   =  0.257   95% CP [0.201,0.319]
+
+====================================================================================================
+SUMMARY -- carry-over to ShapeKnots, the predictor never in any loop
+====================================================================================================
+  gamer (pKiss)                            22/643   =  0.034   95% CP [0.022,0.051]
+  panel operator (pKiss+ProbKnot)          48/530   =  0.091   95% CP [0.068,0.118]
+  undirected walk (same predicate)         24/253   =  0.095   95% CP [0.062,0.138]
+  oracle-blind walk (same predicate)       23/209   =  0.110   95% CP [0.071,0.161]
+  agent-written (pKiss+ProbKnot)           57/222   =  0.257   95% CP [0.201,0.319]
+
+Read: making the success predicate a two-oracle conjunction raises the IN-OBJECTIVE rate enormously
+but does not raise the rate at which those successes carry to the un-optimized predictor. That is
+the metric-neutral reading of Delta_gamer, and it is a null.
