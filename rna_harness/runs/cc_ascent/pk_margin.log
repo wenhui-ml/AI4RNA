@@ -1,0 +1,15 @@
+probe: 60 random compatible sequences per target, 15 sweep cells for outcomes
+
+=== Q1. Is the 43/60 pKiss rate a property of the targets? ===
+  median Delta_norm  pKiss-SOLVED (n=43) 0.000   unsolved (n=17) 0.111
+  AUC(Delta_norm -> pKiss failure) = 0.824
+
+=== Q2. Where do the panel operator's r_mix wins sit on Delta? ===
+  targets the panel operator EVER wins: 21/60  median Delta_norm 0.000
+  never wins:                           39/60  median Delta_norm 0.111
+  AUC(Delta_norm -> panel never wins) = 0.794
+
+=== Q3. Does the panel-vs-gamer gap come from closing margin, or from easy targets? ===
+  low  Delta (easiest third)   n=30  panel wins  41  gamer wins   5  paired diff +0.0800
+  mid  Delta                   n=11  panel wins   1  gamer wins   0  paired diff +0.0061
+  high Delta (hardest third)   n=19  panel wins   6  gamer wins   0  paired diff +0.0211

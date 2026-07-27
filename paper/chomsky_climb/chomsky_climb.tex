@@ -93,7 +93,8 @@ $43$ solves a held-out predictor confirms $2$, against $26$ for a minimum-free-e
 for cross-oracle agreement recovers $3$--$8/60$, but on a metric-neutral statistic---the rate at which an arm's
 own successes carry over to a predictor never in \emph{its} loop---that gain is narrow (${+}0.049$) and shrinks
 as replication is added, matched undirected search is indistinguishable from the full operator, and carry-over
-tracks shared model family rather than correctness.
+tracks shared model family rather than correctness. A search-free probe of the targets then bounds it further:
+$84\%$ of the effect sits where a random compatible sequence already succeeds.
 
 For this study the vector reads one exact, three established (one narrowly, one structurally), one weak, one
 not established. Because an audit nothing passes is indistinguishable from an audit that cannot see, we
@@ -105,9 +106,12 @@ measures.
 \noindent\textbf{Keywords:} automated scientific discovery; self-improving agents; capability acquisition;
 formal language theory; Chomsky hierarchy; RNA inverse design; decidable verification.
 
-\begin{table}[!t]\centering\small
+\clearpage
+\begingroup
+\centering\footnotesize
+\setlength{\abovecaptionskip}{4pt}
 \setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.2}
-\caption{\textbf{The audit's output for this study: the evidence vector $\mathcal A$ of Eq.~\eqref{eq:vector},
+\captionof{table}{\textbf{The audit's output for this study: the evidence vector $\mathcal A$ of Eq.~\eqref{eq:vector},
 filled in.} All rates are $r_{\mathrm{mix}}$
 (Eq.~\eqref{eq:metricnames}) unless stated. This is the verdict:
 \emph{partial audit success---diagnostic crossing evidence, not robust capability acquisition}.
@@ -130,7 +134,11 @@ the conservative one-execution-per-seed variant reaches $0.000$ (Table~\ref{tab:
 monotonically as replication was added (${+}0.080\!\to\!{+}0.056\!\to\!{+}0.048$), which suggests the estimator
 has not converged and that a fourth level of variation (the target set) could carry it to zero. It survives the
 change to a metric-neutral statistic (${+}0.049$, $p{=}6.9\!\times\!10^{-4}$, Table~\ref{tab:carry}), though one
-stricter conditioning disagrees. A \emph{between-system}
+stricter conditioning disagrees. A search-free target-side probe bounds what it measures: $36$ of the $43$
+discordant wins that constitute it ($84\%$) fall on targets a random compatible sequence already solves, and on
+the $30$ targets random sampling cannot reach the paired difference is ${+}0.016$ ($7$ against $0$,
+$p{=}0.016$)---that residue, not ${+}0.048$, is what the operator buys where search is required
+(\S\ref{sec:exp}). A \emph{between-system}
 association; does not attribute the gain to any component; and the arms are matched on oracle \emph{access},
 not oracle \emph{use} ($2.3\times$ realized calls)\\
 $\Delta_{\mathrm{undirected}}$ (vs.\ matched nominal-cap undirected search) & \chip{vNone}{not established} &
@@ -149,7 +157,8 @@ carries no counterfactual information, because the solver was never on the metho
 oracle-free, and \emph{not} evidence that the gain is the system's own\\
 \bottomrule
 \end{tabularx}
-\end{table}
+\par\endgroup
+\medskip
 
 \section{Introduction}\label{sec:intro}
 Self-improving agents claiming new scientific or design capabilities are proliferating, but the field
@@ -1371,6 +1380,36 @@ count ($1$) and the $0$ floor; four exceed the hand-built \texttt{panel\_auto} b
 so the ordering is not a ranking.}\label{fig:models}
 \end{figure}
 
+\paragraph{How much of this is the method, and how much is which targets are easy?} Every rate in this
+section is a property of a method \emph{and} of a target set, and we had no way to separate them, because the
+only difficulty statistic we carried---the crossing-pair count---is a description of the target's topology, not
+of how hard it is to hit. So we built a search-free probe. Draw $60$ sequences merely \emph{compatible} with
+$T$ (Watson--Crick or GU at every paired position, uniform elsewhere), fold each under pKiss, and record
+\begin{equation}\label{eq:margin}
+  \Delta_{\mathrm{bp}}(T)\;=\;\min_{x\ \text{compatible}}\ \bigl|\,\mathrm{pKiss}(x)\ \triangle\ P(T)\,\bigr|
+  \;\big/\;|P(T)| ,
+\end{equation}
+how close the best of them lands with no optimizer involved (\texttt{runs/cc\_ascent/pk\_margin.py}).
+
+It is a better predictor of our own failures than anything we optimized. $\Delta_{\mathrm{bp}}$ separates the
+targets we solve under pKiss from those we do not at $\mathrm{AUC}=0.824$, against $0.780$ for length and
+$0.624$ for the crossing-pair count, and it is not a restatement of that count
+($r={+}0.124$). The consequence for the headline rate is blunt: \textbf{the median of our $43$
+pKiss-solves has $\Delta_{\mathrm{bp}}=0$}---$30$ of the $43$ are hit \emph{exactly} by at least one of $60$
+random compatible sequences. For most of what we count as solved, the operator is not what got us there.
+
+Stratifying $\Delta_{\mathrm{gamer}}$ by whether the probe can reach the target at all: on the $30$ targets
+with $\Delta_{\mathrm{bp}}=0$ the panel operator takes $41$ discordant wins to the gamer's $5$
+(${+}0.080$); on the $30$ with $\Delta_{\mathrm{bp}}>0$ it takes $7$ to $0$ (${+}0.016$, exact McNemar
+$p{=}0.016$). So $84\%$ of the headline effect sits where a random sequence already succeeds. Something does
+survive where search is genuinely required, and we now report \emph{that} as the size of the effect. This is
+the fourth independent measurement pointing the same way---undirected search matches guided search, the
+decomposition scaffolding is inert, the objective ablation is unattributable, and now the separation is
+concentrated on zero-margin targets. The consistent reading is that the dimension we spent our design effort
+on is not the one that decides the outcome. What this does \emph{not} touch is the oracle-gaming measurement:
+$43\!\to\!1$ and the paired $2/43$ versus $26/43$ carry-over are statements about adjudication, and whether a
+design survives a second predictor is a different question from whether its target was easy to hit.
+
 \paragraph{Which pool is which, and what each can support.} The pools have accumulated different histories of
 contact with our development, and the words ``held-out'' and ``transfer'' have been doing too much work across
 them, so we name them once (Table~\ref{tab:pools}) and use those names for the rest of the paper. Two
@@ -1462,7 +1501,9 @@ is itself a finding about the benchmark.}\label{tab:pools}
 \textbf{name used here} & \textbf{ids\,/\,$n$} & \textbf{contact with development, and what it can support}\\
 \midrule
 development / evaluation pool & $0$--$59$ ($60$) & operator design and \emph{all} hyperparameters fixed here.
-Supports in-development comparison between arms; \textbf{not} a held-out benchmark, and we do not call it one\\
+Supports in-development comparison between arms; \textbf{not} a held-out benchmark, and we do not call it one.
+Half of it ($30/60$) has $\Delta_{\mathrm{bp}}{=}0$ (Eq.~\eqref{eq:margin}): reachable by a random compatible
+sequence, and carrying $84\%$ of $\Delta_{\mathrm{gamer}}$\\
 inspected secondary pool & $60$--$109$ ($50$) & inspected during development but not tuned on. Supports a
 same-regime replication check\\
 invention training pool & $110$--$125$ ($16$) & the agent-invention loop's training set (App.~\ref{app:invent})\\
@@ -1713,8 +1754,10 @@ cross-source bpRNA pool gives $0/60$ for our operator and for the SOTA solver al
 side is model-relative and the panel is mechanistically narrow.} All three predictors share
 nearest-neighbour thermodynamic parameters, and carry-over tracks that shared family rather than correctness
 (Table~\ref{tab:carry}); no wet-lab confirmation is attempted. \emph{(iii) The component attribution is
-partial.} The objective is load-bearing on the metric it optimizes and not distinguishable from an undirected
-walk on the metrics it does not, so we report association rather than causal attribution. \emph{(iv) The
+partial, and much of the effect is target-side.} The objective is load-bearing on the metric it optimizes and
+not distinguishable from an undirected walk on the metrics it does not, so we report association rather than
+causal attribution---and a search-free margin probe puts $84\%$ of $\Delta_{\mathrm{gamer}}$ on targets a
+random compatible sequence already solves, leaving ${+}0.016$ where search is actually required. \emph{(iv) The
 operators were not bit-reproducible for the runs reported here}, and our first diagnosis of why was wrong
 (App.~\ref{app:repro}); the fix is implemented but postdates the measurements. \emph{(v) The audit does not
 separate capability from search}, by construction---it separates a search from single-oracle gaming, from
@@ -1768,7 +1811,8 @@ targets. That contrast is an \emph{association} between what an arm optimizes an
 not a causal localization: the two arms are different methods, not a randomized manipulation of one method's
 oracle. Re-optimizing for cross-oracle agreement recovers a small set of mixed-panel-consistent crossings, and
 on a metric-neutral statistic that gain is narrow, shrinks as replication is added, and is not attributable to
-the search's guidance---matched undirected search is indistinguishable from the full operator. Carry-over
+the search's guidance---matched undirected search is indistinguishable from the full operator, and a
+search-free probe of target difficulty puts $84\%$ of it on targets random sampling already reaches. Carry-over
 itself tracks shared model family rather than correctness, which bounds what any panel of thermodynamically
 related predictors can certify. The exclusion side is exact and concerns the prior \emph{verifier's} range,
 never the prior policy's capacity. The evidence vector for this study reads one exact, three established, one
