@@ -2355,6 +2355,14 @@ two-component (dimension-2) production the count-language family demands and one
 $\mathcal L_{\mathrm H}$, tested by transfer to unseen parameters (\S\ref{sec:exp}), not on any single $T$,
 which as a finite object is regular.
 
+\begin{figure}[h]\centering
+\includegraphics[width=0.82\linewidth]{fig_cc_grades.pdf}
+\caption{Crossing-complexity spectrum (crossing-pair count $g$) of the primary Pseudobase++ pool and
+the independent bpRNA cross-source pool. The ranges overlap, so the cross-source drop is not attributable to
+this covariate alone---but the pools are matched on \emph{this covariate only}, not on length, subtype, motif
+family, or homology.}\label{fig:grades}
+\end{figure}
+
 \section{Datasets, Intrinsic Grades, and Materials}\label{app:data}
 Every target's difficulty \emph{grade} is a property of the target fixed before design: its \emph{formal-family
 type} (nested vs.\ crossing) and, within crossing, its \emph{crossing-pair count} $g$---the number of base pairs
@@ -2380,7 +2388,7 @@ EteRNA100-V2 & \citep{koodli2021eterna100v2} & $100$ / $12$--$400$\,nt & nested 
 \end{table}
 The cross-source pool is reconstructed to crossing dot-bracket from the pair list (crossing pairs are encoded
 as non-type-$0$; a greedy multi-bracket assignment yields $\le4$ bracket levels); multiplet structures are
-excluded so each base is in $\le1$ pair (\texttt{runs/cc\_ascent/bprna\_pk.py}). The two pools overlap on the crossing-pair count, so the cross-source drop
+excluded so each base is in $\le1$ pair (\texttt{runs/cc\_ascent/bprna\_pk.py}). Figure~\ref{fig:grades} shows the two pools overlap on the crossing-pair count, so the cross-source drop
 (\S\ref{sec:exp}) is not explained by that one covariate. \emph{We do not call the comparison
 ``grade-fair''}: overlap on a single prespecified structural covariate is not distribution matching. The two
 pools are \emph{not} matched on length, pseudoknot subtype, loop-length distribution, base-pair composition,
@@ -2494,6 +2502,14 @@ DeepSeek-v4-pro & open & $5$ & $26/60$ & $\mathbf{2}$\\
 \end{tabularx}
 \end{table}
 
+\begin{figure}[h]\centering
+\includegraphics[width=0.78\linewidth]{fig_cc_invent.pdf}
+\caption{Training score across revision rounds, one trajectory. Training solve rate ($/16$, disjoint pool) as an
+LLM agent writes, sandbox-runs, and revises a \texttt{design()} operator; the best round is frozen and scored on
+the held-out $60$. A single trajectory for a single model---shown to document the protocol, not to establish
+that the loop reliably improves.}\label{fig:invent}
+\end{figure}
+
 \smallskip\noindent\textbf{Design limits of the six-model comparison, and the stronger design.} Here we record why the six-model comparison is descriptive.
 Each model contributes one temperature-$0.4$ draw with no within-model seed replication, so per-model rates
 carry unquantified sampling variance and the apparent ranking may be noise; the six share one prompt, one
@@ -2508,7 +2524,7 @@ would license the stronger readings: $\ge5$ invention seeds per model, several p
 feedback'' lower control and a ``hand-written recipe'' upper control, per-model failure and cost accounting,
 and a clustering of operator sources. Until then the experiment supports only the narrow statement that six
 single-run agents produced nonzero cross-predictor consistency under a common invention protocol.
-The agent's training solve rate rises as it folds oracle
+Figure~\ref{fig:invent} shows the learning curve: the agent's training solve rate rises as it folds oracle
 feedback into successive rewrites, and the frozen best round measures $9/60$ under all three predictors on the
 development/evaluation pool. This is the worked example for one model; the analogous frozen results for all six frontier
 models (three open, three closed) are summarized in Table~\ref{tab:models}, and every one peaks by round
