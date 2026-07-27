@@ -1381,6 +1381,13 @@ targets, and rates there are recorded in App.~\ref{app:invent} and used for noth
 had no runtime failures; the other four time out on $19$--$32$ of $60$ targets, and that exclusion is itself a
 selection we cannot fully audit.
 
+Fairness requires putting these operators on the same axis we used to bound our own result, and they survive it
+better than we do. Of the panel operator's $r_{\mathrm{mix}}$ wins $85\%$ fall on zero-margin targets; for the
+two replicated agent operators the figures are $76\%$ and $63\%$, so on the $30$ targets a random compatible
+sequence never reaches they take $45$ and $54$ wins against our $7$. The advantage is therefore not an artifact
+of picking easier targets---it is \emph{larger} on the stratum where search is actually required
+(\texttt{runs/cc\_ascent/pool\_margin.py}).
+
 \begin{figure}[t]\centering
 \includegraphics[width=0.9\linewidth]{fig_cc_models.pdf}
 \caption{\textbf{Agent-written operators, one temperature-$0.4$ draw per model.} $r_{\mathrm{mix}}$ of the
@@ -1459,9 +1466,13 @@ executions the panel operator is mixed-panel-consistent on $1.87/27$ ($6.9\%$) a
 $\mathbf{0.00/27}$, zero in \emph{all fifteen} executions. Pooled discordance is $b{=}28$ against
 $c{=}\mathbf{0}$, exact McNemar $p{=}7.5\!\times\!10^{-9}$, and the cell-level sign test is $15/15$
 ($p{=}6.1\!\times\!10^{-5}$). Crucially the panel operator's absolute rate on structurally novel targets
-($6.9\%$) is \emph{not lower} than on the development pool ($3.20/60=5.3\%$), so the separation is not explained
-by structural overlap with development: the failure mode the split audit was built to detect does not appear
-when tested directly. We deliberately do \emph{not} lean on the interval ($[{+}0.030,{+}0.116]$ at $n{=}27$):
+($6.9\%$) is \emph{not lower} than on the development pool ($3.20/60=5.3\%$), and the search-free probe of
+Eq.~\eqref{eq:margin} shows this pool is not merely different but measurably \emph{harder}: its median
+$\Delta_{\mathrm{bp}}$ is $0.176$ against the development pool's $0.059$, and only $15\%$ of its targets are
+reachable by a random compatible sequence against $50\%$ there (Table~\ref{tab:pools}). Scoring higher on a
+harder pool is the opposite of the memorization signature the split audit was built to detect, so we read this
+as the strongest single piece of evidence for $\Delta_{\mathrm{gamer}}$'s direction, and note that it is
+strictly better than the ``not lower'' phrasing an earlier revision could support. We deliberately do \emph{not} lean on the interval ($[{+}0.030,{+}0.116]$ at $n{=}27$):
 it is underpowered by construction and we quote the sign test instead. That sign test carries the same scope
 limit as its counterpart on the development pool: the $15$ executions are independent \emph{runs} but share one
 fixed $27$-target set, so it licenses ``a fresh execution on \emph{these} structurally novel targets would again
@@ -1514,28 +1525,37 @@ $8.60/27$ vs.\ $0.27/27$, $\Delta={+}0.309$, $b{=}127$ against $c{=}2$, $15/15$ 
 \caption{\textbf{The pools, named by their actual contact with development.} We use these names throughout and
 retire the earlier label ``strictly untouched'', which invited a structural reading the index split does not
 support. The last row is the structure-aware split the evidence calls for; we built and ran it, and its size
-is itself a finding about the benchmark.}\label{tab:pools}
-\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{3.0cm}>{\raggedright\arraybackslash}p{1.45cm}L@{}}
+is itself a finding about the benchmark. The $\Delta_{\mathrm{bp}}$ column is the pool's median
+search-free margin (Eq.~\eqref{eq:margin}, $60$ random compatible sequences per target): the pools are
+\emph{not} difficulty-matched, and two readings in this paper turn on that
+(\texttt{runs/cc\_ascent/pool\_margin.py}).}\label{tab:pools}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{2.7cm}>{\raggedright\arraybackslash}p{1.3cm}>{\centering\arraybackslash}p{1.15cm}L@{}}
 \toprule
-\textbf{name used here} & \textbf{ids\,/\,$n$} & \textbf{contact with development, and what it can support}\\
+\textbf{name used here} & \textbf{ids\,/\,$n$} & \textbf{med.\ $\Delta_{\mathrm{bp}}$} &
+\textbf{contact with development, and what it can support}\\
 \midrule
-development / evaluation pool & $0$--$59$ ($60$) & operator design and \emph{all} hyperparameters fixed here.
+development / evaluation pool & $0$--$59$ ($60$) & $0.059$ & operator design and \emph{all} hyperparameters fixed here.
 Supports in-development comparison between arms; \textbf{not} a held-out benchmark, and we do not call it one.
 Half of it ($30/60$) has $\Delta_{\mathrm{bp}}{=}0$ (Eq.~\eqref{eq:margin}): reachable by a random compatible
 sequence, and carrying $84\%$ of $\Delta_{\mathrm{gamer}}$\\
-inspected secondary pool & $60$--$109$ ($50$) & inspected during development but not tuned on. Supports a
+inspected secondary pool & $60$--$109$ ($50$) & --- & inspected during development but not tuned on. Supports a
 same-regime replication check\\
-invention training pool & $110$--$125$ ($16$) & the agent-invention loop's training set (App.~\ref{app:invent})\\
-ID-disjoint follow-up pool & $126$--$250$ ($125$) & untouched by development, tuning and model feedback, but
+invention training pool & $110$--$125$ ($16$) & --- & the agent-invention loop's training set (App.~\ref{app:invent})\\
+ID-disjoint follow-up pool & $126$--$250$ ($125$) & $0.000$ & untouched by development, tuning and model feedback, but
 \emph{structurally overlapping} with the touched set ($39/125$ exact duplicates, $94/125$ within $15\%$;
 App.~\ref{app:data}). Supports an \emph{ID-held-out evaluation}; does \textbf{not} support a transfer claim\\
-cross-source pool & bpRNA ($60$) & independent source; both our operator and the SOTA solver score $0/60$\\
+cross-source pool & bpRNA ($60$) & $\mathbf{0.581}$ & independent source; both our operator and the SOTA
+solver score $0/60$, on a pool an order of magnitude harder than development on the search-free
+coordinate---which is most of why\\
 \midrule
-\textbf{structurally disjoint pool} & $24$ clusters ($27$) & whole structure clusters assigned, keeping only
+\textbf{structurally disjoint pool} & $24$ clusters ($27$) & $\mathbf{0.176}$ & whole structure clusters
+assigned, keeping only
 clusters with \emph{no} touched member; every target $>15\%$ from every developed-on target. Supports the
 \emph{direction} of $\Delta_{\mathrm{gamer}}$ ($15/15$ executions, gamer $0/27$ throughout;
 Table~\ref{tab:sdis}); too small for its magnitude, and that smallness is a fact about Pseudobase++, whose
-$251$ targets contain only $60$ structural clusters\\
+$251$ targets contain only $60$ structural clusters. \emph{Harder} than development ($15\%$ of its targets
+reachable by a random compatible sequence against $50\%$), which is why the panel operator's higher rate there
+counts for more, not less\\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -1611,8 +1631,13 @@ panel rate is weak evidence of \emph{absence} of capability, and $r_{\mathrm{mix
 consistency measure rather than a lower bound on true capability. \emph{(ii) Generalization, and its limit.}
 On a second disjoint Pseudobase pool the regime repeats ($0/50$ floor, $5/50$ panel-unanimous), but on a
 cross-source bpRNA pool both our operator and the SOTA solver reach $0/60$. ProbKnot, not just de-novo
-ShapeKnots, already does most of the rejecting, for the SOTA solver as much as for ours. Given the $1\%$
-native recall, we do not read that $0/60$ as absence of capability. The negative side generalizes across
+ShapeKnots, already does most of the rejecting, for the SOTA solver as much as for ours. We previously declined
+to read that $0/60$ as absence of capability on the grounds of the panel's $1\%$ native recall, which was an
+argument rather than a measurement; the probe supplies the measurement. The bpRNA pool's median
+$\Delta_{\mathrm{bp}}$ is $0.581$ against the development pool's $0.059$, and $5\%$ of its targets are
+reachable by a random compatible sequence against $50\%$ there---an order of magnitude harder on the
+coordinate that predicts our failures, at matched length. The cross-source $0/60$ is therefore substantially a
+statement about that pool's difficulty. The negative side generalizes across
 datasets; the positive claim we support is limited to the Pseudobase++ distribution. \emph{(iii) Budget.} Over
 $\{60,180,300\}$\,s on a fixed $20$-target subset, panel-unanimous is $\{1,3,1\}/20$: no clean budget trend,
 dominated by search variance.
