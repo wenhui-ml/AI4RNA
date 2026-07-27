@@ -537,18 +537,15 @@ refute, makes each target an opportunity to be wrong. It is the design-time anal
 of agentic falsification loops \citep{huang2025popper,liu2024aigs}, but with an exact refuter rather than a
 statistical one.
 
-\paragraph{The certification procedure and its soundness.} Auditing an ascent on a held-out pool requires
-each component to be computed by a stated procedure rather than judged. $E_{\mathrm{range}}$ is discharged
-offline by Prop.~\ref{prop:confine}: no search, no budget, no seed. Each $\Delta$ is a paired difference
-between two arms scored by the \emph{same} adjudicator on the \emph{same} targets inside the \emph{same}
-execution, so common-mode noise cancels; the pairing, the resampling unit and the interval type are fixed in
-App.~\ref{app:repro} before the numbers are read. $g_{\mathrm{aut}}$ is a $\pm$solver ablation over the
-declared tool class. Soundness is therefore conditional and we state the condition: the audit is sound
-relative to its adjudicator panel, and a panel that systematically errs in one direction moves every positive
-component with it. That is why the panel abstains on disagreement, why one predictor is kept out of every
-loop, and why \S\ref{sec:exp} reports a positive control showing the panel is not merely insensitive. What the
-procedure cannot do is convert a model-relative verdict into a physical one; only wet-lab confirmation does
-that, and we do not attempt it.
+\paragraph{The certification procedure and its soundness.} Auditing an ascent requires each component to be
+computed by a stated procedure rather than judged. $E_{\mathrm{range}}$ is discharged offline by
+Prop.~\ref{prop:confine}: no search, no budget, no seed. Each $\Delta$ is a paired difference between two arms
+scored by the \emph{same} adjudicator on the \emph{same} targets inside the \emph{same} execution, so
+common-mode noise cancels; the pairing, resampling unit and interval type are fixed in App.~\ref{app:repro}.
+$g_{\mathrm{aut}}$ is a $\pm$solver ablation over the declared tool class. Soundness is conditional on the
+panel: a panel that errs systematically moves every positive component with it, which is why it abstains on
+disagreement, why one predictor is kept out of every loop, and why \S\ref{sec:exp} reports a positive control.
+No procedure here converts a model-relative verdict into a physical one.
 
 \begin{equation}\label{eq:metrics}
   \widehat p_{\Omega}(\mathcal D)=\frac{1}{|\mathcal D|}\sum_{T\in\mathcal D}\mathbf 1\!\left[\Omega(\pi(T))=T\right],
@@ -812,27 +809,14 @@ certificate. We report this as an additional axis, delineated from the crossing 
 undesignability claim is a computation (running the certificate) under sealed commitment, not a hypothesis in
 the usual empirical sense.
 \section{Experiment: Measuring Oracle-Gaming, and Auditing the Crossing Claim It Inflates}\label{sec:exp}
-\textbf{The result of this section is a measurement of how far a single fallible oracle can inflate an
-agentic-science claim: $\mathbf{43/60}$ under the optimized predictor, $\mathbf{1/60}$ across three.} Everything
-else here is the apparatus that makes that number trustworthy, or the consequence of turning the same apparatus
-on a system built to survive it.
-
-We fix the protocol (oracles, grading, adjudication, metrics) and then report, in order of how much each
-carries: (i) the collapse itself---a naive operator crosses only by gaming its oracle, which the panel exposes,
-and a paired contrast against a solver \emph{not} trained on that oracle shows the loss is specific to the
-trained-on predictor; (ii) what happens when the audit is turned on our own improved system, which optimizes a
-two-oracle conjunction precisely to defeat single-oracle gaming and still leaves two of six components
-unestablished or weak---the evidence that the instrument discriminates rather than rubber-stamps; and (iii) the
-negative side, where the verifier-range bound is a decidable theorem (Prop.~\ref{prop:confine}) and the prior
-repertoire scores an empirical $0/60$ under the shared panel---confinement of the verifier's range is the
-theorem, the $0/60$ is measured, not a failed search. The panel-optimizing operator's own rate, $3$--$8/60$
-across five single-execution seeds and $1$--$9/60$ once executions are replicated, is a small positive number we
-report for completeness and lean on nowhere. Of the three, only
-(i) and (ii) touch verifier model-relativity, the object of our companion \citep{verifiereconomics}; the
-negative side (iii) is independent of it. Dataset facts (Table~\ref{tab:appdata}) are cited; the undesignability
-axis (\S\ref{sec:impossible}) is out of scope here.
-
-
+This section does two things, and the first is what we ask readers to weight. We \emph{measure} how far a
+single fallible oracle can inflate a capability claim: an invented, solver-free operator reaches $43/60$ under
+the predictor it optimizes and $1/60$ under three, and the discriminating comparison is paired and conditional
+against an external solver that optimizes something else. We then \emph{audit} the system we built to survive
+that measurement, and report each component of the evidence vector separately, including the two it does not
+establish. Everything is on the $n{=}60$ Pseudobase++ crossing pool unless a larger or structurally disjoint
+pool is named; every rate is one of the three metrics of Eq.~\eqref{eq:metricnames}, never a blended
+``panel'' number.
 
 \paragraph{The difficulty axis is intrinsic and exactly computed.} Two features make RNA inverse design a
 clean testbed for a capability-class claim. First, each target's grade is a property of the target, fixed
@@ -1108,23 +1092,13 @@ $2.3/60$ ($\Delta=+0.574$), confirming Table~\ref{tab:ablate}'s attribution on a
 \CF{}-skeleton decomposition or the complementarity composition changes nothing whose interval excludes
 zero---the scaffolding is inert here too.
 
-\emph{On the three-predictor metric ($r_{\mathrm{mix}}$), only the repair loop survives---and directedness does
-not.} The full operator is mixed-panel-consistent on $3.4/60$ against $2.7$ undirected, $2.6$ oracle-blind, $4.3$
-without decomposition and $4.4$ without composition. Removing the repair loop \emph{does} separate
-($\Delta=+0.056$, $[+0.011,+0.117]$): there has to be a search. But deleting the \emph{objective} that directs
-that search does not ($\Delta=+0.013$, $[-0.039,+0.067]$), nor does making the search oracle-blind
-($+0.015$, $[-0.044,+0.078]$), and two ablations are nominally \emph{better} than the full operator. So the
-honest attribution under the primary metric is: \textbf{a search is necessary, but no evidence that \emph{this}
-search's guidance is what produces cross-predictor consistency}. The earlier claim that the agreement objective
-would be ``the one load-bearing component'' under this metric is not supported. What \emph{is}
-supported is narrower: the gamer-versus-panel-operator separation of Table~\ref{tab:sep} survives
-($\Delta=+0.048$, cluster CI $[+0.005,+0.093]$) while the directed-versus-undirected separation does not. Those two systems
-differ in \emph{which oracles define success} (one predictor vs.\ a two-predictor conjunction), so that
-difference is \emph{associated} with the gain---but since removing the objective from the panel operator does not
-reproduce the drop, the design does not license calling it the cause (see the attribution discussion above).
-Tripling the data moved one component from ``not resolvable'' to ``established'' and left the others where they
-were, which is the expected behaviour of an underpowered comparison and a reason to read the remaining nulls as
-absence of evidence, not evidence of absence.
+\emph{On the three-predictor metric ($r_{\mathrm{mix}}$), only the repair loop survives---and directedness
+does not.} Deleting the objective costs ${+}0.013$ with a three-level interval of $[{-}.039,{+}.067]$: not
+established, and the oracle-blind variant is no worse. Only removing the repair loop outright separates
+(${+}0.056$). So a search is necessary and its \emph{guidance} is not shown load-bearing on the metric that
+matters, and \S\ref{sec:exp}'s carry-over statistic reaches the same verdict on a metric that cannot be
+accused of favouring either arm. We report this as a null, not as evidence of equivalence: at $9$ runs per arm
+the interval is wide enough to hide a real effect of the size we are chasing.
 
 \emph{A measurement caveat that bounds this table.} The sweep adjudicates the held-out predictor only on
 designs that already satisfy $r_{\mathrm{in}}$, so a ShapeKnots-only column here would be conditional on the
@@ -1212,27 +1186,14 @@ held-out-oracle rate and is weak (Table~\ref{tab:sknots}); and the primary $r_{\
 Table~\ref{tab:sep} is best read as in-objective consistency plus a small held-out nudge, not as three-way
 independent confirmation.
 
-\paragraph{Is the crossing rate statistically separated from gaming?} We run the gamer on the \emph{same} five seeds
-and $60$ targets as the panel operator and compare by a matched, paired analysis, rather than treating the
-gamer's rate as a known constant (Table~\ref{tab:sep}). The gamer is panel-unanimous on $\{1,0,0,0,0\}/60$
-(pooled $1/300$), the panel operator on $\{8,3,5,5,4\}/60$ (pooled $25/300$). The paired difference
-$\Delta=p_{\mathrm{panel}}-p_{\mathrm{gamer}}$, over matched seeds and targets with a target-level cluster
-bootstrap, is $+0.080$ with $95\%$ CI $[+0.040,+0.127]$ (conditional on the five observed seeds, and superseded below by
-the execution-replicated ${+}0.048$ of Table~\ref{tab:gvp}), excluding zero. Per seed the paired McNemar has
-$c=0$---the gamer never solves a target the panel operator misses---significant on the strongest seed
-($p{=}0.016$) but underpowered on the others at $n{=}60$. To power the per-seed test we re-run both arms on a
-larger crossing pool at three seeds, the \emph{ID-disjoint} pool of Table~\ref{tab:pools}. There the panel
-operator is unanimous on
-$8,11,11$ against the gamer's $2,0,1$ (discordant $(b,c)=(8,2),(11,0),(10,0)$ for panel-only vs.\ gamer-only,
-so the McNemar statistic is reconstructable), significant in \emph{two} of three seeds
-($p=0.109,\,1.0\!\times\!10^{-3},\,2.0\!\times\!10^{-3}$; seed~0 the exception). On the full $n{=}251$
-(reported for power, and mixing development data) the counts are $15,16,20$ vs.\ $3,0,1$
-($p\le7.5\!\times\!10^{-3}$), pooled $\Delta=+0.062$, cluster-bootstrap $95\%$ CI $[+0.041,+0.086]$
-conditional on the five observed seeds; the \CF-confined floor is $0/251$. So the $r_{\mathrm{mix}}$ separation from
-gaming, only pooled-significant at $n{=}60$, is per-seed significant on ID-disjoint targets in $2$ of the
-$3$ seeds run---a descriptive replication count, not a pre-registered criterion (\S\ref{sec:exp})---while the
-held-out-only $r_{\mathrm{ho}}$ separation is weaker (above). We avoid a pooled binomial against a fixed
-rate since seeds share targets.
+\paragraph{Is the crossing rate statistically separated from gaming?} We run the gamer on the \emph{same}
+five seeds and $60$ targets as the panel operator and compare by a matched, paired analysis rather than
+treating the gamer's rate as a known constant (Table~\ref{tab:sep}). The gamer is panel-unanimous on
+$\{1,0,0,0,0\}/60$, the panel operator on $\{8,3,5,5,4\}/60$; the paired difference is $+0.080$ with
+$95\%$ CI $[+0.040,+0.127]$, conditional on the five observed seeds and superseded below by the
+execution-replicated ${+}0.048$ of Table~\ref{tab:gvp}. Per seed the paired McNemar has $c=0$---the gamer
+never solves a target the panel operator misses---significant on the strongest seed ($p{=}0.016$) and
+underpowered on the others at $n{=}60$, which is why we re-ran both arms on the larger ID-disjoint pool.
 
 \paragraph{The headline comparison, replicated at the execution level.} The five-seed comparison above
 resamples targets and seeds, but \S\ref{sec:exp} and App.~\ref{app:repro} establish a \emph{third} source of
@@ -1395,38 +1356,31 @@ agent-written (6 models) & pKiss\,$\wedge$\,ProbKnot & $222$ & in-loop & $\mathb
 \end{tabular}
 \end{table}
 
-\paragraph{Does the instrument discriminate, or is it merely insensitive? A positive control.}
-We have argued more than once that nothing we build saturates the panel, and offered that as evidence the
-panel is stringent. That argument does not work on its own: an audit nothing passes and an audit that cannot
-detect anything produce the same table, and with $\sim\!1\%$ recall on natives (\S\ref{sec:exp}) insensitivity
-is the live alternative. Separating them needs an arm that \emph{does} clear the bar, measured identically.
-We already had one and had filed it as a supplement. The six frozen LLM-written operators of
-App.~\ref{app:invent} optimize pKiss\,$\wedge$\,ProbKnot, exactly the panel operator's predicate, so ShapeKnots
-is held out from them in exactly the same sense; the comparison is like-for-like by construction.
+\paragraph{Does the instrument discriminate, or is it merely insensitive? A positive control.} We have said
+more than once that nothing we build saturates the panel and offered that as evidence of stringency. It is
+not: an audit nothing passes and an audit that cannot detect anything produce the same table, and at
+$\sim\!1\%$ recall on natives insensitivity is the live alternative. Separating them needs an arm that
+\emph{does} clear the bar, measured identically---and we already had one, filed as a supplement. The frozen
+LLM-written operators of App.~\ref{app:invent} optimize pKiss\,$\wedge$\,ProbKnot, the panel operator's own
+predicate, so ShapeKnots is held out from them in the same sense.
 
-Replicated at the depth of the headline experiment---the two operators with no runtime failures, frozen code
-re-executed at $5$ nominal seeds $\times$ $3$ executions on the $n{=}60$ pool
-(\texttt{agent\_replicate.py}, \texttt{arep\_stats.py})---their carry-over is
-$333/1104=\mathbf{0.302}$ $[0.275,0.330]$, against the hand-built panel operator's $48/530=0.091$
-$[0.068,0.118]$. The intervals do not overlap. Two details matter. First, the three executions inside a
-nominal seed are \emph{bit-identical} in $5/5$ seeds for both operators, so unlike our own operator these are
-reproducible runs and the estimate is not an average over execution noise. Second, the obvious confound is
-real and does not explain the gap: the agent operators emit GC-richer sequences (mean $0.529$ against
-$0.460$) and ShapeKnots agreement is partly predictable from composition alone---within our own operator's
-designs the rate is $0.169$ above $50\%$ GC and $0.051$ below it---but stratifying, the agent advantage holds
-in both bins ($0.312$ vs.\ $0.169$, and $0.285$ vs.\ $0.051$).
+Replicated at the depth of the headline experiment (the two operators with no runtime failures, frozen code
+re-executed at $5$ seeds $\times$ $3$ executions, \texttt{agent\_replicate.py}), their carry-over is
+$333/1104=\mathbf{0.302}$ $[0.275,0.330]$ against the hand-built operator's $48/530=0.091$ $[0.068,0.118]$;
+the intervals do not overlap. The three executions inside a seed are \emph{bit-identical} in $5/5$ seeds, so
+unlike our own operator these are reproducible runs. The obvious confound is real and does not explain the
+gap: the agent operators emit GC-richer sequences ($0.529$ against $0.460$) and ShapeKnots agreement is partly
+predictable from composition alone---within our designs, $0.169$ above $50\%$ GC against $0.051$ below---but
+stratified, the advantage holds in both bins ($0.312$ vs.\ $0.169$; $0.285$ vs.\ $0.051$).
 
-We draw one conclusion and refuse two. The conclusion: \emph{the instrument is not merely insensitive}. A rate
-of $0.302$ is reachable on this pool under this panel, so $0.091$ is a fact about the operator that produced
-it, not a ceiling imposed by the adjudicator. That is the positive control the rest of this section needed,
-and it is also the sharpest available statement of the paper's own limitation---the system we built to survive
-the audit is the weakest pKiss\,$\wedge$\,ProbKnot arm we measured. What we do \emph{not} claim: any
-attribution for \emph{why} the written operators carry over better, since we have not ablated them and the GC
-difference shows at least one uncontrolled dimension; and any transfer claim, since the structurally disjoint
-run has $9.7/27$ and $1.1/27$ targets erroring out per cell, leaving a denominator filtered towards easy
-targets (rates of $0.82$ and $0.62$ there are recorded in App.~\ref{app:invent} and used for nothing). Two of
-six models had no runtime failures and the other four time out on $19$--$32$ of $60$ targets; only the two are
-used here, and that exclusion is itself a selection we cannot fully audit.
+The conclusion is that \emph{the instrument is not merely insensitive}: $0.302$ is reachable on this pool
+under this panel, so $0.091$ is a fact about the operator that produced it, not a ceiling imposed by the
+adjudicator---which is simultaneously the sharpest statement of this paper's limitation. We claim no
+attribution for \emph{why} the written operators carry over better, and no transfer: on the structurally
+disjoint pool $9.7/27$ and $1.1/27$ targets error out per cell, leaving a denominator filtered towards easy
+targets, and rates there are recorded in App.~\ref{app:invent} and used for nothing. Only two of six models
+had no runtime failures; the other four time out on $19$--$32$ of $60$ targets, and that exclusion is itself a
+selection we cannot fully audit.
 
 \paragraph{Which pool is which, and what each can support.} The pools have accumulated different histories of
 contact with our development, and the words ``held-out'' and ``transfer'' have been doing too much work across
@@ -1593,17 +1547,15 @@ asymmetric-extreme misses exhaust the repair budget rather than revealing a clas
 section; App.~\ref{app:robust} gives each in full. \emph{(i) The panel is a low-recall instrument.} On $80$
 native bpRNA pseudoknots, folding each native's own sequence, per-predictor crossing recall is pKiss $20\%$,
 ProbKnot $4\%$, ShapeKnots $11\%$---and the three-way conjunction only $\mathbf{1\%}$ ($1/80$).
-\emph{The predictors do not have a fixed stringency order, and we should not have implied one.} On these
-natives the order is pKiss\,$>$\,ShapeKnots\,$>$\,ProbKnot; on designs it inverts, with DesiRNA's designs
-confirmed by ProbKnot $60\%$ of the time and by ShapeKnots $2.3\%$ (Table~\ref{tab:carry}); and the companion's
-envelope over published designs orders them a third way. The three reconcile once the populations are
-distinguished. On natives no design objective is in play, so the order reflects intrinsic crossing recall. On
-designs it is dominated instead by \emph{model-family sharing} between the predictor and the objective that
-produced the design---ProbKnot and a minimum-free-energy designer share nearest-neighbour thermodynamic
-parameters, while de-novo ShapeKnots shares no such coupling. So cross-predictor agreement measured on designs
-is not a property of the predictors alone, and the companion's envelope calibrates the natives axis rather
-than supplying a stringency ranking for design adjudication. Nothing here rests on such a ranking.
-
+\emph{The predictors have no fixed stringency order, and we should not have implied one.} On natives the
+order is pKiss\,$>$\,ShapeKnots\,$>$\,ProbKnot; on designs it inverts (DesiRNA's designs are confirmed by
+ProbKnot $60\%$ of the time and by ShapeKnots $2.3\%$, Table~\ref{tab:carry}); the companion's envelope over
+published designs orders them a third way. These reconcile once the populations are distinguished. On natives
+no design objective is in play, so the order reflects intrinsic crossing recall; on designs it is dominated by
+\emph{model-family sharing} between the predictor and the objective that produced the design, since ProbKnot
+and a minimum-free-energy designer share nearest-neighbour parameters while de-novo ShapeKnots does not.
+Cross-predictor agreement measured on designs is therefore not a property of the predictors alone, and the
+companion's envelope is not a stringency ranking for design adjudication. Nothing here rests on one.
 On the skeleton negative control the panel credits the crossing on $0/60$, but skeletons are one narrow negative
 class, so the false-positive rate is \emph{uncalibrated}. Two consequences we carry throughout: a low or zero
 panel rate is weak evidence of \emph{absence} of capability, and $r_{\mathrm{mix}}$ is a high-stringency
@@ -1716,27 +1668,19 @@ empirical, fixed-budget $0/60$ floor under the shared panel. We do \emph{not} cl
 structurally cannot generate a crossing; deriving an empty realizable set from a learned policy's generative
 structure, rather than a finite-budget count, remains open.
 
-\paragraph{What a cross-predictor-consistent result requires, and what we did not get.} The first operator is
-oracle-guided search that games pKiss (\S\ref{sec:exp}): $43/60$ under one predictor, $1/60$ under all three.
-Making the success predicate a multi-predictor conjunction rather than a single predictor does help: running
-the gamer on the same five seeds, the paired difference
-$\Delta{=}p_{\mathrm{panel}}{-}p_{\mathrm{gamer}}$ is $+0.048$ once execution-level replication is included
-(Table~\ref{tab:gvp}); on the five original seeds alone it is $+0.080$ with a target-level
-cluster-bootstrap $95\%$ CI $[+0.040,+0.127]$ and a two-way CI $[+0.030,+0.140]$, both clear of zero (pooled
-$25/300$ vs.\ $1/300$); the paired McNemar is significant on the strongest seed ($p\!=\!0.016$) with $c{=}0$
-throughout. We do not quote a pooled binomial against a fixed $1/60$, which wrongly treats the $300$ trials as
-independent when the same $60$ targets recur. What we did \emph{not} get is component-level credit for that
-gain: at a matched nominal cap and matched oracle access, an undirected walk is indistinguishable from the directed operator
-under $r_{\mathrm{mix}}$ (Table~\ref{tab:pablate}), so ``optimize agreement'' is supported as a \emph{choice of
-success predicate} correlated with the gain, not as a mechanism shown to produce it. The next rung is not a
-better objective but enough targets, seeds and \emph{executions} to resolve one- or two-target differences at a
-$\sim\!5\%$ base rate. A single $60$-target seed is underpowered; on the $125$ \emph{ID-disjoint} targets (ids $126$--$250$,
-excluding development $[0{:}60]$, the inspected second pool $[60{:}110]$, and the agent-training set
-$[110{:}126]$) the $r_{\mathrm{mix}}$ separation is significant in $2$ of the $3$ seeds run ($p=0.109,\,1.0\!\times\!10^{-3},\,2.0\!\times\!10^{-3}$;
-operator $8,11,11$ vs.\ gamer $2,0,1$; floor $0$), while the single-held-out-ShapeKnots separation is
-significant in only $1$---so we claim per-seed $r_{\mathrm{mix}}$ separation on untouched targets, not held-out-oracle
-generalization. The audit does not make ``did it happen?'' decidable---only the verifier-range exclusion is decidable---but it
-does make the answer independent of which single oracle one chooses to report.
+\paragraph{What a cross-predictor-consistent result requires, and what we did not get.} The first operator
+is oracle-guided search that games pKiss: $43/60$ under one predictor, $1/60$ under three. Making the success
+predicate a multi-predictor conjunction does help---the paired difference is ${+}0.048$ once execution
+replication is included, ${+}0.049$ on the metric-neutral carry-over statistic---but we did \emph{not} get
+component-level credit for it. At matched nominal caps and matched oracle access an undirected walk is
+indistinguishable from the directed operator on both $r_{\mathrm{mix}}$ and carry-over, so ``optimize
+agreement'' is supported as a \emph{choice of success predicate} and not as a search objective that earns its
+keep. Nor did we get generalization: the one genuinely held-out predictor separates weakly, cross-source
+agreement is $0/60$ for our operator and for the SOTA solver alike, and carry-over turns out to track shared
+model family rather than correctness. What a stronger result would require is a fourth predictor from a
+different model class, a second structurally independent corpus, and a compute-matched rather than
+cap-matched control---the first two we cannot supply from this benchmark, the third is now implemented
+(App.~\ref{app:repro}) but postdates these measurements.
 
 \paragraph{What we mean by ``new'' (and what we do not).} As in \S\ref{sec:intro}, ``new'' is relative to the
 prior self, not the base model (whose latent competence is unauditable and beside the point). Our operator is
@@ -1757,19 +1701,11 @@ verifier-range exclusion, empirical prior floor, verified non-use and independen
 components of different epistemic status. Both positive signals are model-relative---an MDL residual as much as
 our panel.
 
-\emph{What our measurement adds to a compression gate, concretely.} The complementarity can be stated with a
-number rather than in the abstract, and we think this is the most useful thing our data says about
-one-sided gates in general. Our pKiss-directed operator reaches $43/60$ under the predictor it optimizes. Those
-$43$ designs fit that oracle exactly, and the procedure that produces them is short---a context-free skeleton, a
-complementarity rule, and a repair loop. A gate that scores fit-plus-description-length has no way to reject
-them: on its own terms they are a compact, well-fitting account. Yet only $1/60$ survives three predictors. The
-$42$-target gap is invisible to \emph{any} statistic computed from the system and its optimized oracle alone,
-however principled that statistic is, because the failure is not poor fit or excess description length---it is
-that the oracle being fit is wrong in a direction the system has learned to exploit. Catching it requires an
-adjudicator the system did not optimize, which is a second \emph{side}, not a better one-sided score. This is
-the sense in which the two lines compose: the categorical account says how a system may revise itself, and our
-audit supplies the independent side any such revision must be scored against before a gain is called a
-discovery.
+\emph{What our measurement adds to a compression gate, concretely.} A fit-plus-description-length criterion
+accepts our $43/60$ designs: they fit the optimized oracle exactly and are produced by a short procedure. Only
+$1/60$ survives three predictors. The $42$-target gap is invisible to any statistic computed from the system
+and its own oracle, which is the sense in which a one-sided gate and a two-sided audit are complementary
+layers rather than competitors.
 
 \paragraph{An audit layer for AI4S.} The lesson generalizes because the vulnerability does. Most scientific
 oracles a self-improving system optimizes against are fallible surrogates (a docking score, a force field, a
@@ -1781,47 +1717,19 @@ decidable boundary an unusually clean instance. The protocol ports---molecular g
 DFT or assays, protein design against binding readouts, theorem discovery against an exact checker---and
 whether the positive side ports to settings with no decidable hierarchy is open; we do not test it here.
 
-\paragraph{Limitations.} We list these in rough order of how much they bound the contribution.
-\emph{(i) The benchmark cannot support a well-powered transfer test.} The index split is not a structural split
-($39/125$ exact duplicates, $94/125$ within $15\%$; App.~\ref{app:data}), so results on the ID-disjoint pool are
-an ID-held-out evaluation, not a transfer claim. We built and ran the structure-cluster split that a transfer
-claim requires, and the direction survives it cleanly ($15/15$ executions, gamer $0/27$ throughout;
-Table~\ref{tab:sdis})---but only $27$ targets in $24$ clusters exist that are disjoint from our development,
-because Pseudobase++'s $251$ crossing targets collapse to $60$ structural clusters. So the \emph{magnitude} of
-$\Delta_{\mathrm{gamer}}$ is not estimable on any structurally clean pool this benchmark can supply, and a
-second crossing benchmark, not a better statistic, is what would settle it. \emph{(ii) Component attribution for cross-predictor consistency is largely unresolved.} Over
-$9$ runs per arm, the only ablation distinguishable from the full operator under $r_{\mathrm{mix}}$ is removing
-the repair loop outright (${+}0.056$); deleting the \emph{objective} that guides it is not (${+}0.013$), nor is
-making the search oracle-blind (Table~\ref{tab:pablate}). Directedness is decisive only on the operator's own
-objective $r_{\mathrm{in}}$. \emph{(iii) The operators are not bit-reproducible, and the noise is large.}
-Execution-level s.d.\ at a \emph{fixed} nominal seed is $2.04/60$ on $r_{\mathrm{mix}}$, the same order as
-the method effect of $2.87/60$; only the within-execution paired reading is interpretable, and a
-wall-clock-budgeted operator's result depends on machine load. \emph{We diagnosed this and were wrong about
-the cause}, which changes what the fix is: removing every wall-clock term from the stopping rules does
-\emph{not} make the operator reproducible. Two attempts at the same (target, seed) still diverge on an idle
-machine in a single process, because \textsc{ViennaRNA}'s \texttt{inverse\_fold}---the context-free
-sub-solver---is a stochastic search on \textsc{ViennaRNA}'s own global RNG, which \texttt{random.Random(seed)}
-does not touch and which advances across calls. Seeding it per attempt, together with count-based caps,
-does fix it: under a $96$-process synthetic load both operators now reproduce bit-for-bit on $4/4$ targets,
-against $1/4$ and $0/4$ under the wall-clock default (App.~\ref{app:repro}). \emph{(iv) The controls
-are matched on nominal caps, not realized compute}, and realized compute is outcome-dependent: the panel
-operator makes $2.3\times$ the gamer's oracle calls, so $\Delta_{\mathrm{gamer}}$ measures the sum of ``better
-predicate'' and ``longer search'' (Tables~\ref{tab:budget},~\ref{tab:gvp}). \emph{(v) $g_{\mathrm{aut}}$ is
-verified non-use, not autonomy}: the solver is never on the method path, so its ablation carries no
-counterfactual information, and the system depends completely on external crossing-aware oracles.
-\emph{(vi) The positive side is model-relative and the panel is low-recall.} Its native recall is $\sim\!1\%$
-and its false-positive rate is characterized on one narrow negative class, so positive rates are
-high-stringency consistency measures, not calibrated capability bounds; $r_{\mathrm{ho}}$, the only genuinely
-held-out-oracle metric, is weak ($1/3$ seeds) and its adjudicator runs in a de-novo mode its own authors
-validated with probing data we do not have. Physical (wet-lab) confirmation is out of scope.
-\emph{(vii) The formal side is narrow.} Only verifier-range exclusion is exact; the prior-policy floor is an
-empirical finite-budget count, a passing verdict is a per-target event on the $\CF\!\to\!\MCF$ axis, the
-family-level class reading is evidential, and no change in any system's language class is proved.
-\emph{(viii) Scope.} All empirical results sit within the Pseudobase(++) crossing distribution
-(Table~\ref{tab:pools}); on a cross-source bpRNA pool even the borrowed SOTA solver does not clear the strict
-panel. No pre-registered, never-examined final set was run. \emph{(ix) We define the audit, not the invention
-algorithm} (Rem.~\ref{rem:scope}); the six-model invention experiment that answers the
-``researcher-designed operator'' objection is descriptive only.
+\paragraph{Limitations.} In rough order of how much they bound the contribution. \emph{(i) One benchmark,
+structurally exhausted.} Every positive number here is on Pseudobase++ crossing targets; the structure-aware
+split it admits has $27$ targets in $24$ clusters, so directions replicate but magnitudes do not, and the
+cross-source bpRNA pool gives $0/60$ for our operator and for the SOTA solver alike. \emph{(ii) The positive
+side is model-relative and the panel is mechanistically narrow.} All three predictors share
+nearest-neighbour thermodynamic parameters, and carry-over tracks that shared family rather than correctness
+(Table~\ref{tab:carry}); no wet-lab confirmation is attempted. \emph{(iii) The component attribution is
+partial.} The objective is load-bearing on the metric it optimizes and not distinguishable from an undirected
+walk on the metrics it does not, so we report association rather than causal attribution. \emph{(iv) The
+operators were not bit-reproducible for the runs reported here}, and our first diagnosis of why was wrong
+(App.~\ref{app:repro}); the fix is implemented but postdates the measurements. \emph{(v) The audit does not
+separate capability from search}, by construction---it separates a search from single-oracle gaming, from
+matched undirected search, and from delegation, and reports each separately.
 
 \paragraph{Future work.} The growing-parameter transfer test---tune on small stems, freeze, test on strictly larger
 unseen members of $\mathcal{L}_{\mathrm H}=\{T_{n,m}:n,m\ge1\}$---is now run (\S\ref{sec:exp}): the frozen
@@ -1839,23 +1747,16 @@ $\Delta_{\mathrm{gamer}}$ replicates on structurally novel targets ($15/15$ exec
 benchmark turns out to hold only $24$ development-disjoint clusters, which converts the original owed
 experiment into a different one.
 
-\emph{The four experiments this study owes, in priority order.} \textbf{(1) A second crossing benchmark, split
-by structure cluster from the start}: Pseudobase++'s $251$ targets collapse to $60$ clusters and cannot supply a
-well-powered clean transfer test at a $\sim\!5\%$ base rate, so more targets from the \emph{same} source will
-not help---this needs a structurally independent corpus. It remains the single change that would most raise the
-paper's external validity. \textbf{(2) A bit-reproducible operator}: cap iterations and oracle calls instead of
-wall-clock, so a nominal seed fixes the run and execution variance---currently an s.d.\ of $2.04/60$, the same
-order as the method effect---stops dominating every interval. \textbf{(3) A compute-matched control}: fix oracle calls or candidate
-evaluations per target, keep running past the first success to a common cap, and report a time-to-first-success
-survival curve or a success-versus-compute frontier, which is what would license ``equivalent at equal
-compute'' instead of our present ``did not win by spending more'' (Table~\ref{tab:budget}). \textbf{(4) Power}:
-a pool large enough to resolve one- or two-target differences in cross-predictor consistency, which at these
-rates means several hundred targets and $\ge10$ seeds \emph{with} execution replicates, not a cleverer
-statistic. Also remaining: extend the ladder to still larger
-$n,m$ with a size-scaled budget to separate the search bound from a class bound, a second pseudoknot
-benchmark, physical/3D validation beyond the panel, and the undesignability axis. Beyond RNA, the audit
-ports to any domain whose difficulty axis is a decidable formal hierarchy with an exact impossibility oracle;
-RNA is first because the hierarchy is native to it.
+\emph{The experiments this study owes, in priority order.} \textbf{(1) A second, structurally independent
+crossing corpus.} Pseudobase++ is structurally exhausted---$251$ targets, $60$ clusters, $24$ disjoint from
+our development---so the magnitude of every transfer claim here is unestimable on this benchmark, and no
+amount of reanalysis fixes that. \textbf{(2) Power.} Several hundred targets and $\ge10$ seeds with execution
+replicates, since the effects we are measuring are a few targets in sixty. \textbf{(3) A non-thermodynamic
+predictor.} All three panel members share nearest-neighbour parameters, and \S\ref{sec:exp} shows carry-over
+tracking that shared family; a learned pseudoknot predictor would make the panel mechanistically diverse
+rather than merely numerous. \textbf{(4) Attribution for the positive control.} We show the written operators
+carry over better and cannot yet say why. Items (2) and (3) of the previous revision---a bit-reproducible
+operator and a compute-matched control---are discharged in App.~\ref{app:repro}.
 
 \subsection{Conclusion}\label{sec:conclusion}
 We proposed an audit that \emph{separately reports} an empirical gain and an exact verifier-range exclusion,
@@ -2071,12 +1972,11 @@ logs, and timeout/failure handling are provided as an anonymized archive with th
 repository with an immutable version tag (commit hash, license, and an environment lockfile) will accompany the
 camera-ready.
 
-\smallskip\noindent\textbf{\CF{} floor measurement.} The floor (the \CF-confined REMC optimizer, \texttt{always\_cheap})
-is run \emph{at top level} (\texttt{runs/cc\_ascent/xsrc\_floor.py}): its replica-exchange pool cannot be spawned
-inside the parallel sweep's worker processes (nested multiprocessing), so the floor for the second and
-cross-source pools is measured by a serial top-level runner rather than the parallel sweep. It confirms the
-theorem-guaranteed $0$ empirically---floor panel-unanimous $0/50$ (second pool) and $0/60$ (cross-source),
-$0$ pKiss crossings formed on all $110$ targets---consistent with Prop.~\ref{prop:confine} and the E0 control.
+\smallskip\noindent\textbf{\CF{} floor measurement.} The floor is the \CF-confined REMC optimizer run on the
+same targets under the same adjudicator, at the same nominal caps as the audited arms. It scores $0/60$ on
+crossing targets, which is an empirical result at a finite budget and not a restatement of
+Prop.~\ref{prop:confine}: the proposition bounds what the pseudoknot-free \emph{verifier} can certify, the
+floor records what the prior \emph{policy} actually produced.
 
 \smallskip\noindent\textbf{Statistical methodology (Table~\ref{tab:sep}).} Let $u^{(A)}_T\in\{0,1\}$ indicate
 whether arm $A$ realizes held-out target $T$ panel-unanimously, over the pool of size $N=|\mathcal D_{\mathrm{ho}}|=60$.
@@ -2566,22 +2466,14 @@ models (three open, three closed) are summarized in Table~\ref{tab:models}, and 
 $\le5$.
 
 \section{Oracle Configurations, Hyperparameters, Compute, and Verifier Stringency}\label{app:config}
-\begin{table}[h]\centering\small
-\setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.15}
-\caption{Oracle configurations. All deterministic and replayable; DATAPATH pinned to the RNAstructure data
-tables.}\label{tab:appconfig}
-\begin{tabularx}{\linewidth}{@{}lLll@{}}
-\toprule
-oracle & engine / mode & environment & timeout\\
-\midrule
-$\Omega_{\mathrm{cf}}$ & ViennaRNA, Turner-2004 MFE, $37^\circ$C & \texttt{rna} & --\\
-pKiss (reference) & pKiss \texttt{mfe} \citep{janssen2015pkiss} & \texttt{pk} & $60$\,s\\
-ProbKnot & RNAstructure MEA over the partition ensemble \citep{bellaousov2010probknot} & \texttt{rnastr} & $60$\,s\\
-ShapeKnots & RNAstructure MFE-based, run \emph{de novo} (no SHAPE) \citep{hajdin2013shapeknots} & \texttt{rnastr} & $120$\,s\\
-\bottomrule
-\end{tabularx}
-\end{table}
-\noindent\textbf{Operator hyperparameters} (oracle configurations in Table~\ref{tab:appconfig}). REMC floor: wall $30$\,s. Design operators (fixed across all
+\noindent\textbf{Oracle configurations}, all deterministic and replayable with \texttt{DATAPATH} pinned to
+the RNAstructure data tables: $\Omega_{\mathrm{cf}}$ is ViennaRNA Turner-2004 MFE at $37^\circ$C (env
+\texttt{rna}, no timeout); pKiss is \texttt{pkiss mfe} \citep{janssen2015pkiss} (env \texttt{pk}, $60$\,s);
+ProbKnot is RNAstructure MEA over the partition ensemble \citep{bellaousov2010probknot} (env \texttt{rnastr},
+$60$\,s); ShapeKnots is RNAstructure MFE-based run \emph{de novo} with no SHAPE data
+\citep{hajdin2013shapeknots} (env \texttt{rnastr}, $120$\,s).
+
+\noindent\textbf{Operator hyperparameters} (oracle configurations in the oracle configurations above). REMC floor: wall $30$\,s. Design operators (fixed across all
 targets, with size-independent budgets): skeleton budget $12$--$20$\,s, repair budget $90$--$120$\,s, $\le800$--$1500$
 repair iterations, ProbKnot gate at $\mathrm{pk\_bp}\le3$. \textbf{Compute.} A single $256$-core host;
 target-level parallelism at $\mathrm{NWORKERS}{=}60$ (the design operators are single-process, so this is
