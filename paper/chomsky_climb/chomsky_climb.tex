@@ -294,12 +294,31 @@ measurement} are what we are confident in and what a reader should take away. Th
 survive the instrument is secondary: it separates from the gamer, but narrowly, and the audit's own verdict on
 it is two components unestablished or weak (Table~\ref{tab:verdict}). We regard that as the instrument working,
 not as a result withheld. The SAT domain
-(App.~\ref{sec:sat}) and the three-channel LLM-gaming protocol (App.~\ref{sec:audit}) are \emph{supplements}
-that no claim here depends on. Two
+(App.~\ref{sec:sat}) is a \emph{supplement} that no claim here depends on. Two
 things are \emph{not} claimed: (i) a robust autonomous ascent---at $1/60$ panel-unanimous the instrument only
 exposes an oracle artifact, and the invention algorithm remains the object under test; (ii) any scientific
-discovery of a new design principle. Table~\ref{tab:claims} (App.~\ref{app:support}) maps each claim to its
-evidence and status.
+discovery of a new design principle.
+
+\paragraph{Classification rule, and how to count the components.} \emph{Exact}: proved, discharged offline.
+\emph{Established}: the effect's $95\%$ interval excludes zero at the deepest resampling level run for that
+component, where ``deepest'' is fixed in advance as \emph{every} level of variation the component's design
+contains, resampled by the estimator that matches that design. Where a component admits more than one nesting
+variant we name which is which rather than choosing after seeing the answer: for $\Delta_{\mathrm{gamer}}$ the
+primary estimator draws all three executions inside each drawn seed, because that is the design that was run;
+the one-execution-per-seed variant estimates the uncertainty of a \emph{different, smaller} study and is
+reported as a conservative sensitivity, not as the classifier. We state both intervals in every case, so a
+reader who prefers the conservative variant can reclassify $\Delta_{\mathrm{gamer}}$ as weak and nothing else
+in the paper changes. \emph{Weak}: directionally consistent, but the interval or the replication does not
+support it. \emph{Not established}: the interval spans zero. By that rule this study returns \textbf{one exact,
+three established, one weak, one not established}, and every count stated elsewhere in this paper is this one.
+It should not be read without the second question the rows also answer, flagged \textsc{no counterfactual} and
+\textsc{weak counterfactual} in Table~\ref{tab:verdict}: whether a component is a contrast against an arm that
+could have come out otherwise. Two are not---$E_{\mathrm{range}}$ is a theorem about the instrument's range,
+and $g_{\mathrm{aut}}$ records that a solver was never on the method path, so neither can be surprised by
+data---and $\Delta_{\mathrm{prior}}$ is weak in this sense because the prior arm optimizes a \emph{different}
+objective. Only $\Delta_{\mathrm{gamer}}$, $\Delta_{\mathrm{undirected}}$ and
+$\Delta_{\mathrm{held\text{-}out}}$ are counterfactual contrasts, and of those one is narrow, one is null and
+one is weak.
 
 \begin{table}[t]\centering\small
 \setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.2}
@@ -308,28 +327,8 @@ filled in.} The expanded form of Fig.~\ref{fig:verdict}. All rates are $r_{\math
 (Eq.~\eqref{eq:metricnames}) unless stated. This is the verdict:
 \emph{partial audit success---diagnostic crossing evidence, not robust capability acquisition}.
 How to read a mostly-negative vector is discussed in the text immediately preceding this table.
-\textbf{Classification rule, applied uniformly throughout the paper.} \emph{Exact}: proved, discharged offline.
-\emph{Established}: the effect's $95\%$ interval excludes zero at the deepest resampling level run for that
-component, where ``deepest'' is fixed in advance as \emph{every} level of variation the component's design
-contains, resampled by the estimator that matches that design. Where a component admits more than one nesting
-variant we name which is which rather than choosing after seeing the answer: for $\Delta_{\mathrm{gamer}}$ the
-primary estimator draws all three executions inside each drawn seed, because that is the design that was run;
-the one-execution-per-seed variant estimates the uncertainty of a \emph{different, smaller} study and is
-reported as a conservative sensitivity, not as the classifier. We state both intervals in every case, so a
-reader who prefers the conservative variant can reclassify $\Delta_{\mathrm{gamer}}$ as weak and nothing else in
-the paper changes. \emph{Weak}: the effect is directionally consistent but its interval or its replication does
-not support it. \emph{Not established}: the interval spans zero. By that rule this study returns \textbf{one exact,
-three established, one weak, one not established}---and one of the three established components
-($g_{\mathrm{aut}}$) is established by \emph{verified non-use}, a structural fact about the system, not by a
-counterfactual ablation. Every count of components stated elsewhere in this paper is this
-one---but that count should not be read without the second question the rows also answer, flagged
-\textsc{no counterfactual} and \textsc{weak counterfactual} where it applies: whether a component is a contrast
-against an arm that could have come out otherwise. Two are not. $E_{\mathrm{range}}$ is a theorem about the
-instrument's range and $g_{\mathrm{aut}}$ records that a solver was never on the method path, so neither can be
-surprised by data; $\Delta_{\mathrm{prior}}$ is weak in this sense because the prior arm optimizes a
-\emph{different} objective, so its $0/60$ is partly a statement about that objective. Only
-$\Delta_{\mathrm{gamer}}$, $\Delta_{\mathrm{undirected}}$ and $\Delta_{\mathrm{held\text{-}out}}$ are
-counterfactual contrasts, and of those one is narrow, one is null and one is weak.}\label{tab:verdict}
+The classification rule and how to count the components are stated in the text immediately preceding this
+table, and applied uniformly throughout the paper.}\label{tab:verdict}
 \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{3.3cm}>{\raggedright\arraybackslash}p{2.35cm}L@{}}
 \toprule
 \textbf{component} & \textbf{finding} & \textbf{basis, and what it does \emph{not} show}\\
@@ -424,8 +423,7 @@ operating over the mildly context-sensitive class \citep{reedergiegerich2004}. C
 context-free (an Ogden-lemma argument on the interleaved dependencies rules out any CFG \citep{nebelweinberg})
 and are captured by an MCFG of dimension $\le 2$; the canonical pseudoknot grammar of \citet{rivaseddy2000} is
 exactly such \citep{katosekikasami2006}. The pseudoknot-free/pseudoknot split a design pipeline already treats
-as two verifier branches therefore straddles the $\CF\!\to\!\MCF$ boundary \emph{for the families we treat}
-(Fig.~\ref{fig:hierarchy}, App.~\ref{app:support}); we do not claim the whole crossing set $\PK$ falls in one
+as two verifier branches therefore straddles the $\CF\!\to\!\MCF$ boundary \emph{for the families we treat}; we do not claim the whole crossing set $\PK$ falls in one
 fixed low-dimension MCFG
 class.
 
@@ -580,8 +578,7 @@ Def.~\ref{def:cert}---never a single result. Within it: \textbf{exact exclusion}
 (Prop.~\ref{prop:confine}), the only exact component; \textbf{empirical gain} is the before/after difference
 under a shared adjudicator; \textbf{verified non-use} is the solver-removal result, always relative to a
 declared tool class, and is an audit of the call graph rather than a counterfactual (Rem.~\ref{rem:autonomy}); \textbf{cross-predictor consistency} is what the panel measures,
-never physical truth; and \textbf{scientific confirmation}---the wet-lab rung---is \emph{not attempted here}
-(Table~\ref{tab:layers}, Fig.~\ref{fig:ladder} R4). \textbf{We reserve ``certified'' for the exact exclusion
+never physical truth; and \textbf{scientific confirmation}---the wet-lab rung---is \emph{not attempted here}. \textbf{We reserve ``certified'' for the exact exclusion
 alone}: a panel verdict is \emph{adjudicated} or \emph{mixed-panel-consistent}, never certified, and no design
 in this paper is described as a certified design. For the same reason we write \emph{mixed-panel-consistent
 crossing} and not ``panel-robust ascent'': two of the three predictors are inside the operator's objective and
@@ -630,7 +627,7 @@ exposes. This operationalizes a Lakatosian \emph{risky prediction} \citep{popper
 committing before the verdict, including an undesignability claim (\S\ref{sec:impossible}) the oracle may
 refute, makes each target an opportunity to be wrong. It is the design-time analogue of pre-registration and
 of agentic falsification loops \citep{huang2025popper,liu2024aigs}, but with an exact refuter rather than a
-statistical one. Figure~\ref{fig:cert} (App.~\ref{app:support}) summarizes the audit.
+statistical one.
 
 \paragraph{The certification procedure and its soundness.} Certifying an ascent on a held-out pool
 $\mathcal D_{\mathrm{ho}}$ runs five steps: (i) pre-screen $\mathcal D_{\mathrm{ho}}$ for designability
@@ -667,13 +664,11 @@ the paired McNemar per seed ($b$ solved only by the panel operator, $c$ only by 
 effect size $\widehat\Delta_s$ (paired risk difference), and the pooled
 paired difference $\Delta{=}p_{\mathrm{panel}}{-}p_{\mathrm{gamer}}$ under \emph{two} bootstraps
 ($B{=}20{,}000$): a target-level cluster bootstrap (seeds fixed) and a \emph{two-way} bootstrap resampling
-targets \emph{and} seeds, which admits algorithmic variance. Both exclude zero---but with five seeds the
-second is a sensitivity interval, not a stable variance estimate, and a third source of variation
-(execution-to-execution at a fixed seed) is quantified separately in App.~\ref{app:repro}. Single $60$-target
-seeds are underpowered, but on the $125$ ID-disjoint targets (ids $126$--$250$) the three-predictor
-separation is significant in $2/3$ seeds (paired McNemar $p\le2.0\!\times\!10^{-3}$; \S\ref{sec:exp}).
-This is the $r_{\mathrm{mix}}$ metric of Eq.~\eqref{eq:metricnames}; the held-out-only metric
-$r_{\mathrm{ho}}$ is far weaker (Table~\ref{tab:sknots}).
+targets \emph{and} seeds. Both exclude zero, but with five seeds the second is a sensitivity interval, not a
+stable variance estimate, and execution-to-execution variation is quantified separately in
+App.~\ref{app:repro}. Single $60$-target seeds are underpowered; on the $125$ ID-disjoint targets the
+separation is significant in $2/3$ seeds ($p\le2.0\!\times\!10^{-3}$). This is $r_{\mathrm{mix}}$; the
+held-out-only $r_{\mathrm{ho}}$ is far weaker (Table~\ref{tab:sknots}).
 (\texttt{runs/cc\_ascent/stats\_separation.py}, \texttt{large\_pool\_stats.py}.)}\label{tab:sep}
 \begin{tabularx}{\linewidth}{@{}Xcccc@{}}
 \toprule
@@ -697,7 +692,7 @@ empirical, and the positive side is neither. A ``formed pseudoknot''
 verdict comes from a heuristic predictor over a restricted pseudoknot class, not biophysical ground truth,
 and is oracle-dependent: our companion measured that the fraction of state-of-the-art pseudoknot designs
 judged to form their target swings across predictors, a $[\,15,60\,]\%$ envelope over pKiss, ProbKnot, and
-ShapeKnots, with only fair pairwise agreement \citep{verifiereconomics} (Fig.~\ref{fig:oracle}). The
+ShapeKnots, with only fair pairwise agreement \citep{verifiereconomics}. The
 disagreement is mechanistic, not noise: the three predictors cover different pseudoknot subclasses and
 optimize different objectives. pKiss enumerates H-type and kissing-hairpin motifs under a heuristic folding
 model \citep{janssen2015pkiss}, ProbKnot assembles maximum-expected-accuracy pairs from a partition function
@@ -708,17 +703,6 @@ declines to convert a modeling artifact into a claimed capability. We call the p
 not statistically independent: all three are computational secondary-structure models sharing thermodynamic
 and structural assumptions, so their errors can correlate. Panel-unanimity is therefore cross-predictor
 consistency under the declared computational panel, not independent physical confirmation or ground truth.
-
-\begin{figure}[t]\centering
-\includegraphics[width=0.82\linewidth]{fig_cc_oracle.pdf}
-\caption{\textbf{The positive side is model-relative.} The fraction of state-of-the-art pseudoknot designs
-judged to ``form'' their target swings across predictors---a $[\,15,60\,]\%$ envelope over ProbKnot, pKiss,
-and ShapeKnots, measured in the companion \citep{verifiereconomics} on \emph{published} state-of-the-art
-designs. The ordering within that envelope does not carry over to the designs adjudicated in this paper, and we
-do not use it as one---see the reconciliation in \S\ref{sec:exp}. We report the conservative
-panel-unanimous rate as primary, pKiss as reference, and the full envelope, abstaining where predictors
-disagree. Values are companion-measured; no rate is fixed in this manuscript.}\label{fig:oracle}
-\end{figure}
 
 We adjudicate the positive side accordingly. A held-out crossing target counts as realized only under an
 explicit rule, and we report all three: (i) \emph{panel-unanimous} (all three predictors confirm the exact
@@ -1020,7 +1004,7 @@ higher.) Disagreements trigger abstention; we never treat a single predictor as 
 Development/evaluation pool, $n=60$ Pseudobase targets, seed $0$; solves adjudicated by the pKiss branch; values
 from a single logged run (\texttt{rna\_harness/runs/cc\_ascent}). The invented operator matches the external
 solver under pKiss while never calling it, but this rate is largely an oracle artifact
-(Table~\ref{tab:panel}, Fig.~\ref{fig:collapse}). At a $\sim\!3\times$ smaller budget the operator also
+(Table~\ref{tab:panel}). At a $\sim\!3\times$ smaller budget the operator also
 reaches $43/60$ ($8.3\!\times\!10^{-3}$ USD).}\label{tab:baselines}
 \begin{tabularx}{\linewidth}{@{}Lccc@{}}
 \toprule
@@ -1046,7 +1030,7 @@ panel refutes (a $0/60$ panel credit on the E0 skeleton control below).
 
 The positive side does not survive the panel. The operator optimized pKiss in the loop; re-adjudicated by
 a held-out predictor, only $2/43$ of its solves are confirmed and one is panel-unanimous
-(Table~\ref{tab:panel}, Fig.~\ref{fig:collapse}). The apparent $43/60$ ascent collapses to
+(Table~\ref{tab:panel}). The apparent $43/60$ ascent collapses to
 $1/60$: an oracle artifact, the operator having learned the blind spots of the predictor it was scored on
 \citep{skalse2022,gao2023overopt}. A single-oracle evaluation would have reported a new autonomous
 capability; under the abstaining panel (\S\ref{sec:oracle}) almost nothing survives. The gap between $43$
@@ -1081,14 +1065,6 @@ pseudoknot-free MFE, \emph{blind} $A_{\mathrm{nest}}$ & $4/43$ & designs the nes
 \bottomrule
 \end{tabularx}
 \end{table}
-
-\begin{figure}[t]\centering
-\includegraphics[width=0.78\linewidth]{fig_cc_collapse.pdf}
-\caption{\textbf{The panel exposes oracle-gaming (measured, $n=60$).} The invented operator's single-oracle
-solve rate ($43/60$, matching the borrowed DesiRNA ceiling) collapses to $2$ under a held-out predictor
-and to $1$ panel-unanimous, a collapse from $43/60$ to $1/60$ invisible to a one-sided criterion, above the
-decidable context-free floor of $0/60$.}\label{fig:collapse}
-\end{figure}
 
 \paragraph{Oracle-gaming vs.\ oracle-robustness: a contrast with the borrowed solver.} Is the collapse
 specific to our operator? Re-adjudicating the external solver's $43$ pKiss-solves under the same panel
@@ -1179,6 +1155,23 @@ to be causally load-bearing only for $r_{\mathrm{in}}$, the metric it directly o
 This is uncomfortable for a ``capability'' reading, and we let it stay uncomfortable rather than resolving it
 by rhetoric.
 
+\begin{table}[t]\centering\small
+\setlength{\tabcolsep}{6pt}\renewcommand{\arraystretch}{1.15}
+\caption{\textbf{Component ablation of the operator} (pKiss, $n=60$, matched nominal cap). The CF-skeleton
+decomposition and the crossing-stem composition are inert; only the oracle-guided repair carries the
+capability: the operator is search against the oracle.}\label{tab:ablate}
+\begin{tabular}{@{}lcl@{}}
+\toprule
+\textbf{variant} & \textbf{solved\,/\,60 (pKiss)} & \textbf{effect vs.\ full}\\
+\midrule
+full (decompose $+$ compose $+$ repair) & $43$ & baseline\\
+$-$ decompose (random init, no \CF{} skeleton) & $43$ & $0$ (inert)\\
+$-$ compose (crossing bases left unset) & $43$ & $0$ (inert)\\
+$-$ repair (no oracle-guided search) & $25$ & $-18$ (carries the capability)\\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \paragraph{What the operator's capability actually is (ablation).} Ablation localizes the capability
 (Table~\ref{tab:ablate}). Removing the structured decomposition (the \CF{} skeleton and the
 complementarity-composed crossing stem) leaves the pKiss rate unchanged at $43/60$; starting repair from a
@@ -1200,22 +1193,16 @@ App.~\ref{app:support}),
 versus $\sim\!1/60$ for the pKiss-only operator and $0/60$ for the SOTA solver.
 
 \emph{Those bands are single-execution draws, and the replicated bands are wider.} We quote $34$--$37$ and
-$3$--$8$ because they are what the five original seeds gave, but they understate the spread: pooling all $18$
+$3$--$8$ because they are what the five original seeds gave, but they understate the spread: pooling all $24$
 independent executions we later ran (Table~\ref{tab:gvp}, App.~\ref{app:repro}) the two-oracle rate ranges
 $30$--$39/60$ and the three-predictor rate $1$--$9/60$ with mean $\approx\!3.29$. Every band of this form in
 this paper should be read as the range of the runs named beside it, never as a stable interval for the
-operator; the evidential units are the paired differences and their intervals. But panel-unanimity puts two
-of its three conjuncts (pKiss, ProbKnot) \emph{inside} the operator's objective, so it cannot by itself show
-generalization to the one \emph{genuinely held-out} oracle, ShapeKnots. Comparing the two operators on the
-\emph{ShapeKnots-only} exact-match rate at a fixed denominator (ID-disjoint targets, ids $126$--$250$)
-is far less decisive: the panel operator scores $8,11,11$ and the pKiss-gamer $7,4,3$ over three seeds---higher
-each time but small, and significant by paired McNemar in only one seed
-($p=1.000,\,0.092,\,0.021$; discordant $(b,c)=(8,7),(10,3),(9,1)$, so unlike the unanimity outcome the gamer
-does win targets the panel operator loses). The honest
-statement is therefore narrow: optimizing a two-oracle conjunction improves the three-oracle conjunction rate
-(from $\sim\!1/60$ to mean $5.0/60$) and nudges the single-held-out-oracle rate upward, but not by enough to
-claim robust generalization to an unoptimized predictor. More distinct checks tighten the audit; none
-makes its positive side exact.
+operator; the evidential units are the paired differences and their intervals. Panel-unanimity also puts two
+of its three conjuncts inside the operator's objective, so it cannot by itself show generalization to the one
+genuinely held-out oracle. On the ShapeKnots-only rate the panel operator is higher every seed but significant
+in one of three (Table~\ref{tab:sknots}). The honest statement is narrow: optimizing a two-oracle conjunction
+raises the three-oracle rate ($\sim\!1/60$ to mean $5.0/60$) and nudges the held-out rate, not enough to claim
+robust generalization. More distinct checks tighten the audit; none makes its positive side exact.
 
 \paragraph{The matched-nominal-cap control, and what component attribution actually supports.} All
 six arms of Table~\ref{tab:pablate} are the \emph{same} operator at identical wall-clock and iteration
@@ -1284,20 +1271,13 @@ separate, larger-pool run of Table~\ref{tab:sknots} instead.
 \setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.15}
 \caption{\textbf{Matched-\emph{nominal}-budget component ablation of the panel operator}, over
 $3$ nominal seeds $\times$ $3$ independent \emph{executions} $=9$ runs per arm on the primary pool ($n{=}60$),
-all arms in the same sweep so comparisons are paired on target, seed \emph{and} execution. Every arm is the same
-operator at identical wall-clock and iteration \emph{caps}, oracle access and gating, initialization and
-mutation-proposal distribution; only the named component is removed. $-$objective deletes the lexicographic
-acceptance test, making the walk \emph{undirected}; $-$objective$,-$bias additionally draws mutation sites
-uniformly, so the oracles only recognize hits and never steer.
-\emph{Matched-\textnormal{nominal}, not matched-realized}: identical caps do not imply identical consumed
-compute---the undirected arms in fact spend $33$--$63\%$ \emph{more} pKiss calls, because they run to the wall
-instead of solving early (Table~\ref{tab:budget}), so they are not budget-disadvantaged. Per-seed entries are
-means over the three executions; $\Delta$ is the paired difference (full $-$ ablation) with a
-\emph{three-level} bootstrap $95\%$ interval resampling targets, seeds \emph{and} executions
-($B{=}20{,}000$); \textbf{bold} $=$ interval excludes zero. The two metric blocks say different things:
-directedness is decisively load-bearing on the operator's \emph{own} objective $r_{\mathrm{in}}$, whereas on the
-three-predictor $r_{\mathrm{mix}}$ \emph{only the repair loop} is established and directedness is not.
-(\texttt{runs/cc\_ascent/panel\_ablate.sh}, \texttt{panel\_replicate.sh}, \texttt{pabrep\_stats.py}.)}\label{tab:pablate}
+all arms in the same sweep so comparisons are paired on target, seed \emph{and} execution. Every arm is the
+same operator at identical caps, oracle access and gating, initialization and mutation proposal; only the named
+component is removed. Matched on \emph{nominal} caps, not realized compute---the undirected arms spend
+$33$--$63\%$ \emph{more} pKiss calls (Table~\ref{tab:budget}), so they are not budget-disadvantaged. $\Delta$
+is the paired difference (full $-$ ablation) with a three-level bootstrap interval over targets, seeds and
+executions ($B{=}20{,}000$); \textbf{bold} $=$ excludes zero.
+(\texttt{panel\_ablate.sh}, \texttt{panel\_replicate.sh}, \texttt{pabrep\_stats.py}.)}\label{tab:pablate}
 \begin{tabularx}{\linewidth}{@{}Lcccccc@{}}
 \toprule
 & \multicolumn{3}{c}{$r_{\mathrm{in}}$: pKiss\,$\wedge$\,ProbKnot (in-objective)}
@@ -1805,8 +1785,7 @@ ProbKnot $4\%$, ShapeKnots $11\%$---and the three-way conjunction only $\mathbf{
 \emph{The predictors do not have a fixed stringency order, and we should not have implied one.} On these
 natives the order is pKiss\,$>$\,ShapeKnots\,$>$\,ProbKnot; on designs it inverts, with DesiRNA's designs
 confirmed by ProbKnot $60\%$ of the time and by ShapeKnots $2.3\%$ (Table~\ref{tab:carry}); and the
-companion's envelope over published state-of-the-art designs orders them a third way
-(Fig.~\ref{fig:oracle}). The three are not in contradiction once the populations are distinguished. On
+companion's envelope over published state-of-the-art designs orders them a third way. The three are not in contradiction once the populations are distinguished. On
 natives no design objective is in play, so the order reflects each predictor's intrinsic crossing recall. On
 designs it is dominated instead by \emph{model-family sharing} between the predictor and the objective that
 produced the design: ProbKnot and a minimum-free-energy designer are both built on the same nearest-neighbour
@@ -1830,16 +1809,14 @@ dominated by search variance.
 \paragraph{Agent-written operators, and positive-side stringency.} \emph{(a)} Six frontier LLM agents, given
 only primitives and the two crossing oracles, each write an operator with a nonzero $r_{\mathrm{mix}}$ on the
 development/evaluation $60$ ($2$--$17/60$), four of them above the hand-built operator's band---one
-temperature-$0.4$ draw per model, so this supports no model ranking (App.~\ref{app:invent},
-Tables~\ref{tab:invclaims},~\ref{tab:models}). We previously filed this as descriptive support for the single
+temperature-$0.4$ draw per model, so this supports no model ranking (App.~\ref{app:invent}, Table~\ref{tab:models}). We previously filed this as descriptive support for the single
 objection that the audited operator was researcher-designed. It carries more weight than that, and we have
 promoted the part that does: replicated on the conditional carry-over statistic, two of these operators supply
 the positive control that establishes the panel is not merely insensitive (\S\ref{sec:exp}). What stays
 descriptive is the model-to-model comparison, which rests on one draw each. \emph{(b)} On the
 mixed-panel-consistent designs the target is the pKiss MFE for all $17$ whose suboptimal enumeration completed,
 dominant by a median $1.2$\,kcal/mol, so the positive verdict is not a marginal coincidence of pair
-sets---within the pKiss energy model, on the shorter designs only (App.~\ref{app:config},
-Fig.~\ref{fig:stringency}).
+sets---within the pKiss energy model, on the shorter designs only.
 
 
 
@@ -1853,11 +1830,9 @@ itself the finding: robust autonomous pseudoknot design is hard, and two-oracle 
 third only partially. Where an operator cannot cross, \textbf{E3} (a minimal-grammar-hint sweep) bounds what
 a hint would buy above the floor, so the outcome is informative even under a null.
 
-\paragraph{Portability (supplementary).} The two-sided pattern appears not to be specific to RNA: the
-decidable verifier-range side re-instantiates on SAT clause-width definability, and the positive-side
-gaming-catch on three eval-gaming channels with no formal hierarchy. Both are recorded in
-Appendices~\ref{sec:sat} and~\ref{sec:audit} as \emph{supplements}, they are small and single-run, and no claim
-in this paper rests on them.
+\paragraph{Portability (supplementary).} The decidable verifier-range side is not specific to RNA: it
+re-instantiates on SAT clause-width definability (App.~\ref{sec:sat}). That port is small and single-run and
+no claim in this paper rests on it.
 
 \section{Discussion, Related Work, and Conclusion}\label{sec:discussion}
 
@@ -1986,14 +1961,11 @@ discovery.
 oracles a self-improving system optimizes against are fallible surrogates (a docking score, a force field, a
 learned reward, a structure predictor, a theorem-search heuristic), so a closed loop can improve the oracle's
 score without improving the capability---as our operator drove pKiss to $43/60$ while a multi-predictor panel
-saw $1/60$. An autonomous discovery system spans four layers (Table~\ref{tab:layers},
-App.~\ref{app:support}): generation, self-revision, \textbf{audit}, and scientific confirmation. Self-revising
+saw $1/60$. An autonomous discovery system spans four layers: generation, self-revision, \textbf{audit}, and scientific confirmation. Self-revising
 discovery \citep{selfrevising} equips the revision layer; this work equips the audit layer, with RNA's
 decidable boundary an unusually clean instance. The protocol ports---molecular generation adjudicated against
 DFT or assays, protein design against binding readouts, theorem discovery against an exact checker---and
-App.~\ref{sec:audit} gives first evidence that the positive side catches agent gaming in three
-mechanistically distinct channels with no formal hierarchy (biased judge, test-set leakage, sycophancy), each
-with $0$ observed false positives, which is not a calibrated rate.
+whether the positive side ports to settings with no decidable hierarchy is open; we do not test it here.
 
 \paragraph{Limitations.} We list these in rough order of how much they bound the contribution.
 \emph{(i) The benchmark cannot support a well-powered transfer test.} The index split is not a structural split
@@ -2035,7 +2007,7 @@ family-level class reading is evidential, and no change in any system's language
 (Table~\ref{tab:pools}); on a cross-source bpRNA pool even the borrowed SOTA solver does not clear the strict
 panel. No pre-registered, never-examined final set was run. \emph{(ix) We define the audit, not the invention
 algorithm} (Rem.~\ref{rem:scope}); the six-model invention experiment that answers the
-``researcher-designed operator'' objection is descriptive only (Table~\ref{tab:invclaims}).
+``researcher-designed operator'' objection is descriptive only.
 
 \paragraph{Future work.} The growing-parameter transfer test---tune on small stems, freeze, test on strictly larger
 unseen members of $\mathcal{L}_{\mathrm H}=\{T_{n,m}:n,m\ge1\}$---is now run (\S\ref{sec:exp}): the frozen
@@ -2227,12 +2199,6 @@ asserting that statistic is a formal grammar grade. The $\CF\!\to\!\MCF$ boundar
 paper---is crossed already at the first tier (one crossing stem); higher tiers are a finer hierarchy
 \emph{within} \MCF{} that we do not attempt to climb.
 
-\smallskip\noindent\textbf{The folding oracles (models and output spaces).} Table~\ref{tab:oracles} fixes each
-oracle as a map $\Sigma^\ast\!\to\mathcal T$ with an explicit range. $\operatorname{im}\Ocf\subseteq\NESTED$ (generally strict, as undesignable nested structures are unrealizable) is exactly
-what Prop.~\ref{prop:confine} (via Lemma~\ref{lem:bound}) requires; the three panel predictors admit crossing
-outputs but model \emph{different} pseudoknot subclasses under different objectives---the mechanistic source
-of the $[15,60]\%$ cross-oracle envelope of \S\ref{sec:oracle} and hence of the abstention rule.
-
 \begin{table}[h]\centering\small
 \setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.2}
 \caption{The oracles as maps $\Sigma^\ast\!\to\mathcal T$: folding model, range, and pseudoknot subclass
@@ -2248,6 +2214,12 @@ ShapeKnots & MFE under SHAPE restraints (here run \emph{de novo}) \citep{hajdin2
 \bottomrule
 \end{tabularx}
 \end{table}
+
+\smallskip\noindent\textbf{The folding oracles (models and output spaces).} Table~\ref{tab:oracles} fixes each
+oracle as a map $\Sigma^\ast\!\to\mathcal T$ with an explicit range. $\operatorname{im}\Ocf\subseteq\NESTED$ (generally strict, as undesignable nested structures are unrealizable) is exactly
+what Prop.~\ref{prop:confine} (via Lemma~\ref{lem:bound}) requires; the three panel predictors admit crossing
+outputs but model \emph{different} pseudoknot subclasses under different objectives---the mechanistic source
+of the $[15,60]\%$ cross-oracle envelope of \S\ref{sec:oracle} and hence of the abstention rule.
 
 \section{Reproducibility and Protocol Details}\label{app:repro}
 Oracles are computed and replayable under a fixed configuration; harness, target lists, intrinsic grades,
@@ -2454,7 +2426,7 @@ pool-level acquisition---the separation holding per seed on the enlarged pool (\
 level each result reaches rather than collapsing them into one pass/fail bit.
 
 \subsection{Worked example: a canonical H-type pseudoknot}\label{app:worked}
-\paragraph{Worked example (Fig.~\ref{fig:worked}).} The canonical H-type pseudoknot $(((([[[[))))]]]]$ has a
+\paragraph{Worked example.} The canonical H-type pseudoknot $(((([[[[))))]]]]$ has a
 nested round stem and a square stem that crosses it. Its \CF{} skeleton (round brackets only) is realized
 under \Ocf{} and would be scored ``solved'' by a pseudoknot-blind check, yet \Opk{} finds the crossing stem
 absent (a naive-MFE false positive; the negative side, Prop.~\ref{prop:confine}). The full target needs a
@@ -2462,14 +2434,6 @@ design whose \Opk-fold forms both stems, with the target a member of the non-CF 
 The audit reads: ($-$) the \Ocf-verified repertoire yields only the skeleton; (+) the panel confirms
 the full crossing target once the capability exists; autonomy asks whether that capability needs an external
 solver.
-
-\begin{figure}[t]\centering
-\includegraphics[width=0.96\linewidth]{fig_cc_worked.pdf}
-\caption{\textbf{Worked example: a canonical H-type pseudoknot.} The round stem is nested; the square
-stem crosses it (a pseudoknot stem). A \Ocf-verified repertoire yields only the skeleton---the pseudoknot-aware
-oracle reports the crossing stem absent (negative side). This target is a member of the non-CF H-type family
-$\mathcal L_{\mathrm H}$, whose members need a two-component (MCFG-2) derivation.}\label{fig:worked}
-\end{figure}
 
 \subsection{Leave-one-oracle-out}\label{app:looo}
 \paragraph{Leave-one-oracle-out: gaming is real but asymmetric.} Rotating which oracle is optimized and
@@ -2537,23 +2501,6 @@ panel operator has a materially positive one.
 
 \subsection{Additional result tables and schematics}\label{app:moretab}
 \begin{table}[t]\centering\small
-\setlength{\tabcolsep}{6pt}\renewcommand{\arraystretch}{1.15}
-\caption{\textbf{Component ablation of the operator} (pKiss, $n=60$, matched nominal cap). The CF-skeleton
-decomposition and the crossing-stem composition are inert; only the oracle-guided repair carries the
-capability: the operator is search against the oracle.}\label{tab:ablate}
-\begin{tabular}{@{}lcl@{}}
-\toprule
-\textbf{variant} & \textbf{solved\,/\,60 (pKiss)} & \textbf{effect vs.\ full}\\
-\midrule
-full (decompose $+$ compose $+$ repair) & $43$ & baseline\\
-$-$ decompose (random init, no \CF{} skeleton) & $43$ & $0$ (inert)\\
-$-$ compose (crossing bases left unset) & $43$ & $0$ (inert)\\
-$-$ repair (no oracle-guided search) & $25$ & $-18$ (carries the capability)\\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\begin{table}[t]\centering\small
 \setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.15}
 \caption{\textbf{Mixed-panel-consistent autonomous crossings, by success predicate} (development/evaluation pool,
 $n=60$). Systems whose in-loop success predicate is a two-predictor conjunction reach a higher
@@ -2573,15 +2520,6 @@ panel operator & pKiss $\wedge$ ProbKnot & ShapeKnots & $\mathbf{3}$--$\mathbf{8
 \bottomrule
 \end{tabularx}
 \end{table}
-
-\begin{figure}[t]\centering
-\includegraphics[width=0.86\linewidth]{fig_cc_hierarchy.pdf}
-\caption{\textbf{RNA topology maps onto the Chomsky hierarchy.} Nested base pairs are context-free (SCFG);
-crossing pairs (pseudoknots) are, as unbounded families, non-\CF{} and admit mildly context-sensitive (MCFG)
-grammars, provably above \CF. The boundary is the $\CF\!\to\!\MCF$ jump; folding complexity (P$\to$NP-complete)
-is a distinct computational axis (topology-, model-, and objective-dependent), not implied by the generative
-class.}\label{fig:hierarchy}
-\end{figure}
 
 \subsection{Growing-parameter extrapolation, in full}\label{app:family}
 \paragraph{Growing-parameter extrapolation within the H-type family.} A finite held-out set cannot alone
@@ -2663,70 +2601,8 @@ $\{1,3,1\}/20$: no clean budget trend, dominated by search variance, consistent 
 rather than a budget-monotone capability.
 
 \subsection{Claim--evidence--status table}\label{app:claims}
-\begin{table}[t]\centering\small
-\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.15}
-\caption{Claim--evidence--status. Theorems are proved in App.~\ref{app:proofs}; formal-language facts are
-\emph{invoked} from the cited literature; empirical claims are backed by logged runs (\S\ref{sec:exp}).}
-\label{tab:claims}
-\begin{tabularx}{\linewidth}{@{}>{\hsize=1.32\hsize}L>{\hsize=1.00\hsize}L>{\hsize=0.68\hsize}L@{}}
-\toprule
-\textbf{Claim} & \textbf{Basis} & \textbf{Status}\\
-\midrule
-Nested $=$ \CF; \emph{selected} unbounded crossing families non-\CF{} and MCFG-characterizable; those families sit above the $\CF\!\to\!\MCF$ boundary (no claim that all of $\PK$ is uniformly MCFG-$2$) &
- \citep{rivaseddy2000,nebelweinberg,katosekikasami2006} & invoked; cited\\
-A \CF-verified repertoire cannot be \emph{certified} to realize a crossing target (its verifier's range is nested) &
- Prop.~\ref{prop:confine} (oracle output space) & lemma (decidable)\\
-The targeted crossing family $\mathcal L_{\mathrm H}$ is non-\CF{} (low-dim MCFG), not a larger CFG & $\mathcal L_{\mathrm H}\!\subseteq\!\PK$ non-CF $+$ MCFG-2 witness
- \citep{nebelweinberg,katosekikasami2006} & theorem $+$ invoked\\
-Positive side is model-relative, not exact & oracle-dependence of PK predictors \citep{verifiereconomics}
- & acknowledged; panel+abstain\\
-Invented operator solves crossings under \emph{one} oracle & development/evaluation pool, pKiss & measured: $43/60$\\
-That single-oracle rate is largely an \emph{oracle artifact} & three-predictor panel (ProbKnot/ShapeKnots) &
- measured: $1/60$ ($r_{\mathrm{mix}}$)\\
-Two-oracle objective beats single-oracle gaming on $r_{\mathrm{mix}}$ & paired, matched-access, 5 seeds
- (Tables~\ref{tab:sep},~\ref{tab:gvp}) & measured: $\Delta{=}{+}0.048$\\
-The \emph{gain over undirected search} is attributable to components & matched-nominal-cap ablation
- (Table~\ref{tab:pablate}) & measured: \textbf{not established}\\
-Held-out-oracle ($r_{\mathrm{ho}}$) generalization & ShapeKnots-only, ID-disjoint pool
- (Table~\ref{tab:sknots}) & measured: weak\\
-Operator needs no external solver (autonomy w.r.t.\ solver class) & $\pm$solver ablation; \CF{} floor &
- measured: $0/60$ floor\\
-Repertoire-confinement $\neq$ target-undesignability & \S\ref{sec:impossible} & distinction (theorem)\\
-Cross-source generalization, or physical formation & --- & \textbf{not claimed}\\
-\bottomrule
-\end{tabularx}
-\end{table}
-
 \subsection{Schematic of the two-sided audit}\label{app:certfig}
-\begin{figure}[t]\centering
-\includegraphics[width=0.96\linewidth]{fig_cc_certificate.pdf}
-\caption{\textbf{The two-sided audit.} Positive side (model-relative, panel-adjudicated): the predictor panel
-adjudicates crossing designs; of the three predictors only ShapeKnots is held out of the
-optimization loop. Negative side (exact verifier-range exclusion $+$ a separate empirical
-floor): the pseudoknot-free oracle cannot represent crossings (Prop.~\ref{prop:confine}), and the prior policy
-scores $0/60$ under the shared panel. Autonomy is stated \emph{relative to the tool class} of packaged
-inverse-design solvers---solver-free, not oracle-free---with the operator's contribution isolated by a
-matched-access, matched-nominal-cap comparison (Table~\ref{tab:pablate}). Sealed commitment falls after in-loop
-optimization and before held-out adjudication.}\label{fig:cert}
-\end{figure}
-
 \subsection{Dataset summary (main-text version)}\label{app:datatab}
-\begin{table}[t]\centering\small
-\setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.1}
-\caption{Datasets and intrinsic grading (established facts; counts from \citep{andersonlee2016eterna100,koodli2021eterna100v2,rnainvbench,
-verifiereconomics}). The pool split is a protocol choice, by target index; it is \emph{not} a structural
-split (Table~\ref{tab:pools}).}\label{tab:data}
-\begin{tabularx}{\linewidth}{@{}llLL@{}}
-\toprule
-\textbf{Set} & \textbf{Class} & \textbf{Size / length} & \textbf{Intrinsic grade}\\
-\midrule
-EteRNA100-V2 & nested (\CF) & 100 targets, $12$--$400$\,nt & establishes \CF-competence baseline\\
-Pseudobase & crossing (non-\CF) & 251 targets, $21$--$137$\,nt & crossing-stem count: H-type $216$,
- kissing $33$, complex($\ge3$) $2$\\
-\bottomrule
-\end{tabularx}
-\end{table}
-
 \subsection{Adjudicator choice, abstention scoring, and what ShapeKnots costs}\label{app:adjud}
 \paragraph{Conservative scoring, and the adjudicator's role.} The abstention rule is scored
 \emph{conservatively}: a target whose design the predictors do not unanimously confirm counts as not-solved in
@@ -2780,22 +2656,6 @@ $\mathcal L_{\mathrm H}$, tested by transfer to unseen parameters (\S\ref{sec:ex
 which as a finite object is regular.
 
 \subsection{Where the audit layer sits in an AI4S stack}\label{app:layers}
-\begin{table}[t]\centering\small
-\setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.2}
-\caption{\textbf{An AI4S discovery stack, and where each layer's tools sit.} The categorical self-revising
-line and this work occupy \emph{different, complementary} layers; neither subsumes the other.}\label{tab:layers}
-\begin{tabularx}{\linewidth}{@{}lXl@{}}
-\toprule
-\textbf{Layer} & \textbf{Question it answers / representative tools} & \textbf{Occupied by}\\
-\midrule
-Generation & Can the system produce candidates? (LLMs, search, evolution) & \citep{funsearch,alphaevolve}\\
-Self-revision & Can it change its own representations/operators? (schema/left-Kan transport, MDL gate, skill libraries) & \citep{selfrevising}\\
-\textbf{Audit} & \textbf{Is a gain the system's own}---not target memorization, delegation, or single-oracle gaming? (Search stays the mechanism \emph{under} audit, not an excluded alternative.) (sealed commitment, common independent adjudicator, autonomy ablation, decidable negative side) & \textbf{this work}\\
-Scientific confirmation & Does the candidate hold in the world? (exact checker, independent model, wet-lab assay) & (domain-specific)\\
-\bottomrule
-\end{tabularx}
-\end{table}
-
 \section{Datasets, Intrinsic Grades, and Materials}\label{app:data}
 Every target's difficulty \emph{grade} is a property of the target fixed before design: its \emph{formal-family
 type} (nested vs.\ crossing) and, within crossing, its \emph{crossing-pair count} $g$---the number of base pairs
@@ -2821,8 +2681,7 @@ EteRNA100-V2 & \citep{koodli2021eterna100v2} & $100$ / $12$--$400$\,nt & nested 
 \end{table}
 The cross-source pool is reconstructed to crossing dot-bracket from the pair list (crossing pairs are encoded
 as non-type-$0$; a greedy multi-bracket assignment yields $\le4$ bracket levels); multiplet structures are
-excluded so each base is in $\le1$ pair (\texttt{runs/cc\_ascent/bprna\_pk.py}). Figure~\ref{fig:grades}
-shows the two pools overlap on the crossing-pair count, so the cross-source drop
+excluded so each base is in $\le1$ pair (\texttt{runs/cc\_ascent/bprna\_pk.py}). The two pools overlap on the crossing-pair count, so the cross-source drop
 (\S\ref{sec:exp}) is not explained by that one covariate. \emph{We do not call the comparison
 ``grade-fair''}: overlap on a single prespecified structural covariate is not distribution matching. The two
 pools are \emph{not} matched on length, pseudoknot subtype, loop-length distribution, base-pair composition,
@@ -2879,71 +2738,10 @@ mixed-panel-consistent on $1.87/27$ ($6.9\%$, i.e.\ \emph{above} its $5.3\%$ dev
 gamer's $0.00/27$ in all fifteen executions, $b{=}28$ against $c{=}0$. The near-duplicate concern the audit
 raised is thus tested directly and does not materialize---but on $27$ targets that settles direction, not size.
 
-\begin{figure}[h]\centering
-\includegraphics[width=0.82\linewidth]{fig_cc_grades.pdf}
-\caption{Crossing-complexity spectrum (crossing-pair count $g$) of the primary Pseudobase++ pool and
-the independent bpRNA cross-source pool. The ranges overlap, so the cross-source drop is not attributable to
-this covariate alone---but the pools are matched on \emph{this covariate only}, not on length, subtype, motif
-family, or homology.}\label{fig:grades}
-\end{figure}
-
 \section{Full Experimental Results}\label{app:results}
-Table~\ref{tab:appfull} collects every arm on every pool. Table~\ref{tab:appfamily} is the per-size family
-sweep; Table~\ref{tab:appinvent} is the agent-invention trajectory.
-\begin{table}[h]\centering\small
-\setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.15}
-\caption{All arms $\times$ all pools. ``p-un.'' $=$ panel-unanimous (pKiss\,$\wedge$\,ProbKnot\,$\wedge$\,ShapeKnots,
-exact). Floor $=$ \CF-confined REMC; gamer $=$ single-oracle (pKiss) operator; DesiRNA $=$ borrowed SOTA;
-panel\_auto $=$ our two-oracle operator; agent $=$ the autonomously-written operator (App.~\ref{app:invent}).}\label{tab:appfull}
-\begin{tabularx}{\linewidth}{@{}l >{\hsize=.92\hsize}L >{\hsize=1.08\hsize}L@{}}
-\toprule
-arm / pool & development/evaluation ($n{=}60$) & other pools\\
-\midrule
-\CF{} floor & $0/60$ & $0/50$ (2nd); $0/60$ (cross); $0/10$ (family)\\
-gamer (pKiss) & $43/60$ pKiss; $2/43$ ProbKnot; $1/60$ p-un. & ---\\
-DesiRNA (borrowed) & $43/60$ pKiss; $26/43$ ProbKnot; $0/43$ p-un. & $2/10$ p-un. (family); $9/60$ pKiss, $0/60$ p-un. (cross)\\
-panel\_auto (5 seeds) & pKiss$\wedge$ProbKnot $\{37,34,37,36,34\}$; p-un.\ $\{8,3,5,5,4\}$ (mean $5.0$) & $5/50$ p-un.\ (2nd); $1$--$2/60$ pk$\wedge$pb, $0/60$ p-un.\ (cross, two runs); $4/10$ p-un.\ (family)\\
-\textbf{agent-invented} (6 models) & pKiss$\wedge$ProbKnot $26$--$42/60$; \textbf{p-un.\ $2$--$17/60$} (Table~\ref{tab:models}) & $4/6$ exceed hand-built; inherit cross-source narrowness\\
-\bottomrule
-\end{tabularx}
-\end{table}
-\begin{table}[h]\centering\small
-\setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.1}
-\caption{Family $\mathcal L_{\mathrm H}$ sweep (Fig.~\ref{fig:family}). $\times$ = not realized; pk$\wedge$pb =
-pKiss and ProbKnot; \textsc{u} = panel-unanimous.}\label{tab:appfamily}
-\begin{tabular}{@{}l*{10}{>{\centering\arraybackslash}p{1.02cm}}@{}}
-\toprule
-$n{=}m$ & 3 & 4 & 5 & 6 & 7 & 8 & (3,6) & (6,3) & (4,8) & (8,4)\\
-\midrule
-\CF{} floor & $\times$ & $\times$ & $\times$ & $\times$ & $\times$ & $\times$ & $\times$ & $\times$ & $\times$ & $\times$\\
-DesiRNA & pk & pk & \textsc{u} & pk & \textsc{u} & pk & pk & pk & pk & pk\\
-panel\_auto & pk$\wedge$pb & pk$\wedge$pb & \textsc{u} & \textsc{u} & \textsc{u} & pk$\wedge$pb & \textsc{u} & pk$\wedge$pb & pk$\wedge$pb & pk$\wedge$pb\\
-\bottomrule
-\end{tabular}
-\end{table}
-\begin{table}[h]\centering\small
-\setlength{\tabcolsep}{6pt}\renewcommand{\arraystretch}{1.1}
-\caption{Autonomous invention trajectory (GLM-5.2, training pool $=$ Pseudobase idx $110$--$125$, disjoint
-from held-out). Round $5$ failed to compile and was discarded; round $2$ (best) was frozen and
-adjudicated.}\label{tab:appinvent}
-\begin{tabularx}{\linewidth}{@{}lccccccX@{}}
-\toprule
-round & 0 & 1 & 2 & 3 & 4 & 5 & frozen (round 2) on held-out $60$\\
-\midrule
-train solved $/16$ & 1 & 11 & \textbf{12} & 11 & 10 & --- & $35/60$ pKiss$\wedge$ProbKnot; $9/60$ panel-unanimous\\
-\bottomrule
-\end{tabularx}
-\end{table}
-
+Per-arm, per-pool counts are released with the run logs; per-size family results are in Fig.~\ref{fig:family}.
 \section{The Autonomous Operator-Invention Protocol}\label{app:invent}
-\begin{figure}[h]\centering
-\includegraphics[width=0.99\linewidth]{fig_cc_invention.pdf}
-\caption{The autonomous invention loop. The agent receives only primitives and the folding oracles---no
-recipe, no external solver; each candidate is sandboxed and scored on a disjoint training pool; the score and
-failing targets are fed back for six revision rounds; the best round is frozen and \emph{adjudicated} by the
-same panel used for the hand-built operators.}\label{fig:invention}
-\end{figure}
-The invention loop is sketched in Fig.~\ref{fig:invention}. An LLM agent (GLM-5.2, temperature $0.4$, no output cap) is given a documented \emph{primitive API}
+An LLM agent (GLM-5.2, temperature $0.4$, no output cap) is given a documented \emph{primitive API}
 and asked to write one function \texttt{design(target,seed)}; it may not import anything or call an external
 pseudoknot solver. The primitives are: \texttt{fold\_cf} (ViennaRNA MFE, nested), \texttt{inverse\_fold\_cf}
 (nested inverse fold), \texttt{fold\_pkiss\_pairs} and \texttt{fold\_probknot\_pairs} (the two crossing-aware
@@ -2968,7 +2766,7 @@ fold/inverse-fold, the pKiss and ProbKnot oracles, sequence utilities) and the t
 and revise a reusable \texttt{design(target)} operator (up to $12$ rounds, patience-3 early stop) against a
 training pool disjoint from the held-out, with no recipe and no external solver (App.~\ref{app:invent}). All
 six invent an operator with a nonzero panel-unanimous rate on the held-out $60$: $2$--$17/60$
-(Table~\ref{tab:models}, Fig.~\ref{fig:models}), each above the single observed gamer count ($1/60$) and the
+(Table~\ref{tab:models}), each above the single observed gamer count ($1/60$) and the
 $0/60$ floor, and four (Gemini $17$, Opus $14$, Kimi $10$, GLM $9$) exceed the hand-built
 \texttt{panel\_auto}'s $3$--$8/60$. These are single temperature-$0.4$ draws per model, so the comparison is
 descriptive (against the observed gamer), not a per-model significance test, and does not support a strict
@@ -2976,29 +2774,7 @@ model ranking.
 Without the recipe the agents converge on the structure we hand-built: split the target into nested and
 crossing pairs, enforce complementarity, greedily repair against a pKiss\,$\wedge$\,ProbKnot cost. Gains
 saturate early (training rate peaks by round $\le5$; early stop at $5$--$9$), so invention budget is not the
-bottleneck. Table~\ref{tab:invclaims} states exactly which readings of this experiment the design supports;
-the design's limits and the stronger design that would fix them are in App.~\ref{app:invent}.
-
-\begin{table}[t]\centering\small
-\setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.15}
-\caption{\textbf{What the six-model invention experiment does and does not support.} Six single
-temperature-$0.4$ draws, one per model, sharing one prompt, primitive set, training pool, and oracle
-objective. Read the whole experiment as \emph{descriptive}.}\label{tab:invclaims}
-\begin{tabularx}{\linewidth}{@{}Xcl@{}}
-\toprule
-\textbf{reading} & \textbf{supported?} & \textbf{why / what would be needed}\\
-\midrule
-Six independently-run agents each produced a nonzero $r_{\mathrm{mix}}$ & yes & measured, frozen best round,
-held-out $60$\\
-Any one model's rate is reproducible & no & one draw per model; no within-model seeds\\
-Model ranking (e.g.\ Gemini $>$ Opus) & no & single draws; spread is within plausible sampling variance\\
-Model-\emph{independent} invention & no & shared prompt/primitives/pool/objective could induce one strategy\\
-The agents found \emph{distinct} strategies & untested & would need clustering of the operator sources\\
-Rates exceed a well-powered baseline & weak & the single observed gamer count ($1/60$) is a thin baseline\\
-Selection is free of training influence & no & choosing the best revision round \emph{is} training selection\\
-\bottomrule
-\end{tabularx}
-\end{table}
+bottleneck. App.~\ref{app:invent} states which readings of this experiment the design supports; the design's limits and the stronger design that would fix them are in App.~\ref{app:invent}.
 
 \begin{table}[t]\centering\small
 \setlength{\tabcolsep}{6pt}\renewcommand{\arraystretch}{1.12}
@@ -3021,16 +2797,7 @@ DeepSeek-v4-pro & open & $5$ & $26/60$ & $\mathbf{2}$\\
 \end{tabularx}
 \end{table}
 
-\begin{figure}[t]\centering
-\includegraphics[width=0.9\linewidth]{fig_cc_models.pdf}
-\caption{\textbf{Agent-written operators, one temperature-$0.4$ draw per model.} $r_{\mathrm{mix}}$ of the
-agent-written operator for six models (open $=$ green, closed $=$ blue). All six exceed the single observed gamer
-count ($1$) and the $0$ floor; four exceed the hand-built \texttt{panel\_auto} band ($3$--$8$). One draw per model,
-so the ordering is not a ranking (Table~\ref{tab:invclaims}).}\label{fig:models}
-\end{figure}
-
-\smallskip\noindent\textbf{Design limits of the six-model comparison, and the stronger design.} The claim
-table in the main text (Table~\ref{tab:invclaims}) records what is and is not supported; here we record why.
+\smallskip\noindent\textbf{Design limits of the six-model comparison, and the stronger design.} Here we record why the six-model comparison is descriptive.
 Each model contributes one temperature-$0.4$ draw with no within-model seed replication, so per-model rates
 carry unquantified sampling variance and the apparent ranking may be noise; the six share one prompt, one
 primitive set, one training pool, and one oracle objective, so they are not six independent experiments and
@@ -3044,19 +2811,11 @@ would license the stronger readings: $\ge5$ invention seeds per model, several p
 feedback'' lower control and a ``hand-written recipe'' upper control, per-model failure and cost accounting,
 and a clustering of operator sources. Until then the experiment supports only the narrow statement that six
 single-run agents produced nonzero cross-predictor consistency under a common invention protocol.
-Figure~\ref{fig:invent} shows the learning curve: the agent's training solve rate rises as it folds oracle
+The agent's training solve rate rises as it folds oracle
 feedback into successive rewrites, and the frozen best round measures $9/60$ under all three predictors on the
 development/evaluation pool. This is the worked example for one model; the analogous frozen results for all six frontier
 models (three open, three closed) are summarized in Table~\ref{tab:models}, and every one peaks by round
 $\le5$.
-
-\begin{figure}[h]\centering
-\includegraphics[width=0.78\linewidth]{fig_cc_invent.pdf}
-\caption{Training score across revision rounds, one trajectory. Training solve rate ($/16$, disjoint pool) as an
-LLM agent writes, sandbox-runs, and revises a \texttt{design()} operator; the best round is frozen and scored on
-the held-out $60$. A single trajectory for a single model---shown to document the protocol, not to establish
-that the loop reliably improves.}\label{fig:invent}
-\end{figure}
 
 \section{Oracle Configurations, Hyperparameters, Compute, and Verifier Stringency}\label{app:config}
 \begin{table}[h]\centering\small
@@ -3087,47 +2846,28 @@ already requires the target to be each engine's predicted structure; we add one 
 (App.~\ref{app:config}). For the mixed-panel-consistent designs we enumerate pKiss suboptimals and take the
 free-energy gap $\Delta$ from the target (the MFE) to the best alternative fold. The target is the pKiss MFE
 for all $17$ designs whose enumeration completed within budget, dominant by median $\Delta{=}1.2$\,kcal/mol
-(mean $1.44$), with $14/17$ clearing a $\ge1$\,kcal margin (Fig.~\ref{fig:stringency}). Eight longer designs
+(mean $1.44$), with $14/17$ clearing a $\ge1$\,kcal margin. Eight longer designs
 timed out; since timeout correlates with length, this rung covers the shorter adjudicated designs only, and the
 gap is a property of the pKiss energy model, not a model-independent thermodynamic fact. Within that scope the
 positive verdict is not a marginal coincidence of pair sets: the target is the free-energy-minimum fold by a
 real if modest margin. This is as far as computation goes; the verdict stays model-relative, and in-vitro probing is the
 only rung beyond it (App.~\ref{app:config}).
 
-\begin{figure}[t]\centering
-\includegraphics[width=0.72\linewidth]{fig_cc_stringency.pdf}
-\caption{\textbf{Positive-side stringency.} Free-energy gap from the target (pKiss MFE) to the best
-alternative fold, over the mixed-panel-consistent designs. The target is the MFE for all $17$ completed
-designs (eight longer designs timed out) and dominant by $\ge1$\,kcal/mol for $14/17$, under the pKiss energy
-model.}\label{fig:stringency}
-\end{figure}
  The positive verdict is not
 ``the target pairs appear somewhere'': panel-unanimous requires the target to \emph{equal} each method's
 predicted structure---the MFE under pKiss and ShapeKnots, and the maximum-expected-accuracy (MEA) structure
 over a partition-function ensemble under ProbKnot. These are related but not identical notions of a single
 dominant fold (ProbKnot's MEA is not a unique-MFE criterion), so panel-unanimity sits near the
-``unique/dominant fold'' region of the exact\,$\subseteq$\,unique-MFE\,$\subseteq$\,dominance ladder of
-Fig.~\ref{fig:ladder} rather than exactly on one rung, agreed by three distinct predictors (thermodynamically
+``unique/dominant fold'' region of the exact\,$\subseteq$\,unique-MFE\,$\subseteq$\,dominance ladder rather than exactly on one rung, agreed by three distinct predictors (thermodynamically
 related, not statistically independent). The next rung is reported as the \emph{conjunction}
-$\text{R2}\wedge[\Delta G\ge\tau]$, since neither condition implies the other. We \emph{climb one rung further and measure it} (\S\ref{sec:exp},
-Fig.~\ref{fig:stringency}, \texttt{runs/cc\_ascent/positive\_stringency.py}): enumerating pKiss suboptimals for
+$\text{R2}\wedge[\Delta G\ge\tau]$, since neither condition implies the other. We \emph{climb one rung further and measure it} (\S\ref{sec:exp}, \texttt{runs/cc\_ascent/positive\_stringency.py}): enumerating pKiss suboptimals for
 the mixed-panel-consistent designs, the target is the pKiss MFE for all $17$ that enumerated within budget and is dominant
 over the best alternative fold by a median $1.2$\,kcal/mol ($14/17$ clear $\ge1$\,kcal). The verdict remains
 \emph{model-relative}---all engines are thermodynamic secondary-structure predictors, not physical ground
 truth---and two further strengthenings are computable with the installed tooling (\texttt{partition},
 \texttt{ProbabilityPlot}, \texttt{pKiss\_probs}): a Boltzmann-probability threshold and a fourth,
-non-thermodynamic (learned) predictor. Physical confirmation (in-vitro probing, Fig.~\ref{fig:ladder} R4) is
+non-thermodynamic (learned) predictor. Physical confirmation (in-vitro probing) is
 the only route past model-relativity and is out of scope here.
-
-\begin{figure}[h]\centering
-\includegraphics[width=0.66\linewidth]{fig_cc_ladder.pdf}
-\caption{The positive-side stringency ladder. The rungs \emph{nest by construction}: three-predictor agreement
-is R2, and R3 is the conjunction $\text{R2}\wedge[\Delta G_{\mathrm{pKiss}}\ge\tau]$---the energy gap is measured
-\emph{on} the R2-passing designs (\texttt{positive\_stringency.py} enumerates only those), not as an independent
-criterion. R2 alone does not imply a positive gap and a positive gap alone does not imply R2, which is why R3 is
-stated as a conjunction rather than as a separate condition. R4 (physical formation) needs wet-lab and is out
-of scope.}\label{fig:ladder}
-\end{figure}
 
 \clearpage
 % ---- relocated from main text (R3 #15): portability appendices ----
@@ -3174,65 +2914,6 @@ all & $48$ & $11$ & $48$\\
 \bottomrule
 \end{tabularx}
 \end{table}
-
-\section{Supplement: the gaming-catch in three non-hierarchy settings}\label{sec:audit}
-\emph{Supplementary, as \S\ref{sec:sat}: no claim outside this appendix rests on it.} SAT ports the exclusion
-side but trivializes the positive side (its verifier is exact). The question recorded here is whether the
-positive-side audit---an independent check that catches oracle-gaming---ports to settings with no decidable
-hierarchy and no blind oracle. We state it as a domain-agnostic protocol and instantiate it across three
-mechanistically distinct, widely studied gaming channels (\texttt{runs/cc\_ascent/code\_audit};
-Table~\ref{tab:audit}), which carries all the numbers.
-
-\begin{table}[t]\centering\small
-\setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.15}
-\caption{\textbf{A domain-agnostic audit protocol across three eval-gaming channels} (no formal hierarchy, no
-blind oracle). One template---agent optimizes a gameable reward; objective gold $+$ independent panel
-audit the output---instantiated on mechanistically distinct biases: answer-property, test-set leakage, and
-sycophancy. In every channel the flawed reward is gamed and the independent audit catches all of it, with
-no observed false positives (0 of the audited designs). Answers R3's portability question in the affirmative.}\label{tab:audit}
-\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{2.5cm}>{\raggedright\arraybackslash}p{2.7cm}L>{\raggedright\arraybackslash}p{3.0cm}@{}}
-\toprule
-gaming channel & flawed oracle & gaming outcome & audit catch (vs.\ gold)\\
-\midrule
-answer-property bias (verbosity\slash confidence) & LLM helpfulness judge & reward accepts $12/12$ for \emph{every}
-agent; gold-correct $9,9,3$ of $12$ (GPT-5.6\slash GLM-5.2\slash Qwen-7B) $\Rightarrow$ gaming $3,3,9$ & caught
-$3/3,\,3/3,\,9/9$; FP $0$\\
-test-set leakage & visible test set & none natural; constructed lookup gamer passes visible $15/15$ & $0/15$
-panel-unan.; honest $15/15$; FP $0$\\
-sycophancy (agree-with-user) & agreement-with-user reward & accepts $11/12$, gold-correct $1/12$
-$\Rightarrow$ gaming $11$; honest control inverts ($0/12$, $11/12$) & caught $11/11$; FP $0$\\
-\bottomrule
-\end{tabularx}
-\end{table}
-
-\emph{The protocol.} A self-improving agent optimizes a \emph{flawed reward} it can game; an objective
-\emph{gold} and an \emph{independent verifier panel}---which never sees the reward's bias---audit the frozen
-output. We report, per condition, how often the reward accepts, how often the answer is gold-correct, the
-gaming rate (reward-accepted yet wrong), the fraction of gaming the audit catches, and the panel
-false-positive rate. This is RNA's ``optimize a flawed oracle $\to$ an independent check collapses it,''
-stripped of any formal hierarchy.
-
-\emph{The three channels.} (1) \emph{Answer-property bias}: an LLM ``helpfulness'' judge rewarding
-thoroughness and confidence, a documented judge bias \citep{gao2023overopt,skalse2022,zheng2023judge}, is the
-analog of RNA's imperfect pKiss. On hard arithmetic with Python gold it is \emph{fully} gamed---accepting
-$12/12$ for every model---while true correctness falls with capability, so it accepts $3,3,9$
-confident-wrong answers across GPT-5.6-sol / GLM-5.2 / Qwen2.5-7B; the independent audit catches all of them.
-(2) \emph{Test-set leakage}: with an \emph{executable} test set as the oracle there is no natural gaming (the
-proxy is too strong to fake), but a constructed gamer hard-coding the visible cases passes $15/15$ and is
-caught by the held-out\,$\wedge$\,property panel against a $\ge\!600$-input differential gold. (3)
-\emph{Sycophancy}: an agreement rater paying for validation of the user's stated belief
-\citep{sharma2023sycophancy} accepts $11/12$ replies of which $1/12$ are correct; the panel, which never sees
-the user's claim, catches all $11$, and the honest control inverts the reward entirely. In no channel did the
-panel produce an observed false positive---but with denominators of $12$--$15$ that is ``none observed'', not a
-calibrated rate.
-
-\emph{Asymmetric portability, and the caveat.} The two sides port through different
-structure: the decidable exclusion needs a formal class hierarchy (RNA grammar; SAT clone theory), while
-the positive-side gaming-catch needs only an imperfect, gameable verifier---which all three channels
-supply. They coincide when a domain has both, as RNA does. Caveat: these audit panels' checkers are far
-stronger than RNA's folding oracles, so their model-relativity is much milder and the transfer of the
-\emph{difficulty} does not follow; even here verification is imperfect (the LLM verifier throws occasional
-false negatives), which is why every catch is anchored to an objective gold.
 
 \bibliographystyle{plainnat}
 \bibliography{references}
