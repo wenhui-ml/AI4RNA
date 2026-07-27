@@ -467,9 +467,9 @@ def fig_contrast():
     ax.text(0.0, 46.0, "43/43", ha="center", fontsize=8.5, color=INK)
     # the "same 43 targets" caveat lives in the caption; the plot area belongs to the data
 
-    ax.annotate("", xy=(0.5, 2.5), xytext=(0.5, 25.0),
-                arrowprops=dict(arrowstyle="<->", color=GREY, lw=0.8))
-    ax.text(0.53, 13.5, "$13\\times$", fontsize=8.5, color=GREY, va="center")
+    # No span annotation here. A vertical extent on a LINEAR axis is a difference (26-2=24), not a
+    # ratio, so an arrow labelled "13x" would assert one quantity and draw another. The 13x lives in
+    # the caption; the two endpoint labels already carry the comparison.
     ax.set_xlim(-0.18, 1.62); ax.set_ylim(-3, 50)
     ax.set_xticks([0, 1])
     ax.set_xticklabels(["pKiss\n(optimized by one arm)", "ProbKnot\n(optimized by neither)"], fontsize=8)
