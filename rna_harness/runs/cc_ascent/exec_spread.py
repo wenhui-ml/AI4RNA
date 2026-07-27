@@ -12,7 +12,7 @@ Offline over the saved sweeps; no episodes, no oracle calls.
 import json, os, statistics as st
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-SEEDS = [0, 1, 2]
+SEEDS = [0, 1, 2, 3, 4]
 # (label, directory template) for every independent execution of the two arms at a nominal seed
 EXECS = [("ablate-sweep e0", "pablate_s{}"), ("ablate-sweep e1", "pabrep1_s{}"),
          ("ablate-sweep e2", "pabrep2_s{}"), ("paired-sweep e0", "gvp_e0_s{}"),
@@ -52,7 +52,7 @@ def report(arm, label):
 if __name__ == "__main__":
     report("panel_auto", "the panel operator")
     report("autonomous", "the gamer")
-    print("Read against the paired method effect (+0.056 = 3.3/60 over the 9 paired cells): execution spread\n"
+    print("Read against the paired method effect (+0.048 = 2.9/60 over the 15 paired cells): execution spread\n"
           "at a fixed nominal seed EXCEEDS the method effect for the panel operator, while the gamer is nearly\n"
           "deterministic. This is why the comparison must be read paired WITHIN an execution, never as a\n"
           "difference of two separately-reported counts.")

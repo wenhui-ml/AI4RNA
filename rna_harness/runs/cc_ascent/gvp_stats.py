@@ -12,7 +12,7 @@ BOOTSTRAP SPECIFICATION (stated in full because the R5 revision did not).
   Pairing.   The unit of analysis is the PAIRED DIFFERENCE D[(s,e,t)] = panel - gamer within one cell. Both
              arms therefore share, by construction, identical resampling weights at every level; an arm can
              never be resampled against a different target/seed/execution than its counterpart.
-  Level 1 (nominal seed).  Draw |S|=3 nominal seeds with replacement from {0,1,2}.
+  Level 1 (nominal seed).  Draw |S|=5 nominal seeds with replacement from {0,1,2,3,4}.
   Level 2 (execution, NESTED within nominal seed).  Executions are not crossed with seeds -- execution e of
              seed 0 has nothing to do with execution e of seed 1 -- so they are resampled WITHIN each drawn
              seed. Two nesting variants are reported:
@@ -42,7 +42,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.abspath(os.path.join(HERE, "..", "..", "..")))
 from rna_harness.benchmarks.rnainvbench import load_pseudobase   # noqa: E402
 
-SEEDS = [0, 1, 2]
+SEEDS = [0, 1, 2, 3, 4]
 EXECS = [0, 1, 2]
 ARMS = {"autonomous": "gamer (pKiss only)", "panel_auto": "panel operator"}
 B = 20000

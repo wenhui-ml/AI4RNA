@@ -1,0 +1,24 @@
+structurally disjoint pool: 27 targets in 24 clean clusters (of 60 total); min distance to any touched target = 0.1667
+
+27 common targets across 15 (seed, execution) cells
+
+=== r_mix (all three predictors) on the STRUCTURALLY DISJOINT pool ===
+  gamer (pKiss only)      0  0  0  0  0  0  0  0  0  0  0  0  0  0  0   mean  0.00/27  rate 0.0000  sd 0.00
+  panel operator          2  1  1  1  2  1  1  4  1  1  5  2  1  2  3   mean  1.87/27  rate 0.0691  sd 1.25
+  paired Delta = +0.0691 (+1.87 targets in 27)
+  pooled discordance b=28 (panel only), c=0 (gamer only); McNemar exact p=7.45e-09
+  cell-level sign test: panel > gamer in 15/15 executions (0 ties, excluded), two-sided p=6.104e-05
+  target bootstrap 95% CI [+0.0296,+0.1160]  clears 0   (n=27: underpowered by construction)
+
+=== r_in (pKiss AND ProbKnot) on the STRUCTURALLY DISJOINT pool ===
+  gamer (pKiss only)      0  0  0  0  1  2  0  0  0  0  1  0  0  0  0   mean  0.27/27  rate 0.0099  sd 0.59
+  panel operator          5 10 11  9  8  7 11 10 11  8  8  6  7  7 11   mean  8.60/27  rate 0.3185  sd 1.99
+  paired Delta = +0.3086 (+8.33 targets in 27)
+  pooled discordance b=127 (panel only), c=2 (gamer only); McNemar exact p=2.46e-35
+  cell-level sign test: panel > gamer in 15/15 executions (0 ties, excluded), two-sided p=6.104e-05
+  target bootstrap 95% CI [+0.1877,+0.4346]  clears 0   (n=27: underpowered by construction)
+
+Interpretation. The benchmark, not the method, is the binding constraint here: Pseudobase++'s 251
+crossing targets contain only 24 structural clusters disjoint from our development, so a clean
+transfer test on this benchmark cannot be well powered at a ~5% base rate. Report the direction and
+the sign test; do not report the interval as if it settled the question.

@@ -100,10 +100,16 @@ $3$--$8/60$ (mean $5.0$, five seeds) consistent across all three predictors, ver
 and $0/60$ for a borrowed solver---cross-predictor-consistent computational designs on the Pseudobase++
 distribution, not general cross-source pseudoknot design (cross-source is $0/60$ for both our
 operator and the SOTA solver). Replicating that headline comparison at the execution level---both arms, same
-targets, $3$ seeds $\times$ $3$ executions, paired inside each run---shrinks it to
-$\Delta{=}{+}0.056$ with a structural-cluster interval of $[{+}0.006,{+}0.115]$, narrowly clear of zero; what is
-robust there is the \emph{sign}, since the gamer wins no target in any of the $9$ executions, while the
-magnitude is not, execution spread at a fixed seed ($5.3/60$) exceeding the effect itself ($3.3/60$).
+targets, $5$ seeds $\times$ $3$ executions, paired inside each run---gives
+$\Delta{=}{+}0.048$ with a structural-cluster interval of $[{+}0.005,{+}0.093]$, narrowly clear of zero, and the
+estimate falls monotonically as replication is added (${+}0.080\!\to\!{+}0.056\!\to\!{+}0.048$). What is robust
+there is the \emph{sign}---the panel operator is higher in $14$ of $15$ executions---not the magnitude:
+execution spread at a fixed seed ($4.4/60$) exceeds the effect itself ($2.9/60$). Building the structure-aware
+split the evaluation owes (whole clusters assigned, every test target $>15\%$ from every developed-on target)
+leaves only $27$ targets in $24$ clusters, because these $251$ targets contain just $60$ structural
+clusters---a limit of the benchmark we report as a finding; there the direction replicates cleanly ($15/15$
+executions, gamer $\mathbf{0/27}$ throughout, panel rate $6.9\%$ against $5.3\%$ in development), so the
+separation is not an artifact of structural overlap, though its magnitude is not estimable at that size.
 A matched-nominal-cap ablation over $9$ runs per arm sharpens the attribution and narrows it:
 deleting the agreement objective to leave an \emph{undirected} walk---which in fact consumes $33$--$63\%$
 \emph{more} oracle calls---costs $9$--$14$ of $60$ on the operator's own two-oracle objective but is
@@ -163,7 +169,8 @@ pseudoknot-free regime (a decidable instrument bound, \S\ref{sec:formal}) and do
 ($0/60$ under the shared panel), yielding \emph{limited mixed-panel consistency} on a difficulty axis fixed by
 the $\CF\!\to\!\MCF$ boundary, with no packaged inverse-design solver called. We do \emph{not} write
 ``robustly'': the one genuinely held-out predictor separates weakly, matched undirected search is not
-separated, cross-source consistency is $0/60$, execution-level noise \emph{exceeds} the method effect, and the
+separated, cross-source consistency is $0/60$, execution-level noise ($4.4/60$) \emph{exceeds} the method
+effect ($2.9/60$), and the
 evaluation split is not structurally disjoint (Table~\ref{tab:verdict}). Verified, gaming-resistant capability
 acquisition is the decision-relevant quantity, not metaphysical originality---and this study establishes only
 part of it.
@@ -257,13 +264,13 @@ prior policy's generative capacity\\
 $\Delta_{\mathrm{prior}}$ (prior floor) & \textbf{established}, ${+}0.017$--${+}0.15$ &
 prior policy $0/60$ vs.\ after $1$--$9/60$ over all $18$ independent executions (mean $3.5$; $3$--$8$ on the
 five original single-execution seeds) under the shared panel. Finite-budget count, not a structural theorem\\
-$\Delta_{\mathrm{gamer}}$ (vs.\ single-oracle gaming) & \textbf{established, narrowly}, ${+}0.056$ &
-paired at the (target, seed, execution) level over $9$ executions; interval excludes zero when resampling all
-three levels, at both the target ($[{+}.017,{+}.107]$) and structural-cluster ($[{+}.006,{+}.115]$) unit, but
-the conservative one-execution-per-seed variant reaches $0.000$ (Table~\ref{tab:gvp}). The effect is
-$30\%$ smaller than the ${+}0.080$ estimated without execution replication. A \emph{between-system}
+$\Delta_{\mathrm{gamer}}$ (vs.\ single-oracle gaming) & \textbf{established, narrowly}, ${+}0.048$ &
+paired at the (target, seed, execution) level over $15$ executions; interval excludes zero when resampling all
+three levels, at both the target ($[{+}.014,{+}.091]$) and structural-cluster ($[{+}.005,{+}.093]$) unit, but
+the conservative one-execution-per-seed variant reaches $0.000$ (Table~\ref{tab:gvp}). The estimate fell
+monotonically as replication was added (${+}0.080\!\to\!{+}0.056\!\to\!{+}0.048$). A \emph{between-system}
 association; does not attribute the gain to any component; and the arms are matched on oracle \emph{access},
-not oracle \emph{use} ($2.4\times$ realized calls)\\
+not oracle \emph{use} ($2.3\times$ realized calls)\\
 $\Delta_{\mathrm{undirected}}$ (vs.\ matched nominal-cap undirected search) & \textbf{not established} &
 ${+}0.013$, three-level interval $[{-}.039,{+}.067]$ over $9$ runs/arm (Table~\ref{tab:pablate}). Deleting the
 objective does not measurably lower $r_{\mathrm{mix}}$; only removing the repair loop entirely does
@@ -1039,8 +1046,8 @@ verifier boundary---a change of feedback channel, from the pseudoknot-free oracl
 acquiring a new feedback instrument is part of what happened (Rem.~\ref{rem:autonomy}). But the gamer and the
 panel-optimizing operator run with \emph{identical} oracle access and search budget---both may query pKiss and
 ProbKnot in the repair loop---and differ only in the objective, so the $r_{\mathrm{mix}}$ gap between them
-($\sim\!1/60$ vs.\ $3$--$8/60$; $\Delta{=}{+}0.056$ with execution replication, structural-cluster CI
-$[+0.006,+0.115]$, Table~\ref{tab:gvp}) cannot be charged to the
+($\sim\!1/60$ vs.\ $3$--$8/60$; $\Delta{=}{+}0.048$ with execution replication, structural-cluster CI
+$[+0.005,+0.093]$, Table~\ref{tab:gvp}) cannot be charged to the
 added feedback. (ii) \emph{Not the structured decomposition.} Ablation leaves the pKiss rate at $43/60$ when
 the \CF{} skeleton and complementarity composition are removed (Table~\ref{tab:ablate}, App.~\ref{app:support}). (iii) \emph{And not the directedness of the search either.} At matched
 budget, matched oracle access, matched initialization and matched proposal distribution, an \emph{undirected}
@@ -1049,7 +1056,7 @@ walk reaches an $r_{\mathrm{mix}}$ indistinguishable from the full operator's (T
 \emph{What that licenses, stated precisely, and what it does not.} The natural conclusion---that the
 success predicate rather than the search is the causal lever---is not supported in its causal form. Two facts must be held together: the gamer-versus-panel-operator
 comparison shows an \emph{association} between changing the success predicate and a higher $r_{\mathrm{mix}}$
-($\Delta{=}{+}0.056$), while the matched objective ablation shows that deleting the objective from the panel
+($\Delta{=}{+}0.048$), while the matched objective ablation shows that deleting the objective from the panel
 operator does \emph{not} measurably lower $r_{\mathrm{mix}}$. Those two are only reconcilable if something
 other than the objective distinguishes the two systems, and our design cannot say what: the candidates include
 initialization details, implementation differences, candidate-selection differences, execution-level
@@ -1151,7 +1158,7 @@ honest attribution under the primary metric is: \textbf{a search is necessary, b
 search's guidance is what produces cross-predictor consistency}. The earlier claim that the agreement objective
 would be ``the one load-bearing component'' under this metric is not supported. What \emph{is}
 supported is narrower: the gamer-versus-panel-operator separation of Table~\ref{tab:sep} survives
-($\Delta=+0.056$, cluster CI $[+0.006,+0.115]$) while the directed-versus-undirected separation does not. Those two systems
+($\Delta=+0.048$, cluster CI $[+0.005,+0.093]$) while the directed-versus-undirected separation does not. Those two systems
 differ in \emph{which oracles define success} (one predictor vs.\ a two-predictor conjunction), so that
 difference is \emph{associated} with the gain---but since removing the objective from the panel operator does not
 reproduce the drop, the design does not license calling it the cause (see the attribution discussion above).
@@ -1284,62 +1291,75 @@ comparison on the same $60$ targets, at the same $3$ nominal seeds, with $3$ ind
 \emph{both arms evaluated inside the same worker call} so the pairing holds at the (target, seed, execution)
 level (Table~\ref{tab:gvp}; \texttt{gamer\_vs\_panel\_replicate.sh}, \texttt{gvp\_stats.py}).
 
-\emph{The effect survives, and shrinks.} Over the $9$ paired cells the panel operator is
-mixed-panel-consistent on $3.56/60$ against the gamer's $0.22/60$, a paired
-$\Delta_{\mathrm{gamer}}={+}0.056$---about $70\%$ of the ${+}0.080$ estimated without execution replication. The
-$95\%$ interval excludes zero under the resampling design that matches what was run, at both the target level
-($[{+}0.017,{+}0.107]$) and the structural-cluster level ($[{+}0.006,{+}0.115]$); under the deliberately
-conservative variant that draws a single execution per nominal seed the cluster-level lower bound falls to
-$0.000$. So the component remains established by the rule of Table~\ref{tab:verdict}, but it is now
-established \emph{narrowly}, and we say so wherever we cite it.
+\emph{The effect survives, and keeps shrinking as replication is added.} Over the $15$ paired cells the panel
+operator is mixed-panel-consistent on $3.20/60$ against the gamer's $0.33/60$, a paired
+$\Delta_{\mathrm{gamer}}={+}0.048$. That is the third estimate of the same quantity, and the sequence is
+monotone: ${+}0.080$ with no execution replication, ${+}0.056$ at three seeds $\times$ three executions,
+${+}0.048$ at five $\times$ three. We report the trend rather than only the final number, because a point
+estimate that falls each time the design is tightened is evidence that the original was optimistic. The $95\%$
+interval still excludes zero under the resampling design that matches what was run, at both the target level
+($[{+}0.014,{+}0.091]$) and the structural-cluster level ($[{+}0.005,{+}0.093]$); under the deliberately
+conservative variant that draws a single execution per nominal seed the cluster-level lower bound reaches
+$0.000$. The component therefore remains established by the rule of Table~\ref{tab:verdict}, but narrowly, and
+we say so wherever we cite it.
 
-\emph{Why the paired design is what makes it readable at all.} Pooling every independent execution we have
+\emph{What is robust here is the sign, not the magnitude.} Pooling every independent execution
 (\texttt{exec\_spread.py}), the panel operator's $r_{\mathrm{mix}}$ at a \emph{fixed} nominal seed ranges
-$2$--$6$ at seed~$0$, $1$--$5$ at seed~$1$ and $1$--$9$ at seed~$2$: a mean spread of $5.3/60$, which
-\emph{exceeds} the method effect of $3.3/60$. Two separately-reported counts at this noise level would be
-uninterpretable. What rescues the comparison is that the noise is common-mode and the gamer is nearly
-deterministic ($0$--$1$, spread $0.3/60$): within every one of the $9$ executions the panel operator strictly
-exceeds the gamer (cell-level sign test $p{=}0.0039$), and across all $9$ cells the discordant counts are
-$b{=}30$ panel-only against $c{=}0$ gamer-only---the gamer never wins a single target in any cell. The
-defensible claim is therefore about the \emph{sign and consistency} of the paired difference, which is robust,
-rather than about its magnitude, which is not.
+$2$--$6$, $1$--$5$, $1$--$9$, $2$--$5$ and $1$--$4$ across the five seeds: a mean spread of $4.4/60$, which
+\emph{exceeds} the method effect of $2.9/60$. Two separately-reported counts at this noise level would be
+uninterpretable. What makes the comparison readable is that the noise is common-mode and the gamer is nearly
+deterministic ($0$--$2$, mean spread $0.8/60$): the panel operator is strictly higher in $14$ of the $15$
+executions (sign test $p{=}0.0010$) and the pooled discordance is $b{=}46$ panel-only against $c{=}3$
+gamer-only. \textbf{We correct a stronger statement the three-seed data appeared to support}: at $15$ cells the
+gamer does win $3$ targets, and one whole execution (seed~4/e1), so ``the gamer never wins a target'' holds only
+for the in-objective metric $r_{\mathrm{in}}$ ($b{=}498$, $c{=}0$, $15/15$ executions), not for
+$r_{\mathrm{mix}}$. One further scope limit on the sign test: the $15$ executions are independent runs but share
+one fixed target set, so it licenses ``a fresh execution on \emph{these} targets would again favour the panel
+operator'', not ``on a fresh target set''.
 
 \emph{A confound this experiment exposes rather than removes.} Recording realized budgets for both arms
 (Table~\ref{tab:gvp}) shows they are matched on oracle \emph{access} but not on oracle \emph{use}: per target
-the panel operator makes $130.7$ pKiss calls and $65.0$ ProbKnot calls against the gamer's $55.6$ and $0$. The
+the panel operator makes $128.0$ pKiss calls and $63.5$ ProbKnot calls against the gamer's $55.2$ and $0$. The
 gamer stops early because its single-predictor objective is satisfied at $43/60$; the panel operator keeps
 searching because its two-predictor conjunction is not. Realized compute is thus a \emph{mediator} of the
 objective change---a downstream consequence of the success predicate, not an independent advantage---but our
-design cannot separate ``the two-oracle predicate selects better designs'' from ``the two-oracle predicate
-makes the system search $2.4\times$ longer''. Both are consequences of the intervention we made, and
+design cannot separate ``the two-oracle predicate selects better designs'' from ``the two-oracle predicate makes
+the system search $2.3\times$ longer''. Both are consequences of the intervention we made, and
 $\Delta_{\mathrm{gamer}}$ measures their sum.
 
 \begin{table}[t]\centering\small
 \setlength{\tabcolsep}{3.4pt}\renewcommand{\arraystretch}{1.15}
 \caption{\textbf{Execution-level replication of the headline comparison} ($\Delta_{\mathrm{gamer}}$; $n{=}60$
-development/evaluation pool, $3$ nominal seeds $\times$ $3$ independent executions, both arms scored inside the
-same worker call so pairing holds at the (target, seed, execution) level). Counts are $r_{\mathrm{mix}}$/60.
-The paired difference is ${+}0.056$, down from the ${+}0.080$ obtained without execution replication. Intervals
-are nested percentile bootstraps (seeds, then executions within seed, then targets or structural clusters,
-resampled synchronously across both arms; $B{=}20{,}000$; App.~\ref{app:repro} states the procedure in full).
-Execution spread \emph{exceeds} the method effect for the panel operator, which is why only the
-\emph{within-cell paired} reading is interpretable: the gamer wins no target in any
-cell.}\label{tab:gvp}
-\begin{tabularx}{\linewidth}{@{}Lccccccccccc@{}}
+development/evaluation pool, $5$ nominal seeds $\times$ $3$ independent executions $=15$ paired cells, both arms
+scored inside the same worker call so pairing holds at the (target, seed, execution) level). Counts are
+$r_{\mathrm{mix}}$/60. The paired difference is ${+}0.048$, against ${+}0.056$ at three seeds and ${+}0.080$
+with no execution replication at all---the estimate has fallen monotonically as replication was added, which we
+report as such. Intervals are nested percentile bootstraps (seeds, then executions within seed, then targets or
+structural clusters, resampled synchronously across both arms; $B{=}20{,}000$; App.~\ref{app:repro} states the
+procedure in full). Execution spread \emph{exceeds} the method effect for the panel operator, which is why only
+the \emph{within-cell paired} reading is interpretable.}\label{tab:gvp}
+\begin{tabularx}{\linewidth}{@{}Lccccccccccccccccc@{}}
 \toprule
-& \multicolumn{3}{c}{seed 0} & \multicolumn{3}{c}{seed 1} & \multicolumn{3}{c}{seed 2} & &\\
-\cmidrule(lr){2-4}\cmidrule(lr){5-7}\cmidrule(lr){8-10}
-\textbf{arm} & e0 & e1 & e2 & e0 & e1 & e2 & e0 & e1 & e2 & \textbf{mean} & \textbf{exec sd}\\
+& \multicolumn{3}{c}{seed 0} & \multicolumn{3}{c}{seed 1} & \multicolumn{3}{c}{seed 2}
+& \multicolumn{3}{c}{seed 3} & \multicolumn{3}{c}{seed 4} & &\\
+\cmidrule(lr){2-4}\cmidrule(lr){5-7}\cmidrule(lr){8-10}\cmidrule(lr){11-13}\cmidrule(lr){14-16}
+\textbf{arm} & e0 & e1 & e2 & e0 & e1 & e2 & e0 & e1 & e2 & e0 & e1 & e2 & e0 & e1 & e2
+& \textbf{mean} & \textbf{sd}\\
 \midrule
-gamer (pKiss only) & $1$ & $1$ & $0$ & $0$ & $0$ & $0$ & $0$ & $0$ & $0$ & $0.22$ & $0.19$\\
-panel operator & $2$ & $5$ & $6$ & $2$ & $5$ & $1$ & $9$ & $1$ & $1$ & $3.56$ & $2.93$\\
+gamer (pKiss only) & $1$ & $1$ & $0$ & $0$ & $0$ & $0$ & $0$ & $0$ & $0$ & $0$ & $0$ & $1$ & $0$ & $2$ & $0$
+& $0.33$ & $0.46$\\
+panel operator & $2$ & $5$ & $6$ & $2$ & $5$ & $1$ & $9$ & $1$ & $1$ & $2$ & $5$ & $3$ & $4$ & $1$ & $1$
+& $3.20$ & $2.41$\\
 \midrule
-\multicolumn{12}{@{}p{\linewidth}@{}}{\smallskip
-paired $\Delta_{\mathrm{gamer}}={+}0.056$ ($3.3$ targets in $60$); discordant $b{=}30$, $c{=}\mathbf{0}$;
-strictly greater in $9/9$ executions (sign test $p{=}0.0039$). $95\%$ intervals: targets
-$[{+}.017,{+}.107]$, \emph{structural clusters} $[{+}.006,{+}.115]$, conservative one-execution-per-seed
-variant on clusters $[{+}.000,{+}.136]$. Realized budget per target: gamer $55.6$ pKiss and $0$ ProbKnot,
-panel operator $130.7$ pKiss and $65.0$ ProbKnot---matched \emph{access}, unmatched \emph{use}.}\\
+\multicolumn{17}{@{}p{\linewidth}@{}}{\smallskip
+paired $\Delta_{\mathrm{gamer}}={+}0.048$ ($2.9$ targets in $60$); pooled discordance $b{=}46$ panel-only
+against $c{=}3$ gamer-only; the panel operator is strictly higher in $14$ of $15$ executions (cell-level sign
+test $p{=}0.0010$), the exception being seed~4/e1. $95\%$ intervals: targets $[{+}.014,{+}.091]$,
+\emph{structural clusters} $[{+}.005,{+}.093]$, conservative one-execution-per-seed variant on clusters
+$[{+}.000,{+}.109]$. Realized budget per target: gamer $55.2$ pKiss and $0$ ProbKnot, panel operator $128.0$
+pKiss and $63.5$ ProbKnot---matched \emph{access}, unmatched \emph{use}. On the in-objective metric
+$r_{\mathrm{in}}$ the same $15$ cells give $\Delta={+}0.553$, $15/15$ executions, and $b{=}498$ against
+$c{=}\mathbf{0}$: there the gamer wins no target in any cell.}\\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -1353,16 +1373,73 @@ fixed on it, so its rates measure in-development performance and we no longer ca
 Second, the ID-disjoint pool $[126{:}250]$ is disjoint by target
 identity but \emph{not} by structure---$39/125$ of its targets are exact structural duplicates of a touched
 target and $94/125$ lie within $15\%$ (App.~\ref{app:data})---so results on it are an \emph{ID-held-out
-evaluation}, not a transfer claim. A structurally disjoint benchmark, built by assigning whole structure
-clusters to train or test rather than splitting on index, is the right design and \emph{we did not run it}.
+evaluation}, not a transfer claim.
+
+\paragraph{A structurally disjoint evaluation, and what the benchmark will bear.} The split audit says the
+right design assigns whole \emph{structure clusters} to train or test rather than splitting on index, so we
+built it (\texttt{build\_struct\_split.py}). Clustering all $251$ crossing targets by single linkage at the same
+$15\%$ threshold and discarding every cluster that contains \emph{any} target from ids $0$--$125$ leaves
+$24$ clean clusters holding $27$ targets, each verified at $>15\%$ normalized dot-bracket distance from every
+target that entered any stage of our development (minimum realized distance $0.167$). Assigning clusters rather
+than targets is the point: a per-target filter would still admit a target whose cluster-mate we had seen.
+
+\emph{The first thing this measures is the benchmark.} That $251\to60$ clusters $\to24$ clean ones is the
+headline number here: \textbf{Pseudobase++ is structurally exhausted}, and no clean transfer test on it can be
+well powered at a $\sim\!5\%$ base rate---expected count $\approx\!1.4/27$. We report that as a property of the
+benchmark, not of the method, and it is the reason a structure-aware split had not previously been run by us or,
+as far as we know, by anyone reporting on this benchmark.
+
+\emph{Within that limit, the direction survives cleanly} (Table~\ref{tab:sdis}). Over $5$ seeds $\times$ $3$
+executions the panel operator is mixed-panel-consistent on $1.87/27$ ($6.9\%$) and the gamer on
+$\mathbf{0.00/27}$---zero in \emph{all fifteen} executions. Pooled discordance is $b{=}28$ against
+$c{=}\mathbf{0}$, exact McNemar $p{=}7.5\!\times\!10^{-9}$, and the cell-level sign test is $15/15$
+($p{=}6.1\!\times\!10^{-5}$). Crucially the panel operator's absolute rate on structurally novel targets
+($6.9\%$) is \emph{not lower} than on the development pool ($3.20/60=5.3\%$), so the separation is not explained
+by structural overlap with development---the failure mode the split audit was built to detect does not appear
+when tested directly. We deliberately do \emph{not} lean on the interval ($[{+}0.030,{+}0.116]$ at $n{=}27$):
+it is underpowered by construction and we quote the sign test instead. The honest summary is that
+$\Delta_{\mathrm{gamer}}$'s \emph{sign} now has a structurally disjoint replication, while its \emph{magnitude}
+remains unestimable on any pool this benchmark can supply.
+
+\begin{table}[t]\centering\small
+\setlength{\tabcolsep}{3.4pt}\renewcommand{\arraystretch}{1.15}
+\caption{\textbf{Structurally disjoint evaluation} ($27$ targets in $24$ clean structural clusters; every target
+$>15\%$ normalized dot-bracket distance from every target used in any stage of development, minimum realized
+distance $0.167$). $5$ nominal seeds $\times$ $3$ executions, both arms in the same worker call. Counts are
+$r_{\mathrm{mix}}$/27. The gamer scores zero in every one of the $15$ executions; the panel operator's rate here
+($6.9\%$) is not lower than on the development pool ($5.3\%$). The interval is reported only for completeness
+and is underpowered by construction: Pseudobase++ contains just $24$ development-disjoint clusters, so the
+expected count at the development base rate is $\approx\!1.4$. (\texttt{build\_struct\_split.py},
+\texttt{struct\_split\_run.sh}, \texttt{sdis\_stats.py}.)}\label{tab:sdis}
+\begin{tabularx}{\linewidth}{@{}Lccccccccccccccccc@{}}
+\toprule
+& \multicolumn{3}{c}{seed 0} & \multicolumn{3}{c}{seed 1} & \multicolumn{3}{c}{seed 2}
+& \multicolumn{3}{c}{seed 3} & \multicolumn{3}{c}{seed 4} & &\\
+\cmidrule(lr){2-4}\cmidrule(lr){5-7}\cmidrule(lr){8-10}\cmidrule(lr){11-13}\cmidrule(lr){14-16}
+\textbf{arm} & e0 & e1 & e2 & e0 & e1 & e2 & e0 & e1 & e2 & e0 & e1 & e2 & e0 & e1 & e2
+& \textbf{mean} & \textbf{rate}\\
+\midrule
+gamer (pKiss only) & $0$ & $0$ & $0$ & $0$ & $0$ & $0$ & $0$ & $0$ & $0$ & $0$ & $0$ & $0$ & $0$ & $0$ & $0$
+& $\mathbf{0.00}$ & $0.000$\\
+panel operator & $2$ & $1$ & $1$ & $1$ & $2$ & $1$ & $1$ & $4$ & $1$ & $1$ & $5$ & $2$ & $1$ & $2$ & $3$
+& $1.87$ & $0.069$\\
+\midrule
+\multicolumn{17}{@{}p{\linewidth}@{}}{\smallskip
+paired $\Delta={+}0.069$; pooled discordance $b{=}28$ panel-only against $c{=}\mathbf{0}$ gamer-only, exact
+McNemar $p{=}7.5\!\times\!10^{-9}$; cell-level sign test $15/15$, $p{=}6.1\!\times\!10^{-5}$; target bootstrap
+$[{+}.030,{+}.116]$ (underpowered, not the primary statistic). On $r_{\mathrm{in}}$ the same cells give
+$8.60/27$ vs.\ $0.27/27$, $\Delta={+}0.309$, $b{=}127$ against $c{=}2$, $15/15$ executions.}\\
+\bottomrule
+\end{tabularx}
+\end{table}
 
 
 \begin{table}[t]\centering\small
 \setlength{\tabcolsep}{4.5pt}\renewcommand{\arraystretch}{1.15}
 \caption{\textbf{The pools, named by their actual contact with development.} We use these names throughout and
-retire the earlier label ``strictly untouched'', which invited a structural reading the split does not support.
-The last row is the design the evidence calls for and that this study does \emph{not}
-provide.}\label{tab:pools}
+retire the earlier label ``strictly untouched'', which invited a structural reading the index split does not
+support. The last row is the structure-aware split the evidence calls for; we built and ran it, and its size
+is itself a finding about the benchmark.}\label{tab:pools}
 \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{3.0cm}>{\raggedright\arraybackslash}p{1.45cm}L@{}}
 \toprule
 \textbf{name used here} & \textbf{ids\,/\,$n$} & \textbf{contact with development, and what it can support}\\
@@ -1377,8 +1454,11 @@ ID-disjoint follow-up pool & $126$--$250$ ($125$) & untouched by development, tu
 App.~\ref{app:data}). Supports an \emph{ID-held-out evaluation}; does \textbf{not} support a transfer claim\\
 cross-source pool & bpRNA ($60$) & independent source; both our operator and the SOTA solver score $0/60$\\
 \midrule
-\emph{structurally disjoint benchmark} & --- & \emph{not run.} Whole structure clusters assigned to train or
-test. This is what a transfer claim would require\\
+\textbf{structurally disjoint pool} & $24$ clusters ($27$) & whole structure clusters assigned, keeping only
+clusters with \emph{no} touched member; every target $>15\%$ from every developed-on target. Supports the
+\emph{direction} of $\Delta_{\mathrm{gamer}}$ ($15/15$ executions, gamer $0/27$ throughout;
+Table~\ref{tab:sdis}); too small for its magnitude---and that smallness is a fact about Pseudobase++, whose
+$251$ targets contain only $60$ structural clusters\\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -1594,7 +1674,7 @@ structure, rather than a finite-budget count, remains open.
 oracle-guided search that games pKiss (\S\ref{sec:exp}): $43/60$ under one predictor, $1/60$ under all three.
 Making the success predicate a multi-predictor conjunction rather than a single predictor does help: running
 the gamer on the same five seeds, the paired difference
-$\Delta{=}p_{\mathrm{panel}}{-}p_{\mathrm{gamer}}$ is $+0.056$ once execution-level replication is included
+$\Delta{=}p_{\mathrm{panel}}{-}p_{\mathrm{gamer}}$ is $+0.048$ once execution-level replication is included
 (Table~\ref{tab:gvp}); on the five original seeds alone it is $+0.080$ with a target-level
 cluster-bootstrap $95\%$ CI $[+0.040,+0.127]$ and a two-way CI $[+0.030,+0.140]$, both clear of zero (pooled
 $25/300$ vs.\ $1/300$); the paired McNemar is significant on the strongest seed ($p\!=\!0.016$) with $c{=}0$
@@ -1631,6 +1711,20 @@ verifier-range exclusion, empirical prior floor, verified non-use and independen
 components of different epistemic status. Both positive signals are model-relative---an MDL residual as much as
 our panel.
 
+\emph{What our measurement adds to a compression gate, concretely.} The complementarity can be stated with a
+number rather than in the abstract, and we think this is the most useful thing our data says about
+one-sided gates in general. Our pKiss-directed operator reaches $43/60$ under the predictor it optimizes. Those
+$43$ designs fit that oracle exactly, and the procedure that produces them is short---a context-free skeleton, a
+complementarity rule, and a repair loop. A gate that scores fit-plus-description-length has no way to reject
+them: on its own terms they are a compact, well-fitting account. Yet only $1/60$ survives three predictors. The
+$42$-target gap is invisible to \emph{any} statistic computed from the system and its optimized oracle alone,
+however principled that statistic is, because the failure is not poor fit or excess description length---it is
+that the oracle being fit is wrong in a direction the system has learned to exploit. Catching it requires an
+adjudicator the system did not optimize, which is a second \emph{side}, not a better one-sided score. This is
+the sense in which the two lines compose: the categorical account says how a system may revise itself, and our
+audit supplies the independent side any such revision must be scored against before a gain is called a
+discovery.
+
 \paragraph{An audit layer for AI4S.} The lesson generalizes because the vulnerability does. Most scientific
 oracles a self-improving system optimizes against are fallible surrogates (a docking score, a force field, a
 learned reward, a structure predictor, a theorem-search heuristic), so a closed loop can improve the oracle's
@@ -1645,19 +1739,23 @@ mechanistically distinct channels with no formal hierarchy (biased judge, test-s
 with $0$ observed false positives, which is not a calibrated rate.
 
 \paragraph{Limitations.} We list these in rough order of how much they bound the contribution.
-\emph{(i) The evaluation split is not structurally disjoint.} $39/125$ of the ID-disjoint targets are exact
-structural duplicates of touched targets and $94/125$ lie within $15\%$ (App.~\ref{app:data}), so those results
-are an ID-held-out evaluation and \emph{not} a transfer claim; the structure-cluster split that would support
-one was not run. \emph{(ii) Component attribution for cross-predictor consistency is largely unresolved.} Over
+\emph{(i) The benchmark cannot support a well-powered transfer test.} The index split is not a structural split
+($39/125$ exact duplicates, $94/125$ within $15\%$; App.~\ref{app:data}), so results on the ID-disjoint pool are
+an ID-held-out evaluation, not a transfer claim. We built and ran the structure-cluster split that a transfer
+claim requires, and the direction survives it cleanly ($15/15$ executions, gamer $0/27$ throughout;
+Table~\ref{tab:sdis})---but only $27$ targets in $24$ clusters exist that are disjoint from our development,
+because Pseudobase++'s $251$ crossing targets collapse to $60$ structural clusters. So the \emph{magnitude} of
+$\Delta_{\mathrm{gamer}}$ is not estimable on any structurally clean pool this benchmark can supply, and a
+second crossing benchmark, not a better statistic, is what would settle it. \emph{(ii) Component attribution for cross-predictor consistency is largely unresolved.} Over
 $9$ runs per arm, the only ablation distinguishable from the full operator under $r_{\mathrm{mix}}$ is removing
 the repair loop outright (${+}0.056$); deleting the \emph{objective} that guides it is not (${+}0.013$), nor is
 making the search oracle-blind (Table~\ref{tab:pablate}). Directedness is decisive only on the operator's own
 objective $r_{\mathrm{in}}$. \emph{(iii) The operators are not bit-reproducible, and the noise is large.}
-Execution-level spread at a \emph{fixed} nominal seed is $5.3/60$ on $r_{\mathrm{mix}}$, which \emph{exceeds}
-the method effect of $3.3/60$; only the within-execution paired reading is interpretable, and a
+Execution-level spread at a \emph{fixed} nominal seed is $4.4/60$ on $r_{\mathrm{mix}}$, which \emph{exceeds}
+the method effect of $2.9/60$; only the within-execution paired reading is interpretable, and a
 wall-clock-budgeted operator's result depends on machine load (App.~\ref{app:repro}). \emph{(iv) The controls
 are matched on nominal caps, not realized compute}, and realized compute is outcome-dependent: the panel
-operator makes $2.4\times$ the gamer's oracle calls, so $\Delta_{\mathrm{gamer}}$ measures the sum of ``better
+operator makes $2.3\times$ the gamer's oracle calls, so $\Delta_{\mathrm{gamer}}$ measures the sum of ``better
 predicate'' and ``longer search'' (Tables~\ref{tab:budget},~\ref{tab:gvp}). \emph{(v) $g_{\mathrm{aut}}$ is
 verified non-use, not autonomy}: the solver is never on the method path, so its ablation carries no
 counterfactual information, and the system depends completely on external crossing-aware oracles.
@@ -1686,12 +1784,17 @@ panel operator's component ablation are also run
 (Table~\ref{tab:pablate})---with the negative outcome that component attribution under $r_{\mathrm{mix}}$ is
 unresolvable at $n{=}60$.
 
-\emph{The four experiments this study owes, in priority order.} \textbf{(1) A structurally disjoint benchmark}:
-cluster the crossing pools by normalized dot-bracket structure, motif family or homology and assign whole
-clusters to train or test, so that ``transfer'' can be claimed rather than downgraded to an ID-held-out
-evaluation (\S\ref{sec:exp}, App.~\ref{app:data}). This is the single change that would most raise the paper's
-external validity. \textbf{(2) A bit-reproducible operator}: cap iterations and oracle calls instead of
-wall-clock, so a nominal seed fixes the run and execution variance---currently $5.3/60$, larger than the method
+The structure-aware split is also run (Table~\ref{tab:sdis}), with a two-part outcome: the direction of
+$\Delta_{\mathrm{gamer}}$ replicates on structurally novel targets ($15/15$ executions, gamer $0/27$), and the
+benchmark turns out to hold only $24$ development-disjoint clusters, which converts the original owed
+experiment into a different one.
+
+\emph{The four experiments this study owes, in priority order.} \textbf{(1) A second crossing benchmark, split
+by structure cluster from the start}: Pseudobase++'s $251$ targets collapse to $60$ clusters and cannot supply a
+well-powered clean transfer test at a $\sim\!5\%$ base rate, so more targets from the \emph{same} source will
+not help---this needs a structurally independent corpus. It remains the single change that would most raise the
+paper's external validity. \textbf{(2) A bit-reproducible operator}: cap iterations and oracle calls instead of
+wall-clock, so a nominal seed fixes the run and execution variance---currently $4.4/60$, larger than the method
 effect---stops dominating every interval. \textbf{(3) A compute-matched control}: fix oracle calls or candidate
 evaluations per target, keep running past the first success to a common cap, and report a time-to-first-success
 survival curve or a success-versus-compute frontier, which is what would license ``equivalent at equal
@@ -1721,16 +1824,18 @@ pKiss-directed RNA design search attains $43/60$ exact matches under the optimiz
 agreement across pKiss, ProbKnot and de-novo ShapeKnots, demonstrating severe oracle-specific
 over-optimization---invisible to a one-sided criterion, and above a decidable context-free floor of $0/60$. A
 two-oracle-developed system attains a higher mixed-panel rate than the pKiss-only system, and that difference
-survives replication at the execution level ($\Delta={+}0.056$, structural-cluster interval
-$[{+}0.006,{+}0.115]$; the gamer wins no target in any of the nine executions). But the association is
+survives replication at the execution level ($\Delta={+}0.048$, structural-cluster interval
+$[{+}0.005,{+}0.093]$; the panel operator is higher in $14$ of $15$ executions), while shrinking each time
+replication is added. But the association is
 \emph{not yet robustly attributed to the agreement objective}: objective ablation moves the in-objective
-metric and not the mixed-panel metric; execution-level variability at a fixed seed ($5.3/60$) exceeds the
-method effect itself ($3.3/60$); the arms are matched on nominal caps rather than realized compute, which
-differs by $2.4\times$; genuinely held-out ShapeKnots generalization is weak; cross-source agreement is $0/60$
-for our system and the SOTA solver alike; and the evaluation split is not structurally disjoint ($39/125$ exact
-duplicates, and a cluster-aware interval on the near-versus-distant contrast that excludes neither a
-substantial positive nor a substantial negative difference---so we did not \emph{observe} concentration on
-near-duplicates, which is weaker than showing there is none). The exact formal contribution is
+metric and not the mixed-panel metric; execution-level variability at a fixed seed ($4.4/60$) exceeds the
+method effect itself ($2.9/60$); the arms are matched on nominal caps rather than realized compute, which
+differs by $2.3\times$; genuinely held-out ShapeKnots generalization is weak; cross-source agreement is $0/60$
+for our system and the SOTA solver alike; and the primary evaluation split is not structurally disjoint
+($39/125$ exact duplicates). On the structure-aware split we built to answer that last point the direction does
+replicate cleanly---$15/15$ executions with the gamer at $0/27$ throughout---but only $27$ development-disjoint
+targets exist in this benchmark, so the magnitude remains unestimable and a second crossing benchmark, not a
+better statistic, is what would settle it. The exact formal contribution is
 \emph{verifier-range exclusion}, not prior-policy incapacity and not a proved change in the system's language
 class.
 
@@ -1895,8 +2000,9 @@ in a separate paired sweep (\texttt{gamer\_vs\_panel\_replicate.sh}; Table~\ref{
 
 Pooling all six independent executions per nominal seed (\texttt{exec\_spread.py}), the panel operator's
 $r_{\mathrm{mix}}$ is $\{6,5,4,2,5,6\}$ at seed~$0$, $\{1,3,3,2,5,1\}$ at seed~$1$ and $\{2,4,3,9,1,1\}$ at
-seed~$2$---ranges $2$--$6$, $1$--$5$ and $1$--$9$, a mean spread of $\mathbf{5.3/60}$ at a \emph{fixed} nominal
-seed. Against the execution-replicated method effect of $+0.056=3.3/60$, single-execution noise is therefore
+seed~$2$, and $\{2,5,3\}$, $\{4,1,1\}$ at seeds~$3$ and~$4$---ranges $2$--$6$, $1$--$5$, $1$--$9$, $2$--$5$ and
+$1$--$4$, a mean spread of $\mathbf{4.4/60}$ at a \emph{fixed} nominal
+seed. Against the execution-replicated method effect of $+0.048=2.9/60$, single-execution noise is therefore
 \emph{larger} than the signal. The gamer, by contrast, is nearly deterministic ($0$--$1$, mean spread
 $0.3/60$), which is why the paired design rescues the comparison even though neither arm's count is
 individually stable. Two mechanisms drive the spread and both are worth naming: subprocess timing jitter under
@@ -2284,7 +2390,7 @@ Invented operator solves crossings under \emph{one} oracle & development/evaluat
 That single-oracle rate is largely an \emph{oracle artifact} & three-predictor panel (ProbKnot/ShapeKnots) &
  measured: $1/60$ ($r_{\mathrm{mix}}$)\\
 Two-oracle objective beats single-oracle gaming on $r_{\mathrm{mix}}$ & paired, matched-access, 5 seeds
- (Tables~\ref{tab:sep},~\ref{tab:gvp}) & measured: $\Delta{=}{+}0.056$\\
+ (Tables~\ref{tab:sep},~\ref{tab:gvp}) & measured: $\Delta{=}{+}0.048$\\
 The \emph{gain over undirected search} is attributable to components & matched-nominal-cap ablation
  (Table~\ref{tab:pablate}) & measured: \textbf{not established}\\
 Held-out-oracle ($r_{\mathrm{ho}}$) generalization & ShapeKnots-only, ID-disjoint pool
@@ -2464,9 +2570,20 @@ interval of $[{-}0.048,{+}0.108]$. That interval excludes neither a substantial 
 negative difference, and the strata are not difficulty-matched by design (mean crossing-pair counts $5.41$,
 $5.35$, $5.55$) though they happen to be close. The correct statement is therefore the narrow one: \emph{we did
 not observe higher success on the near-duplicate subset, but the structurally non-disjoint split prevents a
-clean transfer claim}---not that the failure mode is absent. The remedy is a structure-cluster, motif-family or
-homology-aware split that assigns whole clusters to train or test; we did not run it, and until it is run this
-pool supports an ID-held-out evaluation only.
+clean transfer claim}---not that the failure mode is absent. This pool therefore supports an ID-held-out
+evaluation only.
+
+\smallskip\noindent\textbf{The remedy, run.} The right design assigns whole structure clusters rather than
+individual targets, and \S\ref{sec:exp} reports it (Table~\ref{tab:sdis}): clustering all $251$ targets at the
+same $15\%$ threshold and keeping only clusters with no touched member yields $24$ clusters holding $27$
+targets, verified at minimum distance $0.167$ from the touched set. Two results. First, about the
+\emph{benchmark}: $251$ crossing targets contain only $60$ structural clusters, of which $36$ touch our
+development, so Pseudobase++ cannot furnish a well-powered structurally clean transfer test for an effect at a
+$\sim\!5\%$ base rate---a constraint we suspect applies to other work reporting on this benchmark and which we
+therefore state plainly. Second, about the \emph{effect}: on that pool the panel operator is
+mixed-panel-consistent on $1.87/27$ ($6.9\%$, i.e.\ \emph{above} its $5.3\%$ development-pool rate) against the
+gamer's $0.00/27$ in all fifteen executions, $b{=}28$ against $c{=}0$. The near-duplicate concern the audit
+raised is thus tested directly and does not materialize---but on $27$ targets that settles direction, not size.
 
 \begin{figure}[h]\centering
 \includegraphics[width=0.82\linewidth]{fig_cc_grades.pdf}

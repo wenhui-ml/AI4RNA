@@ -1,0 +1,17 @@
+all 251 crossing targets -> 60 structural clusters (single linkage, normalized dot-bracket d <= 0.15)
+  clusters containing a TOUCHED target (ids 0-125): 36 (224 targets)
+  CLEAN clusters:                                   24 (27 targets)  <- the structurally disjoint test pool
+  clean-cluster sizes: [2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+
+  VERIFICATION: minimum distance from any test target to any touched target = 0.1667
+  (must exceed 0.15; a value <= 0.15 would mean the cluster filter failed)
+  no id overlap with the touched set; whole clusters assigned, not individual targets.
+
+  difficulty profile (crossing-pair count):
+    test pool     n= 27  mean 5.67  min/max 3/12
+    touched set   n=126  mean 5.54  min/max 3/12
+    all 251       n=251  mean 5.48  min/max 3/12
+    -> report this: a structurally disjoint pool is NOT automatically difficulty-matched, and any
+       rate difference against the development pool confounds disjointness with difficulty.
+
+wrote /data/wenhui/openclaude_rna/rna_harness/runs/cc_ascent/struct_split.json (27 targets) -- use via TARGETS_JSON with sweep.py
