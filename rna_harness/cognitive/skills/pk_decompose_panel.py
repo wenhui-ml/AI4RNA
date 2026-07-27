@@ -50,11 +50,20 @@ class DecomposePKPanelTool(Tool):
 
     def __init__(self, skel_wall_s: float = 12.0, repair_wall_s: float = 90.0,
                  max_repair_iters: int = 800, skel_restarts: int = 6,
-                 panel_gate: int = 3, max_probknot: int = 120, ablate: str = "none"):
+                 panel_gate: int = 3, max_probknot: int = 120, ablate: str = "none",
+                 deterministic: bool = False, max_pkiss: int = 150):
         self.skel_wall_s = float(skel_wall_s)
         self.repair_wall_s = float(repair_wall_s)
         self.max_repair_iters = int(max_repair_iters)
         self.skel_restarts = int(skel_restarts)
+        # R7 M5: see DecomposePKTool. With deterministic=True no wall-clock term enters a stopping rule,
+        # so a nominal seed fixes the run bit-for-bit and the execution-level variance that dominates
+        # Table 9 is removed by construction rather than averaged over.
+        self.deterministic = bool(deterministic)
+        # Counted compute allowance used in deterministic mode. 150 exceeds the largest pKiss use
+        # realized by any arm under the wall-clock regime (142.7), so switching to it hands no arm
+        # less budget than it previously took, while making the allowance identical across arms.
+        self.max_pkiss = int(max_pkiss)
         self.panel_gate = int(panel_gate)        # evaluate ProbKnot only when pKiss bp <= gate
         self.max_probknot = int(max_probknot)     # per-target ProbKnot call budget
         if ablate not in self.ABLATIONS:
@@ -81,6 +90,13 @@ class DecomposePKPanelTool(Tool):
 
         n = len(target)
         rng = random.Random(seed)
+        if self.deterministic:
+            # ViennaRNA's inverse_fold is a stochastic search on ViennaRNA's OWN global RNG, which
+            # advances across calls and is not touched by random.Random(seed). Without this line two
+            # attempts at the same (target, seed) diverge even on an idle machine in one process --
+            # measured, and the actual reason the operator was never reproducible. Removing the
+            # wall-clock caps alone does not fix it.
+            RNA.init_rand(seed)
         target_pairs = pk_pairs(target)
         skeleton = "".join(c if c in "()." else "." for c in target)
         skel_pairs = pk_pairs(skeleton)
@@ -122,7 +138,7 @@ class DecomposePKPanelTool(Tool):
                 s, dist = RNA.inverse_fold(start, skeleton)
                 if dist < best_dist:
                     best_skel, best_dist = s, dist
-                if best_dist <= 0 or (time.time() - t0) > self.skel_wall_s:
+                if best_dist <= 0 or (not self.deterministic and (time.time() - t0) > self.skel_wall_s):
                     break
             seq = list(best_skel)
             if len(seq) != n:
@@ -151,7 +167,8 @@ class DecomposePKPanelTool(Tool):
         t_rep = time.time()
         n_cross = len(cross_pairs)
         while (self.ablate != "norepair" and not solved and (cur_pk > 0 or cur_pb > 0)
-               and it < self.max_repair_iters and (time.time() - t_rep) < self.repair_wall_s):
+               and it < self.max_repair_iters and n_pkiss < self.max_pkiss
+               and (self.deterministic or (time.time() - t_rep) < self.repair_wall_s)):
             it += 1
             cand = list(cur_seq)
             if n_cross and rng.random() < 0.10:

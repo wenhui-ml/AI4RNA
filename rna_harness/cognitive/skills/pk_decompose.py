@@ -66,11 +66,22 @@ class DecomposePKTool(Tool):
 
     def __init__(self, skel_wall_s: float = 15.0, repair_wall_s: float = 60.0,
                  max_repair_iters: int = 400, skel_restarts: int = 6, n_replicas: int = 1,
+                 deterministic: bool = False, max_pkiss: int = 150,
                  ablate: str = "none"):
         self.skel_wall_s = float(skel_wall_s)
         self.repair_wall_s = float(repair_wall_s)
         self.max_repair_iters = int(max_repair_iters)
         self.skel_restarts = int(skel_restarts)
+        # R7 M5: when True, no wall-clock term enters any stopping rule, so (target, seed) alone fixes the
+        # run and a result no longer depends on how loaded the machine was. Caps become purely counted:
+        # skel_restarts restarts and max_repair_iters proposals. The oracle subprocess timeouts in
+        # oracles_pk remain (they are the only residual wall-clock dependency) and are counted in stats
+        # as n_oracle_timeouts so any residual non-determinism is visible rather than silent.
+        self.deterministic = bool(deterministic)
+        # Counted compute allowance used in deterministic mode. 150 exceeds the largest pKiss use
+        # realized by any arm under the wall-clock regime (142.7), so switching to it hands no arm
+        # less budget than it previously took, while making the allowance identical across arms.
+        self.max_pkiss = int(max_pkiss)
         # P2 component ablation: 'none' (full) | 'norepair' (no pKiss-guided repair loop) |
         # 'nocompose' (skip WC on crossing pairs) | 'nodecompose' (random init, no CF skeleton).
         self.ablate = str(ablate)
@@ -108,6 +119,13 @@ class DecomposePKTool(Tool):
 
         n = len(target)
         rng = random.Random(seed)
+        if self.deterministic:
+            # ViennaRNA's inverse_fold is a stochastic search on ViennaRNA's OWN global RNG, which
+            # advances across calls and is not touched by random.Random(seed). Without this line two
+            # attempts at the same (target, seed) diverge even on an idle machine in one process --
+            # measured, and the actual reason the operator was never reproducible. Removing the
+            # wall-clock caps alone does not fix it.
+            RNA.init_rand(seed)
         target_pairs = pk_pairs(target)
         skeleton = "".join(c if c in "()." else "." for c in target)   # the nested '()' reduction
         skel_pairs = pk_pairs(skeleton)
@@ -127,7 +145,7 @@ class DecomposePKTool(Tool):
                 s, dist = RNA.inverse_fold(start, skeleton)
                 if dist < best_dist:
                     best_skel, best_dist = s, dist
-                if best_dist <= 0 or (time.time() - t0) > self.skel_wall_s:
+                if best_dist <= 0 or (not self.deterministic and (time.time() - t0) > self.skel_wall_s):
                     break
         seq = list(best_skel)
         if len(seq) != n:                                              # defensive: pad/trim to length
@@ -163,7 +181,8 @@ class DecomposePKTool(Tool):
         t_rep = time.time()
         n_cross = len(cross_pairs)
         while (self.ablate != "norepair" and not solved and cur_bp and cur_bp > 0
-               and it < self.max_repair_iters and (time.time() - t_rep) < self.repair_wall_s):
+               and it < self.max_repair_iters and n_pkiss < self.max_pkiss
+               and (self.deterministic or (time.time() - t_rep) < self.repair_wall_s)):
             it += 1
             cand = list(cur_seq)
             # occasional restart move: re-randomise ALL crossing-stem pairs (the pseudoknot-specific part)

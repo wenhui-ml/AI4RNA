@@ -96,9 +96,11 @@ still queries crossing-aware folding oracles). Reporting them separately is the 
 \emph{one exact, three established, one weak, one not established} (Table~\ref{tab:verdict} fixes that
 classification rule and the whole paper uses it), and we state the verdict as \emph{partial audit
 success---diagnostic crossing evidence, not robust capability acquisition}. That a system we built
-\emph{specifically to pass this audit} cannot saturate it is the evidence that the instrument
-discriminates rather than rubber-stamps; a vector reading ``established'' six times on the first system it is
-pointed at would be the worrying outcome. \emph{The exact negative side proves that the prior verification regime
+\emph{specifically to pass this audit} does not saturate it is, on its own, no evidence at all about the
+instrument: an audit nothing passes looks exactly like an audit that cannot see. We therefore test it against
+an arm that does clear the bar---the frozen LLM-written operators reach $0.302$ carry-over where our own
+operator reaches $0.091$, on non-overlapping intervals (\S\ref{sec:exp})---so the low rate is a fact about the
+operator, not a ceiling imposed by the adjudicator. \emph{The exact negative side proves that the prior verification regime
 cannot certify crossings; it does not prove that the prior policy is computationally incapable of generating
 them.} Novelty is relative to the system's prior self, not the base model, and the subject throughout is the
 \emph{oracle-augmented} system rather than a bare policy (Rem.~\ref{rem:subject}). The positive side rests on
@@ -535,10 +537,10 @@ reconstruct it from the results section.
 \paragraph{How to read a mostly-negative vector.} It is tempting to read Table~\ref{tab:verdict} as a report
 card our system failed, and that reading would be wrong in a way worth naming. The system audited here was
 \emph{built to pass this audit}---it optimizes a two-oracle conjunction precisely because a single oracle is
-gameable---and it still leaves two of six components unestablished or weak. That is the table's main evidential
-function: an instrument that its own designers' best attempt cannot saturate is an instrument with
-discriminating power, which is what makes the $43/60\!\to\!1/60$ collapse of \S\ref{sec:exp} a measurement
-rather than an anecdote. A vector of six components all reading ``established'' on the first system anyone
+gameable---and it still leaves two of six components unestablished or weak. We resist the tempting reading of
+that fact. Our own failure to saturate the instrument says nothing about the instrument until some arm
+succeeds; the discriminating power is established by the positive control of \S\ref{sec:exp}, not by our
+score. A vector of six components all reading ``established'' on the first system anyone
 points it at would be the worrying outcome.
 
 
@@ -1535,8 +1537,9 @@ ShapeKnots is in no arm's loop, so that column is comparable across every row; t
 meaningful only for the two arms that do not optimize it. Denominators are each arm's own successes, so they
 differ by design---that is what makes the statistic neutral. Intervals are exact binomial (Clopper--Pearson);
 the paired, difficulty-matched contrasts are in the text. Agent-written operators optimize
-pKiss\,$\wedge$\,ProbKnot as well (\texttt{invent\_operator.py}), pooled over six models and reported here as a
-single-run observation pending replication. (\texttt{runs/cc\_ascent/carryover.py}.)}\label{tab:carry}
+pKiss\,$\wedge$\,ProbKnot as well (\texttt{invent\_operator.py}); the row pools six single runs, and the two
+models with no runtime failures were subsequently replicated at $5$ seeds $\times$ $3$ executions, giving
+$0.302$ $[0.275,0.330]$ and serving as this section's positive control. (\texttt{runs/cc\_ascent/carryover.py}.)}\label{tab:carry}
 \begin{tabular}{@{}llcccc@{}}
 \toprule
 \textbf{arm} & \textbf{in-loop objective} & \textbf{own} & \textbf{ProbKnot} & \textbf{ShapeKnots}
@@ -1552,6 +1555,39 @@ agent-written (6 models) & pKiss\,$\wedge$\,ProbKnot & $222$ & in-loop & $\mathb
 \bottomrule
 \end{tabular}
 \end{table}
+
+\paragraph{Does the instrument discriminate, or is it merely insensitive? A positive control.}
+We have argued more than once that nothing we build saturates the panel, and offered that as evidence the
+panel is stringent. That argument does not work on its own: an audit nothing passes and an audit that cannot
+detect anything produce the same table, and with $\sim\!1\%$ recall on natives (\S\ref{sec:exp}) insensitivity
+is the live alternative. Separating them needs an arm that \emph{does} clear the bar, measured identically.
+We already had one and had filed it as a supplement. The six frozen LLM-written operators of
+App.~\ref{app:invent} optimize pKiss\,$\wedge$\,ProbKnot, exactly the panel operator's predicate, so ShapeKnots
+is held out from them in exactly the same sense; the comparison is like-for-like by construction.
+
+Replicated at the depth of the headline experiment---the two operators with no runtime failures, frozen code
+re-executed at $5$ nominal seeds $\times$ $3$ executions on the $n{=}60$ pool
+(\texttt{agent\_replicate.py}, \texttt{arep\_stats.py})---their carry-over is
+$333/1104=\mathbf{0.302}$ $[0.275,0.330]$, against the hand-built panel operator's $48/530=0.091$
+$[0.068,0.118]$. The intervals do not overlap. Two details matter. First, the three executions inside a
+nominal seed are \emph{bit-identical} in $5/5$ seeds for both operators, so unlike our own operator these are
+reproducible runs and the estimate is not an average over execution noise. Second, the obvious confound is
+real and does not explain the gap: the agent operators emit GC-richer sequences (mean $0.529$ against
+$0.460$) and ShapeKnots agreement is partly predictable from composition alone---within our own operator's
+designs the rate is $0.169$ above $50\%$ GC and $0.051$ below it---but stratifying, the agent advantage holds
+in both bins ($0.312$ vs.\ $0.169$, and $0.285$ vs.\ $0.051$).
+
+We draw one conclusion and refuse two. The conclusion: \emph{the instrument is not merely insensitive}. A rate
+of $0.302$ is reachable on this pool under this panel, so $0.091$ is a fact about the operator that produced
+it, not a ceiling imposed by the adjudicator. That is the positive control the rest of this section needed,
+and it is also the sharpest available statement of the paper's own limitation---the system we built to survive
+the audit is the weakest pKiss\,$\wedge$\,ProbKnot arm we measured. What we do \emph{not} claim: any
+attribution for \emph{why} the written operators carry over better, since we have not ablated them and the GC
+difference shows at least one uncontrolled dimension; and any transfer claim, since the structurally disjoint
+run has $9.7/27$ and $1.1/27$ targets erroring out per cell, leaving a denominator filtered towards easy
+targets (rates of $0.82$ and $0.62$ there are recorded in App.~\ref{app:invent} and used for nothing). Two of
+six models had no runtime failures and the other four time out on $19$--$32$ of $60$ targets; only the two are
+used here, and that exclusion is itself a selection we cannot fully audit.
 
 \paragraph{Which pool is which, and what each can support.} The pools have accumulated different histories of
 contact with our development, and the words ``held-out'' and ``transfer'' have been doing too much work across
@@ -1791,13 +1827,15 @@ datasets; the positive claim we support is limited to the Pseudobase++ distribut
 $\{60,180,300\}$\,s on a fixed $20$-target subset, panel-unanimous is $\{1,3,1\}/20$: no clean budget trend,
 dominated by search variance.
 
-\paragraph{Agent-written operators, and positive-side stringency (both relegated).} Two supporting results
-sit in the appendix rather than here, because neither changes the verdict of Table~\ref{tab:verdict} and both
-are descriptive. \emph{(a)} Six frontier LLM agents, given only primitives and the two crossing oracles, each
-write an operator with a nonzero $r_{\mathrm{mix}}$ on the development/evaluation $60$ ($2$--$17/60$), four of
-them above the hand-built operator's band---one temperature-$0.4$ draw per model, so this supports no model
-ranking and no reproducibility claim (App.~\ref{app:invent}, Tables~\ref{tab:invclaims},~\ref{tab:models}).
-It answers only the objection that the audited operator was researcher-designed. \emph{(b)} On the
+\paragraph{Agent-written operators, and positive-side stringency.} \emph{(a)} Six frontier LLM agents, given
+only primitives and the two crossing oracles, each write an operator with a nonzero $r_{\mathrm{mix}}$ on the
+development/evaluation $60$ ($2$--$17/60$), four of them above the hand-built operator's band---one
+temperature-$0.4$ draw per model, so this supports no model ranking (App.~\ref{app:invent},
+Tables~\ref{tab:invclaims},~\ref{tab:models}). We previously filed this as descriptive support for the single
+objection that the audited operator was researcher-designed. It carries more weight than that, and we have
+promoted the part that does: replicated on the conditional carry-over statistic, two of these operators supply
+the positive control that establishes the panel is not merely insensitive (\S\ref{sec:exp}). What stays
+descriptive is the model-to-model comparison, which rests on one draw each. \emph{(b)} On the
 mixed-panel-consistent designs the target is the pKiss MFE for all $17$ whose suboptimal enumeration completed,
 dominant by a median $1.2$\,kcal/mol, so the positive verdict is not a marginal coincidence of pair
 sets---within the pKiss energy model, on the shorter designs only (App.~\ref{app:config},
@@ -1972,7 +2010,14 @@ making the search oracle-blind (Table~\ref{tab:pablate}). Directedness is decisi
 objective $r_{\mathrm{in}}$. \emph{(iii) The operators are not bit-reproducible, and the noise is large.}
 Execution-level s.d.\ at a \emph{fixed} nominal seed is $2.04/60$ on $r_{\mathrm{mix}}$, the same order as
 the method effect of $2.87/60$; only the within-execution paired reading is interpretable, and a
-wall-clock-budgeted operator's result depends on machine load (App.~\ref{app:repro}). \emph{(iv) The controls
+wall-clock-budgeted operator's result depends on machine load. \emph{We diagnosed this and were wrong about
+the cause}, which changes what the fix is: removing every wall-clock term from the stopping rules does
+\emph{not} make the operator reproducible. Two attempts at the same (target, seed) still diverge on an idle
+machine in a single process, because \textsc{ViennaRNA}'s \texttt{inverse\_fold}---the context-free
+sub-solver---is a stochastic search on \textsc{ViennaRNA}'s own global RNG, which \texttt{random.Random(seed)}
+does not touch and which advances across calls. Seeding it per attempt, together with count-based caps,
+does fix it: under a $96$-process synthetic load both operators now reproduce bit-for-bit on $4/4$ targets,
+against $1/4$ and $0/4$ under the wall-clock default (App.~\ref{app:repro}). \emph{(iv) The controls
 are matched on nominal caps, not realized compute}, and realized compute is outcome-dependent: the panel
 operator makes $2.3\times$ the gamer's oracle calls, so $\Delta_{\mathrm{gamer}}$ measures the sum of ``better
 predicate'' and ``longer search'' (Tables~\ref{tab:budget},~\ref{tab:gvp}). \emph{(v) $g_{\mathrm{aut}}$ is
@@ -2072,8 +2117,9 @@ the result. The system is the test case, and it is a demanding one: we built it 
 audit---a two-oracle conjunction exists precisely because one oracle is gameable---and after execution-level
 replication, structural-cluster resampling, a matched-nominal-cap ablation and a structurally disjoint
 evaluation, it separates from the gamer narrowly and leaves two of six components unestablished or weak. An
-audit that the motivated best effort of its own authors cannot saturate is one whose verdicts carry
-information. We would have been more worried by six green cells. The open problem this leaves is not a better
+audit whose verdicts carry information is one that separates arms, and the separation we can demonstrate is
+against a positive control rather than against our own low score: the written operators reach $0.302$
+carry-over, our operator $0.091$. The open problem this leaves is not a better
 objective but a second, structurally independent crossing benchmark: Pseudobase++'s $251$ targets contain $60$
 structural clusters and $24$ untouched ones, and no statistic recovers the power that arithmetic removes.
 
@@ -2224,7 +2270,20 @@ and the raw predictor output for every call. Design seeds are the integers $0$--
 \smallskip\noindent\textbf{Execution-level nondeterminism at a fixed seed: measured, and larger than the method
 effect.} The operators are seeded but \emph{not} bit-reproducible, because their repair loops
 terminate on \emph{wall-clock} budgets and on a per-target ProbKnot call budget, and subprocess timing varies
-with machine load. This is not a footnote-sized detail, so we quantified it rather than acknowledging it: we
+with machine load. That was our diagnosis, and it was incomplete in a way worth recording, because it made the
+obvious fix ineffective. Deleting every wall-clock term from the stopping rules leaves the operator
+\emph{still} irreproducible: at a fixed (target, seed), on an idle machine, inside one process, four of four
+targets diverged. The residual cause is that the context-free sub-solve calls \textsc{ViennaRNA}'s
+\texttt{inverse\_fold}, a stochastic search running on \textsc{ViennaRNA}'s \emph{own} global RNG. That
+generator is invisible to \texttt{random.Random(seed)} and its state advances from call to call, so the
+skeleton the repair loop starts from is not a function of our seed. Machine load was a real but secondary
+term. The operators now expose \texttt{deterministic=True}, which (a) replaces both wall-clock caps with
+counted ones---iterations plus a pKiss-call allowance of $150$, above the $142.7$ that the hungriest arm
+realized under the clock, so no arm loses budget and all arms now get the same---and (b) seeds
+\textsc{ViennaRNA}'s generator per attempt. Validated against a $96$-process synthetic load: $4/4$ and $4/4$
+targets bit-identical for the two operators, against $1/4$ and $0/4$ with the default. This settles owed
+experiment~(2) and the compute-matching half of~(3) with one change; the measurements reported in this paper
+predate it and were made under the wall-clock regime, which is why we replicate rather than assume. We
 re-ran every arm of Table~\ref{tab:pablate} \emph{three} times at each of three nominal seeds
 (\texttt{panel\_replicate.sh}; $54$ runs) and, for the headline comparison, both arms three more times per seed
 in a separate paired sweep (\texttt{gamer\_vs\_panel\_replicate.sh}; Table~\ref{tab:gvp}).
