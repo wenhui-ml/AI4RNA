@@ -1,0 +1,45 @@
+100 Eterna100 targets with outcomes: 36 unsolved, 64 solved
+
+=== 1. minimum or quantile? which functional of gap over S(T) predicts failure ===
+    (all from the same 200 stored draws; 'cost' is oracle calls needed to estimate it)
+             statistic     AUC            95% CI   min cost
+    min (Delta-hat_200)   0.875  [0.801, 0.939]        200
+                   q01   0.867  [0.790, 0.933]        100
+                   q05   0.863  [0.786, 0.930]         20
+                   q10   0.861  [0.783, 0.929]         10
+                   q25   0.860  [0.782, 0.928]          4
+                median   0.856  [0.776, 0.925]          2
+                   q75   0.852  [0.770, 0.920]          4
+                  mean   0.855  [0.774, 0.924]          2
+                    sd   0.767  [0.670, 0.851]          3
+            mean - min   0.754  [0.651, 0.844]        200
+    -> best single statistic: min (Delta-hat_200) at AUC 0.875
+
+=== 2. is Delta just length in disguise? ===
+    AUC(length -> failure)          = 0.757
+    AUC(q10   -> failure)           = 0.861
+    AUC(q10/n -> failure)           = 0.867
+    within length terciles (Delta cannot borrow length there):
+      n <= 88            n= 34 unsolved= 6  AUC(q10) = 0.839   AUC(len) = 0.810
+      88 < n <= 151      n= 33 unsolved=10  AUC(q10) = 0.878   AUC(len) = 0.537
+      n > 151            n= 33 unsolved=20  AUC(q10) = 0.888   AUC(len) = 0.712
+    likelihood-ratio test, adding q10 to a length-only model:
+      LR = 28.53 on 1 df, p = 9.22e-08   beta(length) -1.85  beta(q10) +4.14
+
+=== 3. does the slack / information-budget framing survive? ===
+    slack(T) = H_avail - Delta/(RT ln2). info_budget.py frames this as the point.
+    n < 150   AUC(low slack -> failure) = 0.555
+    n >= 150  AUC(low slack -> failure) = 0.614
+    pooled    AUC(low slack -> failure) = 0.367
+    targets with NEGATIVE slack, the whole point of the framing: 0/100
+    VERDICT: slack pools to 0.355 and stratifies to ~0.53-0.59, and no target ever violates
+    the budget. H_avail scales with length and swamps Delta. The bits framing is dropped;
+    raw Delta is the coordinate that works.
+
+=== 4. the estimator to carry forward ===
+    N=  3  AUC(min)=0.846  AUC(q10)=0.845  AUC(median)=0.849
+    N=  5  AUC(min)=0.859  AUC(q10)=0.856  AUC(median)=0.857
+    N=  8  AUC(min)=0.865  AUC(q10)=0.856  AUC(median)=0.858
+    N= 10  AUC(min)=0.865  AUC(q10)=0.857  AUC(median)=0.854
+    N= 20  AUC(min)=0.873  AUC(q10)=0.857  AUC(median)=0.859
+    N= 40  AUC(min)=0.868  AUC(q10)=0.860  AUC(median)=0.858

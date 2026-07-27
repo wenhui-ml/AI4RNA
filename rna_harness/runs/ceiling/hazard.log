@@ -1,0 +1,40 @@
+arm=panel_auto  N_draws for Delta=8  900 attempts over 15 cells
+  fit split   ids 0-29: 450 attempts, 27 events
+  held out    ids 30-59 : 450 attempts, 21 events
+
+=== fitted hazard (ids 0-29) ===
+  k = 0.891   beta0 = -8.9506   beta1(Delta) = -3.8332
+  LR test, Delta vs no-Delta: LR = 51.39 on 1 df, p = 7.56e-13
+  k interpretation: search exhausts
+  nu_crit(k) = 9.6000  ->  fund target i iff lambda_i > mu / 9.6000
+  cell-bootstrap 95% CI:  k [0.78, 1.06]   beta1 [-5.12, -2.78]  (B=200)
+
+=== out-of-sample check, ids 30-59 under the allocation ALREADY RUN ===
+  predicted solves 34.0   observed 21   (450 attempts, 15 cells)
+  per cell: predicted 2.27/30   observed 1.40/30
+
+=== PREDICTED FRONTIER, ids 30-59 (n=30), baseline B0 = 3684 calls/cell ===
+  observed baseline: 1.40 solves/cell;  10/30 targets ever solved
+    B/B0        B   funded   E[solves]   vs baseline
+    0.05      184       18        0.68         -0.72
+    0.10      368       18        1.22         -0.18
+    0.15      553       19        1.72         +0.32
+    0.20      737       19        2.18         +0.78
+    0.30     1105       19        3.01         +1.61
+    0.50     1842       21        4.41         +3.01
+    0.75     2763       21        5.83         +4.43
+    1.00     3684       21        6.98         +5.58
+    1.50     5526       22        8.71         +7.31
+    2.00     7368       22       10.00         +8.60
+  uniform-allocation comparator at the same budgets:
+    B/B0   b each   E[solves]
+    0.05      6.1        0.37
+    0.10     12.3        0.68
+    0.15     18.4        0.97
+    0.20     24.6        1.24
+    0.30     36.8        1.75
+    0.50     61.4        2.67
+    1.00    122.8        4.61
+    2.00    245.6        7.53
+
+  PREDICTION: policy reaches the uniform baseline's 4.61 solves at 1958 calls = 1.88x cheaper (before charging Delta's own 240 calls -> 1.68x all-in)

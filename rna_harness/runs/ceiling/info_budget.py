@@ -1,6 +1,24 @@
 #!/usr/bin/env python3
 """An information budget for RNA inverse design -- a search-free, algorithm-independent coordinate.
 
+RETRACTED IN PART, 2026-07-27. The slack / rate-distortion framing below DOES NOT WORK, and the AUC 0.867
+reported here was computed with a length-dependent sample size. Both were established by ev_margin.py and
+ev_analyze.py in the same directory:
+
+  * slack(T) = H_avail - Delta/(RT ln2) does NOT predict failure. AUC 0.367 pooled and 0.555 / 0.614
+    within length strata, and 0/100 targets ever have negative slack -- so the claim the framing exists
+    to make ("undesignable for reasons no optimizer can touch") has zero instances in the benchmark.
+    H_avail scales with length and swamps Delta, so pooling inverts the ordering (Simpson's paradox).
+  * `nsamp = 100 / 50 / 30` below is chosen BY TARGET LENGTH. Delta-hat is a sample minimum, hence
+    non-increasing in N, so long targets got inflated Delta-hat and long targets are also likelier to be
+    unsolved. On identical draws the confound turns out to be negligible (0.867 length-dependent vs 0.870
+    at fixed N = 100), but the schedule is still wrong and ev_margin.py supersedes this file.
+
+WHAT SURVIVES: raw Delta(T) itself, as an ordinary search-free predictor of failure -- AUC 0.870 at fixed
+N, still 0.862 at N = 5, and not reducible to length (within length terciles 0.839 / 0.878 / 0.888 against
+length's own 0.810 / 0.537 / 0.712; adding Delta to a length-only logistic gives LR = 28.5, p = 9.2e-8).
+The bits conversion adds nothing and is dropped. Read the frame below as history.
+
 Frame. Design is entropy reduction. A target T admits a set of sequences merely COMPATIBLE with its
 pairing; that set has entropy
 
