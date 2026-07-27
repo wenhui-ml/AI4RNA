@@ -2177,10 +2177,13 @@ level each result reaches rather than collapsing them into one pass/fail bit.
 \begin{figure}[t]\centering
 \includegraphics[width=0.86\linewidth]{fig_cc_hierarchy.pdf}
 \caption{\textbf{RNA topology maps onto the Chomsky hierarchy.} Nested base pairs are context-free (SCFG);
-crossing pairs (pseudoknots) are, as unbounded families, non-\CF{} and admit mildly context-sensitive (MCFG)
-grammars, provably above \CF. The boundary is the $\CF\!\to\!\MCF$ jump; folding complexity (P$\to$NP-complete)
-is a distinct computational axis (topology-, model-, and objective-dependent), not implied by the generative
-class.}\label{fig:hierarchy}
+crossing pairs (pseudoknots) are, as unbounded families, non-\CF{} and admit mildly context-sensitive
+(MCFG) grammars, provably above \CF. The class labels are properties of the \emph{unbounded families}, not of
+the two structures drawn at right: any single finite structure is regular, which is why no finite experiment in
+this paper carries a class claim (\S\ref{sec:formal}). The boundary is the $\CF\!\to\!\MCF$ jump. Folding
+complexity (P$\to$NP-complete) is a \emph{distinct} computational axis, topology-, model- and
+objective-dependent and not implied by the generative class---fixed-fan-out MCFGs parse in polynomial
+time.}\label{fig:hierarchy}
 \end{figure}
 
 \subsection{Worked example: a canonical H-type pseudoknot}\label{app:worked}
