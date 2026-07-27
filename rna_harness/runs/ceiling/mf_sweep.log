@@ -1,0 +1,16 @@
+66 targets under 150nt, 60 samples each
+
+66 targets analysed: 16 unsolved, 50 solved
+
+statistic               median unsolved  median solved  AUC -> failure
+  medC                            0.000          0.315           0.643
+  frac_coop                       0.275          0.465           0.430
+  frac_frus                       0.209          0.000           0.606
+  frac_ind                        0.367          0.354           0.468
+  Delta (kcal/mol)                 27.9            9.1           0.860
+
+control: among targets in the MIDDLE Delta tercile, does the regime still separate?
+  middle tercile: 23 targets (3 unsolved, 20 solved), Delta in [6.5,17.5]
+    AUC(medC       -> failure | Delta held) = 0.633
+    AUC(frac_frus  -> failure | Delta held) = 0.617
+    AUC(frac_coop  -> failure | Delta held) = 0.475
