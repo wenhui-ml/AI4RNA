@@ -20,9 +20,10 @@
 \draw[rounded corners=2pt, gy, line width=0.6pt, fill=white] (1.35,1.32) rectangle (3.45,2.26);
 \node[gy, font=\scriptsize] at (2.4,1.79) {regular};
 % the difficulty axis: a property of target FAMILIES, not of the agent and not of one structure
-\draw[->, negr, line width=1.1pt] (4.9,1.78) to[bend left=12] (6.18,1.30);
-\node[negr, font=\bfseries, align=left, anchor=west] at (6.98,1.32)
-  {target-family axis\\$\mathrm{CF}\rightarrow\mathrm{MCF}$};
+\draw[->, negr, line width=1.1pt] (4.15,1.42) -- (4.15,0.80);
+% an edge label, not a floating block: the phrase "target-family axis" is prose and lives in the caption
+\node[negr, font=\bfseries\scriptsize, anchor=west] at (4.34,0.80)
+  {$\mathrm{CF}\rightarrow\mathrm{MCF}$};
 % arc cartoons (INSTANCES: a single finite structure is regular; the class claim is about the family)
 \draw[inkc, line width=0.6pt] (10.1,3.9)--(12.5,3.9);
 \foreach \r in {0.38,0.63,0.88} \draw[cfg, line width=0.9pt] (11.3-\r,3.9) arc(180:0:\r);
