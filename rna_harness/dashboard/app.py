@@ -170,6 +170,73 @@ def api_orchestration():
                      "D_undesignable": pids(D)}}}
 
 
+@app.get("/api/surface")
+def api_surface():
+    """The capability-cost surface: both benchmarks on ONE measured object.
+
+    Capability and efficiency used to be reported as two incomparable multiples ("1.69x capability" vs
+    "2.23x more expensive"). They are two readings of one curve,
+
+        S(B) = max over {b_i} of sum_i [1 - (1-p_i)^{b_i}]   s.t.  sum_i b_i c_i <= B
+
+    with p_i the per-trajectory success rate under INDEPENDENT adjudication (three-oracle panel on the
+    crossing set, unique-MFE on Eterna) and c_i the cost of one trajectory. Budget is USD at cost.py's
+    rate. S_inf = #{p_i > 0} is capability; the budget scale is efficiency; the gap to the flat policy is
+    scheduler slack. Curves are precomputed by runs/ceiling/{metric,eterna_analyze}.py; this only reshapes
+    them for drawing. Returns None if that branch's runs are absent.
+    """
+    C = os.path.join(RUNS, "ceiling")
+    m = _read_json(os.path.join(C, "metric.json"))
+    e = _read_json(os.path.join(C, "eterna_sb.json"))
+    if not m:
+        return {"surface": None}
+    R = m.get("cpu_usd_per_sec", 0.05 / 3600.0)
+
+    def thin(grid, S, n=20):
+        k = max(1, len(grid) // n)
+        return [[round(float(g), 7), round(float(s), 3)] for g, s in list(zip(grid, S))[::k]]
+
+    cross = {}
+    for a, lab in (("on_400", "闸门开 (ShapeKnots 入环)"), ("off_150", "闸门关 · 150 次预算"),
+                   ("off_400", "闸门关 · 400 次预算 (证伪对照)")):
+        d = m.get(a)
+        if not d:
+            continue
+        cross[a] = {"label": lab, "s_inf": d["s_inf"], "n": 60,
+                    "pass_usd": round(d.get("pass_usd", 0.0), 4),
+                    "pts": thin([g * R for g in d["grid"]], d["S"])}
+    eterna = {}
+    if e:
+        for k, lab in (("remc_gate|umfe", "REMC + 唯一-MFE 闸门"), ("remc_plain|umfe", "REMC 原样")):
+            d = e.get(k)
+            if not d:
+                continue
+            eterna[k.split("|")[0]] = {"label": lab, "s_inf": d["s_inf"], "n": 100,
+                                       "pass_usd": round(float(sum(d["c"])) * R, 4),
+                                       "pts": thin([g * R for g in d["grid"]], d["S"])}
+    return {"surface": {
+        "cpu_usd_per_sec": R, "cross": cross, "eterna": eterna,
+        # DesiRNA under the SAME panel, from cc_ascent/desirna_seqs/panel_always_sota.json:
+        # 43/60 under pKiss alone, 0/60 unanimous, at 180 s x 10 replicas x 60 targets.
+        "sota": {"label": "DesiRNA (SOTA)", "s_inf": 0, "n": 60, "pass_usd": 1.50,
+                 "note": "pKiss 下 43/60,三 oracle 一致 0/60,预算是我们的 1.6 倍"},
+        "fixed": [["3 / 60", 0.0021, 0.0022, "0.96×"], ["6 / 60", 0.0079, 0.0069, "1.15×"],
+                  ["8 / 60", 0.0168, 0.0115, "1.47×"], ["10 / 60", 0.0355, 0.0176, "2.02×"],
+                  ["12 / 60", 0.9705, 0.0266, "36.5×"], ["15 / 60", None, 0.0520, "∞"],
+                  ["20 / 60", None, 0.1760, "∞"]],
+        "slack": [["闸门关", 3.25, 10.39, "3.20×"], ["闸门开", 5.50, 17.42, "3.17×"]],
+        "unit": [["一次求解尝试 (加闸门)", 0.00155, "≈ 一次小的 LLM 调用"],
+                 ["一次 LLM 调用 2k/0.5k", 0.00175, "≈ 一次求解尝试"],
+                 ["一个三 oracle 一致解", 0.01696, "≈ 一次 20k token 调用"],
+                 ["一次 LLM 调用 20k/4k", 0.01600, "≈ 一个完整的解"],
+                 ["跑完 60 靶交叉基准一遍", 0.09325, "≈ 一个 agent episode"]],
+        "caveats": [
+            "Eterna 闸门臂被混淆:StrictGate 在任何内部失败时都重试,不只在 umfe 拒绝时。平均 2.27 次尝试但只有 0.08 次拒绝,800 次里仅 45 次真的发生拒绝 —— 增益大部分来自多重启,不是闸门。交叉基准那个没有这个问题(同预算证伪臂零差异,p=1)。",
+            "S_inf 由 8 个 seed 估出,是下界:真实 p=0.10 的靶在 8 个 seed 上全输的概率是 0.43。两个坐标采样需求相反(S_inf 要少靶多 seed,成本尺度要多靶少 seed),一次扫描估不好两个。",
+            "两个基准、一个算子族、短靶。本分支约 31 次假设检验中三个过 Bonferroni:闸门 p=7.6e-06、轨迹剂量反应 p=2e-04 / 1e-03、Eterna 集合目标 p=6.5e-12。轨迹臂的解数比值(p=0.0225)过不了。",
+        ]}}
+
+
 @app.get("/api/rssd")
 def api_rssd():
     """RSSD experiment board, organised by the three mainlines (categories) with key-focus headlines.
@@ -431,6 +498,7 @@ HTML_PAGE = """<!doctype html><html><head><meta charset="utf-8">
 </div>
 <div class="tabs">
  <span class="tab active" data-t="scorecard" onclick="tab('scorecard')">🏆 成绩单</span>
+ <span class="tab" data-t="surface" onclick="tab('surface')">🎯 能力-成本平面</span>
  <span class="tab" data-t="rssd" onclick="tab('rssd')">🧬 认知核/RSSD</span>
  <span class="tab" data-t="campaigns" onclick="tab('campaigns')">📈 记忆实验</span>
  <span class="tab" data-t="overview" onclick="tab('overview')">🧭 概览</span>
@@ -439,6 +507,7 @@ HTML_PAGE = """<!doctype html><html><head><meta charset="utf-8">
  <span class="tab" data-t="logs" onclick="tab('logs')">📜 日志(实时)</span>
 </div>
 <div id="scorecard" class="panel"></div>
+<div id="surface" class="panel" style="display:none"></div>
 <div id="rssd" class="panel" style="display:none"></div>
 <div id="campaigns" class="panel" style="display:none"></div>
 <div id="overview" class="panel" style="display:none"></div>
@@ -454,7 +523,7 @@ HTML_PAGE = """<!doctype html><html><head><meta charset="utf-8">
 let RUNS=[]; let SCORECARD=[]; let ORCH=null;
 const SOTA_V2=[{m:'DesiRNA 24h/题(经典极限)',v:0.97,c:'#2e7d32'},{m:'DesiRNA <1min(同预算·最可比)',v:0.85,c:'#66bb6a'},{m:'NEMO 原生',v:0.94,c:'#78909c'},{m:'LLM方法SOTA(Gautam)',v:0.80,c:'#d97706'}];
 function tab(t){document.querySelectorAll('.tab').forEach(e=>e.classList.toggle('active',e.dataset.t==t));
- ['scorecard','rssd','campaigns','overview','runs','figures','logs'].forEach(p=>document.getElementById(p).style.display=p==t?'block':'none');}
+ ['scorecard','surface','rssd','campaigns','overview','runs','figures','logs'].forEach(p=>document.getElementById(p).style.display=p==t?'block':'none');}
 function fmt(x){return x==null?'—':(typeof x=='number'?(Math.round(x*1000)/1000):x)}
 function cls(v){return v==null?'':(v>=0.6?'g':(v>=0.3?'y':'r'))}
 function note(t){return '<p class="note">'+t+'</p>'}
@@ -467,7 +536,104 @@ async function load(){
  try{const cp=(await (await fetch('/api/campaigns')).json()).campaigns; renderCampaigns(cp);}catch(e){}
  try{ORCH=(await (await fetch('/api/orchestration')).json()).orchestration;}catch(e){}
  try{const rs=(await (await fetch('/api/rssd')).json()).rssd; renderRSSD(rs);}catch(e){document.getElementById('rssd').innerHTML=note('RSSD 数据加载失败');}
+ try{const sf=(await (await fetch('/api/surface')).json()).surface; renderSurface(sf);}catch(e){document.getElementById('surface').innerHTML=note('平面数据加载失败');}
  renderFigures();
+}
+// ---- capability-cost surface: one curve, two orthogonal coordinates -------------------------
+const SC={s1:'#2a78d6',s2:'#eb6834',s3:'#1baf7a',neg:'#c62828',gl:'#e7e5df',tx:'#52514e'};
+function usd(v){return v>=1?'$'+v.toFixed(2):v>=0.01?'$'+v.toFixed(3):'$'+v.toFixed(5)}
+function svgLine(series,ymax,ylab,W,H){
+ const M={t:14,r:230,b:44,l:54},pw=W-M.l-M.r,ph=H-M.t-M.b;
+ const all=series.flatMap(s=>s.pts), x0=Math.log10(Math.min(...all.map(p=>p[0]))),
+       x1=Math.log10(Math.max(...all.map(p=>p[0])));
+ const X=v=>M.l+(Math.log10(v)-x0)/(x1-x0)*pw, Y=v=>M.t+ph-v/ymax*ph;
+ let g='';
+ for(let e=Math.ceil(x0);e<=x1;e++){const x=X(Math.pow(10,e));
+  g+=`<line x1="${x}" x2="${x}" y1="${M.t}" y2="${M.t+ph}" stroke="${SC.gl}"/>`+
+     `<text x="${x}" y="${H-24}" text-anchor="middle" font-size="11" fill="${SC.tx}">${usd(Math.pow(10,e))}</text>`;}
+ for(let k=0;k<=4;k++){const v=ymax*k/4,y=Y(v);
+  g+=`<line x1="${M.l}" x2="${M.l+pw}" y1="${y}" y2="${y}" stroke="${SC.gl}"/>`+
+     `<text x="${M.l-9}" y="${y+4}" text-anchor="end" font-size="11" fill="${SC.tx}">${Math.round(v)}</text>`;}
+ g+=`<text x="${M.l+pw/2}" y="${H-6}" text-anchor="middle" font-size="11.5" fill="${SC.tx}">整个基准的预算 (美元, 对数轴)</text>`+
+    `<text x="13" y="${M.t+ph/2}" text-anchor="middle" font-size="11.5" fill="${SC.tx}" transform="rotate(-90 13 ${M.t+ph/2})">${ylab}</text>`;
+ series.forEach(s=>{const d=s.pts.map((p,i)=>(i?'L':'M')+X(p[0])+' '+Y(p[1])).join(' ');
+  const L=s.pts[s.pts.length-1];
+  g+=`<path d="${d}" fill="none" stroke="${s.c}" stroke-width="2" stroke-linejoin="round"/>`+
+     `<circle cx="${X(L[0])}" cy="${Y(L[1])}" r="4" fill="${s.c}" stroke="#fff" stroke-width="2"/>`+
+     `<text x="${X(L[0])+10}" y="${Y(L[1])+4}" font-size="12" font-weight="600" fill="#1a1a2e">${s.label} · ${L[1].toFixed(0)}</text>`;});
+ return `<svg width="${W}" height="${H}" role="img" aria-label="${ylab}">${g}</svg>`;
+}
+function renderSurface(sf){
+ const el=document.getElementById('surface');
+ if(!sf){el.innerHTML=note('本分支尚无 ceiling 运行数据(需要 runs/ceiling/metric.json)');return;}
+ const cr=sf.cross,et=sf.eterna;
+ let h=`<div class="card"><h2>🎯 能力-成本平面</h2>`+
+  note('把"效果"和"效率"放在<b>同一个被测对象</b>上,不再是两个不可比的倍数。曲线 <code>S(B)=max Σ[1-(1-p_i)^b_i]</code>,预算约束 <code>Σ b_i c_i ≤ B</code>。'+
+       '<b>S<sub>∞</sub>=#{p_i>0}</b> 是能力,预算尺度是效率,离"每靶一条轨迹"的差距是调度余量。所有解都由<b>独立裁决</b>(交叉基准用三 oracle panel,Eterna 用唯一-MFE),没有任何一臂能给自己打分。')+`</div>`;
+
+ // ---- the plane
+ const P=[];
+ if(cr.off_150) P.push({x:cr.off_150.pass_usd,y:cr.off_150.s_inf/60*100,c:SC.s2,lab:'交叉 · 闸门关',n:`${cr.off_150.s_inf}/60`});
+ if(cr.off_400) P.push({x:cr.off_400.pass_usd,y:cr.off_400.s_inf/60*100,c:SC.s3,lab:'证伪对照 · 2.5倍预算',n:`${cr.off_400.s_inf}/60`});
+ if(cr.on_400)  P.push({x:cr.on_400.pass_usd, y:cr.on_400.s_inf/60*100, c:SC.s1,lab:'交叉 · ShapeKnots 闸门',n:`${cr.on_400.s_inf}/60`});
+ if(et.remc_plain) P.push({x:et.remc_plain.pass_usd,y:et.remc_plain.s_inf,c:SC.s2,lab:'Eterna · REMC 原样',n:`${et.remc_plain.s_inf}/100`});
+ if(et.remc_gate)  P.push({x:et.remc_gate.pass_usd, y:et.remc_gate.s_inf, c:SC.s1,lab:'Eterna · 加闸门',n:`${et.remc_gate.s_inf}/100`});
+ P.push({x:sf.sota.pass_usd,y:0,c:SC.neg,lab:'DesiRNA (SOTA) · 交叉',n:'0/60'});
+ const W=980,H=420,M={t:20,r:230,b:48,l:58},pw=W-M.l-M.r,ph=H-M.t-M.b;
+ const lx=v=>M.l+(Math.log10(v)-Math.log10(0.02))/(Math.log10(3)-Math.log10(0.02))*pw, ly=v=>M.t+ph-v/70*ph;
+ let g='';
+ [0.02,0.05,0.1,0.3,1,3].forEach(e=>{const x=lx(e);
+  g+=`<line x1="${x}" x2="${x}" y1="${M.t}" y2="${M.t+ph}" stroke="${SC.gl}"/>`+
+     `<text x="${x}" y="${H-26}" text-anchor="middle" font-size="11" fill="${SC.tx}">$${e}</text>`;});
+ for(let v=0;v<=70;v+=10){const y=ly(v);
+  g+=`<line x1="${M.l}" x2="${M.l+pw}" y1="${y}" y2="${y}" stroke="${SC.gl}"/>`+
+     `<text x="${M.l-9}" y="${y+4}" text-anchor="end" font-size="11" fill="${SC.tx}">${v}%</text>`;}
+ g+=`<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#9aa0a6"/></marker></defs>`;
+ const arw=(a,b,dash)=>`<line x1="${lx(a.x)}" y1="${ly(a.y)}" x2="${lx(b.x)}" y2="${ly(b.y)}" stroke="#9aa0a6" stroke-width="2" marker-end="url(#ah)"${dash?' stroke-dasharray="5 4"':''}/>`;
+ if(P.length>=3){g+=arw(P[0],P[1],true)+arw(P[0],P[2],false);}
+ if(P.length>=5){g+=arw(P[3],P[4],false);}
+ P.forEach(p=>{g+=`<circle cx="${lx(p.x)}" cy="${ly(p.y)}" r="7" fill="${p.c}" stroke="#fff" stroke-width="2"/>`+
+   `<text x="${lx(p.x)+12}" y="${ly(p.y)+4}" font-size="12" font-weight="600" fill="#1a1a2e">${p.lab} · ${p.n}</text>`;});
+ g+=`<text x="${M.l+pw/2}" y="${H-6}" text-anchor="middle" font-size="11.5" fill="${SC.tx}">跑完一遍基准的成本 (美元, 对数轴)</text>`+
+    `<text x="14" y="${M.t+ph/2}" text-anchor="middle" font-size="11.5" fill="${SC.tx}" transform="rotate(-90 14 ${M.t+ph/2})">天花板:基准中可达的比例</text>`;
+ h+=`<div class="card"><h3>1 · 每个改动把我们推向哪里</h3>`+
+   note('纵轴是<b>能力天花板</b>,横轴是跑一遍基准的<b>成本</b>。一支箭头是一个改动:<b>竖直向上</b>买到能力,<b>水平向右</b>只是花钱。虚线那支是<b>证伪对照</b>—— 同一个算子给 2.5 倍 oracle 预算,只往右不往上,这就是"多给算力买不到东西"的直接证据。')+
+   `<div style="overflow-x:auto"><svg width="${W}" height="${H}">${g}</svg></div></div>`;
+
+ // ---- curves
+ const cs=[];
+ if(cr.on_400) cs.push({pts:cr.on_400.pts,c:SC.s1,label:'闸门开'});
+ if(cr.off_150)cs.push({pts:cr.off_150.pts,c:SC.s2,label:'闸门关·150'});
+ if(cr.off_400)cs.push({pts:cr.off_400.pts,c:SC.s3,label:'闸门关·400'});
+ h+=`<div class="card"><h3>2 · 交叉基准:两条曲线会交叉</h3>`+
+   note('低于约 $0.0013 便宜的系统更好,高于它加闸门的系统更好,而且差距<b>无上界</b>。'+
+        '这就是为什么"1.69倍能力"和"贵 2.23 倍"看起来像互相矛盾的两件事 —— 它们是<b>同一条曲线读在不同位置</b>。')+
+   `<div style="overflow-x:auto">${svgLine(cs,24,'三 oracle 一致解 (共 60)',980,360)}</div></div>`;
+ const es=[];
+ if(et.remc_gate) es.push({pts:et.remc_gate.pts,c:SC.s1,label:'加闸门'});
+ if(et.remc_plain)es.push({pts:et.remc_plain.pts,c:SC.s2,label:'原样'});
+ if(es.length) h+=`<div class="card"><h3>3 · Eterna100:天花板输在长度上</h3>`+
+   note('和交叉基准不同,Eterna <b>几乎一发就饱和</b>:8 个 seed 只比一发多 1.1–1.2 倍(交叉基准是 3.7 倍)。'+
+        '天花板丢在长靶上 —— 250nt 以上只有 9/25 可达,250nt 以下是 53/75。')+
+   `<div style="overflow-x:auto">${svgLine(es,70,'唯一-MFE 解 (共 100)',980,330)}</div></div>`;
+
+ // ---- tables
+ const fx=sf.fixed.map(r=>`<tr><td>${r[0]}</td><td>${r[1]==null?'达不到':usd(r[1])}</td><td>${usd(r[2])}</td><td class="g">${r[3]}</td></tr>`).join('');
+ h+=`<div class="card"><h3>4 · 达到固定质量目标的成本</h3>`+
+  note('同一条曲线的<b>效率读法</b>。优势随质量目标增长,在弱系统的天花板处发散。')+
+  `<table><tr><th>解出的靶</th><th>闸门关</th><th>闸门开</th><th>倍数</th></tr>${fx}</table></div>`;
+ const sl=sf.slack.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td class="y">${r[3]}</td></tr>`).join('');
+ h+=`<div class="card"><h3>5 · 第三个坐标:调度余量</h3>`+
+  note('"每靶一条轨迹"离<b>同预算下的最优分配</b>有多远。两个系统数值几乎相同,所以调度和能力是<b>经验上独立</b>的。轨迹实验已实现其中 1.6–2.6 倍,<b>剩下的还没拿</b>。')+
+  `<table><tr><th>系统</th><th>平摊策略</th><th>同预算最优</th><th>余量</th></tr>${sl}</table></div>`;
+ const un=sf.unit.map(r=>`<tr><td>${r[0]}</td><td>${usd(r[1])}</td><td>${r[2]}</td></tr>`).join('');
+ h+=`<div class="card"><h3>6 · 一美元买到什么</h3>`+
+  note('<b>规模比倍数更重要。</b>在基准规模上 CPU 几乎免费,主导成本是 R&amp;D 循环的 token;在生产规模上反过来。'+
+       '本分支所有效率倍数都测在<b>第二种</b>规模,而项目实际处在<b>第一种</b>。每靶调一次 LLM 加 14%(可行),每次尝试调一次加 113%(不可行)。')+
+  `<table><tr><th>单位</th><th>成本</th><th>等价于</th></tr>${un}</table></div>`;
+ h+=`<div class="card"><h3>7 · 不声称什么</h3>`+
+  sf.caveats.map(c=>`<p class="note" style="border-left-color:#c62828;background:#fdf0f0">${c}</p>`).join('')+`</div>`;
+ el.innerHTML=h;
 }
 function renderRSSD(rs){
  const el=document.getElementById('rssd'); if(!rs){el.innerHTML=note('暂无 RSSD 数据');return;}

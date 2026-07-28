@@ -1,16 +1,40 @@
-1600 attempts, 1600 errors
-   1600x  RuntimeError("replica_exchange process pool attempted inside a worker 
-0 targets x 0 seeds x 0 arms
+1600 attempts, 0 errors
+100 targets x 8 seeds x 2 arms
 
 === per-arm summary, both predicates ===
   arm           pred  one-shot /100  S_inf (ever)  B_half (cpu-s)       U  cpu-s/attempt
+  remc_gate    match          60.50            66               9   51.76          86.69
+  remc_gate     umfe          60.50            66               9   51.76          86.69
+  remc_plain   match          57.88            64               6   51.83          24.49
+  remc_plain    umfe          53.12            62               6   50.40          24.49
   reference: the archive's one-shot run gave 64/100 under match and 55/100 under umfe
 
 === the honest number: how much does 'ever' beat 'one-shot'? ===
+  remc_gate    match: one-shot 60.50/100   ever-solved (S_inf)  66/100   ratio  1.09x
+  remc_gate     umfe: one-shot 60.50/100   ever-solved (S_inf)  66/100   ratio  1.09x
+  remc_plain   match: one-shot 57.88/100   ever-solved (S_inf)  64/100   ratio  1.11x
+  remc_plain    umfe: one-shot 53.12/100   ever-solved (S_inf)  62/100   ratio  1.17x
 
 === does the umfe gate buy anything here? (expected: little -- umfe rejects ~14%) ===
-Traceback (most recent call last):
-  File "/data/wenhui/openclaude_rna/rna_harness/runs/ceiling/eterna_analyze.py", line 93, in <module>
-    A, Bb = SUM[(a, pred)], SUM[(b, pred)]
-            ~~~^^^^^^^^^^^
-KeyError: ('remc_plain', 'match')
+   match: S_inf 64 -> 66   U 51.83 -> 51.76   cost/attempt 24.49 -> 86.69 cpu-s
+    umfe: S_inf 62 -> 66   U 50.40 -> 51.76   cost/attempt 24.49 -> 86.69 cpu-s
+  gate internals: mean tries 2.27, mean rejects 0.08, attempts that ever rejected 45/800
+
+=== cost to reach a fixed number of solved targets (umfe) ===
+   targets     remc_gate    remc_plain
+        20             1             1
+        40            25            25
+        55           265           363
+        60           974          1639
+        65         11724   unreachable
+        70   unreachable   unreachable
+        75   unreachable   unreachable
+
+=== by length: where is the ceiling actually lost? ===
+    0- 60nt  n= 21  reachable  15  mean p 0.637  mean cpu-s    13.7
+   60-100nt  n= 18  reachable  12  mean p 0.646  mean cpu-s    13.8
+  100-150nt  n= 27  reachable  18  mean p 0.546  mean cpu-s    19.5
+  150-250nt  n=  9  reachable   8  mean p 0.611  mean cpu-s    21.1
+  250-401nt  n= 25  reachable   9  mean p 0.315  mean cpu-s    48.0
+
+wrote eterna_sb.json
