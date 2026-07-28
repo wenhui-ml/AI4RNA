@@ -1,0 +1,30 @@
+RNAstructure available: True
+408 distinct operator-produced sequences; timing 12 of them (lengths 21-42), 3 reps each
+
+              id    n   pKiss ms  ProbKnot ms  ShapeKnots ms  SK/pKiss
+   pseudobase:56   21      212.0        116.1           61.1      0.29
+   pseudobase:16   23      203.6        118.5           60.4      0.30
+    pseudobase:1   24      235.6        120.1           61.4      0.26
+    pseudobase:4   26      217.7        105.0           64.2      0.30
+    pseudobase:4   26      208.2        119.0           65.4      0.31
+   pseudobase:19   28      213.7        120.2           66.9      0.31
+   pseudobase:54   29      205.5        122.0           63.0      0.31
+   pseudobase:13   29      203.4        125.4           62.9      0.31
+   pseudobase:58   35      208.1        126.5           77.5      0.37
+   pseudobase:45   40      198.4        122.2           69.7      0.35
+   pseudobase:18   41      216.8        135.6          106.0      0.49
+   pseudobase:57   42      216.7        119.6           76.8      0.35
+
+  median   pKiss    210.1 ms   ProbKnot    120.1 ms   ShapeKnots     64.8 ms
+  ShapeKnots / pKiss cost ratio: median 0.31, range 0.26-0.49
+
+=== is a late-stage ShapeKnots gate affordable? ===
+  today, per in-loop solve:      37 pKiss + 33 ProbKnot =    11.84 s   (9.1% of these pass the panel)
+  gate, per PANEL-PASSING solve: 11.0 candidates x (same + 1 ShapeKnots) =   130.80 s
+  cost per panel-passing solve today:   130.09 s (you must already pay for 11.0 attempts, you just cannot SEE which one worked)
+  -> the gate's overhead is only the ShapeKnots calls themselves: 0.71 s per success = 0.5% on top
+
+  NOTE the asymmetry: today the 11 candidates are spread over ~11 separate EXECUTIONS and
+  only 21/60 targets ever land one. A gate spends them inside ONE execution, which is why the
+  per-execution rate (3.2/60) can move toward the ever-solved rate (21/60) at nearly no extra
+  oracle cost -- the search work is already being done and thrown away.

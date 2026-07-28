@@ -1,0 +1,35 @@
+900 stored panel_auto attempts (wall-clock regime, the committed sweep)
+
+=== 1. which limit is actually reached? ===
+                   group     n    pKiss  ProbKnot   iters   cands  at PB cap  at iter cap
+                     all   900    128.0      63.5   127.0   128.0       0.35         0.00
+          in-loop solved   530     37.3      33.3    36.3    37.3       0.00         0.00
+          in-loop failed   370    258.0     106.9   257.0   258.0       0.85         0.00
+         panel-unanimous    48     34.5      31.5    33.5    34.5       0.00         0.00
+     solved but panel-NO   482     37.6      33.5    36.6    37.6       0.00         0.00
+
+=== 2. the wall-clock guards: were they the real stopping rule? ===
+    (in this committed sweep deterministic=False, so repair_wall_s=90 / skel_wall_s=12 apply)
+               all n=  900  fraction with repair_wall_s >= 89 (i.e. timed out): 0.41   mean repair_wall_s   49.0
+    in-loop failed n=  370  fraction with repair_wall_s >= 89 (i.e. timed out): 1.00   mean repair_wall_s   90.1
+
+=== 3. how many CANDIDATES does an attempt produce, and does volume buy panel agreement? ===
+     candidate count     n  in-loop rate  panel rate  panel | in-loop
+                0-20   199         1.000       0.060            0.060
+               20-50   171         1.000       0.135            0.135
+              50-100   130         1.000       0.085            0.085
+             100-200    61         0.492       0.033            0.067
+             200-400   339         0.000       0.000            0.000
+
+=== 4. is ProbKnot use the thing that separates panel-YES from panel-NO? ===
+     panel-unanimous n=  48  ProbKnot calls: median   22.5  mean   31.5  pKiss: median   23.0
+    solved, panel-NO n= 482  ProbKnot calls: median   28.0  mean   33.5  pKiss: median   31.5
+  Mann-Whitney on ProbKnot calls, YES vs NO: p = 8.83e-01
+  Mann-Whitney on pKiss    calls, YES vs NO: p = 8.34e-01
+
+=== 5. the event-rate problem, stated as a power calculation ===
+  panel-unanimous rate per attempt 0.0533  ->  3.20 of 60 targets per execution
+  to detect 1.20x at 80% power you need about 135 replicates (17.3 core-h per arm at the step-2 budget)
+  to detect 1.36x at 80% power you need about 45 replicates (5.7 core-h per arm at the step-2 budget)
+  to detect 1.50x at 80% power you need about 24 replicates (3.1 core-h per arm at the step-2 budget)
+  to detect 2.00x at 80% power you need about 7 replicates (0.9 core-h per arm at the step-2 budget)

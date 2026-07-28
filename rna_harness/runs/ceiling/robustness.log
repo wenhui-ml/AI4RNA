@@ -1,0 +1,30 @@
+384 sequences to score: ours=64, inv_mfe=64, inv_pf=64, random=192
+
+=== P(target) under the Boltzmann ensemble ===
+     group     n   median P      q25      q75   >=0.5   >=0.9  still MFE-matches  design s
+      ours    64     0.0594   0.0114   0.1552    0.11    0.05               1.00      0.00
+   inv_mfe    64     0.0000   0.0000   0.0170    0.02    0.00               0.28     60.34
+    inv_pf    64     0.8077   0.5607   0.9522    0.80    0.41               0.86    164.63
+    random   192     0.0000   0.0000   0.0000    0.01    0.00               0.01      0.00
+
+=== paired on the SAME targets: does the ensemble objective buy robustness? ===
+              comparison    n  median P a  median P b   ratio    b>a  Wilcoxon p
+         inv_mfe vs ours   64      0.0594      0.0000    0.00   3/64     1.19e-10
+          inv_pf vs ours   64      0.0594      0.8077   13.59  62/64     6.51e-12
+       inv_pf vs inv_mfe   64      0.0000      0.8077 62972.98  64/64     3.53e-12
+
+=== by length ===
+          band    n      ours   inv_mfe    inv_pf    random
+       20-60nt   16    0.1462    0.0357    0.6443    0.0000
+      60-100nt   13    0.0411    0.0002    0.8012    0.0000
+     100-150nt   18    0.0299    0.0000    0.8266    0.0000
+     150-250nt    6    0.0038    0.0000    0.8783    0.0000
+     250-401nt    8    0.0067    0.0000    0.8363    0.0000
+
+  sanity: ours vs the random floor, MWU p = 2.11e-28
+
+=== the verdict this decides ===
+  inv_pf/ours = 13.59 with 86% still MFE-matching. The fragility is an
+  OBJECTIVE-SPECIFICATION deficit, not a search deficit: ViennaRNA already ships an
+  optimiser for the criterion we never asked for. Same lesson as the ShapeKnots gate,
+  on the main benchmark, and the fix is a different function call.

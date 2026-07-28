@@ -1,0 +1,63 @@
+1440 attempts on disk, 0 errors
+60 targets x 8 seeds
+
+=== 1. the headline: panel-unanimous solves per execution, out of 60 ===
+  arm       claimed  adjudicated  false positives  per execution           95% CI  ever/60
+  off_150       279           26              253           3.25 [ 2.14, 4.70]       12
+  off_400       279           26              253           3.25 [ 2.14, 4.70]       12
+  on_400         44           44                0           5.50 [ 4.04, 7.27]       22
+  reference: the committed 15-cell sweep gives 3.20/60 per execution, 21/60 ever
+
+=== 2. paired comparisons, exact McNemar on (target, seed) cells ===
+  on_400   vs off_150 :  5.50 vs  3.25 per execution  ratio  1.69   on_400 wins  18 cells, off_150 wins   0   p = 7.63e-06
+  off_400  vs off_150 :  3.25 vs  3.25 per execution  ratio  1.00   off_400 wins   0 cells, off_150 wins   0   p = 1
+  on_400   vs off_400 :  5.50 vs  3.25 per execution  ratio  1.69   on_400 wins  18 cells, off_400 wins   0   p = 7.63e-06
+  falsifier: off_400 vs off_150 is the compute-matched control. If extra pKiss budget alone
+  lifts the panel rate, the gate is not what did the work.
+
+=== 3. cost: is the gain paid for, and by how much? ===
+  arm         pKiss  ProbKnot  ShapeKnots  oracle s  s/attempt  oracle s per unanimous
+  off_150      85.3      60.2         0.0      49.7       50.4                   918.4
+  off_400     190.0      64.6         0.0      92.0       92.6                  1697.8
+  on_400      236.7      77.8         1.0     111.9      112.2                  1220.8
+  off_400 costs 1.85x per unanimous solve relative to off_150
+  on_400 costs 1.33x per unanimous solve relative to off_150
+
+=== 4. did the gate merely stop lying, or actually find more? ===
+  off_150  claimed  279  of which unanimous   26 (  9.3%)   pKiss+ProbKnot agreements returned  279
+  off_400  claimed  279  of which unanimous   26 (  9.3%)   pKiss+ProbKnot agreements returned  279
+  on_400   claimed   44  of which unanimous   44 (100.0%)   pKiss+ProbKnot agreements returned   44
+  off_* arms return a sequence whenever pKiss+ProbKnot agree, so their claimed count includes
+  the 90.9% that ShapeKnots rejects. on_400 returns only three-oracle agreements.
+
+=== 5. gate internals: how many candidates were screened and rejected? ===
+  attempts that screened at least one candidate: 279/480
+  candidates screened per such attempt: median 1.0 mean 1.7 max 8
+  rejection rate among screened candidates: 0.905 (the stored sweep implied 0.909)
+  attempts that hit the max_shapeknots=60 cap: 0
+
+=== 6. per-target: which targets the gate unlocked ===
+    id  off_150  off_400   on_400
+     1        0        0        1  <== gate only
+     3        1        1        1
+    10        1        1        3
+    13        3        3        3
+    16        1        1        1
+    17        0        0        1  <== gate only
+    18        0        0        1  <== gate only
+    19        1        1        4
+    21        0        0        1  <== gate only
+    24        5        5        6
+    25        1        1        1
+    27        0        0        1  <== gate only
+    31        0        0        1  <== gate only
+    32        0        0        1  <== gate only
+    40        0        0        1  <== gate only
+    44        1        1        1
+    46        0        0        1  <== gate only
+    47        0        0        1  <== gate only
+    51        1        1        1
+    54        5        5        6
+    56        2        2        2
+    58        4        4        5
+  targets solved by on_400 but never by off_150: 10 ['1', '17', '18', '21', '27', '31', '32', '40', '46', '47']

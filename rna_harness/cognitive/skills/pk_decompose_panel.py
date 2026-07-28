@@ -51,7 +51,8 @@ class DecomposePKPanelTool(Tool):
     def __init__(self, skel_wall_s: float = 12.0, repair_wall_s: float = 90.0,
                  max_repair_iters: int = 800, skel_restarts: int = 6,
                  panel_gate: int = 3, max_probknot: int = 120, ablate: str = "none",
-                 deterministic: bool = False, max_pkiss: int = 150):
+                 deterministic: bool = False, max_pkiss: int = 150,
+                 sk_gate: bool = False, max_shapeknots: int = 60):
         self.skel_wall_s = float(skel_wall_s)
         self.repair_wall_s = float(repair_wall_s)
         self.max_repair_iters = int(max_repair_iters)
@@ -66,6 +67,23 @@ class DecomposePKPanelTool(Tool):
         self.max_pkiss = int(max_pkiss)
         self.panel_gate = int(panel_gate)        # evaluate ProbKnot only when pKiss bp <= gate
         self.max_probknot = int(max_probknot)     # per-target ProbKnot call budget
+        # ShapeKnots gate (off by default, so every previously reported number is unchanged).
+        #
+        # Measured on the committed 15-cell sweep (runs/ceiling/bottleneck.py): of 530 in-loop solves this
+        # operator produced, pKiss agreed 530/530 and ProbKnot agreed 530/530 -- it drives both of its
+        # in-loop oracles to 100% -- while ShapeKnots agreed on 48. Every one of the 482 failures is
+        # ShapeKnots ALONE: pKiss and ProbKnot each kill 0 otherwise-passing solutions. ShapeKnots is the
+        # only rejector and it was never consulted.
+        #
+        # It is also the CHEAPEST of the three on this benchmark's lengths (runs/ceiling/sk_cost.py:
+        # 64.8 ms median against pKiss 210.1 and ProbKnot 120.1, ratio 0.31 over 21-42 nt), so it was left
+        # out of the loop for no cost reason: gating adds ~0.5% to the cost of a panel-passing solve.
+        #
+        # With the gate on, reaching (pk_bp, pb_bp) = (0, 0) is no longer terminal. The candidate is put to
+        # ShapeKnots; on rejection it is remembered, the walk is kicked off that basin, and the search
+        # continues for a DIFFERENT pKiss+ProbKnot solution. So `solved` means all three agree.
+        self.sk_gate = bool(sk_gate)
+        self.max_shapeknots = int(max_shapeknots)
         if ablate not in self.ABLATIONS:
             raise ValueError(f"ablate must be one of {self.ABLATIONS}, got {ablate!r}")
         self.ablate = ablate
@@ -105,6 +123,45 @@ class DecomposePKPanelTool(Tool):
         pb_budget = [self.max_probknot]
         oracle_s = 0.0
         n_pkiss = n_pb = 0
+        n_sk = n_sk_reject = 0
+        sk_seen = {}                  # sequence -> ShapeKnots verdict, so no sequence is paid for twice
+        win_seq = None
+
+        def sk_ok(seq_str):
+            """Does ShapeKnots also fold seq_str into the target? Cached, budgeted, and counted."""
+            nonlocal oracle_s, n_sk, n_sk_reject
+            if seq_str in sk_seen:
+                return sk_seen[seq_str]
+            if n_sk >= self.max_shapeknots:
+                return False          # out of gate budget: refuse to certify rather than guess
+            from ...oracles_pk import forms_target, shapeknots_pairs
+            t0 = time.time()
+            try:
+                ok = bool(forms_target(shapeknots_pairs(seq_str), target))
+            except Exception:
+                ok = False
+            oracle_s += time.time() - t0
+            n_sk += 1
+            if not ok:
+                n_sk_reject += 1
+            sk_seen[seq_str] = ok
+            return ok
+
+        def kick(seq_str):
+            """Leave a ShapeKnots-rejected basin: re-draw a fifth of the target's pairs plus a few
+            unpaired positions. Without this the lexicographic walk sits at (0,0) and re-finds the same
+            rejected sequence forever."""
+            s = list(seq_str)
+            prs = sorted({(i, j) for i, j in partner.items() if i < j})
+            if prs:
+                for i, j in rng.sample(prs, max(1, len(prs) // 5)):
+                    a, b = rng.choice(_WC)
+                    s[i], s[j] = a, b
+            for _ in range(max(1, n // 20)):
+                p = rng.randrange(n)
+                if p not in partner:
+                    s[p] = rng.choice("ACGU")
+            return "".join(s)
 
         def panel_eval(seq_str):
             """(pk_bp, pb_bp, pk_folded, pk_solved). ProbKnot only if pk_bp<=gate and budget remains;
@@ -156,6 +213,13 @@ class DecomposePKPanelTool(Tool):
         cur_pk, cur_pb, cur_folded, pk_solved = panel_eval(cur_seq)
         best = (cur_pk, cur_pb, cur_seq)
         solved = pk_solved and cur_pb == 0
+        if solved and self.sk_gate:
+            if sk_ok(cur_seq):
+                win_seq = cur_seq
+            else:
+                solved = False
+                cur_seq = kick(cur_seq)
+                cur_pk, cur_pb, cur_folded, pk_solved = panel_eval(cur_seq)
 
         # 5. lexicographic (pk_bp, pb_bp) best-frontier repair walk.
         # Under `randwalk`/`blindrand` the acceptance test is dropped (every proposal is accepted), so the
@@ -196,6 +260,14 @@ class DecomposePKPanelTool(Tool):
                 if (cpk, cpb) < (best[0], best[1]):
                     best = (cpk, cpb, cand_seq)
                 solved = cpk_solved and cpb == 0
+                if solved and self.sk_gate:
+                    if sk_ok(cur_seq):
+                        win_seq = cur_seq
+                    else:
+                        # not terminal any more: remember the rejection, leave the basin, keep searching
+                        solved = False
+                        cur_seq = kick(cur_seq)
+                        cur_pk, cur_pb, cur_folded, pk_solved = panel_eval(cur_seq)
 
         best_pk, best_pb, best_seq = best
         cost = solver_cost_usd(solver_wall, self.cores) + solver_cost_usd(oracle_s, cores=1)
@@ -206,8 +278,16 @@ class DecomposePKPanelTool(Tool):
         stats = {"n_pkiss": n_pkiss, "n_probknot": n_pb, "n_iters": it,
                  "n_candidates": it + 1,           # initial evaluation + one proposal per iteration
                  "oracle_s": round(oracle_s, 3), "repair_wall_s": round(time.time() - t_rep, 1),
-                 "skel_wall_s": round(solver_wall, 2), "ablate": self.ablate}
-        # 'bp' reported is the panel distance pk_bp+pb_bp (0 iff both oracles exact)
+                 "skel_wall_s": round(solver_wall, 2), "ablate": self.ablate,
+                 "sk_gate": self.sk_gate, "n_shapeknots": n_sk, "n_sk_reject": n_sk_reject,
+                 "n_pkpb_hits": n_sk}             # candidates that reached (0,0) and were screened
+        # 'bp' reported is the panel distance pk_bp+pb_bp (0 iff both oracles exact). With the gate on,
+        # `solved` additionally requires ShapeKnots, and the returned sequence is the one that passed all
+        # three -- best_seq can be a (0,0) sequence ShapeKnots rejected, so it must not be returned.
+        if self.sk_gate:
+            return ToolResult(self.name, bool(win_seq), int(best_pk + best_pb), round(solver_wall, 3),
+                              self.cores, cost, "panel:pkiss+probknot+shapeknots", win_seq,
+                              oracle_s=round(oracle_s, 3), stats=stats)
         return ToolResult(self.name, solved, int(best_pk + best_pb), round(solver_wall, 3), self.cores,
                           cost, "panel:pkiss+probknot", best_seq if solved else None,
                           oracle_s=round(oracle_s, 3), stats=stats)

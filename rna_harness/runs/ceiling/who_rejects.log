@@ -1,0 +1,38 @@
+1173 in-loop-SOLVED attempts with a panel adjudication
+
+=== panel_auto: n = 530 in-loop solves ===
+   pKiss  ProbKnot  ShapeKnots     n   share
+    True      True       False   481   90.8%
+    True      True        True    48    9.1%
+    True      True        None     1    0.2%
+        pKiss agrees on  530/530 = 100.0%   <- IN LOOP
+     ProbKnot agrees on  530/530 = 100.0%   <- IN LOOP
+   ShapeKnots agrees on   48/530 =   9.1%   <- OUT OF LOOP
+  marginal rejection (passes the other two, fails this one):
+          pKiss     0/  48 =   0.0% of otherwise-passing solutions are killed by pKiss
+       ProbKnot     0/  48 =   0.0% of otherwise-passing solutions are killed by ProbKnot
+     ShapeKnots   482/ 530 =  90.9% of otherwise-passing solutions are killed by ShapeKnots
+
+=== autonomous: n = 643 in-loop solves ===
+   pKiss  ProbKnot  ShapeKnots     n   share
+    True     False       False   594   92.4%
+    True      True       False    27    4.2%
+    True     False        True    17    2.6%
+    True      True        True     5    0.8%
+        pKiss agrees on  643/643 = 100.0%   <- IN LOOP
+     ProbKnot agrees on   32/643 =   5.0%   <- OUT OF LOOP
+   ShapeKnots agrees on   22/643 =   3.4%   <- OUT OF LOOP
+  marginal rejection (passes the other two, fails this one):
+          pKiss     0/   5 =   0.0% of otherwise-passing solutions are killed by pKiss
+       ProbKnot    17/  22 =  77.3% of otherwise-passing solutions are killed by ProbKnot
+     ShapeKnots    27/  32 =  84.4% of otherwise-passing solutions are killed by ShapeKnots
+
+=== what the ceiling would be if each oracle were satisfied ===
+  panel_auto: 530 in-loop solves -> 48 unanimous = 9.1% yield
+  if ShapeKnots were also driven to agreement in-loop, the ceiling on this set is 530/530 = 100.0%  (11.0x the current yield)
+  if ProbKnot were also driven to agreement in-loop, the ceiling on this set is 48/530 = 9.1%  (1.0x the current yield)
+
+=== distinct targets, which is what the benchmark counts ===
+  targets with >=1 in-loop solve:              42
+  targets with >=1 pKiss+ProbKnot agreement:   42
+  targets with >=1 unanimous (all three):      21

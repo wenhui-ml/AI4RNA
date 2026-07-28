@@ -1,0 +1,41 @@
+3420 trajectories on disk, 0 errors, k=11, S=4, budget 2101 calls/replicate
+
+=== results, per replicate (solves = distinct targets passing the full panel) ===
+  arm        traj   calls  x budget  solves    sd  per 1000 calls  in-loop pKiss
+  depth1       30    2239      1.07    2.47  1.09            1.10          17.00
+  delta_S2     22     646      0.31    1.87  0.88            2.89          11.00
+  delta_S4     44    1336      0.64    3.07  1.48            2.30          11.00
+  delta_S8     88    2580      1.23    4.53  1.59            1.76          11.00
+  rand_S4      44    3013      1.43    2.00  1.26            0.66           8.20
+
+=== efficiency vs the depth1 baseline (2.47 solves at 2239 calls) ===
+  arm        solves ratio  cost ratio  efficiency ratio    paired +/-/p
+  delta_S2           0.76        0.29              2.62    3/  8/0.2266
+  delta_S4           1.24        0.60              2.08    8/  4/0.3877
+  delta_S8           1.84        1.15              1.60   11/  2/0.0225
+  rand_S4            0.81        1.35              0.60    3/  9/0.1460
+
+=== the mechanism test: dose-response on the SAME 11 targets, nested seeds ===
+    S  trajectories   calls  solves  marginal solves  marginal calls  solves per 1000 marginal calls
+    2            22     646    1.87                -               -                               -
+    4            44    1336    3.07            +1.20            +690                            1.74
+    8            88    2580    4.53            +1.47           +1244                            1.18
+  paired S4 - S2: mean +1.20   11/0 replicates   p = 0.0010
+  paired S8 - S4: mean +1.47   13/0 replicates   p = 0.0002
+
+=== is it Delta, or just fewer-targets-more-seeds? (delta_S4 vs rand_S4) ===
+  delta_S4 3.07 solves at 1336 calls   rand_S4 2.00 at 3013
+  paired difference +1.07  10/3 replicates  p = 0.0923
+  efficiency: delta 2.30 vs random 0.66 solves per 1000 calls
+
+=== equal-solves cost, interpolated on the delta curve ===
+  depth1 gets 2.47 solves at 2239 calls
+  delta curve reaches it at 991 calls  =  2.26x cheaper
+  charging Delta's own probe (88 calls, N=8 x 11 targets): 2.08x single-run, 2.25x amortised
+
+=== which targets carried it (union over replicates) ===
+  depth1    12 distinct targets ever won,  37 replicate-wins: 54:13, 58:5, 51:5, 35:3, 32:3, 31:2, 44:1, 57:1, 34:1, 36:1, 38:1, 56:1
+  delta_S2   9 distinct targets ever won,  28 replicate-wins: 54:11, 40:3, 35:3, 31:3, 46:2, 32:2, 56:2, 44:1, 36:1
+  delta_S4   9 distinct targets ever won,  46 replicate-wins: 54:15, 32:6, 35:5, 56:5, 40:4, 31:4, 46:3, 36:3, 44:1
+  delta_S8  10 distinct targets ever won,  68 replicate-wins: 54:15, 32:10, 35:10, 46:6, 31:6, 36:6, 40:5, 56:5, 44:4, 41:1
+  rand_S4   11 distinct targets ever won,  30 replicate-wins: 51:5, 36:5, 58:4, 54:4, 40:3, 38:2, 35:2, 32:2, 46:1, 31:1, 47:1

@@ -1,0 +1,45 @@
+   105   True   True  False     0.0529      0.00  Fractile
+   105   True   True  False     0.0783      0.00  Tilted Russian Cross
+   105   True   True  False     0.0832      0.00  Six legd Turtle
+   105   True  False  False     0.0072      0.00  Quasispecies 2-2 Loop Challenge
+   105   True   True  False     0.0119      0.00  Hard Y and a bit more
+   111   True   True  False     0.0174      0.00  Multiloop...
+   116   True   True  False     0.8540      0.00  Arabidopsis Thaliana 6 RNA - Difficult
+   116   True   True  False     0.0021      0.00  Runner
+   116   True   True  False     0.0608      0.00  Chicken Tracks
+   122   True   True  False     0.6444      0.00  InfoRNA bulge test
+   151   True   True  False     0.0024      0.00  loops and stems
+   174   True   True  False     0.1119      0.00  Adenine
+   184   True   True  False     0.0088      0.00  Pokeball
+   192   True   True  False     0.0009      0.00  Human Integrated Adenovirus - Difficul
+   213   True   True  False     0.0041      0.00  Mat - Martian 2
+   214   True   True  False     0.0035      0.00  Anemone
+   258   True  False  False     0.0000      0.00  The Sun
+   284   True   True  False     0.2140      0.00  Fractal 2
+   316   True   True  False     0.0009      0.00  The Turtle(s) Move(s)
+   378   True   True  False     0.0067      0.00  Still Life (Sunflower In A Vase)
+   379   True   True  False     0.1983      0.00  Saccharomyces Cerevisiae - Difficulty 
+   380   True   True  False     0.0066      0.00  Mat - Cuboid
+   387   True   True  False     0.2992      0.00  JF1
+   400   True   True  False     0.0000      0.00  Fractal star x5
+
+=== the audit ===
+   match:  64/64 pass,   0 fail
+    umfe:  55/64 pass,   9 fail
+     pfe:   3/64 pass,  61 fail
+  inflation, match -> umfe: 64 -> 55 = 1.16x
+  inflation, match -> pfe: 64 -> 3 = 21.33x
+  (for scale: the crossing benchmark's pKiss -> panel inflation was 43x)
+
+=== where the strict predicates bite ===
+  degenerate co-optimals (match but not unique MFE): 9/64
+    35nt, 57nt, 75nt, 98nt, 102nt, 104nt, 104nt, 105nt, 258nt
+  knife-edge folds (match but P(target) below the pfe threshold): 61/64
+    P(target) among them: median 0.0551, max 0.8540
+    P(target) among those that pass pfe: median 0.9087
+
+=== does strictness bite harder on long targets? ===
+    0-100nt  n= 32  match  32  umfe  28  pfe   3
+  100-200nt  n= 22  match  22  umfe  18  pfe   0
+  200-400nt  n=  9  match   9  umfe   8  pfe   0
+  400-infnt  n=  1  match   1  umfe   1  pfe   0
