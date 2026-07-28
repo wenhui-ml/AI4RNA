@@ -1,0 +1,28 @@
+529 in-loop solves -> 407 distinct sequences, 42 of them ShapeKnots-agreeing
+  scored 407: 42 agree, 365 disagree
+
+=== does ViennaRNA's own ensemble see the disagreement? ===
+    AUC is oriented so >0.5 means the predictor is HIGHER on ShapeKnots-AGREEING sequences
+               predictor  sign    AUC   agree med  disagree med      MWU p
+      positional entropy    -1  0.458      0.4036        0.3447      0.372
+  ensemble diversity / n    -1  0.461      0.1236        0.0942      0.404
+             P(skeleton)    +1  0.725      0.2294        0.0094   1.82e-06
+         skeleton defect    -1  0.613      0.3300        0.4352     0.0168
+   MFE-ensemble gap (dE)    -1  0.475      0.4159        0.3258      0.601
+         --- control ---
+        skeleton MFE gap    -1  0.715      0.2000        2.4000   3.92e-06
+    skeleton MFE gap / n    -1  0.713      0.0062        0.0700   4.83e-06
+                length n    -1  0.429     29.0000       29.0000      0.129
+
+=== is it independent of length, or just length again? ===
+  best predictor: P(skeleton) (AUC 0.725); within length terciles:
+    n <= 26              n= 154  AUC 0.640  (5 agree / 149 disagree)
+    26 < n <= 35         n= 119  AUC 0.674  (29 agree / 90 disagree)
+    n > 35               n= 134  AUC 0.741  (8 agree / 126 disagree)
+
+=== verdict ===
+  P(skeleton) separates agreement from disagreement at AUC 0.725. If that survives the
+  length check above, a single-model ensemble quantity is a usable SURROGATE for the
+  three-oracle conjunction: it can enter the loop at ViennaRNA prices instead of
+  ShapeKnots prices, and it explains why inverse_pf_fold's ensemble objective matters.
+  Next step would be to optimise it directly and check the panel rate, NOT to believe it.
