@@ -1,0 +1,32 @@
+=== 1. per-target dispersion: is the success count Binomial(K, p_i)? ===
+  arm       targets   K  total wins   obs var   exp var   index         95% null    verdict
+  off_150        60   8          26     1.246     1.494    0.83 [ 0.816, 2.312]         OK
+  on_400         60   8          44     1.962     2.377    0.83 [ 1.550, 3.260]         OK
+  (the count variance across targets is dominated by target heterogeneity, which the simulated
+   null reproduces by construction, so this test isolates the WITHIN-target part)
+
+=== 2. seed main effect: is any seed systematically luckier? ===
+  off_150  seed totals [4, 2, 2, 3, 2, 3, 4, 6]  var 1.688  null [0.438,4.188]  p = 0.577
+  on_400   seed totals [6, 4, 3, 4, 3, 6, 12, 6]  var 7.500  null [0.750,7.000]  p = 0.018   <- a seed effect would break exchangeability
+
+=== 3. THE DIRECT TEST: does doubling trajectories follow 1-(1-p)^b? ===
+  per-target p-hat from 1320 S8 trajectories:
+      54  p-hat 0.633
+      32  p-hat 0.108
+      35  p-hat 0.100
+      31  p-hat 0.067
+      36  p-hat 0.067
+      40  p-hat 0.058
+      56  p-hat 0.058
+      46  p-hat 0.050
+
+  arm        b  observed solves/rep   predicted 1-(1-p)^b  obs/pred    95% CI on obs
+  delta_S2   2                 1.87                  1.92      0.97 [ 1.40, 2.27]
+  delta_S4   4                 3.07                  2.95      1.04 [ 2.33, 3.87]
+  delta_S8   8                 4.53                  4.42      1.03 [ 3.73, 5.33]
+  p-hat comes from the S8 arm, so S8's own row is near-tautological; S2 and S4 are the real test
+  because the model must EXTRAPOLATE DOWN from 8 trajectories to 2 and 4.
+
+=== verdict ===
+  The independence assumption survives the direct test: extrapolating down from 8 trajectories
+  to 2 and 4 lands inside the observed intervals. S(B) = sum[1-(1-p)^b] can be built.

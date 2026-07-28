@@ -1,0 +1,44 @@
+=== the three measured systems, 60 crossing targets, 8 seeds each ===
+    budget axis = oracle-CPU-seconds; metric = panel-unanimous, independently adjudicated
+
+  system      S_inf  B_half (s)       U  c per traj  reachable targets
+  off_150        12         569    7.26        49.7 ['3', '10', '13', '16', '19', '24', '25', '44']
+  off_400        12         595    7.10        92.0 ['3', '10', '13', '16', '19', '24', '25', '44']
+  on_400         22        1554   10.93       111.9 ['1', '3', '10', '13', '16', '17', '18', '19']
+
+=== the curves, S(B) ===
+   B (oracle-s)   off_150   off_400    on_400
+             10      0.44      0.44      0.25
+             27      1.06      0.82      0.68
+             71      1.89      1.82      1.83
+            191      3.37      3.25      3.37
+            511      5.73      5.57      6.11
+           1366      8.31      8.09     10.38
+           3654     10.85     10.22     14.90
+           9769     11.95     11.77     19.01
+          26119     12.00     12.00     21.70
+          69834     12.00     12.00     22.00
+
+=== where do the curves cross? ===
+  on_400 overtakes off_150 at B = 97 oracle-s (0.03 core-hours for the whole 60-target benchmark)
+    below that, off_150 is better; above it the gap grows to 10 targets
+  on_400 overtakes off_400 at B = 70 oracle-s (0.02 core-hours for the whole 60-target benchmark)
+    below that, off_400 is better; above it the gap grows to 10 targets
+
+=== scheduler slack: how far is 'one trajectory per target' from optimal? ===
+  system      B of the flat policy   flat S   optimal S at same B   slack
+  off_150                     2985     3.25                 10.39    3.20x
+  on_400                      6714     5.50                 17.42    3.17x
+  this is the quantity the trajectory experiment moved: it did not raise S_inf (12 -> 10 distinct
+  targets) but it closed part of this gap. Capability and scheduling are separate coordinates.
+
+=== a known bias, stated: S_inf from 8 seeds is a LOWER bound ===
+  a target with true p = 0.05 shows 0 wins in 8 seeds with probability 0.66
+  a target with true p = 0.10 shows 0 wins in 8 seeds with probability 0.43
+  a target with true p = 0.20 shows 0 wins in 8 seeds with probability 0.17
+  so S_inf is underestimated, and the two coordinates have OPPOSITE sampling needs:
+    measuring S_inf  -> many seeds, few targets
+    measuring B_half -> few seeds, many targets
+  a single sweep cannot estimate both well; the eval suite should budget for each separately.
+
+wrote metric.json
