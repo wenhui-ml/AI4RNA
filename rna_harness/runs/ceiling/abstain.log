@@ -1,0 +1,48 @@
+Priority 2: abstention on the measured DesiRNA ladder, 100 Eterna100 targets, tiers [5, 15, 60, 180] s
+  tier-1 (t=5s) solves 72/100 for $0.211; 28 left, 12 eventually solve, 16 never
+  escalating a hopeless target costs the full ladder $0.03997 = 4.0% of the cascade bill, each
+
+  policy                          lost   $ cost  vs CASCADE  abstained  of prize
+  CASCADE (zero knowledge)           0   1.0041      1.000x          0      0.0%
+  LENGTH(theta)                      0   0.8842      1.136x          3     18.8%
+  LENGTH(theta) (lost 1)             1   0.6010      1.671x         11     63.0%
+  LENGTH(theta) (lost 2)             2   0.4811      2.087x         14     81.8%
+  BP(theta) @t=5                     0   0.9241      1.086x          2     12.5%
+  BP(theta) @t=5 (lost 1)            1   0.6843      1.467x          8     50.0%
+  kNN, features                      0   1.0041      1.000x          0      0.0%
+  kNN, features (lost 1)             1   0.6010      1.671x         11     63.0%
+  kNN, features+bp                   0   1.0041      1.000x          0      0.0%
+  kNN, features+bp (lost 1)          1   0.6010      1.671x         11     63.0%
+  kNN, features+bp (lost 2)          2   0.5576      1.801x         13     69.8%
+  logistic, features                 0   1.0041      1.000x          0      0.0%
+  logistic, features (lost 1)        1   0.6010      1.671x         11     63.0%
+  logistic, features (lost 2)        2   0.5576      1.801x         13     69.8%
+  logistic, features+bp              0   1.0041      1.000x          0      0.0%
+  logistic, features+bp (lost 1)     1   0.6010      1.671x         11     63.0%
+  logistic, features+bp (lost 2)     2   0.5610      1.790x         12     69.3%
+  ORACLE-abstain (bound)             0   0.3646      2.754x         16    100.0%
+  ORACLE-tier (frontier.py)          0   0.2991      3.357x          -       n/a
+
+=== the only question that matters at zero solves lost ===
+  of the 16 hopeless targets, how many can each rule catch WITHOUT abstaining on a solvable one?
+    LENGTH(theta)              catches  3/16  saves $0.1199  (1.136x)
+    BP(theta) @t=5             catches  2/16  saves $0.0799  (1.086x)
+    kNN, features              catches  0/16  saves $0.0000  (1.000x)
+    kNN, features+bp           catches  0/16  saves $0.0000  (1.000x)
+    logistic, features         catches  0/16  saves $0.0000  (1.000x)
+    logistic, features+bp      catches  0/16  saves $0.0000  (1.000x)
+
+=== exact null: is a zero-loss catch of k better than a RANDOM abstention order? ===
+  (H=16 hopeless, 12 solvable, n=28; P = prod_(j<k) (H-j)/(n-j))
+    LENGTH(theta)              k=3  p = 0.171   NOT distinguishable from random
+    BP(theta) @t=5             k=2  p = 0.317   NOT distinguishable from random
+    kNN, features              k=0  p = 1.000   NOT distinguishable from random
+    kNN, features+bp           k=0  p = 1.000   NOT distinguishable from random
+    logistic, features         k=0  p = 1.000   NOT distinguishable from random
+    logistic, features+bp      k=0  p = 1.000   NOT distinguishable from random
+  expected catches before the first solvable, under random order = 1.23
+
+=== permutation test (is any zero-loss gain distinguishable from chance at n=28?) ===
+  skipped (ABSTAIN_PERMS=0); best real zero-loss catch = 3
+
+  wrote rna_harness/runs/ceiling/abstain.json

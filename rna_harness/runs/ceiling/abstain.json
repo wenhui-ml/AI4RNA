@@ -1,0 +1,176 @@
+{
+ "tiers": [
+  5,
+  15,
+  60,
+  180
+ ],
+ "cost_per_target": {
+  "5": 0.0021114360249704783,
+  "15": 0.003407629421684477,
+  "60": 0.009862885976831118,
+  "180": 0.026696880339582747
+ },
+ "n": 100,
+ "n_decision": 28,
+ "n_positive": 12,
+ "n_hopeless": 16,
+ "cascade": 1.0040845639069875,
+ "oracle_abstain": 0.3646062320974138,
+ "oracle_tier": 0.29909745131399923,
+ "solved_total": 84,
+ "rows": [
+  {
+   "policy": "CASCADE",
+   "lost": 0,
+   "cost": 1.0040845639069875,
+   "vs_cascade": 1.0,
+   "abstained": 0,
+   "prize_captured": 0.0
+  },
+  {
+   "policy": "LENGTH(theta)",
+   "lost": 0,
+   "cost": 0.8841823766926924,
+   "vs_cascade": 1.135607981311268,
+   "abstained": 3,
+   "tau": -396.0,
+   "prize_captured": 0.18750000000000006
+  },
+  {
+   "policy": "LENGTH(theta)",
+   "lost": 1,
+   "cost": 0.6010029771043193,
+   "vs_cascade": 1.6706815143325042,
+   "abstained": 11,
+   "tau": -286.0,
+   "prize_captured": 0.630328764482202
+  },
+  {
+   "policy": "LENGTH(theta)",
+   "lost": 2,
+   "cost": 0.4811007898900243,
+   "vs_cascade": 2.087056569033098,
+   "abstained": 14,
+   "tau": -202.0,
+   "prize_captured": 0.8178287644822017
+  },
+  {
+   "policy": "BP(theta) @t=5",
+   "lost": 0,
+   "cost": 0.9241497724307906,
+   "vs_cascade": 1.0864954944109813,
+   "abstained": 2,
+   "tau": -47.0,
+   "prize_captured": 0.1250000000000004
+  },
+  {
+   "policy": "BP(theta) @t=5",
+   "lost": 1,
+   "cost": 0.6843453980022005,
+   "vs_cascade": 1.4672189903493131,
+   "abstained": 8,
+   "tau": -21.0,
+   "prize_captured": 0.5000000000000002
+  },
+  {
+   "policy": "kNN, features",
+   "lost": 0,
+   "cost": 1.0040845639069875,
+   "vs_cascade": 1.0,
+   "abstained": 0,
+   "tau": 0.0,
+   "prize_captured": 0.0
+  },
+  {
+   "policy": "kNN, features",
+   "lost": 1,
+   "cost": 0.6010029771043193,
+   "vs_cascade": 1.6706815143325042,
+   "abstained": 11,
+   "tau": 0.4,
+   "prize_captured": 0.630328764482202
+  },
+  {
+   "policy": "kNN, features+bp",
+   "lost": 0,
+   "cost": 1.0040845639069875,
+   "vs_cascade": 1.0,
+   "abstained": 0,
+   "tau": 0.0,
+   "prize_captured": 0.0
+  },
+  {
+   "policy": "kNN, features+bp",
+   "lost": 1,
+   "cost": 0.6010029771043193,
+   "vs_cascade": 1.6706815143325042,
+   "abstained": 11,
+   "tau": 0.4,
+   "prize_captured": 0.630328764482202
+  },
+  {
+   "policy": "kNN, features+bp",
+   "lost": 2,
+   "cost": 0.5576279519445365,
+   "vs_cascade": 1.8006352809352302,
+   "abstained": 13,
+   "tau": 0.6,
+   "prize_captured": 0.6981575289644035
+  },
+  {
+   "policy": "logistic, features",
+   "lost": 0,
+   "cost": 1.0040845639069875,
+   "vs_cascade": 1.0,
+   "abstained": 0,
+   "tau": 0.0,
+   "prize_captured": 0.0
+  },
+  {
+   "policy": "logistic, features",
+   "lost": 1,
+   "cost": 0.6010029771043193,
+   "vs_cascade": 1.6706815143325042,
+   "abstained": 11,
+   "tau": 0.2665550930227031,
+   "prize_captured": 0.630328764482202
+  },
+  {
+   "policy": "logistic, features",
+   "lost": 2,
+   "cost": 0.5576279519445364,
+   "vs_cascade": 1.8006352809352306,
+   "abstained": 13,
+   "tau": 0.31339485133196104,
+   "prize_captured": 0.6981575289644038
+  },
+  {
+   "policy": "logistic, features+bp",
+   "lost": 0,
+   "cost": 1.0040845639069875,
+   "vs_cascade": 1.0,
+   "abstained": 0,
+   "tau": 0.0,
+   "prize_captured": 0.0
+  },
+  {
+   "policy": "logistic, features+bp",
+   "lost": 1,
+   "cost": 0.6010029771043193,
+   "vs_cascade": 1.6706815143325042,
+   "abstained": 11,
+   "tau": 0.2614045882383095,
+   "prize_captured": 0.630328764482202
+  },
+  {
+   "policy": "logistic, features+bp",
+   "lost": 2,
+   "cost": 0.5610355813662211,
+   "vs_cascade": 1.7896985454324725,
+   "abstained": 12,
+   "tau": 0.2818866620893539,
+   "prize_captured": 0.6928287644822017
+  }
+ ]
+}
