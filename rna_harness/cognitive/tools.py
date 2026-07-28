@@ -125,11 +125,26 @@ class RemcTool(Tool):
 class DesirnaTool(Tool):
     """External SOTA DesiRNA via the oracle-verified subprocess adapter, bounded by its -t timelimit."""
 
-    def __init__(self, timelimit_s: float, replicas: int = 10):
+    def __init__(self, timelimit_s: float, replicas: int = 10, results_number: int = 20,
+                 panel_screen: bool = False):
         self.tl = int(timelimit_s)
         self.budget_s = float(timelimit_s)
         self.cores = int(replicas)
-        self.name = f"desirna@{int(timelimit_s)}s"
+        self.results_number = int(results_number)
+        # DesiRNA emits `results_number` candidates per call and this tool has always kept ONE. The
+        # candidate loop below screens the rest with `verify`, which on a pseudoknot target means pKiss
+        # alone -- the same in-loop oracle DesiRNA is effectively optimising -- and stops at the first
+        # hit. Measured consequence (runs/ceiling/who_rejects.py, and desirna_seqs/panel_always_sota.json):
+        # DesiRNA reaches 43/60 under pKiss and 0/60 under the three-oracle panel.
+        #
+        # With panel_screen=True every candidate is put to the FULL panel and the loop keeps going past a
+        # pKiss hit. This is the cheapest available form of "add an information source": ShapeKnots costs
+        # 65 ms, so screening 20 candidates costs about 1.3 s against a 180 s design budget -- under 1%.
+        # It is also the form the evidence favours: ranking candidates by a cheap surrogate and taking the
+        # best gave 0.187 where screening all of them gave 0.580 (runs/ceiling/disagree.py). Screening
+        # beats steering, because screening is cheap.
+        self.panel_screen = bool(panel_screen)
+        self.name = f"desirna@{int(timelimit_s)}s" + ("+panel" if panel_screen else "")
 
     def attempt(self, target: str, seed: int = 0) -> ToolResult:
         from ..generators.desirna import DesiRNAGenerator, desirna_available
@@ -137,7 +152,8 @@ class DesirnaTool(Tool):
             return ToolResult(self.name, False, len(target), 0.0, self.cores, 0.0, "none", None,
                               available=False)
         t0 = time.time()
-        res = DesiRNAGenerator(replicas=self.cores, timelimit_s=self.tl, results_number=20).design(
+        res = DesiRNAGenerator(replicas=self.cores, timelimit_s=self.tl,
+                               results_number=self.results_number).design(
             DesignTask(task_id="cog", target=target, oracle=_TURNER2004), seed=seed)
         wall = time.time() - t0
         best_seq = res.best_sequence or None
@@ -145,9 +161,50 @@ class DesirnaTool(Tool):
         v0 = time.time()
         solved, bp, oracle = verify(best_seq, target)
         ov += time.time() - v0
-        # pseudoknot target: DesiRNA is MFE (out-of-model), but re-check every candidate under pKiss
-        if has_pseudoknot(target) and not solved:
-            for c in (getattr(res, "candidates", None) or []):
+        cands = list(getattr(res, "candidates", None) or [])
+        n_scr = n_unan = 0
+        if self.panel_screen and has_pseudoknot(target):
+            from ..oracles_pk import forms_target, pkiss_pairs, probknot_pairs, shapeknots_pairs
+            # The panel is a CONJUNCTION, so a short-circuit should test cheapest-first. Which oracle is
+            # cheapest DEPENDS ON LENGTH, and getting that wrong is expensive: a fixed ShapeKnots-first
+            # order was 2.7-4.1x cheaper on two smoke-test targets and 3.3x WORSE on a third.
+            #
+            # runs/ceiling/oracle_cost.py, 14 targets over 21-62 nt, ms = a*(n/30)^b:
+            #     pKiss       146 ms at n=30, exponent 0.14   (essentially flat)
+            #     ProbKnot     95 ms at n=30, exponent 0.26   (essentially flat)
+            #     ShapeKnots   60 ms at n=30, exponent 1.90   (QUADRATIC -- 223 ms at 60, 588 at 100)
+            #
+            # So ShapeKnots is the cheapest oracle only below about 45 nt and the most expensive above it.
+            # An earlier claim of mine, "ShapeKnots costs 0.31x pKiss", came from a 21-42 nt sample and is
+            # not general. Ordering from the fitted curve rather than from a constant.
+            def _ms(n, a, b):
+                return a * (max(n, 1) / 30.0) ** b
+            _n = len(target)
+            ORDER = tuple(x[1:] for x in sorted(
+                ((_ms(_n, 59.9, 1.90), "shapeknots", shapeknots_pairs),
+                 (_ms(_n, 94.7, 0.26), "probknot", probknot_pairs),
+                 (_ms(_n, 146.0, 0.14), "pkiss", pkiss_pairs))))
+            n_calls = {k: 0 for k, _ in ORDER}
+            win = None
+            for c in ([best_seq] if best_seq else []) + [c for c in cands if c != best_seq]:
+                v0 = time.time()
+                n_scr += 1
+                ok = True
+                for k, fn in ORDER:
+                    n_calls[k] += 1
+                    if not forms_target(fn(c), target):
+                        ok = False
+                        break
+                ov += time.time() - v0
+                if ok:
+                    n_unan += 1
+                    if win is None:
+                        win = c
+            solved, best_seq, oracle = (win is not None), win, "panel:pkiss+probknot+shapeknots"
+            bp = 0 if win is not None else bp
+        elif has_pseudoknot(target) and not solved:
+            # legacy path: screens with the IN-LOOP oracle only (pKiss) and stops at the first hit
+            for c in cands:
                 v0 = time.time()
                 s, b, o = verify(c, target)
                 ov += time.time() - v0
@@ -157,7 +214,11 @@ class DesirnaTool(Tool):
                     break
         cost = solver_cost_usd(wall, self.cores) + solver_cost_usd(ov, cores=1)   # solver + oracle (pKiss dominates)
         return ToolResult(self.name, solved, bp, round(wall, 3), self.cores,
-                          cost, oracle, best_seq if solved else None, oracle_s=round(ov, 3))
+                          cost, oracle, best_seq if solved else None, oracle_s=round(ov, 3),
+                          stats={"n_candidates": len(cands), "n_screened": n_scr,
+                                 "n_unanimous": n_unan, "panel_screen": self.panel_screen,
+                                 **({"oracle_calls": n_calls} if self.panel_screen
+                                    and has_pseudoknot(target) else {})})
 
 
 def default_toolbox() -> List[Tool]:

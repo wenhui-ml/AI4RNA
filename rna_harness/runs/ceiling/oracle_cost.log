@@ -1,0 +1,39 @@
+RNAstructure available: True
+timing 14 targets, lengths 21-62 nt, 3 reps each, on random COMPATIBLE sequences
+
+     n   pKiss ms  ProbKnot ms  ShapeKnots ms    cheapest   sk/pk
+    21      140.5         80.0           48.6  ShapeKnots    0.35
+    24      149.7         93.5           44.0  ShapeKnots    0.29
+    24      143.7         96.3           50.3  ShapeKnots    0.35
+    25      148.9         97.4           46.9  ShapeKnots    0.32
+    26      135.7         95.1           43.9  ShapeKnots    0.32
+    29      144.6         94.6           48.7  ShapeKnots    0.34
+    29      142.2         95.9           50.8  ShapeKnots    0.36
+    33      144.3         83.2           53.7  ShapeKnots    0.37
+    34      149.3         94.5           60.5  ShapeKnots    0.40
+    39      142.3         94.3           75.0  ShapeKnots    0.53
+    40      152.9        101.6           73.4  ShapeKnots    0.48
+    42      149.1        102.5           75.2  ShapeKnots    0.50
+    54      155.8        106.8          233.6    ProbKnot    1.50
+    62      173.3        128.5          455.2    ProbKnot    2.63
+
+=== scaling: fit ms = a * n^b ===
+        pKiss  exponent  0.14   at n=30    146.0 ms   at n=60    160.5 ms   at n=100     172.1 ms
+     ProbKnot  exponent  0.26   at n=30     94.7 ms   at n=60    113.6 ms   at n=100     129.9 ms
+   ShapeKnots  exponent  1.90   at n=30     59.9 ms   at n=60    223.1 ms   at n=100     587.9 ms
+
+=== which oracle is cheapest, by length band ===
+    0-  35nt  n= 9  ShapeKnots 49ms  <  ProbKnot 95ms  <  pKiss 144ms
+   35-  50nt  n= 3  ShapeKnots 75ms  <  ProbKnot 102ms  <  pKiss 149ms
+   50-  80nt  n= 2  ProbKnot 118ms  <  pKiss 165ms  <  ShapeKnots 344ms
+
+=== consequence for the short-circuit order ===
+  A conjunction should test cheapest-first, but 'cheapest' flips with length, so the order
+  must be chosen per target from the measured curve rather than fixed. And the ratio that
+  justified adding ShapeKnots at all -- cheapest AND strictest -- holds only where it is
+  actually cheapest; above that band it buys the same strictness at a higher price.
+
+=== consequence for every dollar figure on this branch ===
+  ShapeKnots median 49 ms below 35 nt against 344 ms above 50 nt (7.1x). The USD numbers in metric.py used oracle-SECONDS measured
+  per attempt, so they are unaffected -- those were realised times, not modelled from a
+  constant. What WAS wrong is every statement of the form 'ShapeKnots costs 0.31x pKiss'.
