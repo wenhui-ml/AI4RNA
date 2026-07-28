@@ -1,0 +1,16 @@
+1600 attempts, 1600 errors
+   1600x  RuntimeError("replica_exchange process pool attempted inside a worker 
+0 targets x 0 seeds x 0 arms
+
+=== per-arm summary, both predicates ===
+  arm           pred  one-shot /100  S_inf (ever)  B_half (cpu-s)       U  cpu-s/attempt
+  reference: the archive's one-shot run gave 64/100 under match and 55/100 under umfe
+
+=== the honest number: how much does 'ever' beat 'one-shot'? ===
+
+=== does the umfe gate buy anything here? (expected: little -- umfe rejects ~14%) ===
+Traceback (most recent call last):
+  File "/data/wenhui/openclaude_rna/rna_harness/runs/ceiling/eterna_analyze.py", line 93, in <module>
+    A, Bb = SUM[(a, pred)], SUM[(b, pred)]
+            ~~~^^^^^^^^^^^
+KeyError: ('remc_plain', 'match')

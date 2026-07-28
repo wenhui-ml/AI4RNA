@@ -1,0 +1,22 @@
+CPU: $1.389e-05 per core-second ($0.050/core-hour)
+
+  one solve attempt, gated (111.9 oracle-s)     $0.00155
+  one solve attempt, ungated (49.7 oracle-s)    $0.00069
+  one panel-unanimous solve, gated (1220.8 s)   $0.01696
+  one panel-unanimous solve, ungated (918.4 s)  $0.01276
+  one LLM call, 2k in / 0.5k out                $0.00175
+  one LLM call, 20k in / 4k out                 $0.01600
+  a 60-target crossing pass, gated (6714 s)     $0.09325
+
+amortisation of an operator-invention capex against gated CPU ($0.01696/solve):
+       capex  episodes @ $0.08   breakeven (solves)   benchmark passes
+  $     0.08                 1                    5                0.2
+  $     0.40                 5                   24                1.1
+  $     2.00                25                  118                5.4
+  $    20.00               250                 1179               53.6
+  (a gated 60-target pass yields about 22 panel-unanimous solves)
+
+when do runtime tokens start to matter? attempt cost is $0.00155 gated:
+  one LLM call per ATTEMPT         +$0.00175/attempt = 112.9% on top
+  one per TARGET (~8 attempts)     +$0.00022/attempt =  14.1% on top
+  one per BENCHMARK PASS           +$0.00003/attempt =   1.9% on top

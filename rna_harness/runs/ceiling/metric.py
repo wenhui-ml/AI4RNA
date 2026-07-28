@@ -112,7 +112,9 @@ for arm in ("off_150", "off_400", "on_400"):
 
 GRID = np.logspace(1, 5.2, 60)          # 10 s to ~160 000 oracle-CPU-seconds
 print("=== the three measured systems, 60 crossing targets, 8 seeds each ===")
-print("    budget axis = oracle-CPU-seconds; metric = panel-unanimous, independently adjudicated\n")
+print("    budget axis = oracle-CPU-seconds; metric = panel-unanimous, independently adjudicated")
+print("    (see the USD section at the end: seconds are only the right currency while no LLM is in")
+print("     the loop, which is true of every operator here today and will not stay true)\n")
 print(f"  {'system':10} {'S_inf':>6} {'B_half (s)':>11} {'U':>7} {'c per traj':>11} "
       f"{'reachable targets':>18}")
 OUT = {}
@@ -166,8 +168,54 @@ print("    measuring S_inf  -> many seeds, few targets")
 print("    measuring B_half -> few seeds, many targets")
 print("  a single sweep cannot estimate both well; the eval suite should budget for each separately.")
 
-json.dump({a: {"p": SYS[a]["p"].tolist(), "c": SYS[a]["c"].tolist(),
-               "s_inf": OUT[a]["s_inf"], "b_half": OUT[a]["b_half"], "U": OUT[a]["U"],
-               "grid": GRID.tolist(), "S": OUT[a]["s"].tolist()} for a in OUT},
+print("\n" + "=" * 78)
+print("=== the same surface in USD, with token capex amortised over a reuse count N ===")
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(H, "..", "..", "..")))
+from rna_harness.cognitive.cost import CPU_USD_PER_SEC                        # noqa: E402
+
+print(f"  CPU ${CPU_USD_PER_SEC:.3e}/core-s. Seconds and dollars are proportional while nothing calls an")
+print("  LLM at solve time, so the CURVE SHAPE is unchanged -- what dollars add is commensurability with")
+print("  the token cost of producing the operator, which seconds cannot express.\n")
+print(f"  {'system':10} {'S_inf':>6} {'B_half ($)':>11} {'$/solve at S_inf/2':>19} "
+      f"{'$ for a full pass':>18}")
+for arm in OUT:
+    p, c = SYS[arm]["p"], SYS[arm]["c"]
+    bh_usd = OUT[arm]["b_half"] * CPU_USD_PER_SEC
+    per = bh_usd / max(OUT[arm]["s_inf"] / 2.0, 1e-9)
+    print(f"  {arm:10} {OUT[arm]['s_inf']:6d} {bh_usd:11.4f} {per:19.4f} "
+          f"{float(np.sum(c))*CPU_USD_PER_SEC:18.4f}")
+
+INVENT = [("$0.08  (1 agent episode)", 0.08), ("$0.40  (5 episodes)", 0.40),
+          ("$2.00  (25 episodes)", 2.00), ("$20.00 (250 episodes)", 20.00)]
+print("\n  effective $/solve once the operator's INVENTION capex is amortised over N solves")
+print(f"  (marginal $/solve: off_150 {918.4*CPU_USD_PER_SEC:.5f}, on_400 {1220.8*CPU_USD_PER_SEC:.5f})")
+print(f"  {'capex':>26} " + " ".join(f"{f'N={n}':>10}" for n in (1, 22, 100, 1000)) +
+      f" {'breakeven N':>12}")
+marg = 1220.8 * CPU_USD_PER_SEC
+for lab, cap in INVENT:
+    cells = " ".join(f"{marg + cap/n:10.4f}" for n in (1, 22, 100, 1000))
+    print(f"  {lab:>26} {cells} {cap/marg:12.0f}")
+print("  N = 22 is one gated pass over the 60-target benchmark, so the right-hand column is also")
+print("  'how many full benchmark passes the invention cost is worth'. A single agent episode ($0.08)")
+print("  costs about as much as ONE ENTIRE PASS ($0.093) -- at this scale CPU is nearly free and the")
+print("  token spend of the R&D loop, not of solving, is the dominant cost.")
+
+print("\n  when do RUNTIME tokens (an LLM inside the solve loop) start to matter?")
+from rna_harness.cognitive.cost import llm_cost_usd                            # noqa: E402
+att = 111.9 * CPU_USD_PER_SEC
+for per, lab in ((1, "one LLM call per attempt"), (8, "one per target (~8 attempts)"),
+                 (60, "one per benchmark pass")):
+    add = llm_cost_usd(2000, 500) / per
+    print(f"    {lab:<32} +${add:.5f}/attempt = {100*add/att:5.1f}% on top of ${att:.5f}")
+print("    one LLM call at 2k/0.5k costs $0.00175, about the same as one solve ATTEMPT ($0.00155),")
+print("    and one at 20k/4k costs $0.016, about the same as one finished SOLVE ($0.017).")
+
+json.dump({"cpu_usd_per_sec": CPU_USD_PER_SEC,
+           **{a: {"p": SYS[a]["p"].tolist(), "c": SYS[a]["c"].tolist(),
+                  "s_inf": OUT[a]["s_inf"], "b_half_s": OUT[a]["b_half"],
+                  "b_half_usd": OUT[a]["b_half"] * CPU_USD_PER_SEC, "U": OUT[a]["U"],
+                  "pass_usd": float(np.sum(SYS[a]["c"])) * CPU_USD_PER_SEC,
+                  "grid": GRID.tolist(), "S": OUT[a]["s"].tolist()} for a in OUT}},
           open(os.path.join(H, "metric.json"), "w"), indent=1)
 print("\nwrote metric.json")
