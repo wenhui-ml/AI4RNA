@@ -1,0 +1,50 @@
+DesiRNA S(B) on Eterna100-V2: 100 nested targets x 4 budgets x 1 seed(s)
+  budgets -t [5, 15, 60, 180] s, -R 10, -r 20, -p 2004 (matches our oracle)
+  published anchor: 85/100 at <1 min, 97/100 at 24 h (Wirecki 2025); our harness: 64/100
+  upper-bound compute if every run uses its full -t: 72.2 core-h = $3.61
+
+  400 cells, 330 to run, 16 workers
+    20/330  0.6 min  eta 9.9 min
+    40/330  1.1 min  eta 8.3 min
+    60/330  1.6 min  eta 7.1 min
+    80/330  2.0 min  eta 6.3 min
+    100/330  2.5 min  eta 5.7 min
+    120/330  3.1 min  eta 5.4 min
+    140/330  4.5 min  eta 6.1 min
+    160/330  5.8 min  eta 6.2 min
+    180/330  7.3 min  eta 6.1 min
+    200/330  8.9 min  eta 5.8 min
+    220/330  10.6 min  eta 5.3 min
+    240/330  14.0 min  eta 5.3 min
+    260/330  17.4 min  eta 4.7 min
+    280/330  22.4 min  eta 4.0 min
+    300/330  26.4 min  eta 2.6 min
+    320/330  30.0 min  eta 0.9 min
+    330/330  32.7 min  eta 0.0 min
+
+=== DesiRNA S(B) on Eterna100-V2, exact `match` oracle (our verification, not its report) ===
+   -t (s)        solved/seed  union  $/target  $ total  errors  published
+        5               [72]     72    0.0021    0.211       0         --
+       15               [77]     77    0.0034    0.341       0         --
+       60               [81]     81    0.0099    0.986       0         85
+      180               [84]     84    0.0267    2.670       0         --
+
+=== calibration against the published anchor (85/100 at <1 min) ===
+  our adapter at -t 60: 81/100 against published 85/100  -> CONSISTENT
+
+=== by length, at each budget (our harness: 53/75 below 250 nt, 9/25 above) ===
+   -t (s)    <=100   101-250     >250
+        5    32/40     28/35    12/25
+       15    35/40     29/35    13/25
+       60    38/40     30/35    13/25
+      180    38/40     32/35    14/25
+
+=== what this does to our efficiency claims ===
+  every archived saving on this branch (Eterna 1.54x, nested 25x) divides by the cost of
+  DesiRNA at ONE budget. On this curve the same capability is available at:
+    -t    5s ->  72/100 at $0.0021/target   (86% of the -t 180s capability at 0.079x the price)
+    -t   15s ->  77/100 at $0.0034/target   (92% of the -t 180s capability at 0.128x the price)
+    -t   60s ->  81/100 at $0.0099/target   (96% of the -t 180s capability at 0.369x the price)
+    -t  180s ->  84/100 at $0.0267/target   (100% of the -t 180s capability at 1.000x the price)
+
+  wrote rna_harness/runs/ceiling/sota_curve.json
