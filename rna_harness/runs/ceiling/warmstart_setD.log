@@ -1,0 +1,23 @@
+set D added
+  warm           1/2   solved   median start_bp  141   median moved   82   -> [92]
+  warm_clamp     1/2   solved   median start_bp  141   median moved   94   -> [92]
+  prior_warm     0/2   solved   median start_bp  141   median moved   82   
+
+=== the shippable design: warm-start ONLY the last rung ===
+  a target reaching t=180 has already failed every cheaper rung, so the cheap-tier
+  breakage measured in C cannot occur; the only risk is D.
+  warm         A gains 2, D breaks 1  ->  net +1 solves at ZERO extra cost (the rung is paid anyway)
+  warm_clamp   A gains 1, D breaks 1  ->  net +0 solves at ZERO extra cost (the rung is paid anyway)
+  prior_warm   A gains 0, D breaks 2  ->  net -2 solves at ZERO extra cost (the rung is paid anyway)
+
+=== channel vs channel, net at the cheap tier ===
+  channel                     B gained  C broken    net
+  hard pin, retrieval                4        25    -21
+  hard pin, prior                    2        30    -28
+  mutable start, warm                3         6     -3
+  mutable start, warm_clamp          3         8     -5
+  mutable start, prior_warm          2         7     -5
+
+  B, retrieval vs its matched prior control: warm-only [52, 61], prior-only [66], exact McNemar p = 1.000
+
+  wrote rna_harness/runs/ceiling/warmstart_arm.json

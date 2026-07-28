@@ -1,0 +1,47 @@
+warm-start arm: A=16 hopeless @t=180, B=12 escalation @t=5, C=72 already-solved @t=5; modes ('warm', 'warm_clamp', 'prior_warm')
+  300 cells to run, 16 workers
+    20/300  6.4 min  eta 89.2 min
+    40/300  9.9 min  eta 64.1 min
+    60/300  10.3 min  eta 41.1 min
+    80/300  10.7 min  eta 29.4 min
+    100/300  11.0 min  eta 21.9 min
+    120/300  11.3 min  eta 16.9 min
+    140/300  11.5 min  eta 13.1 min
+    160/300  11.7 min  eta 10.3 min
+    180/300  11.9 min  eta 8.0 min
+    200/300  12.3 min  eta 6.1 min
+    220/300  12.5 min  eta 4.5 min
+    240/300  12.8 min  eta 3.2 min
+    260/300  13.2 min  eta 2.0 min
+    280/300  13.5 min  eta 1.0 min
+    300/300  14.2 min  eta 0.0 min
+
+=== A. capability: 16 targets no tier solves, t=180 ===
+  cold baseline: 0/16; hard-pin retrieval got 1 (target 97)
+  warm           2/16  solved   median start_bp  121   median moved   87   -> [60, 97]
+  warm_clamp     1/16  solved   median start_bp  121   median moved  100   -> [60]
+  prior_warm     0/16  solved   median start_bp  132   median moved   88   
+
+=== B. efficiency: 12 escalation targets at t=5 ===
+  cold at t=5: 0/12 by construction; hard-pin retrieval got 4, prior 2
+  warm           3/12  solved   median start_bp   31   median moved   28   -> [52, 61, 77]
+  warm_clamp     3/12  solved   median start_bp   31   median moved   27   -> [52, 61, 66]
+  prior_warm     2/12  solved   median start_bp   31   median moved   35   -> [66, 77]
+
+=== C. breakage: 72 targets the plain t=5 tier already solves ===
+  cold: 72/72 by construction; hard-pin retrieval BROKE 25, prior BROKE 30
+  warm          66/72  solved   median start_bp   28   median moved   39   
+  warm_clamp    64/72  solved   median start_bp   28   median moved   38   
+  prior_warm    65/72  solved   median start_bp   28   median moved   36   
+
+=== channel vs channel, net at the cheap tier ===
+  channel                     B gained  C broken    net
+  hard pin, retrieval                4        25    -21
+  hard pin, prior                    2        30    -28
+  mutable start, warm                3         6     -3
+  mutable start, warm_clamp          3         8     -5
+  mutable start, prior_warm          2         7     -5
+
+  B, retrieval vs its matched prior control: warm-only [52, 61], prior-only [66], exact McNemar p = 1.000
+
+  wrote rna_harness/runs/ceiling/warmstart_arm.json
