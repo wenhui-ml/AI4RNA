@@ -1,0 +1,28 @@
+multi-seed probe at t=5s on the 28 targets the tier-1 probe left unsolved
+  12 of them eventually solve at t<=180s, 16 never
+  extra seeds [1, 2]; measured tier costs {5: 0.00211, 15: 0.00341, 60: 0.00986, 180: 0.0267}
+  matched-cost control: 2 extra t=5 seeds ~ $0.00422 vs the t=15 rung $0.00341, which already solves 5 more
+
+  56 cells to run, 16 workers
+    10/56  0.2 min  eta 0.8 min
+    20/56  0.5 min  eta 0.9 min
+    30/56  0.8 min  eta 0.7 min
+    40/56  1.0 min  eta 0.4 min
+    50/56  1.4 min  eta 0.2 min
+    56/56  1.6 min  eta 0.0 min
+
+  complete probes: 28/28
+
+=== (a) capability: do extra t=5s seeds solve any of them? ===
+  solved by an extra seed: 6/28  [50, 57, 61, 66, 77, 80]
+  probe cost $0.1806 for 6 solves = $0.03010/solve
+  the t=15 rung on the same 28 targets costs $0.0954 and solves 6
+
+=== (b) detection: does min-bp over 3 seeds separate solvable from hopeless? ===
+  single-seed bp (old)       catches  2/16 at zero loss   p = 0.317  not distinguishable from random
+  min bp over all seeds      catches  1/16 at zero loss   p = 0.571  not distinguishable from random
+  n seeds failed             catches  0/16 at zero loss   p = 1.000  not distinguishable from random
+  length (trivial control)   catches  3/16 at zero loss   p = 0.171  not distinguishable from random
+  (H=16 hopeless of n=28; p = prod_(j<k) (H-j)/(n-j), the same exact null used all day)
+
+  wrote rna_harness/runs/ceiling/probe.json
