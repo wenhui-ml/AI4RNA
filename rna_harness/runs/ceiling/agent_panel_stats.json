@@ -1,0 +1,58 @@
+{
+ "tests": [
+  {
+   "A": "operator",
+   "B": "desirna_fixed",
+   "criterion": "pkiss",
+   "p_exact": 0.7265625
+  },
+  {
+   "A": "operator",
+   "B": "desirna_fixed",
+   "criterion": "probknot",
+   "p_exact": 6.821210263296962e-13
+  },
+  {
+   "A": "operator",
+   "B": "desirna_fixed",
+   "criterion": "shapeknots",
+   "p_exact": 0.38331031799316406
+  },
+  {
+   "A": "operator",
+   "B": "desirna_fixed",
+   "criterion": "unanimous",
+   "p_exact": 1.0
+  },
+  {
+   "A": "operator",
+   "B": "desirna_pool",
+   "criterion": "unanimous",
+   "p_exact": 5.960464477539063e-08
+  },
+  {
+   "A": "desirna_fixed",
+   "B": "desirna_pool",
+   "criterion": "unanimous",
+   "p_exact": 2.9802322387695312e-08
+  }
+ ],
+ "bonferroni": 0.008333333333333333,
+ "gc_saturation": {
+  "operator, pKiss-pass": {
+   "n": 91,
+   "mean": 0.9130298273155416,
+   "n_fully_saturated": 76
+  },
+  "operator, pKiss-fail": {
+   "n": 28,
+   "mean": 0.7122448979591837,
+   "n_fully_saturated": 14
+  },
+  "DesiRNA best_pk_seq": {
+   "n": 125,
+   "mean": 0.29322539682539683,
+   "n_fully_saturated": 12
+  }
+ }
+}
