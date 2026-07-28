@@ -1,0 +1,55 @@
+warm-start arm: A=16 hopeless @t=180, B=12 escalation @t=5, C=72 already-solved @t=5; modes ('warm', 'prior_warm')
+  72 cells to run, 16 workers
+    20/72  6.3 min  eta 16.3 min
+    40/72  10.2 min  eta 8.2 min
+    60/72  14.1 min  eta 2.8 min
+    72/72  16.8 min  eta 0.0 min
+
+=== A. capability: 16 targets no tier solves, t=180 ===
+  cold baseline: 0/16; hard-pin retrieval got 1 (target 97)
+  warm           2/16  solved   median start_bp  121   median moved   87   -> [60, 97]
+  prior_warm     0/16  solved   median start_bp  132   median moved   88   
+
+=== B. efficiency: 12 escalation targets at t=5 ===
+  cold at t=5: 0/12 by construction; hard-pin retrieval got 4, prior 2
+  warm           3/12  solved   median start_bp   31   median moved   28   -> [52, 61, 77]
+  prior_warm     2/12  solved   median start_bp   31   median moved   35   -> [66, 77]
+
+=== C. breakage: 72 targets the plain t=5 tier already solves ===
+  cold: 72/72 by construction; hard-pin retrieval BROKE 25, prior BROKE 30
+  warm          66/72  solved   median start_bp   28   median moved   39   
+  prior_warm    65/72  solved   median start_bp   28   median moved   36   
+
+=== D. breakage at the LAST rung: 2 targets cold t=180 solves ===
+  cold t=180: 2/2 by construction -> [78, 92]
+  warm           1/2   solved   median start_bp  141   median moved   82   -> [92]
+  prior_warm     0/2   solved   median start_bp  141   median moved   82   
+
+=== the shippable design: warm-start ONLY the last rung ===
+  a target reaching t=180 has already failed every cheaper rung, so the cheap-tier
+  breakage measured in C cannot occur; the only risk is D.
+  warm         A gains 2, D breaks 1  ->  net +1 solves at ZERO extra cost (the rung is paid anyway)
+  prior_warm   A gains 0, D breaks 2  ->  net -2 solves at ZERO extra cost (the rung is paid anyway)
+
+=== SEED REPLICATION: is the +1 stable, or was it three lucky events? ===
+  decision rule declared BEFORE the run: ship iff A >= 2 on EVERY seed and D breaks <= 1 on every seed.
+  mode          seed  A solved/16  D broken/2   net
+  warm             0            2           1    +1
+  warm             1            1           1    +0
+  warm             2            0           1    -1
+  warm         -> DO NOT SHIP   gains [2, 1, 0], breaks [1, 1, 1], nets [1, 0, -1]
+  prior_warm       0            0           2    -2
+  prior_warm       1            1           1    +0
+  prior_warm       2            0           1    -1
+  prior_warm   -> DO NOT SHIP   gains [0, 1, 0], breaks [2, 1, 1], nets [-2, 0, -1]
+
+=== channel vs channel, net at the cheap tier ===
+  channel                     B gained  C broken    net
+  hard pin, retrieval                4        25    -21
+  hard pin, prior                    2        30    -28
+  mutable start, warm                3         6     -3
+  mutable start, prior_warm          2         7     -5
+
+  B, retrieval vs its matched prior control: warm-only [52, 61], prior-only [66], exact McNemar p = 1.000
+
+  wrote rna_harness/runs/ceiling/warmstart_arm.json

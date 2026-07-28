@@ -52,9 +52,14 @@ def make_start(target, libpath, mode):
     return seq, cov, meta
 
 
+def _cell(pid, mode, tl, seed):
+    """Seed 0 keeps the original name so the single-seed run already on disk is reused, not repeated."""
+    return f"p{pid}_{mode}_t{tl}.json" if seed == 0 else f"p{pid}_{mode}_t{tl}_s{seed}.json"
+
+
 def work(item):
-    pid, target, mode, tl, libpath = item
-    dest = os.path.join(OUT, f"p{pid}_{mode}_t{tl}.json")
+    pid, target, mode, tl, libpath, seed = item
+    dest = os.path.join(OUT, _cell(pid, mode, tl, seed))
     if os.path.exists(dest):
         return dest
     from rna_harness.cognitive.cost import solver_cost_usd
@@ -67,10 +72,11 @@ def work(item):
     try:
         res = DesiRNAGenerator(replicas=10, timelimit_s=tl, results_number=20).design(
             DesignTask(task_id=str(pid), target=target,
-                       oracle=OracleConfig(param_set="turner2004", temperature=37.0, dangles=2)), seed=0)
+                       oracle=OracleConfig(param_set="turner2004", temperature=37.0, dangles=2)), seed=seed)
         w = time.time() - t0
         seq = res.best_sequence or None
-        rec = {"id": pid, "n": len(target), "mode": mode, "t": tl, "solved": bool(res.solved),
+        rec = {"id": pid, "n": len(target), "mode": mode, "t": tl, "seed": seed,
+               "solved": bool(res.solved),
                "bp": int(res.best_bp_distance), "wall_s": round(w, 1),
                "cost_usd": solver_cost_usd(w, 10), "unit_cov": round(cov, 3),
                "start_bp": meta.get("assembled_bp"), "n_units": meta.get("n_units"),
@@ -78,7 +84,7 @@ def work(item):
                "moved": (sum(1 for a, b in zip(seq, start) if a != b) if seq else None),
                "seq": seq}
     except Exception as e:                                                       # noqa: BLE001
-        rec = {"id": pid, "mode": mode, "t": tl, "error": repr(e)[:200]}
+        rec = {"id": pid, "mode": mode, "t": tl, "seed": seed, "error": repr(e)[:200]}
     with open(dest, "w") as f:
         json.dump(rec, f)
     return dest
@@ -90,6 +96,8 @@ def main():
     ap.add_argument("--hard-tier", type=int, default=180)
     ap.add_argument("--cheap-tier", type=int, default=5)
     ap.add_argument("--sets", default="A,B,C")
+    ap.add_argument("--seeds", default="0", help="comma list; 0 reuses the original single-seed cells")
+    ap.add_argument("--modes", default="warm,warm_clamp,prior_warm")
     ap.add_argument("--analyse-only", action="store_true")
     a = ap.parse_args()
     os.makedirs(OUT, exist_ok=True)
@@ -115,18 +123,19 @@ def main():
     # t=180 only after every cheaper rung failed, so there is no cheap-tier solve to break -- but cold t=180
     # itself solves 2 targets, and a warm start could break THOSE. Without D, "+2 at no risk" is unmeasured.
     AT_HARD = [i for i in ids if solved_at.get(i) == a.hard_tier]
-    MODES = ("warm", "warm_clamp", "prior_warm")
+    MODES = tuple(a.modes.split(","))
+    SEEDS = [int(x) for x in a.seeds.split(",")]
     sets = set(a.sets.split(","))
     print(f"warm-start arm: A={len(HOPELESS)} hopeless @t={a.hard_tier}, B={len(ESCALATE)} escalation "
           f"@t={a.cheap_tier}, C={len(ALREADY)} already-solved @t={a.cheap_tier}; modes {MODES}")
 
     jobs = []
     if "A" in sets:
-        jobs += [(i, tgt[i], m, a.hard_tier, os.path.join(LIB, "libA.json"))
-                 for i in HOPELESS for m in MODES]
+        jobs += [(i, tgt[i], m, a.hard_tier, os.path.join(LIB, "libA.json"), sd)
+                 for i in HOPELESS for m in MODES for sd in SEEDS]
     if "B" in sets:
-        jobs += [(i, tgt[i], m, a.cheap_tier, os.path.join(LIB, f"libB_{i}.json"))
-                 for i in ESCALATE for m in MODES]
+        jobs += [(i, tgt[i], m, a.cheap_tier, os.path.join(LIB, f"libB_{i}.json"), sd)
+                 for i in ESCALATE for m in MODES for sd in SEEDS]
     if "D" in sets:
         from rna_harness.experiments.retrieval import RetrievalLibrary
         donors = [(i, base[solved_at[i]][i].get("seq")) for i in solved_at]
@@ -140,14 +149,13 @@ def main():
                     if j != i:
                         L.add_solution(tgt[j], s_, source="sota_curve")
                 L.save(lp)
-        jobs += [(i, tgt[i], m, a.hard_tier, os.path.join(LIB, f"libD_{i}.json"))
-                 for i in AT_HARD for m in MODES]
+        jobs += [(i, tgt[i], m, a.hard_tier, os.path.join(LIB, f"libD_{i}.json"), sd)
+                 for i in AT_HARD for m in MODES for sd in SEEDS]
     if "C" in sets:
-        jobs += [(i, tgt[i], m, a.cheap_tier, os.path.join(LIB, f"libC_{i}.json"))
-                 for i in ALREADY for m in MODES]
+        jobs += [(i, tgt[i], m, a.cheap_tier, os.path.join(LIB, f"libC_{i}.json"), sd)
+                 for i in ALREADY for m in MODES for sd in SEEDS]
     if not a.analyse_only:
-        todo = [j for j in jobs
-                if not os.path.exists(os.path.join(OUT, f"p{j[0]}_{j[2]}_t{j[3]}.json"))]
+        todo = [j for j in jobs if not os.path.exists(os.path.join(OUT, _cell(j[0], j[2], j[3], j[5])))]
         print(f"  {len(todo)} cells to run, {a.workers} workers", flush=True)
         from concurrent.futures import ProcessPoolExecutor, as_completed
         t0 = time.time()
@@ -159,18 +167,18 @@ def main():
                     print(f"    {n}/{len(todo)}  {el/60:.1f} min  "
                           f"eta {el/max(n,1)*(len(todo)-n)/60:.1f} min", flush=True)
 
-    got = collections.defaultdict(dict)
+    got = collections.defaultdict(lambda: collections.defaultdict(dict))
     for f in glob.glob(os.path.join(OUT, "*.json")):
         d = json.load(open(f))
         if "error" not in d:
-            got[(d["id"], d["t"])][d["mode"]] = d
+            got[(d["id"], d["t"])][d["mode"]][d.get("seed", 0)] = d
 
     def arm(label, S, tier, baseline_txt):
         print(f"\n=== {label} ===")
         print(f"  {baseline_txt}")
         res = {}
         for m in MODES:
-            cells = [got[(i, tier)].get(m) for i in S]
+            cells = [got[(i, tier)][m].get(SEEDS[0]) for i in S]
             cells = [c for c in cells if c]
             if not cells:
                 continue
@@ -204,6 +212,32 @@ def main():
                 gain, broke = len(rA[m]), len(AT_HARD) - len(rD[m])
                 print(f"  {m:<12} A gains {gain}, D breaks {broke}  ->  net {gain-broke:+d} solves "
                       f"at ZERO extra cost (the rung is paid anyway)")
+
+    if len(SEEDS) > 1:
+        print(f"\n=== SEED REPLICATION: is the +1 stable, or was it three lucky events? ===")
+        print(f"  decision rule declared BEFORE the run: ship iff A >= 2 on EVERY seed and D breaks <= 1 "
+              f"on every seed.")
+        print(f"  {'mode':<12} {'seed':>5} {'A solved/16':>12} {'D broken/2':>11} {'net':>5}")
+        verdict = {}
+        for m in MODES:
+            nets = []
+            for sd in SEEDS:
+                ca = [got[(i, a.hard_tier)][m].get(sd) for i in HOPELESS]
+                ca = [c for c in ca if c]
+                cd = [got[(i, a.hard_tier)][m].get(sd) for i in AT_HARD]
+                cd = [c for c in cd if c]
+                if not ca or not cd:
+                    continue
+                gain = sum(1 for c in ca if c["solved"])
+                broke = sum(1 for c in cd if not c["solved"])
+                nets.append((sd, gain, broke))
+                print(f"  {m:<12} {sd:>5} {gain:>12} {broke:>11} {gain-broke:>+5d}")
+            if nets:
+                ok = all(g >= 2 and b <= 1 for _s, g, b in nets)
+                verdict[m] = (ok, nets)
+                print(f"  {m:<12} -> {'SHIP' if ok else 'DO NOT SHIP'}   "
+                      f"gains {[g for _s, g, _b in nets]}, breaks {[b for _s, _g, b in nets]}, "
+                      f"nets {[g-b for _s, g, b in nets]}")
 
     print(f"\n=== channel vs channel, net at the cheap tier ===")
     print(f"  {'channel':<26} {'B gained':>9} {'C broken':>9} {'net':>6}")
