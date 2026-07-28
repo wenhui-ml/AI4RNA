@@ -1,0 +1,41 @@
+retrieval arm: 16 hopeless targets (A, t=180), 12 escalation targets (B, t=5)
+  donors: 84 of our OWN oracle-verified solves (sequences stored by sota_curve)
+  libB: 12 leave-one-out libraries
+
+  set C: 72 targets the plain t=5 tier already solves, leave-one-out libraries built
+
+  72 cells to run, 16 workers
+    10/72  0.2 min  eta 1.1 min
+    20/72  0.3 min  eta 0.8 min
+    30/72  0.4 min  eta 0.6 min
+    40/72  0.5 min  eta 0.4 min
+    50/72  0.6 min  eta 0.3 min
+    60/72  0.8 min  eta 0.2 min
+    70/72  1.1 min  eta 0.0 min
+    72/72  1.2 min  eta 0.0 min
+
+=== A. capability: the 16 targets no tier solves, at t=180 ===
+  baseline (all-N, measured by sota_curve): 0/16
+  retrieval          1/16 solved -> [97]                median bp   23  units hit 113/186  pinned 24% of bases
+  retrieval_clamp    1/16 solved -> [97]                median bp   25  units hit 113/186  pinned 24% of bases
+  prior              0/16 solved                        median bp   13  units hit 113/186  pinned 24% of bases
+
+=== B. efficiency: the 12 escalation targets at the CHEAP tier t=5 (leave-one-out library) ===
+  baseline (all-N at t=5): 0/12 by construction
+  retrieval          4/12 solved -> [61, 66, 77, 80]
+  retrieval_clamp    3/12 solved -> [61, 77, 80]
+  prior              2/12 solved -> [66, 80]
+
+  the control that decides it: `retrieval` must beat `prior` at the SAME pinned positions.
+
+=== C. does the restraint BREAK what the plain tier already solved? ===
+  plain t=5 (no restraint): 72/72 by construction
+  retrieval    kept 47/72  BROKE 25
+  prior        kept 42/72  BROKE 30
+
+  broken by BOTH: 24   only by retrieval: 1   only by prior: 6
+  -> PINNING itself is the problem (both arms break it)
+
+  net at the cheap tier = (B gained) - (C broken) = 4 - 25 = -21
+
+  wrote rna_harness/runs/ceiling/retrieval_arm.json
