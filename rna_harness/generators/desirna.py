@@ -29,6 +29,7 @@ import os
 import re
 import shlex
 import subprocess
+import sys
 import tempfile
 from shutil import which
 from typing import List, Optional, Tuple
@@ -38,13 +39,36 @@ from .base import GenerationResult, Generator
 
 
 def _desirna_cmd() -> Optional[List[str]]:
-    """Resolve the DesiRNA launch command, or None if it cannot be found."""
+    """Resolve the DesiRNA launch command, or None if it cannot be found.
+
+    DISCOVERY MATTERS MORE THAN IT LOOKS. Before this searched the filesystem, resolution was
+    DESIRNA_CMD-or-PATH only. DesiRNA is a checked-out script, not a pip console-script, so it is on neither
+    unless the caller happens to export the variable -- and when it is missing, `default_toolbox()` silently
+    returns the REMC fallback ladder, which measures 62/100 on Eterna100-V2 against DesiRNA's 84/100
+    (runs/ceiling/ladder.py). A forgotten environment variable was therefore worth 22 solves, with no warning
+    anywhere. Searching conventional locations makes an existing install usable by default; DESIRNA_CMD and
+    DESIRNA_HOME still override.
+    """
     env = os.environ.get("DESIRNA_CMD")
     if env:
         return shlex.split(env)
     for cand in ("DesiRNA", "DesiRNA.py", "desirna"):
         if which(cand):
             return [cand]
+    here = os.path.dirname(os.path.abspath(__file__))
+    repo = os.path.abspath(os.path.join(here, "..", ".."))
+    roots = [os.environ.get("DESIRNA_HOME"),
+             os.path.join(repo, "vendor", "DesiRNA"),
+             os.path.join(os.path.dirname(repo), "DesiRNA"),
+             os.path.expanduser("~/DesiRNA")]
+    for r in roots:
+        if not r:
+            continue
+        script = os.path.join(r, "DesiRNA.py")
+        if os.path.exists(script):
+            # sys.executable, not "python": DesiRNA needs ViennaRNA + its own deps, which live in the same
+            # interpreter this harness is running under.
+            return [sys.executable, script]
     return None
 
 

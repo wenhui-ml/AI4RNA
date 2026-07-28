@@ -1,0 +1,19 @@
+rungs available: ['desirna@5s', 'remc@5s', 'desirna@15s', 'remc@30s', 'remc@120s', 'desirna@60s', 'desirna@180s']
+  100 targets with every rung measured
+
+  ladder                            solved   $ total   $/solve  vs CURRENT
+  CURRENT default_toolbox               84    2.1900   0.02607       1.00x
+  drop the dominated remc rungs         84    1.5252   0.01816       1.44x
+  add the cheap desirna rungs           84    1.0811   0.01287       2.03x
+  cheap desirna only                    78    0.3281   0.00421       6.67x
+  desirna@5s alone                      72    0.2111   0.00293      10.37x
+  always-SOTA (desirna@180s)            84    2.6697   0.03178       0.82x
+  keep remc AFTER cheap desirna         84    1.4595   0.01737       1.50x
+
+=== the change worth making ===
+  CURRENT : 84/100 at $2.1900   first solver = {'remc@5s': 58, 'remc@120s': 3, 'desirna@60s': 19, 'remc@30s': 1, 'desirna@180s': 3}
+  PROPOSED: 84/100 at $1.0811   first solver = {'desirna@5s': 72, 'desirna@60s': 4, 'desirna@15s': 6, 'desirna@180s': 2}
+  -> +0 solves and 2.03x cheaper, from reordering the ladder alone
+  the three remc rungs currently solve 62 targets first, and every target pays all three before reaching DesiRNA
+
+  wrote rna_harness/runs/ceiling/ladder.json

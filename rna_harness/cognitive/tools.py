@@ -163,6 +163,7 @@ class DesirnaTool(Tool):
         ov += time.time() - v0
         cands = list(getattr(res, "candidates", None) or [])
         n_scr = n_unan = 0
+        panel_unavailable = False
         if self.panel_screen and has_pseudoknot(target):
             from ..oracles_pk import forms_target, pkiss_pairs, probknot_pairs, shapeknots_pairs
             # The panel is a CONJUNCTION, so a short-circuit should test cheapest-first. Which oracle is
@@ -185,23 +186,47 @@ class DesirnaTool(Tool):
                  (_ms(_n, 94.7, 0.26), "probknot", probknot_pairs),
                  (_ms(_n, 146.0, 0.14), "pkiss", pkiss_pairs))))
             n_calls = {k: 0 for k, _ in ORDER}
-            win = None
+            win, n_undecided = None, 0
             for c in ([best_seq] if best_seq else []) + [c for c in cands if c != best_seq]:
                 v0 = time.time()
                 n_scr += 1
                 ok = True
                 for k, fn in ORDER:
                     n_calls[k] += 1
-                    if not forms_target(fn(c), target):
+                    # forms_target returns None when the ORACLE ITSELF failed to run (missing binary, bad
+                    # DATAPATH, timeout). An earlier version tested `if not forms_target(...)`, which maps
+                    # None to "rejected" -- so with RNAstructure absent EVERY candidate failed the panel and
+                    # the tool silently reported 0 solves with no diagnostic. A missing oracle must abstain,
+                    # never reject.
+                    v = forms_target(fn(c), target)
+                    if v is None:
+                        ok = None
+                        break
+                    if not v:
                         ok = False
                         break
                 ov += time.time() - v0
-                if ok:
+                if ok is None:
+                    n_undecided += 1
+                elif ok:
                     n_unan += 1
                     if win is None:
                         win = c
-            solved, best_seq, oracle = (win is not None), win, "panel:pkiss+probknot+shapeknots"
-            bp = 0 if win is not None else bp
+            if win is None and n_undecided and n_undecided == n_scr:
+                # The panel could not adjudicate ANYTHING, so it carries no information. Degrade to the
+                # in-loop-oracle path rather than reporting a false 0, and say so in stats.
+                panel_unavailable = True
+                for c in ([best_seq] if best_seq else []) + [c for c in cands if c != best_seq]:
+                    v0 = time.time()
+                    s_, b_, o_ = verify(c, target)
+                    ov += time.time() - v0
+                    if b_ < bp:
+                        solved, bp, oracle, best_seq = s_, b_, o_, c
+                    if solved:
+                        break
+            else:
+                solved, best_seq, oracle = (win is not None), win, "panel:pkiss+probknot+shapeknots"
+                bp = 0 if win is not None else bp
         elif has_pseudoknot(target) and not solved:
             # legacy path: screens with the IN-LOOP oracle only (pKiss) and stops at the first hit
             for c in cands:
@@ -217,17 +242,56 @@ class DesirnaTool(Tool):
                           cost, oracle, best_seq if solved else None, oracle_s=round(ov, 3),
                           stats={"n_candidates": len(cands), "n_screened": n_scr,
                                  "n_unanimous": n_unan, "panel_screen": self.panel_screen,
+                                 **({"panel_unavailable": True} if panel_unavailable else {}),
                                  **({"oracle_calls": n_calls} if self.panel_screen
                                     and has_pseudoknot(target) else {})})
 
 
 def default_toolbox() -> List[Tool]:
-    """The action set the router chooses from: cheap->expensive, our-solver + SOTA. Each (tool,budget)
-    is one action; the router learns which to fire (and in what order) per problem, to minimise cost."""
-    return [
-        RemcTool(wall_s=5),
-        RemcTool(wall_s=30),
-        RemcTool(wall_s=120),
-        DesirnaTool(timelimit_s=60),
-        DesirnaTool(timelimit_s=180),
-    ]
+    """The action set the router chooses from, cheapest-first by MEASURED cost. Each (tool, budget) is one
+    action; core.solve fires them in order and stops at the first oracle-verified solve, so the contents of
+    this list are what decide the system's cost and capability.
+
+    Chosen from measurement, not from nominal cost (runs/ceiling/ladder.py, all 100 Eterna100-V2 targets,
+    every rung measured per target):
+
+        rung            solved   $/target
+        desirna@5s       72/100   0.00211
+        remc@5s          58/100   0.00271     <- dominated: dearer AND weaker
+        desirna@15s      77/100   0.00341
+        remc@30s         59/100   0.00371     <- dominated
+        remc@120s        62/100   0.00654     <- dominated
+        desirna@60s      81/100   0.00986
+        desirna@180s     84/100   0.02670
+
+    Simulated cascades over those outcomes:
+
+        [remc@5,remc@30,remc@120,desirna@60,desirna@180]   84/100 at $2.1900   (the old default)
+        [desirna@5,desirna@15,desirna@60,desirna@180]      84/100 at $1.0811   2.03x cheaper
+        [desirna@5,desirna@15,remc@120,desirna@60,...]     84/100 at $1.4595   remc helps NOWHERE
+
+    All three REMC rungs were strictly dominated by desirna@5s, and REMC's 62 solves are a proper SUBSET of
+    DesiRNA's 84, so REMC adds no capability at any position. They ranked first only because
+    Router._cold_order sorts by nominal_cost_usd() = cores x budget_s, and RemcTool overruns its wall budget
+    on long targets: declared 5 s, measured 34.6 s at n=400 (6.9x), 8.1 s at n=108 -- replica_exchange only
+    checks the clock between rounds. So the cheap head of the old cascade was most expensive exactly where it
+    was most useless.
+
+    REMC is kept as the FALLBACK LADDER for when DesiRNA is not installed, which preserves the
+    graceful-degradation property generators/desirna.py is built around: with no external solver the system
+    still designs, at 62/100 instead of 84/100.
+    """
+    from ..generators.desirna import desirna_available
+    if not desirna_available():
+        return [RemcTool(wall_s=5), RemcTool(wall_s=30), RemcTool(wall_s=120)]
+    # The panel screen is the one measured capability win on pseudoknot targets (0.25 -> 25.25 of 60
+    # panel-unanimous per execution, exact McNemar p = 1.58e-30, +11% compute). It needs RNAstructure for
+    # ProbKnot/ShapeKnots; DesirnaTool now abstains rather than rejects when an oracle cannot run, but there
+    # is no point paying for calls that can never adjudicate, so it is only requested when available. On
+    # nested targets the flag is inert -- a single exact criterion has no conjunction to screen against.
+    try:
+        from ..oracles_pk import rnastructure_available
+        panel = bool(rnastructure_available())
+    except Exception:                                          # noqa: BLE001
+        panel = False
+    return [DesirnaTool(timelimit_s=t, panel_screen=panel) for t in (5, 15, 60, 180)]

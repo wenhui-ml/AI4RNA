@@ -1,0 +1,137 @@
+{
+ "n": 100,
+ "rung_summary": {
+  "desirna@5s": {
+   "solved": 72,
+   "cost_per_target": 0.0021114360249704788
+  },
+  "remc@5s": {
+   "solved": 58,
+   "cost_per_target": 0.0027141764422257742
+  },
+  "desirna@15s": {
+   "solved": 77,
+   "cost_per_target": 0.003407629421684478
+  },
+  "remc@30s": {
+   "solved": 59,
+   "cost_per_target": 0.0037098395333356334
+  },
+  "remc@120s": {
+   "solved": 62,
+   "cost_per_target": 0.006538025910390749
+  },
+  "desirna@60s": {
+   "solved": 81,
+   "cost_per_target": 0.009862885976831116
+  },
+  "desirna@180s": {
+   "solved": 84,
+   "cost_per_target": 0.02669688033958275
+  }
+ },
+ "ladders": {
+  "CURRENT default_toolbox": {
+   "rungs": [
+    "remc@5s",
+    "remc@30s",
+    "remc@120s",
+    "desirna@60s",
+    "desirna@180s"
+   ],
+   "solved": 84,
+   "cost": 2.1899599715371925,
+   "cost_per_solve": 0.026070952042109435,
+   "first_solver": {
+    "remc@5s": 58,
+    "remc@120s": 3,
+    "desirna@60s": 19,
+    "remc@30s": 1,
+    "desirna@180s": 3
+   }
+  },
+  "drop the dominated remc rungs": {
+   "rungs": [
+    "desirna@60s",
+    "desirna@180s"
+   ],
+   "solved": 84,
+   "cost": 1.52519422478146,
+   "cost_per_solve": 0.01815707410454119,
+   "first_solver": {
+    "desirna@60s": 81,
+    "desirna@180s": 3
+   }
+  },
+  "add the cheap desirna rungs": {
+   "rungs": [
+    "desirna@5s",
+    "desirna@15s",
+    "desirna@60s",
+    "desirna@180s"
+   ],
+   "solved": 84,
+   "cost": 1.081097713874446,
+   "cost_per_solve": 0.01287021087945769,
+   "first_solver": {
+    "desirna@5s": 72,
+    "desirna@60s": 4,
+    "desirna@15s": 6,
+    "desirna@180s": 2
+   }
+  },
+  "cheap desirna only": {
+   "rungs": [
+    "desirna@5s",
+    "desirna@15s"
+   ],
+   "solved": 78,
+   "cost": 0.32808970633480283,
+   "cost_per_solve": 0.004206278286343626,
+   "first_solver": {
+    "desirna@5s": 72,
+    "desirna@15s": 6
+   }
+  },
+  "desirna@5s alone": {
+   "rungs": [
+    "desirna@5s"
+   ],
+   "solved": 72,
+   "cost": 0.21114360249704783,
+   "cost_per_solve": 0.00293255003468122,
+   "first_solver": {
+    "desirna@5s": 72
+   }
+  },
+  "always-SOTA (desirna@180s)": {
+   "rungs": [
+    "desirna@180s"
+   ],
+   "solved": 84,
+   "cost": 2.6696880339582747,
+   "cost_per_solve": 0.031782000404265175,
+   "first_solver": {
+    "desirna@180s": 84
+   }
+  },
+  "keep remc AFTER cheap desirna": {
+   "rungs": [
+    "desirna@5s",
+    "desirna@15s",
+    "remc@120s",
+    "desirna@60s",
+    "desirna@180s"
+   ],
+   "solved": 84,
+   "cost": 1.4594604153301987,
+   "cost_per_solve": 0.017374528753930935,
+   "first_solver": {
+    "desirna@5s": 72,
+    "desirna@60s": 4,
+    "desirna@15s": 6,
+    "desirna@180s": 2
+   }
+  }
+ }
+}

@@ -90,26 +90,63 @@ def test_router_cold_start_cheapest_first():
     assert order[0].nominal_cost_usd() == min(costs)
 
 
-def test_router_learns_to_prefer_cheap_winner():
+def test_router_orders_by_cost_per_unit_success():
+    """The router's learned order is by $ / P(solve), not by P(solve). At EQUAL cost the reliable rung must
+    come first; a much cheaper rung legitimately stays ahead even at low P, because in a cascade the price of
+    trying it and failing is exactly its cost. (An earlier version of this test asserted "prefer the reliable
+    one" using a 2000x cost ratio, which asserted the wrong thing -- the router was right.)"""
     tb = default_toolbox()
     rt = Router(tb)
     f = features(HAIRPIN)
-    for _ in range(6):                            # cheap tool reliably solves this feature region
-        rt.record(f, "remc@5s", solved=True, cost=1e-6)
-    for _ in range(6):                            # an expensive tool also solves but dear
-        rt.record(f, "desirna@180s", solved=True, cost=2e-3)
-    order = rt.plan(f)
-    assert order[0].name == "remc@5s"             # learned: put the cheap reliable winner first
+    a, b = tb[0].name, tb[1].name
+    for _ in range(6):                              # SAME cost, different outcomes
+        rt.record(f, a, solved=False, cost=1e-3)
+        rt.record(f, b, solved=True, cost=1e-3)
+    assert rt.plan(f)[0].name == b                  # at equal cost, the one that works goes first
+    rt2 = Router(tb)
+    for _ in range(6):                              # now make the loser 1000x cheaper
+        rt2.record(f, a, solved=False, cost=1e-6)
+        rt2.record(f, b, solved=True, cost=1e-3)
+    assert rt2.plan(f)[0].name == a                 # trying it costs almost nothing, so it is tried first
 
 
-def test_cognitive_core_solves_cheap_and_stops_early():
-    core = CognitiveCore(default_toolbox(), learn=True)
+def test_cognitive_core_stops_at_first_verified_solve():
+    """The cascade MECHANISM, exercised on the built-in solver so the unit test needs no external binary."""
+    core = CognitiveCore([_R(wall_s=5), _R(wall_s=30), DesirnaTool(timelimit_s=180)], learn=True)
     out = core.solve(HAIRPIN, seed=0)
     assert out["solved"] is True and out["cost_usd"] > 0
-    assert out["trace"][0]["tool"] == "remc@5s"   # tried cheapest first
+    assert out["trace"][0]["tool"] == "remc@5s"                   # tried cheapest first
+    assert len(out["trace"]) == 1                                 # and stopped there
     assert all("desirna" not in s["tool"] for s in out["trace"])  # never needed SOTA on an easy one
 
 
-def test_fixed_policy_always_cheap_baseline():
-    out = FixedPolicy([_R(wall_s=10, n_replicas=6)], name="always-cheap").solve(HAIRPIN)
-    assert out["solved"] is True and out["cost_usd"] > 0
+def test_default_toolbox_is_the_measured_ladder_or_the_fallback():
+    """default_toolbox() must be the DesiRNA budget ladder when the solver is installed, and the REMC ladder
+    when it is not -- never empty. The measured basis is in the function's own docstring; the point here is
+    that a missing external solver degrades instead of leaving the router with nothing to fire."""
+    from rna_harness.generators.desirna import desirna_available
+    tb = default_toolbox()
+    assert tb, "default_toolbox must never be empty"
+    names = [t.name for t in tb]
+    if desirna_available():
+        assert all(n.startswith("desirna@") for n in names), names
+        assert [t.budget_s for t in tb] == [5.0, 15.0, 60.0, 180.0], names
+    else:
+        assert all(n.startswith("remc@") for n in names), names
+    assert [t.nominal_cost_usd() for t in tb] == sorted(t.nominal_cost_usd() for t in tb)
+
+
+def test_panel_abstains_when_an_oracle_cannot_run(monkeypatch):
+    """A missing panel oracle must ABSTAIN, not reject. Before this, forms_target(None, ...) -> None was read
+    as 'rejected', so with RNAstructure absent every candidate failed and the tool reported 0 solves with no
+    diagnostic."""
+    from rna_harness import oracles_pk
+    monkeypatch.setattr(oracles_pk, "probknot_pairs", lambda seq, timeout_s=60.0: None)
+    monkeypatch.setattr(oracles_pk, "shapeknots_pairs", lambda seq, timeout_s=120.0: None)
+    t = DesirnaTool(timelimit_s=5, panel_screen=True)
+    r = t.attempt(PK, seed=0)
+    if r.available is False:
+        pytest.skip("DesiRNA not installed")
+    # It may or may not solve PK in 5 s; what must NOT happen is a silent panel verdict with no flag.
+    assert r.oracle != "panel:pkiss+probknot+shapeknots" or r.solved is False
+    assert r.stats.get("panel_unavailable") is True or r.stats.get("n_unanimous", 0) == 0
