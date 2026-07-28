@@ -1,0 +1,45 @@
+=== 1. ShapeKnots gate: capability ratio, bootstrapped two ways ===
+  bootstrap over seeds   : ratio 1.69  95% CI [1.27, 2.26]
+  bootstrap over targets : ratio 1.70  95% CI [1.36, 2.67]
+  point: 44/26 = 1.69x   (McNemar 18 discordant cells, all one way, p = 7.6e-06)
+  the falsifier: off_400 = 26 identical to off_150, 0 discordant cells, p = 1
+
+=== 2. trajectory allocation: which comparisons are actually significant? ===
+  depth1    solves  2.47 +/- 0.28  calls    2239  per 1000  1.10
+  delta_S2  solves  1.87 +/- 0.23  calls     646  per 1000  2.89
+  delta_S4  solves  3.07 +/- 0.38  calls    1336  per 1000  2.30
+  delta_S8  solves  4.53 +/- 0.41  calls    2580  per 1000  1.76
+  rand_S4   solves  2.00 +/- 0.33  calls    3013  per 1000  0.66
+  delta_S2  vs depth1: solves x0.76 [0.51,1.10]   efficiency x2.62 [1.69,3.99]
+  delta_S4  vs depth1: solves x1.24 [0.86,1.77]   efficiency x2.08 [1.38,3.08]
+  delta_S8  vs depth1: solves x1.84 [1.36,2.52]   efficiency x1.60 [1.18,2.19]
+  rand_S4   vs depth1: solves x0.81 [0.52,1.23]   efficiency x0.60 [0.37,0.94]
+  NOTE: only delta_S8 vs depth1 reaches p<0.05 on SOLVES (11/2, p=0.0225).
+  delta_S4 vs depth1 is 8/4, p=0.39 -- not significant. The 2.26x equal-solves figure is an
+  INTERPOLATION between delta_S2 and delta_S4 and carries no test of its own.
+  What IS strong is the dose-response: S2->S4 11/0 p=0.0010, S4->S8 13/0 p=0.0002.
+
+=== 3. Eterna ensemble objective: paired ratio over targets ===
+  median P: ours 0.0594  inv_pf 0.8077
+  ratio 13.59x  95% CI [8.12, 22.50]  (62/64 targets, Wilcoxon p = 6.5e-12)
+  LIMIT: this is measured on the 64 targets we ALREADY solve. It shows our existing solutions
+  could be far more robust. It does NOT show inv_pf solves any of the 36 we fail, so it is not
+  yet a capability claim on 55/100.
+
+=== 4. multiplicity: how many tests were run on this branch? ===
+  approximately 31 hypothesis tests across the branch:
+     4  step-2 frontier, delta vs uniform
+     4  step-2, delta vs random
+     4  step-2, delta vs length
+     1  band, Fisher
+     4  p0, MWU + Spearman
+     4  trajectory, arms vs depth1
+     2  trajectory, dose-response
+     3  gate, McNemar
+     3  robustness, Wilcoxon
+     2  who_rejects, MWU
+  Bonferroni threshold at alpha=0.05 with 31 tests: p < 1.61e-03
+  survives:  gate McNemar 7.6e-06  |  dose-response 2e-04 and 1e-03  |  robustness 6.5e-12
+             |  who_rejects (descriptive, not a test)
+  does NOT survive:  step-2's one positive (1.75x, p=0.031)  |  delta_S8 vs depth1 (p=0.0225)
+                     |  delta vs random on solves (p=0.092)
