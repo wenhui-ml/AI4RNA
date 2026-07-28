@@ -1,0 +1,297 @@
+{
+ "desirna_cost_source": "measured median of 8 runs",
+ "desirna_cost_per_attempt": 0.04335906296637323,
+ "remc_cost": 0.0033333333333333335,
+ "cold_order": [
+  "pkdecomp",
+  "remc@30s",
+  "desirna@300"
+ ],
+ "pkdecomp_solves": 175,
+ "desirna_solves": 180,
+ "skill_only_solves_ids": [],
+ "arms": {
+  "held": {
+   "n": 125,
+   "always_sota": {
+    "cost": 5.419882870796647,
+    "solved": 96
+   },
+   "cold": {
+    "cost": 1.5584624129202629,
+    "solved": 96,
+    "first_solver": {
+     "pkdecomp": 92,
+     "null": 0,
+     "desirna@300": 4
+    }
+   },
+   "learned": {
+    "cost": 1.5451290795869297,
+    "solved": 96,
+    "first_solver": {
+     "pkdecomp": 92,
+     "null": 0,
+     "desirna@300": 4
+    }
+   },
+   "abstain": {
+    "0.1": {
+     "cost": 0.8414355313910377,
+     "solved": 96,
+     "desirna_fired": 19,
+     "abstained": 14,
+     "solves_lost": 0
+    },
+    "0.15": {
+     "cost": 0.8414355313910377,
+     "solved": 96,
+     "desirna_fired": 19,
+     "abstained": 14,
+     "solves_lost": 0
+    },
+    "0.2": {
+     "cost": 0.8414355313910377,
+     "solved": 96,
+     "desirna_fired": 19,
+     "abstained": 14,
+     "solves_lost": 0
+    },
+    "0.3": {
+     "cost": 0.45120396469367857,
+     "solved": 96,
+     "desirna_fired": 10,
+     "abstained": 23,
+     "solves_lost": 0
+    },
+    "0.4": {
+     "cost": 0.45120396469367857,
+     "solved": 96,
+     "desirna_fired": 10,
+     "abstained": 23,
+     "solves_lost": 0
+    },
+    "0.5": {
+     "cost": 0.40784490172730553,
+     "solved": 96,
+     "desirna_fired": 9,
+     "abstained": 24,
+     "solves_lost": 0
+    },
+    "0.6": {
+     "cost": 0.40784490172730553,
+     "solved": 96,
+     "desirna_fired": 9,
+     "abstained": 24,
+     "solves_lost": 0
+    },
+    "0.75": {
+     "cost": 0.23440864986181265,
+     "solved": 93,
+     "desirna_fired": 5,
+     "abstained": 28,
+     "solves_lost": 3
+    },
+    "0.9": {
+     "cost": 0.10433146096269287,
+     "solved": 92,
+     "desirna_fired": 2,
+     "abstained": 31,
+     "solves_lost": 4
+    }
+   },
+   "oracle_abstain": {
+    "cost": 0.19104958689543936,
+    "solved": 96
+   }
+  },
+  "train": {
+   "n": 126,
+   "always_sota": {
+    "cost": 5.46324193376302,
+    "solved": 84
+   },
+   "cold": {
+    "cost": 2.0311638970838657,
+    "solved": 84,
+    "first_solver": {
+     "null": 0,
+     "pkdecomp": 83,
+     "desirna@300": 1
+    }
+   },
+   "learned": {
+    "cost": 2.0278305637505323,
+    "solved": 84,
+    "first_solver": {
+     "null": 0,
+     "pkdecomp": 83,
+     "desirna@300": 1
+    }
+   },
+   "abstain": {
+    "0.1": {
+     "cost": 1.1940855562885602,
+     "solved": 84,
+     "desirna_fired": 27,
+     "abstained": 16,
+     "solves_lost": 0
+    },
+    "0.15": {
+     "cost": 1.1940855562885602,
+     "solved": 84,
+     "desirna_fired": 27,
+     "abstained": 16,
+     "solves_lost": 0
+    },
+    "0.2": {
+     "cost": 1.1940855562885602,
+     "solved": 84,
+     "desirna_fired": 27,
+     "abstained": 16,
+     "solves_lost": 0
+    },
+    "0.3": {
+     "cost": 0.5436996117929617,
+     "solved": 84,
+     "desirna_fired": 12,
+     "abstained": 31,
+     "solves_lost": 0
+    },
+    "0.4": {
+     "cost": 0.5436996117929617,
+     "solved": 84,
+     "desirna_fired": 12,
+     "abstained": 31,
+     "solves_lost": 0
+    },
+    "0.5": {
+     "cost": 0.3702633599274689,
+     "solved": 84,
+     "desirna_fired": 8,
+     "abstained": 35,
+     "solves_lost": 0
+    },
+    "0.6": {
+     "cost": 0.3702633599274689,
+     "solved": 84,
+     "desirna_fired": 8,
+     "abstained": 35,
+     "solves_lost": 0
+    },
+    "0.75": {
+     "cost": 0.1534680450956027,
+     "solved": 84,
+     "desirna_fired": 3,
+     "abstained": 40,
+     "solves_lost": 0
+    },
+    "0.9": {
+     "cost": 0.02339085619648299,
+     "solved": 83,
+     "desirna_fired": 0,
+     "abstained": 43,
+     "solves_lost": 1
+    }
+   },
+   "oracle_abstain": {
+    "cost": 0.06674991916285622,
+    "solved": 84
+   }
+  },
+  "all": {
+   "n": 251,
+   "always_sota": {
+    "cost": 10.883124804559722,
+    "solved": 180
+   },
+   "cold": {
+    "cost": 3.589626310004128,
+    "solved": 180,
+    "first_solver": {
+     "null": 0,
+     "pkdecomp": 175,
+     "desirna@300": 5
+    }
+   },
+   "learned": {
+    "cost": 3.572959643337461,
+    "solved": 180,
+    "first_solver": {
+     "null": 0,
+     "pkdecomp": 175,
+     "desirna@300": 5
+    }
+   },
+   "abstain": {
+    "0.1": {
+     "cost": 2.035521087679597,
+     "solved": 180,
+     "desirna_fired": 46,
+     "abstained": 30,
+     "solves_lost": 0
+    },
+    "0.15": {
+     "cost": 2.035521087679597,
+     "solved": 180,
+     "desirna_fired": 46,
+     "abstained": 30,
+     "solves_lost": 0
+    },
+    "0.2": {
+     "cost": 2.035521087679597,
+     "solved": 180,
+     "desirna_fired": 46,
+     "abstained": 30,
+     "solves_lost": 0
+    },
+    "0.3": {
+     "cost": 0.9949035764866403,
+     "solved": 180,
+     "desirna_fired": 22,
+     "abstained": 54,
+     "solves_lost": 0
+    },
+    "0.4": {
+     "cost": 0.9949035764866403,
+     "solved": 180,
+     "desirna_fired": 22,
+     "abstained": 54,
+     "solves_lost": 0
+    },
+    "0.5": {
+     "cost": 0.7781082616547741,
+     "solved": 180,
+     "desirna_fired": 17,
+     "abstained": 59,
+     "solves_lost": 0
+    },
+    "0.6": {
+     "cost": 0.7781082616547741,
+     "solved": 180,
+     "desirna_fired": 17,
+     "abstained": 59,
+     "solves_lost": 0
+    },
+    "0.75": {
+     "cost": 0.3878766949574152,
+     "solved": 177,
+     "desirna_fired": 8,
+     "abstained": 68,
+     "solves_lost": 3
+    },
+    "0.9": {
+     "cost": 0.12772231715917584,
+     "solved": 175,
+     "desirna_fired": 2,
+     "abstained": 74,
+     "solves_lost": 5
+    }
+   },
+   "oracle_abstain": {
+    "cost": 0.25779950605829566,
+    "solved": 180
+   }
+  }
+ }
+}

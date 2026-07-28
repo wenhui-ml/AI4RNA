@@ -1,0 +1,48 @@
+
+=== crossing / pseudobase  (held-out n = 125, all arms solve 96) ===
+  FLAT (always_sota)            $5.4199
+  CASCADE (zero knowledge)      $1.5585    FLAT/CASCADE = 3.478x  <- FREE
+  ORACLE (perfect foresight)    $0.1910    CASCADE/ORACLE = 8.157x  <- the whole prize
+
+  learned arm                    $   vs FLAT  vs CASCADE  prize captured  solves lost
+  learned ordering          1.5451    3.508x      1.009x            1.0%            0
+  abstain@tau=0.1           0.8414    6.441x      1.852x           52.4%            0
+  abstain@tau=0.15          0.8414    6.441x      1.852x           52.4%            0
+  abstain@tau=0.2           0.8414    6.441x      1.852x           52.4%            0
+  abstain@tau=0.3           0.4512   12.012x      3.454x           81.0%            0
+  abstain@tau=0.4           0.4512   12.012x      3.454x           81.0%            0
+  abstain@tau=0.5           0.4078   13.289x      3.821x           84.1%            0
+  abstain@tau=0.6           0.4078   13.289x      3.821x           84.1%            0
+  abstain@tau=0.75          0.2344   23.122x      6.648x           96.8%            3
+  abstain@tau=0.9           0.1043   51.949x     14.938x          106.3%            4
+
+  best arm AT ZERO SOLVES LOST        abstain@tau=0.5  $0.4078
+  headline as quoted (FLAT/best)      13.289x
+  honest learned gain (CASCADE/best)  3.821x
+  free part that was bundled in       3.478x
+  VERDICT: learning is real but SMALLER than quoted: 3.82x, not 13.29x
+
+=== Eterna100  (held-out n = 50, all arms solve 42) ===
+  FLAT (always_sota)            $1.3182
+  CASCADE (zero knowledge)      $1.0027    FLAT/CASCADE = 1.315x  <- FREE
+  ORACLE (perfect foresight)    $0.7761    CASCADE/ORACLE = 1.292x  <- the whole prize
+
+  learned arm                    $   vs FLAT  vs CASCADE  prize captured  solves lost
+  abstain@tau=0.15          0.9714    1.357x      1.032x           13.8%            0
+  abstain@tau=0.3           0.9411    1.401x      1.065x           27.2%            0
+  abstain@tau=0.5           0.8817    1.495x      1.137x           53.4%            0
+  abstain@tau=0.75          0.8560    1.540x      1.171x           64.7%            0
+
+  best arm AT ZERO SOLVES LOST        abstain@tau=0.75  $0.8560
+  headline as quoted (FLAT/best)      1.540x
+  honest learned gain (CASCADE/best)  1.171x
+  free part that was bundled in       1.315x
+  VERDICT: learning is real but SMALLER than quoted: 1.17x, not 1.54x
+
+=== which archived ratio equals the numbers this branch has been quoting? ===
+  1.54x (Eterna)     closest archived ratio = eterna_held/FLAT/best = 1.540x   [MATCH]
+  3.51x (crossing)   closest archived ratio = crossing_held/FLAT/CASCADE = 3.478x   [MATCH]
+  13x (memory upper) closest archived ratio = crossing_held/FLAT/best = 13.289x   [MATCH]
+  8x (memory lower)  closest archived ratio = crossing_held/CASCADE/ORACLE = 8.157x   [MATCH]
+
+  wrote rna_harness/runs/ceiling/baseline_audit.json
