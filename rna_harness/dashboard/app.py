@@ -520,14 +520,20 @@ HTML_PAGE = """<!doctype html><html><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
  :root{--bg:#fafafa;--card:#fff;--border:#e6e8ec;--text:#1a1a2e;--muted:#6b7280;--accent:#1976d2;--g:#2e7d32;--r:#c62828;--y:#b07d00}
- body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;margin:0;background:var(--bg);color:var(--text)}
+ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;margin:0;background:var(--bg);color:var(--text);
+      display:flex;flex-direction:column;min-height:100vh}
  header{background:var(--card);padding:14px 22px;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between}
  h1{font-size:18px;margin:0} .sub{color:var(--muted);font-size:12px;margin-left:8px}
  .lnk{background:var(--accent);color:#fff!important;padding:7px 14px;border-radius:6px;font-weight:700;font-size:13px}
  .intro{background:var(--card);border-bottom:1px solid var(--border);padding:12px 22px;font-size:13.5px;line-height:1.7}
  .tabs{margin:12px 22px 0} .tab{display:inline-block;padding:7px 15px;cursor:pointer;border:1px solid var(--border);border-bottom:none;border-radius:8px 8px 0 0;background:#eef1f5;color:var(--muted);margin-right:3px;font-size:14px}
  .tab.active{background:var(--card);color:var(--accent);font-weight:700}
- .panel{margin:0 22px 30px;border:1px solid var(--border);border-radius:0 10px 10px 10px;padding:18px;background:var(--card)}
+ .panel{margin:0 22px 30px;border:1px solid var(--border);border-radius:0 10px 10px 10px;padding:18px;background:var(--card);
+        flex:1 1 auto;min-height:0}
+ /* the chat is an app pane, not a document: the log takes whatever height is left and the composer stays put */
+ #chat{display:flex;flex-direction:column}
+ #chatlog{flex:1 1 auto;min-height:220px;overflow:auto}
+ #chatrow{flex:0 0 auto}
  .card{border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin:12px 0;background:var(--card);box-shadow:0 1px 3px rgba(0,0,0,.05)}
  .name{font-weight:700;color:var(--accent);font-size:15px} h3{margin:4px 0} h4{margin:16px 0 4px;font-size:1rem}
  .note{color:#374151;font-size:12.5px;line-height:1.75;margin:6px 0 8px;background:#eef4fb;border-left:3px solid var(--accent);padding:9px 12px;border-radius:0 6px 6px 0}
@@ -572,8 +578,8 @@ HTML_PAGE = """<!doctype html><html><head><meta charset="utf-8">
 <div id="chat" class="panel">
  <p class="note">用一句话描述你要的 RNA 结构,或直接粘贴 dot-bracket;也可以同时给"序列 + 结构"来检查一条已有序列。
  返回的是<b>证书</b>而不是序列:谁判的、过了哪一级、花了多少、以及它<b>不</b>主张什么。</p>
- <div id="chatlog" style="border:1px solid var(--border);border-radius:10px;padding:14px;height:52vh;overflow:auto;background:#fff"></div>
- <div style="display:flex;gap:8px;margin-top:10px">
+ <div id="chatlog" style="border:1px solid var(--border);border-radius:10px;padding:14px;background:#fff"></div>
+ <div id="chatrow" style="display:flex;gap:8px;margin-top:10px">
   <input id="chatin" placeholder="例:一个 6 对茎、4 nt 环的发夹    或    ((((....))))" 
          style="flex:1;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px"
          onkeydown="if(event.key==='Enter')send()">
