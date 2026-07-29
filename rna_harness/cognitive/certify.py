@@ -447,3 +447,62 @@ def certify_design(target: str, budget: str = "standard", seed: int = 0) -> Cert
                        detail={"tiers_tried": tried, "best_bp": best_bp},
                        reason=(f"no sequence survived the criterion within the '{budget}' budget "
                                f"(tiers {tried} s).{near}{more}"))
+
+
+# --------------------------------------------------------------------------- human-facing rendering
+def render(c: Certificate) -> str:
+    """A certificate as a non-expert should read it: the verdict, what was actually checked, what it cost,
+    and -- for the two negative verdicts -- why, in words rather than a status code."""
+    icon = {"certified": "CERTIFIED", "knot_confirmed": "KNOT CONFIRMED",
+            "cannot_certify": "CANNOT CERTIFY", "not_found": "NOT FOUND",
+            "invalid_input": "INVALID INPUT"}.get(c.verdict, c.verdict.upper())
+    out = [f"[{icon}]  {c.kind} target, {c.n} nt"]
+    if c.sequence:
+        out.append(f"  sequence   {c.sequence}")
+    if c.checked_by:
+        out.append(f"  checked by {c.checked_by}")
+    if c.strictness:
+        out.append(f"  criterion  {c.strictness}"
+                   + (f"   (also passes: {', '.join(c.rungs_passed[:-1])})"
+                      if len(c.rungs_passed) > 1 else ""))
+    op = (c.detail or {}).get("operating_point")
+    if op:
+        out.append(f"  this criterion recognises "
+                   f"{op['sensitivity_on_known_structures']:.1%} of known natural structures and accepts "
+                   f"{op['false_accept_on_random_sequences']:.1%} of random sequences")
+        if op.get("scope"):
+            out.append(f"  scope      {op['scope']}")
+    if c.cost_usd or c.wait_s:
+        out.append(f"  cost       ${c.cost_usd:.5f}   waited {c.wait_s:.1f}s"
+                   + (f"   budget '{c.budget}'" if c.budget else ""))
+    if c.reason:
+        import textwrap
+        for i, line in enumerate(textwrap.wrap(c.reason, 92)):
+            out.append(("  why        " if i == 0 else "             ") + line)
+    out.append(f"  note       {c.disclaimer}")
+    return "\n".join(out)
+
+
+def _cli(argv=None):
+    import argparse
+    import json as _json
+    ap = argparse.ArgumentParser(
+        prog="python -m rna_harness.cognitive.certify",
+        description="Design or check an RNA sequence and return a CERTIFICATE: what was verified, by which "
+                    "oracles, at what strictness, at what cost -- and what it does not claim.")
+    ap.add_argument("target", help="target secondary structure in dot-bracket, e.g. '((((....))))'")
+    ap.add_argument("--sequence", help="check THIS sequence instead of designing one (free, no search)")
+    ap.add_argument("--budget", default="standard", choices=sorted(BUDGETS),
+                    help="cheap = one 5s tier (answers ~72%% of targets); standard = 5/15/60/180s; "
+                         "best_effort adds 600/1800s")
+    ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--json", action="store_true", help="machine-readable output")
+    a = ap.parse_args(argv)
+    c = (certify_sequence(a.sequence, a.target) if a.sequence
+         else certify_design(a.target, budget=a.budget, seed=a.seed))
+    print(_json.dumps(c.to_dict(), indent=1) if a.json else render(c))
+    return 0 if c.verdict in ("certified", "knot_confirmed") else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(_cli())

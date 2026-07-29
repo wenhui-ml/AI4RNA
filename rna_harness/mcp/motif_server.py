@@ -7,6 +7,8 @@ Tools appear to the agent as:
     mcp__rna_motifs__lookup_hairpin_loop
     mcp__rna_motifs__search_motifs
     mcp__rna_motifs__analyze_target
+    mcp__rna_motifs__certify_design     <- the default entry point: returns a CERTIFICATE, not a sequence
+    mcp__rna_motifs__certify_check
 
 Design note: this is a DETERMINISTIC, offline knowledge base (no network). It supplies known
 structural-motif priors ("what cap is stable for a 4-nt loop?", "what are the hard features of
@@ -225,11 +227,14 @@ def batch_fold(sequences: list[str], target: str = "") -> str:
 
 
 def parallel_search(target: str, n_restarts: int = 0, steps: int = 3000) -> str:
-    """Run a MANY-RESTART simulated-annealing inverse-folding search IN PARALLEL across up to 160
-    CPU cores to design a sequence whose MFE structure equals `target`. Returns the best sequence
-    found in one call (seconds), replacing a slow hand-written single-threaded search. ALWAYS
-    confirm the returned sequence with RnaVerify (this uses the same Turner2004 model but RnaVerify
-    is the official scorer).
+    """RAW SEARCH -- returns a candidate, NOT a verified answer. Runs a many-restart simulated-annealing
+    inverse fold in parallel across up to 160 CPU cores for `target`.
+
+    Prefer `certify_design` unless you specifically want the raw search: this tool returns whatever the
+    search reached and leaves verification to the caller, which is the wrong default for anyone who cannot
+    perform it. `certify_design` runs the measured budget cascade, picks the oracle appropriate to the
+    target (a pseudoknot target judged by the MFE oracle yields a FALSE bp=0), and returns a certificate
+    stating what was checked and at what strictness.
 
     Args:
         target: target secondary structure in dot-bracket notation.
@@ -348,6 +353,51 @@ _NEUTRAL_DOCS = {
 }
 
 
+def certify_design(target: str, budget: str = "standard") -> str:
+    """DESIGN a sequence for `target` and return a CERTIFICATE -- the tool to reach for by default.
+
+    Unlike the raw search tools this makes, on the caller's behalf, the five decisions that stand between a
+    target and a trustworthy answer, each of which silently produces a plausible-looking wrong answer when
+    guessed: which energy model, which oracle (a pseudoknot target judged by the ViennaRNA MFE oracle gives a
+    FALSE bp=0 because MFE cannot represent '[' at all), what "solved" means (match / umfe / pfe are
+    different questions), how much to spend, and whether the answer can be trusted at all.
+
+    Returns the verdict plus what was checked, at what strictness, what it cost, and what it does NOT claim.
+    Verdicts: certified | knot_confirmed | cannot_certify | not_found | invalid_input. `cannot_certify` is a
+    real answer, not a failure -- on pseudoknot targets the three independent predictors disagree on most
+    sequences, and saying so beats forwarding an unconfirmed one.
+
+    Args:
+        target: target secondary structure in dot-bracket ('()' nested, '[]{}<>' for pseudoknots).
+        budget: 'cheap' (one 5 s tier, answers about 72% of targets), 'standard' (5/15/60/180 s),
+                or 'best_effort' (adds 600/1800 s).
+    """
+    err = _guard_target(target)
+    if err:
+        return err
+    from ..cognitive.certify import certify_design as _cd, render
+    return render(_cd(target, budget=budget))
+
+
+def certify_check(sequence: str, target: str) -> str:
+    """CHECK whether `sequence` forms `target`, and return a certificate. Free -- no search.
+
+    The cheapest and most common question, and the one most often answered wrongly by hand: on a nested
+    target this reports every strictness rung the sequence passes (match / umfe / pfe are different claims);
+    on a pseudoknot target it is adjudicated by three independent predictors rather than the single reference
+    oracle, and a sequence only the reference accepts comes back `cannot_certify` rather than `solved`.
+
+    Args:
+        sequence: the RNA sequence to check (A/C/G/U).
+        target: the target dot-bracket it is supposed to form.
+    """
+    err = _guard_target(target)
+    if err:
+        return err
+    from ..cognitive.certify import certify_sequence as _cs, render
+    return render(_cs(sequence, target))
+
+
 def _register_tools() -> None:
     auto = _autonomous()
     # neutral capabilities/facts -- registered in BOTH modes
@@ -355,7 +405,8 @@ def _register_tools() -> None:
     # strategy/advice tools + external/native solvers that "do the solving for you" -- ONLY in
     # crutched (flag-off) mode, so they never contaminate the autonomous-A_theta experiments.
     # desirna_solve is the PLAN-A accessibility surface: the agent calls the SOTA tool, Claude-Code-style.
-    crutch_only = [lookup_hairpin_loop, search_motifs, inverse_fold_search, desirna_solve]
+    crutch_only = [lookup_hairpin_loop, search_motifs, inverse_fold_search, desirna_solve,
+                   certify_design, certify_check]
     for fn in always:
         if auto and fn.__name__ in _NEUTRAL_DOCS:
             fn.__doc__ = _NEUTRAL_DOCS[fn.__name__]
