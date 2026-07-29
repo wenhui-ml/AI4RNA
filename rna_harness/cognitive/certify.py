@@ -6,20 +6,37 @@ wrong, returns an answer that LOOKS right:
 
     decision                                what goes wrong if the user guesses          measured
     which energy model                      optimiser and verifier disagree              sequences come back bp 1-2 off
-    does my target have a pseudoknot        ViennaRNA MFE drops '[' and ']'              bp=0 becomes a FALSE 'solved'
+    does my target have a pseudoknot        ViennaRNA MFE drops '[' and ']'              bp=0 becomes a FALSE 'solved'   <- this one really is false
     what does "solved" even mean            match / umfe / pfe are different questions   survival 1.000 / 0.902 / 0.066
     how much should I spend                 flat runs pay for every target equally       72/100 for $0.21 vs 84/100 for $1.10
-    can I trust this answer                 one heuristic oracle is not adjudication     43 of 43 claims were false positives
+    can I trust this answer                 one heuristic oracle is not adjudication     43 of 43 claims went unconfirmed
 
 The whole point of the certificate is the last row. Under the single pseudoknot oracle the standard tool
-claims 43 of 60 targets and INDEPENDENT ADJUDICATION rejects all 43 (runs/ceiling, exact McNemar p=1.58e-30).
-A product that forwards those 43 to a non-expert is worse than useless. So this module has a third verdict
-besides "here it is" and "could not find one":
+claims 43 of 60 targets and INDEPENDENT ADJUDICATION confirms none of them (runs/ceiling, exact McNemar
+p=1.58e-30). So this module has a third verdict besides "here it is" and "could not find one":
 
     certified       a sequence that survives the declared criterion
     not_found       searched the declared budget, nothing survived
     cannot_certify  candidates satisfied SOME oracles and the independent panel disagreed, or a required
                     oracle could not run. Being able to say this is the feature, not a shortfall.
+
+HOW STRONG IS `certified`, AND HOW WEAK IS `cannot_certify`. Both directions are measured, and the second one
+is easy to overstate -- I did. The archived native-sequence positive control (runs/axis1_native_control, 250
+Pseudobase targets) asks each predictor to fold the WILD-TYPE sequence back to its own known structure:
+
+    exact recovery of the native structure   pKiss 32.4%   ProbKnot 5.6%   ShapeKnots 7.6%
+    crossing-pair recall on the same natures pKiss 0.85    ProbKnot 0.62   ShapeKnots 0.63
+
+So under exact match the panel rejects most of NATURE'S OWN answers. `certified` is therefore a very strong
+statement -- it survives a filter that biology usually fails -- but `cannot_certify` is NOT evidence the
+design is wrong. It means the panel cannot tell, which is exactly what the word says and why the verdict
+exists. Anything that calls the rejected population "false" (including earlier commit messages of mine)
+overclaims; the honest word is UNCONFIRMED.
+
+The panel is also not evenly weighted: over 3000 screened candidates pKiss accepts 70.8%, ProbKnot 30.6% and
+ShapeKnots 9.4%, and dropping ShapeKnots alone takes the deliverable count from 16 to 87 of 125
+(runs/ceiling/loo_oracle.py). The conjunction is in large part a ShapeKnots filter, and a certificate names
+its adjudicators so that a caller can judge that for themselves.
 
 WHAT IT COMPOSES (nothing here is new; it is the four measured mechanisms behind one call):
   * the budget cascade + stop-at-first-verified-solve         cognitive/core.py
@@ -108,7 +125,7 @@ def certify_sequence(seq: str, target: str) -> Certificate:
     No search. On a nested target this reports every strictness rung the sequence passes, because those are
     different questions and the user has no way to know which one they meant. On a pseudoknot target it is
     adjudicated by the three-oracle panel, and a sequence that satisfies only the single reference oracle
-    comes back `cannot_certify` -- that case is the 43-of-43 false-positive population.
+    comes back `cannot_certify` -- the population a single-oracle tool would have handed over as solved.
     """
     kind, err = classify(target)
     t0 = time.time()
@@ -156,8 +173,9 @@ def certify_sequence(seq: str, target: str) -> Certificate:
                            checked_by="panel: pKiss AND ProbKnot AND ShapeKnots",
                            cost_usd=solver_cost_usd(w, 1), wait_s=round(w, 2), detail=v,
                            reason="the reference oracle (pKiss) accepts this sequence but the independent "
-                                  "predictors do not. Under single-oracle scoring this population was 43 of "
-                                  "43 false positives, so it is reported as unconfirmed rather than solved.")
+                                  "predictors do not. Reported as UNCONFIRMED, not as wrong: on native "
+                                  "sequences the same panel recovers only 32%/6%/8% of known structures "
+                                  "exactly, so its rejection is weak evidence about the design.")
     return Certificate("not_found", target, len(target), kind, sequence=seq,
                        checked_by="panel: pKiss AND ProbKnot AND ShapeKnots",
                        cost_usd=solver_cost_usd(w, 1), wait_s=round(w, 2), detail=v,
@@ -282,9 +300,10 @@ def certify_design(target: str, budget: str = "standard", seed: int = 0) -> Cert
                            checked_by="panel: pKiss AND ProbKnot AND ShapeKnots",
                            cost_usd=cost, wait_s=round(w, 2), budget=budget, detail=v,
                            reason="the search found sequences the reference oracle (pKiss) accepts, but the "
-                                  "independent predictors reject them. A single-oracle tool would have "
-                                  "returned one of these as the answer; that population measured 43 of 43 "
-                                  "false positives, so it is reported unconfirmed instead.")
+                                  "independent predictors do not confirm them. A single-oracle tool would "
+                                  "have returned one of these as the answer. Reported as UNCONFIRMED rather "
+                                  "than wrong: the same panel recovers only 32%/6%/8% of NATIVE structures "
+                                  "exactly, so non-confirmation is weak evidence against a design.")
     nxt = {"cheap": "standard", "standard": "best_effort"}.get(budget)
     return Certificate("not_found", target, len(target), kind, budget=budget,
                        checked_by=("panel: pKiss AND ProbKnot AND ShapeKnots" if kind == "pseudoknot"
