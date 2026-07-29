@@ -1,0 +1,29 @@
+calibrated criterion on 125 held-out crossing targets, stored pools
+
+  125 targets, 16 workers
+    25/125  0.4 min
+    50/125  0.6 min
+    75/125  0.9 min
+    100/125  1.2 min
+    125/125  4.1 min
+
+=== what each criterion can hand a user, 125 targets ===
+  criterion                                     targets   sensitivity on natives   random FA
+  certified (whole structure, all 3 exact)           16                     0.8%        0.0%
+  knot_confirmed (crossing stems, >=1 oracle)       124                    84.0%        0.4%
+
+  strict is a subset of knot: 16/16   neither: 1/125
+  -> the calibrated rule answers 99% of requests against 13%, a 7.8x increase in answered requests
+
+=== which predictor confirms the knot ===
+  pkiss         110
+  probknot       61
+  shapeknots     22
+  (a target counts once per confirming oracle, so these sum above 124)
+
+=== by length ===
+   <=40nt: certified  11/73    knot_confirmed  72/73
+    41-70: certified   4/43    knot_confirmed  43/43
+      >70: certified   1/9     knot_confirmed   9/9
+
+  wrote rna_harness/runs/ceiling/knot_deliverable.json

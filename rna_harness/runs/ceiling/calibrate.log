@@ -48,6 +48,39 @@ calibration set: 250 natural structures with all three oracles run
      winner (k=1, d=8) was an artefact of averaging a mild tolerance on big targets with a
      vacuous one on small targets.
 
+=== a different judged quantity: CROSSING-PAIR RECALL (the pairs that make it a pseudoknot) ===
+  native means: pkiss 0.85, probknot 0.62, shapeknots 0.63
+  (250 natives, 250 randoms)
+    tau                    k=1                   k=2                   k=3
+              sens      random      sens      random      sens      random
+   1.00     84.0%        0.4%    63.6%        0.4%    43.2%        0.4%
+   0.90     84.0%        0.4%    63.6%        0.4%    43.2%        0.4%
+   0.80     86.4%        0.4%    66.4%        0.4%    52.0%        0.4%
+   0.67     87.6%        0.8%    67.6%        0.8%    52.0%        0.4%
+   0.50     90.4%        2.8%    70.0%        2.0%    55.2%        1.6%
+
+  usable under the SAME declared rule: [(1, 1.0, 0.84, 0.004), (1, 0.9, 0.84, 0.004), (1, 0.8, 0.864, 0.004), (1, 0.67, 0.876, 0.008), (1, 0.5, 0.904, 0.028)]
+  -> crossing-pair recall SEPARATES where exact match did not: k=1, tau=1.0 at 84.0% sensitivity / 0.4% random false-accept.
+     A certificate could then say 'reproduces the pseudoknot stems under 1 of 3 independent predictors, a criterion that recognises 84% of known structures'.
+
+=== combined rule: nested skeleton by an EXACT judge AND crossing stems by the panel ===
+  wild-type sequences parsed and matched to targets: 186/250
+  native skeleton recovered by ViennaRNA MFE alone: 20/186 (10.8%)
+    (a native really does form a pseudoknot, so its MFE need not equal the nested reduction -- this is the number that decides whether the two parts compose)
+
+    tau   k  combined sens  combined random
+   1.00   1          8.6%            0.0%
+   0.90   1          8.6%            0.0%
+   0.80   1          8.6%            0.0%
+   0.67   1          8.6%            0.0%
+   0.50   1          9.1%            0.0%
+
+  usable combined rules under the SAME declared bar: NONE
+  -> the two parts do NOT compose: requiring the nested skeleton to be the ViennaRNA MFE
+     costs most of the sensitivity, because a native's MFE is not its nested reduction.
+     The defensible criterion therefore stays crossing-stem recall alone, and a
+     certificate must say that it speaks about the KNOT, not the whole structure.
+
 === the missing half: false-accept rate on RANDOM sequences (same lengths) ===
   null set: 250 random ACGU sequences
      d                    k=1                   k=2                   k=3

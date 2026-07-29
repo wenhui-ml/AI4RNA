@@ -105,6 +105,21 @@ def test_pseudoknot_without_panel_refuses_rather_than_guessing():
     assert "panel" in c.reason.lower()
 
 
+@pytest.mark.skipif(not _panel_ready(), reason="needs pKiss + RNAstructure")
+def test_knot_confirmed_is_a_weaker_claim_than_certified_and_says_so():
+    """The calibrated verdict. Exact-and-unanimous has 0.8% sensitivity on known natural structures, so it
+    refuses nearly everything including correct designs; crossing-stem recall by >=1 oracle reaches 84.0% at
+    0.4% false accept per draw, and 3.1% [0.1, 16.2] on a matched best-of-pool null. It is reported as a
+    claim about the KNOT only -- composing it with an exact nested-skeleton check was refuted (ViennaRNA
+    recovers the nested reduction from 20 of 186 natives)."""
+    from rna_harness.cognitive.certify import KNOT_OPERATING_POINT, _knot_recall
+    assert KNOT_OPERATING_POINT["sensitivity_on_known_structures"] > 0.8
+    assert "CROSSING STEMS only" in KNOT_OPERATING_POINT["scope"]
+    kr = _knot_recall("G" * len(PK), PK)
+    assert set(kr) >= {"per_oracle", "confirmed_by", "knot_confirmed", "n_cross"}
+    assert kr["n_cross"] > 0                       # PK really does have crossing pairs to recall
+
+
 # ---- contract shape -------------------------------------------------------------------------------
 def test_every_certificate_carries_the_disclaimer_and_a_reason():
     for c in (certify_design(""), certify_sequence("A" * len(HAIRPIN), HAIRPIN)):

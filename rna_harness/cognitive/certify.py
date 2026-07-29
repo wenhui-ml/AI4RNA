@@ -16,6 +16,11 @@ claims 43 of 60 targets and INDEPENDENT ADJUDICATION confirms none of them (runs
 p=1.58e-30). So this module has a third verdict besides "here it is" and "could not find one":
 
     certified       a sequence that survives the declared criterion
+    knot_confirmed  (pseudoknot targets only) the CROSSING STEMS -- the pairs that make the target a
+                    pseudoknot at all -- are fully reproduced by at least one independent predictor. A
+                    weaker claim than `certified` because it speaks about the knot, not the whole structure,
+                    and a CALIBRATED one: 84.0% sensitivity on known natural structures at 0.4% false accept
+                    on random sequences (runs/ceiling/calibrate.py).
     not_found       searched the declared budget, nothing survived
     cannot_certify  candidates satisfied SOME oracles and the independent panel disagreed, or a required
                     oracle could not run. Being able to say this is the feature, not a shortfall.
@@ -56,8 +61,23 @@ r=0.75 permits three quarters of the target's pairs to be wrong. An earlier abso
 to find a usable rule at (k=1, d=8); that was an artefact of one number meaning "mild" on large targets and
 "vacuous" on small ones.
 
-So on pseudoknot targets this module reports a verdict it can defend and refuses to dress the negative one up
-as evidence. Every pseudoknot certificate carries the operating point.
+WHAT DOES WORK IS CHANGING THE JUDGED QUANTITY, not the threshold and not the instruments. Asking "is the
+whole structure reproduced exactly, unanimously" is unanswerable with these tools. Asking "are the CROSSING
+STEMS reproduced" is answerable:
+
+    crossing-stem recall, k=1, tau=1.0    sensitivity 84.0%    random false-accept 0.4%
+
+Sensitivity is flat from tau=1.0 to tau=0.9, i.e. these predictors get a knot entirely right or entirely
+wrong; there is no "nearly". That is why the shipped threshold is the strictest one (tau=1.0).
+
+One appealing composition was tried and refuted: judging the nested skeleton with an EXACT instrument
+(ViennaRNA MFE on the pseudoknot-free reduction) AND the stems with the panel. ViennaRNA recovers the nested
+reduction from only 20 of 186 native sequences (10.8%) -- a native's energetics are dominated by the knot,
+which ViennaRNA cannot represent, so its MFE lands elsewhere. Combined sensitivity 8.6%. The parts do not
+compose, so `knot_confirmed` is reported for what it is: a claim about the knot only.
+
+So on pseudoknot targets this module reports verdicts it can defend and refuses to dress the negative one up
+as evidence. Every pseudoknot certificate carries the operating point of whichever rule it used.
 
 WHAT IT COMPOSES (nothing here is new; it is the four measured mechanisms behind one call):
   * the budget cascade + stop-at-first-verified-solve         cognitive/core.py
@@ -100,11 +120,20 @@ PANEL_OPERATING_POINT = {
     "note": ("certification is a strong claim; NON-certification is nearly uninformative, because this rule "
              "recognises only 2 of 250 natural structures whose sequences are known to form them."),
 }
+KNOT_OPERATING_POINT = {
+    "rule": "crossing stems fully reproduced by at least 1 of 3 oracles (k=1, tau=1.0)",
+    "sensitivity_on_known_structures": 0.840,
+    "false_accept_on_random_sequences": 0.004,
+    "scope": "the CROSSING STEMS only -- this says nothing about the rest of the structure",
+    "note": ("sensitivity is unchanged from tau=1.0 down to 0.9: these predictors get a knot entirely right "
+             "or entirely wrong. Composing this with an exact nested-skeleton check was tried and refuted "
+             "(ViennaRNA recovers the nested reduction from only 20 of 186 natives)."),
+}
 
 
 @dataclass
 class Certificate:
-    verdict: str                      # certified | not_found | cannot_certify | invalid_input
+    verdict: str                      # certified | knot_confirmed | cannot_certify | not_found | invalid_input
     target: str
     n: int
     kind: str                         # nested | pseudoknot | invalid
@@ -197,6 +226,18 @@ def certify_sequence(seq: str, target: str) -> Certificate:
                            wait_s=round(w, 2), detail=v,
                            reason="a required independent oracle could not be run, so this cannot be "
                                   "adjudicated. A missing oracle is not a rejection.")
+    kr = _knot_recall(seq, target)
+    if kr["knot_confirmed"]:
+        return Certificate("knot_confirmed", target, len(target), kind, sequence=seq,
+                           checked_by="crossing stems: " + ", ".join(kr["confirmed_by"]),
+                           strictness="knot-recall (k=1, tau=1.0)", rungs_passed=["knot-recall"],
+                           cost_usd=solver_cost_usd(time.time() - t0, 1),
+                           wait_s=round(time.time() - t0, 2),
+                           detail={**v, "knot": kr, "operating_point": KNOT_OPERATING_POINT},
+                           reason="the crossing stems that make this a pseudoknot are fully reproduced by "
+                                  + ", ".join(kr["confirmed_by"]) + ". This is a claim about the KNOT, not "
+                                  "the whole structure: the criterion recognises 84% of known natural "
+                                  "structures at 0.4% false accept on random sequences.")
     if v["reference_only"]:
         return Certificate("cannot_certify", target, len(target), kind, sequence=seq,
                            checked_by="panel: pKiss AND ProbKnot AND ShapeKnots",
@@ -230,6 +271,28 @@ def _nested_rungs(seq: str, target: str) -> List[str]:
     if float(fc2.pr_structure(target)) >= 0.90:
         rungs.append("pfe")
     return rungs
+
+
+def _knot_recall(seq: str, target: str) -> dict:
+    """Per-oracle recall of the CROSSING pairs -- the pairs that make the target a pseudoknot at all.
+
+    This is the one quantity that calibrates. Asking whether the whole structure is reproduced exactly and
+    unanimously is unanswerable with these predictors (sensitivity 0.8% on known natural structures); asking
+    whether the crossing stems are reproduced by at least one of them reaches 84.0% sensitivity at 0.4% false
+    accept on random sequences (runs/ceiling/calibrate.py). `None` means the oracle failed to run, which is
+    never a rejection.
+    """
+    from ..benchmarks.rnainvbench import _round_only, pk_pairs
+    from ..oracles_pk import pkiss_pairs, probknot_pairs, shapeknots_pairs
+    cross = pk_pairs(target) - pk_pairs(_round_only(target))
+    out = {}
+    for name, fn_ in (("pkiss", pkiss_pairs), ("probknot", probknot_pairs),
+                      ("shapeknots", shapeknots_pairs)):
+        ps = fn_(seq)
+        out[name] = None if (ps is None or not cross) else len(ps & cross) / len(cross)
+    full = [k for k, v in out.items() if v is not None and v >= 1.0]      # tau = 1.0, the strictest point
+    return {"per_oracle": out, "n_cross": len(cross), "confirmed_by": full,
+            "knot_confirmed": bool(full)}
 
 
 def _panel_verdict(seq: str, target: str) -> dict:
@@ -283,6 +346,7 @@ def certify_design(target: str, budget: str = "standard", seed: int = 0) -> Cert
     t0, cost, tried = time.time(), 0.0, []
     best_bp = None                             # closest miss, so `not_found` can say HOW close it got
     best_ref_only = None                       # a candidate the reference oracle accepts but the panel does not
+    best_knot = None                           # a candidate whose CROSSING STEMS are fully reproduced
     for tl in tiers:
         a0 = time.time()
         res = DesiRNAGenerator(replicas=10, timelimit_s=tl, results_number=20).design(
@@ -325,10 +389,27 @@ def certify_design(target: str, budget: str = "standard", seed: int = 0) -> Cert
                                        detail={"tiers_tried": tried, "n_candidates_screened": len(uniq),
                                                "per_oracle": v["per_oracle"],
                                                "operating_point": PANEL_OPERATING_POINT})
+                if best_knot is None:
+                    kr = _knot_recall(c, target)
+                    if kr["knot_confirmed"]:
+                        best_knot = (c, kr)
                 if best_ref_only is None and v["reference_only"]:
                     best_ref_only = (c, v)
 
     w = time.time() - t0
+    if kind == "pseudoknot" and best_knot is not None:
+        c, kr = best_knot
+        return Certificate("knot_confirmed", target, len(target), kind, sequence=c,
+                           checked_by="crossing stems: " + ", ".join(kr["confirmed_by"]),
+                           strictness="knot-recall (k=1, tau=1.0)", rungs_passed=["knot-recall"],
+                           cost_usd=cost, wait_s=round(w, 2), budget=budget,
+                           detail={"tiers_tried": tried, "knot": kr,
+                                   "operating_point": KNOT_OPERATING_POINT},
+                           reason="no candidate reproduced the whole structure under all three predictors, "
+                                  "but the crossing stems that make this a pseudoknot are fully reproduced "
+                                  "by " + ", ".join(kr["confirmed_by"]) + ". Claim is about the KNOT only; "
+                                  "the criterion recognises 84% of known natural structures at 0.4% false "
+                                  "accept on random sequences.")
     if kind == "pseudoknot" and best_ref_only is not None:
         c, v = best_ref_only
         return Certificate("cannot_certify", target, len(target), kind, sequence=c,

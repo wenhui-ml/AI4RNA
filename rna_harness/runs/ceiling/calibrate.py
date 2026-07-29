@@ -59,7 +59,7 @@ TARGET_SENSITIVITY = 0.80          # declared before looking: the rule must reco
 def _null_rows(rows, seed=0):
     """Fold ONE random sequence per target under all three oracles -> the false-accept null for each (k, d).
     Cached, because it costs real oracle time and nothing about it changes between runs."""
-    cache = os.path.join(HERE, "calibrate_null.json")
+    cache = os.path.join(HERE, "calibrate_null_v2.json")
     if os.path.exists(cache):
         return json.load(open(cache))
     import random
@@ -84,14 +84,49 @@ def _null_one(item):
     import rna_harness.benchmarks.rnainvbench as rib
     fns = {"pkiss": pkiss_pairs, "probknot": probknot_pairs, "shapeknots": shapeknots_pairs}
     rec = {"id": tid, "n": len(target)}
+    tp = rib.pk_pairs(target)
+    # the CROSSING pairs are the ones that make this a pseudoknot at all; a predictor can be far off on the
+    # nested skeleton and still be the right answer to "did it form the knot", so this is a genuinely
+    # different quantity from full-structure distance, not a rescaling of it.
+    nested_only = rib.pk_pairs(rib._round_only(target))
+    cross = tp - nested_only
     for o, fn in fns.items():
         ps = fn(seq)
         if ps is None:
-            rec[o] = {"ok": False, "bp_dist": None}
+            rec[o] = {"ok": False, "bp_dist": None, "cross_recall": None}
             continue
-        tp = rib.pk_pairs(target)
-        rec[o] = {"ok": True, "bp_dist": len(ps ^ tp)}
+        rec[o] = {"ok": True, "bp_dist": len(ps ^ tp),
+                  "cross_recall": (len(ps & cross) / len(cross)) if cross else None}
     return rec
+
+
+def _native_sequences():
+    """Parse antaRNA constraint triples (>name / native sequence / dot-bracket) and match each to a
+    Pseudobase target by (length, pair set) -- robust to bracket-symbol conventions, the same matching the
+    archived native control used."""
+    import os as _os
+    from rna_harness.benchmarks.rnainvbench import load_pseudobase, pk_pairs
+    FILES = ["/data/wenhui/RNAInvBench/rna_design_algorithms/antaRNA/Constraints/Pseudobase++",
+             "/data/wenhui/RNAInvBench/rna_design_algorithms/antaRNA/Constraints/Pseudobase++_TEST",
+             "/data/wenhui/RNAInvBench/rna_design_algorithms/antaRNA/Constraints/Pseudobase++_TRAIN"]
+    key = {}
+    for t in load_pseudobase():
+        key[(len(t.target), frozenset(pk_pairs(t.target)))] = t.task_id
+    out = {}
+    for path in FILES:
+        if not _os.path.exists(path):
+            continue
+        lines = [ln.strip() for ln in open(path) if ln.strip()]
+        for i in range(0, len(lines) - 2):
+            if not lines[i].startswith(">"):
+                continue
+            seq, db = lines[i + 1].upper().replace("T", "U"), lines[i + 2]
+            if set(seq) - set("ACGU") or len(seq) != len(db):
+                continue
+            tid = key.get((len(db), frozenset(pk_pairs(db))))
+            if tid and tid not in out:
+                out[tid] = seq
+    return out
 
 
 def main():
@@ -189,6 +224,103 @@ def main():
         print(f"     winner (k=1, d=8) was an artefact of averaging a mild tolerance on big targets with a")
         print(f"     vacuous one on small targets.")
 
+    # ---- option B: a DIFFERENT quantity, not a rescaling -- crossing-pair recall --------------------
+    print(f"\n=== a different judged quantity: CROSSING-PAIR RECALL (the pairs that make it a pseudoknot) ===")
+    print(f"  native means: " + ", ".join(
+        f"{o} {sum(r[o].get('cross_recall') or 0 for r in rows)/len(rows):.2f}" for o in ORACLES))
+    TAUS = [1.0, 0.9, 0.8, 0.67, 0.5]
+
+    def grid_cr(recs):
+        g = {}
+        use = [r for r in recs if any(r.get(o, {}).get("cross_recall") is not None for o in ORACLES)]
+        for tau in TAUS:
+            for k in (1, 2, 3):
+                n = 0
+                for r in use:
+                    acc = sum(1 for o in ORACLES
+                              if (r.get(o, {}).get("cross_recall") or 0.0) >= tau)
+                    n += (acc >= k)
+                g[(k, tau)] = n / max(len(use), 1)
+        return g, len(use)
+
+    cs, n_cs = grid_cr(rows)
+    cn, n_cn = grid_cr(nullr)
+    print(f"  ({n_cs} natives, {n_cn} randoms)")
+    print(f"  {'tau':>5} " + "".join(f"{'k=' + str(k):>22}" for k in (1, 2, 3)))
+    print(f"  {'':>5} " + "".join(f"{'sens':>10}{'  random':>12}" for _ in (1, 2, 3)))
+    usable_cr = []
+    for tau in TAUS:
+        cells = []
+        for k in (1, 2, 3):
+            cells.append(f"{cs[(k, tau)]:>9.1%}{cn[(k, tau)]:>12.1%}")
+            if cs[(k, tau)] >= TARGET_SENSITIVITY and cn[(k, tau)] <= 0.05:
+                usable_cr.append((k, tau, cs[(k, tau)], cn[(k, tau)]))
+        print(f"  {tau:>5.2f} " + "".join(cells))
+    print(f"\n  usable under the SAME declared rule: {usable_cr if usable_cr else 'NONE'}")
+    if usable_cr:
+        k, tau, se, fa = sorted(usable_cr, key=lambda t: (-t[0], -t[1]))[0]
+        print(f"  -> crossing-pair recall SEPARATES where exact match did not: k={k}, tau={tau} "
+              f"at {se:.1%} sensitivity / {fa:.1%} random false-accept.")
+        print(f"     A certificate could then say 'reproduces the pseudoknot stems under {k} of 3 "
+              f"independent predictors, a criterion that recognises {se:.0%} of known structures'.")
+    else:
+        print(f"  -> crossing-pair recall does NOT separate either. Both quantities fail on these")
+        print(f"     instruments, which closes option B and leaves reporting the disagreement profile.")
+
+    # ---- the combined rule: judge each PART with the instrument that can judge it -------------------
+    # crossing-pair recall covers only the pairs that make the target a pseudoknot. A design could form the
+    # knot and get the nested skeleton wrong, so recall alone is an incomplete structural claim. The nested
+    # skeleton, though, has an EXACT and unambiguous judge -- ViennaRNA MFE on the pseudoknot-free reduction
+    # -- so the honest criterion judges each part with the instrument that can actually judge it. Whether
+    # that composes is a question, not an assumption: a native sequence really forms a pseudoknot, so its
+    # ViennaRNA MFE may well NOT equal the nested reduction. Measured, not assumed.
+    print(f"\n=== combined rule: nested skeleton by an EXACT judge AND crossing stems by the panel ===")
+    import RNA
+    from rna_harness.benchmarks.rnainvbench import _round_only
+    nat = _native_sequences()
+    print(f"  wild-type sequences parsed and matched to targets: {len(nat)}/{len(rows)}")
+    if not nat:
+        print(f"  SKIPPED: antaRNA constraint files not found; the combined rule stays UNCALIBRATED.")
+    else:
+        use = [r for r in rows if r["id"] in nat and r["id"] in tg]
+        skel = {r["id"]: (RNA.fold(nat[r["id"]])[0] == _round_only(tg[r["id"]])) for r in use}
+        n_sk = sum(skel.values())
+        print(f"  native skeleton recovered by ViennaRNA MFE alone: {n_sk}/{len(use)} "
+              f"({n_sk/max(len(use),1):.1%})")
+        print(f"    (a native really does form a pseudoknot, so its MFE need not equal the nested"
+              f" reduction -- this is the number that decides whether the two parts compose)")
+        # the null: random sequences, same combined rule
+        nullm = {r["id"]: r for r in nullr}
+        rnd_use = [r for r in use if r["id"] in nullm]
+        import random as _rnd
+        _g = _rnd.Random(0)
+        rnd_seq = {r["id"]: "".join(_g.choice("ACGU") for _ in range(len(tg[r["id"]]))) for r in rnd_use}
+        rnd_skel = {i: (RNA.fold(q)[0] == _round_only(tg[i])) for i, q in rnd_seq.items()}
+        print(f"\n  {'tau':>5} {'k':>3} {'combined sens':>14} {'combined random':>16}")
+        best = None
+        for tau in TAUS:
+            for k in (1, 2, 3):
+                se = sum(1 for r in use
+                         if skel[r["id"]]
+                         and sum(1 for o in ORACLES
+                                 if (r.get(o, {}).get("cross_recall") or 0.0) >= tau) >= k) / max(len(use), 1)
+                fa = sum(1 for r in rnd_use
+                         if rnd_skel[r["id"]]
+                         and sum(1 for o in ORACLES
+                                 if (nullm[r["id"]].get(o, {}).get("cross_recall") or 0.0) >= tau) >= k
+                         ) / max(len(rnd_use), 1)
+                if k == 1:
+                    print(f"  {tau:>5.2f} {k:>3} {se:>13.1%} {fa:>15.1%}")
+                if se >= TARGET_SENSITIVITY and fa <= 0.05 and (best is None or (k, tau) > best[:2]):
+                    best = (k, tau, se, fa)
+        print(f"\n  usable combined rules under the SAME declared bar: "
+              f"{'yes -> k=%d tau=%.2f at %.1f%% / %.1f%%' % (best[0], best[1], 100*best[2], 100*best[3]) if best else 'NONE'}")
+        if not best:
+            print(f"  -> the two parts do NOT compose: requiring the nested skeleton to be the ViennaRNA MFE")
+            print(f"     costs most of the sensitivity, because a native's MFE is not its nested reduction.")
+            print(f"     The defensible criterion therefore stays crossing-stem recall alone, and a")
+            print(f"     certificate must say that it speaks about the KNOT, not the whole structure.")
+
     print(f"\n=== the missing half: false-accept rate on RANDOM sequences (same lengths) ===")
     null = _null_rows(rows)
     print(f"  null set: {len(null)} random ACGU sequences")
@@ -226,7 +358,10 @@ def main():
                "usable_with_specificity": usable,
                "grid_relative_sens": {f"k{k}_r{r}": v for (k, r), v in gs.items()},
                "grid_relative_random": {f"k{k}_r{r}": v for (k, r), v in gn.items()},
-               "usable_relative": usable_rel},
+               "usable_relative": usable_rel,
+               "grid_cross_recall_sens": {f"k{k}_t{t}": v for (k, t), v in cs.items()},
+               "grid_cross_recall_random": {f"k{k}_t{t}": v for (k, t), v in cn.items()},
+               "usable_cross_recall": usable_cr},
               open(os.path.join(HERE, "calibrate.json"), "w"), indent=1)
     print(f"\n  wrote rna_harness/runs/ceiling/calibrate.json")
 
