@@ -58,6 +58,7 @@ class Session:
     steps: List[Step] = field(default_factory=list)
     target: Optional[str] = None
     restraint: Optional[str] = None
+    gc: Optional[dict] = None
     certificate: Optional[dict] = None
     done: bool = False
     outcome: str = ""
@@ -101,7 +102,11 @@ def place_constraint(target: str, motif: str, at: int, existing: Optional[str] =
     if at < 0 or at + len(motif) > len(target):
         return {"ok": False, "error": (f"a {len(motif)}-nt motif at position {at} does not fit in a "
                                        f"{len(target)}-nt target (valid range 0..{len(target) - len(motif)})")}
-    r = list(existing) if existing and len(existing) == len(target) else ["N"] * len(target)
+    if existing and len(existing) != len(target):
+        return {"ok": False, "error": (f"the existing restraint is {len(existing)} long but the target is "
+                                       f"{len(target)} -- it belongs to a different shape. Silently starting "
+                                       f"over would drop pins the caller still expects.")}
+    r = list(existing) if existing else ["N"] * len(target)
     clash = []
     for k, ch in enumerate(motif):
         cur = r[at + k]
@@ -124,6 +129,11 @@ def check_feasible(target: str, restraint: Optional[str]) -> dict:
     what lets the agent do something useful (move the motif, move the structure) instead of buying more time.
     """
     from ..structure_utils import pair_table
+    if restraint and len(restraint) != len(target):
+        # A stale restraint from a previous, differently sized shape used to index past the end and raise.
+        # A primitive that crashes teaches the agent nothing; one that says what is wrong lets it recover.
+        return {"ok": False, "error": (f"the restraint is {len(restraint)} long but the target is "
+                                       f"{len(target)} -- it belongs to a different shape; re-pin it")}
     if not restraint or set(restraint) == {"N"}:
         # An observation that does not say what to do next wastes a step. It cost one here.
         return {"ok": True, "conflicts": [], "note": ("nothing is pinned yet, so there is nothing to check -- "
@@ -144,43 +154,142 @@ def check_feasible(target: str, restraint: Optional[str]) -> dict:
                      f"{len(conflicts)} pinned pair(s) cannot form; no amount of search budget will fix this")}
 
 
-def design(target: str, restraint: Optional[str] = None, budget: str = "cheap", seed: int = 0) -> dict:
+def recommend_loop_cap(target: str) -> dict:
+    """Ask the motif knowledge base what caps a loop of this size stably. KNOWLEDGE IN, HARD PIN OUT.
+
+    DesiRNA's own -motifs flag applies a soft bonus, which cannot be verified afterwards -- a design either
+    got the bonus or did not and there is no exact predicate for it. So this primitive only SUGGESTS: the
+    agent pins the cap with place_constraint, and the pin is then checked exactly like any other. The
+    knowledge base never decides anything.
+    """
+    from ..structure_utils import pair_table
+    from ..mcp.motif_kb import recommend_hairpin
+    pt = pair_table(target)
+    loops = []
+    for i, j in enumerate(pt):
+        if j > i and all(pt[k] < 0 for k in range(i + 1, j)):
+            loops.append({"start": i + 1, "len": j - i - 1, "closing_pair_at": [i, j]})
+    if not loops:
+        return {"ok": False, "error": "this target has no hairpin loop to cap"}
+    out = []
+    for lp in loops:
+        r = recommend_hairpin(lp["len"]) or {}
+        out.append({**lp, "motifs": r.get("motifs", []), "closing_pair": r.get("closing_pair"),
+                    "note": (r.get("note") or "")[:160]})
+    return {"ok": True, "loops": out,
+            "how": "pin one with place_constraint(motif=<one of motifs>, at=<start>); it is then verified exactly"}
+
+
+def set_gc_content(percent: float, tolerance: float = 5.0) -> dict:
+    """Ask the solver for a GC target, and declare the tolerance the RESULT will be checked against.
+
+    Two separate things, deliberately: -acgu_content STEERS the search, and the check after the fact DECIDES.
+    A steer that is not checked is a wish.
+    """
+    try:
+        pct = float(percent)
+    except (TypeError, ValueError):
+        return {"ok": False, "error": f"percent must be a number, got {percent!r}"}
+    if not 0 <= pct <= 100:
+        return {"ok": False, "error": f"GC content must be between 0 and 100, got {pct}"}
+    tol = max(0.0, float(tolerance))
+    gc_half, at_half = pct / 2.0, (100.0 - pct) / 2.0
+    # DesiRNA rejects -acgu_content unless -acgu is on ("error: The -acgu_content option is only applicable
+    # when -acgu is set to 'on'"), and argparse exits before any search -- which surfaced as an instant
+    # not_found rather than as an error.
+    return {"ok": True, "gc_percent": pct, "tolerance": tol,
+            "acgu_content": f"{at_half:g},{gc_half:g},{gc_half:g},{at_half:g}",
+            "note": f"the solver is steered toward {pct:g}% GC; the result is checked against {pct:g} +/- {tol:g}"}
+
+
+def _gc_of(seq: Optional[str]):
+    if not seq:
+        return None
+    return 100.0 * sum(1 for c in seq if c in "GC") / len(seq)
+
+
+def design(target: str, restraint: Optional[str] = None, budget: str = "cheap", seed: int = 0,
+           gc: Optional[dict] = None) -> dict:
     """Run the solver and report what came back, including HOW it failed."""
     from .certify import BUDGETS, certify_design
     from .cost import solver_cost_usd
     if budget not in BUDGETS:
         budget = "cheap"
     t0 = time.time()
-    if restraint and set(restraint) != {"N"}:
-        from ..generators.desirna import DesiRNAGenerator, desirna_available
+    # STEER OR SCREEN. DesiRNA's -acgu_content steers the search toward a composition; measured on a 6-bp
+    # hairpin it produced 81.2% GC against a 50% request -- WORSE than the 62.5% it reaches with no request
+    # at all. Screening its candidate POOL instead found 66 of 200 candidates that both fold correctly and
+    # sit within 50 +/- 10. So the requirement is enforced by reading the pool, which is exact, and not by
+    # asking the solver nicely, which is not. Same mechanism that recovered 14 pseudoknot targets the tool
+    # had thrown away.
+    if (restraint and set(restraint) != {"N"}) or gc:
         from ..experiments.rssd_constrained import ConstrainedDesiRNA
+        from ..generators.desirna import desirna_available
         from ..task import DesignTask, OracleConfig
+        from .certify import certify_sequence
         if not desirna_available():
             return {"ok": False, "error": "the external solver is not installed"}
         oc = OracleConfig(param_set="turner2004", temperature=37.0, dangles=2)
-        best, cost = None, 0.0
+        cost, err, screened, best_partial = 0.0, None, 0, None
         for tl in BUDGETS[budget]:
             a0 = time.time()
-            res = ConstrainedDesiRNA(replicas=10, timelimit_s=tl, results_number=20).design(
-                DesignTask(task_id="agent", target=target, oracle=oc, meta={"seq_restr": restraint}), seed=seed)
+            res = ConstrainedDesiRNA(replicas=10, timelimit_s=tl, results_number=50).design(
+                DesignTask(task_id="agent", target=target, oracle=oc,
+                           meta=({"seq_restr": restraint} if restraint else {})), seed=seed)
             cost += solver_cost_usd(time.time() - a0, 10)
-            if res.solved:
-                best = res.best_sequence
-                break
-            best = best or res.best_sequence
-        from .certify import certify_sequence
-        cert = certify_sequence(best, target) if best else None
-        kept = _constraint_held(best, restraint) if best else None
-        return {"ok": True, "sequence": best, "cost_usd": cost, "wall_s": round(time.time() - t0, 1),
-                "verdict": (cert.verdict if cert else "not_found"),
-                "constraint_held": kept,
+            err = (res.meta or {}).get("error") or err
+            pool, seen = [], set()
+            for c in ([res.best_sequence] if res.best_sequence else []) + list(res.candidates or []):
+                if c and len(c) == len(target) and c not in seen:
+                    seen.add(c)
+                    pool.append(c)
+            for c in pool:
+                screened += 1
+                held = _constraint_held(c, restraint) if restraint else None
+                if held is not None and not held["held"]:
+                    continue
+                g = _gc_check(c, gc)
+                if g is not None and not g["held"]:
+                    continue
+                cert = certify_sequence(c, target)
+                if cert.verdict in ("certified", "knot_confirmed"):
+                    err = None
+                    return {"ok": True, "sequence": c, "cost_usd": cost,
+                            "wall_s": round(time.time() - t0, 1), "verdict": cert.verdict,
+                            "constraint_held": held, "gc": g, "n_screened": screened,
+                            "bp_away": 0, "certificate": cert.to_dict()}
+                best_partial = best_partial or c
+        if err:
+            # A TOOL FAILURE IS NOT A SEARCH FAILURE. Reporting it as not_found sent the agent up the budget
+            # ladder three times, paying each time, for a request that was failing for an unrelated reason.
+            return {"ok": False, "error": f"the solver did not run: {err}", "cost_usd": cost,
+                    "wall_s": round(time.time() - t0, 1),
+                    "hint": "this is a tool failure, not a search failure -- a bigger budget will not help"}
+        cert = certify_sequence(best_partial, target) if best_partial else None
+        return {"ok": True, "sequence": best_partial, "cost_usd": cost,
+                "wall_s": round(time.time() - t0, 1), "verdict": "not_found", "n_screened": screened,
+                "constraint_held": (_constraint_held(best_partial, restraint)
+                                    if (best_partial and restraint) else None),
+                "gc": _gc_check(best_partial, gc),
                 "bp_away": (cert.detail or {}).get("best_bp") if cert else None,
-                "certificate": (cert.to_dict() if cert else None)}
+                "note": (f"screened {screened} candidates; none satisfied every requirement at once")}
     c = certify_design(target, budget=budget, seed=seed)
     return {"ok": True, "sequence": c.sequence, "cost_usd": c.cost_usd, "wall_s": c.wait_s,
-            "verdict": c.verdict, "constraint_held": None,
+            "verdict": c.verdict, "constraint_held": None, "gc": _gc_check(c.sequence, gc),
             "bp_away": (c.detail or {}).get("best_bp"),
             "certificate": c.to_dict()}
+
+
+def _gc_check(seq: Optional[str], gc: Optional[dict]):
+    """Exact, and reported separately from folding: a design that misses the GC target is not an answer."""
+    if not gc:
+        return None
+    got = _gc_of(seq)
+    if got is None:
+        return {"held": None, "measured": None, "target": gc["gc_percent"],
+                "tolerance": gc["tolerance"]}
+    return {"held": abs(got - gc["gc_percent"]) <= gc["tolerance"], "measured": round(got, 1),
+            "target": gc["gc_percent"], "tolerance": gc["tolerance"]}
 
 
 def _constraint_held(seq: Optional[str], restraint: str):
@@ -192,7 +301,8 @@ def _constraint_held(seq: Optional[str], restraint: str):
 
 
 PRIMITIVES = {"propose_structure": propose_structure, "place_constraint": place_constraint,
-              "check_feasible": check_feasible, "design": design}
+              "check_feasible": check_feasible, "design": design,
+              "recommend_loop_cap": recommend_loop_cap, "set_gc_content": set_gc_content}
 
 
 # --------------------------------------------------------------------------- the loop
@@ -214,6 +324,10 @@ Actions:
   check_feasible    {}                      FREE and EXACT. If pinned bases sit on positions that must pair
         with each other and cannot, no search will ever succeed. Always run this before spending on `design`
         when anything is pinned.
+  recommend_loop_cap {}                     ask the motif knowledge base which caps stabilise a loop of this
+        size. It only SUGGESTS; pin one with place_constraint so the result can be checked exactly.
+  set_gc_content    {"percent":50,"tolerance":5}   steer the solver toward a GC fraction. The steer is not
+        the check: the result is verified against percent +/- tolerance afterwards.
   design            {"budget":"cheap|standard|best_effort"}     run the solver and verify the result
   done              {"reason":"..."}        stop: either the goal is met, or you have concluded it cannot be
 
@@ -326,6 +440,13 @@ def run(request: str, client=None, model: str = "z-ai/glm-5.2", max_steps: int =
                      existing=sess.restraint)
             if obs.get("ok"):
                 sess.restraint = obs["restraint"]
+        elif name == "set_gc_content":
+            obs = fn(args.get("percent"), float(args.get("tolerance", 5.0)))
+            if obs.get("ok"):
+                sess.gc = obs
+        elif name == "recommend_loop_cap":
+            obs = fn(sess.target) if sess.target else \
+                {"ok": False, "error": "no target yet -- propose_structure first"}
         elif name == "check_feasible":
             obs = fn(sess.target or "", sess.restraint) if sess.target else \
                 {"ok": False, "error": "no target yet -- propose_structure first"}
@@ -335,12 +456,16 @@ def run(request: str, client=None, model: str = "z-ai/glm-5.2", max_steps: int =
             elif sess.total_cost_usd >= max_cost_usd:
                 obs = {"ok": False, "error": f"cost cap ${max_cost_usd} reached"}
             else:
-                obs = fn(sess.target, sess.restraint, str(args.get("budget", "cheap")))
+                obs = fn(sess.target, sess.restraint, str(args.get("budget", "cheap")), gc=sess.gc)
                 sess.total_cost_usd += float(obs.get("cost_usd") or 0.0)
                 if obs.get("certificate"):
                     sess.certificate = obs["certificate"]
-                held = obs.get("constraint_held")
-                if obs.get("verdict") in ("certified", "knot_confirmed") and (held is None or held["held"]):
+                held, gcc = obs.get("constraint_held"), obs.get("gc")
+                # every declared requirement must hold, not just the folding one -- a design that folds but
+                # breaks the pin or misses the GC target is not the answer to what was asked
+                if (obs.get("verdict") in ("certified", "knot_confirmed")
+                        and (held is None or held["held"])
+                        and (gcc is None or gcc.get("held"))):
                     sess.done, sess.outcome = True, "certified"
         sess.steps.append(Step(n, name, args, obs, cost_usd=float(obs.get("cost_usd") or 0.0),
                                wall_s=round(time.time() - t0, 1), thought=thought))
@@ -374,6 +499,9 @@ def render(sess: "Session", lang: str = "zh") -> str:
             out.append(f"        {'失败' if zh else 'failed'}: {o['error']}")
         elif s.action == "propose_structure":
             out.append(f"        {o['target']}   {o.get('plain', '')}")
+        elif s.action == "recommend_loop_cap":
+            for lp in (o.get("loops") or [])[:2]:
+                out.append(f"        loop@{lp['start']} len={lp['len']} -> {lp.get('motifs')}")
         elif s.action == "check_feasible":
             out.append("        " + (o.get("note") or ""))
             for c in o.get("conflicts", [])[:4]:
@@ -381,6 +509,11 @@ def render(sess: "Session", lang: str = "zh") -> str:
         elif s.action == "design":
             out.append(f"        {o.get('verdict')}   bp_away={o.get('bp_away')}   "
                        f"${o.get('cost_usd', 0):.5f}   {o.get('wall_s')}s")
+            if o.get("gc") is not None:
+                g = o["gc"]
+                out.append(f"        GC: {'达标' if zh else 'on target'}={g.get('held')}  "
+                           f"{'实测' if zh else 'measured'}={g.get('measured')}%  "
+                           f"{'目标' if zh else 'target'}={g.get('target')}±{g.get('tolerance')}")
             if o.get("constraint_held") is not None:
                 h = o["constraint_held"]
                 out.append(f"        {'固定区保持' if zh else 'constraint held'}: {h['held']}"

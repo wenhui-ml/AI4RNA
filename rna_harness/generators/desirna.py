@@ -80,10 +80,14 @@ class DesiRNAGenerator(Generator):
     name = "desirna"
 
     def __init__(self, replicas: int = 10, timelimit_s: int = 120, results_number: int = 20,
-                 timeout_s: Optional[float] = None):
+                 timeout_s: Optional[float] = None, extra_args: Optional[List[str]] = None):
         self.replicas = replicas
         self.timelimit_s = int(timelimit_s)              # DesiRNA's own -t (it stops itself)
         self.results_number = int(results_number)        # DesiRNA's -r (how many best seqs it reports)
+        # Per-instance extra CLI args. DESIRNA_ARGS already existed for this, but it is process-global, so it
+        # cannot express "this call wants a GC target and that one does not" -- which is exactly what a
+        # parallel benchmark does.
+        self.extra_args = list(extra_args or [])
         # subprocess hard-kill: allow DesiRNA to finish its -t run + startup/IO margin
         self.timeout_s = float(timeout_s) if timeout_s is not None else float(timelimit_s) + 120.0
 
@@ -104,6 +108,7 @@ class DesiRNAGenerator(Generator):
                             "-R", str(self.replicas),
                             "-t", str(self.timelimit_s),
                             "-r", str(self.results_number)]
+        argv += list(self.extra_args)
         extra = os.environ.get("DESIRNA_ARGS")
         if extra:
             argv += shlex.split(extra)      # user extra args can override (argparse: last wins)

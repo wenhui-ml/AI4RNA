@@ -3,6 +3,18 @@
  "steps": [
   {
    "n": 1,
+   "action": "check_feasible",
+   "args": {},
+   "observation": {
+    "ok": false,
+    "error": "no target yet -- propose_structure first"
+   },
+   "cost_usd": 0.0,
+   "wall_s": 0.0,
+   "thought": "现在检查可行性：位置 0-3 (GGGG) 必须与位置 19-16 (GGGG) 配对，但 G-G 不是 Watson-Crick 配对，因此这应该会失败。"
+  },
+  {
+   "n": 2,
    "action": "propose_structure",
    "args": {
     "elements": [
@@ -22,20 +34,7 @@
    },
    "cost_usd": 0.0,
    "wall_s": 0.0,
-   "thought": "茎8对+环4nt总长20nt，开头GGGG(0-3)和结尾GGGG(16-19)在茎中正好配对，G-G无法配对，存在结构性冲突。先构建结构并放置约束，再用check_feasible确认。"
-  },
-  {
-   "n": 2,
-   "action": "check_feasible",
-   "args": {},
-   "observation": {
-    "ok": true,
-    "conflicts": [],
-    "note": "nothing is pinned yet, so there is nothing to check -- either place_constraint first, or go straight to design"
-   },
-   "cost_usd": 0.0,
-   "wall_s": 0.0,
-   "thought": "GGGG at both ends would put G on both sides of the first four stem pairs (0-19,1-18,2-17,3-16), and G-G cannot base-pair, so this is structurally infeasible."
+   "thought": "Need to create the requested hairpin first, then pin GGGG at both ends and check feasibility."
   },
   {
    "n": 3,
@@ -53,7 +52,7 @@
    },
    "cost_usd": 0.0,
    "wall_s": 0.0,
-   "thought": "Pin GGGG at both ends, then check feasibility before designing."
+   "thought": "The start GGGG (positions 0-3) and end GGGG (positions 16-19) would force paired positions 0↔19, 1↔18, 2↔17, 3↔16 all to be G-G, which cannot base-pair. I should confirm this conflict with check_feasi"
   },
   {
    "n": 4,
@@ -71,7 +70,7 @@
    },
    "cost_usd": 0.0,
    "wall_s": 0.0,
-   "thought": "The start (positions 0-3) and end (positions 16-19) of an 8bp stem hairpin pair with each other; pinning both as GGGG forces G-G pairs, which is impossible. Let me place the second constraint and chec"
+   "thought": "The end GGGG (positions 16-19) pairs with the start GGGG (positions 0-3) in the 8-bp stem, but G cannot pair with G, so this is a structural conflict; I should place the constraint and run check_feasi"
   },
   {
    "n": 5,
@@ -111,7 +110,7 @@
    },
    "cost_usd": 0.0,
    "wall_s": 0.0,
-   "thought": "The first 4 and last 4 bases are paired with each other in an 8-bp stem, but GGGG vs GGGG means G-G pairs, which are invalid. Let me confirm with check_feasible."
+   "thought": "Position 3 (G) pairs with position 16 (G), but G-G cannot pair, so this is infeasible."
   },
   {
    "n": 6,
@@ -142,23 +141,10 @@
    },
    "cost_usd": 0.0,
    "wall_s": 0.0,
-   "thought": "GGGG at both ends falls on paired positions that face each other (G-G cannot pair). Adding spacers before and after the hairpin places both GGGG motifs in unpaired regions, preserving the stem-8/loop-"
+   "thought": "GGGG at both ends of a 20nt hairpin forces G-G pairs (0-19,1-18,2-17,3-16), which is impossible. Adding spacers before and after the hairpin keeps GGGG at the true start/end while placing them in unpa"
   },
   {
    "n": 7,
-   "action": "check_feasible",
-   "args": {},
-   "observation": {
-    "ok": true,
-    "conflicts": [],
-    "note": "nothing is pinned yet, so there is nothing to check -- either place_constraint first, or go straight to design"
-   },
-   "cost_usd": 0.0,
-   "wall_s": 0.0,
-   "thought": "The spacers move the GGGG ends into unpaired regions, so the conflict should be resolved. Let me verify feasibility before designing."
-  },
-  {
-   "n": 8,
    "action": "place_constraint",
    "args": {
     "motif": "GGGG",
@@ -173,10 +159,10 @@
    },
    "cost_usd": 0.0,
    "wall_s": 0.0,
-   "thought": "The spacers place the GGGG ends in unpaired regions, so constraints should now be compatible; pin both ends and check feasibility before designing."
+   "thought": "The new shape has 4-nt spacers at both ends, so the required GGGG caps can sit in unpaired regions instead of conflicting stem positions. I'll pin the opening GGGG first."
   },
   {
-   "n": 9,
+   "n": 8,
    "action": "place_constraint",
    "args": {
     "motif": "GGGG",
@@ -191,10 +177,10 @@
    },
    "cost_usd": 0.0,
    "wall_s": 0.0,
-   "thought": "The structure now has 4-nt spacers on both ends, so positions 0-3 and 24-27 are unpaired. GGGG at start is placed; now place GGGG at position 24 (end)."
+   "thought": "Need to pin the ending GGGG at position 24 (28-4), then check feasibility."
   },
   {
-   "n": 10,
+   "n": 9,
    "action": "check_feasible",
    "args": {},
    "observation": {
@@ -206,13 +192,103 @@
    },
    "cost_usd": 0.0,
    "wall_s": 0.0,
-   "thought": "Constraints are now in spacer regions, so they should not conflict with paired positions. Let me verify feasibility before designing."
+   "thought": "Structure and constraints are set; need to verify feasibility before designing."
+  },
+  {
+   "n": 10,
+   "action": "design",
+   "args": {
+    "budget": "cheap"
+   },
+   "observation": {
+    "ok": true,
+    "sequence": "GGGGGCCAGCGCUCCUGCGCUGGCGGGG",
+    "cost_usd": 0.0010284699334038628,
+    "wall_s": 7.4,
+    "verdict": "certified",
+    "constraint_held": {
+     "held": true,
+     "violated_positions": []
+    },
+    "gc": null,
+    "n_screened": 1,
+    "bp_away": 0,
+    "certificate": {
+     "verdict": "certified",
+     "target": "....((((((((....))))))))....",
+     "n": 28,
+     "kind": "nested",
+     "sequence": "GGGGGCCAGCGCUCCUGCGCUGGCGGGG",
+     "checked_by": "ViennaRNA MFE (turner2004, dangles=2)",
+     "strictness": "pfe",
+     "rungs_passed": [
+      "match",
+      "umfe",
+      "pfe"
+     ],
+     "cost_usd": 1.514289114210341e-08,
+     "wait_s": 0.0,
+     "budget": "",
+     "reason": "folds exactly to the target; also passes: umfe, pfe",
+     "detail": {},
+     "disclaimer": "`certified` means the sequence folds to the target under the stated computational model. It is not a claim about behaviour in vitro or in vivo.",
+     "seed": null,
+     "generated_utc": "2026-07-29T09:59:50Z",
+     "provenance": {
+      "schema": "rna-certificate/1.0",
+      "python": "3.10.20",
+      "viennarna": "2.7.2",
+      "desirna": "/data/wenhui/DesiRNA@bdb4908",
+      "pkiss": "/home/ubuntu/miniconda3/envs/pk/bin/pKiss",
+      "rnastructure": "ProbKnot: Version 6.6 (April 2, 2026)."
+     },
+     "verify_cmd": "python -m rna_harness.cognitive.certify '....((((((((....))))))))....' --sequence GGGGGCCAGCGCUCCUGCGCUGGCGGGG",
+     "rerun_search": "python -m rna_harness.cognitive.certify '....((((((((....))))))))....' --budget standard",
+     "reproducibility": "verify_cmd reproduces this certificate's claim exactly -- folding is deterministic. rerun_search re-runs the design and may return a different sequence: the search budget is wall-clock, not iteration count, so it is not seed-reproducible."
+    }
+   },
+   "cost_usd": 0.0010284699334038628,
+   "wall_s": 7.4,
+   "thought": "Feasibility check passed with spacers on both ends; now run the solver to find a valid sequence."
   }
  ],
  "target": "....((((((((....))))))))....",
  "restraint": "GGGGNNNNNNNNNNNNNNNNNNNNGGGG",
- "certificate": null,
- "done": false,
- "outcome": "out of steps",
- "total_cost_usd": 0.0
+ "gc": null,
+ "certificate": {
+  "verdict": "certified",
+  "target": "....((((((((....))))))))....",
+  "n": 28,
+  "kind": "nested",
+  "sequence": "GGGGGCCAGCGCUCCUGCGCUGGCGGGG",
+  "checked_by": "ViennaRNA MFE (turner2004, dangles=2)",
+  "strictness": "pfe",
+  "rungs_passed": [
+   "match",
+   "umfe",
+   "pfe"
+  ],
+  "cost_usd": 1.514289114210341e-08,
+  "wait_s": 0.0,
+  "budget": "",
+  "reason": "folds exactly to the target; also passes: umfe, pfe",
+  "detail": {},
+  "disclaimer": "`certified` means the sequence folds to the target under the stated computational model. It is not a claim about behaviour in vitro or in vivo.",
+  "seed": null,
+  "generated_utc": "2026-07-29T09:59:50Z",
+  "provenance": {
+   "schema": "rna-certificate/1.0",
+   "python": "3.10.20",
+   "viennarna": "2.7.2",
+   "desirna": "/data/wenhui/DesiRNA@bdb4908",
+   "pkiss": "/home/ubuntu/miniconda3/envs/pk/bin/pKiss",
+   "rnastructure": "ProbKnot: Version 6.6 (April 2, 2026)."
+  },
+  "verify_cmd": "python -m rna_harness.cognitive.certify '....((((((((....))))))))....' --sequence GGGGGCCAGCGCUCCUGCGCUGGCGGGG",
+  "rerun_search": "python -m rna_harness.cognitive.certify '....((((((((....))))))))....' --budget standard",
+  "reproducibility": "verify_cmd reproduces this certificate's claim exactly -- folding is deterministic. rerun_search re-runs the design and may return a different sequence: the search budget is wall-clock, not iteration count, so it is not seed-reproducible."
+ },
+ "done": true,
+ "outcome": "certified",
+ "total_cost_usd": 0.0010284699334038628
 }

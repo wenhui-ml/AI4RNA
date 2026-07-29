@@ -82,6 +82,49 @@ def test_checking_before_pinning_anything_says_what_to_do_next():
     assert o["ok"] and ("place_constraint" in o["note"] and "design" in o["note"])
 
 
+# ---- GC content and loop caps: steer vs screen, and the bugs the live runs exposed ---------------
+def test_gc_content_rejects_impossible_percentages():
+    from rna_harness.cognitive.agent import set_gc_content
+    assert not set_gc_content(150)["ok"]
+    assert not set_gc_content(-1)["ok"]
+    assert not set_gc_content("half")["ok"]
+
+
+def test_gc_target_becomes_a_symmetric_acgu_split():
+    from rna_harness.cognitive.agent import set_gc_content
+    g = set_gc_content(50, 5)
+    assert g["acgu_content"] == "25,25,25,25"
+    assert set_gc_content(60)["acgu_content"] == "20,30,30,20"
+
+
+def test_gc_is_checked_exactly_and_reports_the_measurement():
+    from rna_harness.cognitive.agent import _gc_check, set_gc_content
+    g = set_gc_content(50, 10)
+    assert _gc_check("GCAUGCAU", g)["held"] is True and _gc_check("GCAUGCAU", g)["measured"] == 50.0
+    assert _gc_check("GGGGCCCC", g)["held"] is False
+    assert _gc_check(None, g)["tolerance"] == 10.0, "the no-sequence branch must still carry the tolerance"
+    assert _gc_check("GCAU", None) is None
+
+
+def test_loop_cap_suggests_and_does_not_decide():
+    from rna_harness.cognitive.agent import recommend_loop_cap
+    o = recommend_loop_cap(HAIRPIN6)
+    assert o["ok"] and o["loops"][0]["start"] == 6 and o["loops"][0]["len"] == 4
+    assert "GAAA" in o["loops"][0]["motifs"]
+    assert "place_constraint" in o["how"], "knowledge in, hard pin out -- the KB never decides"
+    assert not recommend_loop_cap("....")["ok"]
+
+
+def test_a_stale_restraint_is_refused_rather_than_crashing_or_resetting():
+    """Both of these came out of a live run. check_feasible indexed past the end and raised; place_constraint
+    silently started over, which drops pins the caller still expects."""
+    from rna_harness.cognitive.agent import check_feasible, place_constraint
+    o = check_feasible(HAIRPIN6, "GGGG")
+    assert not o["ok"] and "different shape" in o["error"]
+    p = place_constraint(HAIRPIN6, "AA", 0, existing="G" * 30)
+    assert not p["ok"] and "different shape" in p["error"]
+
+
 # ---- the loop ------------------------------------------------------------------------------------
 def test_function_requests_never_reach_the_solver():
     s = run("设计一个能结合某某蛋白的 RNA", client=_Scripted(["{}"]))
