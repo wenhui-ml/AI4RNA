@@ -1,0 +1,18 @@
+row 5 under the calibrated rule: 125 targets, 125 to run
+    25/125
+    50/125
+    75/125
+    100/125
+    125/125
+
+=== knot_confirmed, same 125 targets, same pools ===
+  arm                                             confirmed
+  A1  the sequence DesiRNA reports as best              110
+  A2  first candidate the reference oracle accepts         96
+  B   any candidate in the pool (ours)                  124
+
+  margin over A1: +14   over A2: +28
+  targets where WE confirm the knot and the tool's own output does not: 14
+  exact McNemar vs A1: B-only 14, A1-only 0, p = 0.000122
+
+  wrote rna_harness/runs/ceiling/row5.json
