@@ -17,6 +17,7 @@ from typing import Dict, List, Optional
 
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
+from pydantic import BaseModel
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.environ.get("RNA_HARNESS_DIR", os.path.abspath(os.path.join(_HERE, "..", "..")))
@@ -410,6 +411,56 @@ def logtail(path: str = Query(...), n: int = Query(120, le=2000)):
         raise HTTPException(500, str(e))
 
 
+class ChatIn(BaseModel):
+    message: str
+    budget: Optional[str] = None
+
+
+@app.post("/api/chat")
+def api_chat(inp: ChatIn):
+    """The product entry point: a request in words (or dot-bracket, or a sequence to check) -> a CERTIFICATE.
+
+    Routing is deliberate and cheap to explain:
+      * a dot-bracket string            -> design for it
+      * a sequence AND a dot-bracket    -> check that sequence (free, no search)
+      * anything else                   -> the intent layer translates it, and code assembles the structure
+    Default budget is 'cheap' (one 5 s tier): the measured curve answers about 72% of targets there in ~9 s
+    for about $0.002, which is the right default for an interactive box. A caller can ask for more.
+    """
+    from ..cognitive.certify import BUDGETS, certify_design, certify_sequence, classify, render
+    msg = (inp.message or "").strip()
+    if not msg:
+        return {"kind": "error", "text": "empty message"}
+    budget = inp.budget if inp.budget in BUDGETS else "cheap"
+
+    toks = [t for t in msg.replace(",", " ").split() if t]
+    db = [t for t in toks if set(t) <= set("().[]{}<>") and any(c in t for c in "([{<")]
+    sq = [t for t in toks if len(t) > 3 and set(t.upper()) <= set("ACGUT")]
+
+    if db and sq and len(db[0]) == len(sq[0]):
+        c = certify_sequence(sq[0].upper().replace("T", "U"), db[0])
+        return {"kind": "check", "text": render(c), "certificate": c.to_dict()}
+    if db and not sq:
+        kind, err = classify(db[0])
+        if err:
+            return {"kind": "error", "text": f"that dot-bracket is not valid: {err}"}
+        c = certify_design(db[0], budget=budget)
+        return {"kind": "design", "text": render(c), "certificate": c.to_dict()}
+
+    from ..cognitive.intent import design_from_request, render as irender
+    spec, target, c = design_from_request(msg, budget=budget)
+    if spec.error:
+        hint = ""
+        if "translation unavailable" in (spec.error or ""):
+            hint = ("\n\nThe natural-language layer needs a model API key (OPENROUTER_API_KEY). Without one "
+                    "you can still use this box by pasting a dot-bracket structure, e.g. ((((....)))) , or a "
+                    "sequence and its target together to check it.")
+        return {"kind": "error", "text": f"{spec.error}{hint}", "spec": spec.to_dict()}
+    return {"kind": "design", "text": irender(spec, target, c),
+            "spec": spec.to_dict(), "target": target,
+            "certificate": (c.to_dict() if c else None)}
+
+
 @app.get("/ui", response_class=HTMLResponse)
 def ui_runs():
     from . import pages
@@ -497,7 +548,8 @@ HTML_PAGE = """<!doctype html><html><head><meta charset="utf-8">
  </ul></details>
 </div>
 <div class="tabs">
- <span class="tab active" data-t="scorecard" onclick="tab('scorecard')">🏆 成绩单</span>
+ <span class="tab active" data-t="chat" onclick="tab('chat')">💬 对话</span>
+ <span class="tab" data-t="scorecard" onclick="tab('scorecard')">🏆 成绩单</span>
  <span class="tab" data-t="surface" onclick="tab('surface')">🎯 能力-成本平面</span>
  <span class="tab" data-t="rssd" onclick="tab('rssd')">🧬 认知核/RSSD</span>
  <span class="tab" data-t="campaigns" onclick="tab('campaigns')">📈 记忆实验</span>
@@ -506,7 +558,22 @@ HTML_PAGE = """<!doctype html><html><head><meta charset="utf-8">
  <span class="tab" data-t="figures" onclick="tab('figures')">📊 图表</span>
  <span class="tab" data-t="logs" onclick="tab('logs')">📜 日志(实时)</span>
 </div>
-<div id="scorecard" class="panel"></div>
+<div id="chat" class="panel">
+ <p class="note">用一句话描述你要的 RNA 结构,或直接粘贴 dot-bracket;也可以同时给"序列 + 结构"来检查一条已有序列。
+ 返回的是<b>证书</b>而不是序列:谁判的、过了哪一级、花了多少、以及它<b>不</b>主张什么。</p>
+ <div id="chatlog" style="border:1px solid var(--border);border-radius:10px;padding:14px;height:52vh;overflow:auto;background:#fff"></div>
+ <div style="display:flex;gap:8px;margin-top:10px">
+  <input id="chatin" placeholder="例:一个 6 对茎、4 nt 环的发夹    或    ((((....))))" 
+         style="flex:1;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px"
+         onkeydown="if(event.key==='Enter')send()">
+  <select id="chatbudget" style="padding:10px;border:1px solid var(--border);border-radius:8px">
+   <option value="cheap">便宜(5s 档)</option><option value="standard">标准(5/15/60/180s)</option>
+   <option value="best_effort">尽力(加 600/1800s)</option>
+  </select>
+  <button onclick="send()" style="padding:10px 18px;border:0;border-radius:8px;background:#2563eb;color:#fff;cursor:pointer">发送</button>
+ </div>
+</div>
+<div id="scorecard" class="panel" style="display:none"></div>
 <div id="surface" class="panel" style="display:none"></div>
 <div id="rssd" class="panel" style="display:none"></div>
 <div id="campaigns" class="panel" style="display:none"></div>
@@ -523,7 +590,27 @@ HTML_PAGE = """<!doctype html><html><head><meta charset="utf-8">
 let RUNS=[]; let SCORECARD=[]; let ORCH=null;
 const SOTA_V2=[{m:'DesiRNA 24h/题(经典极限)',v:0.97,c:'#2e7d32'},{m:'DesiRNA <1min(同预算·最可比)',v:0.85,c:'#66bb6a'},{m:'NEMO 原生',v:0.94,c:'#78909c'},{m:'LLM方法SOTA(Gautam)',v:0.80,c:'#d97706'}];
 function tab(t){document.querySelectorAll('.tab').forEach(e=>e.classList.toggle('active',e.dataset.t==t));
- ['scorecard','surface','rssd','campaigns','overview','runs','figures','logs'].forEach(p=>document.getElementById(p).style.display=p==t?'block':'none');}
+ ['chat','scorecard','surface','rssd','campaigns','overview','runs','figures','logs'].forEach(p=>document.getElementById(p).style.display=p==t?'block':'none');}
+function bub(who,txt,cls){const d=document.createElement('div');
+ d.style.cssText='margin:10px 0;display:flex;'+(who=='you'?'justify-content:flex-end':'');
+ const b=document.createElement('div');
+ b.style.cssText='max-width:82%;padding:10px 13px;border-radius:12px;white-space:pre-wrap;font-size:13.5px;line-height:1.55;'
+  +(who=='you'?'background:#2563eb;color:#fff':'background:#f1f5f9;border:1px solid var(--border);font-family:ui-monospace,Menlo,monospace');
+ if(cls)b.style.borderLeft='4px solid '+cls;
+ b.textContent=txt; d.appendChild(b);
+ const L=document.getElementById('chatlog'); L.appendChild(d); L.scrollTop=L.scrollHeight; return b;}
+async function send(){const i=document.getElementById('chatin'); const m=i.value.trim(); if(!m)return;
+ i.value=''; bub('you',m);
+ const wait=bub('bot','正在设计并验证…(便宜档约 9 秒)');
+ try{
+  const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({message:m,budget:document.getElementById('chatbudget').value})});
+  const j=await r.json();
+  const v=(j.certificate||{}).verdict||'';
+  const col={certified:'#2e7d32',knot_confirmed:'#66bb6a',cannot_certify:'#d97706',
+             not_found:'#b91c1c',invalid_input:'#b91c1c'}[v]||'#94a3b8';
+  wait.textContent=j.text||JSON.stringify(j); wait.style.borderLeft='4px solid '+col;
+ }catch(e){wait.textContent='请求失败: '+e;}}
 function fmt(x){return x==null?'—':(typeof x=='number'?(Math.round(x*1000)/1000):x)}
 function cls(v){return v==null?'':(v>=0.6?'g':(v>=0.3?'y':'r'))}
 function note(t){return '<p class="note">'+t+'</p>'}
