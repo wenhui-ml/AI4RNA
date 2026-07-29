@@ -115,7 +115,8 @@ Rules:
     less, still emit what was asked and let the caller's validator explain the problem.
   * choose "cheap" unless the request implies a hard or long structure.
   * `interpretation` is what the caller will be shown to confirm you understood; write it for someone who
-    does not know RNA.
+    does not know RNA, and WRITE IT IN THE SAME LANGUAGE THE REQUEST WAS WRITTEN IN. A Chinese question
+    answered in English defeats the whole point of this layer.
   * if the request needs a multiloop or a pseudoknot, emit {{"type":"multiloop"}} or {{"type":"pseudoknot"}}
     so the caller can say it is out of scope, rather than guessing.
 """

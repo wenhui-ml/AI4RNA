@@ -427,25 +427,34 @@ def api_chat(inp: ChatIn):
     Default budget is 'cheap' (one 5 s tier): the measured curve answers about 72% of targets there in ~9 s
     for about $0.002, which is the right default for an interactive box. A caller can ask for more.
     """
-    from ..cognitive.certify import BUDGETS, certify_design, certify_sequence, classify, render
+    from ..cognitive.certify import (BUDGETS, certify_design, certify_sequence, classify, render,
+                                     to_display)
     msg = (inp.message or "").strip()
     if not msg:
         return {"kind": "error", "text": "empty message"}
+    # answer in the language the question was asked in; a Chinese question answered in English undoes the
+    # accessibility this layer exists for
+    lang = "zh" if any("\u4e00" <= ch <= "\u9fff" for ch in msg) else "en"
     budget = inp.budget if inp.budget in BUDGETS else "cheap"
 
     toks = [t for t in msg.replace(",", " ").split() if t]
     db = [t for t in toks if set(t) <= set("().[]{}<>") and any(c in t for c in "([{<")]
     sq = [t for t in toks if len(t) > 3 and set(t.upper()) <= set("ACGUT")]
 
-    if db and sq and len(db[0]) == len(sq[0]):
+    if db and sq:
+        # A sequence AND a structure means "check this", always. Falling through to design when the lengths
+        # disagree would silently answer a DIFFERENT question -- the exact failure this product exists to
+        # prevent -- so a mismatch is reported as a mismatch.
         c = certify_sequence(sq[0].upper().replace("T", "U"), db[0])
-        return {"kind": "check", "text": render(c), "certificate": c.to_dict()}
+        return {"kind": "check", "lang": lang, "text": render(c),
+                "display": to_display(c, lang), "certificate": c.to_dict()}
     if db and not sq:
         kind, err = classify(db[0])
         if err:
             return {"kind": "error", "text": f"that dot-bracket is not valid: {err}"}
         c = certify_design(db[0], budget=budget)
-        return {"kind": "design", "text": render(c), "certificate": c.to_dict()}
+        return {"kind": "design", "lang": lang, "text": render(c),
+                "display": to_display(c, lang), "certificate": c.to_dict()}
 
     from ..cognitive.intent import design_from_request, render as irender
     spec, target, c = design_from_request(msg, budget=budget)
@@ -456,8 +465,10 @@ def api_chat(inp: ChatIn):
                     "you can still use this box by pasting a dot-bracket structure, e.g. ((((....)))) , or a "
                     "sequence and its target together to check it.")
         return {"kind": "error", "text": f"{spec.error}{hint}", "spec": spec.to_dict()}
-    return {"kind": "design", "text": irender(spec, target, c),
+    return {"kind": "design", "lang": lang, "text": irender(spec, target, c),
             "spec": spec.to_dict(), "target": target,
+            "display": (to_display(c, lang) if c else None),
+            "understood": spec.interpretation,
             "certificate": (c.to_dict() if c else None)}
 
 
@@ -591,26 +602,66 @@ let RUNS=[]; let SCORECARD=[]; let ORCH=null;
 const SOTA_V2=[{m:'DesiRNA 24h/题(经典极限)',v:0.97,c:'#2e7d32'},{m:'DesiRNA <1min(同预算·最可比)',v:0.85,c:'#66bb6a'},{m:'NEMO 原生',v:0.94,c:'#78909c'},{m:'LLM方法SOTA(Gautam)',v:0.80,c:'#d97706'}];
 function tab(t){document.querySelectorAll('.tab').forEach(e=>e.classList.toggle('active',e.dataset.t==t));
  ['chat','scorecard','surface','rssd','campaigns','overview','runs','figures','logs'].forEach(p=>document.getElementById(p).style.display=p==t?'block':'none');}
-function bub(who,txt,cls){const d=document.createElement('div');
- d.style.cssText='margin:10px 0;display:flex;'+(who=='you'?'justify-content:flex-end':'');
+function esc(t){const d=document.createElement('div'); d.textContent=t==null?'':t; return d.innerHTML;}
+function bubble(html,accent){const d=document.createElement('div'); d.style.cssText='margin:12px 0;display:flex';
  const b=document.createElement('div');
- b.style.cssText='max-width:82%;padding:10px 13px;border-radius:12px;white-space:pre-wrap;font-size:13.5px;line-height:1.55;'
-  +(who=='you'?'background:#2563eb;color:#fff':'background:#f1f5f9;border:1px solid var(--border);font-family:ui-monospace,Menlo,monospace');
- if(cls)b.style.borderLeft='4px solid '+cls;
- b.textContent=txt; d.appendChild(b);
+ b.style.cssText='max-width:88%;padding:13px 16px;border-radius:12px;background:#fff;border:1px solid var(--border);'
+  +'font-size:14px;line-height:1.7'+(accent?';border-left:5px solid '+accent:'');
+ b.innerHTML=html; d.appendChild(b);
  const L=document.getElementById('chatlog'); L.appendChild(d); L.scrollTop=L.scrollHeight; return b;}
+function mine(txt){const d=document.createElement('div'); d.style.cssText='margin:12px 0;display:flex;justify-content:flex-end';
+ const b=document.createElement('div');
+ b.style.cssText='max-width:80%;padding:10px 14px;border-radius:12px;background:#2563eb;color:#fff;font-size:14px';
+ b.textContent=txt; d.appendChild(b);
+ const L=document.getElementById('chatlog'); L.appendChild(d); L.scrollTop=L.scrollHeight;}
+function copySeq(el){const s=el.dataset.seq; navigator.clipboard.writeText(s).then(()=>{
+ const o=el.textContent; el.textContent='已复制'; setTimeout(()=>el.textContent=o,1200);});}
+const VCOL={certified:'#16a34a',knot_confirmed:'#65a30d',cannot_certify:'#d97706',
+            not_found:'#dc2626',invalid_input:'#dc2626'};
+function card(j){
+ const d=j.display; const zh=(j.lang||'zh')=='zh';
+ if(!d) return {html:'<b>'+esc(zh?'没能完成':'could not complete')+'</b><br>'+esc(j.text||''),accent:'#dc2626'};
+ const col=VCOL[d.verdict]||'#94a3b8'; let h='';
+ h+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">'
+   +'<span style="background:'+col+';color:#fff;padding:3px 11px;border-radius:20px;font-weight:600;font-size:13px">'
+   +esc(d.headline)+'</span>';
+ if(d.plain) h+='<span style="color:var(--muted);font-size:13px">'+esc(d.plain)+'</span>';
+ h+='</div>';
+ if(j.understood) h+='<div style="color:var(--muted);font-size:13px;margin-bottom:8px">'
+   +esc(zh?'理解为:':'understood as: ')+esc(j.understood)+'</div>';
+ if(d.sequence){h+='<div style="margin:10px 0;padding:10px 12px;background:#f8fafc;border:1px solid var(--border);border-radius:8px">'
+   +'<div style="font-size:12px;color:var(--muted);margin-bottom:4px">'+esc(zh?'设计出的序列':'sequence')+'</div>'
+   +'<code style="font-size:14px;letter-spacing:.5px;word-break:break-all">'+esc(d.sequence)+'</code>'
+   +' <span onclick="copySeq(this)" data-seq="'+esc(d.sequence)+'" style="cursor:pointer;color:#2563eb;font-size:12px;margin-left:8px">'
+   +esc(zh?'复制':'copy')+'</span></div>';}
+ if(d.target) h+='<div style="font-size:12px;color:var(--muted)">'+esc(zh?'目标结构式:':'target: ')
+   +'<code>'+esc(d.target)+'</code></div>';
+ if(d.criterion){h+='<div style="margin-top:10px"><b>'+esc(zh?'通过的判据':'criterion')+'</b>：'
+   +'<code>'+esc(d.criterion.code)+'</code>'
+   +(d.criterion.is_strongest?' <span style="color:#16a34a;font-size:12px">'+esc(zh?'（三级中最强）':'(strongest rung)')+'</span>':'')
+   +'<div style="color:var(--muted);font-size:13px;margin-top:3px">'+esc(d.criterion.means)+'</div>';
+  if(d.criterion.also&&d.criterion.also.length)
+   h+='<div style="color:var(--muted);font-size:12.5px">'+esc(zh?'同时也满足：':'also passes: ')
+     +d.criterion.also.map(esc).join('；')+'</div>';
+  h+='</div>';}
+ if(d.operating_point) h+='<div style="margin-top:8px;font-size:12.5px;color:var(--muted)">'
+   +esc(d.operating_point.text)+(d.operating_point.scope?'<br>'+esc(d.operating_point.scope):'')+'</div>';
+ if(d.why) h+='<div style="margin-top:10px;font-size:13px"><b>'+esc(zh?'为什么':'why')+'</b>：'+esc(d.why)+'</div>';
+ h+='<div style="margin-top:10px;font-size:12.5px;color:var(--muted)">'
+   +esc(zh?'用了 ':'cost ')+'$'+(d.cost_usd||0).toFixed(5)+esc(zh?'，等待 ':', waited ')
+   +(d.wait_s||0).toFixed(1)+'s'+(d.checked_by?esc(zh?'，判定者:':', checked by ')+esc(d.checked_by):'')+'</div>';
+ if(d.note) h+='<div style="margin-top:10px;padding:8px 11px;background:#fff7ed;border-left:3px solid #f59e0b;'
+   +'border-radius:6px;font-size:12.5px;color:#7c2d12">'+esc(d.note)+'</div>';
+ return {html:h,accent:col};}
 async function send(){const i=document.getElementById('chatin'); const m=i.value.trim(); if(!m)return;
- i.value=''; bub('you',m);
- const wait=bub('bot','正在设计并验证…(便宜档约 9 秒)');
+ i.value=''; mine(m);
+ const w=bubble('<span style="color:var(--muted)">正在设计并验证…（便宜档约 9 秒）</span>','#94a3b8');
  try{
   const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
     body:JSON.stringify({message:m,budget:document.getElementById('chatbudget').value})});
-  const j=await r.json();
-  const v=(j.certificate||{}).verdict||'';
-  const col={certified:'#2e7d32',knot_confirmed:'#66bb6a',cannot_certify:'#d97706',
-             not_found:'#b91c1c',invalid_input:'#b91c1c'}[v]||'#94a3b8';
-  wait.textContent=j.text||JSON.stringify(j); wait.style.borderLeft='4px solid '+col;
- }catch(e){wait.textContent='请求失败: '+e;}}
+  const j=await r.json(); const c=card(j);
+  w.innerHTML=c.html; w.parentElement.firstChild.style.borderLeft='5px solid '+c.accent;
+ }catch(e){w.innerHTML='<span style="color:#dc2626">请求失败: '+esc(String(e))+'</span>';}}
 function fmt(x){return x==null?'—':(typeof x=='number'?(Math.round(x*1000)/1000):x)}
 function cls(v){return v==null?'':(v>=0.6?'g':(v>=0.3?'y':'r'))}
 function note(t){return '<p class="note">'+t+'</p>'}

@@ -449,6 +449,151 @@ def certify_design(target: str, budget: str = "standard", seed: int = 0) -> Cert
                                f"(tiers {tried} s).{near}{more}"))
 
 
+# --------------------------------------------------------------------------- plain language
+# The five decisions are made for the caller; reporting the RESULT in expert vocabulary undoes that. These
+# tables and describe() exist so a certificate can be read by the person it was built for.
+VERDICT_LABEL = {
+    "certified":      ("已认证", "CERTIFIED"),
+    "knot_confirmed": ("假结已确认", "KNOT CONFIRMED"),
+    "cannot_certify": ("无法确认", "CANNOT CERTIFY"),
+    "not_found":      ("没找到", "NOT FOUND"),
+    "invalid_input":  ("输入有问题", "INVALID INPUT"),
+}
+STRICTNESS_DOC = {
+    "match": ("折叠结果与目标完全一致",
+              "the fold equals the target exactly"),
+    "umfe": ("而且目标是唯一的最优折叠,不是并列多解之一",
+             "and the target is the UNIQUE optimal fold, not one of several co-optimal ones"),
+    "pfe": ("而且在热力学系综里目标结构占比 ≥90%,是稳健折叠而非脆弱的一次命中",
+            "and the target holds >=90% of the thermodynamic ensemble -- a robust fold, not a fragile hit"),
+    "panel-unanimous": ("三个相互独立的假结预测器全部认为它形成了目标结构",
+                        "all three independent pseudoknot predictors agree it forms the target"),
+    "knot-recall (k=1, tau=1.0)": (
+        "至少一个独立预测器完整重现了使它成为假结的那些交叉碱基对(只针对假结部分,不针对整个结构)",
+        "at least one independent predictor fully reproduces the crossing stems -- a claim about the KNOT only"),
+}
+RUNG_ORDER = ["match", "umfe", "pfe"]
+
+
+def describe(target: str, lang: str = "zh") -> str:
+    """Restate a dot-bracket in words. The caller was told they do not need to read brackets, so echoing the
+    bracket string back as the answer would take that back."""
+    from ..structure_utils import pair_table
+    pt = pair_table(target)
+    n = len(target)
+    n_bp = sum(1 for i, j in enumerate(pt) if j > i)
+    stems, run = [], 0
+    for i, ch in enumerate(target):
+        if ch in "([{<":
+            run += 1
+        elif run:
+            stems.append(run)
+            run = 0
+    if run:
+        stems.append(run)
+    hairpins = []
+    for i, j in enumerate(pt):
+        if j > i and all(pt[k] < 0 for k in range(i + 1, j)):
+            hairpins.append(j - i - 1)
+    if lang == "zh":
+        parts = [f"共 {n} 个碱基", f"{n_bp} 对碱基配对"]
+        if hairpins:
+            parts.append(f"{len(hairpins)} 个发夹环(环大小 {'、'.join(str(h) for h in hairpins)} 个未配对碱基)")
+        if len(stems) > 1:
+            parts.append(f"{len(stems)} 段茎")
+        return ",".join(parts)
+    parts = [f"{n} nucleotides", f"{n_bp} base pairs"]
+    if hairpins:
+        parts.append(f"{len(hairpins)} hairpin loop(s) of {', '.join(str(h) for h in hairpins)} nt")
+    if len(stems) > 1:
+        parts.append(f"{len(stems)} stem segments")
+    return ", ".join(parts)
+
+
+def _why_zh(reason: str) -> str:
+    """Translate the handful of reasons this module emits. Unmatched text falls through in English rather
+    than being machine-translated -- a wrong translation of WHY an answer was refused is worse than English."""
+    import re as _re
+    r = reason or ""
+    m = _re.match(r"solved at the (\d+)s tier after trying \[([^\]]*)\]", r)
+    if m:
+        return f"在 {m.group(1)} 秒档解出(依次尝试了 {m.group(2)} 秒)"
+    m = _re.match(r"all three independent predictors agree", r)
+    if m:
+        return "三个相互独立的预测器一致认为它形成了目标结构"
+    if r.startswith("folds exactly to the target"):
+        extra = r.split("also passes:", 1)
+        more = ("，" + "、".join(STRICTNESS_DOC.get(x.strip(), (x.strip(),))[0].lstrip("而且")
+                                 for x in extra[1].split(",") if x.strip() and x.strip() != "none")
+                ) if len(extra) > 1 and extra[1].strip() not in ("", "none") else ""
+        return "折叠结果与目标完全一致" + more
+    if r.startswith("the MFE structure of this sequence is not the target"):
+        return "这条序列的最低自由能结构不是目标结构"
+    if r.startswith("no independent predictor forms the target"):
+        return "没有任何一个独立预测器认为这条序列形成了目标结构"
+    if "unbalanced" in r:
+        return "括号不配对,这不是一个合法的结构式"
+    if "not dot-bracket" in r:
+        return "输入里有不属于点括号记法的字符"
+    m = _re.match(r"sequence length (\d+) != target length (\d+)", r)
+    if m:
+        return (f"序列长度 {m.group(1)} 与结构长度 {m.group(2)} 不一致,无法判定。"
+                f"请把两者改成同样长度,或者只给结构、让系统为你设计一条。")
+    if r.startswith("no sequence survived the criterion"):
+        out = ["在当前预算档内没有找到能通过判据的序列。"]
+        m = _re.search(r"Closest candidate was (\d+) base pair", r)
+        if m:
+            out.append(f"最接近的候选差 {m.group(1)} 对碱基。")
+            if int(m.group(1)) <= 2:
+                out.append("注意:实测中卡在 1–2 对碱基的靶,预算加十倍也没有改善 —— 这属于硬案例,而不是「就快成了」。")
+        if "larger budget is available" in r:
+            out.append("可以换更大的预算档,但这不是承诺:实测 16 个这类靶里,预算加十倍解出 7 个、仍有 9 个解不出,"
+                       "而且无法事先判断你的属于哪一类。")
+        else:
+            out.append("这已经是最大的预算档。")
+        return "".join(out)
+    if r.startswith("the reference oracle (pKiss) accepts"):
+        return ("参考预测器认为这条序列可以,但另外两个独立预测器不确认。这里报告为「未确认」而不是「错误」:"
+                "同一套判据在 250 个天然结构上也只认得出 2 个,所以不通过几乎不含信息。")
+    return r
+
+
+def to_display(c: Certificate, lang: str = "zh") -> dict:
+    """A certificate as STRUCTURED fields a UI can lay out -- verdict, plain-language structure, the
+    criterion with its meaning spelled out, the sequence on its own so it can be copied, and the red line."""
+    zh = (lang == "zh")
+    d = {"verdict": c.verdict, "kind": c.kind, "n": c.n,
+         "headline": VERDICT_LABEL.get(c.verdict, (c.verdict, c.verdict))[0 if zh else 1],
+         "sequence": c.sequence, "target": c.target,
+         "plain": describe(c.target, lang) if c.kind in ("nested", "pseudoknot") else None,
+         "checked_by": c.checked_by, "cost_usd": c.cost_usd, "wait_s": c.wait_s,
+         "budget": c.budget, "why": (_why_zh(c.reason) if zh else c.reason),
+         "note": ("`已认证`的含义是:在所声明的计算模型下,这条序列折叠成目标结构。它不是关于体外或体内行为的主张。"
+                  if zh else c.disclaimer)}
+    if c.strictness:
+        zh_t, en_t = STRICTNESS_DOC.get(c.strictness, (c.strictness, c.strictness))
+        zh_t = zh_t.lstrip("而且")          # it reads as a continuation in the rung list, not as a headline
+        also = [STRICTNESS_DOC.get(r, (r, r))[0 if zh else 1].lstrip("而且") if zh
+                else STRICTNESS_DOC.get(r, (r, r))[1]
+                for r in c.rungs_passed if r != c.strictness]
+        d["criterion"] = {"code": c.strictness, "means": zh_t if zh else en_t, "also": also,
+                          "is_strongest": (c.strictness == "pfe")}
+    op = (c.detail or {}).get("operating_point")
+    if op:
+        d["operating_point"] = {
+            "sens": op["sensitivity_on_known_structures"],
+            "random": op["false_accept_on_random_sequences"],
+            "scope": op.get("scope"),
+            "text": (f"这条判据在 250 个已知天然结构上认得出 "
+                     f"{op['sensitivity_on_known_structures']:.1%},在随机序列上误判 "
+                     f"{op['false_accept_on_random_sequences']:.1%}"
+                     if zh else
+                     f"this criterion recognises {op['sensitivity_on_known_structures']:.1%} of known "
+                     f"natural structures and accepts "
+                     f"{op['false_accept_on_random_sequences']:.1%} of random sequences")}
+    return d
+
+
 # --------------------------------------------------------------------------- human-facing rendering
 def render(c: Certificate) -> str:
     """A certificate as a non-expert should read it: the verdict, what was actually checked, what it cost,
