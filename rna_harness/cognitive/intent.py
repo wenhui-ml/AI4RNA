@@ -37,6 +37,30 @@ from typing import Dict, List, Optional
 MIN_LOOP = 3          # a hairpin loop shorter than this cannot close
 MIN_STEM = 2          # a 1-bp "stem" is a lonely pair
 
+# A FUNCTION is not a SHAPE, and this system can only judge shapes. Asked for "an RNA that binds protein X"
+# a language model will happily invent a plausible structure, the pipeline will design a sequence for it and
+# the verifier will certify that sequence -- correctly, against a target nobody has any reason to believe is
+# the right one. That is a misleading success: every downstream number is true and the answer is worthless.
+# The oracle's silence about function is the project's red line, so the refusal is deterministic rather than
+# left to the model's judgement, which can be talked around.
+FUNCTION_WORDS = (
+    "结合", "绑定", "靶向", "适配体", "适体", "核酶", "核开关", "riboswitch", "开关", "调控", "沉默",
+    "干扰", "敲低", "抑制", "表达", "翻译", "剪接", "催化", "药物", "治疗", "疫苗", "蛋白", "基因",
+    "受体", "配体", "免疫",
+    "bind", "binding", "binds", "aptamer", "ribozyme", "riboswitch", "silence", "knockdown", "knock down",
+    "inhibit", "express", "translation", "splic", "cataly", "therapeut", "drug", "vaccine", "protein",
+    "gene ", "receptor", "ligand", "immun",
+)
+
+
+def functional_request(text: str):
+    """The word that makes this a function request, or None. Deterministic on purpose."""
+    low = (text or "").lower()
+    for w in FUNCTION_WORDS:
+        if w in low:
+            return w
+    return None
+
 
 @dataclass
 class Spec:
@@ -119,6 +143,12 @@ Rules:
     answered in English defeats the whole point of this layer.
   * if the request needs a multiloop or a pseudoknot, emit {{"type":"multiloop"}} or {{"type":"pseudoknot"}}
     so the caller can say it is out of scope, rather than guessing.
+  * if the request asks for a biological FUNCTION rather than a SHAPE -- binding something, catalysing
+    something, switching, silencing a gene, a therapeutic -- reply
+    {{"out_of_scope":"function","interpretation":"<say what they asked for, in their language>"}}
+    and NOTHING else. Do not invent a structure. The system downstream can verify that a sequence folds into
+    a given shape; it cannot verify that it does anything. Inventing a shape here would produce a certificate
+    that is true about the wrong target.
 """
 
 
@@ -128,6 +158,21 @@ def translate(request: str, model: str = "z-ai/glm-5.2", temperature: float = 0.
     text = (request or "").strip()
     if not text:
         return Spec(error="empty request")
+    hit = functional_request(text)
+    if hit:
+        return Spec(error=(
+            f"这个请求描述的是 RNA 的**功能**（出现了「{hit}」），而不是它的**形状**。"
+            f"本系统的判定器只能验证「一条序列是否折叠成给定的二级结构」，无法验证它是否具有某种生物功能——"
+            f"如果在这里凭空编一个结构，后面每一个数字都会是真的，而答案是错的。\n\n"
+            f"可以这样用：把功能需求先转成一个具体形状（例如「茎 6 对、环 4 nt 的发夹」），"
+            f"或者直接给出 dot-bracket 结构式。"
+            if any("\u4e00" <= ch <= "\u9fff" for ch in text) else
+            f"This asks for a biological FUNCTION (the word {hit!r}), not a SHAPE. The verifier here can "
+            f"check whether a sequence folds into a given secondary structure; it cannot check that a "
+            f"sequence DOES anything. Inventing a structure at this point would produce a certificate that "
+            f"is entirely true about the wrong target.\n\n"
+            f"What works: state a shape (\"a hairpin with a 6 bp stem and a 4 nt loop\"), or pass a "
+            f"dot-bracket structure directly."))
     if set(text) <= set("().[]{}<> \n") and any(c in text for c in "()[]"):
         return Spec(raw_target=text.replace(" ", "").replace("\n", ""),
                     interpretation="the request already is a dot-bracket structure; passed through unchanged")
@@ -146,6 +191,11 @@ def translate(request: str, model: str = "z-ai/glm-5.2", temperature: float = 0.
         d = json.loads(m.group(0))
     except json.JSONDecodeError as ex:
         return Spec(error=f"the model's spec was not valid json: {ex}")
+    if d.get("out_of_scope"):
+        return Spec(interpretation=str(d.get("interpretation") or ""),
+                    error=(f"the request is out of scope ({d['out_of_scope']}): this system verifies that a "
+                           f"sequence folds into a given SHAPE, and cannot verify function. State a shape, "
+                           f"or pass a dot-bracket structure directly."))
     return Spec(elements=list(d.get("elements") or []),
                 budget=str(d.get("budget") or "standard"),
                 interpretation=str(d.get("interpretation") or ""))

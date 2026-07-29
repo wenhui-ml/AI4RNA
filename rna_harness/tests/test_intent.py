@@ -80,6 +80,40 @@ def test_minimums_are_the_physical_ones():
     assert MIN_STEM == 2          # a 1-bp stem is a lonely pair
 
 
+# ---- a function is not a shape: the refusal that prevents a true certificate for a wrong target -----
+@pytest.mark.parametrize("req", [
+    "我要一个能结合某某蛋白的 RNA",
+    "design an aptamer that binds thrombin",
+    "an RNA that silences my gene of interest",
+    "一个能催化剪接的核酶",
+])
+def test_functional_requests_are_refused_before_a_structure_is_invented(req):
+    """A language model asked for "an RNA that binds X" will invent a plausible shape, the pipeline will
+    design for it and the verifier will certify it -- correctly, against a target nobody has reason to
+    believe is right. Every number true, the answer worthless. The oracle cannot speak about function, so
+    the refusal is deterministic rather than left to the model, which can be talked around."""
+    from rna_harness.cognitive.intent import functional_request
+    assert functional_request(req)
+    sp = translate(req, client=_Stub(GOOD))       # even a model that returns a valid spec must not win
+    assert sp.error and not sp.elements
+    assert len(sp.error) > 60, "the refusal has to explain what the system can do instead"
+
+
+@pytest.mark.parametrize("req", [
+    "a hairpin with a 6 bp stem and a 4 nt loop",
+    "一个茎 6 对、环 4 nt 的发夹",
+    "two small hairpins joined by a short linker",
+])
+def test_pure_shape_requests_are_not_caught_by_the_guard(req):
+    from rna_harness.cognitive.intent import functional_request
+    assert functional_request(req) is None
+
+
+def test_a_model_that_flags_out_of_scope_is_believed():
+    sp = translate("something", client=_Stub('{"out_of_scope":"function","interpretation":"binds a protein"}'))
+    assert sp.error and "function" in sp.error and not sp.elements
+
+
 # ---- the model's half, stubbed --------------------------------------------------------------------
 def test_dot_bracket_input_never_calls_a_model():
     sp = translate("((((....))))", client=None)      # client=None would construct a real one if reached
