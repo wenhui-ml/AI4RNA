@@ -1,0 +1,53 @@
+calibration set: 250 natural structures with all three oracles run
+  ground truth = the wild-type sequence really does form the published structure
+
+  per-oracle native recovery at tolerance d (bp_dist <= d):
+     d        pkiss    probknot  shapeknots
+     0       32.4%       5.6%       7.6%
+     1       45.6%       8.8%      10.0%
+     2       56.4%      12.4%      12.8%
+     3       59.2%      22.4%      27.2%
+     5       62.0%      41.6%      50.4%
+     8       69.6%      64.8%      72.0%
+    12       85.6%      76.0%      78.4%
+    20       94.4%      92.4%      93.6%
+
+=== sensitivity of CONFIRMED(k, d) on ground truth ===
+     d        k=1       k=2       k=3
+     0     37.2%     7.6%     0.8%
+     1     48.0%    14.0%     2.4%
+     2     59.2%    18.4%     4.0%
+     3     62.0%    36.8%    10.0%
+     5     66.8%    51.2%    36.0%
+     8     81.2%    69.2%    56.0%
+    12     90.8%    77.6%    71.6%
+    20     97.6%    93.6%    89.2%
+
+=== the rule, chosen by a declared criterion rather than by taste ===
+  requirement: sensitivity >= 80% on known natural structures
+  among those, take the STRICTEST (largest k, then smallest d)
+  currently shipped rule CONFIRMED(k=3, d=0): sensitivity 0.8%
+  -> CONFIRMED(k=3, d=20) at sensitivity 89.2%
+     a certificate can then say: 'passes a criterion that recognises 89% of known natural structures'
+
+=== the missing half: false-accept rate on RANDOM sequences (same lengths) ===
+  null set: 250 random ACGU sequences
+     d                    k=1                   k=2                   k=3
+             sens      random      sens      random      sens      random
+     0     37.2%        0.0%     7.6%        0.0%     0.8%        0.0%
+     1     48.0%        0.0%    14.0%        0.0%     2.4%        0.0%
+     2     59.2%        0.0%    18.4%        0.0%     4.0%        0.0%
+     3     62.0%        0.0%    36.8%        0.0%    10.0%        0.0%
+     5     66.8%        0.8%    51.2%        0.8%    36.0%        0.4%
+     8     81.2%        4.0%    69.2%        2.4%    56.0%        1.2%
+    12     90.8%       20.4%    77.6%       12.0%    71.6%        4.0%
+    20     97.6%       66.0%    93.6%       64.8%    89.2%       54.0%
+
+  usable rules (sensitivity >= 80% AND random false-accept <= 5%): [(1, 8, 0.812, 0.04)]
+
+=== what the shipped rule costs in sensitivity ===
+  k=3: d=0 1%  d=1 2%  d=2 4%  d=3 10%  d=5 36%  d=8 56%  d=12 72%  d=20 89%
+  k=2: d=0 8%  d=1 14%  d=2 18%  d=3 37%  d=5 51%  d=8 69%  d=12 78%  d=20 94%
+  k=1: d=0 37%  d=1 48%  d=2 59%  d=3 62%  d=5 67%  d=8 81%  d=12 91%  d=20 98%
+
+  wrote rna_harness/runs/ceiling/calibrate.json
