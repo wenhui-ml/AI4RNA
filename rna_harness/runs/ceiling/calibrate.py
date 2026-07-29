@@ -20,6 +20,13 @@ that it recognises a declared fraction of known-correct structures, then report 
 certificate. "This design passes a criterion that recognises 80% of known natural structures" is a statement
 a non-expert can act on. "Three heuristics agreed" is not.
 
+AN ABSOLUTE TOLERANCE IS THE WRONG KNOB, and the relative grid below is why this file reports both. bp_dist
+here is the symmetric difference of pair sets, so for a target with P pairs, bp_dist == P is exactly as wrong
+as predicting NOTHING and bp_dist == 2P is fully disjoint. Pseudobase targets run 24-100 nt with roughly
+8-25 pairs, so a fixed d=8 is a mild tolerance on the largest targets and a vacuous one on the smallest --
+the same number means "nearly right" and "completely wrong" depending on which target it lands on. The
+relative form r = bp_dist / n_pairs(T) is comparable across targets, and only r < 1 is even meaningful.
+
 CRITERION FAMILY, two interpretable knobs:
     accept_o(seq, T; d)  :=  bp_dist(fold_o(seq), T) <= d          per oracle, tolerance d
     CONFIRMED(k, d)      :=  at least k of the 3 oracles accept
@@ -139,6 +146,49 @@ def main():
         print(f"     a certificate can then say: 'passes a criterion that recognises {s:.0%} of known"
               f" natural structures'")
 
+    # ---- the same calibration on a target-NORMALISED tolerance -------------------------------------
+    from rna_harness.benchmarks.rnainvbench import load_pseudobase, pk_pairs
+    tg = {t.task_id: t.target for t in load_pseudobase()}
+    npairs = {r["id"]: len(pk_pairs(tg[r["id"]])) for r in rows if r["id"] in tg}
+    nullr = _null_rows(rows)
+    RS = [0.0, 0.1, 0.2, 0.3, 0.5, 0.75, 1.0]
+
+    def grid_rel(recs):
+        g = {}
+        use = [r for r in recs if r["id"] in npairs and npairs[r["id"]] > 0]
+        for rr in RS:
+            for k in (1, 2, 3):
+                n = 0
+                for r in use:
+                    lim = rr * npairs[r["id"]]
+                    acc = sum(1 for o in ORACLES
+                              if r.get(o, {}).get("bp_dist") is not None and r[o]["bp_dist"] <= lim)
+                    n += (acc >= k)
+                g[(k, rr)] = n / max(len(use), 1)
+        return g, len(use)
+
+    gs, n_s = grid_rel(rows)
+    gn, n_n = grid_rel(nullr)
+    print(f"\n=== RELATIVE tolerance r = bp_dist / n_pairs(T): comparable across target sizes ===")
+    print(f"  ({n_s} natives, {n_n} randoms; r=1 is as wrong as predicting nothing, so r>=1 is vacuous)")
+    print(f"  {'r':>5} " + "".join(f"{'k=' + str(k):>22}" for k in (1, 2, 3)))
+    print(f"  {'':>5} " + "".join(f"{'sens':>10}{'  random':>12}" for _ in (1, 2, 3)))
+    usable_rel = []
+    for rr in RS:
+        cells = []
+        for k in (1, 2, 3):
+            cells.append(f"{gs[(k, rr)]:>9.1%}{gn[(k, rr)]:>12.1%}")
+            if gs[(k, rr)] >= TARGET_SENSITIVITY and gn[(k, rr)] <= 0.05 and rr < 1.0:
+                usable_rel.append((k, rr, gs[(k, rr)], gn[(k, rr)]))
+        print(f"  {rr:>5.2f} " + "".join(cells))
+    print(f"\n  usable under the SAME declared rule, restricted to meaningful r < 1: "
+          f"{usable_rel if usable_rel else 'NONE'}")
+    if not usable_rel:
+        print(f"  -> Once the tolerance is made comparable across target sizes, NO rule in this family")
+        print(f"     recognises 80% of known structures while rejecting random sequences. The absolute-d")
+        print(f"     winner (k=1, d=8) was an artefact of averaging a mild tolerance on big targets with a")
+        print(f"     vacuous one on small targets.")
+
     print(f"\n=== the missing half: false-accept rate on RANDOM sequences (same lengths) ===")
     null = _null_rows(rows)
     print(f"  null set: {len(null)} random ACGU sequences")
@@ -173,7 +223,10 @@ def main():
                "grid": {f"k{k}_d{d}": s for (k, d), s in grid.items()},
                "shipped_k3_d0": shipped,
                "viable_by_sensitivity_only": bool(ok),
-               "usable_with_specificity": usable},
+               "usable_with_specificity": usable,
+               "grid_relative_sens": {f"k{k}_r{r}": v for (k, r), v in gs.items()},
+               "grid_relative_random": {f"k{k}_r{r}": v for (k, r), v in gn.items()},
+               "usable_relative": usable_rel},
               open(os.path.join(HERE, "calibrate.json"), "w"), indent=1)
     print(f"\n  wrote rna_harness/runs/ceiling/calibrate.json")
 

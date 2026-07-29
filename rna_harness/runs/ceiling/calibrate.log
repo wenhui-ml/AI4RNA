@@ -30,6 +30,24 @@ calibration set: 250 natural structures with all three oracles run
   -> CONFIRMED(k=3, d=20) at sensitivity 89.2%
      a certificate can then say: 'passes a criterion that recognises 89% of known natural structures'
 
+=== RELATIVE tolerance r = bp_dist / n_pairs(T): comparable across target sizes ===
+  (250 natives, 250 randoms; r=1 is as wrong as predicting nothing, so r>=1 is vacuous)
+      r                    k=1                   k=2                   k=3
+              sens      random      sens      random      sens      random
+   0.00     37.2%        0.0%     7.6%        0.0%     0.8%        0.0%
+   0.10     42.0%        0.0%    13.6%        0.0%     2.0%        0.0%
+   0.20     55.6%        0.0%    16.8%        0.0%     4.0%        0.0%
+   0.30     64.8%        0.0%    22.4%        0.0%     6.8%        0.0%
+   0.50     75.6%        0.0%    58.8%        0.0%    39.2%        0.0%
+   0.75     79.2%        1.2%    67.6%        0.8%    55.6%        0.4%
+   1.00     90.0%        8.0%    80.0%        2.8%    70.8%        1.2%
+
+  usable under the SAME declared rule, restricted to meaningful r < 1: NONE
+  -> Once the tolerance is made comparable across target sizes, NO rule in this family
+     recognises 80% of known structures while rejecting random sequences. The absolute-d
+     winner (k=1, d=8) was an artefact of averaging a mild tolerance on big targets with a
+     vacuous one on small targets.
+
 === the missing half: false-accept rate on RANDOM sequences (same lengths) ===
   null set: 250 random ACGU sequences
      d                    k=1                   k=2                   k=3

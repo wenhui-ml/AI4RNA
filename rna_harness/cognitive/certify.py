@@ -38,6 +38,27 @@ ShapeKnots 9.4%, and dropping ShapeKnots alone takes the deliverable count from 
 (runs/ceiling/loo_oracle.py). The conjunction is in large part a ShapeKnots filter, and a certificate names
 its adjudicators so that a caller can judge that for themselves.
 
+THE OPERATING POINT, measured on ground truth and on noise (runs/ceiling/calibrate.py). Treating the rule as
+CONFIRMED(k, d) = "at least k of 3 oracles within bp_dist d", calibrated on 250 natural structures (the
+wild-type sequence really does form the published structure) against a null of 250 random ACGU sequences:
+
+    shipped rule, k=3 d=0      sensitivity  0.8%      random false-accept  0.0%
+
+Both halves matter and they say opposite things about the two verdicts:
+  * `certified` is a STRONG claim. Nothing random passes, and almost nothing does at all.
+  * the ABSENCE of certification is nearly uninformative. A filter that recognises 2 of 250 known-correct
+    structures rejects correct designs as a matter of course.
+
+And it cannot be fixed by moving the threshold. Once the tolerance is normalised per target (r = bp_dist /
+n_pairs, so it means the same thing on a 24 nt and a 100 nt target), NO (k, r) with r < 1 reaches 80%
+sensitivity at <= 5% random false-accept; the best meaningful point is k=1, r=0.75 at 79.2% / 1.2%, and
+r=0.75 permits three quarters of the target's pairs to be wrong. An earlier absolute-tolerance sweep appeared
+to find a usable rule at (k=1, d=8); that was an artefact of one number meaning "mild" on large targets and
+"vacuous" on small ones.
+
+So on pseudoknot targets this module reports a verdict it can defend and refuses to dress the negative one up
+as evidence. Every pseudoknot certificate carries the operating point.
+
 WHAT IT COMPOSES (nothing here is new; it is the four measured mechanisms behind one call):
   * the budget cascade + stop-at-first-verified-solve         cognitive/core.py
   * the ladder chosen from measured per-target cost/solves    cognitive/tools.py::default_toolbox
@@ -71,6 +92,14 @@ BUDGETS = {
 }
 DISCLAIMER = ("`certified` means the sequence folds to the target under the stated computational model. "
               "It is not a claim about behaviour in vitro or in vivo.")
+# Measured operating point of the pseudoknot panel (runs/ceiling/calibrate.py, 250 natives vs 250 randoms).
+PANEL_OPERATING_POINT = {
+    "rule": "at least 3 of 3 oracles exact (k=3, d=0)",
+    "sensitivity_on_known_structures": 0.008,
+    "false_accept_on_random_sequences": 0.0,
+    "note": ("certification is a strong claim; NON-certification is nearly uninformative, because this rule "
+             "recognises only 2 of 250 natural structures whose sequences are known to form them."),
+}
 
 
 @dataclass
@@ -161,7 +190,7 @@ def certify_sequence(seq: str, target: str) -> Certificate:
                            checked_by="panel: pKiss AND ProbKnot AND ShapeKnots", strictness="panel-unanimous",
                            rungs_passed=["panel-unanimous"], cost_usd=solver_cost_usd(w, 1),
                            wait_s=round(w, 2), reason="all three independent predictors form the target",
-                           detail=v)
+                           detail={**v, "operating_point": PANEL_OPERATING_POINT})
     if v["any_failed_to_run"]:
         return Certificate("cannot_certify", target, len(target), kind, sequence=seq,
                            checked_by="panel (incomplete)", cost_usd=solver_cost_usd(w, 1),
@@ -171,11 +200,12 @@ def certify_sequence(seq: str, target: str) -> Certificate:
     if v["reference_only"]:
         return Certificate("cannot_certify", target, len(target), kind, sequence=seq,
                            checked_by="panel: pKiss AND ProbKnot AND ShapeKnots",
-                           cost_usd=solver_cost_usd(w, 1), wait_s=round(w, 2), detail=v,
+                           cost_usd=solver_cost_usd(w, 1), wait_s=round(w, 2),
+                           detail={**v, "operating_point": PANEL_OPERATING_POINT},
                            reason="the reference oracle (pKiss) accepts this sequence but the independent "
-                                  "predictors do not. Reported as UNCONFIRMED, not as wrong: on native "
-                                  "sequences the same panel recovers only 32%/6%/8% of known structures "
-                                  "exactly, so its rejection is weak evidence about the design.")
+                                  "predictors do not. Reported as UNCONFIRMED, not as wrong: this panel "
+                                  "recognises only 2 of 250 NATURAL structures whose sequences are known to "
+                                  "form them, so failing it is nearly uninformative.")
     return Certificate("not_found", target, len(target), kind, sequence=seq,
                        checked_by="panel: pKiss AND ProbKnot AND ShapeKnots",
                        cost_usd=solver_cost_usd(w, 1), wait_s=round(w, 2), detail=v,
@@ -293,7 +323,8 @@ def certify_design(target: str, budget: str = "standard", seed: int = 0) -> Cert
                                        reason=f"all three independent predictors agree; solved at the "
                                               f"{tl}s tier after trying {tried}",
                                        detail={"tiers_tried": tried, "n_candidates_screened": len(uniq),
-                                               "per_oracle": v["per_oracle"]})
+                                               "per_oracle": v["per_oracle"],
+                                               "operating_point": PANEL_OPERATING_POINT})
                 if best_ref_only is None and v["reference_only"]:
                     best_ref_only = (c, v)
 
