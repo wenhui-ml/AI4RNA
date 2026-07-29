@@ -1,0 +1,31 @@
+deliverable designs on the 125 held-out crossing targets
+  archived per-ORACLE 'panel-unanimous' on this split: 26/125  <- the number I quoted
+  measuring: does ANY SINGLE candidate satisfy all three?  (pools capped at 50)
+
+  125 targets to scan, 16 workers
+    20/125  0.1 min  eta 0.3 min
+    40/125  0.1 min  eta 0.2 min
+    60/125  0.1 min  eta 0.2 min
+    80/125  0.2 min  eta 0.1 min
+    100/125  0.2 min  eta 0.1 min
+    120/125  0.3 min  eta 0.0 min
+    125/125  0.4 min  eta 0.0 min
+
+=== the number that can actually be handed to a user ===
+  DELIVERABLE (one sequence, all three oracles): 16/125
+  archived per-oracle upper bound on this split: 26/125
+  -> the quoted figure was 1.62x the deliverable count
+  would-be FALSE certificates (reference oracle alone accepts, panel does not): 5/125
+  neither: 104/125
+
+=== which oracle does the rejecting (first-fail counts over all screened candidates) ===
+  shapeknots   rejected first on   1687 candidate screenings  (60.6%)
+  probknot     rejected first on   1054 candidate screenings  (37.9%)
+  pkiss        rejected first on     42 candidate screenings  (1.5%)
+
+=== by length ===
+   <=40nt: deliverable  11/73 
+    41-70: deliverable   4/43 
+      >70: deliverable   1/9  
+
+  wrote rna_harness/runs/ceiling/deliverable.json
