@@ -658,6 +658,21 @@ function card(j){
  h+='<div style="margin-top:10px;font-size:12.5px;color:var(--muted)">'
    +esc(zh?'用了 ':'cost ')+'$'+(d.cost_usd||0).toFixed(5)+esc(zh?'，等待 ':', waited ')
    +(d.wait_s||0).toFixed(1)+'s'+(d.checked_by?esc(zh?'，判定者:':', checked by ')+esc(d.checked_by):'')+'</div>';
+ if(d.audit) h+='<details style="margin-top:10px"><summary style="font-size:12.5px;color:var(--muted);cursor:pointer">'
+   +esc(zh?'可复现性 / 审查信息':'reproducibility')+'</summary>'
+   +'<div style="font-size:12px;color:var(--muted);line-height:1.7;margin-top:6px">'
+   +esc(zh?'生成时间：':'generated ')+esc(d.audit.generated_utc||'')+'　'+esc(zh?'随机种子：':'seed ')
+   +esc(String(d.audit.seed))+'　'+esc(d.audit.schema||'')+'<br>'
+   +Object.entries(d.audit.versions||{}).filter(([k])=>!['schema'].includes(k))
+     .map(([k,v])=>esc(k)+' '+esc(v)).join('　')
+   +(d.audit.verify_cmd?'<br>'+esc(zh?'复核这条结论（确定性，任何人任何时候结果相同）：':'verify (deterministic): ')
+     +'<br><code style="font-size:11.5px;word-break:break-all">'+esc(d.audit.verify_cmd)+'</code>'
+     +' <span onclick="copySeq(this)" data-seq="'+esc(d.audit.verify_cmd)+'" style="cursor:pointer;color:#2563eb">'
+     +esc(zh?'复制':'copy')+'</span>':'')
+   +'<br>'+esc(zh?'重跑搜索（随机，可能给出另一条序列）：':'re-run search (stochastic): ')
+   +'<br><code style="font-size:11.5px;word-break:break-all">'+esc(d.audit.rerun_search||'')+'</code>'
+   +'<div style="margin-top:5px;color:#7c2d12">'+esc(d.audit.reproducibility||'')+'</div>'
+   +'</div></details>';
  if(d.note) h+='<div style="margin-top:10px;padding:8px 11px;background:#fff7ed;border-left:3px solid #f59e0b;'
    +'border-radius:6px;font-size:12.5px;color:#7c2d12">'+esc(d.note)+'</div>';
  return {html:h,accent:col};}

@@ -160,6 +160,43 @@ def test_display_speaks_chinese_and_drops_the_energy_model_jargon():
     assert d["criterion"]["means"] and not d["criterion"]["means"].startswith("而且")
 
 
+# ---- the audit block: a certificate that cannot be reproduced is not a record --------------------
+def test_every_certificate_carries_provenance_and_a_timestamp():
+    from rna_harness.cognitive.certify import SCHEMA_VERSION, certify_sequence
+    c = certify_sequence("GGGGAAAACCCC", HAIRPIN)
+    assert c.provenance.get("schema") == SCHEMA_VERSION
+    assert c.provenance.get("viennarna"), "the verdict depends on it, so it belongs in the answer"
+    assert c.generated_utc.endswith("Z")
+
+
+def test_version_probe_never_records_an_error_message_as_a_version():
+    """pKiss does not understand --version; recording its complaint as the version would be worse than
+    recording the path."""
+    from rna_harness.cognitive.certify import provenance
+    for k, v in provenance().items():
+        assert "unknown option" not in str(v).lower()
+        assert "usage:" not in str(v).lower()
+
+
+def test_the_two_commands_promise_different_things_and_say_so():
+    """MEASURED: the same seed does NOT give the same design -- DesiRNA's budget is wall-clock, not
+    iterations, so two runs at seed 3 gave GGCCGUUGGGCC and GCUCGUAGGAGC. A single `reproduce` field would
+    have been a promise this cannot keep. What IS exactly reproducible is the claim the certificate makes
+    about the sequence it names, because folding is deterministic."""
+    from rna_harness.cognitive.certify import certify_sequence
+    c = certify_sequence("GGGGAAAACCCC", HAIRPIN)
+    assert "--sequence" in c.verify_cmd, "the deterministic command re-checks THIS sequence"
+    assert "--sequence" not in c.rerun_search, "the stochastic command re-runs the search"
+    assert "wall-clock" in c.reproducibility and "not seed-reproducible" in c.reproducibility
+
+
+def test_verifying_the_same_sequence_twice_gives_the_same_verdict():
+    from rna_harness.cognitive.certify import certify_sequence
+    a = certify_sequence("GGGGAAAACCCC", HAIRPIN)
+    b = certify_sequence("GGGGAAAACCCC", HAIRPIN)
+    assert (a.verdict, a.strictness, a.rungs_passed) == (b.verdict, b.strictness, b.rungs_passed)
+
+
 # ---- contract shape -------------------------------------------------------------------------------
 def test_every_certificate_carries_the_disclaimer_and_a_reason():
     for c in (certify_design(""), certify_sequence("A" * len(HAIRPIN), HAIRPIN)):

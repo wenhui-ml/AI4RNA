@@ -95,6 +95,7 @@ nothing about a test tube.
 """
 from __future__ import annotations
 
+import os
 import time
 from dataclasses import dataclass, field, asdict
 from typing import List, Optional
@@ -131,6 +132,73 @@ KNOT_OPERATING_POINT = {
 }
 
 
+SCHEMA_VERSION = "rna-certificate/1.0"
+_PROVENANCE = None
+
+
+def provenance() -> dict:
+    """What produced this verdict, precisely enough for a third party to reproduce it.
+
+    A certificate that can be READ but not REPRODUCED is not an audit record. The verdict depends entirely on
+    which binaries were asked -- ViennaRNA's energy model decides match/umfe/pfe, and pKiss / ProbKnot /
+    ShapeKnots decide every pseudoknot verdict -- so their versions belong in the answer itself, not in a
+    README that drifts away from it. Probing shells out, so it happens once per process and is cached.
+    """
+    global _PROVENANCE
+    if _PROVENANCE is not None:
+        return _PROVENANCE
+    import platform
+    import subprocess
+    out = {"schema": SCHEMA_VERSION, "python": platform.python_version()}
+    try:
+        import RNA
+        out["viennarna"] = getattr(RNA, "__version__", None) or str(RNA.version())
+    except Exception:                                                        # noqa: BLE001
+        out["viennarna"] = "unavailable"
+
+    def _run(argv, timeout=8):
+        """First line of output, or None. A tool that does not understand --version prints an error, and
+        recording THAT as the version is worse than recording the path."""
+        try:
+            r = subprocess.run(argv, capture_output=True, text=True, timeout=timeout)
+            txt = ((r.stdout or "") + (r.stderr or "")).strip()
+            if not txt:
+                return None
+            line = txt.splitlines()[0][:120]
+            low = line.lower()
+            if any(w in low for w in ("unknown option", "unrecognized", "invalid option", "usage:")):
+                return None
+            return line
+        except Exception:                                                    # noqa: BLE001
+            return None
+
+    try:
+        from ..generators.desirna import _desirna_cmd
+        cmd = _desirna_cmd()
+        if cmd:
+            home = os.path.dirname(cmd[-1])
+            sha = _run(["git", "-C", home, "rev-parse", "--short", "HEAD"])
+            out["desirna"] = f"{home}@{sha}" if sha else home
+        else:
+            out["desirna"] = "not installed"
+    except Exception:                                                        # noqa: BLE001
+        out["desirna"] = "unknown"
+    try:
+        from ..benchmarks.rnainvbench import _pkiss_cmd
+        c = _pkiss_cmd()
+        out["pkiss"] = (_run(list(c) + ["--version"]) or " ".join(c)) if c else "not installed"
+    except Exception:                                                        # noqa: BLE001
+        out["pkiss"] = "unknown"
+    try:
+        from ..oracles_pk import _bin, rnastructure_available
+        b = _bin("ProbKnot")
+        out["rnastructure"] = (_run([b, "--version"]) or b) if (b and rnastructure_available()) else "not installed"
+    except Exception:                                                        # noqa: BLE001
+        out["rnastructure"] = "unknown"
+    _PROVENANCE = out
+    return out
+
+
 @dataclass
 class Certificate:
     verdict: str                      # certified | knot_confirmed | cannot_certify | not_found | invalid_input
@@ -147,6 +215,45 @@ class Certificate:
     reason: str = ""                  # human-readable, especially for the two negative verdicts
     detail: dict = field(default_factory=dict)
     disclaimer: str = DISCLAIMER
+    # --- audit block: a certificate that cannot be reproduced is not a record ---------------------
+    seed: Optional[int] = None
+    generated_utc: str = ""
+    provenance: dict = field(default_factory=dict)
+    verify_cmd: str = ""          # deterministic: re-checks THIS sequence, always the same verdict
+    rerun_search: str = ""        # stochastic: re-runs the design, may return a different sequence
+    reproducibility: str = ""
+
+    def stamp(self, seed: Optional[int] = None, budget: Optional[str] = None) -> "Certificate":
+        """Attach the audit block on the way out, so no exit path can forget it.
+
+        TWO COMMANDS, because they promise different things and conflating them would be a false claim.
+        MEASURED: the same seed does NOT give the same design. DesiRNA's budget is WALL-CLOCK (-t 5), not a
+        number of iterations, so how far the search gets depends on machine load; two runs at seed 3 gave
+        GGCCGUUGGGCC and GCUCGUAGGAGC. A single `reproduce` field would therefore have been a promise this
+        cannot keep.
+
+        What IS exactly reproducible is the thing the certificate actually claims: that THIS sequence forms
+        THIS target under these oracles. Folding is deterministic, so `verify` reproduces the verdict for
+        anyone, on any machine, forever. `rerun_search` re-runs the design and may legitimately return a
+        different sequence.
+        """
+        import datetime as _dt
+        self.seed = seed
+        self.generated_utc = _dt.datetime.now(_dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        self.provenance = provenance()
+        q = (self.target or "").replace("'", "")
+        self.verify_cmd = (f"python -m rna_harness.cognitive.certify '{q}' --sequence {self.sequence}"
+                           if self.sequence else "")
+        self.rerun_search = (f"python -m rna_harness.cognitive.certify '{q}' "
+                             f"--budget {budget or self.budget or 'standard'}"
+                             + (f" --seed {seed}" if seed is not None else ""))
+        self.reproducibility = (
+            "verify_cmd reproduces this certificate's claim exactly -- folding is deterministic. "
+            "rerun_search re-runs the design and may return a different sequence: the search budget is "
+            "wall-clock, not iteration count, so it is not seed-reproducible."
+            if self.sequence else
+            "no sequence was produced, so there is nothing to re-verify; rerun_search re-runs the search.")
+        return self
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -177,7 +284,7 @@ def classify(target: str):
 
 
 # --------------------------------------------------------------------------- verify an existing sequence
-def certify_sequence(seq: str, target: str) -> Certificate:
+def _certify_sequence_impl(seq: str, target: str) -> Certificate:
     """"Will this sequence fold into this shape?" -- the cheapest and most common non-expert question.
 
     No search. On a nested target this reports every strictness rung the sequence passes, because those are
@@ -313,7 +420,7 @@ def _panel_verdict(seq: str, target: str) -> dict:
 
 
 # --------------------------------------------------------------------------- design + certify
-def certify_design(target: str, budget: str = "standard", seed: int = 0) -> Certificate:
+def _certify_design_impl(target: str, budget: str = "standard", seed: int = 0) -> Certificate:
     """"Give me a sequence that folds into this shape", answered with a certificate.
 
     Runs the measured budget cascade and stops at the first sequence that survives the criterion for this
@@ -447,6 +554,17 @@ def certify_design(target: str, budget: str = "standard", seed: int = 0) -> Cert
                        detail={"tiers_tried": tried, "best_bp": best_bp},
                        reason=(f"no sequence survived the criterion within the '{budget}' budget "
                                f"(tiers {tried} s).{near}{more}"))
+
+
+# --------------------------------------------------------------------------- public entry points
+def certify_sequence(seq: str, target: str) -> Certificate:
+    """Check an existing sequence. Thin wrapper so the audit block is attached at exactly one place."""
+    return _certify_sequence_impl(seq, target).stamp(seed=None)
+
+
+def certify_design(target: str, budget: str = "standard", seed: int = 0) -> Certificate:
+    """Design and certify. Thin wrapper so the audit block is attached at exactly one place."""
+    return _certify_design_impl(target, budget=budget, seed=seed).stamp(seed=seed, budget=budget)
 
 
 # --------------------------------------------------------------------------- plain language
@@ -621,6 +739,9 @@ def to_display(c: Certificate, lang: str = "zh") -> dict:
          "checked_by": judge, "checked_by_raw": c.checked_by,
          "cost_usd": c.cost_usd, "wait_s": c.wait_s,
          "budget": c.budget, "why": (_why_zh(c.reason) if zh else c.reason),
+         "audit": {"schema": (c.provenance or {}).get("schema"), "generated_utc": c.generated_utc,
+                   "seed": c.seed, "verify_cmd": c.verify_cmd, "rerun_search": c.rerun_search,
+                   "reproducibility": c.reproducibility, "versions": c.provenance},
          "note": ("`已认证`的含义是:在所声明的计算模型下,这条序列折叠成目标结构。它不是关于体外或体内行为的主张。"
                   if zh else c.disclaimer)}
     if c.strictness:
@@ -678,6 +799,15 @@ def render(c: Certificate) -> str:
         for i, line in enumerate(textwrap.wrap(c.reason, 92)):
             out.append(("  why        " if i == 0 else "             ") + line)
     out.append(f"  note       {c.disclaimer}")
+    if c.provenance:
+        v = c.provenance
+        out.append(f"  produced   {c.generated_utc}   seed {c.seed}   schema {v.get('schema')}")
+        out.append(f"  versions   ViennaRNA {v.get('viennarna')} | DesiRNA {v.get('desirna')} | "
+                   f"pKiss {v.get('pkiss')} | RNAstructure {v.get('rnastructure')}")
+        if c.verify_cmd:
+            out.append(f"  verify     {c.verify_cmd}")
+        out.append(f"  re-search  {c.rerun_search}")
+        out.append(f"  note       {c.reproducibility}")
     return "\n".join(out)
 
 
