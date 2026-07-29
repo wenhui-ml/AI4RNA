@@ -120,6 +120,46 @@ def test_knot_confirmed_is_a_weaker_claim_than_certified_and_says_so():
     assert kr["n_cross"] > 0                       # PK really does have crossing pairs to recall
 
 
+# ---- rendering for someone who does not read dot-bracket -----------------------------------------
+def test_hairpin_is_drawn_with_the_right_bases_in_the_right_places():
+    from rna_harness.cognitive.certify import sketch
+    art = sketch("((((((....))))))", "GCCGGCGAAAGCCGGC")
+    assert art
+    lines = art.split("\n")
+    assert lines[0].split() == ["G", "A", "A", "A"], "the loop bases, in order"
+    # innermost pair first: seq[5]='C' with seq[10]='G'
+    assert lines[2].startswith("      C") and lines[2].rstrip().endswith("G")
+    # outermost pair last, just above the 5'/3' line
+    assert lines[-2].startswith("      G") and lines[-2].rstrip().endswith("C")
+    assert lines[-1].strip().startswith("5'") and lines[-1].strip().endswith("3'")
+    left = lines[-1].index("\u256f")
+    assert lines[-2].index("G") == left, "the 5' corner must sit under the stem column"
+
+
+def test_shapes_it_cannot_draw_honestly_return_nothing():
+    """Guessing a layout for a shape this cannot draw would misinform; the caller falls back to words."""
+    from rna_harness.cognitive.certify import sketch
+    assert sketch("((((....)))).....(((.....)))") is None      # two hairpins
+    assert sketch("((((..(((....))).))))") is None             # bulge
+    assert sketch("((((....[[[[))))....]]]]") is None          # pseudoknot
+    assert sketch("....") is None                              # nothing paired
+
+
+def test_a_mismatched_sequence_is_ignored_rather_than_drawn_wrong():
+    from rna_harness.cognitive.certify import sketch
+    art = sketch("((((((....))))))", "ACGU")                   # too short
+    assert art and "\u25cf" in art and "A" not in art.split("\n")[0]
+
+
+def test_display_speaks_chinese_and_drops_the_energy_model_jargon():
+    from rna_harness.cognitive.certify import certify_sequence, to_display
+    d = to_display(certify_sequence("GGGGAAAACCCC", "((((....))))"), "zh")
+    assert "turner2004" not in d["checked_by"] and "dangles" not in d["checked_by"]
+    assert "turner2004" in d["checked_by_raw"], "the exact configuration stays available"
+    assert d["plain"] and "碱基" in d["plain"]
+    assert d["criterion"]["means"] and not d["criterion"]["means"].startswith("而且")
+
+
 # ---- contract shape -------------------------------------------------------------------------------
 def test_every_certificate_carries_the_disclaimer_and_a_reason():
     for c in (certify_design(""), certify_sequence("A" * len(HAIRPIN), HAIRPIN)):

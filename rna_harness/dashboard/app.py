@@ -629,12 +629,14 @@ function card(j){
  h+='</div>';
  if(j.understood) h+='<div style="color:var(--muted);font-size:13px;margin-bottom:8px">'
    +esc(zh?'理解为:':'understood as: ')+esc(j.understood)+'</div>';
+ if(d.sketch) h+='<pre style="margin:10px 0;padding:12px 14px;background:#0f172a;color:#e2e8f0;border-radius:8px;'
+   +'font-size:13px;line-height:1.35;overflow-x:auto">'+esc(d.sketch)+'</pre>';
  if(d.sequence){h+='<div style="margin:10px 0;padding:10px 12px;background:#f8fafc;border:1px solid var(--border);border-radius:8px">'
    +'<div style="font-size:12px;color:var(--muted);margin-bottom:4px">'+esc(zh?'设计出的序列':'sequence')+'</div>'
    +'<code style="font-size:14px;letter-spacing:.5px;word-break:break-all">'+esc(d.sequence)+'</code>'
    +' <span onclick="copySeq(this)" data-seq="'+esc(d.sequence)+'" style="cursor:pointer;color:#2563eb;font-size:12px;margin-left:8px">'
    +esc(zh?'复制':'copy')+'</span></div>';}
- if(d.target) h+='<div style="font-size:12px;color:var(--muted)">'+esc(zh?'目标结构式:':'target: ')
+ if(d.target) h+='<div style="font-size:12px;color:var(--muted)">'+esc(zh?'目标结构式：':'target: ')
    +'<code>'+esc(d.target)+'</code></div>';
  if(d.criterion){h+='<div style="margin-top:10px"><b>'+esc(zh?'通过的判据':'criterion')+'</b>：'
    +'<code>'+esc(d.criterion.code)+'</code>'

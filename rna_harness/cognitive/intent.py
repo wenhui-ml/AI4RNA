@@ -161,7 +161,7 @@ def translate(request: str, model: str = "z-ai/glm-5.2", temperature: float = 0.
     hit = functional_request(text)
     if hit:
         return Spec(error=(
-            f"这个请求描述的是 RNA 的**功能**（出现了「{hit}」），而不是它的**形状**。"
+            f"这个请求描述的是 RNA 的「功能」（出现了「{hit}」），而不是它的「形状」。"
             f"本系统的判定器只能验证「一条序列是否折叠成给定的二级结构」，无法验证它是否具有某种生物功能——"
             f"如果在这里凭空编一个结构，后面每一个数字都会是真的，而答案是错的。\n\n"
             f"可以这样用：把功能需求先转成一个具体形状（例如「茎 6 对、环 4 nt 的发夹」），"

@@ -558,15 +558,68 @@ def _why_zh(reason: str) -> str:
     return r
 
 
+def sketch(target: str, seq: Optional[str] = None) -> Optional[str]:
+    """A text drawing of the structure, or None when the shape is outside what can be drawn HONESTLY.
+
+    A caller who was told they need not read dot-bracket should not be handed dot-bracket as the answer, and
+    for a hairpin -- a shape with an obvious geometry -- a picture carries far more than a sentence. The
+    scope is deliberately narrow: exactly one perfectly stacked stem closing one loop, with optional unpaired
+    tails. Anything else returns None and the caller falls back to the plain-language summary, because
+    guessing at a layout for a shape this cannot draw would misinform rather than help.
+    """
+    from ..structure_utils import pair_table
+    pt = pair_table(target)
+    pairs = sorted((i, j) for i, j in enumerate(pt) if j > i)
+    if not pairs or len(pairs) < 2:
+        return None
+    i0, j0 = pairs[0]
+    if any(p != (i0 + k, j0 - k) for k, p in enumerate(pairs)):
+        return None                                   # not a single perfectly stacked stem
+    inner_i, inner_j = pairs[-1]
+    loop = list(range(inner_i + 1, inner_j))
+    if any(pt[k] >= 0 for k in loop):
+        return None
+    if any(ch != "." for ch in target[:i0] + target[j0 + 1:]):
+        return None                                   # unpaired tails only
+
+    if seq and len(seq) != len(target):
+        seq = None                                    # a mismatched sequence would draw the wrong bases
+
+    def base(k):
+        return (seq[k] if seq else "\u25cf")
+
+    IND = 6                                           # column of the left-hand stem base
+    W = max(len(loop) * 2 - 1, 1)                     # width between the two stem columns
+    lines = [" " * (IND + 1) + " ".join(base(k) for k in loop),
+             " " * IND + "\u256d" + "\u2500" * W + "\u256e"]
+    for (a, b) in reversed(pairs):                    # innermost at the top, like a textbook hairpin
+        lines.append(" " * IND + base(a) + "\u2500" * W + base(b))
+    lines.append(" " * (IND - 3) + "5'\u2500\u256f" + " " * W + "\u2570\u25003'")
+    n5, n3 = len(target[:i0]), len(target[j0 + 1:])
+    if n5 or n3:
+        lines.append(" " * (IND - 3) + f"\uff085' \u7aef\u53e6\u6709 {n5} \u4e2a\u672a\u914d\u5bf9\u78b1\u57fa"
+                                       f"\uff0c3' \u7aef {n3} \u4e2a\uff09")
+    return "\n".join(lines)
+
+
 def to_display(c: Certificate, lang: str = "zh") -> dict:
     """A certificate as STRUCTURED fields a UI can lay out -- verdict, plain-language structure, the
     criterion with its meaning spelled out, the sequence on its own so it can be copied, and the red line."""
     zh = (lang == "zh")
+    judge = c.checked_by
+    if zh:
+        judge = (judge.replace("ViennaRNA MFE (turner2004, dangles=2)",
+                               "ViennaRNA 折叠算法（Turner 2004 能量模型）")
+                      .replace("panel: pKiss AND ProbKnot AND ShapeKnots",
+                               "三个相互独立的假结预测器（pKiss、ProbKnot、ShapeKnots）全部同意")
+                      .replace("crossing stems: ", "重现交叉茎的预测器："))
     d = {"verdict": c.verdict, "kind": c.kind, "n": c.n,
          "headline": VERDICT_LABEL.get(c.verdict, (c.verdict, c.verdict))[0 if zh else 1],
          "sequence": c.sequence, "target": c.target,
          "plain": describe(c.target, lang) if c.kind in ("nested", "pseudoknot") else None,
-         "checked_by": c.checked_by, "cost_usd": c.cost_usd, "wait_s": c.wait_s,
+         "sketch": (sketch(c.target, c.sequence) if c.kind == "nested" else None),
+         "checked_by": judge, "checked_by_raw": c.checked_by,
+         "cost_usd": c.cost_usd, "wait_s": c.wait_s,
          "budget": c.budget, "why": (_why_zh(c.reason) if zh else c.reason),
          "note": ("`已认证`的含义是:在所声明的计算模型下,这条序列折叠成目标结构。它不是关于体外或体内行为的主张。"
                   if zh else c.disclaimer)}
