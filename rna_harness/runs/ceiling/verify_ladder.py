@@ -30,6 +30,12 @@ REPO = os.path.abspath(os.path.join(HERE, "..", "..", ".."))
 sys.path.insert(0, REPO)
 OUT = os.path.join(HERE, "verify_ladder")
 
+# A second, non-Eterna nested source. The product row says "common nested structures" and all the evidence
+# is Eterna100 -- a curated hard-puzzle set whose length tail (75th pct 258 nt) is far heavier than the
+# bpRNA-derived natural distribution (75th pct 127 nt). Same cascade, same code, different population.
+SOURCES = {"eterna100": os.path.join(HERE, "verify_ladder"),
+           "bprna_nested": os.path.join(HERE, "verify_ladder_bprna")}
+
 
 def _cell(pid, seed):
     """Seed 0 keeps the original filename so the run already on disk is reused, not repeated."""
@@ -61,13 +67,16 @@ def work(item):
 
 
 def main():
+    global OUT                                  # must precede any use of OUT in this function
     ap = argparse.ArgumentParser()
     ap.add_argument("--workers", type=int, default=16)
     ap.add_argument("--analyse-only", action="store_true")
+    ap.add_argument("--source", default="eterna100", choices=sorted(SOURCES))
     ap.add_argument("--seeds", default="0",
                     help="comma list. Row 1 of the product table (83/100, 9.5s median, $1.10) rests on ONE "
                          "seed; replication is the only way to know whether those three numbers are stable.")
     a = ap.parse_args()
+    OUT = SOURCES[a.source]
     os.makedirs(OUT, exist_ok=True)
 
     from rna_harness.benchmarks.eterna100 import load_eterna100
@@ -75,8 +84,13 @@ def main():
     from rna_harness.structure_utils import has_pseudoknot
     tb = default_toolbox()
     SEEDS = [int(x) for x in a.seeds.split(",")]
-    T = [(p["id"], p["target"]) for p in load_eterna100(version="V2") if not has_pseudoknot(p["target"])]
-    print(f"end-to-end verification of default_toolbox() on {len(T)} Eterna100-V2 targets")
+    if a.source == "eterna100":
+        T = [(p["id"], p["target"]) for p in load_eterna100(version="V2")
+             if not has_pseudoknot(p["target"])]
+    else:
+        from rna_harness.benchmarks.bprna_nested import load_bprna_nested
+        T = [(p["idx"], p["target"]) for p in load_bprna_nested(100)]
+    print(f"end-to-end verification of default_toolbox() on {len(T)} {a.source} targets")
     print(f"  ladder: {[t.name for t in tb]}")
     print(f"  simulated target (ladder.py): 84/100 at $1.0811; old ladder was 84/100 at $2.1900\n",
           flush=True)
@@ -124,6 +138,9 @@ def main():
     print(f"\n=== measured ===")
     print(f"  {solved}/{len(ok)} solved, ${cost:.4f} total, ${cost/max(solved,1):.5f}/solve, "
           f"{len(err)} errors")
+    if a.source != "eterna100":
+        print(f"  Eterna100 reference (3 seeds): 83.3 +/- 1.25 solved, $1.1019 +/- 0.0227, "
+              f"wait median 9.5 +/- 0.07 s")
     print(f"  simulated: 84/100 at $1.0811  ->  "
           f"{'CONSISTENT' if abs(solved-84) <= 2 and cost < 1.6 else 'DIVERGES -- the replay was wrong'}")
     print(f"  vs the old ladder ($2.1900): {2.1900/cost:.2f}x cheaper at "
