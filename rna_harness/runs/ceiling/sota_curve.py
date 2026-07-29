@@ -164,6 +164,12 @@ def main():
     ap.add_argument("--seeds", type=int, default=1)
     ap.add_argument("--workers", type=int, default=16)    # x10 replicas = 160 of 256 cores
     ap.add_argument("--analyse-only", action="store_true")
+    ap.add_argument("--only-unsolved", action="store_true",
+                    help="restrict to targets unsolved at EVERY tier already on disk. Used to ask whether the "
+                         "16 targets called 'hopeless' at t<=180s are a DESIGNABILITY wall or merely a BUDGET "
+                         "wall -- the published curve reaches 95/100 at 1 h/target, so most of them should "
+                         "flip if it is budget. Declared before the run: >=8 of 16 solving by t<=1800s means "
+                         "budget wall, <=3 means designability wall.")
     a = ap.parse_args()
     os.makedirs(OUT, exist_ok=True)
     budgets = [int(x) for x in a.budgets.split(",")]
@@ -172,6 +178,17 @@ def main():
     from rna_harness.structure_utils import has_pseudoknot
     P = load_eterna100(version="V2")
     T = [(p["id"], p.get("name", ""), p["target"]) for p in P if not has_pseudoknot(p["target"])]
+    if a.only_unsolved:
+        seen, solved_any = set(), set()
+        for f in os.listdir(OUT) if os.path.isdir(OUT) else []:
+            if f.endswith(".json"):
+                d = json.load(open(os.path.join(OUT, f)))
+                seen.add(d["id"])
+                if d.get("solved"):
+                    solved_any.add(d["id"])
+        T = [t for t in T if t[0] in seen and t[0] not in solved_any]
+        print(f"  --only-unsolved: {len(T)} targets unsolved at every tier already measured -> "
+              f"{[t[0] for t in T]}")
     print(f"DesiRNA S(B) on Eterna100-V2: {len(T)} nested targets x {len(budgets)} budgets x {a.seeds} seed(s)")
     print(f"  budgets -t {budgets} s, -R {a.replicas}, -r {a.results}, -p 2004 (matches our oracle)")
     print(f"  published anchor: 85/100 at <1 min, 97/100 at 24 h (Wirecki 2025); our harness: 64/100")

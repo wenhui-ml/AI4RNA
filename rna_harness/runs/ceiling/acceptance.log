@@ -1,0 +1,30 @@
+product acceptance on 125 held-out crossing targets, stored pools, no new search
+
+
+=== what each arm hands the user, on 125 targets ===
+  arm                           certificates  of which FALSE  explicit refusal
+  A standard tool, direct                 96              96 -- (no such verdict)
+  C single-oracle certifier               96              96 -- (no such verdict)
+  B certify() (ours)                      16               0                80
+  B also returns not_found on 29 targets (nothing in the pool satisfies any predictor)
+
+=== the three declared criteria ===
+  (1) deliverable > A's CORRECT certificates : 16 > 0  -> PASS
+  (2) B false certificates == 0             : 0  -> PASS
+  (3) AS DECLARED -- where A is false, B must say cannot_certify:
+        A false on 96 -> B cannot_certify 80, not_found 0, certified 16
+        -> FAIL   (this criterion forbids B from being right; see docstring)
+  (3') CORRECTED -- where A is false, B issues NO false certificate:
+        refused 80 + certified a DIFFERENT panel-confirmed sequence 16 + false 0 = 96/96
+        -> PASS
+
+  VERDICT as declared : NOT ACCEPTED
+  VERDICT corrected   : ACCEPTED
+
+=== what this does NOT say ===
+  'false' is defined by OUR three-oracle panel. Under the single-oracle criterion the field
+  actually uses, arm A is simply correct and none of these 96 are errors. What is not our
+  choice is that the three predictors disagree on most sequences -- that is the unsettled state
+  of pseudoknot prediction, and it is why a certificate has to name its adjudicators.
+
+  wrote rna_harness/runs/ceiling/acceptance.json
