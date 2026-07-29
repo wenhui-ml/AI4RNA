@@ -251,6 +251,7 @@ def certify_design(target: str, budget: str = "standard", seed: int = 0) -> Cert
 
     oc = OracleConfig(param_set="turner2004", temperature=37.0, dangles=2)
     t0, cost, tried = time.time(), 0.0, []
+    best_bp = None                             # closest miss, so `not_found` can say HOW close it got
     best_ref_only = None                       # a candidate the reference oracle accepts but the panel does not
     for tl in tiers:
         a0 = time.time()
@@ -267,7 +268,10 @@ def certify_design(target: str, budget: str = "standard", seed: int = 0) -> Cert
                 uniq.append(c)
 
         if kind == "nested":
+            import RNA
             for c in uniq:
+                bp = RNA.bp_distance(RNA.fold(c)[0], target)
+                best_bp = bp if best_bp is None else min(best_bp, bp)
                 rungs = _nested_rungs(c, target)
                 if "match" in rungs:
                     w = time.time() - t0
@@ -305,12 +309,29 @@ def certify_design(target: str, budget: str = "standard", seed: int = 0) -> Cert
                                   "than wrong: the same panel recovers only 32%/6%/8% of NATIVE structures "
                                   "exactly, so non-confirmation is weak evidence against a design.")
     nxt = {"cheap": "standard", "standard": "best_effort"}.get(budget)
+    # What a larger budget is actually worth, measured (runs/ceiling/wall.py). Of the 16 Eterna100 targets
+    # unsolved at t<=180s, extending to t<=1800s solved 7 and left 9 -- and four of those nine sit at bp=1-2
+    # and did not move under a 10x budget, the same signature the archived E1 certified as a designability
+    # wall rather than a search-budget wall. So "just pay more" is not an honest thing to tell a caller: it
+    # helps SOME targets and nothing here can say which. A near miss is specifically NOT a promise.
+    more = ""
+    if nxt:
+        more = (f" A larger budget is available (budget='{nxt}'), but it is not a promise: on the measured "
+                f"Eterna100 residual, raising the budget 10x solved 7 of 16 and left 9, and this call cannot "
+                f"tell you which kind yours is.")
+    else:
+        more = (" This is the largest budget offered. On the measured Eterna100 residual, 9 of 16 targets "
+                "remain unsolved even at this tier, and four of those sit one base pair away without moving "
+                "under a 10x budget -- for those, more compute is not the missing ingredient.")
+    near = ""
+    if best_bp is not None:
+        near = (f" Closest candidate was {best_bp} base pair(s) away."
+                + (" In our measurements targets stuck at 1-2 base pairs did NOT improve with 10x more"
+                   " budget, so treat this as a hard case rather than an almost." if best_bp <= 2 else ""))
     return Certificate("not_found", target, len(target), kind, budget=budget,
                        checked_by=("panel: pKiss AND ProbKnot AND ShapeKnots" if kind == "pseudoknot"
                                    else "ViennaRNA MFE (turner2004, dangles=2)"),
-                       cost_usd=cost, wait_s=round(w, 2), detail={"tiers_tried": tried},
+                       cost_usd=cost, wait_s=round(w, 2),
+                       detail={"tiers_tried": tried, "best_bp": best_bp},
                        reason=(f"no sequence survived the criterion within the '{budget}' budget "
-                               f"(tiers {tried} s)."
-                               + (f" A larger budget is available: budget='{nxt}'." if nxt else
-                                  " This is the largest budget offered; on Eterna100 about 16 of 100 targets "
-                                  "are unsolved even here.")))
+                               f"(tiers {tried} s).{near}{more}"))
