@@ -317,6 +317,12 @@ Actions:
   propose_structure {"elements":[...]}      build the target shape. Elements are
         {"type":"hairpin","stem":<bp>,"loop":<nt>}   {"type":"spacer","len":<nt>}
         {"type":"internal_loop","outer_stem":<bp>,"left":<nt>,"right":<nt>,"inner_stem":<bp>,"loop":<nt>}
+        {"type":"multiloop","closing_stem":<bp>,"spacer":<nt>,"branches":[{"stem":<bp>,"loop":<nt>}, ...]}
+              a multiway junction -- one closing stem enclosing two or more hairpins. Still NESTED, so it is
+              judged by the exact oracle.
+        {"type":"pseudoknot","stem1":<bp>,"stem2":<bp>,"loop1":<nt>,"loop2":<nt>,"loop3":<nt>}
+              an H-type pseudoknot. Judged by a weaker, calibrated criterion -- only choose it when the
+              request actually asks for crossing stems.
         You never write dot-bracket. You give element types and integer lengths; the code assembles and counts.
   place_constraint  {"motif":"GGGG","at":<0-based position>}    pin a fixed sub-sequence. ADDITIVE:
         call it again to pin a second region; the first stays. Overlapping placements that disagree are

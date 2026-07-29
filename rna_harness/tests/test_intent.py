@@ -68,16 +68,61 @@ def test_physically_impossible_requests_are_refused_with_a_reason(el, why):
     assert len(err) > 20, "the refusal has to explain itself"
 
 
-def test_out_of_scope_shapes_say_so_instead_of_guessing():
-    for t in ("multiloop", "pseudoknot", "kissing"):
+def test_a_kissing_complex_is_still_refused_and_not_faked_as_an_h_type_knot():
+    """Multiloops and H-type pseudoknots are now built. A kissing complex is two hairpin LOOPS pairing with
+    each other -- a different topology -- so assembling it as an H-type knot would silently answer a
+    different question."""
+    for t in ("kissing", "kissing_loop"):
         db, err = assemble(Spec(elements=[{"type": t}]))
         assert db is None
-        assert "dot-bracket directly" in err
+        assert "not an H-type pseudoknot" in err and "dot-bracket directly" in err
 
 
 def test_minimums_are_the_physical_ones():
     assert MIN_LOOP == 3          # a hairpin loop shorter than 3 nt cannot close
     assert MIN_STEM == 2          # a 1-bp stem is a lonely pair
+
+
+# ---- the two classes that were refused for the wrong reason ---------------------------------------
+def test_multiway_junction_is_assembled_and_is_nested():
+    """A junction is NESTED, so the exact MFE oracle judges it with no new machinery. It was refused in v1
+    because this assembler was simple -- an implementation boundary mistaken for a capability boundary."""
+    from rna_harness.cognitive.certify import classify
+    db, err = assemble(Spec(elements=[{"type": "multiloop", "closing_stem": 5, "spacer": 2,
+                                       "branches": [{"stem": 4, "loop": 4}, {"stem": 4, "loop": 4}]}]))
+    assert err is None
+    assert db == "(((((..((((....))))..((((....))))..)))))"
+    assert db.count("(") == db.count(")")
+    assert classify(db)[0] == "nested"
+
+
+def test_junction_needs_at_least_two_branches():
+    db, err = assemble(Spec(elements=[{"type": "multiloop", "closing_stem": 4,
+                                       "branches": [{"stem": 3, "loop": 4}]}]))
+    assert db is None and "at least 2" in err
+
+
+def test_junction_branch_minimums_are_enforced():
+    for br, why in (({"stem": 1, "loop": 4}, "lonely pair"), ({"stem": 3, "loop": 1}, "loop too short")):
+        db, err = assemble(Spec(elements=[{"type": "multiloop", "closing_stem": 4,
+                                          "branches": [br, {"stem": 3, "loop": 4}]}]))
+        assert db is None and err, why
+
+
+def test_h_type_pseudoknot_is_assembled_and_actually_crosses():
+    """Its verdict already existed: knot_confirmed is calibrated at 84.0% sensitivity / 0.4% false accept."""
+    from rna_harness.cognitive.certify import classify
+    db, err = assemble(Spec(elements=[{"type": "pseudoknot", "stem1": 4, "stem2": 4,
+                                       "loop1": 4, "loop2": 3, "loop3": 4}]))
+    assert err is None
+    assert db == "((((....[[[[...))))....]]]]"
+    assert db.count("(") == db.count(")") == 4 and db.count("[") == db.count("]") == 4
+    assert classify(db)[0] == "pseudoknot", "it must route to the pseudoknot verdict, not the MFE one"
+
+
+def test_pseudoknot_stem_minimums_are_enforced():
+    db, err = assemble(Spec(elements=[{"type": "pseudoknot", "stem1": 1, "stem2": 4}]))
+    assert db is None and str(MIN_STEM) in err
 
 
 # ---- a function is not a shape: the refusal that prevents a true certificate for a wrong target -----

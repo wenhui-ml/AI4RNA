@@ -23,9 +23,15 @@ DOMAIN CONSTRAINTS THE CALLER DOES NOT KNOW are enforced here rather than discov
 a hairpin loop needs at least 3 unpaired nucleotides to close at all, and a stem of 1 base pair is a lonely
 pair that will not hold. Rejecting those with an explanation is more useful than designing against them.
 
-SCOPE, stated rather than implied. v1 assembles hairpins, chains of hairpins joined by unpaired spacers, and
-internal loops/bulges. It does NOT assemble multiloops or pseudoknots -- those requests are refused with that
-reason, and a caller who already has a dot-bracket can always pass it through untouched.
+SCOPE. Hairpins, chains of hairpins joined by spacers, internal loops/bulges, MULTIWAY JUNCTIONS and H-type
+PSEUDOKNOTS.
+
+The last two were refused in v1 for the wrong reason. They were out of scope because this assembler was
+simple, not because anything downstream could not judge them: a multiway junction is NESTED, so the exact
+ViennaRNA oracle handles it with no new work at all, and a pseudoknot is adjudicated by the already-calibrated
+knot_confirmed rule (84.0% sensitivity on known natural structures, 0.4% false accept on random). Refusing
+them confused the author's implementation boundary with the system's capability boundary, which is a mistake
+worth naming: it made the product look narrower than the machinery underneath it.
 """
 from __future__ import annotations
 
@@ -107,9 +113,43 @@ def assemble(spec: Spec):
                 if loop < MIN_LOOP:
                     return None, f"element {i} has a {loop}-nt hairpin loop; the minimum is {MIN_LOOP}"
                 out.append("(" * so + "." * lft + "(" * si + "." * loop + ")" * si + "." * rgt + ")" * so)
-            elif t in ("multiloop", "pseudoknot", "kissing"):
-                return None, (f"element {i} is a {t}; v1 assembles hairpins, chains of hairpins and "
-                              f"internal loops only. Supply the dot-bracket directly for this one.")
+            elif t in ("multiloop", "junction"):
+                # A multiway junction: one closing stem, then `branches` hairpins separated by spacers, all
+                # nested -- so the exact MFE oracle judges it exactly as it judges a hairpin.
+                cl = int(e["closing_stem"])
+                br = list(e.get("branches") or [])
+                sp = int(e.get("spacer", 1))
+                if cl < MIN_STEM:
+                    return None, f"element {i} has a {cl}-bp closing stem; the minimum is {MIN_STEM}"
+                if len(br) < 2:
+                    return None, (f"element {i} is a junction with {len(br)} branch(es); a junction needs at "
+                                  f"least 2 -- one branch inside a stem is just an internal loop")
+                inner = []
+                for b in br:
+                    bs, bl = int(b["stem"]), int(b["loop"])
+                    if bs < MIN_STEM:
+                        return None, f"element {i} has a branch stem of {bs} bp; the minimum is {MIN_STEM}"
+                    if bl < MIN_LOOP:
+                        return None, f"element {i} has a branch loop of {bl} nt; the minimum is {MIN_LOOP}"
+                    inner.append("(" * bs + "." * bl + ")" * bs)
+                out.append("(" * cl + ("." * sp) + ("." * sp).join(inner) + ("." * sp) + ")" * cl)
+            elif t in ("pseudoknot", "h_pseudoknot"):
+                # H-type pseudoknot: stem1 opens, stem2 opens inside loop1, stem1 closes, stem2 closes in the
+                # tail. The crossing is what makes it a pseudoknot, and knot_confirmed already judges it.
+                s1, s2 = int(e["stem1"]), int(e["stem2"])
+                l1 = int(e.get("loop1", MIN_LOOP))
+                l2 = int(e.get("loop2", MIN_LOOP))
+                l3 = int(e.get("loop3", MIN_LOOP))
+                if min(s1, s2) < MIN_STEM:
+                    return None, f"element {i} has a stem below {MIN_STEM} bp"
+                if min(l1, l2, l3) < 1:
+                    return None, f"element {i} needs at least 1 unpaired nucleotide in each connecting loop"
+                out.append("(" * s1 + "." * l1 + "[" * s2 + "." * l2 + ")" * s1 + "." * l3 + "]" * s2)
+            elif t in ("kissing", "kissing_loop"):
+                # A kissing complex is two hairpin loops pairing with EACH OTHER -- a different topology from
+                # an H-type knot, and assembling it as one would silently answer a different question.
+                return None, (f"element {i} is a kissing complex, which this assembler does not build; it is "
+                              f"not an H-type pseudoknot. Supply the dot-bracket directly for this one.")
             else:
                 return None, f"element {i} has unknown type {t!r}"
         except (KeyError, TypeError, ValueError) as ex:
@@ -133,6 +173,11 @@ Element types:
   {{"type":"spacer","len":<nt>}}                              unpaired nucleotides between elements
   {{"type":"internal_loop","outer_stem":<bp>,"left":<nt>,
     "right":<nt>,"inner_stem":<bp>,"loop":<nt>}}              a stem interrupted by an asymmetric bulge
+  {{"type":"multiloop","closing_stem":<bp>,"spacer":<nt>,
+    "branches":[{{"stem":<bp>,"loop":<nt>}}, ...]}}           a multiway junction: one closing stem enclosing
+                                                              two or more hairpin branches
+  {{"type":"pseudoknot","stem1":<bp>,"stem2":<bp>,
+    "loop1":<nt>,"loop2":<nt>,"loop3":<nt>}}                  an H-type pseudoknot (two crossing stems)
 
 Rules:
   * a hairpin loop must be at least {MIN_LOOP} nt and a stem at least {MIN_STEM} bp; if the request asks for
@@ -141,8 +186,8 @@ Rules:
   * `interpretation` is what the caller will be shown to confirm you understood; write it for someone who
     does not know RNA, and WRITE IT IN THE SAME LANGUAGE THE REQUEST WAS WRITTEN IN. A Chinese question
     answered in English defeats the whole point of this layer.
-  * if the request needs a multiloop or a pseudoknot, emit {{"type":"multiloop"}} or {{"type":"pseudoknot"}}
-    so the caller can say it is out of scope, rather than guessing.
+  * a pseudoknot is judged by a different, weaker criterion than a nested shape -- do not choose one unless
+    the request actually asks for crossing stems.
   * if the request asks for a biological FUNCTION rather than a SHAPE -- binding something, catalysing
     something, switching, silencing a gene, a therapeutic -- reply
     {{"out_of_scope":"function","interpretation":"<say what they asked for, in their language>"}}
