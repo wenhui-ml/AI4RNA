@@ -1,0 +1,48 @@
+end-to-end verification of default_toolbox() on 100 Eterna100-V2 targets
+  ladder: ['desirna@5s+panel', 'desirna@15s+panel', 'desirna@60s+panel', 'desirna@180s+panel']
+  simulated target (ladder.py): 84/100 at $1.0811; old ladder was 84/100 at $2.1900
+
+  200 to run, 16 workers
+    10/200  0.2 min  eta 3.0 min
+    20/200  0.3 min  eta 2.7 min
+    30/200  0.5 min  eta 2.6 min
+    40/200  0.5 min  eta 2.2 min
+    50/200  0.7 min  eta 2.0 min
+    60/200  0.9 min  eta 2.2 min
+    70/200  1.5 min  eta 2.7 min
+    80/200  3.5 min  eta 5.2 min
+    90/200  6.3 min  eta 7.7 min
+    100/200  6.8 min  eta 6.8 min
+    110/200  7.1 min  eta 5.8 min
+    120/200  7.3 min  eta 4.8 min
+    130/200  7.5 min  eta 4.1 min
+    140/200  7.7 min  eta 3.3 min
+    150/200  8.0 min  eta 2.7 min
+    160/200  9.1 min  eta 2.3 min
+    170/200  9.8 min  eta 1.7 min
+    180/200  12.7 min  eta 1.4 min
+    190/200  14.8 min  eta 0.8 min
+    200/200  19.7 min  eta 0.0 min
+
+=== SEED REPLICATION of the product row: 83/100, 9.5 s median, $1.10 ===
+   seed  solved   $ total  wait median (solved)
+      0      83    1.0992                   9.5
+      1      85    1.0755                   9.5
+      2      82    1.1310                   9.6
+  solved  mean 83.3  sd 1.25  range [82, 85]
+  cost    mean $1.1019  sd $0.0227
+  wait    mean 9.5s  sd 0.07s
+  -> the solved count is STABLE (spread <= 3) across seeds
+
+=== measured ===
+  83/100 solved, $1.0992 total, $0.01324/solve, 0 errors
+  simulated: 84/100 at $1.0811  ->  CONSISTENT
+  vs the old ladder ($2.1900): 1.99x cheaper at -1 solves
+
+  first solver: {'desirna@5s+panel': 72, 'desirna@15s+panel': 5, 'desirna@60s+panel': 4, 'desirna@180s+panel': 2}
+  rungs fired per target: {1: 72, 2: 5, 3: 4, 4: 19}
+   <=100nt:  38/40  $0.1939
+   101-250:  31/35  $0.2407
+      >250:  14/25  $0.6646
+
+  wrote rna_harness/runs/ceiling/verify_ladder.json
