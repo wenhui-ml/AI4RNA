@@ -44,6 +44,13 @@ MAX_STEPS = 14   # the real bound is max_cost_usd; this one only stops a loop th
 # The output cap covers reasoning AND content, so it must clear the hardest shape's reasoning with room left
 # for the json. MEASURED on the benchmark's own items: a hairpin decision costs ~300 tokens, a junction or an
 # H-type knot 2900-4300 tokens of reasoning alone. At 1200 the junction family scored 0/6 with EMPTY replies.
+# The shape probe is only free on short targets, and "free" is the entire reason it is run before every
+# design. MEASURED on bpRNA structures, 6 per band, 20 s cap: <=110 nt answers 6/6 at a 1.1 s median; 111-150
+# answers 5/6 at 14.4 s; 151-200 answers 1/6; above 200 it answers 0/6 and always burns the full cap. So
+# above the cutoff it stops being either free or informative, and it declines by length instead of making a
+# user wait 20 s to be told nothing.
+PROBE_MAX_N = 110
+
 THINK_TOKENS = 6000
 THINK_TOKENS_MAX = 16000   # the one retry after a truncated reply; beyond this it is a real failure
 WC = {("A", "U"), ("U", "A"), ("G", "C"), ("C", "G"), ("G", "U"), ("U", "G")}
@@ -208,6 +215,11 @@ def designable_probe(target: str, timeout_s: float = 20.0) -> dict:
     if kind != "nested":
         return {"ok": True, "designable": None,
                 "note": "skipped: ViennaRNA's inverse fold cannot represent crossing pairs (it crashes on them)"}
+    if len(target) > PROBE_MAX_N:
+        return {"ok": True, "designable": None, "min_helix": _min_helix(target),
+                "note": (f"skipped: at {len(target)} nt this check answers less than half the time and costs "
+                         f"the full {timeout_s:.0f}s when it fails (measured); it is only worth running at "
+                         f"or below {PROBE_MAX_N} nt")}
     code = ("import sys, RNA\n"
             "t = sys.argv[1]\n"
             "for _ in range(3):\n"
@@ -554,10 +566,10 @@ def _prime(sess: "Session") -> None:
                         "nothing to choose")
     sess.target = sess.requested_target = obs["target"]
     sess.requested_by_user = True
-    sess.steps.append(Step(0, "use_target", {"which": 0}, obs))
+    sess.steps.append(Step(len(sess.steps) + 1, "use_target", {"which": 0}, obs))
     chk = check_feasible(sess.target, sess.restraint)
     chk["automatic"] = "run by the harness: it is free and it is required before spending"
-    sess.steps.append(Step(0, "check_feasible", {}, chk))
+    sess.steps.append(Step(len(sess.steps) + 1, "check_feasible", {}, chk))
 
 
 def _observations(sess: "Session") -> str:

@@ -24,8 +24,9 @@ cascade on the 14 decomposable targets, same oracle, same solver, comparable wal
 
     whole-target cascade    1/14      decompose + design + pin + repair    0/14
 
-Not a near miss -- the closest the parts arm came was 20 base pairs away and the median was 94. So the
-question is which assumption broke, and it is the load-bearing one. Design every unit independently, verify
+Mostly not close either: median 84.5 base pairs away, and only one target (Cat's Toy 2, 100 nt) came within
+1 -- which the whole-target arm also failed. So the question is which assumption broke, and it is the
+load-bearing one. Design every unit independently, verify
 each folds to its own sub-target exactly, place them at their positions, and ask what the assembly folds to:
 
     42 of 145 individually-correct units -- 29% -- still hold their own shape once embedded
@@ -90,6 +91,13 @@ def _inverse_fold_many(sub_targets: List[str], tries: int = UNIT_TRIES, timeout_
         return _json.loads(r.stdout.strip())
     except Exception:                                                     # noqa: BLE001
         return [None] * len(sub_targets)
+
+
+def _held(seq: str, restraint: str) -> Dict:
+    """Exact: does this sequence keep every pinned base? Reported, never assumed."""
+    bad = [i for i, ch in enumerate(restraint) if ch != "N" and seq[i] != ch]
+    return {"held": not bad, "violated_positions": bad[:16], "n_violated": len(bad),
+            "n_pinned": sum(1 for ch in restraint if ch != "N")}
 
 
 def design_by_parts(target: str, restraint: Optional[str] = None, repair_budget: str = "standard",
@@ -161,9 +169,17 @@ def design_by_parts(target: str, restraint: Optional[str] = None, repair_budget:
                 pool.append(c)
         for c in pool:
             screened += 1
+            # THE FOLD IS NOT THE WHOLE ANSWER. Measured at real scale: with 233 of 282 positions pinned,
+            # only 12 of 22 returned candidates hold the restraint completely -- the rest keep 95-99% of it.
+            # Accepting on the fold alone would issue a certificate for a sequence that breaks the very pins
+            # the repair stage was given, which is the same class of error as certifying the wrong shape.
+            held = _held(c, seed_restraint)
+            if not held["held"]:
+                continue
             cert = certify_sequence(c, target)
             if cert.verdict in ("certified", "knot_confirmed"):
                 return {"ok": True, "verdict": cert.verdict, "sequence": c, "cost_usd": cost,
+                        "constraint_held": held, "seed_restraint": seed_restraint,
                         "wall_s": round(time.time() - t0, 1), "n_units": len(units),
                         "units_solved": pinned_units, "units_dropped_for_pin_clash": dropped_units,
                         "seed_coverage": round(covered / len(target), 3), "n_screened": screened,
@@ -172,8 +188,11 @@ def design_by_parts(target: str, restraint: Optional[str] = None, repair_budget:
                                  f"({covered}/{len(target)} positions), the rest repaired by search")}
             bp = (cert.detail or {}).get("best_bp")
             if bp is not None and (best_bp is None or bp < best_bp):
-                best, best_bp = c, bp
+                best, best_bp = c, bp        # only pin-holding candidates reach here, so the reported
+                                             # closest miss is a real candidate and not a rule-breaker
     return {"ok": True, "verdict": "not_found", "sequence": best, "cost_usd": cost,
+            "seed_restraint": seed_restraint,
+            "constraint_held": (_held(best, seed_restraint) if best else None),
             "wall_s": round(time.time() - t0, 1), "n_units": len(units), "units_solved": pinned_units,
             "units_dropped_for_pin_clash": dropped_units, "seed_coverage": round(covered / len(target), 3),
             "n_screened": screened, "bp_away": best_bp, "units": unit_report,

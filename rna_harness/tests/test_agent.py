@@ -464,3 +464,24 @@ def test_a_request_with_no_structure_is_not_primed():
             client=_Scripted(['{"action":"propose_structure","args":{"elements":'
                               '[{"type":"hairpin","stem":6,"loop":4}]}}']), max_steps=1)
     assert s.steps[0].action == "propose_structure" and len(s.steps) == 1
+
+
+def test_the_free_check_declines_by_length_instead_of_burning_its_timeout():
+    """MEASURED on bpRNA, 6 structures per band at a 20 s cap: <=110 nt answers 6/6 at a 1.1 s median;
+    111-150 answers 5/6; 151-200 answers 1/6; above 200 it answers 0/6 and always spends the full cap. Since
+    the whole reason it runs before every design is that it is free, above the cutoff it must decline rather
+    than make someone wait 20 s to be told nothing -- the primed opening runs it on every pasted structure."""
+    import time
+    from rna_harness.cognitive.agent import PROBE_MAX_N, designable_probe
+    long_target = "(" * 200 + "." * 20 + ")" * 200
+    t0 = time.time()
+    o = designable_probe(long_target)
+    assert o["designable"] is None and str(PROBE_MAX_N) in o["note"]
+    assert time.time() - t0 < 1.0, "declining must be instant, not a timeout"
+    assert o["min_helix"] == 200, "it can still report what it computes for free"
+
+
+def test_primed_steps_are_numbered_in_order():
+    s = run("我有一个结构 ((((...)))) 请给我序列",
+            client=_Scripted(['{"action":"check_feasible","args":{}}']), max_steps=1)
+    assert [st.n for st in s.steps] == [1, 2, 3]

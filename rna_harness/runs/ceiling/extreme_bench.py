@@ -38,18 +38,24 @@ def work(job):
     from rna_harness.benchmarks.eterna100 import load_eterna100
     row = {int(r["id"]): r for r in load_eterna100()}[tid]
     t0 = time.time()
-    if arm == "whole":
-        from rna_harness.cognitive.certify import certify_design
-        c = certify_design(row["target"], budget=budget)
-        rec = {"verdict": c.verdict, "sequence": c.sequence, "cost_usd": c.cost_usd}
-    else:
-        from rna_harness.cognitive.parts import design_by_parts
-        o = design_by_parts(row["target"], repair_budget=budget)
-        rec = {"verdict": o.get("verdict") or ("error" if not o.get("ok") else "?"),
-               "sequence": o.get("sequence"), "cost_usd": o.get("cost_usd") or 0.0,
-               "n_units": o.get("n_units"), "units_solved": o.get("units_solved"),
-               "seed_coverage": o.get("seed_coverage"), "bp_away": o.get("bp_away"),
-               "note": o.get("note") or o.get("error")}
+    try:
+        if arm == "whole":
+            from rna_harness.cognitive.certify import certify_design
+            c = certify_design(row["target"], budget=budget)
+            rec = {"verdict": c.verdict, "sequence": c.sequence, "cost_usd": c.cost_usd}
+        else:
+            from rna_harness.cognitive.parts import design_by_parts
+            o = design_by_parts(row["target"], repair_budget=budget)
+            rec = {"verdict": o.get("verdict") or ("error" if not o.get("ok") else "?"),
+                   "sequence": o.get("sequence"), "cost_usd": o.get("cost_usd") or 0.0,
+                   "n_units": o.get("n_units"), "units_solved": o.get("units_solved"),
+                   "seed_coverage": o.get("seed_coverage"), "bp_away": o.get("bp_away"),
+                   "constraint_held": o.get("constraint_held"),
+                   "note": o.get("note") or o.get("error")}
+    except Exception as e:                                                # noqa: BLE001
+        # One target that raises must not take the other 31 jobs with it: the pool re-raises from
+        # f.result() and the whole comparison is lost, including the arms that had already finished.
+        rec = {"verdict": "error", "sequence": None, "cost_usd": 0.0, "note": repr(e)[:200]}
     rec.update({"id": tid, "arm": arm, "name": row.get("name"), "n": len(row["target"]),
                 "solved": rec["verdict"] in ("certified", "knot_confirmed"),
                 "wall_s": round(time.time() - t0, 1)})
