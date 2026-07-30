@@ -1,0 +1,185 @@
+{
+ "request": "我有一个结构 ..(((.[[[.[[)))...]].]]].. ,请给我一条能折叠成它的 RNA 序列",
+ "steps": [
+  {
+   "n": 1,
+   "action": "use_target",
+   "args": {
+    "which": 0
+   },
+   "observation": {
+    "ok": true,
+    "target": "..(((.[[[.[[)))...]].]]]..",
+    "n": 26,
+    "kind": "pseudoknot",
+    "plain": "共 26 个碱基,8 对碱基配对,3 段茎",
+    "note": "adopted verbatim from the request -- it is the user's structure, not a proposed one",
+    "automatic": "adopted by the harness: the request contains exactly one structure, so there was nothing to choose"
+   },
+   "cost_usd": 0.0,
+   "wall_s": 0.0,
+   "thought": ""
+  },
+  {
+   "n": 2,
+   "action": "check_feasible",
+   "args": {},
+   "observation": {
+    "ok": true,
+    "conflicts": [],
+    "shape": {
+     "ok": true,
+     "designable": null,
+     "note": "skipped: ViennaRNA's inverse fold cannot represent crossing pairs (it crashes on them)"
+    },
+    "note": "nothing is pinned yet, so the pins have nothing to check -- but the SHAPE check above did run, and it is the one that decides whether search can work at all. Next: place_constraint if the request fixes any bases, otherwise design.",
+    "automatic": "run by the harness: it is free and it is required before spending"
+   },
+   "cost_usd": 0.0,
+   "wall_s": 0.0,
+   "thought": ""
+  },
+  {
+   "n": 3,
+   "action": "design",
+   "args": {
+    "budget": "cheap"
+   },
+   "observation": {
+    "ok": true,
+    "sequence": "AACCGACCCAGCCGGGAAGCAGGGGA",
+    "cost_usd": 0.001200079553657108,
+    "wall_s": 74.2,
+    "verdict": "knot_confirmed",
+    "constraint_held": null,
+    "gc": null,
+    "tm": null,
+    "bp_away": null,
+    "certificate": {
+     "verdict": "knot_confirmed",
+     "target": "..(((.[[[.[[)))...]].]]]..",
+     "n": 26,
+     "kind": "pseudoknot",
+     "sequence": "AACCGACCCAGCCGGGAAGCAGGGGA",
+     "checked_by": "crossing stems: shapeknots",
+     "strictness": "knot-recall (k=1, tau=1.0)",
+     "rungs_passed": [
+      "knot-recall"
+     ],
+     "cost_usd": 0.001200079553657108,
+     "wait_s": 74.2,
+     "budget": "cheap",
+     "reason": "no candidate reproduced the whole structure under all three predictors, but the crossing stems that make this a pseudoknot are fully reproduced by shapeknots. Claim is about the KNOT only; the criterion recognises 84% of known natural structures at 0.4% false accept on random sequences.",
+     "detail": {
+      "tiers_tried": [
+       5
+      ],
+      "knot": {
+       "per_oracle": {
+        "pkiss": 0.6,
+        "probknot": 0.6,
+        "shapeknots": 1.0
+       },
+       "n_cross": 5,
+       "confirmed_by": [
+        "shapeknots"
+       ],
+       "knot_confirmed": true
+      },
+      "operating_point": {
+       "rule": "crossing stems fully reproduced by at least 1 of 3 oracles (k=1, tau=1.0)",
+       "sensitivity_on_known_structures": 0.84,
+       "false_accept_on_random_sequences": 0.004,
+       "scope": "the CROSSING STEMS only -- this says nothing about the rest of the structure",
+       "note": "sensitivity is unchanged from tau=1.0 down to 0.9: these predictors get a knot entirely right or entirely wrong. Composing this with an exact nested-skeleton check was tried and refuted (ViennaRNA recovers the nested reduction from only 20 of 186 natives)."
+      }
+     },
+     "disclaimer": "`certified` means the sequence folds to the target under the stated computational model. It is not a claim about behaviour in vitro or in vivo.",
+     "seed": 0,
+     "generated_utc": "2026-07-30T12:53:36Z",
+     "provenance": {
+      "schema": "rna-certificate/1.0",
+      "python": "3.10.20",
+      "viennarna": "2.7.2",
+      "desirna": "/data/wenhui/DesiRNA@bdb4908",
+      "pkiss": "/home/ubuntu/miniconda3/envs/pk/bin/pKiss",
+      "rnastructure": "ProbKnot: Version 6.6 (April 2, 2026)."
+     },
+     "verify_cmd": "python -m rna_harness.cognitive.certify '..(((.[[[.[[)))...]].]]]..' --sequence AACCGACCCAGCCGGGAAGCAGGGGA",
+     "rerun_search": "python -m rna_harness.cognitive.certify '..(((.[[[.[[)))...]].]]]..' --budget cheap --seed 0",
+     "reproducibility": "verify_cmd reproduces this certificate's claim exactly -- folding is deterministic. rerun_search re-runs the design and may return a different sequence: the search budget is wall-clock, not iteration count, so it is not seed-reproducible."
+    }
+   },
+   "cost_usd": 0.001200079553657108,
+   "wall_s": 74.2,
+   "thought": "The target pseudoknot is adopted and feasibility check passed (no conflicts, shape skipped for pseudoknots). No bases are pinned, so I'll try a cheap design first."
+  }
+ ],
+ "target": "..(((.[[[.[[)))...]].]]]..",
+ "restraint": null,
+ "gc": null,
+ "tm": null,
+ "sequences": null,
+ "pins": [],
+ "requested_target": "..(((.[[[.[[)))...]].]]]..",
+ "requested_by_user": true,
+ "substituted": null,
+ "certificate": {
+  "verdict": "knot_confirmed",
+  "target": "..(((.[[[.[[)))...]].]]]..",
+  "n": 26,
+  "kind": "pseudoknot",
+  "sequence": "AACCGACCCAGCCGGGAAGCAGGGGA",
+  "checked_by": "crossing stems: shapeknots",
+  "strictness": "knot-recall (k=1, tau=1.0)",
+  "rungs_passed": [
+   "knot-recall"
+  ],
+  "cost_usd": 0.001200079553657108,
+  "wait_s": 74.2,
+  "budget": "cheap",
+  "reason": "no candidate reproduced the whole structure under all three predictors, but the crossing stems that make this a pseudoknot are fully reproduced by shapeknots. Claim is about the KNOT only; the criterion recognises 84% of known natural structures at 0.4% false accept on random sequences.",
+  "detail": {
+   "tiers_tried": [
+    5
+   ],
+   "knot": {
+    "per_oracle": {
+     "pkiss": 0.6,
+     "probknot": 0.6,
+     "shapeknots": 1.0
+    },
+    "n_cross": 5,
+    "confirmed_by": [
+     "shapeknots"
+    ],
+    "knot_confirmed": true
+   },
+   "operating_point": {
+    "rule": "crossing stems fully reproduced by at least 1 of 3 oracles (k=1, tau=1.0)",
+    "sensitivity_on_known_structures": 0.84,
+    "false_accept_on_random_sequences": 0.004,
+    "scope": "the CROSSING STEMS only -- this says nothing about the rest of the structure",
+    "note": "sensitivity is unchanged from tau=1.0 down to 0.9: these predictors get a knot entirely right or entirely wrong. Composing this with an exact nested-skeleton check was tried and refuted (ViennaRNA recovers the nested reduction from only 20 of 186 natives)."
+   }
+  },
+  "disclaimer": "`certified` means the sequence folds to the target under the stated computational model. It is not a claim about behaviour in vitro or in vivo.",
+  "seed": 0,
+  "generated_utc": "2026-07-30T12:53:36Z",
+  "provenance": {
+   "schema": "rna-certificate/1.0",
+   "python": "3.10.20",
+   "viennarna": "2.7.2",
+   "desirna": "/data/wenhui/DesiRNA@bdb4908",
+   "pkiss": "/home/ubuntu/miniconda3/envs/pk/bin/pKiss",
+   "rnastructure": "ProbKnot: Version 6.6 (April 2, 2026)."
+  },
+  "verify_cmd": "python -m rna_harness.cognitive.certify '..(((.[[[.[[)))...]].]]]..' --sequence AACCGACCCAGCCGGGAAGCAGGGGA",
+  "rerun_search": "python -m rna_harness.cognitive.certify '..(((.[[[.[[)))...]].]]]..' --budget cheap --seed 0",
+  "reproducibility": "verify_cmd reproduces this certificate's claim exactly -- folding is deterministic. rerun_search re-runs the design and may return a different sequence: the search budget is wall-clock, not iteration count, so it is not seed-reproducible."
+ },
+ "done": true,
+ "outcome": "certified",
+ "total_cost_usd": 0.0018674395536571078,
+ "llm_cost_usd": 0.00066736
+}

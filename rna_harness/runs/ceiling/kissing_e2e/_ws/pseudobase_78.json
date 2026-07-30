@@ -1,0 +1,171 @@
+{
+ "request": "我有一个结构 ((((.[[[[[..))))........(((((]]]]]((((....((((....)))).))))........))))). ,请给我一条能折叠成它的 RNA 序列",
+ "steps": [
+  {
+   "n": 1,
+   "action": "use_target",
+   "args": {
+    "which": 0
+   },
+   "observation": {
+    "ok": true,
+    "target": "((((.[[[[[..))))........(((((]]]]]((((....((((....)))).))))........))))).",
+    "n": 73,
+    "kind": "pseudoknot",
+    "plain": "共 73 个碱基,22 对碱基配对,1 个发夹环(环大小 4 个未配对碱基),5 段茎",
+    "note": "adopted verbatim from the request -- it is the user's structure, not a proposed one",
+    "automatic": "adopted by the harness: the request contains exactly one structure, so there was nothing to choose"
+   },
+   "cost_usd": 0.0,
+   "wall_s": 0.0,
+   "thought": ""
+  },
+  {
+   "n": 2,
+   "action": "check_feasible",
+   "args": {},
+   "observation": {
+    "ok": true,
+    "conflicts": [],
+    "shape": {
+     "ok": true,
+     "designable": null,
+     "note": "skipped: ViennaRNA's inverse fold cannot represent crossing pairs (it crashes on them)"
+    },
+    "note": "nothing is pinned yet, so the pins have nothing to check -- but the SHAPE check above did run, and it is the one that decides whether search can work at all. Next: place_constraint if the request fixes any bases, otherwise design.",
+    "automatic": "run by the harness: it is free and it is required before spending"
+   },
+   "cost_usd": 0.0,
+   "wall_s": 0.0,
+   "thought": ""
+  },
+  {
+   "n": 3,
+   "action": "design",
+   "args": {
+    "budget": "cheap"
+   },
+   "observation": {
+    "ok": true,
+    "sequence": "GGACGUGGUUAAGUCCCAAAUAAAGGUGAAACCAUCCGAGCAGACCGACGGGUCACGGAGAAAGCAGUCAUCG",
+    "cost_usd": 0.001284191409746806,
+    "wall_s": 9.86,
+    "verdict": "certified",
+    "constraint_held": null,
+    "gc": null,
+    "tm": null,
+    "bp_away": null,
+    "certificate": {
+     "verdict": "certified",
+     "target": "((((.[[[[[..))))........(((((]]]]]((((....((((....)))).))))........))))).",
+     "n": 73,
+     "kind": "pseudoknot",
+     "sequence": "GGACGUGGUUAAGUCCCAAAUAAAGGUGAAACCAUCCGAGCAGACCGACGGGUCACGGAGAAAGCAGUCAUCG",
+     "checked_by": "panel: pKiss AND ProbKnot AND ShapeKnots",
+     "strictness": "panel-unanimous",
+     "rungs_passed": [
+      "panel-unanimous"
+     ],
+     "cost_usd": 0.001284191409746806,
+     "wait_s": 9.86,
+     "budget": "cheap",
+     "reason": "all three independent predictors agree; solved at the 5s tier after trying [5]",
+     "detail": {
+      "tiers_tried": [
+       5
+      ],
+      "n_candidates_screened": 71,
+      "per_oracle": {
+       "pkiss": true,
+       "probknot": true,
+       "shapeknots": true
+      },
+      "operating_point": {
+       "rule": "at least 3 of 3 oracles exact (k=3, d=0)",
+       "sensitivity_on_known_structures": 0.008,
+       "false_accept_on_random_sequences": 0.0,
+       "note": "certification is a strong claim; NON-certification is nearly uninformative, because this rule recognises only 2 of 250 natural structures whose sequences are known to form them."
+      }
+     },
+     "disclaimer": "`certified` means the sequence folds to the target under the stated computational model. It is not a claim about behaviour in vitro or in vivo.",
+     "seed": 0,
+     "generated_utc": "2026-07-30T12:29:32Z",
+     "provenance": {
+      "schema": "rna-certificate/1.0",
+      "python": "3.10.20",
+      "viennarna": "2.7.2",
+      "desirna": "/data/wenhui/DesiRNA@bdb4908",
+      "pkiss": "/home/ubuntu/miniconda3/envs/pk/bin/pKiss",
+      "rnastructure": "ProbKnot: Version 6.6 (April 2, 2026)."
+     },
+     "verify_cmd": "python -m rna_harness.cognitive.certify '((((.[[[[[..))))........(((((]]]]]((((....((((....)))).))))........))))).' --sequence GGACGUGGUUAAGUCCCAAAUAAAGGUGAAACCAUCCGAGCAGACCGACGGGUCACGGAGAAAGCAGUCAUCG",
+     "rerun_search": "python -m rna_harness.cognitive.certify '((((.[[[[[..))))........(((((]]]]]((((....((((....)))).))))........))))).' --budget cheap --seed 0",
+     "reproducibility": "verify_cmd reproduces this certificate's claim exactly -- folding is deterministic. rerun_search re-runs the design and may return a different sequence: the search budget is wall-clock, not iteration count, so it is not seed-reproducible."
+    }
+   },
+   "cost_usd": 0.001284191409746806,
+   "wall_s": 9.9,
+   "thought": "目标伪结结构已采用，无冲突，无固定碱基约束，直接尝试设计。"
+  }
+ ],
+ "target": "((((.[[[[[..))))........(((((]]]]]((((....((((....)))).))))........))))).",
+ "restraint": null,
+ "gc": null,
+ "tm": null,
+ "sequences": null,
+ "pins": [],
+ "requested_target": "((((.[[[[[..))))........(((((]]]]]((((....((((....)))).))))........))))).",
+ "requested_by_user": true,
+ "substituted": null,
+ "certificate": {
+  "verdict": "certified",
+  "target": "((((.[[[[[..))))........(((((]]]]]((((....((((....)))).))))........))))).",
+  "n": 73,
+  "kind": "pseudoknot",
+  "sequence": "GGACGUGGUUAAGUCCCAAAUAAAGGUGAAACCAUCCGAGCAGACCGACGGGUCACGGAGAAAGCAGUCAUCG",
+  "checked_by": "panel: pKiss AND ProbKnot AND ShapeKnots",
+  "strictness": "panel-unanimous",
+  "rungs_passed": [
+   "panel-unanimous"
+  ],
+  "cost_usd": 0.001284191409746806,
+  "wait_s": 9.86,
+  "budget": "cheap",
+  "reason": "all three independent predictors agree; solved at the 5s tier after trying [5]",
+  "detail": {
+   "tiers_tried": [
+    5
+   ],
+   "n_candidates_screened": 71,
+   "per_oracle": {
+    "pkiss": true,
+    "probknot": true,
+    "shapeknots": true
+   },
+   "operating_point": {
+    "rule": "at least 3 of 3 oracles exact (k=3, d=0)",
+    "sensitivity_on_known_structures": 0.008,
+    "false_accept_on_random_sequences": 0.0,
+    "note": "certification is a strong claim; NON-certification is nearly uninformative, because this rule recognises only 2 of 250 natural structures whose sequences are known to form them."
+   }
+  },
+  "disclaimer": "`certified` means the sequence folds to the target under the stated computational model. It is not a claim about behaviour in vitro or in vivo.",
+  "seed": 0,
+  "generated_utc": "2026-07-30T12:29:32Z",
+  "provenance": {
+   "schema": "rna-certificate/1.0",
+   "python": "3.10.20",
+   "viennarna": "2.7.2",
+   "desirna": "/data/wenhui/DesiRNA@bdb4908",
+   "pkiss": "/home/ubuntu/miniconda3/envs/pk/bin/pKiss",
+   "rnastructure": "ProbKnot: Version 6.6 (April 2, 2026)."
+  },
+  "verify_cmd": "python -m rna_harness.cognitive.certify '((((.[[[[[..))))........(((((]]]]]((((....((((....)))).))))........))))).' --sequence GGACGUGGUUAAGUCCCAAAUAAAGGUGAAACCAUCCGAGCAGACCGACGGGUCACGGAGAAAGCAGUCAUCG",
+  "rerun_search": "python -m rna_harness.cognitive.certify '((((.[[[[[..))))........(((((]]]]]((((....((((....)))).))))........))))).' --budget cheap --seed 0",
+  "reproducibility": "verify_cmd reproduces this certificate's claim exactly -- folding is deterministic. rerun_search re-runs the design and may return a different sequence: the search budget is wall-clock, not iteration count, so it is not seed-reproducible."
+ },
+ "done": true,
+ "outcome": "certified",
+ "total_cost_usd": 0.002593218609746806,
+ "llm_cost_usd": 0.0013090272
+}
