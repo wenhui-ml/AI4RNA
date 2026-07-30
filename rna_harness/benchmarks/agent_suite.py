@@ -150,6 +150,11 @@ def build(n_per_class: int = 6):
         cs = _conflicting(t, 4)
         items.append({"id": f"restructurable-{k}", "class": "restructurable", "family": fam,
                       "expect": "certified", "target": t, "constraints": cs,
+                      # NO HINT THAT THE LENGTH IS FREE. Saying "总长不限,可以加长" out loud raised the
+                      # score and destroyed the measurement: recovery went to 0 and anticipation to 6/6,
+                      # because an announced freedom is planned around, not discovered. The silence is the
+                      # experiment -- what is being measured is whether the loop finds the room by hitting
+                      # the wall. (The over-refusal this briefly caused was a prompt bug, fixed there.)
                       "request": (f"我要这样一个结构:{phrase}，"
                                   f"第 {cs[0]['at'] + 1} 位起的 4 个碱基必须是 GGGG，"
                                   f"第 {cs[1]['at'] + 1} 位起的 4 个也必须是 GGGG"),

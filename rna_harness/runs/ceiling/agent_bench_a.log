@@ -1,0 +1,41 @@
+agent-loop benchmark: 18 items, 6 workers
+  the answer key is COMPUTED, not searched for -- constrained-design feasibility follows from the pair table
+
+  18 to run
+    1/18  0.6 min
+    2/18  0.6 min
+    3/18  0.8 min
+    4/18  0.8 min
+    5/18  0.8 min
+    6/18  1.0 min
+    7/18  2.2 min
+    8/18  2.5 min
+    9/18  3.2 min
+    10/18  3.3 min
+    11/18  3.4 min
+    12/18  3.7 min
+    13/18  3.8 min
+    14/18  3.8 min
+    15/18  5.3 min
+    16/18  7.1 min
+    17/18  8.7 min
+    18/18  24.3 min
+
+=== score, 18 items ===
+  class              correct      cost   steps                        notes
+  direct              6/6       0.0577     4.2                             
+  restructurable      6/6       0.2730     6.3   recovered 0, anticipated 4
+  impossible          5/6       0.4431     7.0       named the conflict 6/6
+
+=== by shape family (the two newly unlocked ones must not regress) ===
+  hairpin       6/6   correct   $0.1479
+  junction      5/6   correct   $0.4068
+  pseudoknot    6/6   correct   $0.2192
+
+  ran the FREE feasibility check before paying, when anything was pinned: 18/18
+
+=== the 1 it got wrong ===
+  impossible-5         expected refused    got certified          certified
+
+  total spend $0.7739
+  wrote rna_harness/runs/ceiling/agent_bench_a.json

@@ -1,0 +1,182 @@
+{
+ "request": "给我这样一个结构:一个多分支结构：闭合茎 5 对，里面并排 2 个发夹（茎 4 对环 4 nt、茎 4 对环 4 nt），每段之间隔 2 nt，并且第 12 位开始的 3 个碱基必须固定为 AAA",
+ "steps": [
+  {
+   "n": 1,
+   "action": "propose_structure",
+   "args": {
+    "elements": [
+     {
+      "type": "multiloop",
+      "closing_stem": 5,
+      "spacer": 2,
+      "branches": [
+       {
+        "stem": 4,
+        "loop": 4
+       },
+       {
+        "stem": 4,
+        "loop": 4
+       }
+      ]
+     }
+    ]
+   },
+   "observation": {
+    "ok": true,
+    "target": "(((((..((((....))))..((((....))))..)))))",
+    "n": 40,
+    "kind": "nested",
+    "plain": "共 40 个碱基,13 对碱基配对,2 个发夹环(环大小 4、4 个未配对碱基),3 段茎"
+   },
+   "cost_usd": 0.0,
+   "wall_s": 0.0,
+   "thought": "The request is a multiloop with closing stem 5 bp, two hairpin branches (stem 4 bp, loop 4 nt each), spacers of 2 nt between segments, and AAA pinned at position 12. Position 12 falls inside the first"
+  },
+  {
+   "n": 2,
+   "action": "place_constraint",
+   "args": {
+    "motif": "AAA",
+    "at": 12
+   },
+   "observation": {
+    "ok": true,
+    "restraint": "NNNNNNNNNNNNAAANNNNNNNNNNNNNNNNNNNNNNNNN",
+    "pinned_now": 3,
+    "at": 12,
+    "pinned_total": 3
+   },
+   "cost_usd": 0.0,
+   "wall_s": 0.0,
+   "thought": "The structure is proposed. Now I need to place the AAA constraint at position 12 (0-based) and check feasibility before designing."
+  },
+  {
+   "n": 3,
+   "action": "check_feasible",
+   "args": {},
+   "observation": {
+    "ok": true,
+    "conflicts": [],
+    "shape": {
+     "ok": true,
+     "designable": true,
+     "min_helix": 4,
+     "note": "ViennaRNA's own inverse fold reproduces this shape, so a sequence for it exists"
+    },
+    "pinned_total": 3,
+    "pinned_in_paired_positions": 0,
+    "note": "the pinned bases are compatible with this shape"
+   },
+   "cost_usd": 0.0,
+   "wall_s": 0.0,
+   "thought": "结构已构建，约束已放置在位置12（发夹环内，未配对区域）。先运行可行性检查。"
+  },
+  {
+   "n": 4,
+   "action": "design",
+   "args": {
+    "budget": "cheap"
+   },
+   "observation": {
+    "ok": true,
+    "sequence": "GGGACGAGGUGGAAACGCCAAGAGCAGGAGCUCAAGUCCC",
+    "cost_usd": 0.0011720973915523953,
+    "wall_s": 16.5,
+    "verdict": "certified",
+    "constraint_held": {
+     "held": true,
+     "violated_positions": []
+    },
+    "gc": null,
+    "n_screened": 1,
+    "bp_away": 0,
+    "certificate": {
+     "verdict": "certified",
+     "target": "(((((..((((....))))..((((....))))..)))))",
+     "n": 40,
+     "kind": "nested",
+     "sequence": "GGGACGAGGUGGAAACGCCAAGAGCAGGAGCUCAAGUCCC",
+     "checked_by": "ViennaRNA MFE (turner2004, dangles=2)",
+     "strictness": "pfe",
+     "rungs_passed": [
+      "match",
+      "umfe",
+      "pfe"
+     ],
+     "cost_usd": 4.379616843329536e-08,
+     "wait_s": 0.0,
+     "budget": "",
+     "reason": "folds exactly to the target; also passes: umfe, pfe",
+     "detail": {},
+     "disclaimer": "`certified` means the sequence folds to the target under the stated computational model. It is not a claim about behaviour in vitro or in vivo.",
+     "seed": null,
+     "generated_utc": "2026-07-30T05:14:45Z",
+     "provenance": {
+      "schema": "rna-certificate/1.0",
+      "python": "3.10.20",
+      "viennarna": "2.7.2",
+      "desirna": "/data/wenhui/DesiRNA@bdb4908",
+      "pkiss": "/home/ubuntu/miniconda3/envs/pk/bin/pKiss",
+      "rnastructure": "ProbKnot: Version 6.6 (April 2, 2026)."
+     },
+     "verify_cmd": "python -m rna_harness.cognitive.certify '(((((..((((....))))..((((....))))..)))))' --sequence GGGACGAGGUGGAAACGCCAAGAGCAGGAGCUCAAGUCCC",
+     "rerun_search": "python -m rna_harness.cognitive.certify '(((((..((((....))))..((((....))))..)))))' --budget standard",
+     "reproducibility": "verify_cmd reproduces this certificate's claim exactly -- folding is deterministic. rerun_search re-runs the design and may return a different sequence: the search budget is wall-clock, not iteration count, so it is not seed-reproducible."
+    }
+   },
+   "cost_usd": 0.0011720973915523953,
+   "wall_s": 16.5,
+   "thought": "Shape and constraints are feasible with no conflicts; proceed to design with cheap budget first."
+  }
+ ],
+ "target": "(((((..((((....))))..((((....))))..)))))",
+ "restraint": "NNNNNNNNNNNNAAANNNNNNNNNNNNNNNNNNNNNNNNN",
+ "gc": null,
+ "pins": [
+  {
+   "motif": "AAA",
+   "at": 12
+  }
+ ],
+ "requested_target": "(((((..((((....))))..((((....))))..)))))",
+ "substituted": null,
+ "certificate": {
+  "verdict": "certified",
+  "target": "(((((..((((....))))..((((....))))..)))))",
+  "n": 40,
+  "kind": "nested",
+  "sequence": "GGGACGAGGUGGAAACGCCAAGAGCAGGAGCUCAAGUCCC",
+  "checked_by": "ViennaRNA MFE (turner2004, dangles=2)",
+  "strictness": "pfe",
+  "rungs_passed": [
+   "match",
+   "umfe",
+   "pfe"
+  ],
+  "cost_usd": 4.379616843329536e-08,
+  "wait_s": 0.0,
+  "budget": "",
+  "reason": "folds exactly to the target; also passes: umfe, pfe",
+  "detail": {},
+  "disclaimer": "`certified` means the sequence folds to the target under the stated computational model. It is not a claim about behaviour in vitro or in vivo.",
+  "seed": null,
+  "generated_utc": "2026-07-30T05:14:45Z",
+  "provenance": {
+   "schema": "rna-certificate/1.0",
+   "python": "3.10.20",
+   "viennarna": "2.7.2",
+   "desirna": "/data/wenhui/DesiRNA@bdb4908",
+   "pkiss": "/home/ubuntu/miniconda3/envs/pk/bin/pKiss",
+   "rnastructure": "ProbKnot: Version 6.6 (April 2, 2026)."
+  },
+  "verify_cmd": "python -m rna_harness.cognitive.certify '(((((..((((....))))..((((....))))..)))))' --sequence GGGACGAGGUGGAAACGCCAAGAGCAGGAGCUCAAGUCCC",
+  "rerun_search": "python -m rna_harness.cognitive.certify '(((((..((((....))))..((((....))))..)))))' --budget standard",
+  "reproducibility": "verify_cmd reproduces this certificate's claim exactly -- folding is deterministic. rerun_search re-runs the design and may return a different sequence: the search budget is wall-clock, not iteration count, so it is not seed-reproducible."
+ },
+ "done": true,
+ "outcome": "certified",
+ "total_cost_usd": 0.008590489391552396,
+ "llm_cost_usd": 0.007418392
+}

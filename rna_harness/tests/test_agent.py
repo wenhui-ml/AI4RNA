@@ -134,16 +134,22 @@ def test_function_requests_never_reach_the_solver():
 
 
 def test_the_agent_cannot_declare_success_itself():
-    """`done` records that the agent stopped; only a certificate from the exact verifier says certified."""
+    """`done` records that the agent stopped; only a certificate from the exact verifier says certified.
+
+    STRENGTHENED after a measured failure: a bare `done` with no prior observation is now refused outright,
+    because the agent used it on step 1 with the reason "Design succeeded" and nothing had been run.
+    """
     s = run("x", client=_Scripted(['{"thought":"t","action":"done","args":{"reason":"I solved it"}}']))
-    assert s.done and s.certificate is None and s.outcome != "certified"
+    assert not s.done, "a conclusion with nothing behind it is not a conclusion"
+    assert s.certificate is None and s.outcome != "certified"
+    assert all("I solved it" not in (st.observation.get("reason") or "") for st in s.steps)
 
 
 def test_an_unknown_action_is_reported_and_the_loop_continues():
     s = run("x", client=_Scripted(['{"action":"hallucinated_tool","args":{}}',
-                                   '{"action":"done","args":{"reason":"stop"}}']))
+                                   '{"action":"check_feasible","args":{}}']), max_steps=2)
     assert any("unknown action" in (st.observation.get("error") or "") for st in s.steps)
-    assert s.done
+    assert len(s.steps) == 2, "an unknown action costs a step and the loop keeps going"
 
 
 def test_a_reply_with_no_action_ends_the_loop_rather_than_guessing():
@@ -154,8 +160,8 @@ def test_a_reply_with_no_action_ends_the_loop_rather_than_guessing():
 def test_json_is_taken_from_the_last_object_not_the_first_brace():
     """A long `thought` containing braces used to swallow the action; the parser takes the last valid one."""
     reply = 'Considering {a:1} and {b:2}...\n{"thought":"t","action":"done","args":{"reason":"ok"}}'
-    s = run("x", client=_Scripted([reply]))
-    assert s.done and s.outcome == "ok"
+    s = run("x", client=_Scripted([reply]), max_steps=1)
+    assert s.steps[0].action == "done" and s.steps[0].args["reason"] == "ok"
 
 
 def test_design_without_a_target_is_refused_before_spending():
@@ -264,3 +270,81 @@ def test_a_new_problem_gets_its_own_two_attempts(monkeypatch):
               '{"action":"design","args":{"budget":"cheap"}}']
     run("x", client=_Scripted(script), max_steps=5)
     assert len(calls) == 3 and len(set(calls)) == 2, calls
+
+
+# ---- pins survive a reshape: they come from the request, not from the agent ----------------------
+def test_pins_are_carried_onto_a_new_shape_instead_of_being_silently_cleared():
+    """Three benchmark items reached a conflict-free, designable shape and then ran out of steps re-issuing
+    pins they had never chosen to drop. The pins belong to the REQUEST; a reshape does not retract them."""
+    script = ['{"action":"propose_structure","args":{"elements":[{"type":"hairpin","stem":5,"loop":6}]}}',
+              '{"action":"place_constraint","args":{"motif":"GGGG","at":0}}',
+              '{"action":"propose_structure","args":{"elements":[{"type":"spacer","len":4},'
+              '{"type":"hairpin","stem":5,"loop":6}]}}',
+              '{"action":"check_feasible","args":{}}']
+    s = run("x", client=_Scripted(script), max_steps=4)
+    reshape = s.steps[2]
+    assert reshape.observation["ok"] and reshape.observation["n"] == 20
+    assert reshape.observation["pins_carried_over"] == [{"motif": "GGGG", "at": 0}]
+    assert s.restraint == "GGGG" + "N" * 16, s.restraint
+
+
+def test_a_pin_that_no_longer_fits_is_reported_not_forgotten():
+    script = ['{"action":"propose_structure","args":{"elements":[{"type":"hairpin","stem":6,"loop":4}]}}',
+              '{"action":"place_constraint","args":{"motif":"GGGG","at":12}}',
+              '{"action":"propose_structure","args":{"elements":[{"type":"hairpin","stem":2,"loop":4}]}}']
+    s = run("x", client=_Scripted(script), max_steps=3)
+    o = s.steps[2].observation
+    assert o["ok"] and o["pins_dropped"] and o["pins_dropped"][0]["at"] == 12
+    assert "re-place" in o["note"]
+    assert s.restraint is None
+
+
+def test_re_pinning_the_same_position_replaces_it_rather_than_stacking():
+    script = ['{"action":"propose_structure","args":{"elements":[{"type":"hairpin","stem":6,"loop":4}]}}',
+              '{"action":"place_constraint","args":{"motif":"AAA","at":6}}',
+              '{"action":"propose_structure","args":{"elements":[{"type":"hairpin","stem":6,"loop":4}]}}']
+    s = run("x", client=_Scripted(script), max_steps=3)
+    assert s.steps[2].observation["pins_carried_over"] == [{"motif": "AAA", "at": 6}]
+
+
+# ---- a conclusion needs an observation, and a substitution has to be said out loud ----------------
+def test_done_is_refused_when_nothing_has_been_observed():
+    """MEASURED: the agent's first action on one item was `done` with the reason "Design succeeded: MFE
+    structure matches the target". It had run nothing. No false certificate can be issued -- only the oracle
+    issues those -- but a sentence that reads like success is the answer to someone who cannot check."""
+    s = run("x", client=_Scripted(['{"action":"done","args":{"reason":"Design succeeded"}}',
+                                   '{"action":"propose_structure","args":{"elements":'
+                                   '[{"type":"hairpin","stem":6,"loop":4}]}}']))
+    first = s.steps[0]
+    assert first.action == "done" and not first.observation["ok"]
+    assert "nothing has been observed" in first.observation["error"]
+    assert not s.done and "Design succeeded" not in s.outcome
+
+
+def test_a_stopped_session_never_repeats_the_agents_claim_as_the_result():
+    s = run("x", client=_Scripted(['{"action":"design","args":{"budget":"cheap"}}',
+                                   '{"action":"done","args":{"reason":"I solved it"}}']))
+    assert s.done and s.outcome.startswith("the agent stopped:")
+    assert s.certificate is None
+
+
+def test_delivering_a_different_shape_than_the_request_is_stated_not_hidden():
+    """MEASURED: on a request that fixed the shape completely the agent returned a genuinely certified
+    sequence for a different 40-nt shape. Every oracle was satisfied and the question was not answered.
+    Reshaping is legitimate -- it is how a pin conflict gets resolved -- so this states it rather than
+    forbidding it."""
+    script = ['{"action":"propose_structure","args":{"elements":[{"type":"hairpin","stem":6,"loop":4}]}}',
+              '{"action":"check_feasible","args":{}}',
+              '{"action":"propose_structure","args":{"elements":[{"type":"hairpin","stem":4,"loop":8}]}}']
+    s = run("x", client=_Scripted(script), max_steps=3)
+    assert s.substituted and s.substituted["requested"] == HAIRPIN6
+    assert s.substituted["delivered"] == "((((........))))"
+    assert s.substituted["same_length"] is True
+    assert "⚠" in render(s, "zh") and "requested" in render(s, "en")
+
+
+def test_no_substitution_is_reported_when_the_shape_never_changed():
+    s = run("x", client=_Scripted(['{"action":"propose_structure","args":{"elements":'
+                                   '[{"type":"hairpin","stem":6,"loop":4}]}}',
+                                   '{"action":"check_feasible","args":{}}']), max_steps=2)
+    assert s.substituted is None

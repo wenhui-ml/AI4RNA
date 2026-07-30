@@ -29,7 +29,7 @@ import time
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.abspath(os.path.join(HERE, "..", "..", ".."))
 sys.path.insert(0, REPO)
-OUT = os.path.join(HERE, "agent_bench")
+OUT = os.path.join(HERE, "agent_bench")   # rebound by --tag; the score moves +/-1 per cell between runs
 
 
 def classify_trajectory(item, sess) -> dict:
@@ -104,7 +104,11 @@ def main():
     ap.add_argument("--per-class", type=int, default=6)
     ap.add_argument("--workers", type=int, default=4)
     ap.add_argument("--analyse-only", action="store_true")
+    ap.add_argument("--tag", default="", help="separate results dir, for a repeat run at the same settings")
     a = ap.parse_args()
+    global OUT
+    if a.tag:
+        OUT = os.path.join(HERE, f"agent_bench_{a.tag}")
     os.makedirs(os.path.join(OUT, "_ws"), exist_ok=True)
 
     from rna_harness.benchmarks.agent_suite import build
@@ -163,9 +167,10 @@ def main():
             print(f"  {r['id']:<20} expected {r['expect']:<10} got {r['got']:<18} "
                   f"{r.get('outcome', r.get('error', ''))[:60]}")
     print(f"\n  total spend ${sum(r.get('cost_usd') or 0 for r in R):.4f}")
+    dest = os.path.join(HERE, f"agent_bench{('_' + a.tag) if a.tag else ''}.json")
     json.dump({"n": len(R), "by_class": out, "checked_before_spending": disc, "rows": R},
-              open(os.path.join(HERE, "agent_bench.json"), "w"), ensure_ascii=False, indent=1)
-    print(f"  wrote rna_harness/runs/ceiling/agent_bench.json")
+              open(dest, "w"), ensure_ascii=False, indent=1)
+    print(f"  wrote {os.path.relpath(dest, REPO)}")
 
 
 if __name__ == "__main__":

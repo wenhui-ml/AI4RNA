@@ -37,7 +37,9 @@ import time
 from dataclasses import dataclass, field, asdict
 from typing import Dict, List, Optional
 
-MAX_STEPS = 10   # a request needing a restructure takes ~6; the real bound is max_cost_usd
+# MEASURED, not guessed: a restructure costs propose + re-check + design, and the three items that still
+# failed at 10 had all FOUND a conflict-free designable shape and then ran out before they could pay for it.
+MAX_STEPS = 14   # the real bound is max_cost_usd; this one only stops a loop that is going nowhere
 
 # The output cap covers reasoning AND content, so it must clear the hardest shape's reasoning with room left
 # for the json. MEASURED on the benchmark's own items: a hairpin decision costs ~300 tokens, a junction or an
@@ -65,6 +67,9 @@ class Session:
     target: Optional[str] = None
     restraint: Optional[str] = None
     gc: Optional[dict] = None
+    pins: List[dict] = field(default_factory=list)   # (motif, at) as REQUESTED, so a reshape can re-apply them
+    requested_target: Optional[str] = None           # the FIRST shape proposed -- what the user asked for
+    substituted: Optional[dict] = None               # set when the delivered shape is not the requested one
     certificate: Optional[dict] = None
     done: bool = False
     outcome: str = ""
@@ -427,7 +432,9 @@ Actions:
   set_gc_content    {"percent":50,"tolerance":5}   steer the solver toward a GC fraction. The steer is not
         the check: the result is verified against percent +/- tolerance afterwards.
   design            {"budget":"cheap|standard|best_effort"}     run the solver and verify the result
-  done              {"reason":"..."}        stop: either the goal is met, or you have concluded it cannot be
+  done              {"reason":"..."}        stop: either the goal is met, or you have concluded it cannot be.
+        REFUSED until something has actually been observed -- you must have run a design or found a conflict.
+        Saying "it worked" is not a result; only the verifier's certificate is.
 
 Rules:
   * read the observation before choosing. A conflict at positions i and j is not fixed by a bigger budget --
@@ -442,7 +449,33 @@ Rules:
     refused. Change the problem instead -- lengthen short helices, move a pin into a loop, relax a
     requirement -- and re-run the free check.
   * you cannot mark anything solved. `design` returns a verdict from an exact verifier; that is the answer.
+  * ONLY AN EXPLICIT TOTAL-LENGTH LOCK closes the door. If the request says the length must be exactly N and
+    not one base more, then a certified sequence for a different shape does not answer it, and `done` naming
+    the conflict is correct. Otherwise you have room and you are EXPECTED to use it: describing the stems and
+    loops is not the same as forbidding a longer version of them. Lengthen a loop, add a spacer, move the
+    pinned region out of a paired position -- then re-check, which is free. A pin conflict is a reason to
+    reshape, not a reason to stop. Any reshape is reported to the user alongside the answer.
 """
+
+
+def _reapply(pins: List[dict], target: str):
+    """Re-place the requested pins on a new shape. Returns (restraint, kept, dropped).
+
+    Position-based and therefore honest about what a reshape can break: a pin past the end of the new shape
+    cannot be carried, and is REPORTED rather than silently forgotten. Whether the carried pins conflict with
+    the new pairing is a separate question, and check_feasible is the thing that answers it.
+    """
+    kept, dropped, r = [], [], ["N"] * len(target)
+    for p in pins:
+        at, motif = int(p["at"]), str(p["motif"])
+        if at < 0 or at + len(motif) > len(target):
+            dropped.append({"motif": motif, "at": at, "why": f"does not fit in {len(target)} nt"})
+            continue
+        for k, ch in enumerate(motif):
+            r[at + k] = ch
+        kept.append({"motif": motif, "at": at})
+    out = "".join(r)
+    return (out if set(out) != {"N"} else None), kept, dropped
 
 
 def _observations(sess: "Session") -> str:
@@ -554,7 +587,24 @@ def run(request: str, client=None, model: str = "z-ai/glm-5.2", max_steps: int =
         thought = str(act.get("thought", ""))[:200]
 
         if name == "done":
-            sess.done, sess.outcome = True, args.get("reason", "the agent stopped")
+            # A CONCLUSION NEEDS AN OBSERVATION. Measured: on one item the agent's FIRST action was `done`
+            # with the reason "Design succeeded: MFE structure matches the target" -- it had proposed
+            # nothing, run nothing and verified nothing. No false certificate was issued, because only the
+            # oracle can issue one, but the session still ended carrying a sentence that reads like success.
+            # For someone who cannot check, that sentence IS the answer, so it does not get to exist.
+            seen = (sess.certificate is not None
+                    or any(st.action == "design" for st in sess.steps)
+                    or any(st.action == "check_feasible" and st.observation.get("conflicts")
+                           for st in sess.steps))
+            if not seen:
+                sess.steps.append(Step(n, "done", args, {"ok": False, "error": (
+                    "nothing has been observed yet: no design was run and no conflict was found, so there is "
+                    "nothing to conclude from. Propose a structure, check it, and design -- or find the "
+                    "conflict that makes it impossible.")}, thought=thought))
+                continue
+            sess.done = True
+            sess.outcome = (sess.outcome if sess.outcome == "certified"
+                            else "the agent stopped: " + str(args.get("reason", "no reason given")))
             sess.steps.append(Step(n, "done", args, {"reason": sess.outcome}, thought=thought))
             break
         fn = PRIMITIVES.get(name)
@@ -567,12 +617,30 @@ def run(request: str, client=None, model: str = "z-ai/glm-5.2", max_steps: int =
         if name == "propose_structure":
             obs = fn(args.get("elements") or [])
             if obs.get("ok"):
-                sess.target, sess.restraint = obs["target"], None
+                if sess.requested_target is None:
+                    sess.requested_target = obs["target"]      # the shape the REQUEST asked for
+                # CARRY THE PINS ACROSS A RESHAPE. They come from the request, not from the agent, so a new
+                # shape does not retract them -- and clearing them made the agent spend two steps re-issuing
+                # what it had never chosen to drop. Three benchmark items reached a conflict-free designable
+                # shape and then ran out of steps on that bookkeeping, without ever paying for a design.
+                sess.target = obs["target"]
+                sess.restraint, kept, dropped = _reapply(sess.pins, sess.target)
+                sess.pins = kept
+                if sess.pins or dropped:
+                    obs["pins_carried_over"] = [{"motif": p["motif"], "at": p["at"]} for p in sess.pins]
+                    if dropped:
+                        obs["pins_dropped"] = dropped
+                        obs["note"] = (f"{len(dropped)} pinned region(s) no longer fit in a "
+                                       f"{len(sess.target)}-nt shape and were dropped; re-place them if the "
+                                       f"request still needs them")
         elif name == "place_constraint":
             obs = fn(sess.target or "", args.get("motif", ""), int(args.get("at", 0)),
                      existing=sess.restraint)
             if obs.get("ok"):
                 sess.restraint = obs["restraint"]
+                sess.pins = [p for p in sess.pins if p["at"] != int(args.get("at", 0))]
+                sess.pins.append({"motif": str(args.get("motif", "")).upper().replace("T", "U"),
+                                  "at": int(args.get("at", 0))})
         elif name == "set_gc_content":
             obs = fn(args.get("percent"), float(args.get("tolerance", 5.0)))
             if obs.get("ok"):
@@ -619,6 +687,19 @@ def run(request: str, client=None, model: str = "z-ai/glm-5.2", max_steps: int =
             break
     if not sess.outcome:
         sess.outcome = "out of steps"
+    # DID WE ANSWER THE QUESTION THAT WAS ASKED? The certificate is honest about "this sequence folds to THIS
+    # structure" -- and says nothing about whether THIS structure is the one the user wanted. Measured: on a
+    # request that fixed the shape completely (closing stem 5, two 4-bp branches, 2-nt spacers, exactly 40
+    # nt) the agent delivered a genuinely certified sequence for a DIFFERENT 40-nt shape (closing stem 6, no
+    # spacers). Every oracle was satisfied and the user's question was not. Substituting the shape can be the
+    # right move -- it is exactly how a conflicting pin gets resolved -- so this states it instead of
+    # forbidding it. What must never happen is that it goes unsaid.
+    if sess.requested_target and sess.target and sess.target != sess.requested_target:
+        sess.substituted = {
+            "requested": sess.requested_target, "delivered": sess.target,
+            "same_length": len(sess.target) == len(sess.requested_target),
+            "note": ("the answer is for a DIFFERENT shape than the one first built from the request. If the "
+                     "request fixed the shape, this answer does not satisfy it.")}
     return _persist(sess, workspace)
 
 
@@ -664,6 +745,13 @@ def render(sess: "Session", lang: str = "zh") -> str:
                 out.append(f"        {'固定区保持' if zh else 'constraint held'}: {h['held']}"
                            + (f"  {'违反位置' if zh else 'violated'}: {h['violated_positions']}"
                               if not h["held"] else ""))
+    if sess.substituted:
+        out.append(("⚠ 交付的形状与最初按请求搭出来的不同：" if zh else
+                    "! the delivered shape is not the one first built from the request:"))
+        out.append(("   请求：" if zh else "   requested: ") + sess.substituted["requested"])
+        out.append(("   交付：" if zh else "   delivered: ") + sess.substituted["delivered"])
+        out.append(("   若请求把形状写死了，这个答案就不满足它。" if zh else
+                    "   if the request fixed the shape, this answer does not satisfy it."))
     out.append(("结果：" if zh else "outcome: ") + sess.outcome
                + f"   {'总花费' if zh else 'total'} ${sess.total_cost_usd:.5f}"
                + (f"  ({'其中思考' if zh else 'of which thinking'} ${sess.llm_cost_usd:.5f})"

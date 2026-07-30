@@ -1,0 +1,186 @@
+{
+ "request": "给我这样一个结构:一个多分支结构：闭合茎 4 对，里面并排 3 个发夹（茎 3 对环 4 nt、茎 3 对环 4 nt、茎 3 对环 4 nt），每段之间隔 1 nt，并且第 9 位开始的 3 个碱基必须固定为 AAA",
+ "steps": [
+  {
+   "n": 1,
+   "action": "propose_structure",
+   "args": {
+    "elements": [
+     {
+      "type": "multiloop",
+      "closing_stem": 4,
+      "spacer": 1,
+      "branches": [
+       {
+        "stem": 3,
+        "loop": 4
+       },
+       {
+        "stem": 3,
+        "loop": 4
+       },
+       {
+        "stem": 3,
+        "loop": 4
+       }
+      ]
+     }
+    ]
+   },
+   "observation": {
+    "ok": true,
+    "target": "((((.(((....))).(((....))).(((....))).))))",
+    "n": 42,
+    "kind": "nested",
+    "plain": "共 42 个碱基,13 对碱基配对,3 个发夹环(环大小 4、4、4 个未配对碱基),4 段茎"
+   },
+   "cost_usd": 0.0,
+   "wall_s": 0.0,
+   "thought": "Multiloop with closing stem 4, three hairpins (stem 3, loop 4), spacers 1; position 9 falls inside the first hairpin loop, so AAA is unpaired."
+  },
+  {
+   "n": 2,
+   "action": "place_constraint",
+   "args": {
+    "motif": "AAA",
+    "at": 9
+   },
+   "observation": {
+    "ok": true,
+    "restraint": "NNNNNNNNNAAANNNNNNNNNNNNNNNNNNNNNNNNNNNNNN",
+    "pinned_now": 3,
+    "at": 9,
+    "pinned_total": 3
+   },
+   "cost_usd": 0.0,
+   "wall_s": 0.0,
+   "thought": "The proposed structure matches the request. Now I need to pin AAA at position 9 (0-based), which falls in the first hairpin loop, then run the free feasibility check before designing."
+  },
+  {
+   "n": 3,
+   "action": "check_feasible",
+   "args": {},
+   "observation": {
+    "ok": true,
+    "conflicts": [],
+    "shape": {
+     "ok": true,
+     "designable": true,
+     "min_helix": 3,
+     "note": "ViennaRNA's own inverse fold reproduces this shape, so a sequence for it exists"
+    },
+    "pinned_total": 3,
+    "pinned_in_paired_positions": 0,
+    "note": "the pinned bases are compatible with this shape"
+   },
+   "cost_usd": 0.0,
+   "wall_s": 0.1,
+   "thought": "Structure and constraint are set; must run check_feasible before designing."
+  },
+  {
+   "n": 4,
+   "action": "design",
+   "args": {
+    "budget": "cheap"
+   },
+   "observation": {
+    "ok": true,
+    "sequence": "GCACAGGCAAAAGCCAGCCAUUCGGCAGCCACUCGGCAGUGC",
+    "cost_usd": 0.0011933547589513991,
+    "wall_s": 16.6,
+    "verdict": "certified",
+    "constraint_held": {
+     "held": true,
+     "violated_positions": []
+    },
+    "gc": null,
+    "n_screened": 1,
+    "bp_away": 0,
+    "certificate": {
+     "verdict": "certified",
+     "target": "((((.(((....))).(((....))).(((....))).))))",
+     "n": 42,
+     "kind": "nested",
+     "sequence": "GCACAGGCAAAAGCCAGCCAUUCGGCAGCCACUCGGCAGUGC",
+     "checked_by": "ViennaRNA MFE (turner2004, dangles=2)",
+     "strictness": "pfe",
+     "rungs_passed": [
+      "match",
+      "umfe",
+      "pfe"
+     ],
+     "cost_usd": 4.801154136657715e-08,
+     "wait_s": 0.0,
+     "budget": "",
+     "reason": "folds exactly to the target; also passes: umfe, pfe",
+     "detail": {},
+     "disclaimer": "`certified` means the sequence folds to the target under the stated computational model. It is not a claim about behaviour in vitro or in vivo.",
+     "seed": null,
+     "generated_utc": "2026-07-30T05:16:17Z",
+     "provenance": {
+      "schema": "rna-certificate/1.0",
+      "python": "3.10.20",
+      "viennarna": "2.7.2",
+      "desirna": "/data/wenhui/DesiRNA@bdb4908",
+      "pkiss": "/home/ubuntu/miniconda3/envs/pk/bin/pKiss",
+      "rnastructure": "ProbKnot: Version 6.6 (April 2, 2026)."
+     },
+     "verify_cmd": "python -m rna_harness.cognitive.certify '((((.(((....))).(((....))).(((....))).))))' --sequence GCACAGGCAAAAGCCAGCCAUUCGGCAGCCACUCGGCAGUGC",
+     "rerun_search": "python -m rna_harness.cognitive.certify '((((.(((....))).(((....))).(((....))).))))' --budget standard",
+     "reproducibility": "verify_cmd reproduces this certificate's claim exactly -- folding is deterministic. rerun_search re-runs the design and may return a different sequence: the search budget is wall-clock, not iteration count, so it is not seed-reproducible."
+    }
+   },
+   "cost_usd": 0.0011933547589513991,
+   "wall_s": 16.6,
+   "thought": "Feasibility check passed with no conflicts and shape is designable; proceed with a cheap design first."
+  }
+ ],
+ "target": "((((.(((....))).(((....))).(((....))).))))",
+ "restraint": "NNNNNNNNNAAANNNNNNNNNNNNNNNNNNNNNNNNNNNNNN",
+ "gc": null,
+ "pins": [
+  {
+   "motif": "AAA",
+   "at": 9
+  }
+ ],
+ "requested_target": "((((.(((....))).(((....))).(((....))).))))",
+ "substituted": null,
+ "certificate": {
+  "verdict": "certified",
+  "target": "((((.(((....))).(((....))).(((....))).))))",
+  "n": 42,
+  "kind": "nested",
+  "sequence": "GCACAGGCAAAAGCCAGCCAUUCGGCAGCCACUCGGCAGUGC",
+  "checked_by": "ViennaRNA MFE (turner2004, dangles=2)",
+  "strictness": "pfe",
+  "rungs_passed": [
+   "match",
+   "umfe",
+   "pfe"
+  ],
+  "cost_usd": 4.801154136657715e-08,
+  "wait_s": 0.0,
+  "budget": "",
+  "reason": "folds exactly to the target; also passes: umfe, pfe",
+  "detail": {},
+  "disclaimer": "`certified` means the sequence folds to the target under the stated computational model. It is not a claim about behaviour in vitro or in vivo.",
+  "seed": null,
+  "generated_utc": "2026-07-30T05:16:17Z",
+  "provenance": {
+   "schema": "rna-certificate/1.0",
+   "python": "3.10.20",
+   "viennarna": "2.7.2",
+   "desirna": "/data/wenhui/DesiRNA@bdb4908",
+   "pkiss": "/home/ubuntu/miniconda3/envs/pk/bin/pKiss",
+   "rnastructure": "ProbKnot: Version 6.6 (April 2, 2026)."
+  },
+  "verify_cmd": "python -m rna_harness.cognitive.certify '((((.(((....))).(((....))).(((....))).))))' --sequence GCACAGGCAAAAGCCAGCCAUUCGGCAGCCACUCGGCAGUGC",
+  "rerun_search": "python -m rna_harness.cognitive.certify '((((.(((....))).(((....))).(((....))).))))' --budget standard",
+  "reproducibility": "verify_cmd reproduces this certificate's claim exactly -- folding is deterministic. rerun_search re-runs the design and may return a different sequence: the search budget is wall-clock, not iteration count, so it is not seed-reproducible."
+ },
+ "done": true,
+ "outcome": "certified",
+ "total_cost_usd": 0.034083731558951405,
+ "llm_cost_usd": 0.0328903768
+}
