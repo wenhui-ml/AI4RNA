@@ -1,0 +1,27 @@
+forbidden-motif benchmark: 6 shapes x 3 rules x 2 penalties x 3 seeds = 108 runs
+
+    15/108  0.6 min
+    30/108  1.0 min
+    45/108  1.6 min
+    60/108  1.9 min
+    75/108  2.5 min
+    90/108  2.8 min
+    105/108  3.4 min
+
+=== 108 runs, same solver, same seconds, same pool ===
+  the tool's own answer   folds AND obeys the ban : 106/108
+  screening its pool      folds AND obeys the ban : 108/108
+  (the tool's answer folds correctly, ignoring the ban): 108/108
+  McNemar exact, paired: 2-0, p=5.00e-01
+
+  rule                penalty    tool    ours
+  no-GGGG                  10  18/18   18/18 
+  no-GGGG                 100  18/18   18/18 
+  no-CCCC                  10  18/18   18/18 
+  no-CCCC                 100  18/18   18/18 
+  no-homopolymer-5         10  16/18   18/18 
+  no-homopolymer-5        100  18/18   18/18 
+
+  我们也失败(池中 0 合格): 0/108
+
+  wrote rna_harness/runs/ceiling/forbid_bench.json
