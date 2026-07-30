@@ -74,6 +74,8 @@ class Session:
     target: Optional[str] = None
     restraint: Optional[str] = None
     gc: Optional[dict] = None
+    tm: Optional[dict] = None                        # melting-temperature requirement, checked not steered
+    sequences: Optional[List[str]] = None            # set-level answers (design_set), when one was asked for
     pins: List[dict] = field(default_factory=list)   # (motif, at) as REQUESTED, so a reshape can re-apply them
     requested_target: Optional[str] = None           # the FIRST shape proposed -- what the user asked for
     requested_by_user: bool = False                  # True when it came VERBATIM from the request text
@@ -350,6 +352,151 @@ def set_gc_content(percent: float, tolerance: float = 5.0) -> dict:
             "note": f"the solver is steered toward {pct:g}% GC; the result is checked against {pct:g} +/- {tol:g}"}
 
 
+def set_melting_temperature(celsius: float, tolerance: float = 5.0) -> dict:
+    """Declare a melting-temperature requirement. There is no steer for this one -- only a check.
+
+    MEASURED, and this is why the primitive exists: the external solver has no folding-temperature option at
+    all; it designs at 37 C, and -tmin/-tmax are replica-exchange temperatures while -tm is a mutation
+    heuristic. Asked for a Tm BELOW what it naturally produces (median 83.1 C), its own answer landed in the
+    window 12 times out of 60 while reading its pool landed 54 (McNemar 42-0, p=4.6e-13). Asked for one AT
+    its natural value the gap nearly closed -- so this is not "the tool is bad", it is "the request costs
+    stability and the tool is not optimising for that".
+    """
+    try:
+        c = float(celsius)
+    except (TypeError, ValueError):
+        return {"ok": False, "error": f"celsius must be a number, got {celsius!r}"}
+    if not 0 < c < 120:
+        return {"ok": False, "error": f"a melting temperature of {c} C is outside anything this can check"}
+    tol = max(0.0, float(tolerance))
+    return {"ok": True, "celsius": c, "tolerance": tol,
+            "definition": ("the temperature at which the TARGET structure's probability in the Boltzmann "
+                           "ensemble falls to 0.5 -- computed by bisection on the partition function, not "
+                           "by a nearest-neighbour formula for a generic duplex"),
+            "note": (f"the solver cannot be steered toward this at all; candidates are checked against "
+                     f"{c:g} +/- {tol:g} C after the fact")}
+
+
+def melting_point(seq: str, target: str, lo: float = 5.0, hi: float = 120.0, iters: int = 12) -> float:
+    """The temperature where P(target) crosses 0.5. Exact given the model; returns the bound when it is not
+    crossed inside [lo, hi]."""
+    import RNA
+
+    def p_at(T):
+        md = RNA.md()
+        md.temperature = float(T)
+        fc = RNA.fold_compound(seq, md)
+        fc.pf()
+        return fc.pr_structure(target)
+
+    if p_at(lo) < 0.5:
+        return lo
+    if p_at(hi) >= 0.5:
+        return hi
+    for _ in range(iters):
+        mid = (lo + hi) / 2
+        if p_at(mid) >= 0.5:
+            lo = mid
+        else:
+            hi = mid
+    return round((lo + hi) / 2, 1)
+
+
+def _tm_check(seq: Optional[str], target: str, tm: Optional[dict]):
+    """Exact, and reported separately from folding -- a design that folds but melts at the wrong temperature
+    is not an answer to what was asked."""
+    if not tm:
+        return None
+    if not seq:
+        return {"held": None, "measured": None, "target": tm["celsius"], "tolerance": tm["tolerance"]}
+    got = melting_point(seq, target)
+    return {"held": abs(got - tm["celsius"]) <= tm["tolerance"], "measured": got,
+            "target": tm["celsius"], "tolerance": tm["tolerance"]}
+
+
+def design_set(target: str, count: int = 8, max_identity: float = 60.0,
+               max_duplex_kcal: float = -12.0, budget: str = "cheap", runs: int = 4,
+               restraint: Optional[str] = None) -> dict:
+    """Design a SET: N sequences that all fold to the target, are pairwise dissimilar, and do not hybridise.
+
+    WHY THIS IS A SEPARATE PRIMITIVE. Every other requirement here is a property of ONE sequence, so `design`
+    can screen candidates one at a time. This one is a property of the SET, and no per-sequence filter can
+    express it. It is also the requirement the external solver has no formulation for at all: its input file
+    is one structure and one sequence restraint, and "these N must differ from each other" cannot be written
+    down in it.
+
+    MEASURED, asking for 8 sequences at <=60% identity and no duplex below -12 kcal/mol: running the solver 8
+    times and taking each run's answer reached the full set on 0 of 5 shapes (1-2 usable of 8); reading the
+    pools those same runs already produced reached it on 4 of 5. The mechanism is not diversity of search --
+    it is that the solver's answers are GC-rich (73.1%) and therefore hybridise with each other, 27 of 28
+    pairs violating the threshold, while the qualifying sets sit at 50-57% GC.
+
+    Selection is greedy in the solver's OWN ranking order, so the set is drawn from what it considers best
+    rather than reordered by us.
+    """
+    from .certify import certify_sequence
+    from .cost import solver_cost_usd
+    import RNA
+    from ..experiments.rssd_constrained import ConstrainedDesiRNA
+    from ..generators.desirna import desirna_available
+    from ..task import DesignTask, OracleConfig
+    if count < 2:
+        return {"ok": False, "error": "a set of fewer than 2 is not a set -- use design"}
+    if not desirna_available():
+        return {"ok": False, "error": "the external solver is not installed"}
+    from .certify import BUDGETS
+    tl = BUDGETS.get(budget, BUDGETS["cheap"])[0]
+    oc = OracleConfig(param_set="turner2004", temperature=37.0, dangles=2)
+    t0, cost, pool, seen = time.time(), 0.0, [], set()
+    for seed in range(max(1, runs)):
+        a0 = time.time()
+        res = ConstrainedDesiRNA(replicas=10, timelimit_s=tl, results_number=50).design(
+            DesignTask(task_id="set", target=target, oracle=oc,
+                       meta=({"seq_restr": restraint} if restraint else {})), seed=seed)
+        cost += solver_cost_usd(time.time() - a0, 10)
+        for c in ([res.best_sequence] if res.best_sequence else []) + list(res.candidates or []):
+            if c and len(c) == len(target) and c not in seen:
+                seen.add(c)
+                pool.append(c)
+
+    def ident(a, b):
+        return 100.0 * sum(1 for x, y in zip(a, b) if x == y) / len(a)
+
+    chosen, certs, rejected = [], [], {"folds": 0, "identity": 0, "duplex": 0}
+    for c in pool:
+        if len(chosen) >= count:
+            break
+        cert = certify_sequence(c, target)
+        if cert.verdict not in ("certified", "knot_confirmed"):
+            rejected["folds"] += 1
+            continue
+        if any(ident(c, t) > max_identity for t in chosen):
+            rejected["identity"] += 1
+            continue
+        if any(RNA.duplexfold(c, t).energy < max_duplex_kcal for t in chosen):
+            rejected["duplex"] += 1
+            continue
+        chosen.append(c)
+        certs.append(cert.to_dict())
+
+    worst_id = max((ident(chosen[i], chosen[j]) for i in range(len(chosen))
+                    for j in range(i + 1, len(chosen))), default=None)
+    worst_dup = min((RNA.duplexfold(chosen[i], chosen[j]).energy for i in range(len(chosen))
+                     for j in range(i + 1, len(chosen))), default=None)
+    ok = len(chosen) >= count
+    return {"ok": True, "verdict": "certified" if ok else "not_found",
+            "sequences": chosen, "n_delivered": len(chosen), "n_requested": count,
+            "cost_usd": cost, "wall_s": round(time.time() - t0, 1), "n_screened": len(pool),
+            "set_check": {"held": ok, "worst_pairwise_identity": round(worst_id, 1) if worst_id else None,
+                          "strongest_duplex_kcal": round(worst_dup, 1) if worst_dup else None,
+                          "max_identity": max_identity, "max_duplex_kcal": max_duplex_kcal},
+            "rejected": rejected, "certificates": certs,
+            "note": (f"delivered {len(chosen)} of {count}; every member is certified individually and the "
+                     f"pairwise checks are exact"
+                     + ("" if ok else f". The pool held {len(pool)} candidates and ran out -- ask for a "
+                                      f"bigger budget or relax max_identity / max_duplex_kcal"))}
+
+
 def _gc_of(seq: Optional[str]):
     if not seq:
         return None
@@ -357,7 +504,7 @@ def _gc_of(seq: Optional[str]):
 
 
 def design(target: str, restraint: Optional[str] = None, budget: str = "cheap", seed: int = 0,
-           gc: Optional[dict] = None) -> dict:
+           gc: Optional[dict] = None, tm: Optional[dict] = None) -> dict:
     """Run the solver and report what came back, including HOW it failed."""
     from .certify import BUDGETS, certify_design
     from .cost import solver_cost_usd
@@ -370,7 +517,7 @@ def design(target: str, restraint: Optional[str] = None, budget: str = "cheap", 
     # sit within 50 +/- 10. So the requirement is enforced by reading the pool, which is exact, and not by
     # asking the solver nicely, which is not. Same mechanism that recovered 14 pseudoknot targets the tool
     # had thrown away.
-    if (restraint and set(restraint) != {"N"}) or gc:
+    if (restraint and set(restraint) != {"N"}) or gc or tm:
         from ..experiments.rssd_constrained import ConstrainedDesiRNA
         from ..generators.desirna import desirna_available
         from ..task import DesignTask, OracleConfig
@@ -399,14 +546,22 @@ def design(target: str, restraint: Optional[str] = None, budget: str = "cheap", 
                 g = _gc_check(c, gc)
                 if g is not None and not g["held"]:
                     continue
+                # THE FOLD CHECK COMES BEFORE THE MELTING CHECK ON PURPOSE. A melting point costs about a
+                # dozen partition-function evaluations; a fold costs one. Ordering it after the fold means
+                # it is only ever paid for candidates that are already answers to the shape question.
                 cert = certify_sequence(c, target)
-                if cert.verdict in ("certified", "knot_confirmed"):
-                    err = None
-                    return {"ok": True, "sequence": c, "cost_usd": cost,
-                            "wall_s": round(time.time() - t0, 1), "verdict": cert.verdict,
-                            "constraint_held": held, "gc": g, "n_screened": screened,
-                            "bp_away": 0, "certificate": cert.to_dict()}
-                best_partial = best_partial or c
+                if cert.verdict not in ("certified", "knot_confirmed"):
+                    best_partial = best_partial or c        # the closest miss still gets reported
+                    continue
+                m = _tm_check(c, target, tm)
+                if m is not None and not m["held"]:
+                    best_partial = best_partial or c        # it folds; it melts at the wrong temperature
+                    continue
+                err = None
+                return {"ok": True, "sequence": c, "cost_usd": cost,
+                        "wall_s": round(time.time() - t0, 1), "verdict": cert.verdict,
+                        "constraint_held": held, "gc": g, "tm": m, "n_screened": screened,
+                        "bp_away": 0, "certificate": cert.to_dict()}
         if err:
             # A TOOL FAILURE IS NOT A SEARCH FAILURE. Reporting it as not_found sent the agent up the budget
             # ladder three times, paying each time, for a request that was failing for an unrelated reason.
@@ -419,11 +574,12 @@ def design(target: str, restraint: Optional[str] = None, budget: str = "cheap", 
                 "constraint_held": (_constraint_held(best_partial, restraint)
                                     if (best_partial and restraint) else None),
                 "gc": _gc_check(best_partial, gc),
+                "tm": (_tm_check(best_partial, target, tm) if best_partial else None),
                 "bp_away": (cert.detail or {}).get("best_bp") if cert else None,
                 "note": (f"screened {screened} candidates; none satisfied every requirement at once")}
     c = certify_design(target, budget=budget, seed=seed)
     return {"ok": True, "sequence": c.sequence, "cost_usd": c.cost_usd, "wall_s": c.wait_s,
-            "verdict": c.verdict, "constraint_held": None, "gc": _gc_check(c.sequence, gc),
+            "verdict": c.verdict, "constraint_held": None, "gc": _gc_check(c.sequence, gc), "tm": None,
             "bp_away": (c.detail or {}).get("best_bp"),
             "certificate": c.to_dict()}
 
@@ -450,8 +606,9 @@ def _constraint_held(seq: Optional[str], restraint: str):
 
 PRIMITIVES = {"propose_structure": propose_structure, "place_constraint": place_constraint,
               "use_target": use_target,
-              "check_feasible": check_feasible, "design": design,
-              "recommend_loop_cap": recommend_loop_cap, "set_gc_content": set_gc_content}
+              "check_feasible": check_feasible, "design": design, "design_set": design_set,
+              "recommend_loop_cap": recommend_loop_cap, "set_gc_content": set_gc_content,
+              "set_melting_temperature": set_melting_temperature}
 
 
 # --------------------------------------------------------------------------- the loop
@@ -494,6 +651,15 @@ Actions:
         size. It only SUGGESTS; pin one with place_constraint so the result can be checked exactly.
   set_gc_content    {"percent":50,"tolerance":5}   steer the solver toward a GC fraction. The steer is not
         the check: the result is verified against percent +/- tolerance afterwards.
+  set_melting_temperature {"celsius":55,"tolerance":5}   require a melting temperature -- the point where
+        the TARGET structure stops being more likely than not. There is NO steer for this; candidates are
+        checked after the fact. Requests BELOW what the solver naturally produces (around 83 C) are the ones
+        that need this; a request at or above it usually comes for free.
+  design_set        {"count":8,"max_identity":60,"max_duplex_kcal":-12}
+        design a SET of sequences that all fold to the target, are pairwise at most max_identity per cent
+        identical, and form no duplex stronger than max_duplex_kcal. Use this only when the request asks for
+        several sequences that must not interfere with each other -- a library, barcodes, orthogonal parts.
+        It returns a certificate per member plus the exact pairwise checks.
   design            {"budget":"cheap|standard|best_effort"}     run the solver and verify the result
   done              {"reason":"..."}        stop: either the goal is met, or you have concluded it cannot be.
         REFUSED until something has actually been observed -- you must have run a design or found a conflict.
@@ -752,6 +918,25 @@ def run(request: str, client=None, model: str = "z-ai/glm-5.2", max_steps: int =
             obs = fn(args.get("percent"), float(args.get("tolerance", 5.0)))
             if obs.get("ok"):
                 sess.gc = obs
+        elif name == "set_melting_temperature":
+            obs = fn(args.get("celsius"), float(args.get("tolerance", 5.0)))
+            if obs.get("ok"):
+                sess.tm = obs
+        elif name == "design_set":
+            if not sess.target:
+                obs = {"ok": False, "error": "no target yet -- propose_structure or use_target first"}
+            elif sess.total_cost_usd >= max_cost_usd:
+                obs = {"ok": False, "error": f"cost cap ${max_cost_usd} reached"}
+            else:
+                obs = fn(sess.target, int(args.get("count", 8)),
+                         float(args.get("max_identity", 60.0)),
+                         float(args.get("max_duplex_kcal", -12.0)),
+                         str(args.get("budget", "cheap")), int(args.get("runs", 4)), sess.restraint)
+                sess.total_cost_usd += float(obs.get("cost_usd") or 0.0)
+                if obs.get("verdict") == "certified":
+                    sess.sequences = obs["sequences"]
+                    sess.certificate = (obs.get("certificates") or [None])[0]
+                    sess.done, sess.outcome = True, "certified"
         elif name == "recommend_loop_cap":
             obs = fn(sess.target) if sess.target else \
                 {"ok": False, "error": "no target yet -- propose_structure first"}
@@ -759,7 +944,8 @@ def run(request: str, client=None, model: str = "z-ai/glm-5.2", max_steps: int =
             obs = fn(sess.target or "", sess.restraint) if sess.target else \
                 {"ok": False, "error": "no target yet -- propose_structure first"}
         else:  # design
-            problem = (sess.target, sess.restraint, json.dumps(sess.gc, sort_keys=True))
+            problem = (sess.target, sess.restraint, json.dumps(sess.gc, sort_keys=True),
+                       json.dumps(sess.tm, sort_keys=True))
             if not sess.target:
                 obs = {"ok": False, "error": "no target yet -- propose_structure first"}
             elif sess.total_cost_usd >= max_cost_usd:
@@ -791,16 +977,18 @@ def run(request: str, client=None, model: str = "z-ai/glm-5.2", max_steps: int =
                                 "requirement -- then check_feasible again, which is free.")}
             else:
                 paid[problem] = paid.get(problem, 0) + 1
-                obs = fn(sess.target, sess.restraint, str(args.get("budget", "cheap")), gc=sess.gc)
+                obs = fn(sess.target, sess.restraint, str(args.get("budget", "cheap")),
+                         gc=sess.gc, tm=sess.tm)
                 sess.total_cost_usd += float(obs.get("cost_usd") or 0.0)
                 if obs.get("certificate"):
                     sess.certificate = obs["certificate"]
-                held, gcc = obs.get("constraint_held"), obs.get("gc")
+                held, gcc, tmc = obs.get("constraint_held"), obs.get("gc"), obs.get("tm")
                 # every declared requirement must hold, not just the folding one -- a design that folds but
                 # breaks the pin or misses the GC target is not the answer to what was asked
                 if (obs.get("verdict") in ("certified", "knot_confirmed")
                         and (held is None or held["held"])
-                        and (gcc is None or gcc.get("held"))):
+                        and (gcc is None or gcc.get("held"))
+                        and (tmc is None or tmc.get("held"))):
                     sess.done, sess.outcome = True, "certified"
         sess.steps.append(Step(n, name, args, obs, cost_usd=float(obs.get("cost_usd") or 0.0),
                                wall_s=round(time.time() - t0, 1), thought=thought))
@@ -862,6 +1050,16 @@ def render(sess: "Session", lang: str = "zh") -> str:
                 out.append(f"        GC: {'达标' if zh else 'on target'}={g.get('held')}  "
                            f"{'实测' if zh else 'measured'}={g.get('measured')}%  "
                            f"{'目标' if zh else 'target'}={g.get('target')}±{g.get('tolerance')}")
+            if o.get("tm") is not None:
+                m = o["tm"]
+                out.append(f"        {'熔点' if zh else 'melting point'}: {m.get('held')}  "
+                           f"{'实测' if zh else 'measured'}={m.get('measured')}C  "
+                           f"{'目标' if zh else 'target'}={m.get('target')}±{m.get('tolerance')}C")
+            if o.get("set_check") is not None:
+                k = o["set_check"]
+                out.append(f"        {'集合' if zh else 'set'}: {o.get('n_delivered')}/{o.get('n_requested')}  "
+                           f"{'最大两两相同度' if zh else 'worst identity'}={k.get('worst_pairwise_identity')}%  "
+                           f"{'最强二聚体' if zh else 'strongest duplex'}={k.get('strongest_duplex_kcal')} kcal/mol")
             if o.get("constraint_held") is not None:
                 h = o["constraint_held"]
                 out.append(f"        {'固定区保持' if zh else 'constraint held'}: {h['held']}"

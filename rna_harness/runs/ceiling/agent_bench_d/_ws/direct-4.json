@@ -1,0 +1,230 @@
+{
+ "request": "给我这样一个结构:一个 H 型假结：茎1 4 对、茎2 4 对，三段环依次 4 nt、3 nt、4 nt，并且第 5 位开始的 3 个碱基必须固定为 AAA",
+ "steps": [
+  {
+   "n": 1,
+   "action": "propose_structure",
+   "args": {
+    "elements": [
+     {
+      "type": "pseudoknot",
+      "stem1": 4,
+      "stem2": 4,
+      "loop1": 4,
+      "loop2": 3,
+      "loop3": 4
+     }
+    ]
+   },
+   "observation": {
+    "ok": true,
+    "target": "((((....[[[[...))))....]]]]",
+    "n": 27,
+    "kind": "pseudoknot",
+    "plain": "共 27 个碱基,8 对碱基配对,2 段茎"
+   },
+   "cost_usd": 0.0,
+   "wall_s": 0.0,
+   "thought": "用户想要一个 H 型假结，stem1=4bp，stem2=4bp，loop1=4nt，loop2=3nt，loop3=4nt，且第 5-7 位（1-based，即 0-based 4-6）固定为 AAA。这些位置落在 loop1 中，是未配对区域，应该没有冲突。先提出结构。"
+  },
+  {
+   "n": 2,
+   "action": "place_constraint",
+   "args": {
+    "motif": "AAA",
+    "at": 5
+   },
+   "observation": {
+    "ok": true,
+    "restraint": "NNNNNAAANNNNNNNNNNNNNNNNNNN",
+    "pinned_now": 3,
+    "at": 5,
+    "pinned_total": 3
+   },
+   "cost_usd": 0.0,
+   "wall_s": 0.0,
+   "thought": "结构已构建完成，现在需要固定第5位开始的3个碱基为AAA，然后检查可行性。"
+  },
+  {
+   "n": 3,
+   "action": "check_feasible",
+   "args": {},
+   "observation": {
+    "ok": true,
+    "conflicts": [],
+    "shape": {
+     "ok": true,
+     "designable": null,
+     "note": "skipped: ViennaRNA's inverse fold cannot represent crossing pairs (it crashes on them)"
+    },
+    "pinned_total": 3,
+    "pinned_in_paired_positions": 0,
+    "note": "the pinned bases are compatible with this shape"
+   },
+   "cost_usd": 0.0,
+   "wall_s": 0.0,
+   "thought": "Structure and constraint are set; I must run the free feasibility check before designing to detect any pin conflicts or shape issues."
+  },
+  {
+   "n": 4,
+   "action": "design",
+   "args": {
+    "budget": "cheap"
+   },
+   "observation": {
+    "ok": true,
+    "sequence": "GGCCAAAACCGUAACGGCCGAUAAUGG",
+    "cost_usd": 0.0012298491597175598,
+    "wall_s": 17.5,
+    "verdict": "knot_confirmed",
+    "constraint_held": {
+     "held": true,
+     "violated_positions": []
+    },
+    "gc": null,
+    "tm": null,
+    "n_screened": 1,
+    "bp_away": 0,
+    "certificate": {
+     "verdict": "knot_confirmed",
+     "target": "((((....[[[[...))))....]]]]",
+     "n": 27,
+     "kind": "pseudoknot",
+     "sequence": "GGCCAAAACCGUAACGGCCGAUAAUGG",
+     "checked_by": "crossing stems: pkiss",
+     "strictness": "knot-recall (k=1, tau=1.0)",
+     "rungs_passed": [
+      "knot-recall"
+     ],
+     "cost_usd": 8.233699533674453e-06,
+     "wait_s": 0.59,
+     "budget": "",
+     "reason": "the crossing stems that make this a pseudoknot are fully reproduced by pkiss. This is a claim about the KNOT, not the whole structure: the criterion recognises 84% of known natural structures at 0.4% false accept on random sequences.",
+     "detail": {
+      "per_oracle": {
+       "pkiss": true,
+       "probknot": false,
+       "shapeknots": false
+      },
+      "any_failed_to_run": false,
+      "unanimous": false,
+      "reference_only": true,
+      "knot": {
+       "per_oracle": {
+        "pkiss": 1.0,
+        "probknot": 0.0,
+        "shapeknots": 0.0
+       },
+       "n_cross": 4,
+       "confirmed_by": [
+        "pkiss"
+       ],
+       "knot_confirmed": true
+      },
+      "operating_point": {
+       "rule": "crossing stems fully reproduced by at least 1 of 3 oracles (k=1, tau=1.0)",
+       "sensitivity_on_known_structures": 0.84,
+       "false_accept_on_random_sequences": 0.004,
+       "scope": "the CROSSING STEMS only -- this says nothing about the rest of the structure",
+       "note": "sensitivity is unchanged from tau=1.0 down to 0.9: these predictors get a knot entirely right or entirely wrong. Composing this with an exact nested-skeleton check was tried and refuted (ViennaRNA recovers the nested reduction from only 20 of 186 natives)."
+      }
+     },
+     "disclaimer": "`certified` means the sequence folds to the target under the stated computational model. It is not a claim about behaviour in vitro or in vivo.",
+     "seed": null,
+     "generated_utc": "2026-07-30T10:59:22Z",
+     "provenance": {
+      "schema": "rna-certificate/1.0",
+      "python": "3.10.20",
+      "viennarna": "2.7.2",
+      "desirna": "/data/wenhui/DesiRNA@bdb4908",
+      "pkiss": "/home/ubuntu/miniconda3/envs/pk/bin/pKiss",
+      "rnastructure": "ProbKnot: Version 6.6 (April 2, 2026)."
+     },
+     "verify_cmd": "python -m rna_harness.cognitive.certify '((((....[[[[...))))....]]]]' --sequence GGCCAAAACCGUAACGGCCGAUAAUGG",
+     "rerun_search": "python -m rna_harness.cognitive.certify '((((....[[[[...))))....]]]]' --budget standard",
+     "reproducibility": "verify_cmd reproduces this certificate's claim exactly -- folding is deterministic. rerun_search re-runs the design and may return a different sequence: the search budget is wall-clock, not iteration count, so it is not seed-reproducible."
+    }
+   },
+   "cost_usd": 0.0012298491597175598,
+   "wall_s": 17.5,
+   "thought": "No conflicts and the pinned AAA sits in unpaired positions. I'll run a cheap design first."
+  }
+ ],
+ "target": "((((....[[[[...))))....]]]]",
+ "restraint": "NNNNNAAANNNNNNNNNNNNNNNNNNN",
+ "gc": null,
+ "tm": null,
+ "sequences": null,
+ "pins": [
+  {
+   "motif": "AAA",
+   "at": 5
+  }
+ ],
+ "requested_target": "((((....[[[[...))))....]]]]",
+ "requested_by_user": false,
+ "substituted": null,
+ "certificate": {
+  "verdict": "knot_confirmed",
+  "target": "((((....[[[[...))))....]]]]",
+  "n": 27,
+  "kind": "pseudoknot",
+  "sequence": "GGCCAAAACCGUAACGGCCGAUAAUGG",
+  "checked_by": "crossing stems: pkiss",
+  "strictness": "knot-recall (k=1, tau=1.0)",
+  "rungs_passed": [
+   "knot-recall"
+  ],
+  "cost_usd": 8.233699533674453e-06,
+  "wait_s": 0.59,
+  "budget": "",
+  "reason": "the crossing stems that make this a pseudoknot are fully reproduced by pkiss. This is a claim about the KNOT, not the whole structure: the criterion recognises 84% of known natural structures at 0.4% false accept on random sequences.",
+  "detail": {
+   "per_oracle": {
+    "pkiss": true,
+    "probknot": false,
+    "shapeknots": false
+   },
+   "any_failed_to_run": false,
+   "unanimous": false,
+   "reference_only": true,
+   "knot": {
+    "per_oracle": {
+     "pkiss": 1.0,
+     "probknot": 0.0,
+     "shapeknots": 0.0
+    },
+    "n_cross": 4,
+    "confirmed_by": [
+     "pkiss"
+    ],
+    "knot_confirmed": true
+   },
+   "operating_point": {
+    "rule": "crossing stems fully reproduced by at least 1 of 3 oracles (k=1, tau=1.0)",
+    "sensitivity_on_known_structures": 0.84,
+    "false_accept_on_random_sequences": 0.004,
+    "scope": "the CROSSING STEMS only -- this says nothing about the rest of the structure",
+    "note": "sensitivity is unchanged from tau=1.0 down to 0.9: these predictors get a knot entirely right or entirely wrong. Composing this with an exact nested-skeleton check was tried and refuted (ViennaRNA recovers the nested reduction from only 20 of 186 natives)."
+   }
+  },
+  "disclaimer": "`certified` means the sequence folds to the target under the stated computational model. It is not a claim about behaviour in vitro or in vivo.",
+  "seed": null,
+  "generated_utc": "2026-07-30T10:59:22Z",
+  "provenance": {
+   "schema": "rna-certificate/1.0",
+   "python": "3.10.20",
+   "viennarna": "2.7.2",
+   "desirna": "/data/wenhui/DesiRNA@bdb4908",
+   "pkiss": "/home/ubuntu/miniconda3/envs/pk/bin/pKiss",
+   "rnastructure": "ProbKnot: Version 6.6 (April 2, 2026)."
+  },
+  "verify_cmd": "python -m rna_harness.cognitive.certify '((((....[[[[...))))....]]]]' --sequence GGCCAAAACCGUAACGGCCGAUAAUGG",
+  "rerun_search": "python -m rna_harness.cognitive.certify '((((....[[[[...))))....]]]]' --budget standard",
+  "reproducibility": "verify_cmd reproduces this certificate's claim exactly -- folding is deterministic. rerun_search re-runs the design and may return a different sequence: the search budget is wall-clock, not iteration count, so it is not seed-reproducible."
+ },
+ "done": true,
+ "outcome": "certified",
+ "total_cost_usd": 0.00947954115971756,
+ "llm_cost_usd": 0.008249692
+}

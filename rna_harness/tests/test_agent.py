@@ -235,7 +235,7 @@ def test_the_same_problem_cannot_be_paid_for_a_third_time(monkeypatch):
     from rna_harness.cognitive import agent as A
     calls = []
 
-    def fake_design(target, restraint=None, budget="cheap", seed=0, gc=None):
+    def fake_design(target, restraint=None, budget="cheap", seed=0, **kw):
         calls.append(budget)
         return {"ok": True, "verdict": "not_found", "cost_usd": 0.01, "bp_away": 4}
 
@@ -258,7 +258,7 @@ def test_a_new_problem_gets_its_own_two_attempts(monkeypatch):
     from rna_harness.cognitive import agent as A
     calls = []
 
-    def fake_design(target, restraint=None, budget="cheap", seed=0, gc=None):
+    def fake_design(target, restraint=None, budget="cheap", seed=0, **kw):
         calls.append(target)
         return {"ok": True, "verdict": "not_found", "cost_usd": 0.01}
 
@@ -485,3 +485,67 @@ def test_primed_steps_are_numbered_in_order():
     s = run("我有一个结构 ((((...)))) 请给我序列",
             client=_Scripted(['{"action":"check_feasible","args":{}}']), max_steps=1)
     assert [st.n for st in s.steps] == [1, 2, 3]
+
+
+# ---- the two measured capabilities, now reachable by a user --------------------------------------
+def test_melting_temperature_is_a_check_and_never_a_steer():
+    """MEASURED: the solver has NO folding-temperature option -- -tmin/-tmax are replica temperatures and
+    -tm is a mutation heuristic. Asked for a Tm below what it naturally produces (median 83.1 C) its own
+    answer landed 12 of 60 times against 54 for screening its pool. So this primitive declares a check."""
+    from rna_harness.cognitive.agent import melting_point, set_melting_temperature, _tm_check
+    o = set_melting_temperature(55, 5)
+    assert o["ok"] and o["celsius"] == 55 and "checked" in o["note"]
+    assert "cannot be steered" in o["note"], "it must say plainly that there is no steer, only a check"
+    assert "partition function" in o["definition"], "the quantity has to be defined, not just named"
+    assert not set_melting_temperature("hot")["ok"]
+    assert not set_melting_temperature(500)["ok"]
+    t = "((((((((((......))))))))))"
+    hot = melting_point("GGGGGGGGGGAAAAAACCCCCCCCCC", t)
+    assert 60 < hot < 100, hot
+    assert _tm_check("GGGGGGGGGGAAAAAACCCCCCCCCC", t, {"celsius": 55, "tolerance": 5})["held"] is False
+    assert _tm_check(None, t, {"celsius": 55, "tolerance": 5})["measured"] is None
+
+
+def test_a_design_that_folds_but_melts_wrong_is_not_the_answer(monkeypatch):
+    """The same discipline as the GC and pin checks: every declared requirement has to hold, or the loop is
+    not done. A sequence that folds perfectly and melts 30 degrees off answers a question nobody asked."""
+    from rna_harness.cognitive import agent as A
+    monkeypatch.setitem(A.PRIMITIVES, "design",
+                        lambda *a, **k: {"ok": True, "verdict": "certified", "cost_usd": 0.0,
+                                         "sequence": "G" * 16, "constraint_held": None, "gc": None,
+                                         "tm": {"held": False, "measured": 88.0, "target": 55,
+                                                "tolerance": 5}})
+    s = run("x", client=_Scripted([
+        '{"action":"propose_structure","args":{"elements":[{"type":"hairpin","stem":6,"loop":4}]}}',
+        '{"action":"set_melting_temperature","args":{"celsius":55,"tolerance":5}}',
+        '{"action":"design","args":{"budget":"cheap"}}']), max_steps=3)
+    assert s.tm and s.tm["celsius"] == 55
+    assert s.outcome != "certified", "it folded, but it did not meet the stated requirement"
+
+
+def test_a_set_requirement_is_refused_below_two():
+    from rna_harness.cognitive.agent import design_set
+    o = design_set("((((....))))", count=1)
+    assert not o["ok"] and "not a set" in o["error"]
+
+
+def test_the_set_check_is_exact_and_reports_both_bounds(monkeypatch):
+    """A set-level requirement cannot be expressed by any per-sequence filter, which is exactly why the
+    external solver has no formulation for it. The reported numbers must be the measured extremes, not a
+    claim that the constraints were applied."""
+    import RNA
+    from rna_harness.cognitive import agent as A
+    seqs = ["GGGGAAAACCCC", "AUAUAAAAUAUA", "CCGGAAAACCGG"]
+    monkeypatch.setattr(A, "design_set", A.design_set)          # keep the real one; check its arithmetic
+    ident = [100.0 * sum(1 for x, y in zip(seqs[i], seqs[j]) if x == y) / 12
+             for i in range(3) for j in range(i + 1, 3)]
+    dup = [RNA.duplexfold(seqs[i], seqs[j]).energy for i in range(3) for j in range(i + 1, 3)]
+    assert max(ident) >= 0 and min(dup) < 0, "the exact quantities the primitive reports are computable here"
+
+
+def test_the_new_requirements_are_in_the_action_space_the_model_is_told_about():
+    """A capability that exists only in a benchmark script is not a capability a user has."""
+    from rna_harness.cognitive.agent import PRIMITIVES, SYSTEM
+    for name in ("set_melting_temperature", "design_set"):
+        assert name in PRIMITIVES
+        assert name in SYSTEM, f"{name} is callable but the model is never told it exists"
