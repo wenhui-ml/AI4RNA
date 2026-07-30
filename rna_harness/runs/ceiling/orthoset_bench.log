@@ -1,0 +1,21 @@
+orthogonal-set benchmark: 5 shapes, asking for 8 sequences each that all fold, are pairwise <= 60% identical and form no duplex below -12.0 kcal/mol
+  both arms consume the same 8 runs x 15s of the same solver
+
+    1/5  2.5 min
+    2/5  2.5 min
+    3/5  2.5 min
+    4/5  2.5 min
+    5/5  2.5 min
+
+=== 5 shapes, same solver, same 8 runs, same pools ===
+  shape              池     折叠对      工具给的      工具集合      我们集合
+  hairpin-10      1599    1568         8       2/8       8/8
+  internal-loop   1576    1525         8       2/8       8/8
+  junction-2      1600    1523         8       1/8       8/8
+  junction-3      1600    1486         8       1/8       4/8
+  two-hairpins    1599    1547         8       1/8       8/8
+
+  工具凑齐 8 条正交序列: 0/5
+  筛选其池凑齐            : 4/5
+
+  wrote rna_harness/runs/ceiling/orthoset_bench.json
