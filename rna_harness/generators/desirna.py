@@ -93,11 +93,22 @@ class DesiRNAGenerator(Generator):
 
     # -- helpers (match DesiRNA's real interface: github.com/fryzjergda/DesiRNA) --------------
     def _build_input(self, task: DesignTask) -> str:
-        # 3 labelled sections: name, seq restraints (IUPAC; N = any), target dot-bracket.
+        """3 labelled sections: name, seq restraints (IUPAC; N = any), target dot-bracket.
+
+        `meta["seed_seq"]` adds DesiRNA's own `>seed_seq` section, which sets the STARTING sequence for the
+        search. It is plumbed here so that any comparison against a "stay near this sequence" requirement
+        gives the tool its own mechanism rather than nothing -- a benchmark that withholds the feature under
+        test measures our plumbing, not the tool.
+        """
         n = len(task.target)
-        return (">name\nDesign\n"
-                f">seq_restr\n{'N' * n}\n"
-                f">sec_struct\n{task.target}\n")
+        meta = task.meta or {}
+        out = (">name\nDesign\n"
+               f">seq_restr\n{meta.get('seq_restr') or ('N' * n)}\n"
+               f">sec_struct\n{task.target}\n")
+        seed_seq = meta.get("seed_seq")
+        if seed_seq and len(seed_seq) == n:
+            out += f">seed_seq\n{seed_seq}\n"
+        return out
 
     def _argv(self, cmd: List[str], input_name: str, seed: Optional[int], param: str = "2004") -> List[str]:
         # -p aligns DesiRNA's OPTIMIZATION energy model to OUR verification oracle. DesiRNA defaults to

@@ -1,0 +1,24 @@
+stay-near-a-reference benchmark: 5 shapes x 2 thresholds x 3 references = 30 runs
+
+    10/30  0.3 min
+    20/30  0.6 min
+    30/30  1.0 min
+
+=== 30 runs, same solver, same seconds, same pool ===
+  工具自己的答案  折叠对 AND 相似度达标 : 0/30
+  筛选它的池      折叠对 AND 相似度达标 : 2/30
+  McNemar 2-0, p=5.00e-01
+
+  工具答案与参考序列的相同度  中位 21%
+  它自己池中能达到的最高相同度 中位 50%
+
+      门槛       工具       筛选
+     60%     0/15     2/15
+     70%     0/15     0/15
+
+  按参考序列的 GC 分层(检验这是不是又一次 GC 缺口):
+    参考 GC≈30%  工具 0/10   筛选 0/10
+    参考 GC≈50%  工具 0/10   筛选 1/10
+    参考 GC≈70%  工具 0/10   筛选 1/10
+
+  wrote rna_harness/runs/ceiling/nearby_bench.json
