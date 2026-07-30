@@ -348,3 +348,78 @@ def test_no_substitution_is_reported_when_the_shape_never_changed():
                                    '[{"type":"hairpin","stem":6,"loop":4}]}}',
                                    '{"action":"check_feasible","args":{}}']), max_steps=2)
     assert s.substituted is None
+
+
+# ---- a structure the USER brought: the model selects it, it never writes one ----------------------
+def test_the_model_chooses_which_structure_never_what_it_is():
+    """The invariant this module is built on is that the model never writes dot-bracket -- counting brackets
+    is precise computation. So a user-supplied structure is EXTRACTED by code and indexed by the model. There
+    is no argument through which a bracket the user never wrote can enter."""
+    from rna_harness.cognitive.agent import use_target, structures_in
+    import inspect
+    assert "structure" not in inspect.signature(use_target).parameters
+    req = "我有一个结构 ((((...)))) 请给我序列"
+    assert structures_in(req) == ["((((...))))"]
+    o = use_target(req, 0)
+    assert o["ok"] and o["target"] == "((((...))))" and o["kind"] == "nested"
+
+
+def test_an_unbalanced_or_absent_structure_is_not_adopted():
+    from rna_harness.cognitive.agent import structures_in, use_target
+    assert structures_in("((((...))") == [], "an unbalanced string is not a structure"
+    assert structures_in("....") == [], "nothing paired is not a structure to design for"
+    o = use_target("给我一个发夹", 0)
+    assert not o["ok"] and "propose_structure" in o["error"]
+
+
+def test_an_out_of_range_index_lists_what_is_actually_available():
+    from rna_harness.cognitive.agent import use_target
+    o = use_target("A ((((...)))) B ((....))", 5)
+    assert not o["ok"] and len(o["available"]) == 2
+
+
+def test_adopting_the_users_structure_makes_it_the_requested_one():
+    """If the agent later designs for something else, that is a substitution and must be reported against
+    what the USER brought -- not against whatever the agent proposed afterwards."""
+    script = ['{"action":"use_target","args":{"which":0}}',
+              '{"action":"propose_structure","args":{"elements":[{"type":"hairpin","stem":6,"loop":4}]}}',
+              '{"action":"check_feasible","args":{}}']
+    s = run("我有一个结构 ((((...))))..((((....)))) 请给我序列", client=_Scripted(script), max_steps=3)
+    assert s.steps[0].observation["ok"]
+    assert s.substituted and s.substituted["requested"] == "((((...))))..((((....))))"
+    assert s.substituted["delivered"] == HAIRPIN6 and s.substituted["same_length"] is False
+
+
+def test_a_structure_the_user_supplied_cannot_be_designed_away_from(monkeypatch):
+    """MEASURED on natural bpRNA shapes: given a structure, two pins that must pair and cannot, and an
+    explicit length lock, the agent SHIFTED the whole structure so the pins fell off the stem and returned a
+    genuinely certified sequence -- for a structure the user never wrote. 2 of 8, and it had already named
+    the conflict in all 8. Reshaping is fine when the agent built the shape; never when the user gave it."""
+    from rna_harness.cognitive import agent as A
+    calls = []
+    monkeypatch.setitem(A.PRIMITIVES, "design",
+                        lambda *a, **k: (calls.append(a[0]) or {"ok": True, "verdict": "certified",
+                                                                "cost_usd": 0.0}))
+    script = ['{"action":"use_target","args":{"which":0}}',
+              '{"action":"propose_structure","args":{"elements":[{"type":"spacer","len":2},'
+              '{"type":"hairpin","stem":4,"loop":3}]}}',
+              '{"action":"design","args":{"budget":"cheap"}}',
+              '{"action":"design","args":{"budget":"cheap"}}']
+    s = run("我有一个结构 ((((...)))) 请给我序列", client=_Scripted(script), max_steps=4)
+    assert calls == [], "it designed for a structure the user never gave"
+    bad = [st for st in s.steps if st.action == "design"][0]
+    assert "cannot be replaced" in bad.observation["error"]
+    assert bad.observation["requested"] == "((((...))))"
+
+
+def test_designing_for_the_users_own_structure_is_not_blocked(monkeypatch):
+    """The guard must key on 'different from what was given', not on 'the user gave one'."""
+    from rna_harness.cognitive import agent as A
+    calls = []
+    monkeypatch.setitem(A.PRIMITIVES, "design",
+                        lambda *a, **k: (calls.append(a[0]) or {"ok": True, "verdict": "certified",
+                                                                "cost_usd": 0.0}))
+    s = run("我有一个结构 ((((...)))) 请给我序列",
+            client=_Scripted(['{"action":"use_target","args":{"which":0}}',
+                              '{"action":"design","args":{"budget":"cheap"}}']), max_steps=2)
+    assert calls == ["((((...))))"] and s.outcome == "certified"

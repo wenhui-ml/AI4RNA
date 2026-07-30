@@ -69,6 +69,7 @@ class Session:
     gc: Optional[dict] = None
     pins: List[dict] = field(default_factory=list)   # (motif, at) as REQUESTED, so a reshape can re-apply them
     requested_target: Optional[str] = None           # the FIRST shape proposed -- what the user asked for
+    requested_by_user: bool = False                  # True when it came VERBATIM from the request text
     substituted: Optional[dict] = None               # set when the delivered shape is not the requested one
     certificate: Optional[dict] = None
     done: bool = False
@@ -94,6 +95,49 @@ def propose_structure(elements: List[Dict]) -> dict:
     if cerr:
         return {"ok": False, "error": cerr}
     return {"ok": True, "target": db, "n": len(db), "kind": kind, "plain": describe(db)}
+
+
+def structures_in(request: str) -> List[str]:
+    """Every dot-bracket string that is LITERALLY PRESENT in the request, in order of appearance.
+
+    This is the whole mechanism behind use_target. Most people who already work with RNA arrive holding a
+    structure, and until now there was no way for one to enter this loop at all: the only route to a target
+    was assembling it from a closed grammar of five element types, which covers almost none of what nature
+    actually makes. A real bpRNA structure could not be worked on here.
+
+    The obvious fix -- let the model type the structure -- would break the rule the rest of this module is
+    built on: the model never writes dot-bracket, because counting parentheses is precise computation and
+    that is what the code is for. So the code extracts the candidates and the model only chooses WHICH one.
+    It can never introduce a bracket that was not in front of the user.
+    """
+    import re as _re
+    from .certify import classify
+    out, seen = [], set()
+    for m in _re.finditer(r"[().\[\]{}<>]{4,}", request or ""):
+        cand = m.group(0)
+        if cand in seen or not any(c in cand for c in "([{<"):
+            continue
+        if classify(cand)[1] is None:                  # balanced and well-formed, else it is not a structure
+            seen.add(cand)
+            out.append(cand)
+    return out
+
+
+def use_target(request: str, which: int = 0) -> dict:
+    """Adopt a structure the REQUEST already contains. `which` indexes the list; no string is accepted."""
+    from .certify import classify, describe
+    cands = structures_in(request)
+    if not cands:
+        return {"ok": False, "error": ("the request contains no dot-bracket structure, so there is nothing "
+                                       "to adopt -- build one with propose_structure instead")}
+    if not isinstance(which, int) or which < 0 or which >= len(cands):
+        return {"ok": False, "error": (f"the request contains {len(cands)} structure(s), indexed 0.."
+                                       f"{len(cands) - 1}; `which`={which!r} is not one of them"),
+                "available": [{"which": i, "n": len(c)} for i, c in enumerate(cands)]}
+    db = cands[which]
+    kind, _ = classify(db)
+    return {"ok": True, "target": db, "n": len(db), "kind": kind, "plain": describe(db),
+            "note": "adopted verbatim from the request -- it is the user's structure, not a proposed one"}
 
 
 def place_constraint(target: str, motif: str, at: int, existing: Optional[str] = None) -> dict:
@@ -393,6 +437,7 @@ def _constraint_held(seq: Optional[str], restraint: str):
 
 
 PRIMITIVES = {"propose_structure": propose_structure, "place_constraint": place_constraint,
+              "use_target": use_target,
               "check_feasible": check_feasible, "design": design,
               "recommend_loop_cap": recommend_loop_cap, "set_gc_content": set_gc_content}
 
@@ -416,6 +461,12 @@ Actions:
               an H-type pseudoknot. Judged by a weaker, calibrated criterion -- only choose it when the
               request actually asks for crossing stems.
         You never write dot-bracket. You give element types and integer lengths; the code assembles and counts.
+  use_target        {"which":0}              adopt a dot-bracket structure that the REQUEST already
+        contains, instead of building one. Use this whenever the user supplied a structure -- it is theirs,
+        and rebuilding it from a description would change it. You pass an INDEX, never a structure string.
+        Once adopted, that structure is FIXED: designing for a different one is refused, because a
+        certificate for a structure the user did not ask for answers nobody's question. If the requirements
+        cannot all hold on it, say so.
   place_constraint  {"motif":"GGGG","at":<0-based position>}    pin a fixed sub-sequence. ADDITIVE:
         call it again to pin a second region; the first stays. Overlapping placements that disagree are
         rejected rather than silently overwritten.
@@ -614,7 +665,17 @@ def run(request: str, client=None, model: str = "z-ai/glm-5.2", max_steps: int =
             continue
 
         t0 = time.time()
-        if name == "propose_structure":
+        if name == "use_target":
+            obs = fn(sess.request, args.get("which", 0))
+            if obs.get("ok"):
+                if sess.requested_target is None:
+                    sess.requested_target = obs["target"]      # the user's own structure IS the request
+                    sess.requested_by_user = True
+                sess.target = obs["target"]
+                sess.restraint, sess.pins, dropped = _reapply(sess.pins, sess.target)
+                if dropped:
+                    obs["pins_dropped"] = dropped
+        elif name == "propose_structure":
             obs = fn(args.get("elements") or [])
             if obs.get("ok"):
                 if sess.requested_target is None:
@@ -657,6 +718,21 @@ def run(request: str, client=None, model: str = "z-ai/glm-5.2", max_steps: int =
                 obs = {"ok": False, "error": "no target yet -- propose_structure first"}
             elif sess.total_cost_usd >= max_cost_usd:
                 obs = {"ok": False, "error": f"cost cap ${max_cost_usd} reached"}
+            elif sess.requested_by_user and sess.target != sess.requested_target:
+                # THE USER'S STRUCTURE IS DATA, NOT A PROPOSAL. Measured on natural bpRNA shapes: given a
+                # structure plus two pins that must pair and cannot, plus an explicit length lock, the agent
+                # SHIFTED the whole structure a few positions so the pins fell off the stem, and returned a
+                # genuinely certified sequence -- for a structure the user never wrote. Every oracle was
+                # satisfied. 2 of 8 items, and it had already found and named the conflict in all 8.
+                # Reshaping is legitimate when the agent built the shape itself from a description; it is
+                # never legitimate when the shape came verbatim from the person asking.
+                obs = {"ok": False,
+                       "error": ("this structure came from the request itself, so it cannot be replaced. "
+                                 "You are about to design for a different one."),
+                       "requested": sess.requested_target, "about_to_design_for": sess.target,
+                       "hint": ("use_target to go back to what was given. If the requirements cannot all "
+                                "hold on it, that is the answer -- say so with `done` and name the "
+                                "conflicting positions.")}
             elif paid.get(problem, 0) >= 2:
                 # BUYING MORE TIME IS NOT A NEW IDEA. Measured: on one undesignable junction the agent went
                 # cheap -> standard -> best_effort without changing anything, and the third call alone cost
