@@ -1,74 +1,89 @@
 {
- "request": "给我一个茎 7 对、环 4 nt 的发夹，并且第 8 位开始的 3 个碱基必须固定为 AAA",
+ "request": "给我这样一个结构:一个 H 型假结,两个交叉茎分别 4 对和 4 对，并且第 5 位开始的 3 个碱基必须固定为 AAA",
  "steps": [
   {
    "n": 1,
+   "action": "check_feasible",
+   "args": {},
+   "observation": {
+    "ok": false,
+    "error": "no target yet -- propose_structure first"
+   },
+   "cost_usd": 0.0,
+   "wall_s": 0.0,
+   "thought": "检查固定碱基是否与配位冲突。"
+  },
+  {
+   "n": 2,
    "action": "propose_structure",
    "args": {
     "elements": [
      {
-      "type": "hairpin",
-      "stem": 7,
-      "loop": 4
+      "type": "pseudoknot",
+      "stem1": 4,
+      "stem2": 4,
+      "loop1": 3,
+      "loop2": 3,
+      "loop3": 3
      }
     ]
    },
    "observation": {
     "ok": true,
-    "target": "(((((((....)))))))",
-    "n": 18,
-    "kind": "nested",
-    "plain": "共 18 个碱基,7 对碱基配对,1 个发夹环(环大小 4 个未配对碱基)"
+    "target": "((((...[[[[...))))...]]]]",
+    "n": 25,
+    "kind": "pseudoknot",
+    "plain": "共 25 个碱基,8 对碱基配对,2 段茎"
    },
    "cost_usd": 0.0,
    "wall_s": 0.0,
-   "thought": "用户想要一个茎7对、环4nt的发夹结构，并且第8位（1-based，即0-based第7位）开始固定AAA。先构建结构。"
+   "thought": "Need an H-type pseudoknot with stem1=4, stem2=4; position 5 (1-based) maps to 0-based index 4, which falls in loop1 if loop1 starts right after the 4-nt stem1 left strand, so set loop1>=3 and pin AAA "
   },
   {
-   "n": 2,
+   "n": 3,
    "action": "place_constraint",
    "args": {
     "motif": "AAA",
-    "at": 8
+    "at": 5
    },
    "observation": {
     "ok": true,
-    "restraint": "NNNNNNNNAAANNNNNNN",
+    "restraint": "NNNNNAAANNNNNNNNNNNNNNNNN",
     "pinned_now": 3,
-    "at": 8,
+    "at": 5,
     "pinned_total": 3
    },
    "cost_usd": 0.0,
    "wall_s": 0.0,
-   "thought": "Positions 8-10 (0-based) fall within the 4-nt loop, so no pairing conflict is expected. I'll pin AAA there and check feasibility before designing."
+   "thought": "Positions 5,6 are unpaired (loop1) and position 7 is paired with position 21 (stem2). AAA at position 7 requires position 21 to be U, which is a valid pair. Let me place the constraint and check feasi"
   },
   {
-   "n": 3,
+   "n": 4,
    "action": "check_feasible",
    "args": {},
    "observation": {
     "ok": true,
     "conflicts": [],
     "pinned_total": 3,
-    "pinned_in_paired_positions": 0,
+    "pinned_in_paired_positions": 1,
     "note": "the pinned bases are compatible with this shape"
    },
    "cost_usd": 0.0,
    "wall_s": 0.0,
-   "thought": "Constraint AAA at positions 8-10 lies entirely in the hairpin loop (unpaired), so no pairing conflict; run feasibility check then design."
+   "thought": "The structure and constraint are set; I should check feasibility before running the solver."
   },
   {
-   "n": 4,
+   "n": 5,
    "action": "design",
    "args": {
     "budget": "cheap"
    },
    "observation": {
     "ok": true,
-    "sequence": "GCGCGGCGAAAGCCGCGC",
-    "cost_usd": 0.0011922535962528653,
-    "wall_s": 8.6,
-    "verdict": "certified",
+    "sequence": "CCGCGAAAAGGAAAGCGGAUCCCUU",
+    "cost_usd": 0.0012050259444448684,
+    "wall_s": 9.3,
+    "verdict": "knot_confirmed",
     "constraint_held": {
      "held": true,
      "violated_positions": []
@@ -77,26 +92,53 @@
     "n_screened": 1,
     "bp_away": 0,
     "certificate": {
-     "verdict": "certified",
-     "target": "(((((((....)))))))",
-     "n": 18,
-     "kind": "nested",
-     "sequence": "GCGCGGCGAAAGCCGCGC",
-     "checked_by": "ViennaRNA MFE (turner2004, dangles=2)",
-     "strictness": "pfe",
+     "verdict": "knot_confirmed",
+     "target": "((((...[[[[...))))...]]]]",
+     "n": 25,
+     "kind": "pseudoknot",
+     "sequence": "CCGCGAAAAGGAAAGCGGAUCCCUU",
+     "checked_by": "crossing stems: pkiss, probknot",
+     "strictness": "knot-recall (k=1, tau=1.0)",
      "rungs_passed": [
-      "match",
-      "umfe",
-      "pfe"
+      "knot-recall"
      ],
-     "cost_usd": 6.669097476535374e-09,
-     "wait_s": 0.0,
+     "cost_usd": 9.268926249610054e-06,
+     "wait_s": 0.67,
      "budget": "",
-     "reason": "folds exactly to the target; also passes: umfe, pfe",
-     "detail": {},
+     "reason": "the crossing stems that make this a pseudoknot are fully reproduced by pkiss, probknot. This is a claim about the KNOT, not the whole structure: the criterion recognises 84% of known natural structures at 0.4% false accept on random sequences.",
+     "detail": {
+      "per_oracle": {
+       "pkiss": true,
+       "probknot": false,
+       "shapeknots": false
+      },
+      "any_failed_to_run": false,
+      "unanimous": false,
+      "reference_only": true,
+      "knot": {
+       "per_oracle": {
+        "pkiss": 1.0,
+        "probknot": 1.0,
+        "shapeknots": 0.0
+       },
+       "n_cross": 4,
+       "confirmed_by": [
+        "pkiss",
+        "probknot"
+       ],
+       "knot_confirmed": true
+      },
+      "operating_point": {
+       "rule": "crossing stems fully reproduced by at least 1 of 3 oracles (k=1, tau=1.0)",
+       "sensitivity_on_known_structures": 0.84,
+       "false_accept_on_random_sequences": 0.004,
+       "scope": "the CROSSING STEMS only -- this says nothing about the rest of the structure",
+       "note": "sensitivity is unchanged from tau=1.0 down to 0.9: these predictors get a knot entirely right or entirely wrong. Composing this with an exact nested-skeleton check was tried and refuted (ViennaRNA recovers the nested reduction from only 20 of 186 natives)."
+      }
+     },
      "disclaimer": "`certified` means the sequence folds to the target under the stated computational model. It is not a claim about behaviour in vitro or in vivo.",
      "seed": null,
-     "generated_utc": "2026-07-29T09:56:23Z",
+     "generated_utc": "2026-07-29T15:42:36Z",
      "provenance": {
       "schema": "rna-certificate/1.0",
       "python": "3.10.20",
@@ -105,40 +147,67 @@
       "pkiss": "/home/ubuntu/miniconda3/envs/pk/bin/pKiss",
       "rnastructure": "ProbKnot: Version 6.6 (April 2, 2026)."
      },
-     "verify_cmd": "python -m rna_harness.cognitive.certify '(((((((....)))))))' --sequence GCGCGGCGAAAGCCGCGC",
-     "rerun_search": "python -m rna_harness.cognitive.certify '(((((((....)))))))' --budget standard",
+     "verify_cmd": "python -m rna_harness.cognitive.certify '((((...[[[[...))))...]]]]' --sequence CCGCGAAAAGGAAAGCGGAUCCCUU",
+     "rerun_search": "python -m rna_harness.cognitive.certify '((((...[[[[...))))...]]]]' --budget standard",
      "reproducibility": "verify_cmd reproduces this certificate's claim exactly -- folding is deterministic. rerun_search re-runs the design and may return a different sequence: the search budget is wall-clock, not iteration count, so it is not seed-reproducible."
     }
    },
-   "cost_usd": 0.0011922535962528653,
-   "wall_s": 8.6,
-   "thought": "结构已构建，约束已固定且可行性检查通过，AAA 位于发夹环内未配对区域，直接用 cheap 预算运行设计验证。"
+   "cost_usd": 0.0012050259444448684,
+   "wall_s": 9.3,
+   "thought": "Structure proposed, constraint placed, and feasibility confirmed. Now run the solver to verify the design."
   }
  ],
- "target": "(((((((....)))))))",
- "restraint": "NNNNNNNNAAANNNNNNN",
+ "target": "((((...[[[[...))))...]]]]",
+ "restraint": "NNNNNAAANNNNNNNNNNNNNNNNN",
  "gc": null,
  "certificate": {
-  "verdict": "certified",
-  "target": "(((((((....)))))))",
-  "n": 18,
-  "kind": "nested",
-  "sequence": "GCGCGGCGAAAGCCGCGC",
-  "checked_by": "ViennaRNA MFE (turner2004, dangles=2)",
-  "strictness": "pfe",
+  "verdict": "knot_confirmed",
+  "target": "((((...[[[[...))))...]]]]",
+  "n": 25,
+  "kind": "pseudoknot",
+  "sequence": "CCGCGAAAAGGAAAGCGGAUCCCUU",
+  "checked_by": "crossing stems: pkiss, probknot",
+  "strictness": "knot-recall (k=1, tau=1.0)",
   "rungs_passed": [
-   "match",
-   "umfe",
-   "pfe"
+   "knot-recall"
   ],
-  "cost_usd": 6.669097476535374e-09,
-  "wait_s": 0.0,
+  "cost_usd": 9.268926249610054e-06,
+  "wait_s": 0.67,
   "budget": "",
-  "reason": "folds exactly to the target; also passes: umfe, pfe",
-  "detail": {},
+  "reason": "the crossing stems that make this a pseudoknot are fully reproduced by pkiss, probknot. This is a claim about the KNOT, not the whole structure: the criterion recognises 84% of known natural structures at 0.4% false accept on random sequences.",
+  "detail": {
+   "per_oracle": {
+    "pkiss": true,
+    "probknot": false,
+    "shapeknots": false
+   },
+   "any_failed_to_run": false,
+   "unanimous": false,
+   "reference_only": true,
+   "knot": {
+    "per_oracle": {
+     "pkiss": 1.0,
+     "probknot": 1.0,
+     "shapeknots": 0.0
+    },
+    "n_cross": 4,
+    "confirmed_by": [
+     "pkiss",
+     "probknot"
+    ],
+    "knot_confirmed": true
+   },
+   "operating_point": {
+    "rule": "crossing stems fully reproduced by at least 1 of 3 oracles (k=1, tau=1.0)",
+    "sensitivity_on_known_structures": 0.84,
+    "false_accept_on_random_sequences": 0.004,
+    "scope": "the CROSSING STEMS only -- this says nothing about the rest of the structure",
+    "note": "sensitivity is unchanged from tau=1.0 down to 0.9: these predictors get a knot entirely right or entirely wrong. Composing this with an exact nested-skeleton check was tried and refuted (ViennaRNA recovers the nested reduction from only 20 of 186 natives)."
+   }
+  },
   "disclaimer": "`certified` means the sequence folds to the target under the stated computational model. It is not a claim about behaviour in vitro or in vivo.",
   "seed": null,
-  "generated_utc": "2026-07-29T09:56:23Z",
+  "generated_utc": "2026-07-29T15:42:36Z",
   "provenance": {
    "schema": "rna-certificate/1.0",
    "python": "3.10.20",
@@ -147,11 +216,12 @@
    "pkiss": "/home/ubuntu/miniconda3/envs/pk/bin/pKiss",
    "rnastructure": "ProbKnot: Version 6.6 (April 2, 2026)."
   },
-  "verify_cmd": "python -m rna_harness.cognitive.certify '(((((((....)))))))' --sequence GCGCGGCGAAAGCCGCGC",
-  "rerun_search": "python -m rna_harness.cognitive.certify '(((((((....)))))))' --budget standard",
+  "verify_cmd": "python -m rna_harness.cognitive.certify '((((...[[[[...))))...]]]]' --sequence CCGCGAAAAGGAAAGCGGAUCCCUU",
+  "rerun_search": "python -m rna_harness.cognitive.certify '((((...[[[[...))))...]]]]' --budget standard",
   "reproducibility": "verify_cmd reproduces this certificate's claim exactly -- folding is deterministic. rerun_search re-runs the design and may return a different sequence: the search budget is wall-clock, not iteration count, so it is not seed-reproducible."
  },
  "done": true,
  "outcome": "certified",
- "total_cost_usd": 0.0011922535962528653
+ "total_cost_usd": 0.013518869144444869,
+ "llm_cost_usd": 0.0123138432
 }

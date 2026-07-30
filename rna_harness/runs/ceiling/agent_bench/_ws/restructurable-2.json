@@ -1,5 +1,5 @@
 {
- "request": "我要一个茎 7 对、环 4 nt 的发夹，序列开头必须是 GGGG，结尾也必须是 GGGG",
+ "request": "我要这样一个结构:一个 H 型假结,两个交叉茎分别 4 对和 4 对，第 1 位起的 4 个碱基必须是 GGGG，第 16 位起的 4 个也必须是 GGGG",
  "steps": [
   {
    "n": 1,
@@ -7,22 +7,25 @@
    "args": {
     "elements": [
      {
-      "type": "hairpin",
-      "stem": 7,
-      "loop": 4
+      "type": "pseudoknot",
+      "stem1": 4,
+      "stem2": 4,
+      "loop1": 3,
+      "loop2": 8,
+      "loop3": 3
      }
     ]
    },
    "observation": {
     "ok": true,
-    "target": "(((((((....)))))))",
-    "n": 18,
-    "kind": "nested",
-    "plain": "共 18 个碱基,7 对碱基配对,1 个发夹环(环大小 4 个未配对碱基)"
+    "target": "((((...[[[[........))))...]]]]",
+    "n": 30,
+    "kind": "pseudoknot",
+    "plain": "共 30 个碱基,8 对碱基配对,2 段茎"
    },
    "cost_usd": 0.0,
    "wall_s": 0.0,
-   "thought": "用户想要一个茎7对、环4的发夹，开头和结尾都是GGGG。在发夹中，前4个碱基与后4个碱基配对，因此GGGG将与GGGG配对——G-G不是有效的配对。让我先构建结构，固定约束，并检查可行性。"
+   "thought": "用户想要一个 H 型假结，两个茎均为 4 bp，位置 0 (1-based 1) 和位置 15 (1-based 16) 处为 GGGG。我需要安排环，使这两个 GGGG 区域不会被迫相互配对。我将使用 stem1=4, stem2=4, loop1=3, loop2=8, loop3=3，这样位置 0-3 是 stem1 的前半部分 (GGGG)，位置 15-18 在 loop2 (GGGG) "
   },
   {
    "n": 2,
@@ -33,195 +36,115 @@
    },
    "observation": {
     "ok": true,
-    "restraint": "GGGGNNNNNNNNNNNNNN",
+    "restraint": "GGGGNNNNNNNNNNNNNNNNNNNNNNNNNN",
     "pinned_now": 4,
     "at": 0,
     "pinned_total": 4
    },
    "cost_usd": 0.0,
    "wall_s": 0.0,
-   "thought": "The start (positions 0-3) and end (positions 14-17) both fall in the 7-bp stem, and position 0 pairs with 17, 1 with 16, etc. G-G is not a valid pair, so this is likely infeasible. I'll pin both const"
+   "thought": "The structure is already proposed. Now I need to place the two GGGG constraints at positions 0 and 15 (0-based), then check feasibility before designing."
   },
   {
    "n": 3,
    "action": "place_constraint",
    "args": {
     "motif": "GGGG",
-    "at": 14
+    "at": 15
    },
    "observation": {
     "ok": true,
-    "restraint": "GGGGNNNNNNNNNNGGGG",
+    "restraint": "GGGGNNNNNNNNNNNGGGGNNNNNNNNNNN",
     "pinned_now": 4,
-    "at": 14,
+    "at": 15,
     "pinned_total": 8
    },
    "cost_usd": 0.0,
    "wall_s": 0.0,
-   "thought": "Pin the terminal GGGG at position 14, then check feasibility since start and end bases pair with each other in a 7-bp hairpin."
+   "thought": "需要将第二个GGGG约束放在0基位置15（第16位），该位置落在loop2未配对区域，应无冲突。"
   },
   {
    "n": 4,
    "action": "check_feasible",
    "args": {},
    "observation": {
-    "ok": false,
-    "conflicts": [
-     {
-      "i": 0,
-      "j": 17,
-      "bases": "G-G",
-      "why": "positions 0 and 17 must pair, but G and G cannot"
-     },
-     {
-      "i": 1,
-      "j": 16,
-      "bases": "G-G",
-      "why": "positions 1 and 16 must pair, but G and G cannot"
-     },
-     {
-      "i": 2,
-      "j": 15,
-      "bases": "G-G",
-      "why": "positions 2 and 15 must pair, but G and G cannot"
-     },
-     {
-      "i": 3,
-      "j": 14,
-      "bases": "G-G",
-      "why": "positions 3 and 14 must pair, but G and G cannot"
-     }
-    ],
-    "pinned_total": 8,
-    "pinned_in_paired_positions": 8,
-    "note": "4 pinned pair(s) cannot form; no amount of search budget will fix this"
-   },
-   "cost_usd": 0.0,
-   "wall_s": 0.0,
-   "thought": "The first 4 and last 4 positions are paired with each other in a 7-bp stem, but G-G is not a valid base pair, so this is structurally infeasible. Let me confirm with check_feasible."
-  },
-  {
-   "n": 5,
-   "action": "propose_structure",
-   "args": {
-    "elements": [
-     {
-      "type": "spacer",
-      "len": 4
-     },
-     {
-      "type": "hairpin",
-      "stem": 7,
-      "loop": 4
-     },
-     {
-      "type": "spacer",
-      "len": 4
-     }
-    ]
-   },
-   "observation": {
-    "ok": true,
-    "target": "....(((((((....)))))))....",
-    "n": 26,
-    "kind": "nested",
-    "plain": "共 26 个碱基,7 对碱基配对,1 个发夹环(环大小 4 个未配对碱基)"
-   },
-   "cost_usd": 0.0,
-   "wall_s": 0.0,
-   "thought": "The GGGG ends fall on paired stem positions that must pair with each other, but G-G cannot pair. I need to add unpaired spacers at both ends so the GGGG motifs sit in unpaired regions."
-  },
-  {
-   "n": 6,
-   "action": "place_constraint",
-   "args": {
-    "motif": "GGGG",
-    "at": 0
-   },
-   "observation": {
-    "ok": true,
-    "restraint": "GGGGNNNNNNNNNNNNNNNNNNNNNN",
-    "pinned_now": 4,
-    "at": 0,
-    "pinned_total": 4
-   },
-   "cost_usd": 0.0,
-   "wall_s": 0.0,
-   "thought": "The spacers move the GGGG ends into unpaired regions, so the pinned G-G pairing conflict should be resolved. Now pin both motifs and check feasibility before designing."
-  },
-  {
-   "n": 7,
-   "action": "place_constraint",
-   "args": {
-    "motif": "GGGG",
-    "at": 22
-   },
-   "observation": {
-    "ok": true,
-    "restraint": "GGGGNNNNNNNNNNNNNNNNNNGGGG",
-    "pinned_now": 4,
-    "at": 22,
-    "pinned_total": 8
-   },
-   "cost_usd": 0.0,
-   "wall_s": 0.0,
-   "thought": "Structure now has 4-nt spacers flanking the hairpin, so GGGG at start and end fall on unpaired spacer positions. Place the ending GGGG at position 22, then check feasibility."
-  },
-  {
-   "n": 8,
-   "action": "check_feasible",
-   "args": {},
-   "observation": {
     "ok": true,
     "conflicts": [],
     "pinned_total": 8,
-    "pinned_in_paired_positions": 0,
+    "pinned_in_paired_positions": 4,
     "note": "the pinned bases are compatible with this shape"
    },
    "cost_usd": 0.0,
    "wall_s": 0.0,
-   "thought": "The GGGG motifs are now in the spacer regions (unpaired), so the pairing conflict should be resolved. I need to check feasibility before designing."
+   "thought": "Both constraints are placed; GGGG at 0-3 pairs with positions 19-22 (must be CCCC), and GGGG at 15-18 is in loop2 (unpaired). Let me verify feasibility before designing."
   },
   {
-   "n": 9,
+   "n": 5,
    "action": "design",
    "args": {
     "budget": "cheap"
    },
    "observation": {
     "ok": true,
-    "sequence": "GGGGGCCCGGCGAAAGCCGGGCGGGG",
-    "cost_usd": 0.001059180564350552,
-    "wall_s": 7.6,
-    "verdict": "certified",
+    "sequence": "GGGGAUAUAGCGACAGGGGCCCCGAAGCUA",
+    "cost_usd": 0.0012085179487864178,
+    "wall_s": 10.0,
+    "verdict": "knot_confirmed",
     "constraint_held": {
      "held": true,
      "violated_positions": []
     },
     "gc": null,
-    "n_screened": 1,
+    "n_screened": 2,
     "bp_away": 0,
     "certificate": {
-     "verdict": "certified",
-     "target": "....(((((((....)))))))....",
-     "n": 26,
-     "kind": "nested",
-     "sequence": "GGGGGCCCGGCGAAAGCCGGGCGGGG",
-     "checked_by": "ViennaRNA MFE (turner2004, dangles=2)",
-     "strictness": "pfe",
+     "verdict": "knot_confirmed",
+     "target": "((((...[[[[........))))...]]]]",
+     "n": 30,
+     "kind": "pseudoknot",
+     "sequence": "GGGGAUAUAGCGACAGGGGCCCCGAAGCUA",
+     "checked_by": "crossing stems: pkiss, probknot",
+     "strictness": "knot-recall (k=1, tau=1.0)",
      "rungs_passed": [
-      "match",
-      "umfe",
-      "pfe"
+      "knot-recall"
      ],
-     "cost_usd": 1.0447369681464301e-08,
-     "wait_s": 0.0,
+     "cost_usd": 9.178830517662896e-06,
+     "wait_s": 0.66,
      "budget": "",
-     "reason": "folds exactly to the target; also passes: umfe, pfe",
-     "detail": {},
+     "reason": "the crossing stems that make this a pseudoknot are fully reproduced by pkiss, probknot. This is a claim about the KNOT, not the whole structure: the criterion recognises 84% of known natural structures at 0.4% false accept on random sequences.",
+     "detail": {
+      "per_oracle": {
+       "pkiss": true,
+       "probknot": true,
+       "shapeknots": false
+      },
+      "any_failed_to_run": false,
+      "unanimous": false,
+      "reference_only": true,
+      "knot": {
+       "per_oracle": {
+        "pkiss": 1.0,
+        "probknot": 1.0,
+        "shapeknots": 0.0
+       },
+       "n_cross": 4,
+       "confirmed_by": [
+        "pkiss",
+        "probknot"
+       ],
+       "knot_confirmed": true
+      },
+      "operating_point": {
+       "rule": "crossing stems fully reproduced by at least 1 of 3 oracles (k=1, tau=1.0)",
+       "sensitivity_on_known_structures": 0.84,
+       "false_accept_on_random_sequences": 0.004,
+       "scope": "the CROSSING STEMS only -- this says nothing about the rest of the structure",
+       "note": "sensitivity is unchanged from tau=1.0 down to 0.9: these predictors get a knot entirely right or entirely wrong. Composing this with an exact nested-skeleton check was tried and refuted (ViennaRNA recovers the nested reduction from only 20 of 186 natives)."
+      }
+     },
      "disclaimer": "`certified` means the sequence folds to the target under the stated computational model. It is not a claim about behaviour in vitro or in vivo.",
      "seed": null,
-     "generated_utc": "2026-07-29T09:58:30Z",
+     "generated_utc": "2026-07-29T15:46:53Z",
      "provenance": {
       "schema": "rna-certificate/1.0",
       "python": "3.10.20",
@@ -230,40 +153,67 @@
       "pkiss": "/home/ubuntu/miniconda3/envs/pk/bin/pKiss",
       "rnastructure": "ProbKnot: Version 6.6 (April 2, 2026)."
      },
-     "verify_cmd": "python -m rna_harness.cognitive.certify '....(((((((....)))))))....' --sequence GGGGGCCCGGCGAAAGCCGGGCGGGG",
-     "rerun_search": "python -m rna_harness.cognitive.certify '....(((((((....)))))))....' --budget standard",
+     "verify_cmd": "python -m rna_harness.cognitive.certify '((((...[[[[........))))...]]]]' --sequence GGGGAUAUAGCGACAGGGGCCCCGAAGCUA",
+     "rerun_search": "python -m rna_harness.cognitive.certify '((((...[[[[........))))...]]]]' --budget standard",
      "reproducibility": "verify_cmd reproduces this certificate's claim exactly -- folding is deterministic. rerun_search re-runs the design and may return a different sequence: the search budget is wall-clock, not iteration count, so it is not seed-reproducible."
     }
    },
-   "cost_usd": 0.001059180564350552,
-   "wall_s": 7.6,
-   "thought": "Feasibility passed; now run the solver to design and verify the sequence."
+   "cost_usd": 0.0012085179487864178,
+   "wall_s": 10.0,
+   "thought": "Structure and constraints are set and feasibility check passed; now run the solver with a cheap budget first."
   }
  ],
- "target": "....(((((((....)))))))....",
- "restraint": "GGGGNNNNNNNNNNNNNNNNNNGGGG",
+ "target": "((((...[[[[........))))...]]]]",
+ "restraint": "GGGGNNNNNNNNNNNGGGGNNNNNNNNNNN",
  "gc": null,
  "certificate": {
-  "verdict": "certified",
-  "target": "....(((((((....)))))))....",
-  "n": 26,
-  "kind": "nested",
-  "sequence": "GGGGGCCCGGCGAAAGCCGGGCGGGG",
-  "checked_by": "ViennaRNA MFE (turner2004, dangles=2)",
-  "strictness": "pfe",
+  "verdict": "knot_confirmed",
+  "target": "((((...[[[[........))))...]]]]",
+  "n": 30,
+  "kind": "pseudoknot",
+  "sequence": "GGGGAUAUAGCGACAGGGGCCCCGAAGCUA",
+  "checked_by": "crossing stems: pkiss, probknot",
+  "strictness": "knot-recall (k=1, tau=1.0)",
   "rungs_passed": [
-   "match",
-   "umfe",
-   "pfe"
+   "knot-recall"
   ],
-  "cost_usd": 1.0447369681464301e-08,
-  "wait_s": 0.0,
+  "cost_usd": 9.178830517662896e-06,
+  "wait_s": 0.66,
   "budget": "",
-  "reason": "folds exactly to the target; also passes: umfe, pfe",
-  "detail": {},
+  "reason": "the crossing stems that make this a pseudoknot are fully reproduced by pkiss, probknot. This is a claim about the KNOT, not the whole structure: the criterion recognises 84% of known natural structures at 0.4% false accept on random sequences.",
+  "detail": {
+   "per_oracle": {
+    "pkiss": true,
+    "probknot": true,
+    "shapeknots": false
+   },
+   "any_failed_to_run": false,
+   "unanimous": false,
+   "reference_only": true,
+   "knot": {
+    "per_oracle": {
+     "pkiss": 1.0,
+     "probknot": 1.0,
+     "shapeknots": 0.0
+    },
+    "n_cross": 4,
+    "confirmed_by": [
+     "pkiss",
+     "probknot"
+    ],
+    "knot_confirmed": true
+   },
+   "operating_point": {
+    "rule": "crossing stems fully reproduced by at least 1 of 3 oracles (k=1, tau=1.0)",
+    "sensitivity_on_known_structures": 0.84,
+    "false_accept_on_random_sequences": 0.004,
+    "scope": "the CROSSING STEMS only -- this says nothing about the rest of the structure",
+    "note": "sensitivity is unchanged from tau=1.0 down to 0.9: these predictors get a knot entirely right or entirely wrong. Composing this with an exact nested-skeleton check was tried and refuted (ViennaRNA recovers the nested reduction from only 20 of 186 natives)."
+   }
+  },
   "disclaimer": "`certified` means the sequence folds to the target under the stated computational model. It is not a claim about behaviour in vitro or in vivo.",
   "seed": null,
-  "generated_utc": "2026-07-29T09:58:30Z",
+  "generated_utc": "2026-07-29T15:46:53Z",
   "provenance": {
    "schema": "rna-certificate/1.0",
    "python": "3.10.20",
@@ -272,11 +222,12 @@
    "pkiss": "/home/ubuntu/miniconda3/envs/pk/bin/pKiss",
    "rnastructure": "ProbKnot: Version 6.6 (April 2, 2026)."
   },
-  "verify_cmd": "python -m rna_harness.cognitive.certify '....(((((((....)))))))....' --sequence GGGGGCCCGGCGAAAGCCGGGCGGGG",
-  "rerun_search": "python -m rna_harness.cognitive.certify '....(((((((....)))))))....' --budget standard",
+  "verify_cmd": "python -m rna_harness.cognitive.certify '((((...[[[[........))))...]]]]' --sequence GGGGAUAUAGCGACAGGGGCCCCGAAGCUA",
+  "rerun_search": "python -m rna_harness.cognitive.certify '((((...[[[[........))))...]]]]' --budget standard",
   "reproducibility": "verify_cmd reproduces this certificate's claim exactly -- folding is deterministic. rerun_search re-runs the design and may return a different sequence: the search budget is wall-clock, not iteration count, so it is not seed-reproducible."
  },
  "done": true,
  "outcome": "certified",
- "total_cost_usd": 0.001059180564350552
+ "total_cost_usd": 0.027600837948786417,
+ "llm_cost_usd": 0.02639232
 }

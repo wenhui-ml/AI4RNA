@@ -38,6 +38,12 @@ from dataclasses import dataclass, field, asdict
 from typing import Dict, List, Optional
 
 MAX_STEPS = 10   # a request needing a restructure takes ~6; the real bound is max_cost_usd
+
+# The output cap covers reasoning AND content, so it must clear the hardest shape's reasoning with room left
+# for the json. MEASURED on the benchmark's own items: a hairpin decision costs ~300 tokens, a junction or an
+# H-type knot 2900-4300 tokens of reasoning alone. At 1200 the junction family scored 0/6 with EMPTY replies.
+THINK_TOKENS = 6000
+THINK_TOKENS_MAX = 16000   # the one retry after a truncated reply; beyond this it is a real failure
 WC = {("A", "U"), ("U", "A"), ("G", "C"), ("C", "G"), ("G", "U"), ("U", "G")}
 
 
@@ -62,7 +68,8 @@ class Session:
     certificate: Optional[dict] = None
     done: bool = False
     outcome: str = ""
-    total_cost_usd: float = 0.0
+    total_cost_usd: float = 0.0     # solver + the agent's own thinking; see llm_cost_usd for the split
+    llm_cost_usd: float = 0.0       # what the reasoning cost, as billed -- excluded, this number flatters us
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -121,23 +128,103 @@ def place_constraint(target: str, motif: str, at: int, existing: Optional[str] =
             "pinned_total": sum(1 for c in out if c != "N")}
 
 
+def designable_probe(target: str, timeout_s: float = 20.0) -> dict:
+    """FREE, BEFORE SPENDING ANYTHING: can ViennaRNA's own inverse fold reproduce this SHAPE at all?
+
+    The pin check below answers "do the pinned bases conflict". It says nothing about whether the shape is
+    reachable, and that gap cost real money: the agent proposed a junction whose helices were 2 bp, got a
+    clean feasibility pass, and then climbed cheap -> standard -> best_effort on it -- $0.38 and 45 minutes
+    for one target -- because "not_found" is indistinguishable from "not yet found".
+
+    MEASURED against what the solver actually did, on the 9 nested targets the benchmark asked it to solve:
+
+        probe says YES and DesiRNA solved it      4        probe says NO  and DesiRNA solved it      0
+        probe says NO  and DesiRNA failed         5        probe says YES and DesiRNA failed         0
+
+    9/9, in 0.03-0.3 s against 18 s / 282 s / 2727 s of paid search. Small n and one population, so this is
+    reported as EVIDENCE and not as a verdict -- inverse_fold is a heuristic local search, so a NO is not a
+    proof of undesignability, and the agent stays free to spend anyway.
+
+    TWO HARD CONSTRAINTS, both learned the expensive way:
+      * it SEGFAULTS on pseudoknots ("Junk in structure at aux_structure"), so knots are skipped by name;
+      * a crash here would take the whole agent down with it, so it runs in an isolated child process. `-I`
+        also keeps the current directory off sys.path, which is the /tmp-shadowing failure class.
+    """
+    import subprocess
+    import sys as _sys
+    from .certify import classify
+    kind, err = classify(target)
+    if err:
+        return {"ok": False, "error": err}
+    if kind != "nested":
+        return {"ok": True, "designable": None,
+                "note": "skipped: ViennaRNA's inverse fold cannot represent crossing pairs (it crashes on them)"}
+    code = ("import sys, RNA\n"
+            "t = sys.argv[1]\n"
+            "for _ in range(3):\n"
+            "    s, _d = RNA.inverse_fold(None, t)\n"
+            "    if RNA.fold(s)[0] == t:\n"
+            "        print('YES'); break\n"
+            "else:\n"
+            "    print('NO')\n")
+    try:
+        r = subprocess.run([_sys.executable, "-I", "-c", code, target],
+                           capture_output=True, text=True, timeout=timeout_s)
+        out = (r.stdout or "").strip()
+    except subprocess.TimeoutExpired:
+        return {"ok": True, "designable": None, "note": f"the probe did not finish in {timeout_s}s"}
+    if out not in ("YES", "NO"):
+        return {"ok": True, "designable": None,
+                "note": f"the probe did not answer (exit {r.returncode}); treat as unknown"}
+    yes = out == "YES"
+    return {"ok": True, "designable": yes, "min_helix": _min_helix(target),
+            "note": ("ViennaRNA's own inverse fold reproduces this shape, so a sequence for it exists"
+                     if yes else
+                     f"ViennaRNA's own inverse fold could NOT reproduce this shape in 3 tries (shortest "
+                     f"helix {_min_helix(target)} bp). A bigger search budget is unlikely to help; "
+                     f"lengthening the short helices is what changes the answer.")}
+
+
+def _min_helix(target: str) -> int:
+    """Length of the shortest run of stacked pairs. Short helices are the usual reason a shape is unreachable:
+    on a 2-branch junction, 2 bp and 3 bp helices were both undesignable here and 4 bp was not."""
+    from ..structure_utils import pair_table
+    pt = pair_table(target)
+    lens = []
+    for i, j in enumerate(pt):
+        if j > i and not (i > 0 and pt[i - 1] == j + 1):        # this pair starts a helix
+            k = 0
+            while i + k < len(pt) and pt[i + k] == j - k and j - k > i + k:
+                k += 1
+            lens.append(k)
+    return min(lens) if lens else 0
+
+
 def check_feasible(target: str, restraint: Optional[str]) -> dict:
     """EXACT, BEFORE SPENDING ANYTHING: are the pinned bases compatible with the target's own pairing?
 
     If positions i and j must pair and both are pinned to bases that cannot form a pair, no search will ever
     succeed -- and a search would burn its whole budget discovering that. Reporting the offending positions is
     what lets the agent do something useful (move the motif, move the structure) instead of buying more time.
+
+    It also runs the SHAPE probe, in the same step: the agent already calls this before every paid design
+    (18/18 on the benchmark), so folding the second free check in here costs nothing and closes the gap where
+    "pins are fine" was read as "this will work".
     """
     from ..structure_utils import pair_table
+    shape = designable_probe(target)
     if restraint and len(restraint) != len(target):
         # A stale restraint from a previous, differently sized shape used to index past the end and raise.
         # A primitive that crashes teaches the agent nothing; one that says what is wrong lets it recover.
-        return {"ok": False, "error": (f"the restraint is {len(restraint)} long but the target is "
-                                       f"{len(target)} -- it belongs to a different shape; re-pin it")}
+        return {"ok": False, "shape": shape,
+                "error": (f"the restraint is {len(restraint)} long but the target is "
+                          f"{len(target)} -- it belongs to a different shape; re-pin it")}
     if not restraint or set(restraint) == {"N"}:
         # An observation that does not say what to do next wastes a step. It cost one here.
-        return {"ok": True, "conflicts": [], "note": ("nothing is pinned yet, so there is nothing to check -- "
-                                                      "either place_constraint first, or go straight to design")}
+        return {"ok": True, "conflicts": [], "shape": shape,
+                "note": ("nothing is pinned yet, so the pins have nothing to check -- but the SHAPE check "
+                         "above did run, and it is the one that decides whether search can work at all. "
+                         "Next: place_constraint if the request fixes any bases, otherwise design.")}
     pt = pair_table(target)
     conflicts = []
     for i, j in enumerate(pt):
@@ -148,7 +235,7 @@ def check_feasible(target: str, restraint: Optional[str]) -> dict:
                                   "why": f"positions {i} and {j} must pair, but {a} and {b} cannot"})
     pinned_in_stem = sum(1 for i, j in enumerate(pt) if j >= 0 and restraint[i] != "N")
     pinned_total = sum(1 for c in restraint if c != "N")
-    return {"ok": not conflicts, "conflicts": conflicts,
+    return {"ok": not conflicts, "conflicts": conflicts, "shape": shape,
             "pinned_total": pinned_total, "pinned_in_paired_positions": pinned_in_stem,
             "note": ("the pinned bases are compatible with this shape" if not conflicts else
                      f"{len(conflicts)} pinned pair(s) cannot form; no amount of search budget will fix this")}
@@ -327,9 +414,14 @@ Actions:
   place_constraint  {"motif":"GGGG","at":<0-based position>}    pin a fixed sub-sequence. ADDITIVE:
         call it again to pin a second region; the first stays. Overlapping placements that disagree are
         rejected rather than silently overwritten.
-  check_feasible    {}                      FREE and EXACT. If pinned bases sit on positions that must pair
-        with each other and cannot, no search will ever succeed. Always run this before spending on `design`
-        when anything is pinned.
+  check_feasible    {}                      FREE. Run it before every `design`, always -- it answers TWO
+        separate questions and either one can make search hopeless:
+          conflicts  : pinned bases sitting on positions that must pair with each other and cannot. EXACT.
+          shape      : whether ViennaRNA's own inverse fold can reproduce this shape at all. On the targets
+                       measured so far it agreed with the solver 9 times out of 9, in under a second, where
+                       the solver needed up to 45 minutes to reach the same answer. If designable is false,
+                       the shape is the problem -- short helices are the usual cause -- and a bigger budget
+                       is the wrong move. It is evidence, not a verdict: you may still spend if you disagree.
   recommend_loop_cap {}                     ask the motif knowledge base which caps stabilise a loop of this
         size. It only SUGGESTS; pin one with place_constraint so the result can be checked exactly.
   set_gc_content    {"percent":50,"tolerance":5}   steer the solver toward a GC fraction. The steer is not
@@ -342,7 +434,13 @@ Rules:
     move the motif, or change the shape so those positions are not paired with each other.
   * a hairpin loop needs >= 3 unpaired nucleotides; a stem needs >= 2 base pairs.
   * prefer "cheap" first. Escalate the budget only when the failure looks like a search failure (a small
-    bp_away with no constraint conflict), never when it looks structural.
+    bp_away with no constraint conflict), never when it looks structural. "best_effort" can run for 30
+    minutes; it is worth that only when you already have evidence the shape is designable.
+  * a failed `design` reports mfe_structure, best_bp and wrong_positions. Read them: they say WHERE the fold
+    went wrong, which tells you which part of the shape to change.
+  * you may pay for the same target/restraint/GC at most TWICE. A third attempt on an unchanged problem is
+    refused. Change the problem instead -- lengthen short helices, move a pin into a loop, relax a
+    requirement -- and re-run the free check.
   * you cannot mark anything solved. `design` returns a verdict from an exact verifier; that is the answer.
 """
 
@@ -355,7 +453,7 @@ def _observations(sess: "Session") -> str:
         out.append(f"current restraint: {sess.restraint}")
     for s in sess.steps:
         out.append(f"[step {s.n}] {s.action}({json.dumps(s.args, ensure_ascii=False)}) -> "
-                   f"{json.dumps(s.observation, ensure_ascii=False)[:600]}")
+                   f"{json.dumps(s.observation, ensure_ascii=False)[:1400]}")
     return "\n".join(out)
 
 
@@ -380,10 +478,32 @@ def run(request: str, client=None, model: str = "z-ai/glm-5.2", max_steps: int =
         from ..llm.openrouter import OpenRouterClient
         client = OpenRouterClient(model=model)
 
-    def _ask(extra: str = ""):
+    def _ask(extra: str = "", max_tokens: int = THINK_TOKENS):
+        """Every model call goes through here, so its billed cost is counted exactly once -- including the
+        retries, which is precisely where an uncounted call would hide."""
         msg = _observations(sess) + (("\n\n" + extra) if extra else "")
-        return client.chat([{"role": "user", "content": msg}], system=SYSTEM,
-                           temperature=0.0, max_tokens=1200)
+        r = client.chat([{"role": "user", "content": msg}], system=SYSTEM,
+                        temperature=0.0, max_tokens=max_tokens)
+        c = float(getattr(r, "cost_usd", 0.0) or 0.0)
+        sess.llm_cost_usd += c
+        sess.total_cost_usd += c
+        return r
+
+    def _truncated(r) -> bool:
+        """Did the reply run out of output budget before it could emit the action?
+
+        MEASURED, and the reason this check exists: `max_tokens` is the cap on reasoning PLUS content, so a
+        model that thinks hard about a junction can spend the whole cap thinking and return content="" with
+        finish_reason="length". At a 1200-token cap that was every junction item and half the pseudoknot
+        items -- 9 of 18 -- and the loop reported it as "the agent did not return an action", which reads as
+        a model that cannot do the task rather than a cap that was too small. Same silent-failure class as
+        the /tmp shadowing and the argparse exit: a tool failure wearing the costume of a negative result.
+        """
+        try:
+            return (r.raw["choices"][0].get("finish_reason") == "length"
+                    and not (getattr(r, "text", "") or "").strip())
+        except Exception:                                                     # noqa: BLE001
+            return False
 
     def _parse(text: str):
         """Prefer a fenced block, else the LAST balanced object. A long `thought` followed by the action is
@@ -410,6 +530,7 @@ def run(request: str, client=None, model: str = "z-ai/glm-5.2", max_steps: int =
                 continue
         return None
 
+    paid: Dict[tuple, int] = {}          # how many times each exact problem has been PAID for
     for n in range(1, max_steps + 1):
         r = _ask()
         if getattr(r, "error", None):
@@ -417,11 +538,17 @@ def run(request: str, client=None, model: str = "z-ai/glm-5.2", max_steps: int =
             break
         act = _parse(getattr(r, "text", "") or "")
         if act is None:                       # one retry, told plainly what went wrong
-            r = _ask('Your last reply contained no usable action. Reply with ONLY the json object, '
-                     'nothing before or after it, and keep "thought" under 25 words.')
+            if _truncated(r):                 # it never got to the answer -- give it room, do not scold it
+                r = _ask('Your last reply ran out of room while thinking. Decide now and reply with ONLY '
+                         'the json object; keep "thought" under 20 words.', max_tokens=THINK_TOKENS_MAX)
+            else:
+                r = _ask('Your last reply contained no usable action. Reply with ONLY the json object, '
+                         'nothing before or after it, and keep "thought" under 25 words.')
             act = _parse(getattr(r, "text", "") or "")
         if act is None:
-            sess.outcome = "the agent did not return an action"
+            sess.outcome = ("the agent's reply was cut off before it produced an action, twice, even at "
+                            f"{THINK_TOKENS_MAX} tokens -- this is a budget failure, not a refusal"
+                            if _truncated(r) else "the agent did not return an action")
             break
         name, args = str(act.get("action", "")), dict(act.get("args") or {})
         thought = str(act.get("thought", ""))[:200]
@@ -457,11 +584,23 @@ def run(request: str, client=None, model: str = "z-ai/glm-5.2", max_steps: int =
             obs = fn(sess.target or "", sess.restraint) if sess.target else \
                 {"ok": False, "error": "no target yet -- propose_structure first"}
         else:  # design
+            problem = (sess.target, sess.restraint, json.dumps(sess.gc, sort_keys=True))
             if not sess.target:
                 obs = {"ok": False, "error": "no target yet -- propose_structure first"}
             elif sess.total_cost_usd >= max_cost_usd:
                 obs = {"ok": False, "error": f"cost cap ${max_cost_usd} reached"}
+            elif paid.get(problem, 0) >= 2:
+                # BUYING MORE TIME IS NOT A NEW IDEA. Measured: on one undesignable junction the agent went
+                # cheap -> standard -> best_effort without changing anything, and the third call alone cost
+                # $0.38 and 45 minutes to return the same not_found. Two paid attempts on an unchanged
+                # problem is enough evidence; the third has to be a different problem.
+                obs = {"ok": False, "error": ("you have already paid twice for this exact target, restraint "
+                                              "and GC requirement, and it did not work"),
+                       "hint": ("a larger budget searches the same space harder. Change the PROBLEM: "
+                                "lengthen the short helices, move a pinned motif into a loop, or relax a "
+                                "requirement -- then check_feasible again, which is free.")}
             else:
+                paid[problem] = paid.get(problem, 0) + 1
                 obs = fn(sess.target, sess.restraint, str(args.get("budget", "cheap")), gc=sess.gc)
                 sess.total_cost_usd += float(obs.get("cost_usd") or 0.0)
                 if obs.get("certificate"):
@@ -526,5 +665,7 @@ def render(sess: "Session", lang: str = "zh") -> str:
                            + (f"  {'违反位置' if zh else 'violated'}: {h['violated_positions']}"
                               if not h["held"] else ""))
     out.append(("结果：" if zh else "outcome: ") + sess.outcome
-               + f"   {'总花费' if zh else 'total'} ${sess.total_cost_usd:.5f}")
+               + f"   {'总花费' if zh else 'total'} ${sess.total_cost_usd:.5f}"
+               + (f"  ({'其中思考' if zh else 'of which thinking'} ${sess.llm_cost_usd:.5f})"
+                  if sess.llm_cost_usd else ""))
     return "\n".join(out)

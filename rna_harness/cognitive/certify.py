@@ -314,10 +314,20 @@ def _certify_sequence_impl(seq: str, target: str) -> Certificate:
                                strictness=rungs[-1], rungs_passed=rungs,
                                cost_usd=solver_cost_usd(w, 1), wait_s=round(w, 2),
                                reason=f"folds exactly to the target; also passes: {', '.join(rungs[1:]) or 'none'}")
+        # SAY HOW IT FAILED, not just that it did. The agent loop's whole premise is that it reads the real
+        # failure and changes course; a bare "not_found" gave it nothing to change, and MEASURED consequence:
+        # it climbed the budget ladder three times on one undesignable shape, paying $0.38 and 45 minutes for
+        # a fact this block computes for free.
+        import RNA
+        got = RNA.fold(seq)[0]
+        bad = [i for i in range(len(target)) if got[i] != target[i]]
         return Certificate("not_found", target, len(target), kind, sequence=None,
                            checked_by="ViennaRNA MFE (turner2004, dangles=2)",
                            cost_usd=solver_cost_usd(w, 1), wait_s=round(w, 2),
-                           reason="the MFE structure of this sequence is not the target")
+                           detail={"mfe_structure": got, "best_bp": _bp_distance(got, target),
+                                   "wrong_positions": bad[:24], "n_wrong": len(bad)},
+                           reason=(f"the MFE structure of this sequence is not the target: it differs at "
+                                   f"{len(bad)} of {len(target)} positions"))
 
     v = _panel_verdict(seq, target)
     w = time.time() - t0
@@ -358,6 +368,16 @@ def _certify_sequence_impl(seq: str, target: str) -> Certificate:
                        checked_by="panel: pKiss AND ProbKnot AND ShapeKnots",
                        cost_usd=solver_cost_usd(w, 1), wait_s=round(w, 2), detail=v,
                        reason="no independent predictor forms the target from this sequence")
+
+
+def _bp_distance(a: str, b: str) -> int:
+    """Base pairs in one structure and not the other, counted both ways. Symmetric, so it is a distance and
+    not a recall -- an answer that invents extra pairs is as wrong as one that misses them."""
+    from ..structure_utils import pair_table
+    pa, pb = pair_table(a), pair_table(b)
+    sa = {(i, j) for i, j in enumerate(pa) if j > i}
+    sb = {(i, j) for i, j in enumerate(pb) if j > i}
+    return len(sa ^ sb)
 
 
 def _nested_rungs(seq: str, target: str) -> List[str]:

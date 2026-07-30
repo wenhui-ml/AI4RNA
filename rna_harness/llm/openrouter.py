@@ -33,6 +33,7 @@ class LLMResult:
     model: str = ""
     raw: Dict = field(default_factory=dict)
     error: Optional[str] = None
+    cost_usd: float = 0.0        # what OpenRouter actually billed, not a price-table estimate
     reasoning: str = ""          # separate reasoning-trace field (reasoning models); empty otherwise
     reasoning_details: Optional[object] = None  # pass back UNMODIFIED in the next assistant turn so a
                                                 # reasoning model continues its chain across turns
@@ -54,6 +55,7 @@ class OpenRouterClient:
         self.timeout = timeout
         self.total_prompt_tokens = 0
         self.total_completion_tokens = 0
+        self.total_cost_usd = 0.0
         self.n_calls = 0
 
     def available(self) -> bool:
@@ -97,10 +99,12 @@ class OpenRouterClient:
                 rtext = msg.get("reasoning") or msg.get("reasoning_content") or ""
                 usage = d.get("usage", {}) or {}
                 pt, ct = int(usage.get("prompt_tokens", 0)), int(usage.get("completion_tokens", 0))
+                cost = float(usage.get("cost") or 0.0)   # OpenRouter reports the real charge per call
                 self.total_prompt_tokens += pt
                 self.total_completion_tokens += ct
+                self.total_cost_usd += cost
                 self.n_calls += 1
-                return LLMResult(text=text, prompt_tokens=pt, completion_tokens=ct,
+                return LLMResult(text=text, prompt_tokens=pt, completion_tokens=ct, cost_usd=cost,
                                  model=d.get("model", self.model), raw=d, reasoning=rtext,
                                  reasoning_details=msg.get("reasoning_details"))
             except urllib.error.HTTPError as e:
@@ -115,9 +119,10 @@ class OpenRouterClient:
                 time.sleep(min(2 ** attempt, 20))
         return LLMResult(text="", error=last_err or "unknown error")
 
-    def usage(self) -> Dict[str, int]:
+    def usage(self) -> Dict[str, float]:
         return {
             "n_calls": self.n_calls,
             "prompt_tokens": self.total_prompt_tokens,
             "completion_tokens": self.total_completion_tokens,
+            "cost_usd": self.total_cost_usd,
         }

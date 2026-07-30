@@ -2,32 +2,47 @@ agent-loop benchmark: 18 items, 4 workers
   the answer key is COMPUTED, not searched for -- constrained-design feasibility follows from the pair table
 
   18 to run
-    1/18  0.7 min
-    2/18  0.7 min
-    3/18  0.8 min
-    4/18  0.8 min
-    5/18  1.2 min
-    6/18  1.7 min
-    7/18  2.5 min
-    8/18  2.6 min
-    9/18  3.3 min
-    10/18  3.6 min
-    11/18  4.5 min
-    12/18  4.6 min
-    13/18  4.9 min
-    14/18  5.1 min
-    15/18  5.6 min
-    16/18  5.9 min
-    17/18  6.2 min
-    18/18  6.2 min
+    1/18  1.4 min
+    2/18  1.6 min
+    3/18  2.2 min
+    4/18  2.4 min
+    5/18  5.1 min
+    6/18  6.7 min
+    7/18  8.9 min
+    8/18  9.5 min
+    9/18  10.8 min
+    10/18  11.1 min
+    11/18  12.2 min
+    12/18  13.5 min
+    13/18  14.2 min
+    14/18  14.3 min
+    15/18  21.2 min
+    16/18  23.5 min
+    17/18  51.9 min
+    18/18  60.8 min
 
 === score, 18 items ===
   class              correct      cost   steps                        notes
-  direct              6/6       0.0072     4.2                             
-  restructurable      6/6       0.0065     8.3   recovered 4, anticipated 0
-  impossible          6/6       0.0000     5.3       named the conflict 6/6
+  direct              4/6       0.9763     6.2                             
+  restructurable      4/6       0.2907     7.3   recovered 1, anticipated 4
+  impossible          2/6       0.2370     7.3       named the conflict 2/6
+
+=== by shape family (the two newly unlocked ones must not regress) ===
+  hairpin       5/6   correct   $0.1096
+  junction      1/6   correct   $1.2436
+  pseudoknot    4/6   correct   $0.1509
 
   ran the FREE feasibility check before paying, when anything was pinned: 18/18
 
-  total spend $0.0137
+=== the 8 it got wrong ===
+  direct-2             expected certified  got gave-up-or-ran-out out of steps
+  direct-3             expected certified  got gave-up-or-ran-out out of steps
+  impossible-0         expected refused    got certified          certified
+  impossible-1         expected refused    got certified          certified
+  impossible-4         expected refused    got gave-up-or-ran-out out of steps
+  impossible-5         expected refused    got gave-up-or-ran-out out of steps
+  restructurable-1     expected certified  got gave-up-or-ran-out out of steps
+  restructurable-4     expected certified  got gave-up-or-ran-out out of steps
+
+  total spend $1.5041
   wrote rna_harness/runs/ceiling/agent_bench.json

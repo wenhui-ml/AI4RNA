@@ -13,9 +13,9 @@ behaviours, and one column that matters more than the score:
                            one live trajectory this project has is an avoidance, so "the loop works" is so
                            far a claim about anticipation, not about recovery.
 
-Detection is mechanical, not judged: the naive shape has n = 2*stem + loop, so a first proposal longer than
-that is an anticipation, and a first proposal equal to it followed by a conflict observation and a second
-proposal is a recovery.
+Detection is mechanical, not judged: the request names one exact shape, so a first proposal longer than that
+shape is an anticipation, and a first proposal of exactly that length followed by a conflict observation and
+a second proposal is a recovery.
 """
 from __future__ import annotations
 
@@ -34,7 +34,7 @@ OUT = os.path.join(HERE, "agent_bench")
 
 def classify_trajectory(item, sess) -> dict:
     """What the agent actually did, from the trace alone."""
-    naive_n = 2 * item["shape"]["stem"] + item["shape"]["loop"]
+    naive_n = len(item["target"])          # the shape the request describes, before any restructure
     proposals = [s for s in sess.steps if s.action == "propose_structure" and s.observation.get("ok")]
     saw_conflict = any(s.action == "check_feasible" and s.observation.get("conflicts")
                        for s in sess.steps)
@@ -82,15 +82,17 @@ def work(item):
         cert = sess.certificate or {}
         got = "certified" if sess.outcome == "certified" else (
             "refused" if sess.done else "gave-up-or-ran-out")
-        rec = {"id": item["id"], "class": item["class"], "expect": item["expect"], "got": got,
+        rec = {"id": item["id"], "class": item["class"], "family": item.get("family"),
+               "expect": item["expect"], "got": got,
                "correct": got == item["expect"],
                "sequence": cert.get("sequence"), "strictness": cert.get("strictness"),
-               "cost_usd": sess.total_cost_usd, "n_steps": len(sess.steps),
+               "cost_usd": sess.total_cost_usd, "llm_cost_usd": sess.llm_cost_usd,
+               "n_steps": len(sess.steps),
                "outcome": sess.outcome, "wall_s": round(time.time() - t0, 1),
                **classify_trajectory(item, sess)}
     except Exception as e:                                                    # noqa: BLE001
-        rec = {"id": item["id"], "class": item["class"], "expect": item["expect"],
-               "got": "error", "correct": False, "error": repr(e)[:200],
+        rec = {"id": item["id"], "class": item["class"], "family": item.get("family"),
+               "expect": item["expect"], "got": "error", "correct": False, "error": repr(e)[:200],
                "wall_s": round(time.time() - t0, 1)}
     with open(dest, "w") as f:
         json.dump(rec, f, ensure_ascii=False)
@@ -144,6 +146,13 @@ def main():
             note = f"named the conflict {named}/{len(sub)}"
         print(f"  {cls:<16} {ok:>4}/{len(sub):<4} {cost:>9.4f} {steps:>7.1f} {note:>28}")
         out[cls] = {"correct": ok, "n": len(sub), "cost": cost, "mean_steps": steps, "note": note}
+
+    print(f"\n=== by shape family (the two newly unlocked ones must not regress) ===")
+    for fam in ("hairpin", "junction", "pseudoknot"):
+        sub = [r for r in R if r.get("family") == fam]
+        if sub:
+            print(f"  {fam:<12} {sum(r['correct'] for r in sub):>2}/{len(sub):<3} correct   "
+                  f"${sum(r.get('cost_usd') or 0 for r in sub):.4f}")
 
     disc = sum(1 for r in R if r.get("checked_before_spending"))
     print(f"\n  ran the FREE feasibility check before paying, when anything was pinned: {disc}/{len(R)}")

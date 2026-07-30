@@ -24,6 +24,11 @@ worth measuring:
                   correct = refuse, and say which positions conflict. An agent that burns ten steps here is
                   worse than one that stops at three with a reason.
 
+SHAPE FAMILIES. Hairpins, multiway junctions and H-type pseudoknots -- the three the assembler can build.
+The junction and knot families exist so that unlocking them cannot silently regress: they are judged by
+different oracles (exact MFE for the two nested families, the calibrated knot rule for the third), so a
+change that breaks routing shows up here rather than in a user's answer.
+
 AND ONE COLUMN THAT MATTERS MORE THAN THE SCORE. On a restructurable item, did the agent AVOID the conflict up
 front, or hit it and RECOVER? Only the second is Claude Code's mechanism, and this project has never measured
 it -- the one live trajectory we have is an avoidance. A loop that can only anticipate is a smarter pipeline.
@@ -39,88 +44,135 @@ def _hairpin(stem: int, loop: int) -> str:
     return "(" * stem + "." * loop + ")" * stem
 
 
-def _pairs(stem: int, loop: int):
-    n = 2 * stem + loop
-    return [(i, n - 1 - i) for i in range(stem)]
+def _junction(closing: int, branches, spacer: int = 2) -> str:
+    inner = ["(" * b[0] + "." * b[1] + ")" * b[0] for b in branches]
+    return "(" * closing + ("." * spacer) + ("." * spacer).join(inner) + ("." * spacer) + ")" * closing
 
 
-def _conflicting_motifs(stem: int, loop: int, m: int):
-    """A pair of motifs of length m at the two ends whose pinned positions cannot pair."""
-    a, b = "G" * m, "G" * m                       # G-G is not a pair in any orientation
-    n = 2 * stem + loop
-    return [{"motif": a, "at": 0}, {"motif": b, "at": n - m}]
+def _knot(s1: int, s2: int, l1: int, l2: int, l3: int) -> str:
+    return "(" * s1 + "." * l1 + "[" * s2 + "." * l2 + ")" * s1 + "." * l3 + "]" * s2
 
 
-def _compatible_motif(stem: int, loop: int, m: int):
-    """A motif pinned inside the LOOP: unpaired, so it cannot conflict with anything."""
-    return [{"motif": ("A" * m), "at": stem + max(0, (loop - m) // 2)}]
+def pair_table(target: str):
+    """0-based partner index per position, -1 when unpaired. Handles every bracket family, so the same
+    feasibility rule covers nested shapes and pseudoknots without a special case."""
+    pt = [-1] * len(target)
+    stacks = {}
+    close = {")": "(", "]": "[", "}": "{", ">": "<"}
+    for i, ch in enumerate(target):
+        if ch in "([{<":
+            stacks.setdefault(ch, []).append(i)
+        elif ch in close:
+            st = stacks.get(close[ch]) or []
+            if st:
+                j = st.pop()
+                pt[i], pt[j] = j, i
+    return pt
 
 
-def build(n_per_class: int = 6) -> List[Dict]:
-    """A deterministic suite. Same input, same items, every time -- no sampling, nothing to re-roll."""
-    items: List[Dict] = []
-    shapes = [(4, 5), (5, 4), (6, 4), (6, 6), (7, 4), (5, 6), (8, 4), (4, 8)]
-
-    for k in range(n_per_class):
-        stem, loop = shapes[k % len(shapes)]
-        n = 2 * stem + loop
-        m = min(3, loop)
-        c = _compatible_motif(stem, loop, m)
-        items.append({
-            "id": f"direct-{k}", "class": "direct", "expect": "certified",
-            "request": (f"给我一个茎 {stem} 对、环 {loop} nt 的发夹，"
-                        f"并且第 {c[0]['at'] + 1} 位开始的 {m} 个碱基必须固定为 {c[0]['motif']}"),
-            "shape": {"stem": stem, "loop": loop}, "constraints": c,
-            "why": f"the pinned bases sit in the loop, which is unpaired, so nothing can conflict",
-        })
-
-    for k in range(n_per_class):
-        stem, loop = shapes[(k + 2) % len(shapes)]
-        m = min(4, stem)
-        cs = _conflicting_motifs(stem, loop, m)
-        items.append({
-            "id": f"restructurable-{k}", "class": "restructurable", "expect": "certified",
-            "request": (f"我要一个茎 {stem} 对、环 {loop} nt 的发夹，"
-                        f"序列开头必须是 {cs[0]['motif']}，结尾也必须是 {cs[1]['motif']}"),
-            "shape": {"stem": stem, "loop": loop}, "constraints": cs,
-            "why": ("in the plain hairpin those pinned positions pair with each other and G cannot pair with "
-                    "G; the total length is not fixed, so spacers at both ends resolve it"),
-        })
-
-    for k in range(n_per_class):
-        stem, loop = shapes[(k + 4) % len(shapes)]
-        n = 2 * stem + loop
-        m = min(4, stem)
-        cs = _conflicting_motifs(stem, loop, m)
-        items.append({
-            "id": f"impossible-{k}", "class": "impossible", "expect": "refused",
-            "request": (f"我要一个茎 {stem} 对、环 {loop} nt 的发夹，总长必须正好 {n} nt，一个碱基都不能多，"
-                        f"并且序列开头必须是 {cs[0]['motif']}，结尾也必须是 {cs[1]['motif']}"),
-            "shape": {"stem": stem, "loop": loop}, "constraints": cs,
-            "why": (f"positions 0..{m-1} pair with {n-1}..{n-m}, both pinned to G, and G-G is not a pair; "
-                    f"the length is fixed so no spacer can be added"),
-        })
-    return items
-
-
-def feasible(stem: int, loop: int, constraints: List[Dict]) -> Dict:
+def feasible(target: str, constraints) -> dict:
     """The answer key, computed exactly: can these pins co-exist on this shape?"""
-    n = 2 * stem + loop
-    r = ["N"] * n
+    r = ["N"] * len(target)
     for c in constraints:
         for k, ch in enumerate(c["motif"]):
             r[c["at"] + k] = ch
+    pt = pair_table(target)
     conflicts = [{"i": i, "j": j, "bases": f"{r[i]}-{r[j]}"}
-                 for i, j in _pairs(stem, loop)
-                 if r[i] in "ACGU" and r[j] in "ACGU" and (r[i], r[j]) not in WC]
-    return {"feasible": not conflicts, "conflicts": conflicts, "restraint": "".join(r), "n": n}
+                 for i, j in enumerate(pt)
+                 if j > i and r[i] in "ACGU" and r[j] in "ACGU" and (r[i], r[j]) not in WC]
+    return {"feasible": not conflicts, "conflicts": conflicts, "restraint": "".join(r), "n": len(target)}
+
+
+def _conflicting(target: str, m: int):
+    """Pin G on BOTH SIDES of a real stacked stem, so the pins are forced to pair and cannot.
+
+    An earlier version pinned the two ENDS of the sequence, which only conflicts when the ends pair with each
+    other. That is true of a hairpin and false of an H-type knot, where position 0 pairs with a ')' in the
+    middle and the last position pairs with a '[' -- so four "conflicting" pseudoknot items were actually
+    feasible and the suite's own sanity check flagged them. Reading the pair table works for every topology.
+    """
+    pt = pair_table(target)
+    for i0, j0 in enumerate(pt):
+        if j0 > i0 and all(pt[i0 + k] == j0 - k for k in range(m)):
+            return [{"motif": "G" * m, "at": i0}, {"motif": "G" * m, "at": j0 - m + 1}]
+    return None
+
+
+def _in_loop(target: str, m: int):
+    """A pin inside the FIRST hairpin loop -- unpaired, so it cannot conflict with anything."""
+    pt = pair_table(target)
+    for i, j in enumerate(pt):
+        if j > i and all(pt[k] < 0 for k in range(i + 1, j)) and (j - i - 1) >= m:
+            return [{"motif": "A" * m, "at": i + 1}]
+    return [{"motif": "A" * m, "at": next(k for k, c in enumerate(target) if c == ".")}]
+
+
+def _shapes():
+    """(family, target, the request in words). The words must pin the shape down COMPLETELY.
+
+    They did not, and it cost two wrong scores. "一个 H 型假结,两个交叉茎分别 4 对和 4 对" plus "total 27 nt"
+    does NOT determine a single string -- the three loop lengths are still free. The agent used that freedom
+    exactly as it should: it kept both stems, kept the length, redistributed the loops so the pinned bases no
+    longer paired, and got certified on two items whose answer key said "impossible". The key was wrong, not
+    the agent. A hairpin has no such freedom (stem + loop + length is one string), which is why the hairpin-
+    only version of this suite never exposed it.
+    """
+    out = []
+    for stem, loop in ((6, 4), (5, 6)):
+        out.append(("hairpin", _hairpin(stem, loop), f"一个茎 {stem} 对、环 {loop} nt 的发夹"))
+    for closing, branches, spacer in ((5, [(4, 4), (4, 4)], 2), (4, [(3, 4), (3, 4), (3, 4)], 1)):
+        br = "、".join(f"茎 {b[0]} 对环 {b[1]} nt" for b in branches)
+        out.append(("junction", _junction(closing, branches, spacer),
+                    f"一个多分支结构：闭合茎 {closing} 对，里面并排 {len(branches)} 个发夹（{br}），"
+                    f"每段之间隔 {spacer} nt"))
+    for s1, s2, l1, l2, l3 in ((4, 4, 4, 3, 4), (5, 4, 4, 3, 5)):
+        out.append(("pseudoknot", _knot(s1, s2, l1, l2, l3),
+                    f"一个 H 型假结：茎1 {s1} 对、茎2 {s2} 对，三段环依次 {l1} nt、{l2} nt、{l3} nt"))
+    return out
+
+
+SHAPES = _shapes()
+
+
+def build(n_per_class: int = 6):
+    """Deterministic: same input, same items, every time. No sampling, nothing to re-roll."""
+    items = []
+    for k in range(n_per_class):
+        fam, t, phrase = SHAPES[k % len(SHAPES)]
+        c = _in_loop(t, 3)
+        items.append({"id": f"direct-{k}", "class": "direct", "family": fam, "expect": "certified",
+                      "target": t, "constraints": c,
+                      "request": (f"给我这样一个结构:{phrase}，"
+                                  f"并且第 {c[0]['at'] + 1} 位开始的 3 个碱基必须固定为 {c[0]['motif']}"),
+                      "why": "the pinned bases sit in an unpaired loop, so nothing can conflict"})
+    for k in range(n_per_class):
+        fam, t, phrase = SHAPES[(k + 2) % len(SHAPES)]
+        cs = _conflicting(t, 4)
+        items.append({"id": f"restructurable-{k}", "class": "restructurable", "family": fam,
+                      "expect": "certified", "target": t, "constraints": cs,
+                      "request": (f"我要这样一个结构:{phrase}，"
+                                  f"第 {cs[0]['at'] + 1} 位起的 4 个碱基必须是 GGGG，"
+                                  f"第 {cs[1]['at'] + 1} 位起的 4 个也必须是 GGGG"),
+                      "why": ("those pinned positions pair with each other in the obvious shape and G cannot "
+                              "pair with G; the length is not fixed, so spacers resolve it")})
+    for k in range(n_per_class):
+        fam, t, phrase = SHAPES[(k + 4) % len(SHAPES)]
+        cs = _conflicting(t, 4)
+        items.append({"id": f"impossible-{k}", "class": "impossible", "family": fam, "expect": "refused",
+                      "target": t, "constraints": cs,
+                      "request": (f"我要这样一个结构:{phrase}，总长必须正好 {len(t)} nt，"
+                                  f"一个碱基都不能多，并且第 {cs[0]['at'] + 1} 位起的 4 个碱基必须是 GGGG，"
+                                  f"第 {cs[1]['at'] + 1} 位起的 4 个也必须是 GGGG"),
+                      "why": ("the pinned positions pair with each other in the ONLY shape the request permits, "
+                              "and G-G is not a pair; the length is fixed, so nothing can move")})
+    return items
 
 
 if __name__ == "__main__":
     S = build()
     print(f"{len(S)} items")
     for it in S:
-        f = feasible(it["shape"]["stem"], it["shape"]["loop"], it["constraints"])
+        f = feasible(it["target"], it["constraints"])
         mark = "OK " if ((it["class"] == "direct") == f["feasible"]) else "!! "
-        print(f"  {mark}{it['id']:<18} expect={it['expect']:<10} naive-shape feasible={f['feasible']}")
-        print(f"      {it['request']}")
+        print(f"  {mark}{it['id']:<18} {it['family']:<11} expect={it['expect']:<10} "
+              f"naive feasible={f['feasible']}  n={f['n']}")

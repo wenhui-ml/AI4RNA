@@ -177,3 +177,90 @@ def test_step_cap_is_bounded_and_cost_is_capped_separately():
     assert MAX_STEPS >= 6, "a request needing a restructure takes about six steps"
     s = run("x", client=_Scripted(['{"action":"check_feasible","args":{}}']))
     assert len(s.steps) <= MAX_STEPS
+
+
+# ---- the SHAPE check: the gap that let the loop pay three times for an unreachable target ---------
+def test_the_probe_never_runs_on_a_pseudoknot_because_it_crashes_on_one():
+    """ViennaRNA's inverse_fold SEGFAULTS on crossing pairs ("Junk in structure at aux_structure"), and a
+    segfault inside a primitive takes the whole agent down. So knots are excluded by name, not by luck."""
+    from rna_harness.cognitive.agent import designable_probe
+    o = designable_probe("((((....[[[[))))....]]]]")
+    assert o["ok"] and o["designable"] is None
+    assert "crash" in o["note"].lower() or "cannot represent" in o["note"]
+
+
+def test_the_probe_separates_a_reachable_shape_from_an_unreachable_one():
+    """MEASURED: on a 2-branch junction, 2 bp helices are undesignable and 4 bp helices are not. This is the
+    check that would have saved $0.38 and 45 minutes on one benchmark item."""
+    from rna_harness.cognitive.agent import designable_probe
+    assert designable_probe(HAIRPIN6)["designable"] is True
+    bad = designable_probe("((...((....))...((....))...))")     # every helix 2 bp -- the real failing item
+    assert bad["designable"] is False
+    assert "budget" in bad["note"], "it must say that paying more is the wrong move"
+
+
+def test_min_helix_measures_the_shortest_stack_not_the_total_pairs():
+    from rna_harness.cognitive.agent import _min_helix
+    assert _min_helix(HAIRPIN6) == 6
+    assert _min_helix("((...((....))...((....))...))") == 2
+    assert _min_helix("(((((..((((....))))..((((....))))..)))))") == 4
+    assert _min_helix("....") == 0
+
+
+def test_every_feasibility_answer_carries_the_shape_verdict():
+    """All three exits, including the error ones -- a caller that reads `shape` must never find it missing."""
+    for target, restraint in ((HAIRPIN6, None), (HAIRPIN6, "GGGGNN" + "N" * 10), (HAIRPIN6, "GGG")):
+        assert "shape" in check_feasible(target, restraint)
+
+
+def test_a_failed_nested_design_says_where_the_fold_went_wrong():
+    """A bare not_found gave the loop nothing to act on, and it responded the only way it could: by buying a
+    bigger budget. The detail below is what makes a different decision possible."""
+    from rna_harness.cognitive.certify import certify_sequence
+    c = certify_sequence("CCAUAUCGAAAGAAAGGCGCAAGCGGUGG", "((...((....))...((....))...))")
+    assert c.verdict == "not_found"
+    assert c.detail["mfe_structure"] and c.detail["best_bp"] > 0
+    assert c.detail["wrong_positions"] and c.detail["n_wrong"] == len(c.detail["wrong_positions"])
+
+
+def test_the_same_problem_cannot_be_paid_for_a_third_time(monkeypatch):
+    """Escalating cheap -> standard -> best_effort without changing anything is not a new idea, and the third
+    call is the expensive one. The refusal has to name what to change, or it just wastes the step instead."""
+    from rna_harness.cognitive import agent as A
+    calls = []
+
+    def fake_design(target, restraint=None, budget="cheap", seed=0, gc=None):
+        calls.append(budget)
+        return {"ok": True, "verdict": "not_found", "cost_usd": 0.01, "bp_away": 4}
+
+    monkeypatch.setitem(A.PRIMITIVES, "design", fake_design)
+    script = ['{"action":"propose_structure","args":{"elements":[{"type":"hairpin","stem":6,"loop":4}]}}',
+              '{"action":"design","args":{"budget":"cheap"}}',
+              '{"action":"design","args":{"budget":"standard"}}',
+              '{"action":"design","args":{"budget":"best_effort"}}',
+              '{"action":"design","args":{"budget":"best_effort"}}']
+    s = run("x", client=_Scripted(script), max_steps=5)
+    assert calls == ["cheap", "standard"], f"paid more than twice for one problem: {calls}"
+    refused = [st for st in s.steps if st.action == "design" and not st.observation.get("ok")]
+    assert refused and "twice" in refused[0].observation["error"]
+    assert "helices" in refused[0].observation["hint"] or "loop" in refused[0].observation["hint"]
+
+
+def test_a_new_problem_gets_its_own_two_attempts(monkeypatch):
+    """The guard keys on the PROBLEM, not on a global counter -- restructuring is exactly the behaviour we
+    want, so it must not inherit the previous shape's spend."""
+    from rna_harness.cognitive import agent as A
+    calls = []
+
+    def fake_design(target, restraint=None, budget="cheap", seed=0, gc=None):
+        calls.append(target)
+        return {"ok": True, "verdict": "not_found", "cost_usd": 0.01}
+
+    monkeypatch.setitem(A.PRIMITIVES, "design", fake_design)
+    script = ['{"action":"propose_structure","args":{"elements":[{"type":"hairpin","stem":6,"loop":4}]}}',
+              '{"action":"design","args":{"budget":"cheap"}}',
+              '{"action":"design","args":{"budget":"standard"}}',
+              '{"action":"propose_structure","args":{"elements":[{"type":"hairpin","stem":6,"loop":6}]}}',
+              '{"action":"design","args":{"budget":"cheap"}}']
+    run("x", client=_Scripted(script), max_steps=5)
+    assert len(calls) == 3 and len(set(calls)) == 2, calls
