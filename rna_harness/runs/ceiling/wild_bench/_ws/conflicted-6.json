@@ -2,7 +2,7 @@
  "request": "我有一个结构 .....((((((.......))))))........................... ，请给我一条能折叠成它的 RNA 序列，总长必须正好 51 nt，一个碱基都不能多；第 6 位起的 4 个碱基必须是 GGGG，第 21 位起的 4 个也必须是 GGGG",
  "steps": [
   {
-   "n": 1,
+   "n": 0,
    "action": "use_target",
    "args": {
     "which": 0
@@ -13,14 +13,15 @@
     "n": 51,
     "kind": "nested",
     "plain": "共 51 个碱基,6 对碱基配对,1 个发夹环(环大小 7 个未配对碱基)",
-    "note": "adopted verbatim from the request -- it is the user's structure, not a proposed one"
+    "note": "adopted verbatim from the request -- it is the user's structure, not a proposed one",
+    "automatic": "adopted by the harness: the request contains exactly one structure, so there was nothing to choose"
    },
    "cost_usd": 0.0,
    "wall_s": 0.0,
-   "thought": "The user provides a dot-bracket structure of length 51 with a 6bp stem and 7nt loop. I need to adopt it, pin GGGG at positions 6 and 21 (0-based), then check feasibility — there may be a pairing confl"
+   "thought": ""
   },
   {
-   "n": 2,
+   "n": 0,
    "action": "check_feasible",
    "args": {},
    "observation": {
@@ -32,11 +33,12 @@
      "min_helix": 6,
      "note": "ViennaRNA's own inverse fold reproduces this shape, so a sequence for it exists"
     },
-    "note": "nothing is pinned yet, so the pins have nothing to check -- but the SHAPE check above did run, and it is the one that decides whether search can work at all. Next: place_constraint if the request fixes any bases, otherwise design."
+    "note": "nothing is pinned yet, so the pins have nothing to check -- but the SHAPE check above did run, and it is the one that decides whether search can work at all. Next: place_constraint if the request fixes any bases, otherwise design.",
+    "automatic": "run by the harness: it is free and it is required before spending"
    },
    "cost_usd": 0.0,
-   "wall_s": 0.1,
-   "thought": "The pinned GGGG at positions 6-9 and 21-24 fall on paired positions that would be forced into G-G mismatches, so I need to run the free feasibility check to confirm the conflict before concluding."
+   "wall_s": 0.0,
+   "thought": ""
   },
   {
    "n": 3,
@@ -54,7 +56,7 @@
    },
    "cost_usd": 0.0,
    "wall_s": 0.0,
-   "thought": "The user wants GGGG at positions 6-9 and 21-24. In this structure, positions 6-9 are in the stem and pair with positions 22-19 respectively, while positions 21-23 are also in the stem. G-G cannot form"
+   "thought": "The two GGGG pins at positions 6-9 and 21-24 overlap the 6bp stem: positions 6↔22 and 7↔21 would both be G-G mismatches, which is a conflict. Let me place the pins and confirm with check_feasible."
   },
   {
    "n": 4,
@@ -72,7 +74,7 @@
    },
    "cost_usd": 0.0,
    "wall_s": 0.0,
-   "thought": "I need to place the second GGGG constraint at position 21, then check feasibility — positions 6-9 are in the stem and pair with positions 22-19, so GGGG at 21-24 may conflict with GGGG at 6-9 (G-G pai"
+   "thought": "I need to place the second GGGG constraint at position 21 and then check feasibility, since positions 6-9 and 21-24 may fall on paired regions that conflict."
   },
   {
    "n": 5,
@@ -106,20 +108,20 @@
    },
    "cost_usd": 0.0,
    "wall_s": 0.1,
-   "thought": "The two GGGG pins at positions 6-9 and 21-24 fall inside the 6-bp stem (positions 5-10 pair with 18-23). Position 7 (G) must pair with position 21 (G), which is a G-G mismatch — a conflict. Let me con"
+   "thought": "The pins at positions 6-9 (GGGG) and 21-24 (GGGG) likely create G-G pairing conflicts in the stem: position 6 pairs with 22, and position 7 pairs with 21, all pinned to G. I need to run check_feasible"
   },
   {
    "n": 6,
    "action": "done",
    "args": {
-    "reason": "结构已固定且总长锁定为 51 nt。第 6 位 GGGG 和第 21 位 GGGG 落在 6 bp 茎上：位置 6 必须与 22 配对、位置 7 必须与 21 配对，但 G-G 无法形成有效碱基对，存在 2 个不可解决的冲突。在不改变结构或长度的前提下无法满足约束。"
+    "reason": "结构已固定且总长锁定为 51 nt。约束冲突无法解决：第 6-9 位的 GGGG 与第 21-24 位的 GGGG 落在 6 对碱基的茎区内（第 6-11 位与第 19-24 位配对），其中 4 对配对（6↔24、7↔23、8↔22、9↔21）均为 G-G，无法形成碱基配对。在固定结构和固定长度下，此冲突不可调和。"
    },
    "observation": {
-    "reason": "the agent stopped: 结构已固定且总长锁定为 51 nt。第 6 位 GGGG 和第 21 位 GGGG 落在 6 bp 茎上：位置 6 必须与 22 配对、位置 7 必须与 21 配对，但 G-G 无法形成有效碱基对，存在 2 个不可解决的冲突。在不改变结构或长度的前提下无法满足约束。"
+    "reason": "the agent stopped: 结构已固定且总长锁定为 51 nt。约束冲突无法解决：第 6-9 位的 GGGG 与第 21-24 位的 GGGG 落在 6 对碱基的茎区内（第 6-11 位与第 19-24 位配对），其中 4 对配对（6↔24、7↔23、8↔22、9↔21）均为 G-G，无法形成碱基配对。在固定结构和固定长度下，此冲突不可调和。"
    },
    "cost_usd": 0.0,
    "wall_s": 0.0,
-   "thought": "The length is locked at 51 nt and the structure is fixed; the two GGGG pins fall on stem positions that must pair with each other (6↔22 and 7↔21), but G-G cannot form a valid base pair, so this is an "
+   "thought": "The pinned GGGG at positions 6-9 and 21-24 fall inside the 6-bp stem (positions 6-11 pair with 19-24), creating 4 G-G mismatches that cannot form base pairs. The structure is fixed by use_target, the "
   }
  ],
  "target": ".....((((((.......))))))...........................",
@@ -140,7 +142,7 @@
  "substituted": null,
  "certificate": null,
  "done": true,
- "outcome": "the agent stopped: 结构已固定且总长锁定为 51 nt。第 6 位 GGGG 和第 21 位 GGGG 落在 6 bp 茎上：位置 6 必须与 22 配对、位置 7 必须与 21 配对，但 G-G 无法形成有效碱基对，存在 2 个不可解决的冲突。在不改变结构或长度的前提下无法满足约束。",
- "total_cost_usd": 0.02669591,
- "llm_cost_usd": 0.02669591
+ "outcome": "the agent stopped: 结构已固定且总长锁定为 51 nt。约束冲突无法解决：第 6-9 位的 GGGG 与第 21-24 位的 GGGG 落在 6 对碱基的茎区内（第 6-11 位与第 19-24 位配对），其中 4 对配对（6↔24、7↔23、8↔22、9↔21）均为 G-G，无法形成碱基配对。在固定结构和固定长度下，此冲突不可调和。",
+ "total_cost_usd": 0.02354242,
+ "llm_cost_usd": 0.02354242
 }

@@ -2,7 +2,7 @@
  "request": "我有一个结构 ((((((....)))))).................................... ，请给我一条能折叠成它的 RNA 序列",
  "steps": [
   {
-   "n": 1,
+   "n": 0,
    "action": "use_target",
    "args": {
     "which": 0
@@ -13,14 +13,15 @@
     "n": 52,
     "kind": "nested",
     "plain": "共 52 个碱基,6 对碱基配对,1 个发夹环(环大小 4 个未配对碱基)",
-    "note": "adopted verbatim from the request -- it is the user's structure, not a proposed one"
+    "note": "adopted verbatim from the request -- it is the user's structure, not a proposed one",
+    "automatic": "adopted by the harness: the request contains exactly one structure, so there was nothing to choose"
    },
    "cost_usd": 0.0,
    "wall_s": 0.0,
-   "thought": "用户提供了一个目标结构，我应该直接采用它，然后检查可行性并设计序列。"
+   "thought": ""
   },
   {
-   "n": 2,
+   "n": 0,
    "action": "check_feasible",
    "args": {},
    "observation": {
@@ -32,11 +33,12 @@
      "min_helix": 6,
      "note": "ViennaRNA's own inverse fold reproduces this shape, so a sequence for it exists"
     },
-    "note": "nothing is pinned yet, so the pins have nothing to check -- but the SHAPE check above did run, and it is the one that decides whether search can work at all. Next: place_constraint if the request fixes any bases, otherwise design."
+    "note": "nothing is pinned yet, so the pins have nothing to check -- but the SHAPE check above did run, and it is the one that decides whether search can work at all. Next: place_constraint if the request fixes any bases, otherwise design.",
+    "automatic": "run by the harness: it is free and it is required before spending"
    },
    "cost_usd": 0.0,
-   "wall_s": 0.7,
-   "thought": "Simple hairpin with 6-bp stem and 4-nt loop plus a long spacer. Let me check feasibility first, then design with a cheap budget."
+   "wall_s": 0.0,
+   "thought": ""
   },
   {
    "n": 3,
@@ -46,9 +48,9 @@
    },
    "observation": {
     "ok": true,
-    "sequence": "CGCCCCGAAAGGGGCGGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-    "cost_usd": 0.0010026928120189242,
-    "wall_s": 7.22,
+    "sequence": "GCGGCGGAAACGCCGCGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+    "cost_usd": 0.0011195013258192275,
+    "wall_s": 8.06,
     "verdict": "certified",
     "constraint_held": null,
     "gc": null,
@@ -58,7 +60,7 @@
      "target": "((((((....))))))....................................",
      "n": 52,
      "kind": "nested",
-     "sequence": "CGCCCCGAAAGGGGCGGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+     "sequence": "GCGGCGGAAACGCCGCGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
      "checked_by": "ViennaRNA MFE (turner2004, dangles=2)",
      "strictness": "pfe",
      "rungs_passed": [
@@ -66,8 +68,8 @@
       "umfe",
       "pfe"
      ],
-     "cost_usd": 0.0010026928120189242,
-     "wait_s": 7.22,
+     "cost_usd": 0.0011195013258192275,
+     "wait_s": 8.06,
      "budget": "cheap",
      "reason": "solved at the 5s tier after trying [5]",
      "detail": {
@@ -78,7 +80,7 @@
      },
      "disclaimer": "`certified` means the sequence folds to the target under the stated computational model. It is not a claim about behaviour in vitro or in vivo.",
      "seed": 0,
-     "generated_utc": "2026-07-30T06:34:21Z",
+     "generated_utc": "2026-07-30T07:08:52Z",
      "provenance": {
       "schema": "rna-certificate/1.0",
       "python": "3.10.20",
@@ -87,14 +89,14 @@
       "pkiss": "/home/ubuntu/miniconda3/envs/pk/bin/pKiss",
       "rnastructure": "ProbKnot: Version 6.6 (April 2, 2026)."
      },
-     "verify_cmd": "python -m rna_harness.cognitive.certify '((((((....))))))....................................' --sequence CGCCCCGAAAGGGGCGGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+     "verify_cmd": "python -m rna_harness.cognitive.certify '((((((....))))))....................................' --sequence GCGGCGGAAACGCCGCGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
      "rerun_search": "python -m rna_harness.cognitive.certify '((((((....))))))....................................' --budget cheap --seed 0",
      "reproducibility": "verify_cmd reproduces this certificate's claim exactly -- folding is deterministic. rerun_search re-runs the design and may return a different sequence: the search budget is wall-clock, not iteration count, so it is not seed-reproducible."
     }
    },
-   "cost_usd": 0.0010026928120189242,
-   "wall_s": 7.2,
-   "thought": "No constraints requested and shape is feasible; proceed to design with cheap budget."
+   "cost_usd": 0.0011195013258192275,
+   "wall_s": 8.1,
+   "thought": "Structure is adopted and feasible; no constraints requested, so proceed to design with cheap budget."
   }
  ],
  "target": "((((((....))))))....................................",
@@ -109,7 +111,7 @@
   "target": "((((((....))))))....................................",
   "n": 52,
   "kind": "nested",
-  "sequence": "CGCCCCGAAAGGGGCGGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+  "sequence": "GCGGCGGAAACGCCGCGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
   "checked_by": "ViennaRNA MFE (turner2004, dangles=2)",
   "strictness": "pfe",
   "rungs_passed": [
@@ -117,8 +119,8 @@
    "umfe",
    "pfe"
   ],
-  "cost_usd": 0.0010026928120189242,
-  "wait_s": 7.22,
+  "cost_usd": 0.0011195013258192275,
+  "wait_s": 8.06,
   "budget": "cheap",
   "reason": "solved at the 5s tier after trying [5]",
   "detail": {
@@ -129,7 +131,7 @@
   },
   "disclaimer": "`certified` means the sequence folds to the target under the stated computational model. It is not a claim about behaviour in vitro or in vivo.",
   "seed": 0,
-  "generated_utc": "2026-07-30T06:34:21Z",
+  "generated_utc": "2026-07-30T07:08:52Z",
   "provenance": {
    "schema": "rna-certificate/1.0",
    "python": "3.10.20",
@@ -138,12 +140,12 @@
    "pkiss": "/home/ubuntu/miniconda3/envs/pk/bin/pKiss",
    "rnastructure": "ProbKnot: Version 6.6 (April 2, 2026)."
   },
-  "verify_cmd": "python -m rna_harness.cognitive.certify '((((((....))))))....................................' --sequence CGCCCCGAAAGGGGCGGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+  "verify_cmd": "python -m rna_harness.cognitive.certify '((((((....))))))....................................' --sequence GCGGCGGAAACGCCGCGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
   "rerun_search": "python -m rna_harness.cognitive.certify '((((((....))))))....................................' --budget cheap --seed 0",
   "reproducibility": "verify_cmd reproduces this certificate's claim exactly -- folding is deterministic. rerun_search re-runs the design and may return a different sequence: the search budget is wall-clock, not iteration count, so it is not seed-reproducible."
  },
  "done": true,
  "outcome": "certified",
- "total_cost_usd": 0.005555984812018924,
- "llm_cost_usd": 0.0045532920000000005
+ "total_cost_usd": 0.0021125013258192276,
+ "llm_cost_usd": 0.000993
 }

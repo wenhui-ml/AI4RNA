@@ -423,3 +423,44 @@ def test_designing_for_the_users_own_structure_is_not_blocked(monkeypatch):
             client=_Scripted(['{"action":"use_target","args":{"which":0}}',
                               '{"action":"design","args":{"budget":"cheap"}}']), max_steps=2)
     assert calls == ["((((...))))"] and s.outcome == "certified"
+
+
+# ---- the deterministic opening: the model is not asked what it cannot choose ----------------------
+def test_a_lone_structure_is_adopted_and_checked_without_a_model_call():
+    """MEASURED: eight plain requests produced eight identical trajectories, use_target -> check_feasible ->
+    design, at three model calls each. The first two had nothing to decide."""
+    class _Counting(_Scripted):
+        calls = 0
+
+        def chat(self, messages, **kw):
+            type(self).calls += 1
+            return super().chat(messages, **kw)
+
+    _Counting.calls = 0
+    c = _Counting(['{"action":"check_feasible","args":{}}'])
+    s = run("我有一个结构 ((((...)))) 请给我序列", client=c, max_steps=1)
+    assert [st.action for st in s.steps[:2]] == ["use_target", "check_feasible"]
+    assert all(st.observation.get("automatic") for st in s.steps[:2])
+    assert _Counting.calls == 1, "the primed steps must not cost a model call"
+    assert s.target == "((((...))))" and s.requested_by_user
+
+
+def test_choosing_between_two_structures_stays_the_models_decision():
+    """With more than one candidate, adopting one IS a decision, so the harness must not make it."""
+    s = run("对比 ((((...)))) 和 ((....)) ，给第二个的序列",
+            client=_Scripted(['{"action":"use_target","args":{"which":1}}']), max_steps=1)
+    assert s.steps[0].action == "use_target" and not s.steps[0].observation.get("automatic")
+    assert s.target == "((....))"
+
+
+def test_priming_does_not_eat_the_step_budget():
+    s = run("我有一个结构 ((((...)))) 请给我序列",
+            client=_Scripted(['{"action":"check_feasible","args":{}}']), max_steps=3)
+    assert len(s.steps) == 2 + 3, "2 primed + 3 the model was actually given"
+
+
+def test_a_request_with_no_structure_is_not_primed():
+    s = run("给我一个茎 6 对、环 4 nt 的发夹",
+            client=_Scripted(['{"action":"propose_structure","args":{"elements":'
+                              '[{"type":"hairpin","stem":6,"loop":4}]}}']), max_steps=1)
+    assert s.steps[0].action == "propose_structure" and len(s.steps) == 1

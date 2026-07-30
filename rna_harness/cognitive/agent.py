@@ -529,6 +529,37 @@ def _reapply(pins: List[dict], target: str):
     return (out if set(out) != {"N"} else None), kept, dropped
 
 
+def _prime(sess: "Session") -> None:
+    """Do the part that is not a decision, before the model is asked anything.
+
+    MEASURED: on eight "here is my structure, give me a sequence" requests the agent produced eight
+    IDENTICAL trajectories -- use_target -> check_feasible -> design -- at three model calls each, and the
+    whole loop cost 6x the money and 8x the wall clock of calling the ladder directly for exactly the same
+    8/8 answers. Two of those three calls were spent on steps with nothing to decide:
+
+      use_target      the request contains exactly ONE structure, so there is no other thing to adopt
+      check_feasible  free, side-effect-free, and the rules already say to run it before spending
+
+    So the code does them. This is the same division of labour as everywhere else here -- the model decides
+    what needs deciding -- and it is deliberately conservative: with zero structures or more than one,
+    choosing is a real decision and the model makes it.
+    """
+    cands = structures_in(sess.request)
+    if len(cands) != 1:
+        return
+    obs = use_target(sess.request, 0)
+    if not obs.get("ok"):
+        return
+    obs["automatic"] = ("adopted by the harness: the request contains exactly one structure, so there was "
+                        "nothing to choose")
+    sess.target = sess.requested_target = obs["target"]
+    sess.requested_by_user = True
+    sess.steps.append(Step(0, "use_target", {"which": 0}, obs))
+    chk = check_feasible(sess.target, sess.restraint)
+    chk["automatic"] = "run by the harness: it is free and it is required before spending"
+    sess.steps.append(Step(0, "check_feasible", {}, chk))
+
+
 def _observations(sess: "Session") -> str:
     out = [f"REQUEST: {sess.request}"]
     if sess.target:
@@ -615,7 +646,10 @@ def run(request: str, client=None, model: str = "z-ai/glm-5.2", max_steps: int =
         return None
 
     paid: Dict[tuple, int] = {}          # how many times each exact problem has been PAID for
-    for n in range(1, max_steps + 1):
+    _prime(sess)                         # the deterministic opening, if there is one; costs no model call
+    _persist(sess, workspace)
+    n0 = len(sess.steps)                 # primed steps are free, so they do not eat the model's step budget
+    for n in range(n0 + 1, n0 + max_steps + 1):
         r = _ask()
         if getattr(r, "error", None):
             sess.outcome = f"agent unavailable: {r.error}"
