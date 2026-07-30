@@ -1,0 +1,50 @@
+strictness benchmark: 6 shapes x 2 rungs x 3 seeds = 36 runs
+
+    8/36  0.3 min
+    16/36  0.6 min
+    24/36  1.0 min
+    32/36  1.3 min
+
+=== 36 runs, same solver, same seconds, same pool ===
+  umfe   tool's own answer 18/18   screening its pool 18/18   McNemar 0-0, p=1.00e+00
+  pfe    tool's own answer 18/18   screening its pool 18/18   McNemar 0-0, p=1.00e+00
+
+  shape          rung  tool rungs              tool ok  ours ok  pool ok
+  hairpin-10     pfe   match,umfe,pfe             True     True      110
+  hairpin-10     pfe   match,umfe,pfe             True     True      120
+  hairpin-10     pfe   match,umfe,pfe             True     True      108
+  hairpin-6      pfe   match,umfe,pfe             True     True      111
+  hairpin-6      pfe   match,umfe,pfe             True     True      119
+  hairpin-6      pfe   match,umfe,pfe             True     True      125
+  internal-loop  pfe   match,umfe,pfe             True     True       82
+  internal-loop  pfe   match,umfe,pfe             True     True       90
+  internal-loop  pfe   match,umfe,pfe             True     True       83
+  junction-2     pfe   match,umfe,pfe             True     True       52
+  junction-2     pfe   match,umfe,pfe             True     True       41
+  junction-2     pfe   match,umfe,pfe             True     True       46
+  junction-3     pfe   match,umfe,pfe             True     True        3
+  junction-3     pfe   match,umfe,pfe             True     True        1
+  junction-3     pfe   match,umfe,pfe             True     True        3
+  two-hairpins   pfe   match,umfe,pfe             True     True       75
+  two-hairpins   pfe   match,umfe,pfe             True     True       72
+  two-hairpins   pfe   match,umfe,pfe             True     True       72
+  hairpin-10     umfe  match,umfe,pfe             True     True      198
+  hairpin-10     umfe  match,umfe,pfe             True     True      200
+  hairpin-10     umfe  match,umfe,pfe             True     True      198
+  hairpin-6      umfe  match,umfe,pfe             True     True      199
+  hairpin-6      umfe  match,umfe,pfe             True     True      198
+  hairpin-6      umfe  match,umfe,pfe             True     True      199
+  internal-loop  umfe  match,umfe,pfe             True     True      192
+  internal-loop  umfe  match,umfe,pfe             True     True      192
+  internal-loop  umfe  match,umfe,pfe             True     True      193
+  junction-2     umfe  match,umfe,pfe             True     True      189
+  junction-2     umfe  match,umfe,pfe             True     True      192
+  junction-2     umfe  match,umfe,pfe             True     True      196
+  junction-3     umfe  match,umfe,pfe             True     True      176
+  junction-3     umfe  match,umfe,pfe             True     True      185
+  junction-3     umfe  match,umfe,pfe             True     True      182
+  two-hairpins   umfe  match,umfe,pfe             True     True      195
+  two-hairpins   umfe  match,umfe,pfe             True     True      197
+  two-hairpins   umfe  match,umfe,pfe             True     True      197
+
+  wrote rna_harness/runs/ceiling/rung_bench.json
