@@ -1,0 +1,44 @@
+mRNA 密码子约束基准: 4 个肽 x 4 种子 = 16 次
+
+  LSR-rich-12   36 nt  逐位约束泄漏 40%
+  LSR-rich-16   48 nt  逐位约束泄漏 40%
+  mixed-14      42 nt  逐位约束泄漏 37%
+  mixed-18      54 nt  逐位约束泄漏 35%
+
+    1/16  0.3 min
+    2/16  0.3 min
+    3/16  0.3 min
+    4/16  0.3 min
+    5/16  0.5 min
+    6/16  0.6 min
+    7/16  0.6 min
+    8/16  0.6 min
+    9/16  0.7 min
+    10/16  0.7 min
+    11/16  0.8 min
+    12/16  0.8 min
+    13/16  0.9 min
+    14/16  1.1 min
+    15/16  1.1 min
+    16/16  1.1 min
+
+=== 16 次,判据相同且精确:翻译正确 AND 折叠等于靶结构 ===
+  A  工具自己的答案                0/16
+  A2 筛选工具的池                  15/16
+  B  同义密码子池 + 筛选           10/16
+
+  拆开看工具为什么失败:
+    它的答案折叠正确               16/16
+    它的答案**翻译正确**            0/16   <- 关键
+    它整个池里翻译正确的条数(中位) 7 / 200
+
+  耗时中位:工具 18.8s   同义采样 10.1s (采样条数中位 8627)
+  McNemar (B vs A): 10-0, p=1.95e-03
+
+  肽               A   A2    B  工具交付的蛋白(取一例)            
+  LSR-rich-12     0    4    4  MLTRFTRLSRLV             (要求 MLSRLSRLSRLV)
+  LSR-rich-16     0    3    0  MFTRVLSRVLCRVLSR         (要求 MLSRVLSRVLSRVLSR)
+  mixed-14        0    4    4  MGSFLRCVLGKSTA           (要求 MGSLLRSVLGKSTA)
+  mixed-18        0    4    2  MKLRRDGVLSRAFTELWR       (要求 MKLSRDGVLSRAFTELSR)
+
+  wrote rna_harness/runs/ceiling/mrna_bench.json
