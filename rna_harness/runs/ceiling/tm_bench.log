@@ -1,0 +1,21 @@
+melting-temperature benchmark: 5 shapes x 4 requests x 3 seeds = 60 runs
+
+    10/60  0.4 min
+    20/60  0.7 min
+    30/60  1.1 min
+    40/60  1.4 min
+    50/60  1.8 min
+    60/60  2.1 min
+
+=== 60 runs, same solver, same seconds, same pool ===
+  求解器不受约束时的天然 Tm:中位 83.1C  区间 60.9-99.0C
+
+     请求 Tm     方向       工具达标       筛选其池         池中合格(中位)
+      55±5     逆向       0/15      15/15               36
+      65±5     逆向       4/15      15/15               44
+      75±5     逆向       3/15      15/15               45
+      85±5     顺向       5/15       9/15               14
+
+  合计: 工具 12/60   筛选 54/60   McNemar 42-0, p=4.55e-13
+
+  wrote rna_harness/runs/ceiling/tm_bench.json
