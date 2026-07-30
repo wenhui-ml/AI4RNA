@@ -108,6 +108,11 @@ class DesiRNAGenerator(Generator):
         seed_seq = meta.get("seed_seq")
         if seed_seq and len(seed_seq) == n:
             out += f">seed_seq\n{seed_seq}\n"
+        alts = [a for a in (meta.get("alt_sec_struct") or []) if a and len(a) == n]
+        if alts:
+            # DesiRNA's own negative-design channel: named alternative structures, one per line. Plumbed so
+            # a comparison on negative design gives the tool its mechanism instead of nothing.
+            out += ">alt_sec_struct\n" + "\n".join(alts) + "\n"
         return out
 
     def _argv(self, cmd: List[str], input_name: str, seed: Optional[int], param: str = "2004") -> List[str]:

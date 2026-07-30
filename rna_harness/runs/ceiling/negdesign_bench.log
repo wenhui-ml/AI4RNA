@@ -1,0 +1,25 @@
+choosing a STRUCTURALLY DISTINCT competitor for each shape (bp distance >= n_pairs/3)...
+  hairpin-10     .(.(((((((......))))))))..   bp距离=4
+  two-hairpins   ((((....)).))...((((....))))   bp距离=4
+  junction-2     (((((....(((...)))...((((....))))..)))))   bp距离=7
+  internal-loop  ((((..((.((...))))..))))   bp距离=4
+  hairpin-6      (..(((....))).).   bp距离=4
+
+negative-design benchmark: 30 runs
+
+    10/30  0.3 min
+    20/30  0.7 min
+    30/30  1.0 min
+
+=== 30 runs, same solver, same seconds, same pool, tool given -nd on + alt_sec_struct ===
+  工具自己的答案  折叠对 AND 间隔达标 : 23/30
+  筛选它的池      折叠对 AND 间隔达标 : 27/30
+  McNemar 4-0, p=1.25e-01
+
+      间隔要求       工具       筛选
+       2      14/15    15/15
+       4       9/15    12/15
+
+  这是不是又一次 GC 缺口?  工具 GC 中位 66.7%   我们 GC 中位 67.5%
+
+  wrote rna_harness/runs/ceiling/negdesign_bench.json
