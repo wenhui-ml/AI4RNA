@@ -1,0 +1,59 @@
+extreme benchmark: 16 targets x 2 arms at budget=standard
+  31 to run
+    1/31  0.0 min
+    2/31  0.0 min
+    3/31  4.9 min
+    4/31  5.0 min
+    5/31  5.1 min
+    6/31  5.8 min
+    7/31  6.2 min
+    8/31  6.4 min
+    9/31  6.8 min
+    10/31  6.8 min
+    11/31  7.5 min
+    12/31  7.7 min
+    13/31  10.6 min
+    14/31  10.6 min
+    15/31  11.0 min
+    16/31  11.3 min
+    17/31  11.8 min
+    18/31  13.4 min
+    19/31  13.5 min
+    20/31  14.6 min
+    21/31  14.6 min
+    22/31  14.8 min
+    23/31  16.2 min
+    24/31  17.0 min
+    25/31  18.1 min
+    26/31  18.3 min
+    27/31  18.3 min
+    28/31  18.9 min
+    29/31  20.1 min
+    30/31  20.9 min
+    31/31  21.3 min
+
+=== paired, 14 decomposable targets (2 excluded: a single unit, so the arms cannot differ) ===
+    id    n   units  cover   whole   parts   bp  whole s  parts s  name
+    68  282   14/14    83%   False   False   61      383      371  Taraxacum officinale
+    73  370   24/24    62%    True   False   99      409      459  Snowflake 4  <-- LOST
+    76  393   29/29    66%   False   False  164      406      452  Snowflake 3
+    79  101     0/2     0%   False   False None      298        1  Shapes and Energy
+    81  214     6/7    56%   False   False   37      344      342  Campfire
+    86  358   15/18    45%   False   False  130      380      405  Methaqualone C16H14N2O Str
+    87  100     2/3    16%   False   False    1      289      287  Cat's Toy 2
+    90  400     4/6    10%   False   False   20      424      568  Gladius
+    91  398    5/10    23%   False   False   50      396      423  Thunderbolt
+    94  389    9/12    44%   False   False   69      419      451  Looking Back Again
+    96  378   11/20    40%   False   False   94      384      437  Cesspool
+    97  400   18/18    69%   False   False  144      418      424  Hoglafractal
+    99  370    8/12    28%   False   False   27      401      471  Shooting Star
+   100  381     0/9     0%   False   False None      379        9  Teslagon
+
+  whole-target cascade   1/14   89 min total
+  decompose + repair     0/14   85 min total
+
+  excluded 60: this target decomposes into 1 unit(s), so there is nothing to design separately
+
+  excluded 71: this target decomposes into 1 unit(s), so there is nothing to design separately
+
+  wrote rna_harness/runs/ceiling/extreme_bench.json
