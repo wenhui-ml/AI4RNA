@@ -75,6 +75,8 @@ class Session:
     restraint: Optional[str] = None
     gc: Optional[dict] = None
     tm: Optional[dict] = None                        # melting-temperature requirement, checked not steered
+    kin: Optional[dict] = None                       # co-transcriptional requirement -- the second measured gap
+    switch: Optional[dict] = None                    # two-state requirement -- the third measured gap
     sequences: Optional[List[str]] = None            # set-level answers (design_set), when one was asked for
     pins: List[dict] = field(default_factory=list)   # (motif, at) as REQUESTED, so a reshape can re-apply them
     requested_target: Optional[str] = None           # the FIRST shape proposed -- what the user asked for
@@ -503,13 +505,54 @@ def _gc_of(seq: Optional[str]):
     return 100.0 * sum(1 for c in seq if c in "GC") / len(seq)
 
 
+# A tier of t seconds bills for MORE than t: process start, input writing and the final verification are all
+# inside the wall clock the cost model charges for. Measured on the 64-target end-to-end run, the 5 s tier
+# came to $0.00121 per target against a predicted $0.000694 -- a factor of 1.74. Rounded up, and used only to
+# decide what we can AFFORD, so erring high is the safe direction.
+TIER_OVERHEAD = 2.0
+
+
+def affordable_tiers(budget: str, max_spend_usd: Optional[float]):
+    """The prefix of a budget's ladder that fits in what is left, and never fewer than one tier.
+
+    WHY THIS EXISTS. The agent's cost cap was checked BETWEEN steps, which cannot stop a single call: one
+    best_effort design ends with a 1800 s x 10-replica tier, so a run sitting at $0.49 under a $0.50 cap could
+    still commit half an hour. It did. Two runs on the 64-target end-to-end went to $0.5111 / 5033 s and
+    $0.4354 / 8948 s and both returned not_found -- together 93% of that arm's entire solver spend, on two
+    targets it never solved. Enforcement has to happen where the ladder is chosen.
+
+    One tier always survives. Refusing to run at all would turn a cost cap into a silent no-answer, which is
+    the failure class this project keeps finding; the honest behaviour is a cheap attempt plus a note.
+    """
+    from .certify import BUDGETS
+    from .cost import solver_cost_usd
+    tiers = list(BUDGETS.get(budget) or BUDGETS["cheap"])
+    if max_spend_usd is None:
+        return tiers, None
+    keep, spent = [], 0.0
+    for tl in tiers:
+        cost = solver_cost_usd(tl, 10) * TIER_OVERHEAD
+        if keep and spent + cost > max_spend_usd:
+            break
+        keep.append(tl)
+        spent += cost
+    if len(keep) == len(tiers):
+        return keep, None
+    return keep, (f"budget ladder truncated from {tiers} to {keep} seconds: ${max_spend_usd:.4f} left of the "
+                  f"cost cap, and the next tier alone would cost about "
+                  f"${solver_cost_usd(tiers[len(keep)], 10) * TIER_OVERHEAD:.4f}")
+
+
 def design(target: str, restraint: Optional[str] = None, budget: str = "cheap", seed: int = 0,
-           gc: Optional[dict] = None, tm: Optional[dict] = None) -> dict:
+           gc: Optional[dict] = None, tm: Optional[dict] = None,
+           kin: Optional[dict] = None, sw: Optional[dict] = None,
+           max_spend_usd: Optional[float] = None) -> dict:
     """Run the solver and report what came back, including HOW it failed."""
     from .certify import BUDGETS, certify_design
     from .cost import solver_cost_usd
     if budget not in BUDGETS:
         budget = "cheap"
+    tiers, capped = affordable_tiers(budget, max_spend_usd)
     t0 = time.time()
     # STEER OR SCREEN. DesiRNA's -acgu_content steers the search toward a composition; measured on a 6-bp
     # hairpin it produced 81.2% GC against a 50% request -- WORSE than the 62.5% it reaches with no request
@@ -517,7 +560,7 @@ def design(target: str, restraint: Optional[str] = None, budget: str = "cheap", 
     # sit within 50 +/- 10. So the requirement is enforced by reading the pool, which is exact, and not by
     # asking the solver nicely, which is not. Same mechanism that recovered 14 pseudoknot targets the tool
     # had thrown away.
-    if (restraint and set(restraint) != {"N"}) or gc or tm:
+    if (restraint and set(restraint) != {"N"}) or gc or tm or kin or sw:
         from ..experiments.rssd_constrained import ConstrainedDesiRNA
         from ..generators.desirna import desirna_available
         from ..task import DesignTask, OracleConfig
@@ -526,7 +569,7 @@ def design(target: str, restraint: Optional[str] = None, budget: str = "cheap", 
             return {"ok": False, "error": "the external solver is not installed"}
         oc = OracleConfig(param_set="turner2004", temperature=37.0, dangles=2)
         cost, err, screened, best_partial = 0.0, None, 0, None
-        for tl in BUDGETS[budget]:
+        for tl in tiers:
             a0 = time.time()
             res = ConstrainedDesiRNA(replicas=10, timelimit_s=tl, results_number=50).design(
                 DesignTask(task_id="agent", target=target, oracle=oc,
@@ -553,14 +596,26 @@ def design(target: str, restraint: Optional[str] = None, budget: str = "cheap", 
                 if cert.verdict not in ("certified", "knot_confirmed"):
                     best_partial = best_partial or c        # the closest miss still gets reported
                     continue
+                # CHEAPEST DISCRIMINATOR FIRST, and every one of these only runs on candidates that already
+                # answer the shape question. A switch test is one cofold; a melting point is about a dozen
+                # partition functions; a co-transcriptional scan is one fold PER PREFIX, so it goes last.
+                w = _switch_check(c, target, sw)
+                if w is not None and not w.get("held"):
+                    best_partial = best_partial or c
+                    continue
                 m = _tm_check(c, target, tm)
                 if m is not None and not m["held"]:
                     best_partial = best_partial or c        # it folds; it melts at the wrong temperature
                     continue
+                k = _kin_check(c, target, kin)
+                if k is not None and not k["held"]:
+                    best_partial = best_partial or c        # it folds; it traps on the way there
+                    continue
                 err = None
                 return {"ok": True, "sequence": c, "cost_usd": cost,
                         "wall_s": round(time.time() - t0, 1), "verdict": cert.verdict,
-                        "constraint_held": held, "gc": g, "tm": m, "n_screened": screened,
+                        "constraint_held": held, "gc": g, "tm": m, "kinetics": k, "switch": w,
+                        "n_screened": screened, "budget_capped": capped,
                         "bp_away": 0, "certificate": cert.to_dict()}
         if err:
             # A TOOL FAILURE IS NOT A SEARCH FAILURE. Reporting it as not_found sent the agent up the budget
@@ -575,12 +630,16 @@ def design(target: str, restraint: Optional[str] = None, budget: str = "cheap", 
                                     if (best_partial and restraint) else None),
                 "gc": _gc_check(best_partial, gc),
                 "tm": (_tm_check(best_partial, target, tm) if best_partial else None),
+                "kinetics": (_kin_check(best_partial, target, kin) if best_partial else None),
+                "switch": (_switch_check(best_partial, target, sw) if best_partial else None),
                 "bp_away": (cert.detail or {}).get("best_bp") if cert else None,
-                "note": (f"screened {screened} candidates; none satisfied every requirement at once")}
-    c = certify_design(target, budget=budget, seed=seed)
+                "budget_capped": capped,
+                "note": (f"screened {screened} candidates; none satisfied every requirement at once"
+                         + (f". {capped}" if capped else ""))}
+    c = certify_design(target, budget=budget, seed=seed, tiers=tuple(tiers))
     return {"ok": True, "sequence": c.sequence, "cost_usd": c.cost_usd, "wall_s": c.wait_s,
             "verdict": c.verdict, "constraint_held": None, "gc": _gc_check(c.sequence, gc), "tm": None,
-            "bp_away": (c.detail or {}).get("best_bp"),
+            "bp_away": (c.detail or {}).get("best_bp"), "budget_capped": capped,
             "certificate": c.to_dict()}
 
 
@@ -604,11 +663,93 @@ def _constraint_held(seq: Optional[str], restraint: str):
     return {"held": not bad, "violated_positions": bad}
 
 
+
+def set_cotranscriptional(max_trap_fraction: float = 0.10) -> dict:
+    """Require the design to fold cleanly AS IT IS SYNTHESISED, 5' to 3', not only once it is complete.
+
+    WHY THIS IS A PRIMITIVE AND NOT A NOTE IN THE DOCS. It is a requirement the external solver has no term
+    for -- its whole objective is equilibrium (MFE, ensemble defect, suboptimal gap, oligomerisation,
+    composition), and its source contains no cotranscriptional/kinetic/barrier/findpath anywhere. Measured on
+    24 natural structures off the SAME solver runs, both arms required to fold correctly AND pass:
+
+        its own answer 8/24        screening its own pool 19/24        rescue 11 of 16 failures
+
+    and it is not the composition gap in disguise: restricted to the targets whose own answer already sits in
+    45-58% GC, 3/11 against 9/11 at 52.4% GC on both sides.
+
+    A prefix is a TRAP when its MFE contains a pair the target does not have -- that pair has to be broken
+    later. `max_trap_fraction` is the share of prefixes allowed to be traps; 0.10 is the benchmark's declared
+    value. This is ViennaRNA MFE per prefix, deterministic and exact under the stated model. It is NOT a
+    kinetic simulation and says nothing about polymerase speed or pausing, so it is a lower bound on trouble.
+    """
+    try:
+        f = float(max_trap_fraction)
+    except (TypeError, ValueError):
+        return {"ok": False, "error": "max_trap_fraction must be a number between 0 and 1"}
+    if not 0.0 <= f <= 1.0:
+        return {"ok": False, "error": f"max_trap_fraction {f} is outside 0..1"}
+    return {"ok": True, "max_trap_fraction": f,
+            "means": (f"at most {f:.0%} of 5'->3' prefixes may misfold into a pair the target does not have"),
+            "note": "checked by screening, never steered -- the solver has no term for this"}
+
+
+def set_switch(enabled: bool = True) -> dict:
+    """Require a TWO-STATE design: folds to the target alone, and opens when its trigger strand is present.
+
+    The window is found BY CODE from the target -- an unpaired toehold immediately 5' of a stem, plus the
+    stem pairs the trigger must displace. The model never picks positions, the same rule as everywhere else
+    here. A target without that motif gets an honest refusal rather than a silently different requirement.
+
+    MEASURED, and this is the strongest composition control the project has run. 72 natural structures, same
+    solver runs, both arms needing both states:
+
+        its own answer 35/72        screening its own pool 58/72
+
+    and with our arm restricted PER TARGET to candidates whose GC EQUALS its own answer's, exactly:
+
+        35/58 against 54/58, ours-only 19 / its-only 0, p=3.8e-06
+
+    The mechanism is measured too, not assumed. Splitting its own answers by whether they switch: monomer MFE
+    median -25.2 kcal/mol for the ones that fail against -20.2 for the ones that work, at the same lengths
+    (60 vs 61) and the same complex energy (-25.9 vs -25.7). The solver optimises toward a deeper well, and a
+    deeper well is one the trigger cannot displace. The requirement is directly opposed to the objective.
+    """
+    return {"ok": True, "switch": bool(enabled),
+            "means": ("the sequence must fold to the target on its own AND be fully opened at the toehold "
+                      "stem by its own complementary trigger strand"),
+            "note": "the toehold window is located by code from the target; the solver cannot express this"}
+
+
+def _kin_check(seq: Optional[str], target: str, kin: Optional[dict]):
+    """Exact, reported separately: a design that folds but traps during synthesis is not an answer."""
+    if not kin or not seq:
+        return None
+    from ..benchmarks.kinetic_suite import cotranscriptional
+    k = cotranscriptional(seq, target)
+    return {"held": k["trap_fraction"] <= kin["max_trap_fraction"],
+            "trap_fraction": k["trap_fraction"], "limit": kin["max_trap_fraction"],
+            "first_trap_at": k["first_trap_k"]}
+
+
+def _switch_check(seq: Optional[str], target: str, sw: Optional[dict]):
+    """Exact, reported separately: both states or it is not a switch."""
+    if not sw or not sw.get("switch") or not seq:
+        return None
+    from ..benchmarks.switch_suite import INVADE, switch_window, switches
+    at = switch_window(target)
+    if at is None:
+        return {"held": None, "error": "this target has no toehold + stem motif, so it cannot be a switch"}
+    r = switches(seq, target, at)
+    return {"held": r["held"], "invasion": r["invasion"], "needed": INVADE,
+            "window_at": at, "trigger": r["trigger"], "complex_dg": r["complex_dg"]}
+
+
 PRIMITIVES = {"propose_structure": propose_structure, "place_constraint": place_constraint,
               "use_target": use_target,
               "check_feasible": check_feasible, "design": design, "design_set": design_set,
               "recommend_loop_cap": recommend_loop_cap, "set_gc_content": set_gc_content,
-              "set_melting_temperature": set_melting_temperature}
+              "set_melting_temperature": set_melting_temperature,
+              "set_cotranscriptional": set_cotranscriptional, "set_switch": set_switch}
 
 
 # --------------------------------------------------------------------------- the loop
@@ -655,6 +796,16 @@ Actions:
         the TARGET structure stops being more likely than not. There is NO steer for this; candidates are
         checked after the fact. Requests BELOW what the solver naturally produces (around 83 C) are the ones
         that need this; a request at or above it usually comes for free.
+  set_cotranscriptional {"max_trap_fraction":0.10}   require the design to fold cleanly AS IT IS MADE,
+        5' to 3', not only once finished. Use it when the request mentions transcription, folding while being
+        synthesised, kinetic traps, or "must fold correctly in the cell/in vivo" rather than just at
+        equilibrium. Checked, never steered -- the solver has no term for it. Costs one fold per prefix, so
+        ask for it when the request calls for it, not by default.
+  set_switch        {"enabled":true}   require a TWO-STATE design: folds to the target alone, and opens at
+        its toehold stem when the complementary trigger strand is present. Use it for a riboswitch, a
+        toehold switch, a sensor, or anything described as changing shape when something binds. The window is
+        located by code from the target; if the target has no unpaired toehold beside a stem this is refused
+        outright rather than searched for.
   design_set        {"count":8,"max_identity":60,"max_duplex_kcal":-12}
         design a SET of sequences that all fold to the target, are pairwise at most max_identity per cent
         identical, and form no duplex stronger than max_duplex_kcal. Use this only when the request asks for
@@ -922,6 +1073,23 @@ def run(request: str, client=None, model: str = "z-ai/glm-5.2", max_steps: int =
             obs = fn(args.get("celsius"), float(args.get("tolerance", 5.0)))
             if obs.get("ok"):
                 sess.tm = obs
+        elif name == "set_cotranscriptional":
+            obs = fn(float(args.get("max_trap_fraction", 0.10)))
+            if obs.get("ok"):
+                sess.kin = obs
+        elif name == "set_switch":
+            obs = fn(bool(args.get("enabled", True)))
+            if obs.get("ok"):
+                sess.switch = obs
+                # AN IMPOSSIBLE REQUIREMENT SHOULD BE REFUSED NOW, not paid for and then reported as
+                # not_found -- that confusion is what the whole feasibility step exists to prevent.
+                if sess.target:
+                    from ..benchmarks.switch_suite import switch_window
+                    if switch_window(sess.target) is None:
+                        sess.switch = None
+                        obs = {"ok": False, "error": ("this target has no unpaired toehold next to a stem, "
+                                                      "so no trigger can open it"),
+                               "hint": "a switch needs a single-stranded run immediately 5' of a helix"}
         elif name == "design_set":
             if not sess.target:
                 obs = {"ok": False, "error": "no target yet -- propose_structure or use_target first"}
@@ -945,7 +1113,8 @@ def run(request: str, client=None, model: str = "z-ai/glm-5.2", max_steps: int =
                 {"ok": False, "error": "no target yet -- propose_structure first"}
         else:  # design
             problem = (sess.target, sess.restraint, json.dumps(sess.gc, sort_keys=True),
-                       json.dumps(sess.tm, sort_keys=True))
+                       json.dumps(sess.tm, sort_keys=True), json.dumps(sess.kin, sort_keys=True),
+                       json.dumps(sess.switch, sort_keys=True))
             if not sess.target:
                 obs = {"ok": False, "error": "no target yet -- propose_structure first"}
             elif sess.total_cost_usd >= max_cost_usd:
@@ -978,17 +1147,21 @@ def run(request: str, client=None, model: str = "z-ai/glm-5.2", max_steps: int =
             else:
                 paid[problem] = paid.get(problem, 0) + 1
                 obs = fn(sess.target, sess.restraint, str(args.get("budget", "cheap")),
-                         gc=sess.gc, tm=sess.tm)
+                         gc=sess.gc, tm=sess.tm, kin=sess.kin, sw=sess.switch,
+                         max_spend_usd=max(0.0, max_cost_usd - sess.total_cost_usd))
                 sess.total_cost_usd += float(obs.get("cost_usd") or 0.0)
                 if obs.get("certificate"):
                     sess.certificate = obs["certificate"]
                 held, gcc, tmc = obs.get("constraint_held"), obs.get("gc"), obs.get("tm")
+                kinc, swc = obs.get("kinetics"), obs.get("switch")
                 # every declared requirement must hold, not just the folding one -- a design that folds but
                 # breaks the pin or misses the GC target is not the answer to what was asked
                 if (obs.get("verdict") in ("certified", "knot_confirmed")
                         and (held is None or held["held"])
                         and (gcc is None or gcc.get("held"))
-                        and (tmc is None or tmc.get("held"))):
+                        and (tmc is None or tmc.get("held"))
+                        and (kinc is None or kinc.get("held"))
+                        and (swc is None or swc.get("held"))):
                     sess.done, sess.outcome = True, "certified"
         sess.steps.append(Step(n, name, args, obs, cost_usd=float(obs.get("cost_usd") or 0.0),
                                wall_s=round(time.time() - t0, 1), thought=thought))

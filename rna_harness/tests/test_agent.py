@@ -589,3 +589,42 @@ def test_switch_window_returns_an_index_not_a_tuple():
     r = switches(seq, "." * len(seq), at)                    # a target it cannot match: must not raise
     assert r["held"] is False and 0 <= r["invasion"] <= INVADE
     assert switch_window("." * 30) is None                   # no stem at all
+
+
+def test_cost_cap_truncates_the_ladder_before_the_call_not_after():
+    """A cap checked only BETWEEN steps cannot stop one best_effort call whose last tier is 1800 s.
+
+    It did not: two end-to-end runs went to $0.5111 / 5033 s and $0.4354 / 8948 s against a $0.50 cap and
+    both returned not_found -- together 93% of that arm's entire solver spend, on targets it never solved.
+    """
+    from rna_harness.cognitive.agent import affordable_tiers
+    from rna_harness.cognitive.certify import BUDGETS
+    full, note = affordable_tiers("best_effort", None)
+    assert list(full) == list(BUDGETS["best_effort"]) and note is None
+    # the tier that burned the money must be unreachable at the shipped cap
+    at_cap, note = affordable_tiers("best_effort", 0.5)
+    assert 1800 not in at_cap and note and "truncated" in note
+    # ladders shrink monotonically as money runs out
+    lens = [len(affordable_tiers("best_effort", x)[0]) for x in (0.5, 0.1, 0.01, 0.001)]
+    assert lens == sorted(lens, reverse=True)
+    # NEVER zero tiers: a cap must not silently turn into "no answer and no explanation"
+    assert affordable_tiers("best_effort", 0.0)[0] == [5]
+    assert affordable_tiers("cheap", 0.0)[0] == [5]
+
+
+def test_new_requirements_are_reachable_and_refuse_honestly():
+    """The two measured gaps have to be askable, and an impossible one must be refused before it is paid for."""
+    from rna_harness.cognitive.agent import (PRIMITIVES, _kin_check, _switch_check,
+                                             set_cotranscriptional, set_switch)
+    assert "set_cotranscriptional" in PRIMITIVES and "set_switch" in PRIMITIVES
+    assert set_cotranscriptional(0.1)["ok"] and not set_cotranscriptional(1.5)["ok"]
+    assert not set_cotranscriptional("x")["ok"]
+    # a hairpin with a 5' single-stranded run IS a switch target; a bare hairpin is not
+    tgt = "....((((((....))))))"
+    seq = "AAAAGGGGGGAAAACCCCCC"
+    w = _switch_check(seq, tgt, set_switch())
+    assert w is not None and w.get("error") is None and 0 <= w["invasion"] <= w["needed"]
+    assert _switch_check(seq, "((((((....))))))....", set_switch())["error"]
+    assert _switch_check(seq, tgt, None) is None          # not asked for -> not checked
+    k = _kin_check(seq, tgt, {"max_trap_fraction": 0.1})
+    assert set(k) >= {"held", "trap_fraction", "limit"} and 0.0 <= k["trap_fraction"] <= 1.0

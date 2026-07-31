@@ -481,7 +481,8 @@ def _panel_verdict(seq: str, target: str) -> dict:
 
 
 # --------------------------------------------------------------------------- design + certify
-def _certify_design_impl(target: str, budget: str = "standard", seed: int = 0) -> Certificate:
+def _certify_design_impl(target: str, budget: str = "standard", seed: int = 0,
+                         tiers: Optional[tuple] = None) -> Certificate:
     """"Give me a sequence that folds into this shape", answered with a certificate.
 
     Runs the measured budget cascade and stops at the first sequence that survives the criterion for this
@@ -490,7 +491,11 @@ def _certify_design_impl(target: str, budget: str = "standard", seed: int = 0) -
     kind, err = classify(target)
     if kind == "invalid":
         return Certificate("invalid_input", target, len(target or ""), "invalid", reason=err, budget=budget)
-    tiers = BUDGETS.get(budget)
+    # An explicit tier list overrides the named budget. The caller that needs this is a cost cap: a cap
+    # checked only BETWEEN calls cannot stop a single best_effort call, whose last tier is 1800 s x 10
+    # replicas -- measured, two agent runs blew past a $0.50 cap to $0.51 and $0.44 and burned 5033 s and
+    # 8948 s to return not_found. Truncating the ladder is the only place that can be enforced.
+    tiers = tuple(tiers) if tiers else BUDGETS.get(budget)
     if tiers is None:
         return Certificate("invalid_input", target, len(target), kind, budget=budget,
                            reason=f"unknown budget '{budget}'; choose one of {sorted(BUDGETS)}")
@@ -624,9 +629,11 @@ def certify_sequence(seq: str, target: str) -> Certificate:
     return _certify_sequence_impl(seq, target).stamp(seed=None)
 
 
-def certify_design(target: str, budget: str = "standard", seed: int = 0) -> Certificate:
+def certify_design(target: str, budget: str = "standard", seed: int = 0,
+                   tiers: Optional[tuple] = None) -> Certificate:
     """Design and certify. Thin wrapper so the audit block is attached at exactly one place."""
-    return _certify_design_impl(target, budget=budget, seed=seed).stamp(seed=seed, budget=budget)
+    return _certify_design_impl(target, budget=budget, seed=seed, tiers=tiers).stamp(
+        seed=seed, budget=(budget if not tiers else f"{budget} (capped to {list(tiers)}s)"))
 
 
 # --------------------------------------------------------------------------- plain language
