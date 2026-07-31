@@ -628,3 +628,34 @@ def test_new_requirements_are_reachable_and_refuse_honestly():
     assert _switch_check(seq, tgt, None) is None          # not asked for -> not checked
     k = _kin_check(seq, tgt, {"max_trap_fraction": 0.1})
     assert set(k) >= {"held", "trap_fraction", "limit"} and 0.0 <= k["trap_fraction"] <= 1.0
+
+
+def test_calibrate_strict_helpers():
+    """Pin the two things whose failure destroyed a run: the record/id confusion and the shuffle's invariant."""
+    import importlib.util
+    import os
+    import random
+    from collections import Counter
+    p = os.path.join(os.path.dirname(__file__), "..", "runs", "ceiling", "calibrate_strict.py")
+    spec = importlib.util.spec_from_file_location("_cs", os.path.abspath(p))
+    m = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(m)
+    # a DINUCLEOTIDE shuffle must preserve dinucleotide counts, not merely base counts -- stacking energy
+    # depends on adjacent pairs, so a mononucleotide shuffle would be a null about composition instead
+    rng = random.Random(0)
+    s = "AGGUCACUGCGACCAACAAGCAUCCGGAUUACGCA"
+    di = lambda x: Counter(a + b for a, b in zip(x, x[1:]))          # noqa: E731
+    for _ in range(20):
+        sh = m.dinucleotide_shuffle(s, rng)
+        assert sh and len(sh) == len(s) and di(sh) == di(s) and sorted(sh) == sorted(s)
+    # exact interval, not a normal approximation: at 1/250 the normal one is meaningless
+    lo, hi = m.clopper_pearson(1, 250)
+    assert lo < 0.0002 and 0.02 < hi < 0.023
+    assert m.clopper_pearson(0, 100)[0] == 0.0
+    # confirmed() must read the RECORD, and the k/tau semantics must be monotone
+    rec = {"id": "t#sh0", "recall": {"pkiss": 1.0, "probknot": 1.0, "shapeknots": 0.4}}
+    assert m.confirmed(rec, 1, 1.0) and m.confirmed(rec, 2, 1.0) and not m.confirmed(rec, 3, 1.0)
+    assert m.confirmed(rec, 3, 0.4)
+    # a None recall is an oracle that did not run -- never a score of zero
+    assert not m.confirmed({"id": "x", "recall": {"pkiss": None, "probknot": None,
+                                                  "shapeknots": None}}, 1, 1.0)

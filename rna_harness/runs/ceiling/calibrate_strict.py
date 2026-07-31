@@ -248,6 +248,11 @@ def main():
         with ProcessPoolExecutor(max_workers=a.workers) as ex:
             recs = [r for r in ex.map(judge, items) if r]
         print(f"  判完 {len(recs)} 条,{(time.time()-t0)/60:.1f} min\n", flush=True)
+        # LAND THE ORACLE WORK BEFORE ANY ANALYSIS TOUCHES IT. The first run of this file crashed in the
+        # summary and threw away 918 judgements that had cost real oracle time -- the analysis is seconds and
+        # rerunnable, the judging is not, and they had no business sharing a failure mode.
+        json.dump({"records": recs, "stage": "judged"}, open(a.out, "w"), ensure_ascii=False)
+        print(f"  已先落盘 {a.out}(判决先存,分析后补) \n", flush=True)
         # the original weak null, reused rather than recomputed, so the comparison is like for like
         for r in json.load(open(os.path.join(HERE, "calibrate_null_v2.json"))):
             rec = {"id": f"{r['id']}#rand", "pop": "random", "n": r["n"], "n_cross": None,
@@ -255,12 +260,14 @@ def main():
             if any(v is not None for v in rec["recall"].values()):
                 recs.append(rec)
 
-    base = lambda r: r["id"].split("#")[0]                                        # noqa: E731
+    def base(r):
+        """The target id a record belongs to. Draws are `<id>#sh0`, `<id>#nested`, `<id>#rand`."""
+        return r["id"].split("#")[0]
     P = {p: [r for r in recs if r["pop"] == p] for p in ("native", "dishuffle", "nested", "random")}
     print(f"  各总体样本数: " + "  ".join(f"{p}={len(v)}" for p, v in P.items()) + "\n")
 
     def counts(pop, k, tau, which):
-        sub = [r for r in P[pop] if base(r["id"]) in which]
+        sub = [r for r in P[pop] if base(r) in which]
         return sum(1 for r in sub if confirmed(r, k, tau)), len(sub)
 
     # ---- scan the grid on FIT ONLY, by a rule declared before the scan ------------------------------
@@ -297,7 +304,7 @@ def main():
     for label, (k, tau) in (("FIT 选出", (K, TAU)), ("出厂规则 k=1,tau=1.0", (1, 1.0))):
         row = {}
         for pop in ("native", "nested", "dishuffle", "random"):
-            which = test_ids if pop != "random" else {base(r["id"]) for r in P["random"]} & test_ids
+            which = test_ids if pop != "random" else {base(r) for r in P["random"]} & test_ids
             kk, nn = counts(pop, k, tau, which)
             row[pop] = rate(kk, nn)
         out["test"][f"k={k},tau={tau}"] = row
