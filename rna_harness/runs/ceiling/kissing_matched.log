@@ -1,0 +1,22 @@
+端到端:64 条靶标(kissing + higher-order)x 1 臂,预算 cheap
+
+  64 个待跑
+    10/64  2.9 min
+    20/64  4.4 min
+    30/64  6.8 min
+    40/64  10.4 min
+    50/64  13.5 min
+    60/64  18.1 min
+
+=== 192 次运行,判据为出厂的已校准假结判据 ===
+  臂        拓扑类                       交付       $求解器       $思考      中位耗时
+  agent    kissing / chain        55/55     0.1819    0.0859       74s
+  agent    higher-order             7/9     0.8368    0.1316       68s
+  direct   kissing / chain        53/55     0.0663    0.0000       69s
+  direct   higher-order             7/9     0.0112    0.0000       71s
+  direct_matched kissing / chain        54/55     0.2072    0.0000       87s
+  direct_matched higher-order             7/9     0.5129    0.0000       99s
+
+  判决分布:{"agent": {"knot_confirmed": 61, "not_found": 2, "certified": 1}, "direct": {"knot_confirmed": 60, "not_found": 4}, "direct_matched": {"knot_confirmed": 60, "not_found": 3, "certified": 1}}
+
+  wrote rna_harness/runs/ceiling/kissing_e2e.json

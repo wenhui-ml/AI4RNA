@@ -145,6 +145,24 @@ def main():
     if gt:
         print(f"  GC:  工具答案中位 {sorted(gt)[len(gt)//2]:.1f}%"
               + (f"   我们选中的中位 {sorted(go)[len(go)//2]:.1f}%" if go else "   我们无选中"))
+    # THE THRESHOLD SWEEP, BOTH ARMS, printed rather than left for a reader to trust. A declared threshold
+    # is only worth something if the conclusion does not hinge on it, and the way to show that is to move it.
+    sub_b = [r for r in ok if r["tool_in_band"]]
+    sweep = []
+    for th in (0.05, 0.10, 0.15, 0.20, 0.25, 0.35):
+        sweep.append({
+            "threshold": th,
+            "tool": sum(1 for r in ok if (r.get("tool") or {}).get("folds")
+                        and r["tool"]["trap_fraction"] <= th),
+            "ours": sum(1 for r in ok if any(x["trap_fraction"] <= th for x in r["free_rows"])),
+            "tool_in_band": sum(1 for r in sub_b if r["tool"]["folds"]
+                                and r["tool"]["trap_fraction"] <= th),
+            "ours_in_band": sum(1 for r in sub_b if any(x["trap_fraction"] <= th for x in r["band_rows"])),
+            "n": len(ok), "n_in_band": len(sub_b)})
+    print(f"  阈值敏感性(两臂同时重算):")
+    for w in sweep:
+        print(f"    {w['threshold']:.2f}   工具 {w['tool']:>2}/{w['n']}   我们 {w['ours']:>2}/{w['n']}"
+              f"   |带内| 工具 {w['tool_in_band']}/{w['n_in_band']}  我们 {w['ours_in_band']}/{w['n_in_band']}")
     tfs = sorted(r["tool"]["trap_fraction"] for r in ok if r.get("tool"))
     near = [x for x in tfs if 0.5 * TRAP_FRACTION_MAX < x < 2.0 * TRAP_FRACTION_MAX]
     rescued = sum(1 for r in ok if r["free"]["chosen"] and not (r.get("tool") or {}).get("held"))
@@ -159,7 +177,7 @@ def main():
                         "tool_only": b_only, "p": mcnemar(a_only, b_only)},
                "band": {"tool": tb_ok, "tool_n_in_band": n_in_band, "ours": ob_ok, "n": len(ok)},
                "median_pool_pass_rate": rates[len(rates) // 2] if rates else None,
-               "trap_fraction_sorted": tfs, "n_near_threshold": len(near),
+               "threshold_sweep": sweep, "trap_fraction_sorted": tfs, "n_near_threshold": len(near),
                "rescue": {"tool_failed": failed, "recovered_by_screening": rescued,
                           "note": "arms are nested; the tool-only cell is structurally 0"},
                "rows": R}, open(a.out, "w"), ensure_ascii=False, indent=1)
