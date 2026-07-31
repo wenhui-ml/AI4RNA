@@ -169,6 +169,47 @@
    "cost_usd": 0.0,
    "wall_s": 0.0,
    "thought": "Two budget levels failed on the unchanged problem; a third attempt is refused. I'll add a GC content steer to change the problem and give the solver direction, then try best_effort."
+  },
+  {
+   "n": 6,
+   "action": "design",
+   "args": {
+    "budget": "best_effort"
+   },
+   "observation": {
+    "ok": true,
+    "sequence": "ACUUGGGGGAAACGGGAUGUCAGAAAAAAUACCCCAAGCUACCACCCCCCCGUAUUCGGAGAAUACGGGUGGGGCAAAUUCUCGUUAC",
+    "cost_usd": 0.3739300832152367,
+    "wall_s": 6121.7,
+    "verdict": "not_found",
+    "n_screened": 962,
+    "constraint_held": null,
+    "gc": {
+     "held": true,
+     "measured": 52.3,
+     "target": 50.0,
+     "tolerance": 10.0
+    },
+    "tm": null,
+    "bp_away": null,
+    "note": "screened 962 candidates; none satisfied every requirement at once"
+   },
+   "cost_usd": 0.3739300832152367,
+   "wall_s": 6121.7,
+   "thought": "Two budgets failed on this pseudoknot; GC steer is now set. Escalate to best_effort as the last available budget before concluding the shape is infeasible."
+  },
+  {
+   "n": 7,
+   "action": "done",
+   "args": {
+    "reason": "The target structure .(((((((..[[[[[[[{{{.[[.....}}})))))))]]....(((((((((((((...))))))))).)))).....]]]]]]].. (88 nt) could not be designed after exhausting all budget levels (cheap, standard, best_effort with 962 candidates screened). The structure contains multiple crossing pseudoknot interactions — a 7-bp bracket stem crossing the 7-bp parenthesis stem, a 3-bp brace stem, and critically a 2-bp bracket pseudoknot stem ([[...]]), which is too short to be reliably stabilized. No sequence survived the verification panel (pKiss AND ProbKnot AND ShapeKnots). To get a foldable sequence, the structure would need modification: lengthen the 2-bp pseudoknot stem to at least 3–4 bp, or simplify the crossing pattern. As-is, this structure appears to be beyond what current pseudoknot-aware design tools can reliably produce."
+   },
+   "observation": {
+    "reason": "the agent stopped: The target structure .(((((((..[[[[[[[{{{.[[.....}}})))))))]]....(((((((((((((...))))))))).)))).....]]]]]]].. (88 nt) could not be designed after exhausting all budget levels (cheap, standard, best_effort with 962 candidates screened). The structure contains multiple crossing pseudoknot interactions — a 7-bp bracket stem crossing the 7-bp parenthesis stem, a 3-bp brace stem, and critically a 2-bp bracket pseudoknot stem ([[...]]), which is too short to be reliably stabilized. No sequence survived the verification panel (pKiss AND ProbKnot AND ShapeKnots). To get a foldable sequence, the structure would need modification: lengthen the 2-bp pseudoknot stem to at least 3–4 bp, or simplify the crossing pattern. As-is, this structure appears to be beyond what current pseudoknot-aware design tools can reliably produce."
+   },
+   "cost_usd": 0.0,
+   "wall_s": 0.0,
+   "thought": "All three budget levels (cheap, standard, best_effort) have failed on this complex multi-crossing pseudoknot structure. The structure contains 4 crossing stem systems including a very short 2-bp pseud"
   }
  ],
  "target": ".(((((((..[[[[[[[{{{.[[.....}}})))))))]]....(((((((((((((...))))))))).)))).....]]]]]]]..",
@@ -223,8 +264,8 @@
   "rerun_search": "python -m rna_harness.cognitive.certify '.(((((((..[[[[[[[{{{.[[.....}}})))))))]]....(((((((((((((...))))))))).)))).....]]]]]]]..' --budget standard --seed 0",
   "reproducibility": "no sequence was produced, so there is nothing to re-verify; rerun_search re-runs the search."
  },
- "done": false,
- "outcome": "",
- "total_cost_usd": 0.05258249810405732,
- "llm_cost_usd": 0.01278746
+ "done": true,
+ "outcome": "the agent stopped: The target structure .(((((((..[[[[[[[{{{.[[.....}}})))))))]]....(((((((((((((...))))))))).)))).....]]]]]]].. (88 nt) could not be designed after exhausting all budget levels (cheap, standard, best_effort with 962 candidates screened). The structure contains multiple crossing pseudoknot interactions — a 7-bp bracket stem crossing the 7-bp parenthesis stem, a 3-bp brace stem, and critically a 2-bp bracket pseudoknot stem ([[...]]), which is too short to be reliably stabilized. No sequence survived the verification panel (pKiss AND ProbKnot AND ShapeKnots). To get a foldable sequence, the structure would need modification: lengthen the 2-bp pseudoknot stem to at least 3–4 bp, or simplify the crossing pattern. As-is, this structure appears to be beyond what current pseudoknot-aware design tools can reliably produce.",
+ "total_cost_usd": 0.435377359319294,
+ "llm_cost_usd": 0.021652238
 }

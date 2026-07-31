@@ -5,12 +5,25 @@ WHY THIS AND NOT THE RE-ADJUDICATION. The 51-of-55 figure came from re-scoring s
 the archive: it is a statement about the criterion, and it is silent about whether the shipped pipeline
 actually produces such a sequence when someone asks. This runs the thing a user would run.
 
-TWO ARMS, same targets, same budget, same verdict:
-    agent   run() on a request that contains the structure -- adopt, check, design, certify
-    direct  certify_design() on the same target -- the baseline without the loop
+THREE ARMS, same targets, same verdict:
+    agent           run() on a request that contains the structure -- adopt, check, design, certify
+    direct          certify_design() at a fixed `cheap` tier -- the baseline without the loop
+    direct_matched  certify_design() given, PER TARGET, the same money the agent spent on that target
 
-BUDGET IS `cheap` ON BOTH, DECLARED: one 5-second tier. Every delivery rate below is therefore a LOWER bound,
-and the comparison between arms is what the run is for.
+WHY THE THIRD ARM EXISTS, and it is a correction to this file's first version. Arms 1 and 2 are NOT at
+matched budget: the agent may escalate a tier and did so 4 times, ending at 3.87x the solver spend. So
+"agent 62/62 against direct 60/62" could not distinguish a better DECISION from simply more money, and
+publishing it without the third arm left the central question open. The matched arm converts the escalation
+into a testable claim:
+
+    matched arm >= agent   ->  the escalation bought nothing a flat budget would not have bought
+    agent > matched arm    ->  spending the SAME money ADAPTIVELY beats spending it flat (M2, allocation)
+
+The matched budget is deliberately GENEROUS to the baseline: the agent's total solver spend on a target is
+converted back to seconds and handed over as ONE tier, so the baseline pays none of the restart overhead the
+agent paid. A null under those conditions is a real null; a win is a real win.
+
+BUDGET IS `cheap` on the `direct` arm, DECLARED: one 5-second tier. Delivery rates there are a LOWER bound.
 
 THE VERDICT IS THE SHIPPED ONE and carries its operating point: `knot_confirmed` means the CROSSING STEMS are
 fully reproduced by at least one of three independent predictors (84.0% sensitivity on 250 natural
@@ -30,6 +43,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.abspath(os.path.join(HERE, "..", "..", ".."))
 sys.path.insert(0, REPO)
 OUT = os.path.join(HERE, "kissing_e2e")
+REPLICAS = 10          # ConstrainedDesiRNA/certify run 10 replicas; the cost model bills cores x wall
 
 
 def work(job):
@@ -48,6 +62,24 @@ def work(job):
                    "sequence": cert.get("sequence"), "cost_usd": sess.total_cost_usd,
                    "llm_cost_usd": sess.llm_cost_usd, "n_steps": len(sess.steps),
                    "outcome": sess.outcome}
+        elif arm == "direct_matched":
+            # THE AGENT'S OWN SPEND ON THIS TARGET, converted back to seconds and handed over as one tier.
+            # If the agent never ran here there is nothing to match, and the honest move is to skip rather
+            # than substitute a default -- a guessed budget would silently become the thing under test.
+            from rna_harness.cognitive.certify import BUDGETS, certify_design
+            from rna_harness.cognitive.cost import CPU_USD_PER_SEC
+            ap = os.path.join(OUT, f"{tid.replace(':', '_')}-agent.json")
+            if not os.path.exists(ap):
+                return None
+            a = json.load(open(ap))
+            spend = (a.get("cost_usd") or 0.0) - (a.get("llm_cost_usd") or 0.0)
+            secs = spend / (REPLICAS * CPU_USD_PER_SEC) if spend > 0 else 0.0
+            secs = max(5.0, min(1800.0, secs))          # floor = the cheap tier, cap = the solver's own limit
+            BUDGETS["matched"] = (round(secs, 1),)
+            c = certify_design(target, budget="matched")
+            rec = {"verdict": c.verdict, "sequence": c.sequence, "cost_usd": c.cost_usd,
+                   "llm_cost_usd": 0.0, "n_steps": 0, "outcome": c.reason[:80],
+                   "matched_to_agent_usd": round(spend, 6), "granted_s": round(secs, 1)}
         else:
             from rna_harness.cognitive.certify import certify_design
             c = certify_design(target, budget=budget)
@@ -88,7 +120,8 @@ def main():
         t0 = time.time()
         with ProcessPoolExecutor(max_workers=a.workers) as ex:
             for n, f in enumerate(as_completed([ex.submit(work, j) for j in todo]), 1):
-                f.result()
+                if f.result() is None:
+                    continue
                 if n % 10 == 0:
                     print(f"    {n}/{len(todo)}  {(time.time()-t0)/60:.1f} min", flush=True)
 
@@ -96,7 +129,7 @@ def main():
     print(f"\n=== {len(R)} 次运行,判据为出厂的已校准假结判据 ===")
     print(f"  {'臂':<8} {'拓扑类':<18} {'交付':>9} {'$求解器':>10} {'$思考':>9} {'中位耗时':>9}")
     out = {}
-    for arm in a.arms.split(","):
+    for arm in sorted({r["arm"] for r in R}):
         for g in ("kissing / chain", "higher-order"):
             sub = [r for r in R if r["arm"] == arm and r["topology"] == g]
             if not sub:
