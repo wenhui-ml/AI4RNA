@@ -123,12 +123,28 @@ PANEL_OPERATING_POINT = {
 }
 KNOT_OPERATING_POINT = {
     "rule": "crossing stems fully reproduced by at least 1 of 3 oracles (k=1, tau=1.0)",
-    "sensitivity_on_known_structures": 0.840,
-    "false_accept_on_random_sequences": 0.004,
+    # HELD OUT, not in-sample. Threshold scanned on one half of the natives, every rate below reported on the
+    # other half, with exact Clopper-Pearson intervals (runs/ceiling/calibrate_strict.py).
+    "sensitivity_on_known_structures": 0.785,
+    "sensitivity_ci95": [0.688, 0.863],
+    "sensitivity_n": 93,
+    # THREE NULLS, weakest to hardest. The one that matters is `nested`: sequences designed for the target's
+    # PSEUDOKNOT-FREE skeleton and then judged against the full target -- they get the easy half right by
+    # construction and have no reason to form the crossing stems. That is the population this rule actually
+    # faces, and across all 183 of them not one was accepted; no single oracle even reached full crossing
+    # recall (pKiss tops out at 0.80, ProbKnot 0.75, ShapeKnots 0.29).
+    "false_accept_nested_decoys": 0.000,
+    "false_accept_nested_ci95": [0.000, 0.039],
+    "false_accept_nested_n": 92,
+    "false_accept_dinucleotide_shuffle": 0.007,
+    "false_accept_on_random_sequences": 0.000,
     "scope": "the CROSSING STEMS only -- this says nothing about the rest of the structure",
     "note": ("sensitivity is unchanged from tau=1.0 down to 0.9: these predictors get a knot entirely right "
              "or entirely wrong. Composing this with an exact nested-skeleton check was tried and refuted "
-             "(ViennaRNA recovers the nested reduction from only 20 of 186 natives)."),
+             "(ViennaRNA recovers the nested reduction from only 20 of 186 natives). An earlier 84.0% was "
+             "quoted from a 250-target in-sample set while the hard-null work runs on the 186 of those whose "
+             "sequence can be recovered; 78.5% is the held-out figure on that set, and the fit and test "
+             "halves agree exactly, so the difference is the denominator rather than overfitting."),
 }
 
 # HOW MANY OF THE THREE ACTUALLY AGREED -- reported per certificate, because k=1 and k=3 are not the same
@@ -146,13 +162,29 @@ KNOT_OPERATING_POINT = {
 # the judge. Nothing in the random null can see that, because the null contains no sequences that were
 # optimised against anything. So the grade answers "would this survive if we had picked a different
 # predictor", and that is the question the random false-accept rate cannot answer.
+# HOW INDEPENDENT THE THREE JUDGES ACTUALLY ARE, measured rather than asserted. Pairwise Cohen's kappa on
+# "reproduces every crossing pair", over 186 natives (runs/ceiling/calibrate_strict.py):
+#
+#     pKiss ~ ProbKnot       0.324
+#     pKiss ~ ShapeKnots     0.359
+#     ProbKnot ~ ShapeKnots  0.743      <- substantial agreement
+#
+# So the panel is effectively TWO voices: pKiss, and a correlated ProbKnot/ShapeKnots pair. This is why k=1
+# and k=3 carry the same false-accept rate, which looked like a paradox while the phrase "three independent
+# predictors" was doing unexamined work. The grade is reported with that caveat attached rather than with an
+# adjective the data does not support.
+ORACLE_KAPPA = {"pkiss~probknot": 0.324, "pkiss~shapeknots": 0.359, "probknot~shapeknots": 0.743,
+                "effective_independent_sources": 2}
+
 KNOT_GRADES = {
     3: {"grade": "k=3", "agreeing_oracles": 3, "sensitivity_on_known_structures": 0.432,
-        "means": "all three independent predictors reproduce the crossing stems; no single predictor's "
-                 "idiosyncrasy can be carrying this result"},
+        "means": "all three predictors reproduce the crossing stems. Note that two of them (ProbKnot and "
+                 "ShapeKnots) agree with each other at kappa=0.74, so this is closer to two independent "
+                 "votes than to three"},
     2: {"grade": "k=2", "agreeing_oracles": 2, "sensitivity_on_known_structures": 0.636,
-        "means": "two of three independent predictors agree; one dissents or could not run"},
-    1: {"grade": "k=1", "agreeing_oracles": 1, "sensitivity_on_known_structures": 0.840,
+        "means": "two of three predictors agree; one dissents or could not run. Which two matters: pKiss "
+                 "plus either of the others is more independent evidence than ProbKnot plus ShapeKnots"},
+    1: {"grade": "k=1", "agreeing_oracles": 1, "sensitivity_on_known_structures": 0.785,
         "means": "exactly one predictor reproduces the crossing stems -- this is the shipped floor, and it "
                  "is the grade most exposed to a single predictor's bias"},
 }
@@ -169,6 +201,8 @@ def knot_grade(kr: dict) -> dict:
     g = dict(KNOT_GRADES.get(min(3, max(1, k)), KNOT_GRADES[1]))
     g["false_accept_on_random_sequences"] = 0.004      # identical at every k -- see the comment above
     g["shipped_threshold"] = "k>=1"
+    g["oracle_agreement_kappa"] = ORACLE_KAPPA
+    g["which_agreed"] = list(kr.get("confirmed_by") or [])
     return g
 
 
@@ -394,8 +428,9 @@ def _certify_sequence_impl(seq: str, target: str) -> Certificate:
                                    "grade": knot_grade(kr)},
                            reason="the crossing stems that make this a pseudoknot are fully reproduced by "
                                   + ", ".join(kr["confirmed_by"]) + ". This is a claim about the KNOT, not "
-                                  "the whole structure: the criterion recognises 84% of known natural "
-                                  "structures at 0.4% false accept on random sequences.")
+                                  "the whole structure: the criterion recognises 78.5% of known natural "
+                                  "structures (held out, 95% CI 68.8-86.3) and accepted 0 of 183 decoys "
+                                  "designed for this target's pseudoknot-free skeleton.")
     if v["reference_only"]:
         return Certificate("cannot_certify", target, len(target), kind, sequence=seq,
                            checked_by="panel: pKiss AND ProbKnot AND ShapeKnots",
@@ -582,8 +617,8 @@ def _certify_design_impl(target: str, budget: str = "standard", seed: int = 0,
                            reason="no candidate reproduced the whole structure under all three predictors, "
                                   "but the crossing stems that make this a pseudoknot are fully reproduced "
                                   "by " + ", ".join(kr["confirmed_by"]) + ". Claim is about the KNOT only; "
-                                  "the criterion recognises 84% of known natural structures at 0.4% false "
-                                  "accept on random sequences.")
+                                  "the criterion recognises 78.5% of known natural structures (held out, "
+                                  "95% CI 68.8-86.3) and accepted 0 of 183 pseudoknot-free decoys.")
     if kind == "pseudoknot" and best_ref_only is not None:
         c, v = best_ref_only
         return Certificate("cannot_certify", target, len(target), kind, sequence=c,

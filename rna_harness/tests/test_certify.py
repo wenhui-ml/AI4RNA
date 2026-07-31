@@ -107,14 +107,25 @@ def test_pseudoknot_without_panel_refuses_rather_than_guessing():
 
 @pytest.mark.skipif(not _panel_ready(), reason="needs pKiss + RNAstructure")
 def test_knot_confirmed_is_a_weaker_claim_than_certified_and_says_so():
-    """The calibrated verdict. Exact-and-unanimous has 0.8% sensitivity on known natural structures, so it
-    refuses nearly everything including correct designs; crossing-stem recall by >=1 oracle reaches 84.0% at
-    0.4% false accept per draw, and 3.1% [0.1, 16.2] on a matched best-of-pool null. It is reported as a
-    claim about the KNOT only -- composing it with an exact nested-skeleton check was refuted (ViennaRNA
-    recovers the nested reduction from 20 of 186 natives)."""
-    from rna_harness.cognitive.certify import KNOT_OPERATING_POINT, _knot_recall
-    assert KNOT_OPERATING_POINT["sensitivity_on_known_structures"] > 0.8
-    assert "CROSSING STEMS only" in KNOT_OPERATING_POINT["scope"]
+    """The calibrated verdict, and the numbers pinned here are the HELD-OUT ones.
+
+    Exact-and-unanimous has 0.8% sensitivity on known natural structures, so it refuses nearly everything
+    including correct designs. Crossing-stem recall by >=1 oracle reaches 78.5% [68.8, 86.3] on a held-out
+    half, and -- the null that actually matters -- accepted 0 of 183 decoys designed for the target's
+    PSEUDOKNOT-FREE skeleton, which get the easy half right by construction. An earlier 84.0% was in-sample
+    on a different denominator (250 natives vs the 186 whose sequence can be recovered) and is not quotable;
+    this test exists so it cannot drift back in. Composing the rule with an exact nested-skeleton check was
+    refuted (ViennaRNA recovers the nested reduction from 20 of 186 natives)."""
+    from rna_harness.cognitive.certify import KNOT_OPERATING_POINT, ORACLE_KAPPA, _knot_recall
+    op = KNOT_OPERATING_POINT
+    assert op["sensitivity_on_known_structures"] == 0.785, "held out, not the in-sample 0.840"
+    lo, hi = op["sensitivity_ci95"]
+    assert lo < op["sensitivity_on_known_structures"] < hi, "a rate without its interval is not a result"
+    assert op["false_accept_nested_decoys"] == 0.0 and op["false_accept_nested_ci95"][1] < 0.05
+    assert "CROSSING STEMS only" in op["scope"]
+    # "three independent predictors" is not what the data says, and the certificate must not imply it
+    assert ORACLE_KAPPA["probknot~shapeknots"] > 0.7 > ORACLE_KAPPA["pkiss~probknot"]
+    assert ORACLE_KAPPA["effective_independent_sources"] == 2
     kr = _knot_recall("G" * len(PK), PK)
     assert set(kr) >= {"per_oracle", "confirmed_by", "knot_confirmed", "n_cross"}
     assert kr["n_cross"] > 0                       # PK really does have crossing pairs to recall
