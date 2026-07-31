@@ -80,14 +80,19 @@ def sign_test(a: int, b: int) -> float:
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--n", type=int, default=24)
+    # THE PAIRED BAND CONTROL IS WHAT DECIDES THIS, and at n=24 it had 14 paired targets and 4
+    # discordant pairs -- p=0.125, which settles nothing. The motif hit rate is ~24 of 64 scanned,
+    # so power comes from scanning a bigger structure pool rather than from a longer solver budget.
+    ap.add_argument("--pool", type=int, default=400)
     ap.add_argument("--timelimit", type=int, default=15)
     ap.add_argument("--workers", type=int, default=6)
     ap.add_argument("--out", default=os.path.join(HERE, "switch_bench.json"))
+    ap.add_argument("--analyse-only", action="store_true")
     a = ap.parse_args()
 
     from rna_harness.benchmarks.bprna_nested import load_bprna_nested
     from rna_harness.benchmarks.switch_suite import INVADE, TOEHOLD, switch_window
-    rows = [r for r in load_bprna_nested(400) if 25 <= len(str(r["target"])) <= 70]
+    rows = [r for r in load_bprna_nested(a.pool) if 25 <= len(str(r["target"])) <= 70]
     jobs, dropped = [], 0
     for r in rows:
         at = switch_window(str(r["target"]))
@@ -100,12 +105,16 @@ def main():
     print(f"两态开关:{len(jobs)} 条自然结构,toehold {TOEHOLD} nt + 入侵 {INVADE} 对,"
           f"因无此基序而丢弃 {dropped} 条\n", flush=True)
 
-    from concurrent.futures import ProcessPoolExecutor, as_completed
-    R, t0 = [], time.time()
-    with ProcessPoolExecutor(max_workers=a.workers) as ex:
-        for n, f in enumerate(as_completed([ex.submit(run_one, j) for j in jobs]), 1):
-            R.append(f.result())
-            print(f"    {n}/{len(jobs)}  {(time.time()-t0)/60:.1f} min", flush=True)
+    if a.analyse_only:
+        R = json.load(open(a.out))["rows"]
+        print(f"  从归档的 {len(R)} 条逐条数据重算,不重跑求解器\n", flush=True)
+    else:
+        from concurrent.futures import ProcessPoolExecutor, as_completed
+        R, t0 = [], time.time()
+        with ProcessPoolExecutor(max_workers=a.workers) as ex:
+            for n, f in enumerate(as_completed([ex.submit(run_one, j) for j in jobs]), 1):
+                R.append(f.result())
+                print(f"    {n}/{len(jobs)}  {(time.time()-t0)/60:.1f} min", flush=True)
 
     ok = [r for r in R if not r.get("error") and r.get("tool")]
     t_ok = sum(1 for r in ok if r["tool"]["held"])
@@ -132,6 +141,9 @@ def main():
     # our own arm here, but it is the identical defect that had to be fixed in kinetic_bench, so it is named.
     print(f"  控制(配对,只取它自己答案落在带内的靶标):   工具 {tb}/{len(sub_b)}   我们 {ob}/{len(sub_b)}")
     print(f"  池通过率中位 {rates[len(rates)//2] if rates else 0:.3f}   (接近 0 = M1 天花板)")
+    fo = [r for r in ok if r["tool"]["free_ok"]]
+    print(f"  拆开两态:它的答案折叠正确 {len(fo)}/{len(ok)},其中开关成立 "
+          f"{sum(1 for r in fo if r['tool']['held'])} -- 折叠失败不算开关缺口,分开记")
     print(f"  失败落在哪一态:折叠对但触发打不开 {only_free}/{len(ok)};"
           f"  它自己答案的入侵深度中位 {st.median(depths) if depths else 0:.0f}/{INVADE}")
     # NO SINGLE CUTOFF IS LOAD-BEARING: sweep the requirement over every achievable invasion depth.
@@ -147,6 +159,31 @@ def main():
         mark = "  <-- 满入侵(声明的头条)" if k == INVADE else ""
         print(f"    >={k}   工具 {t_k:>2}/{len(ok)}   我们 {o_k:>2}/{len(ok)}"
               f"   |带内| 工具 {tb_k}/{len(sub_b)}  我们 {ob_k}/{len(sub_b)}{mark}")
+    # THE DECISIVE CONTROL, and it is stronger than the band. The band still let the two arms sit 3.2 points
+    # apart in GC on the 72-target run, which is exactly the drift that forced the kinetic benchmark's
+    # orthogonality claim to be withdrawn. So pin composition PER TARGET: our arm may only use candidates
+    # whose GC equals the tool's own answer, to the tolerance shown. At tolerance 0 the two arms have
+    # literally the same base composition and the comparison cannot be a composition effect.
+    print(f"  GC 严格配对(逐条钉在它自己答案的 GC 上,只比开关、不混折叠失败):")
+    matched = []
+    for tol in (2.0, 1.0, 0.0):
+        w = l = both = 0
+        rows_m = 0
+        for r in ok:
+            if not r["tool"]["free_ok"]:
+                continue
+            cand = [x for x in r["free_rows"] if abs(x["gc"] - r["tool"]["gc"]) <= tol]
+            if not cand:
+                continue
+            rows_m += 1
+            oo, tt = any(x["held"] for x in cand), r["tool"]["held"]
+            w += oo and not tt
+            l += tt and not oo
+            both += oo and tt
+        matched.append({"tolerance": tol, "n": rows_m, "tool": both + l, "ours": both + w,
+                        "ours_only": w, "tool_only": l, "p": sign_test(w, l)})
+        print(f"    ±{tol:<4} (n={rows_m})  工具 {both + l:>2}/{rows_m}  我们 {both + w:>2}/{rows_m}"
+              f"   仅我们 {w} / 仅它 {l}   p={sign_test(w, l):.3g}")
     if sub_b:
         gt = [r["tool"]["gc"] for r in sub_b]
         go = [r["band"]["chosen"]["gc"] for r in sub_b if r["band"]["chosen"]]
@@ -158,7 +195,7 @@ def main():
                "rescue": {"tool_failed": failed, "recovered": rescued, "lost": lost,
                           "note": "arms are nested; 'tool only' is structurally 0"},
                "band": {"tool": tb, "ours": ob, "n_paired": len(sub_b)},
-               "sweep": sweep,
+               "sweep": sweep, "gc_matched": matched,
                "median_pool_pass_rate": rates[len(rates) // 2] if rates else None,
                "rows": R}, open(a.out, "w"), ensure_ascii=False, indent=1)
     print(f"\n  wrote {a.out}")
