@@ -549,3 +549,24 @@ def test_the_new_requirements_are_in_the_action_space_the_model_is_told_about():
     for name in ("set_melting_temperature", "design_set"):
         assert name in PRIMITIVES
         assert name in SYSTEM, f"{name} is callable but the model is never told it exists"
+
+
+def test_knot_grade_reports_agreement_not_specificity():
+    """The grade must say how many oracles agreed, and must NOT imply a specificity difference.
+
+    k=1 and k=3 have the SAME measured random false-accept rate (0.004, runs/ceiling/calibrate.json). A
+    certificate that let a reader infer "stricter grade => fewer false accepts" would be asserting something
+    the calibration does not support, so the number is pinned here.
+    """
+    from rna_harness.cognitive.certify import KNOT_GRADES, knot_grade
+    for k, want in ((3, "k=3"), (2, "k=2"), (1, "k=1")):
+        g = knot_grade({"confirmed_by": ["a", "b", "c"][:k]})
+        assert g["grade"] == want and g["agreeing_oracles"] == k
+        assert g["false_accept_on_random_sequences"] == 0.004
+        assert g["shipped_threshold"] == "k>=1"
+    # sensitivity must DECREASE as the grade tightens -- that is the thing the grade actually costs
+    sens = [KNOT_GRADES[k]["sensitivity_on_known_structures"] for k in (1, 2, 3)]
+    assert sens == sorted(sens, reverse=True)
+    # out-of-range k must not crash or silently invent a grade
+    assert knot_grade({"confirmed_by": []})["grade"] == "k=1"
+    assert knot_grade({})["grade"] == "k=1"

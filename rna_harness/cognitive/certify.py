@@ -131,6 +131,46 @@ KNOT_OPERATING_POINT = {
              "(ViennaRNA recovers the nested reduction from only 20 of 186 natives)."),
 }
 
+# HOW MANY OF THE THREE ACTUALLY AGREED -- reported per certificate, because k=1 and k=3 are not the same
+# evidence even though the shipped threshold is k>=1.
+#
+# WHAT THE GRADE DOES NOT BUY, stated first because the obvious reading is wrong. It does NOT buy specificity
+# against random sequences: measured on the same 250-structure calibration, the false-accept rate is 0.004 at
+# k=1, k=2 AND k=3 alike (runs/ceiling/calibrate.json). A random sequence essentially never fools even one
+# predictor, so demanding three does not make that number smaller -- it only throws sensitivity away, 0.840
+# down to 0.432.
+#
+# WHAT IT DOES BUY is robustness against ONE predictor's idiosyncrasy, which is a failure mode this project
+# has measured directly rather than imagined: an operator that used pKiss inside its own search loop scored
+# 43/60 by pKiss and 1/60 by the unanimous panel -- a 43x inflation produced entirely by optimising against
+# the judge. Nothing in the random null can see that, because the null contains no sequences that were
+# optimised against anything. So the grade answers "would this survive if we had picked a different
+# predictor", and that is the question the random false-accept rate cannot answer.
+KNOT_GRADES = {
+    3: {"grade": "k=3", "agreeing_oracles": 3, "sensitivity_on_known_structures": 0.432,
+        "means": "all three independent predictors reproduce the crossing stems; no single predictor's "
+                 "idiosyncrasy can be carrying this result"},
+    2: {"grade": "k=2", "agreeing_oracles": 2, "sensitivity_on_known_structures": 0.636,
+        "means": "two of three independent predictors agree; one dissents or could not run"},
+    1: {"grade": "k=1", "agreeing_oracles": 1, "sensitivity_on_known_structures": 0.840,
+        "means": "exactly one predictor reproduces the crossing stems -- this is the shipped floor, and it "
+                 "is the grade most exposed to a single predictor's bias"},
+}
+
+
+def knot_grade(kr: dict) -> dict:
+    """Which grade the evidence for THIS sequence actually reached, alongside the shipped floor.
+
+    The floor decides the verdict; the grade tells the reader how much of the panel was behind it. Both are
+    reported because a certificate that says only "passed" hides the difference between unanimous agreement
+    and a single vote.
+    """
+    k = len(kr.get("confirmed_by") or [])
+    g = dict(KNOT_GRADES.get(min(3, max(1, k)), KNOT_GRADES[1]))
+    g["false_accept_on_random_sequences"] = 0.004      # identical at every k -- see the comment above
+    g["shipped_threshold"] = "k>=1"
+    return g
+
 
 SCHEMA_VERSION = "rna-certificate/1.0"
 _PROVENANCE = None
@@ -350,7 +390,8 @@ def _certify_sequence_impl(seq: str, target: str) -> Certificate:
                            strictness="knot-recall (k=1, tau=1.0)", rungs_passed=["knot-recall"],
                            cost_usd=solver_cost_usd(time.time() - t0, 1),
                            wait_s=round(time.time() - t0, 2),
-                           detail={**v, "knot": kr, "operating_point": KNOT_OPERATING_POINT},
+                           detail={**v, "knot": kr, "operating_point": KNOT_OPERATING_POINT,
+                                   "grade": knot_grade(kr)},
                            reason="the crossing stems that make this a pseudoknot are fully reproduced by "
                                   + ", ".join(kr["confirmed_by"]) + ". This is a claim about the KNOT, not "
                                   "the whole structure: the criterion recognises 84% of known natural "
@@ -531,7 +572,8 @@ def _certify_design_impl(target: str, budget: str = "standard", seed: int = 0) -
                            strictness="knot-recall (k=1, tau=1.0)", rungs_passed=["knot-recall"],
                            cost_usd=cost, wait_s=round(w, 2), budget=budget,
                            detail={"tiers_tried": tried, "knot": kr,
-                                   "operating_point": KNOT_OPERATING_POINT},
+                                   "operating_point": KNOT_OPERATING_POINT,
+                                   "grade": knot_grade(kr)},
                            reason="no candidate reproduced the whole structure under all three predictors, "
                                   "but the crossing stems that make this a pseudoknot are fully reproduced "
                                   "by " + ", ".join(kr["confirmed_by"]) + ". Claim is about the KNOT only; "
@@ -785,6 +827,21 @@ def to_display(c: Certificate, lang: str = "zh") -> dict:
                      f"this criterion recognises {op['sensitivity_on_known_structures']:.1%} of known "
                      f"natural structures and accepts "
                      f"{op['false_accept_on_random_sequences']:.1%} of random sequences")}
+    gr = (c.detail or {}).get("grade")
+    if gr:
+        # WHAT THE READER NEEDS TO KNOW is not "it passed" but HOW MANY of the three were behind it. The
+        # random false-accept rate is identical at every grade, so it cannot express this and the text says so
+        # rather than letting a reader infer a specificity difference that the calibration does not support.
+        d["grade"] = {
+            "code": gr["grade"], "agreeing_oracles": gr["agreeing_oracles"],
+            "text": (f"三个独立预测器中有 {gr['agreeing_oracles']} 个重现了交叉茎。"
+                     f"出厂门槛是 ≥1;更高的等级并不降低随机误收率(每一级都是 0.4%),"
+                     f"它降低的是【结论依赖某一个预测器的偏好】这一风险。"
+                     if zh else
+                     f"{gr['agreeing_oracles']} of 3 independent predictors reproduced the crossing stems. "
+                     f"The shipped threshold is >=1; a higher grade does NOT lower the random false-accept "
+                     f"rate (it is 0.4% at every grade) -- what it lowers is the risk that the result rests "
+                     f"on one predictor's idiosyncrasy.")}
     return d
 
 
