@@ -127,8 +127,10 @@ def main():
     print(f"  自由:   工具自己的答案 {t_ok}/{len(ok)}     筛同一批池 {o_ok}/{len(ok)}"
           f"   (符号检验 p={sign_test(rescued, lost):.3g},两臂嵌套,见下)")
     print(f"  救回率:它失败 {failed} 条,筛同一批池救回 {rescued} 条;它成功而我们失败 {lost} 条")
-    print(f"  控制:   GC {GC_BAND[0]}-{GC_BAND[1]}% 带内   工具 {tb}/{len(sub_b)}(它落在带内的答案)"
-          f"     我们 {ob}/{len(ok)}")
+    # PAIRED, so BOTH numbers are out of the same denominator. `ob` is counted over sub_b, and printing it
+    # against len(ok) -- which is what this line did first -- silently mixes two populations. It understated
+    # our own arm here, but it is the identical defect that had to be fixed in kinetic_bench, so it is named.
+    print(f"  控制(配对,只取它自己答案落在带内的靶标):   工具 {tb}/{len(sub_b)}   我们 {ob}/{len(sub_b)}")
     print(f"  池通过率中位 {rates[len(rates)//2] if rates else 0:.3f}   (接近 0 = M1 天花板)")
     print(f"  失败落在哪一态:折叠对但触发打不开 {only_free}/{len(ok)};"
           f"  它自己答案的入侵深度中位 {st.median(depths) if depths else 0:.0f}/{INVADE}")
@@ -155,7 +157,7 @@ def main():
                "free": {"tool": t_ok, "ours": o_ok, "n": len(ok)},
                "rescue": {"tool_failed": failed, "recovered": rescued, "lost": lost,
                           "note": "arms are nested; 'tool only' is structurally 0"},
-               "band": {"tool": tb, "n_in_band": len(sub_b), "ours": ob, "n": len(ok)},
+               "band": {"tool": tb, "ours": ob, "n_paired": len(sub_b)},
                "sweep": sweep,
                "median_pool_pass_rate": rates[len(rates) // 2] if rates else None,
                "rows": R}, open(a.out, "w"), ensure_ascii=False, indent=1)

@@ -570,3 +570,22 @@ def test_knot_grade_reports_agreement_not_specificity():
     # out-of-range k must not crash or silently invent a grade
     assert knot_grade({"confirmed_by": []})["grade"] == "k=1"
     assert knot_grade({})["grade"] == "k=1"
+
+
+def test_switch_window_returns_an_index_not_a_tuple():
+    """The benchmark uses this value as a string index. Returning a tuple type-errors on the first real run.
+
+    It did: the pilot script carried its own copy of the search, so the smoke test passed while the benchmark
+    died. Pinned here because "the helper and its caller disagree about the return shape" is invisible to any
+    test that only exercises one of them.
+    """
+    from rna_harness.benchmarks.switch_suite import INVADE, TOEHOLD, switch_window, switches, trigger_for
+    t = "....((((((....))))))......"
+    at = switch_window(t)
+    assert isinstance(at, int), f"expected an index, got {type(at).__name__}"
+    assert at == 0 and t[at:at + TOEHOLD] == "." * TOEHOLD
+    seq = "AAAAGGGGGGCAAAAGCCCCCCAAAA"
+    assert len(trigger_for(seq, at)) == TOEHOLD + INVADE     # index arithmetic must stay in range
+    r = switches(seq, "." * len(seq), at)                    # a target it cannot match: must not raise
+    assert r["held"] is False and 0 <= r["invasion"] <= INVADE
+    assert switch_window("." * 30) is None                   # no stem at all

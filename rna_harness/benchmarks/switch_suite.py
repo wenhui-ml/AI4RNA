@@ -83,8 +83,13 @@ def pair_table(struct: str) -> List[int]:
     return pt
 
 
-def switch_window(target: str, toe: int = TOEHOLD, inv: int = INVADE):
-    """(start, toe, inv) for the first stacked stem of `inv` pairs with an unpaired run of `toe` just 5' of it.
+def switch_window(target: str, toe: int = TOEHOLD, inv: int = INVADE) -> Optional[int]:
+    """START INDEX of the window: the first stacked stem of `inv` pairs with `toe` unpaired positions 5' of it.
+
+    Returns a bare int, not a tuple. An earlier version returned (start, toe, inv) while every caller used the
+    result directly as a string index; the pilot script happened to carry its own copy of this function and so
+    did not catch it, and the benchmark died on its first real run. The lengths are module constants -- a
+    caller that needs them reads TOEHOLD and INVADE.
 
     Both halves are required. Without the toehold the trigger has nowhere to nucleate and the requirement is
     unsatisfiable rather than hard -- which is exactly how the first version of this file failed.
@@ -100,7 +105,7 @@ def switch_window(target: str, toe: int = TOEHOLD, inv: int = INVADE):
             continue
         if i - toe < 0 or any(pt[i - 1 - k] >= 0 for k in range(toe)):
             continue
-        return i - toe, toe, inv
+        return i - toe
     return None
 
 

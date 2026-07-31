@@ -103,6 +103,11 @@ def main():
     ap.add_argument("--timelimit", type=int, default=15)
     ap.add_argument("--workers", type=int, default=6)
     ap.add_argument("--out", default=os.path.join(HERE, "kinetic_bench.json"))
+    # RE-DERIVE THE SUMMARY FROM THE ARCHIVED PER-ITEM ROWS, without touching the solver. The threshold sweep
+    # was added to this file AFTER the run it is quoted from, so the archived json did not contain the table
+    # the weekly report cites -- a number in a report that cannot be regenerated from its own artifact is not
+    # a result. Every quantity below is a function of `rows`, so this reproduces all of them exactly.
+    ap.add_argument("--analyse-only", action="store_true")
     a = ap.parse_args()
 
     from rna_harness.benchmarks.bprna_nested import load_bprna_nested
@@ -112,12 +117,16 @@ def main():
     print(f"动力学/共转录:{len(jobs)} 条自然结构,同一批求解器运行两臂读法,"
           f"外加 GC {GC_BAND[0]}-{GC_BAND[1]}% 控制变量\n", flush=True)
 
-    from concurrent.futures import ProcessPoolExecutor, as_completed
-    R, t0 = [], time.time()
-    with ProcessPoolExecutor(max_workers=a.workers) as ex:
-        for n, f in enumerate(as_completed([ex.submit(run_one, j) for j in jobs]), 1):
-            R.append(f.result())
-            print(f"    {n}/{len(jobs)}  {(time.time()-t0)/60:.1f} min", flush=True)
+    if a.analyse_only:
+        R = json.load(open(a.out))["rows"]
+        print(f"  从归档的 {len(R)} 条逐条数据重算,不重跑求解器\n", flush=True)
+    else:
+        from concurrent.futures import ProcessPoolExecutor, as_completed
+        R, t0 = [], time.time()
+        with ProcessPoolExecutor(max_workers=a.workers) as ex:
+            for n, f in enumerate(as_completed([ex.submit(run_one, j) for j in jobs]), 1):
+                R.append(f.result())
+                print(f"    {n}/{len(jobs)}  {(time.time()-t0)/60:.1f} min", flush=True)
 
     ok = [r for r in R if not r.get("error")]
     # FREE: tool's own answer vs screening the same pool
