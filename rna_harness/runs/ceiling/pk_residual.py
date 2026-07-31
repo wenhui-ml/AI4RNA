@@ -58,21 +58,32 @@ def triage(job):
         d = cert.detail or {}
         # HOW CLOSE THE PANEL CAME, per oracle -- the number that separates the two failure modes.
         # certify_sequence reports it at detail["knot"]["per_oracle"] as a per-oracle crossing-pair recall.
+        # None there means THE ORACLE DID NOT RUN, which is not a score of zero and must not be max()'d
+        # against floats -- that raises, and it would raise exactly on the hard targets this script exists
+        # for, where an oracle timing out is most likely.
         recalls = ((d.get("knot") or {}).get("per_oracle")) or {}
-        top = max(recalls.values()) if recalls else 0.0
+        scored = [v for v in recalls.values() if v is not None]
+        top = max(scored) if scored else None
+        n_ran = len(scored)
         if cert.verdict in ("certified", "knot_confirmed"):
             accepted = {"sequence": s, "verdict": cert.verdict, "cross_recall": recalls}
             break
-        if best is None or top > best["best_cross_recall"]:
+        if top is not None and (best is None or best["best_cross_recall"] is None
+                                or top > best["best_cross_recall"]):
             best = {"sequence": s, "verdict": cert.verdict, "best_cross_recall": top,
-                    "cross_recall": recalls, "best_bp": d.get("best_bp")}
+                    "n_oracles_ran": n_ran, "cross_recall": recalls, "best_bp": d.get("best_bp")}
 
     if accepted:
         klass = "search-limited"
-    elif best and best["best_cross_recall"] > 0.0:
+    elif best and (best["best_cross_recall"] or 0.0) > 0.0:
         klass = "judgment-limited"
+    elif best is not None:
+        klass = "no-signal"                    # candidates exist, no oracle reproduces any crossing pair
     else:
-        klass = "unreachable-or-no-signal"
+        # NOT the same thing as "no signal": here no candidate was ever scored, either because the pool was
+        # empty or because every oracle failed to run. Calling that a scientific negative would be the
+        # silent-failure class this project keeps finding.
+        klass = "unscored (empty pool or oracles unavailable)"
     return {"task_id": tid, "n": len(target), "pool": len(pool), "timelimit_s": timelimit,
             "class": klass, "accepted": accepted, "closest": best,
             "wall_s": round(time.time() - t0, 1)}
