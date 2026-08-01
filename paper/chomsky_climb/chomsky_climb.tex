@@ -100,7 +100,7 @@ On targets both arms solved under the same in-loop predicate the two that ran ca
 our $0.095$ ($n{=}951$ paired units, target-clustered $[{+}0.108,{+}0.297]$, $p{=}5\!\times\!10^{-5}$), while
 spending $4.6$--$10\times$ \emph{fewer} oracle calls. We grade this on three rungs---difference under an
 outside adjudicator (reached), not bought with compute (reached, both directions), mechanism identified and
-transferable (\emph{not} reached: seven candidates tested, none reproduces the gain).
+transferable (\emph{not} reached: seven candidates tested, and the two that differ at matched composition both fail to reproduce the gain when intervened on).
 
 \textbf{Two limits bound everything above.} The three panel predictors share thermodynamic parameters, and we
 measure the cost rather than assuming it away: the held-out predictor and an in-loop one agree at
@@ -1481,6 +1481,36 @@ composition, and \emph{intervening} on it reproduces none of that---if anything 
 was built precisely so that an observational association could not be reported as a mechanism, and here it
 caught one. Any attribution that stops at Stage 1, as most feature analyses of learned systems do, would have
 reported \texttt{decoy} as the explanation.
+
+\emph{A seventh test, distributional rather than scalar, and the second observational lead to die under
+intervention.} A reviewer asked the sharpest version of the remaining question: a difference could live in the
+\emph{whole distribution} of accepted designs while every hand-picked scalar came back null. Answering it took
+three designs, and the first two failed their own controls, which is worth recording. Unstratified, all six
+quantities we pre-stated came back significant---the signature of a test measuring composition six times,
+since folding energy per nucleotide is largely GC in energy units. GC-decile stratification did not repair it
+either: the negative control, GC tested against itself within GC bins, came back significant. Caliper-matching
+on GC ($\pm0.01$, no replacement, $399/530$ pairs) finally calibrates it: the control passes at $p{=}0.98$
+with matched mean GC $0.4643$ against $0.4640$. \textbf{And a difference survives at matched composition.} The
+agent operators' designs have an ensemble gap $(\mathrm{MFE}-\mathrm{EFE})/n$ of $0.005$ against our $0.012$
+(KS $D{=}0.466$), with longer unpaired loops ($\max$ $13.9$ against $10.8$): they concentrate the Boltzmann
+ensemble on a single fold, and a dominant fold is one any model confirms
+(\texttt{d3\_distributional.py}).
+
+That is a mechanism-shaped lead, and the transplant kills it. Minimizing the ensemble gap where it is
+determined---choosing the crossing stem's bases, plus a tiebreak, using a nested partition function outside
+every arm's objective and outside the counted allowance---engages properly ($0.0126\to0.0080$ per design,
+$60\%$ of the way to the agents' value). Carry-over does not follow: $15/151=0.099$ $[0.043,0.167]$ against
+the baseline's $0.108$, and on the $141$ cells both arms solved the paired difference is \textbf{exactly zero}
+($b{=}7$, $c{=}7$, $p{=}1.0$), with $r_{\mathrm{in}}$ falling $37.0\to30.2$
+(\texttt{dominant.sh}, \texttt{dom\_stats.py}).
+
+\emph{Two independent leads, both composition-controlled, both dead under intervention.} That is now the most
+transferable thing this paper has to say about attributing a capability difference. \texttt{decoy} and the
+ensemble gap each differ between the arms at matched composition, each predicts or plausibly explains
+carry-over, and neither reproduces any of it when the operator is biased toward it. A study that stopped at
+the observational stage---which is where most feature analyses of learned systems stop---would have reported
+either as the mechanism, twice, with a clean $p$-value each time. \textbf{Seven candidates have now been
+excluded by intervention rather than by argument.}
 
 So the advantage is robust, is not compute in either direction, and is not legible in the source. That is a
 narrower open question than we had, and a more uncomfortable one: a \emph{discovery}-grade claim on this axis

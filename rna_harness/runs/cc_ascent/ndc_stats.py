@@ -7,7 +7,7 @@ hand-built arm -- both adjusted for overall GC after the negative control showed
 anything GC-correlated. Exactly one feature passed both: `decoy`, the number of off-target windows
 complementary to the crossing stem's 5' arm (agent designs 0.003 per design, ours 0.060).
 
-pv_nodecoy adds that count as a tiebreak in the acceptance rule and changes nothing else. It calls no oracle,
+pv_dominant adds that count as a tiebreak in the acceptance rule and changes nothing else. It calls no oracle,
 so a compute explanation is structurally impossible here, unlike every arm matched only on allowance.
 
 THE RULE, WRITTEN BEFORE THE RUN AND IDENTICAL TO THE ONE EVERY EARLIER TRANSPLANT FACED:
@@ -15,16 +15,16 @@ THE RULE, WRITTEN BEFORE THE RUN AND IDENTICAL TO THE ONE EVERY EARLIER TRANSPLA
 A conditional rate can always be raised by refusing to solve anything hard, so the two columns are read
 together or not at all. Passing Stage 1's observational gate earned this arm a test; only the test decides.
 
-Offline over ndc2_s{0..4}/sweep.json; no oracle calls.
+Offline over dom_s{0..4}/sweep.json; no oracle calls.
 """
 import json, math, os, random
 
 random.seed(20260801)
 HERE = os.path.dirname(os.path.abspath(__file__))
 SEEDS = [0, 1, 2, 3, 4]
-ARMS = ["panel_auto", "pv_nodecoy"]
+ARMS = ["panel_auto", "pv_dominant"]
 LABEL = {"panel_auto": "baseline (hand-built)",
-         "pv_nodecoy": "+ decoy tiebreak [stage-2 transplant]"}
+         "pv_dominant": "+ ensemble-dominance bias [stage-2]"}
 AGENT = (333, 1104, 0.302, 0.275, 0.330)
 
 
@@ -56,7 +56,7 @@ def mcnemar(b, c):
 def main():
     data = {}
     for s in SEEDS:
-        p = os.path.join(HERE, f"ndc2_s{s}", "sweep.json")
+        p = os.path.join(HERE, f"dom_s{s}", "sweep.json")
         if os.path.exists(p):
             d = json.load(open(p))
             if len(d.get("rows") or []) >= 60:
@@ -101,7 +101,7 @@ def main():
     for s in seeds:
         for r in data[s]:
             A = r["arms"].get("panel_auto") or {}
-            B = r["arms"].get("pv_nodecoy") or {}
+            B = r["arms"].get("pv_dominant") or {}
             if not (A.get("solved") and A.get("seq") and B.get("solved") and B.get("seq")):
                 continue
             a_sk = bool((A.get("panel") or {}).get("shapeknots"))

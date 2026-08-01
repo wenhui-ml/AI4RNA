@@ -1,0 +1,12 @@
+D3 stage 2: ensemble-dominance transplant, deterministic regime, seeds [0, 1, 2, 3, 4], n=60 targets
+
+  arm                                              r_in               carry-over  real pKiss
+  baseline (hand-built)                        37.0/60   20/ 185 = 0.108 [0.053,0.175]       82.2
+  + ensemble-dominance bias [stage-2]          30.2/60   15/ 151 = 0.099 [0.043,0.167]       93.9  (interval contains the baseline)
+
+  paired on the 141 (target, seed) cells both arms solved: b=7 (transplant only), c=7 (baseline only), exact p=1, difference +0.0000
+
+  frozen agent operators (the target to reproduce)        ---  333/1104 = 0.302 [0.275,0.330]
+
+  Rule, fixed before the run: carry-over must RISE and r_in must hold near the baseline's
+  37.0/60. Stage 1 earned this arm a test; the test is what decides.
