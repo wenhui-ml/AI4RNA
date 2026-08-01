@@ -20,6 +20,6 @@ export PKX_MAXPKISS=${PKX_MAXPKISS:-150}
 export PKD_ITERS=800
 for s in 0 1 2 3 4; do
   echo "=== nodecoy sweep, nominal seed $s ==="
-  /home/ubuntu/miniconda3/envs/rna/bin/python sweep.py "ndc_s$s" 0 60 "$s" "$ARMS"
+  /home/ubuntu/miniconda3/envs/rna/bin/python sweep.py "ndc2_s$s" 0 60 "$s" "$ARMS"
 done
 echo NODECOY_DONE

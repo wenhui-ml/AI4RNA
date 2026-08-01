@@ -243,9 +243,30 @@ class DecomposePKPanelTool(Tool):
 
         # 3. compose crossing pairs (WC, seed-varied)
         if self.ablate != "nocompose":
-            for k, (i, j) in enumerate(cross_pairs):
-                a, b = _WC[(seed + k) % 4]
-                seq[i], seq[j] = a, b
+            if self.variant == "nodecoy" and cross_pairs:
+                # D3 stage 2, engaged at the point where the feature is actually determined. A tiebreak in
+                # the acceptance rule was the first attempt and it did not engage: exact ties in
+                # (pk_bp, pb_bp) are rare, so accepted designs came out with the same decoy count as the
+                # baseline (0.0761 against 0.0757) and the resulting null tested nothing. `decoy` is fixed by
+                # WHICH bases the crossing stem gets, so we choose them here: sample candidate assignments
+                # and keep the one with the fewest off-target complementary windows. Oracle-free, same rng,
+                # so determinism and the compute matching both hold.
+                best_assign, best_d = None, None
+                for _ in range(16):
+                    trial = list(seq)
+                    for i, j in cross_pairs:
+                        a, b = rng.choice(_WC)
+                        trial[i], trial[j] = a, b
+                    d = _decoy_count("".join(trial), cross_pairs)
+                    if best_d is None or d < best_d:
+                        best_assign, best_d = trial, d
+                    if best_d == 0:
+                        break
+                seq = best_assign
+            else:
+                for k, (i, j) in enumerate(cross_pairs):
+                    a, b = _WC[(seed + k) % 4]
+                    seq[i], seq[j] = a, b
         cur_seq = "".join(seq)
         solver_wall = time.time() - t0
 

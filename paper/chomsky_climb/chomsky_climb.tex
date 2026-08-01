@@ -100,7 +100,7 @@ $4.6$--$10\times$ \emph{fewer} oracle calls per target than the operator they be
 own realized volume carries over at $0.107$ where they reach $0.367$: the advantage is not bought with
 search, measured at three times their compute and at exactly their compute. We grade this on three rungs: a difference under an adjudicator outside every loop
 (reached), not bought with compute (reached, in both directions), mechanism identified and transferable (not
-reached---four mechanisms legible in the agent source transplant into ours without moving the statistic).
+reached---six candidate mechanisms transplant into ours without moving the statistic, including the one structural feature that survives a composition-adjusted observational gate and then reproduces nothing when intervened on).
 
 The audit is unsparing about our own system, and we report that in full rather than as a footnote: matched
 undirected search is an exact zero, a search-free probe puts $84\%$ of our headline effect on targets a random
@@ -111,125 +111,6 @@ discovery until it is not. Every positive number here is on one crossing corpus,
 development-disjoint structural clusters; directions replicate on them, magnitudes do not.
 \end{abstract}
 
-
-\clearpage
-\begingroup
-\centering\footnotesize
-\setlength{\abovecaptionskip}{4pt}
-\setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.2}
-\begin{xltabular}{\linewidth}{@{}>{\raggedright\arraybackslash}p{3.0cm}l L@{}}
-\caption{\textbf{The audit's output for this study: the evidence vector $\mathcal A$ of Eq.~\eqref{eq:vector},
-filled in.} All rates are $r_{\mathrm{mix}}$
-(Eq.~\eqref{eq:metricnames}) unless stated. This is the verdict on \emph{our own system}:
-\emph{partial audit success---diagnostic crossing evidence, not robust capability acquisition}.
-Table~\ref{tab:rungs} reports the arm that does clear the bar, which this vector has no row for.
-The classification rule, how to count the components, and how to read a mostly-negative vector are stated in
-\S\ref{sec:cert} and applied uniformly throughout.}\label{tab:verdict}\\
-\toprule
-\textbf{component} & \textbf{verdict} & \textbf{basis, and what it does \emph{not} show}\\
-\midrule
-\endfirsthead
-\multicolumn{3}{@{}l}{\footnotesize Table~\ref{tab:verdict}, continued.}\\
-\toprule
-\textbf{component} & \textbf{verdict} & \textbf{basis, and what it does \emph{not} show}\\
-\midrule
-\endhead
-$E_{\mathrm{range}}$ (exact exclusion) & \chip{vExact}{exact} &
-\textsc{no counterfactual.} Prop.~\ref{prop:confine}, discharged offline. Bounds the prior \emph{verifier's} range; says nothing about the
-prior policy's generative capacity\\
-$\Delta_{\mathrm{prior}}$ (prior floor) & \chip{vEst}{established} & \textsc{weak counterfactual.}
-prior policy $0/60$ vs.\ after $1$--$9/60$ over all $24$ independent executions (mean $3.29$; $3$--$8$ on the
-five original single-execution seeds) under the shared panel. \emph{The ${+}0.017$--${+}0.15$ we quote is the
-\textbf{range of point estimates} across executions, not a $95\%$ interval}: strictly, this component is
-established by the floor being an exact $0$ at every one of the $24$ executions, not by the interval rule, and
-we flag the mismatch rather than let ``established'' carry a precision it lacks here. Finite-budget count, not
-a structural theorem\\
-$\Delta_{\mathrm{gamer}}$ (vs.\ single-oracle gaming) & \chip{vNarrow}{established, narrowly} &
-${+}0.048$, paired at the (target, seed, execution) level over $15$ executions; interval excludes zero when resampling all
-three levels, at both the target ($[{+}.014,{+}.091]$) and structural-cluster ($[{+}.005,{+}.093]$) unit, but
-the conservative one-execution-per-seed variant reaches $0.000$ (\S\ref{sec:exp}). The estimate fell
-monotonically as replication was added (${+}0.080\!\to\!{+}0.056\!\to\!{+}0.048$), which suggests the estimator
-has not converged and that a fourth level of variation (the target set) could carry it to zero. It survives the
-change to a metric-neutral statistic (${+}0.049$, $p{=}6.9\!\times\!10^{-4}$, Fig.~\ref{fig:carry}), though one
-stricter conditioning disagrees. Re-measured in the bit-reproducible, equal-allowance regime it is
-${+}0.067$ $[{+}0.023,{+}0.120]$, gamer $0/60$ at all five seeds (Table~\ref{tab:det}). That removes the
-\emph{execution} level, but the level the monotone decline pointed at is the \emph{target set}, and the
-re-run uses the same $60$ targets; the narrower interval reflects one fewer variance component, not more
-evidence. Settled: not an execution-noise artifact. Open: a different corpus. A search-free target-side probe bounds what it measures: $36$ of the $43$
-discordant wins that constitute it ($84\%$) fall on targets a random compatible sequence already solves, and on
-the $30$ targets random sampling cannot reach the paired difference is ${+}0.016$ ($7$ against $0$,
-$p{=}0.016$)---that residue, not ${+}0.048$, is what the operator buys where search is required
-(\S\ref{sec:exp}). A \emph{between-system}
-association; does not attribute the gain to any component; and the arms are matched on oracle \emph{access},
-not oracle \emph{use} ($2.3\times$ realized calls)\\
-$\Delta_{\mathrm{undirected}}$ (vs.\ matched nominal-cap undirected search) & \chip{vNone}{not established} &
-Measured bit-reproducibly at equal allowance, the point estimate is \emph{exactly} $+0.0000$ on $300$ paired
-cells, $[{-}0.060,{+}0.050]$ (Table~\ref{tab:det}): \emph{measured absent} at this pool size, not an
-underpowered null, since execution noise can no longer be blamed. Deleting the objective does not lower
-$r_{\mathrm{mix}}$ at all; only removing the repair loop entirely does. A search is necessary; its
-\emph{guidance} is not shown load-bearing---confirmed on the metric-neutral statistic, where the undirected
-and oracle-blind walks match the full operator (Fig.~\ref{fig:carry}). Matched on the allowance, \emph{not}
-on realized use, which cannot be equalized without penalizing success\\
-$\Delta_{\mathrm{held\text{-}out}}$ (held-out oracle) & \chip{vWeak}{weak} &
-weak \emph{as a separation}: $r_{\mathrm{ho}}$ higher each seed but significant in $1$ of $3$
-(\S\ref{sec:exp}); adjudicator run in an unvalidated de-novo mode. In \emph{absolute} terms it is not
-small once given its reference class: the judge recovers $11.3\%$ of natives from their own sequences and
-confirms our designs at $8.0\%$, about $70\%$ of its own ceiling, against the gamer's $3.7\%$
-(App.~\ref{app:adjud}). That reframes the size, not the verdict, and the comparison is unstratified\\
-$g_{\mathrm{aut}}$ (verified non-use of packaged inverse-design solvers) & \chip{vEst}{established} &
-\textsc{no counterfactual.} No solver is ever called, so removing it changes nothing. This is a \emph{structural} fact---the ablation
-carries no counterfactual information, because the solver was never on the method path. Solver-free, \emph{not}
-oracle-free, and \emph{not} evidence that the gain is the system's own\\
-\bottomrule
-\end{xltabular}
-\par\endgroup
-\medskip
-
-\begingroup
-\centering\footnotesize
-\setlength{\abovecaptionskip}{4pt}
-\setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.2}
-\captionof{table}{\textbf{The instrument's other output, which the vector above cannot carry.}
-Table~\ref{tab:verdict} is the audit's verdict on \emph{our} system, so by construction it has no row for the
-arm that does clear the bar. That arm---frozen LLM-written operators (App.~\ref{app:invent}), optimizing the
-same pKiss$\,\wedge\,$ProbKnot predicate, scored by the ShapeKnots predictor held out of every arm's
-loop---is reported here on the three rungs of \S\ref{sec:disc}, which are reachable independently. It is
-simultaneously the positive control that shows the panel is not merely insensitive and the sharpest bound on
-our own result. Quantifier: these are the $2$ of $6$ invented operators with no runtime failures, so the
-claim is about \emph{some} agent-written operators, not the class.}\label{tab:rungs}
-\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{2.55cm}l L@{}}
-\toprule
-\textbf{rung} & \textbf{verdict} & \textbf{basis, and what it does \emph{not} show}\\
-\midrule
-(D1) difference under an adjudicator no objective can flatter & \chip{vEst}{established} &
-Paired and difficulty-matched: on the $951$ (target, cell) units \emph{both} arms solved under the shared
-in-loop predicate, carry-over is $0.293$ vs.\ $0.095$, paired difference ${+}0.199$, \emph{target-clustered}
-$95\%$ CI $[{+}0.108,{+}0.297]$ over $42$ clusters, cluster-permutation $p{=}5\!\times\!10^{-5}$ ($b{=}218$
-vs.\ $c{=}29$; \texttt{arep\_matched.py}). We quote the clustered pair rather than the exact McNemar
-$p{=}5\!\times\!10^{-37}$ the same counts give, because the $951$ units come from $60$ targets---the standard
-the transplant arms and $\Delta_{\mathrm{gamer}}$ are already held to. Re-derived per design through the
-sweep's own oracle calls with zero disagreements. \textsc{Between-system} association, on one pool, with the
-model-level selection above\\
-(D2) not bought with compute & \chip{vEst}{established} &
-Two measurements, and the second is the stronger. Tripling the pKiss allowance raises realized use
-$82.2\!\to\!196.2$ calls per target and moves carry-over from $0.108$ to $0.108$ (Table~\ref{tab:attr}). And
-the agents' \emph{realized} use, counted by instrumenting the frozen code in the replication's own regime, is
-$\approx\!28$ (gemini) and $\approx\!13$ (kimi) pKiss calls per target against this operator's $128.0$
-(\texttt{agent\_budget.py}): they win while spending $4.6$--$10\times$ \emph{fewer} oracle calls, so the
-control does not merely fail to reproduce the gap, it brackets the agents by $7\times$ in the wrong direction.
-And an arm run at the agents' \emph{own} realized volume ($26.0$ calls/target against gemini's $27.8$)
-carries over at $0.107$ where the agent reaches $0.367$, which is the compute-\emph{matched} control, not
-merely a cap-matched one. Rules out oracle-call volume in both directions; does not rule out resources we did
-not count\\
-(D3) mechanism identified and transferable & \chip{vNone}{not established} &
-Four mechanisms legible in the agent source, transplanted one at a time and run deterministically at $5$
-seeds: every interval contains the baseline and none reaches the agents' lower bound of $0.275$
-(Table~\ref{tab:attr}). What the difference \emph{is} remains unidentified, and we withhold the word
-``discovery'' until this rung is reached\\
-\bottomrule
-\end{tabularx}
-\par\endgroup
-\medskip
 
 \section{Introduction}\label{sec:intro}
 Self-improving agents claiming new scientific or design capabilities are proliferating, but the field
@@ -609,6 +490,114 @@ confirmation. Every headline number below is labelled with which of the three it
 means held out of the optimization \emph{loop}} (the ShapeKnots adjudicator), and never ``held out of
 development''. The primary $n{=}60$ pool is a \emph{development/evaluation} pool: the operator and every
 hyperparameter were fixed on it. Pools are named in Table~\ref{tab:pools} and we use those names.
+
+\begingroup
+\centering\footnotesize
+\setlength{\abovecaptionskip}{4pt}
+\setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.2}
+\begin{xltabular}{\linewidth}{@{}>{\raggedright\arraybackslash}p{2.5cm}>{\raggedright\arraybackslash}p{2.0cm}L L@{}}
+\caption{\textbf{The audit's output for this study: the evidence vector $\mathcal A$ of Eq.~\eqref{eq:vector},
+filled in.} All rates are $r_{\mathrm{mix}}$ (Eq.~\eqref{eq:metricnames}) unless stated. This is the verdict
+on \emph{our own system}: \emph{partial audit success---diagnostic crossing evidence, not robust capability
+acquisition}. Table~\ref{tab:rungs} reports the arm that does clear the bar, which this vector has no row for.
+Each row is a pointer, not an argument: the classification rule is in \S\ref{sec:cert} and every number is
+derived where it is cited.}\label{tab:verdict}\\
+\toprule
+\textbf{component} & \textbf{verdict} & \textbf{basis} & \textbf{what it does \emph{not} show}\\
+\midrule
+\endfirsthead
+\multicolumn{4}{@{}l}{\footnotesize Table~\ref{tab:verdict}, continued.}\\
+\toprule
+\textbf{component} & \textbf{verdict} & \textbf{basis} & \textbf{what it does \emph{not} show}\\
+\midrule
+\endhead
+$E_{\mathrm{range}}$ \newline exact exclusion & \chip{vExact}{exact} &
+Prop.~\ref{prop:confine}, discharged offline before any run &
+Bounds the prior \emph{verifier's} range, not the prior policy's capacity. \textsc{No counterfactual}: a
+theorem cannot be surprised by data\\
+\addlinespace[2pt]
+$\Delta_{\mathrm{prior}}$ \newline prior floor & \chip{vEst}{established} &
+Prior policy $0/60$ at \emph{every} one of $24$ executions; after, $1$--$9/60$ (mean $3.29$) under the shared
+panel &
+The quoted ${+}0.017$--${+}0.15$ is the \textbf{range of point estimates}, not a $95\%$ interval---so this row
+rests on the floor being an exact zero, not on the interval rule. \textsc{Weak counterfactual}: the prior arm
+optimizes a different objective\\
+\addlinespace[2pt]
+$\Delta_{\mathrm{gamer}}$ \newline vs.\ single-oracle gaming & \chip{vNarrow}{narrow} &
+\emph{Established, narrowly.} ${+}0.067$ $[{+}0.023,{+}0.120]$ bit-reproducibly, gamer $0/60$ at all five seeds
+(Table~\ref{tab:det}); operator strictly higher in $14/15$ wall-clock executions and $15/15$ on the
+structurally disjoint pool (\S\ref{sec:exp}) &
+A stable \emph{magnitude}. The estimate fell ${+}0.080\!\to\!{+}0.056\!\to\!{+}0.048$ as replication was
+added, and determinism removes the execution level, not the target set. A search-free probe puts $84\%$ of it
+where a random compatible sequence already succeeds, leaving ${+}0.016$. Between-system; matched on oracle
+\emph{access}, not \emph{use} ($2.3\times$)\\
+\addlinespace[2pt]
+$\Delta_{\mathrm{undirected}}$ \newline vs.\ matched undirected search & \chip{vNone}{not est.} &
+\emph{Not established.} Exactly ${+}0.0000$ on $300$ paired bit-reproducible cells, $[{-}0.060,{+}0.050]$ (Table~\ref{tab:det}) &
+An underpowered null---execution noise can no longer be blamed, so this is \emph{measured absent} at this pool
+size. Deleting the objective does not lower $r_{\mathrm{mix}}$ at all; only deleting the repair loop does.
+Matched on allowance, not on realized use\\
+\addlinespace[2pt]
+$\Delta_{\mathrm{held\text{-}out}}$ \newline held-out oracle & \chip{vWeak}{weak} &
+$r_{\mathrm{ho}}$ higher at every seed but significant in $1$ of $3$ (\S\ref{sec:exp}) &
+A small \emph{absolute} signal: against its own ceiling the judge confirms our designs at $8.0\%$ where it
+recovers only $11.3\%$ of natives, against the gamer's $3.7\%$ (App.~\ref{app:adjud}). Run in an unvalidated
+de-novo mode; the comparison is unstratified\\
+\addlinespace[2pt]
+$g_{\mathrm{aut}}$ \newline verified non-use of packaged solvers & \chip{vEst}{established} &
+No packaged inverse-design solver is ever called &
+Anything counterfactual: the solver was never on the method path, so removing it changes nothing. Solver-free
+is \emph{not} oracle-free, and not evidence that the gain is the system's own\\
+\bottomrule
+\end{xltabular}
+\par\endgroup
+\medskip
+
+\begingroup
+\centering\footnotesize
+\setlength{\abovecaptionskip}{4pt}
+\setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.2}
+\captionof{table}{\textbf{The instrument's other output, which the vector above cannot carry.}
+Table~\ref{tab:verdict} is the audit's verdict on \emph{our} system, so by construction it has no row for the
+arm that does clear the bar. That arm---frozen LLM-written operators (App.~\ref{app:invent}), optimizing the
+same pKiss$\,\wedge\,$ProbKnot predicate, scored by the ShapeKnots predictor held out of every arm's
+loop---is reported here on the three rungs of \S\ref{sec:disc}, which are reachable independently. It is
+simultaneously the positive control that shows the panel is not merely insensitive and the sharpest bound on
+our own result. Quantifier: these are the $2$ of $6$ invented operators with no runtime failures, so the
+claim is about \emph{some} agent-written operators, not the class.}\label{tab:rungs}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{2.5cm}>{\raggedright\arraybackslash}p{2.0cm}L L@{}}
+\toprule
+\textbf{rung} & \textbf{verdict} & \textbf{basis} & \textbf{what it does \emph{not} show}\\
+\midrule
+(D1) \newline difference under an adjudicator no objective can flatter & \chip{vEst}{established} &
+Paired and difficulty-matched on the $951$ units \emph{both} arms solved under the shared predicate:
+$0.293$ vs.\ $0.095$, difference ${+}0.199$, target-clustered $[{+}0.108,{+}0.297]$ over $42$ clusters,
+cluster-permutation $p{=}5\!\times\!10^{-5}$. Re-derived per design through a second code path with zero
+disagreements &
+Correctness, and not a within-system contrast. Carry-over measures agreement with a partly correlated panel
+(\S\ref{sec:oracle}). We quote the clustered pair, not the exact McNemar $p{=}5\!\times\!10^{-37}$ the same
+counts give, since the $951$ units come from $60$ targets. One pool; the model-level selection above\\
+\addlinespace[2pt]
+(D2) \newline not bought with compute & \chip{vEst}{established} &
+Measured in both directions. Tripling the pKiss allowance ($82.2\!\to\!196.2$ calls/target) moves carry-over
+$0.108\!\to\!0.108$. And the agents' \emph{realized} use is $\approx\!28$ and $\approx\!13$ calls/target
+against this operator's $128.0$; an arm held to that volume ($26.0$) carries over at $0.107$ where the agent
+reaches $0.367$ &
+That no resource explains it---only that oracle-call volume does not, in either direction. Resources we did
+not count remain open\\
+\addlinespace[2pt]
+(D3) \newline mechanism identified and transferable & \chip{vNone}{not est.} &
+\emph{Not established.} \textbf{Six} mechanisms transplanted one at a time, deterministically at $5$ seeds:
+four legible in the source, a compute control in each direction, and one structural feature that survived a
+GC-adjusted observational gate. Every interval contains the baseline; none reaches the agents' lower bound of
+$0.275$ (Table~\ref{tab:attr}, \S\ref{sec:exp}) &
+What the difference \emph{is}. We withhold the word ``discovery'' until this rung is reached, and note in
+\S\ref{sec:related} that the criterion we position against reaches neither D1 nor D2\\
+\bottomrule
+\end{tabularx}
+\par\endgroup
+\medskip
+
 
 \paragraph{The audit is asymmetric.} The negative side has two components of different epistemic status:
 an \emph{exact}, decidable verifier-range bound (the representational limit of \Ocf{}, Prop.~\ref{prop:confine})
@@ -1420,6 +1409,37 @@ discharges the compute-matched (rather than cap-matched) control the previous re
 closes the compute question in both directions: the advantage does not appear when we are given three times
 the allowance, and it does not appear when we are held to the agents' own.
 
+\emph{A structural property of the designs themselves, gated then transplanted.} Composition is excluded and
+compute is excluded, so the surviving shape of the hypothesis is that the accepted designs differ in
+\emph{where} their nucleotides sit relative to the target's pair set. We pre-stated six such features and two
+gates---(a) the feature differs between the arms, and (b) it predicts carry-over \emph{within} the hand-built
+arm, where the program is held fixed---and included overall GC as a negative control
+(\texttt{d3\_structural.py}). The control earned its place immediately: GC passed gate (b) outright (AUC
+$0.749$, $p{=}1.9\!\times\!10^{-10}$), so an unadjusted gate admits anything GC-correlated and would have
+promoted \texttt{gc\_cross} on the strength of its GC content alone. With both gates adjusted for GC by
+logistic regression, and a permuted feature as the adjusted null ($p{=}0.813$), \texttt{gc\_cross}
+($p{=}0.558$) and \texttt{a\_loop} ($p{=}0.176$) fall to fingerprints; two features turn out undefined on
+$513$ of $530$ designs, because a bare H-type pseudoknot has no non-crossing pairs at all. One survives:
+\texttt{decoy}, the number of off-target windows complementary to the crossing stem's $5'$ arm, of which
+agent designs carry $0.003$ each against our $0.060$.
+
+That earned a transplant, and the transplant refutes it. \textbf{Our first attempt does not count and we say
+so}: adding \texttt{decoy} as a tiebreak in the acceptance rule left the accepted designs' decoy count
+unchanged ($0.0757\!\to\!0.0761$), so the resulting null tested nothing---by the standard of
+Table~\ref{tab:attr}, a transplant that changes nothing measurable is a bug. Moving the intervention to the
+step that actually determines the feature---choosing the crossing stem's bases to minimize decoys, still
+oracle-free---engages properly: decoys fall $0.0757\!\to\!0.0452$ and the designs carrying any halve from
+$12$ to $6$. Carry-over then goes the \emph{wrong way}: $16/177=0.090$ $[0.034,0.157]$ against the baseline's
+$0.108$, paired $b{=}6$ against $c{=}11$ on the $162$ cells both arms solved ($p{=}0.33$), with
+$r_{\mathrm{in}}$ at $35.4/60$ (\texttt{nodecoy.sh}, \texttt{ndc\_stats.py}).
+
+This is the cleanest failure in the paper and worth naming as a general one. \texttt{decoy} predicts
+carry-over \emph{observationally} within an arm at $p{=}2.6\!\times\!10^{-3}$ after adjusting for
+composition, and \emph{intervening} on it reproduces none of that---if anything it reverses. A two-stage gate
+was built precisely so that an observational association could not be reported as a mechanism, and here it
+caught one. Any attribution that stops at Stage 1, as most feature analyses of learned systems do, would have
+reported \texttt{decoy} as the explanation.
+
 So the advantage is robust, is not compute in either direction, and is not legible in the source. That is a
 narrower open question than we had, and a more uncomfortable one: a \emph{discovery}-grade claim on this axis
 would need a transferable design principle, and one cannot transfer what one cannot identify. We therefore continue to
@@ -1762,10 +1782,12 @@ testable with what is already built, and is now dead. \emph{(a) Early commitment
 explicit \texttt{budget = [30]}, so a search forced to stop early might accept from a different region of
 sequence space. We ran it: at a $30$-call allowance carry-over is $0.107$ against the baseline's $0.108$ while
 $r_{\mathrm{in}}$ halves (\S\ref{sec:exp}). Not a mechanism, but it delivered the compute-matched control as a
-by-product. What remains is \emph{(b) structural, not compositional, sequence properties.} GC content is excluded, but the panel's disagreements are about \emph{pairing}, so
-loop-length and stem-composition statistics of the accepted designs are the natural next covariates. We flag
-that (b) risks becoming RNA feature-engineering rather than mechanism identification, and would hold it to
-the transfer test of D3: a property only counts if porting it reproduces the gain. A bit-reproducible operator and a compute-matched control, owed by the previous revision, are discharged
+by-product. \emph{(b) Structural, not compositional, sequence properties} is also now run and also dead: six pre-stated
+features, GC-adjusted gates with a calibrated null, one survivor (\texttt{decoy}), and a transplant that
+engages and moves carry-over the wrong way (\S\ref{sec:exp}). Six mechanisms have now been excluded by
+measurement rather than by argument. We are no longer able to name a seventh candidate that is both legible
+and testable on this benchmark, and we would rather say that than pad the list; what the difference
+\emph{is} is the open problem this paper hands on. A bit-reproducible operator and a compute-matched control, owed by the previous revision, are discharged
 in App.~\ref{app:repro}.
 
 \subsection{Conclusion}\label{sec:conclusion}

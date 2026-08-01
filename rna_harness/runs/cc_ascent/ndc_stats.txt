@@ -1,0 +1,12 @@
+D3 stage 2: decoy transplant, deterministic regime, seeds [0, 1, 2, 3, 4], n=60 targets
+
+  arm                                              r_in               carry-over  real pKiss
+  baseline (hand-built)                        37.0/60   20/ 185 = 0.108 [0.053,0.175]       82.2
+  + decoy tiebreak [stage-2 transplant]        35.4/60   16/ 177 = 0.090 [0.034,0.157]       84.8  (interval contains the baseline)
+
+  paired on the 162 (target, seed) cells both arms solved: b=6 (transplant only), c=11 (baseline only), exact p=0.3323, difference -0.0309
+
+  frozen agent operators (the target to reproduce)        ---  333/1104 = 0.302 [0.275,0.330]
+
+  Rule, fixed before the run: carry-over must RISE and r_in must hold near the baseline's
+  37.0/60. Stage 1 earned this arm a test; the test is what decides.
