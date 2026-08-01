@@ -1454,6 +1454,34 @@ $0.302$ $[0.275,0.330]$, and serve as this section's positive control.
 (\texttt{runs/cc\_ascent/carryover.py}.)}\label{fig:carry}
 \end{figure}
 
+\begin{table}[t]\centering\small
+\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.15}
+\caption{\textbf{Attributing the positive control's advantage: four transplanted mechanisms and a compute
+control, none of which accounts for it.} Each arm is the hand-built panel operator with exactly one mechanism
+taken from the frozen agent-written source added, run deterministically at $5$ seeds on the primary pool, so
+each cell is one noise-free observation. Carry-over is
+$P(\text{de-novo ShapeKnots confirms}\mid\text{the arm's own pKiss}\wedge\text{ProbKnot predicate confirmed})$,
+the statistic no arm's objective can flatter; intervals are percentile bootstraps resampling \emph{targets},
+the clustering unit. $r_{\mathrm{in}}$ is printed beside it because a conditional rate can be inflated by
+collapsing its own denominator: a mechanism counts only if carry-over rises \emph{and} $r_{\mathrm{in}}$ holds.
+Every interval contains the baseline, and none reaches the agents' lower bound of $0.275$.
+(\texttt{attribution.sh}, \texttt{attr\_stats.py}.)}\label{tab:attr}
+\begin{tabularx}{\linewidth}{@{}Lccc@{}}
+\toprule
+\textbf{arm} & \textbf{$r_{\mathrm{in}}$ mean/60} & \textbf{carry-over} & \textbf{95\% CI (target-clustered)}\\
+\midrule
+baseline (hand-built panel operator) & $37.0$ & $20/185=0.108$ & $[0.053,0.175]$\\
+$+$ ungated ProbKnot (every candidate) & $37.0$ & $20/185=0.108$ & $[0.048,0.182]$\\
+$+$ summed cost, symmetric weights & $34.8$ & $25/174=0.144$ & $[0.076,0.225]$\\
+$+$ summed cost, spurious pairs $2\times$ & $35.2$ & $20/176=0.114$ & $[0.056,0.182]$\\
+$+$ Metropolis annealing & $35.2$ & $20/176=0.114$ & $[0.047,0.195]$\\
+$3\times$ pKiss allowance \emph{(compute control)} & $37.2$ & $20/186=0.108$ & $[0.053,0.175]$\\
+\midrule
+frozen agent-written operators \emph{(the target to explain)} & --- & $\mathbf{333/1104=0.302}$ & $\mathbf{[0.275,0.330]}$\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
 \paragraph{Does the instrument discriminate, or is it merely insensitive? A positive control.} We have said
 more than once that nothing we build saturates the panel and offered that as evidence of stringency. It is
 not: an audit nothing passes and an audit that cannot detect anything produce the same table, and at
@@ -1473,8 +1501,27 @@ stratified, the advantage holds in both bins ($0.312$ vs.\ $0.169$; $0.285$ vs.\
 
 The conclusion is that \emph{the instrument is not merely insensitive}: $0.302$ is reachable on this pool
 under this panel, so $0.091$ is a fact about the operator that produced it, not a ceiling imposed by the
-adjudicator. That is simultaneously the sharpest statement of this paper's limitation. We claim no
-attribution for \emph{why} the written operators carry over better, and no transfer: on the structurally
+adjudicator. That is simultaneously the sharpest statement of this paper's limitation.
+We can now say rather more about \emph{why} than ``we cannot say'', though what we can say is negative.
+Reading the frozen agent source against ours identifies four mechanisms it has and we lack, and we
+transplanted each into the hand-built operator one at a time, deterministically, at $5$ seeds
+(Table~\ref{tab:attr}). \emph{None of them accounts for the gap, and neither does compute.} The mechanism
+we expected most---consulting ProbKnot on every candidate rather than only once pKiss is already close,
+which matters because ProbKnot is the least-correlated panel member (\S\ref{sec:oracle}) and because under
+the gate it is sometimes never consulted at all---engages as intended (its ProbKnot calls rise from $58.4$ to
+$82.3$ per target, one per pKiss call) and moves carry-over by nothing: $0.108$ against the baseline's $0.108$. Weighting
+spurious pairs $2\times$, as the agents write it, gives $0.114$. Annealing gives $0.114$. Tripling the pKiss
+allowance and changing nothing else---the control that would have shown the agents simply bought their
+advantage---raises realized pKiss use from $82.2$ to $196.2$ calls per target and gives $0.108$, to three
+decimals the baseline. Only replacing the lexicographic acceptance rule
+with a summed cost moves the point estimate at all ($0.144$), and its interval $[0.076,0.225]$ contains the
+baseline while its $r_{\mathrm{in}}$ falls from $37.0$ to $34.8$, so we record it as not established and as
+the one worth re-testing with power. No hand-built variant's interval reaches the agents': the highest upper
+bound among them is $0.225$ against an agent lower bound of $0.275$.
+So the advantage is robust, is not compute, and is not legible in the source. That is a narrower open
+question than we had, and a more uncomfortable one: a \emph{discovery}-grade claim on this axis would need a
+transferable design principle, and one cannot transfer what one cannot identify. We therefore continue to
+claim no attribution, and no transfer either: on the structurally
 disjoint pool $9.7/27$ and $1.1/27$ targets error out per cell, leaving a denominator filtered towards easy
 targets, and rates there are recorded in App.~\ref{app:invent} and used for nothing. Only two of six models
 had no runtime failures; the other four time out on $19$--$32$ of $60$ targets, and that exclusion is itself a
@@ -1935,8 +1982,11 @@ amount of reanalysis fixes that. \textbf{(2) Power.} Several hundred targets and
 replicates, since the effects we are measuring are a few targets in sixty. \textbf{(3) A non-thermodynamic
 predictor.} All three panel members share nearest-neighbour parameters, and \S\ref{sec:exp} shows carry-over
 tracking that shared family; a learned pseudoknot predictor would make the panel mechanistically diverse
-rather than merely numerous. \textbf{(4) Attribution for the positive control.} We show the written operators
-carry over better and cannot yet say why. Items (2) and (3) of the previous revision, a bit-reproducible
+rather than merely numerous. \textbf{(4) Attribution for the positive control}, now narrowed rather than
+open. We can name five candidate explanations for the written operators' carry-over advantage, test each,
+and report that none accounts for it (Table~\ref{tab:attr}): the gap is real, is not compute, and is not
+any mechanism legible in the source. What remains owed is the explanation itself, which we no longer
+expect to find by reading code. Items (2) and (3) of the previous revision, a bit-reproducible
 operator and a compute-matched control, are discharged in App.~\ref{app:repro}.
 
 \subsection{Conclusion}\label{sec:conclusion}

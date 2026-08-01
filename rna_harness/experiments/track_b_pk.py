@@ -154,6 +154,19 @@ def build_policies(which):
                                       max_probknot=int(os.environ.get("PKP_MAXPB", "120")),
                                       ablate=_mode, deterministic=_det,
                                       max_pkiss=_maxpk)], name=f"panel_{_mode}")
+    # R8 attribution: arm name 'pv_<variant>' => the panel operator with ONE agent-written mechanism
+    # transplanted in, at otherwise identical settings. See DecomposePKPanelTool.VARIANTS for the chain.
+    for _v in ("ungated", "scalar1", "scalar2", "anneal", "bigpk"):
+        if f"pv_{_v}" in which:
+            from ..cognitive.skills.pk_decompose_panel import DecomposePKPanelTool
+            pol[f"pv_{_v}"] = FixedPolicy(
+                [DecomposePKPanelTool(skel_wall_s=float(os.environ.get("PKP_SKEL_S", "12")),
+                                      repair_wall_s=float(os.environ.get("PKP_REPAIR_S", "90")),
+                                      max_repair_iters=int(os.environ.get("PKP_ITERS", "800")),
+                                      panel_gate=int(os.environ.get("PKP_GATE", "3")),
+                                      max_probknot=int(os.environ.get("PKP_MAXPB", "120")),
+                                      deterministic=_det, max_pkiss=_maxpk,
+                                      variant=_v)], name=f"pv_{_v}")
     if "probknot_auto" in which:
         # P4 symmetry control: optimizes ProbKnot in-loop (analog of autonomous, which optimizes pKiss).
         from ..cognitive.skills.pk_decompose_probknot import DecomposeProbKnotTool

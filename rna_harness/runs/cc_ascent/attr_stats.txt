@@ -1,0 +1,23 @@
+attribution chain, deterministic regime, seeds [0, 1, 2, 3, 4], n=60 targets
+
+  arm                                            r_in             carry-over        per-seed r_in
+  baseline (hand-built)                    37.0/60    20/ 185 = 0.108 [0.053,0.175]  [37, 37, 39, 36, 36]
+  + ungated ProbKnot                       37.0/60    20/ 185 = 0.108 [0.048,0.182]  [35, 37, 38, 38, 37]
+  + scalar cost (sym)                      34.8/60    25/ 174 = 0.144 [0.076,0.225]  [35, 32, 36, 35, 36]
+  + scalar, FP x2                          35.2/60    20/ 176 = 0.114 [0.056,0.182]  [35, 32, 37, 37, 35]
+  + annealing                              35.2/60    20/ 176 = 0.114 [0.047,0.195]  [35, 35, 36, 35, 35]
+  3x pKiss allowance [compute control]     37.2/60    20/ 186 = 0.108 [0.053,0.175]  [37, 38, 39, 36, 36]
+
+  frozen agent operators (reference)            ---   333/1104 = 0.302 [0.275,0.330]
+
+  A mechanism counts only if carry-over rises AND r_in does not collapse: a high conditional
+  rate on a handful of surviving designs is not an improvement. Read the two columns together.
+
+=== realized oracle use per target (mean over all cells) -- did each mechanism engage? ===
+  arm                                       pKiss  ProbKnot   pb/pk
+  baseline (hand-built)                      82.2      58.4    0.71
+  + ungated ProbKnot                         82.3      82.3    1.00
+  + scalar cost (sym)                        84.6      84.6    1.00
+  + scalar, FP x2                            85.0      85.0    1.00
+  + annealing                                86.7      86.7    1.00
+  3x pKiss allowance [compute control]      196.2      62.4    0.32
