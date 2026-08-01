@@ -100,8 +100,13 @@ sequence already succeeds.
 For this study the vector reads one exact, three established (one narrowly, one structurally), one weak, one
 not established. An audit that nothing passes is indistinguishable from an audit that cannot see, so we
 include a positive control: frozen LLM-written operators reach $0.302$ carry-over where ours reaches $0.091$,
-on non-overlapping intervals. The instrument discriminates. Our own system is simply the weakest arm it
-measures.
+on non-overlapping intervals, re-derived per design through a second code path with zero disagreements. The
+instrument discriminates. Our own system is simply the weakest arm it measures. That control also separates
+what ``discovery'' can mean here: an agent-written procedure beats the human-built one under an adjudicator
+no objective can flatter, and tripling the compute allowance reproduces none of it, but four mechanisms
+legible in the agent source transplant into ours without moving the statistic. The difference is real and
+not compute; what it \emph{is} remains unidentified, and we report those as separate rungs rather than as
+one verdict.
 \end{abstract}
 
 \noindent\textbf{Keywords:} automated scientific discovery; self-improving agents; capability acquisition;
@@ -1494,7 +1499,16 @@ Replicated at the depth of the headline experiment (the two operators with no ru
 re-executed at $5$ seeds $\times$ $3$ executions, \texttt{agent\_replicate.py}), their carry-over is
 $333/1104=\mathbf{0.302}$ $[0.275,0.330]$ against the hand-built operator's $48/530=0.091$ $[0.068,0.118]$;
 the intervals do not overlap. The three executions inside a seed are \emph{bit-identical} in $5/5$ seeds, so
-unlike our own operator these are reproducible runs. The obvious confound is real and does not explain the
+unlike our own operator these are reproducible runs.
+Because this number carries the instrument's discriminating power, and because it is produced by a
+different script from the one that measures every other arm, we re-derived it end to end rather than trust
+the agreement of two code paths: starting from the stored sequences and recomputing all three predictors
+with the calls the main sweep uses, gemini-3.1-pro gives $62/169=0.367$ against a stored $0.367$ and
+kimi-k3 $49/199=0.246$ against a stored $0.246$, with \emph{zero} per-design disagreements. The two paths
+share the pool (\texttt{load\_pseudobase(limit=60)}) and the match predicate (the same
+\texttt{forms\_target} object), and a spot re-run of sweep-negative designs in a single clean process
+flipped $0/10$, ruling out the silent working-directory failure that a sibling line hit with a different
+pseudoknot tool. The obvious confound is real and does not explain the
 gap: the agent operators emit GC-richer sequences ($0.529$ against $0.460$) and ShapeKnots agreement is partly
 predictable from composition alone (within our designs, $0.169$ above $50\%$ GC against $0.051$ below). But
 stratified, the advantage holds in both bins ($0.312$ vs.\ $0.169$; $0.285$ vs.\ $0.051$).
@@ -1906,8 +1920,28 @@ cap-matched control. The first two we cannot supply from this benchmark; the thi
 prior self, not the base model (whose latent competence is unauditable and beside the point). Our operator is
 oracle-guided search over known moves; its value, when it clears the panel, is a verified autonomous crossing,
 not an original thought. At $1/60$ panel-unanimous we have not established even a robust acquisition on this
-pool, and the audit says so; a discovery-grade claim would additionally require a transferable design
-principle, adjudicated, never asserted.
+pool, and the audit says so.
+
+\emph{But ``discovery-grade'' is not one bar, and collapsing it into one has cost us precision.} Earlier
+drafts wrote that a discovery-grade claim ``would require a transferable design principle, adjudicated'',
+and then reported the positive control as failing that bar. Stating it as a single threshold hides that the
+evidence separates into rungs that can be reached independently, so we name them:
+\begin{description}[leftmargin=1.4em,itemsep=1pt]
+\item[\textnormal{(D1) A difference exists under an adjudicator no arm's objective can flatter.}] Measured
+on a predictor held out of \emph{every} arm's loop, against a stated baseline, with an interval.
+\item[\textnormal{(D2) The difference is not bought with compute.}] Established by a control that raises
+the allowance and changes nothing else.
+\item[\textnormal{(D3) The mechanism is identified and transfers.}] A property one can name, port into
+another system, and watch reproduce the gain.
+\end{description}
+For the agent-written operators this study reaches \textbf{D1} (carry-over $0.302$ $[0.275,0.330]$ against
+the hand-built $0.108$, non-overlapping) and \textbf{D2} (tripling the pKiss allowance moves carry-over by
+nothing, Table~\ref{tab:attr}), and does \emph{not} reach \textbf{D3}: four mechanisms legible in the agent
+source were transplanted one at a time and none reproduced the gain. So the honest verdict is
+\emph{D1 and D2 established, D3 open}, not the undifferentiated ``fails the discovery bar'' the single
+threshold implied. We hold ourselves to D3 before using the word discovery, and we note in
+\S\ref{sec:related} that the criterion we position against does not, on its own reported evidence, reach
+D1 or D2 either.
 
 \paragraph{Complementary to the categorical self-revising line.} The nearest programme is categorical
 self-revising discovery \citep{selfrevising}, which formalizes discovery as the residual beyond a functorial
@@ -1926,6 +1960,20 @@ accepts our $43/60$ designs: they fit the optimized oracle exactly and are produ
 $1/60$ survives three predictors. The $42$-target gap is invisible to any statistic computed from the system
 and its own oracle, which is the sense in which a one-sided gate and a two-sided audit are complementary
 layers rather than competitors.
+
+\emph{Placed on the D1--D3 rungs, and stated as a difference in evidence rather than in ambition.} An MDL or
+AIC gate is computed from the revised system and the evidence it was fitted on. That is precisely a statistic
+of the kind D1 excludes: there is no predictor held outside the loop, so a system that improves its own
+compression cannot be distinguished from one that adapted to the evidence it is scored on---the failure mode
+our $43\!\to\!1$ collapse exhibits directly. Nor is a compute control reported, so D2 is not addressed. And
+as \citet{selfrevising} state, the residual measures the \emph{additional bits} a revision needs, not the
+prior regime's incapacity, so there is no counterpart to our exact exclusion. We say this as a statement
+about reported evidence, not about the framework's reach: a categorical account of regime change is doing
+different work from an audit, and D3---naming the mechanism---is reached by neither of us. The comparison we
+do claim is narrow and checkable: on the rungs where evidence can be demanded, this paper supplies a
+held-out adjudicator, a compute control, matched baselines, ablations and intervals, and reports its own two
+unestablished components; the case studies of the categorical line report neither baselines nor ablations
+nor significance tests across roughly five runs.
 
 \paragraph{An audit layer for AI4S.} The lesson generalizes because the vulnerability does. Most scientific
 oracles a self-improving system optimizes against are fallible surrogates (a docking score, a force field, a

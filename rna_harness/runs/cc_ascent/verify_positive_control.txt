@@ -1,0 +1,13 @@
+(2) pool: agent path and sweep path both use load_pseudobase(limit=60), n=60
+
+(1) match predicate: agent path forms_target IS sweep path forms_target -> True (rna_harness.oracles_pk)
+
+(3) per-design re-derivation from stored sequences, using the sweep's own oracle calls
+    gemini31pro  stored  62/169 = 0.367   recomputed  62/169 = 0.367   per-design disagreements: 0
+    kimik3       stored  49/199 = 0.246   recomputed  49/199 = 0.246   per-design disagreements: 0
+
+(4) ShapeKnots stability: 0/10 sweep-negative designs flip when re-folded serially in a clean process
+
+positive control verified end to end: True
+  If any line above is False the 0.302 reference is an artifact of its measurement path and the
+  instrument's discriminating power claim must be withdrawn.
