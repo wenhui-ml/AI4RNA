@@ -82,33 +82,34 @@ where one fallible oracle credits $43$ designs and three predictors credit $1$}
 benchmark delta, a description-length gate, or a $p$-value. None separates a real gain from extra search, from
 a changed verifier, or from adaptation to a fallible oracle. We build a two-sided audit in a domain where one
 side is a formal fact---a pseudoknot-free oracle provably cannot represent a crossing base pair, so the prior
-\emph{verifier's} range is bounded exactly, offline, before any run---and use it to measure two things.
+\emph{verifier's} range is bounded exactly, offline, before any run---and use it to measure two things. ``New''
+here means new relative to the agent's prior self, never relative to its base model, whose latent competence
+is unauditable and beside the point.
 
-\textbf{First, how far a single fallible oracle can inflate a capability claim.} An invented, solver-free
-operator solves $43/60$ crossing RNA targets under the predictor it optimizes, above a context-free floor of
-$0/60$; under three predictors, $1/60$ survives. The discriminating evidence is paired on the \emph{same} $43$
+\textbf{First, how far one fallible oracle can inflate a capability claim.} An invented, solver-free operator
+solves $43/60$ crossing RNA targets under the predictor it optimizes, above a context-free floor of $0/60$;
+under three predictors, $1/60$ survives. The discriminating evidence is paired on the \emph{same} $43$
 targets: a predictor the operator never saw confirms $2$ of its designs against $26$ for a
 minimum-free-energy solver ($p{=}8\!\times\!10^{-7}$). The gap is invisible to any statistic computed from the
-system and its own oracle, which is exactly what a compression gate or a benchmark delta is.
+system and its own oracle, which is what a compression gate or a benchmark delta is.
 
-\textbf{Second, that an agent-written procedure beats a human-written one under a judge no objective can
-flatter---at a fraction of the compute.} On the targets both solved under the same in-loop predicate, frozen
-LLM-written operators carry over to the held-out predictor at $0.293$ against our $0.095$ ($n{=}951$ paired
-units, target-clustered $[{+}0.108,{+}0.297]$, $p{=}5\!\times\!10^{-5}$), re-derived per design through a
-second code path with zero disagreements. Instrumenting the frozen code shows they do it while spending
-$4.6$--$10\times$ \emph{fewer} oracle calls per target than the operator they beat, and an arm held to their
-own realized volume carries over at $0.107$ where they reach $0.367$: the advantage is not bought with
-search, measured at three times their compute and at exactly their compute. We grade this on three rungs: a difference under an adjudicator outside every loop
-(reached), not bought with compute (reached, in both directions), mechanism identified and transferable (not
-reached---six candidate mechanisms transplant into ours without moving the statistic, including the one structural feature that survives a composition-adjusted observational gate and then reproduces nothing when intervened on).
+\textbf{Second, that \emph{two of six} agent-written procedures beat a human-written one under a judge no
+objective can flatter, at a fraction of the compute.} That quantifier is the result's main limit: the other
+four time out on $19$--$32$ of $60$ targets and are excluded, a model-level selection we cannot fully audit.
+On targets both arms solved under the same in-loop predicate the two that ran carry over at $0.293$ against
+our $0.095$ ($n{=}951$ paired units, target-clustered $[{+}0.108,{+}0.297]$, $p{=}5\!\times\!10^{-5}$), while
+spending $4.6$--$10\times$ \emph{fewer} oracle calls. We grade this on three rungs---difference under an
+outside adjudicator (reached), not bought with compute (reached, both directions), mechanism identified and
+transferable (\emph{not} reached: seven candidates tested, none reproduces the gain).
 
-The audit is unsparing about our own system, and we report that in full rather than as a footnote: matched
-undirected search is an exact zero, a search-free probe puts $84\%$ of our headline effect on targets a random
-sequence already solves, and the honest description of our operator is a stochastic search with a better
-success predicate and no better guidance. That is the instrument working. The difference it finds between an
-agent-written procedure and ours is real, is not compute, and is unexplained---and we withhold the word
-discovery until it is not. Every positive number here is on one crossing corpus, which admits only $24$
-development-disjoint structural clusters; directions replicate on them, magnitudes do not.
+\textbf{Two limits bound everything above.} The three panel predictors share thermodynamic parameters, and we
+measure the cost rather than assuming it away: the held-out predictor and an in-loop one agree at
+$\kappa{=}0.673$, so no number here is about correct folding rather than about agreement with one model
+family. And the audit is unsparing about our own operator---matched undirected search is an exact zero, a
+search-free probe puts $84\%$ of our headline effect where a random sequence already succeeds, and the
+description the data supports is a stochastic search with a better success predicate and no better guidance.
+That is the instrument working on its author. The difference it finds between an agent-written procedure and
+ours is real, is not compute, and is unexplained; we withhold the word discovery until it is not.
 \end{abstract}
 
 
@@ -151,6 +152,17 @@ family. And ``crossing'' here is a \emph{structural} predicate on a target, deci
 mildly-context-sensitive reading attaches to the family $\mathcal L_{\mathrm H}$ and never to a design. A
 reader who substitutes ``pseudoknot-free versus pseudoknotted'' throughout loses the family-level statement
 and nothing else.
+
+\emph{What the family-level statement turned out to be worth, which we could not have argued a revision
+ago.} It is the reason a $100$-target test set exists at all. Pseudobase++ is structurally exhausted at $24$
+development-disjoint clusters, and no reanalysis produces more; the grid of \S\ref{sec:exp} is constructible
+only because $\mathcal L_{\mathrm H}$ is a \emph{formally characterized unbounded family} whose members are
+non-context-free by construction rather than by inspection. Without that characterization there is no
+principled way to generate targets that are guaranteed to lie beyond the prior verifier's range, and no
+warrant for calling a synthetic ladder a test of the same capability. So the hierarchy's contribution is not
+depth in the exclusion---which is shallow, as we said---but that it makes the only unbounded axis in this
+study \emph{constructible and interpretable}. That is a methodological dividend, and it is the honest answer
+to a reader who asks what the formal apparatus buys.
 
 \paragraph{Thesis.} \emph{Under a pseudoknot-aware oracle, a self-improving design agent realizes held-out
 crossing targets via a reusable, solver-free procedure, while its prior \CF-verified repertoire is confined by
@@ -727,6 +739,18 @@ estimate of how often those designs really fold as intended. We use it only as a
 never as an accuracy. The same distinction disposes of the mirror worry about $\Delta_{\mathrm{gamer}}$: there
 the two arms optimize \emph{different} predicates, so the correlation does \emph{not} cancel, which is one
 more reason we treat that component as narrow and this one as established.
+
+\emph{Then why not make the least-correlated pair the primary metric?} The answer is structural, not a
+preference. ProbKnot is the member least correlated with the others, so pKiss$\,\wedge\,$ProbKnot is indeed
+the most mechanistically diverse pairing available---but that conjunction \emph{is} $r_{\mathrm{in}}$, the
+panel operator's own success predicate, so for that arm it cannot serve as a held-out measure at all; scoring
+an arm on its own objective is the failure this whole paper is about. Where ProbKnot \emph{is} held out we
+already use it as primary, and it carries the paper's sharpest single result: the gamer optimizes pKiss alone,
+so its $2/43$ against the minimum-free-energy solver's $26/43$ is measured on exactly that least-correlated
+predictor (Table~\ref{tab:contrast}). The pairing the question asks for is therefore used wherever it is
+available and unavailable for the one arm whose objective it is. What no rearrangement of three thermodynamic
+predictors fixes is the underlying problem, which is why owed experiment~(3) asks for a predictor from a
+different model family rather than a different conjunction of these.
 
 We adjudicate the positive side accordingly. A held-out crossing target counts as realized only under an
 explicit rule, and we report all three: (i) \emph{panel-unanimous} (all three predictors confirm the exact
@@ -1825,8 +1849,17 @@ oracles a self-improving system optimizes against are fallible surrogates---a do
 learned reward, a structure predictor, a theorem-search heuristic---so a closed loop can improve the oracle's
 score without improving the capability, as ours drove pKiss to $43/60$ while a three-predictor panel saw
 $1/60$. The protocol ports to molecular generation adjudicated against DFT or assays, to protein design
-against binding readouts, and to theorem discovery against an exact checker. Whether the \emph{positive} side
-ports to settings with no decidable hierarchy is open; we do not test it.
+against binding readouts, and to theorem discovery against an exact checker.
+
+\emph{And what does the framework degrade to where no decidable range relation exists?} Mostly to ordinary
+good practice, and we would rather say so than let the framing carry more than one domain's worth of evidence.
+Without a verifier whose image can be characterized, $E_{\mathrm{range}}$ has no analogue: the negative side
+collapses to an empirical floor, and what remains is held-out adjudication, matched ablations, a compute
+control and interval reporting. That is not nothing---most capability claims in this literature report none of
+it, and the $43\!\to\!1$ collapse is visible with those pieces alone---but it is not this paper's distinctive
+claim either, and ``two-sided, one side decidable'' should be read as verified in exactly one domain. The
+exact side ports where an exact checker exists (theorem search, SAT-style constraint classes); it does not
+port to a docking score or a binding assay, and we do not pretend otherwise.
 
 \paragraph{Limitations, in rough order of how much they bound the contribution.} \emph{(i) One benchmark,
 structurally exhausted---plus one synthetic family that repairs power and nothing else.} The unbounded
@@ -1844,7 +1877,11 @@ is partial, and much of $\Delta_{\mathrm{gamer}}$ is target-side}: a search-free
 targets a random compatible sequence already solves, leaving ${+}0.016$ where search is required.
 \emph{(iv) Most numbers were produced by operators that were not bit-reproducible}, and our first diagnosis of
 why was wrong (App.~\ref{app:repro}). The ablation and the headline comparison are re-run bit-reproducibly at
-equal allowance (Table~\ref{tab:det}); the pool-level and cross-source numbers were not. \emph{(v) The audit
+equal allowance (Table~\ref{tab:det}); the pool-level and cross-source numbers were not. \emph{(v) The invention step is not fully reproducible.} The six operators were written by frontier models
+behind a routed provider alias that exposes no version hash, so a re-run months later may not query the same
+weights (App.~\ref{app:repro}). Every \emph{measurement} in this paper re-executes frozen source rather than
+re-querying a model, so nothing reported here depends on it---but the claim ``an agent can invent such an
+operator'' does, and a replication attempt could fail for reasons outside the protocol. \emph{(vi) The audit
 does not separate capability from search}, by construction.
 
 \paragraph{The experiments this study owes, in priority order.} \textbf{(1) A second, structurally independent
@@ -1922,8 +1959,8 @@ never the prior policy's capacity. The evidence vector for this study reads one 
 weak, one not established; the instrument, not the system, is what we ask readers to take away.
 
 \paragraph{And the positive side, at the same strength.} The instrument is not merely insensitive, and
-establishing that produced this paper's one clearly positive measurement. Frozen agent-written operators,
-scored by the predictor held out of every arm's loop and compared on the targets they and our operator both
+establishing that produced this paper's one clearly positive measurement. Frozen agent-written operators---solver-free in the narrow sense of Rem.~\ref{rem:autonomy}, not
+independent of external oracles---scored by the predictor held out of every arm's loop and compared on the targets they and our operator both
 solved under the same in-loop bar, carry over at $0.293$ against our $0.095$ ($n{=}951$ paired units,
 target-clustered $[{+}0.108,{+}0.297]$, cluster-permutation $p{=}5\!\times\!10^{-5}$), and they do it while
 spending $4.6$--$10\times$ \emph{fewer} oracle calls per target than the operator they beat---so the advantage

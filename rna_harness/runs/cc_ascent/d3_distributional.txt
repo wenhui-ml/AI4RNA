@@ -1,0 +1,27 @@
+====================================================================================================
+D3, seventh test: whole-distribution comparison of accepted designs (reviewer Q2)
+====================================================================================================
+  agent designs 1104   hand-built 530   folded under ViennaRNA (in no arm's loop)
+  Quantities the target does not fix; KS on the full CDF; permutation null on arm labels.
+
+  caliper-matched on GC (+/-0.01, no replacement): 399/530 hand-built designs paired; matched mean GC 0.4643 (agent) vs 0.4640 (hand-built)
+
+  NEGATIVE CONTROL on the matched sets: GC itself, perm p=0.9825 (PASS -- test is calibrated)
+
+  quantity         agent (matched)  hand-built (matched)     KS D     perm p
+  mfe_per_nt        -0.250+-0.090         -0.190+-0.096     0.323  0.0004998
+  efe_per_nt        -0.255+-0.088         -0.202+-0.092     0.313  0.0004998
+  ens_gap            0.005+-0.006          0.012+-0.009     0.466  0.0004998
+  loop_mean          7.254+-2.716          6.148+-2.681     0.243  0.0004998
+  loop_max          13.862+-6.207         10.847+-5.208     0.261  0.0004998
+  n_loops            3.198+-0.782          3.246+-0.871     0.048    0.04148
+
+  ------------------------------------------------------------------------------------------------
+  Distributional differences found: mfe_per_nt (D=0.323, p=0.0005), efe_per_nt (D=0.313, p=0.0005), ens_gap (D=0.466, p=0.0005), loop_mean (D=0.243, p=0.0005), loop_max (D=0.261, p=0.0005), n_loops (D=0.048, p=0.0415)
+  A lead, not a mechanism. Each faces the same transplant test every earlier candidate faced:
+  bias the operator toward it and require carry-over to rise while r_in holds. We report it as
+  Stage 1 evidence only -- `decoy` cleared exactly this bar and then reversed under
+  intervention, which is why an observational difference is never the end of the argument.
+
+  Six quantities on one dataset is multiple comparison; permutation p-values are uncorrected and
+  nothing here is read from a bare p<0.05.

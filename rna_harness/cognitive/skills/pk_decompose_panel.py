@@ -46,6 +46,20 @@ from .pk_decompose import _WC, _partner_map, _wrong_positions
 _PAIRABLE = {("A", "U"), ("U", "A"), ("G", "C"), ("C", "G"), ("G", "U"), ("U", "G")}
 
 
+def _ens_gap(seq):
+    """(MFE - ensemble free energy) / n under ViennaRNA's nested model: how concentrated the ensemble is on
+    its best structure. Smaller means a more dominant fold. Uses a model in no arm's optimization loop and
+    outside the counted pKiss/ProbKnot allowance, so an arm using it gains no oracle budget."""
+    try:
+        import RNA
+        n = max(1, len(seq))
+        _, mfe = RNA.fold(seq)
+        _, efe = RNA.fold_compound(seq).pf()
+        return (mfe - efe) / n
+    except Exception:
+        return 0.0
+
+
 def _decoy_count(seq, cross_pairs, w=4):
     """Off-target windows complementary to the crossing stem's 5' arm -- the one structural feature that
     passed both GC-adjusted gates of d3_structural.py. Each such window is an alternative partner a folding
@@ -106,7 +120,17 @@ class DecomposePKPanelTool(Tool):
     #            it cannot be confused with a compute effect -- and Stage 2 is the test that decides: the
     #            transplant must raise carry-over WITHOUT collapsing r_in, the same rule every other
     #            transplant faced. Passing an observational gate is not a mechanism; reproducing the gain is.
-    VARIANTS = ("none", "ungated", "scalar1", "scalar2", "anneal", "bigpk", "tinypk", "nodecoy")
+    # dominant : D3 seventh test, Stage 2 (reviewer Q2). A caliper-matched distributional comparison
+    #            (d3_distributional.py, negative control p=0.98 at matched GC) finds the agent operators'
+    #            accepted designs differ from ours at MATCHED composition in one quantity above all others:
+    #            the ensemble gap (MFE - ensemble free energy)/n is 0.005 for them against our 0.012, i.e.
+    #            their designs put far more of the Boltzmann ensemble on a single fold. A dominant fold is
+    #            one any model confirms, which is mechanistically why it would raise carry-over. This arm
+    #            minimises that gap: at composition it picks the crossing-stem assignment with the smallest
+    #            gap, and in the repair loop it breaks exact ties on it. Both use ViennaRNA's NESTED partition
+    #            function, which is in no arm's objective and consumes none of the counted pKiss/ProbKnot
+    #            allowance, so the comparison stays compute-matched by construction.
+    VARIANTS = ("none", "ungated", "scalar1", "scalar2", "anneal", "bigpk", "tinypk", "nodecoy", "dominant")
 
     def __init__(self, skel_wall_s: float = 12.0, repair_wall_s: float = 90.0,
                  max_repair_iters: int = 800, skel_restarts: int = 6,
@@ -142,7 +166,7 @@ class DecomposePKPanelTool(Tool):
             self.max_probknot = max(self.max_probknot, self.max_pkiss)
         if variant == "bigpk":
             self.max_pkiss = self.max_pkiss * 3      # the pure-compute control; deliberately NOT matched
-        if variant == "nodecoy":
+        if variant in ("nodecoy", "dominant"):
             self.max_probknot = max(self.max_probknot, 0)   # no budget change: the tiebreak is oracle-free
         if variant == "tinypk":
             self.max_pkiss = 30                      # kimi-k3's self-imposed budget, transplanted verbatim
@@ -243,7 +267,18 @@ class DecomposePKPanelTool(Tool):
 
         # 3. compose crossing pairs (WC, seed-varied)
         if self.ablate != "nocompose":
-            if self.variant == "nodecoy" and cross_pairs:
+            if self.variant == "dominant" and cross_pairs:
+                best_assign, best_g = None, None
+                for _ in range(12):
+                    trial = list(seq)
+                    for i, j in cross_pairs:
+                        a, b = rng.choice(_WC)
+                        trial[i], trial[j] = a, b
+                    g = _ens_gap("".join(trial))
+                    if best_g is None or g < best_g:
+                        best_assign, best_g = trial, g
+                seq = best_assign
+            elif self.variant == "nodecoy" and cross_pairs:
                 # D3 stage 2, engaged at the point where the feature is actually determined. A tiebreak in
                 # the acceptance rule was the first attempt and it did not engage: exact ties in
                 # (pk_bp, pb_bp) are rare, so accepted designs came out with the same decoy count as the
@@ -322,6 +357,13 @@ class DecomposePKPanelTool(Tool):
                 temp = max(2.0 * (0.997 ** it), 0.01)
                 accept = (ccost <= cur_cost
                           or rng.random() < math.exp(-(ccost - cur_cost) / temp))
+            elif self.variant == "dominant":
+                if (cpk, cpb) < (cur_pk, cur_pb):
+                    accept = True
+                elif (cpk, cpb) == (cur_pk, cur_pb):
+                    accept = _ens_gap(cand_seq) <= _ens_gap(cur_seq)
+                else:
+                    accept = False
             elif self.variant == "nodecoy":
                 # Lexicographic as the baseline, with the oracle-free decoy count breaking exact ties.
                 # Ties are where the baseline walks at random, so this steers only the choices the objective
