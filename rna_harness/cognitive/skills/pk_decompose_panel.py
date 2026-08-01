@@ -43,6 +43,29 @@ from ..cost import solver_cost_usd
 from ..tools import Tool, ToolResult
 from .pk_decompose import _WC, _partner_map, _wrong_positions
 
+_PAIRABLE = {("A", "U"), ("U", "A"), ("G", "C"), ("C", "G"), ("G", "U"), ("U", "G")}
+
+
+def _decoy_count(seq, cross_pairs, w=4):
+    """Off-target windows complementary to the crossing stem's 5' arm -- the one structural feature that
+    passed both GC-adjusted gates of d3_structural.py. Each such window is an alternative partner a folding
+    model we never optimized might prefer over the intended crossing stem. Computed from the sequence and the
+    target alone: no fold, no oracle call, so an arm using it consumes no extra budget."""
+    cp = sorted(cross_pairs)
+    if not cp or len(seq) < 2 * w:
+        return 0
+    arm = "".join(seq[i] for i, _ in cp[:w])
+    if len(arm) < w:
+        return 0
+    occupied = {i for p in cp for i in p}
+    n = 0
+    for s in range(len(seq) - w + 1):
+        if any(s + k in occupied for k in range(w)):
+            continue
+        if all((a, b) in _PAIRABLE for a, b in zip(arm, seq[s:s + w][::-1])):
+            n += 1
+    return n
+
 # variants whose objective sums over both predictors, so both must be evaluated every candidate
 _UNGATED = ("ungated", "scalar1", "scalar2", "anneal")
 
@@ -73,7 +96,17 @@ class DecomposePKPanelTool(Tool):
     # Each variant differs from the one above it by exactly one mechanism, so the chain
     #   none -> ungated -> scalar1 -> scalar2 -> anneal
     # attributes the gap one step at a time; `bigpk` sits outside the chain as the compute control.
-    VARIANTS = ("none", "ungated", "scalar1", "scalar2", "anneal", "bigpk", "tinypk")
+    # nodecoy  : D3 hypothesis (b), Stage 2. d3_structural.py pre-stated six structural features of accepted
+    #            designs and gated them on (a) differing between the agent and hand-built arms AND (b)
+    #            predicting held-out carry-over WITHIN the hand-built arm, both adjusted for overall GC after
+    #            the negative control showed the unadjusted gate admits anything GC-correlated. Exactly one
+    #            feature passed both: `decoy`, the number of off-target windows complementary to the crossing
+    #            stem's 5' arm. The agents' designs have essentially none (0.003/design against our 0.060).
+    #            This arm adds that count as a TIEBREAK in the acceptance rule -- it costs no oracle call, so
+    #            it cannot be confused with a compute effect -- and Stage 2 is the test that decides: the
+    #            transplant must raise carry-over WITHOUT collapsing r_in, the same rule every other
+    #            transplant faced. Passing an observational gate is not a mechanism; reproducing the gain is.
+    VARIANTS = ("none", "ungated", "scalar1", "scalar2", "anneal", "bigpk", "tinypk", "nodecoy")
 
     def __init__(self, skel_wall_s: float = 12.0, repair_wall_s: float = 90.0,
                  max_repair_iters: int = 800, skel_restarts: int = 6,
@@ -109,6 +142,8 @@ class DecomposePKPanelTool(Tool):
             self.max_probknot = max(self.max_probknot, self.max_pkiss)
         if variant == "bigpk":
             self.max_pkiss = self.max_pkiss * 3      # the pure-compute control; deliberately NOT matched
+        if variant == "nodecoy":
+            self.max_probknot = max(self.max_probknot, 0)   # no budget change: the tiebreak is oracle-free
         if variant == "tinypk":
             self.max_pkiss = 30                      # kimi-k3's self-imposed budget, transplanted verbatim
             self.max_probknot = min(self.max_probknot, 30)
@@ -266,6 +301,16 @@ class DecomposePKPanelTool(Tool):
                 temp = max(2.0 * (0.997 ** it), 0.01)
                 accept = (ccost <= cur_cost
                           or rng.random() < math.exp(-(ccost - cur_cost) / temp))
+            elif self.variant == "nodecoy":
+                # Lexicographic as the baseline, with the oracle-free decoy count breaking exact ties.
+                # Ties are where the baseline walks at random, so this steers only the choices the objective
+                # was indifferent about and cannot trade panel agreement away for the structural property.
+                if (cpk, cpb) < (cur_pk, cur_pb):
+                    accept = True
+                elif (cpk, cpb) == (cur_pk, cur_pb):
+                    accept = _decoy_count(cand_seq, cross_pairs) <= _decoy_count(cur_seq, cross_pairs)
+                else:
+                    accept = False
             else:
                 accept = (cpk, cpb) <= (cur_pk, cur_pb)
             if accept:

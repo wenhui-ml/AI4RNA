@@ -156,7 +156,7 @@ def build_policies(which):
                                       max_pkiss=_maxpk)], name=f"panel_{_mode}")
     # R8 attribution: arm name 'pv_<variant>' => the panel operator with ONE agent-written mechanism
     # transplanted in, at otherwise identical settings. See DecomposePKPanelTool.VARIANTS for the chain.
-    for _v in ("ungated", "scalar1", "scalar2", "anneal", "bigpk", "tinypk"):
+    for _v in ("ungated", "scalar1", "scalar2", "anneal", "bigpk", "tinypk", "nodecoy"):
         if f"pv_{_v}" in which:
             from ..cognitive.skills.pk_decompose_panel import DecomposePKPanelTool
             pol[f"pv_{_v}"] = FixedPolicy(

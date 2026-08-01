@@ -1,0 +1,34 @@
+====================================================================================================
+D3 hypothesis (b), STAGE 1: structural properties of accepted designs
+====================================================================================================
+  agent designs: 1104   hand-built designs: 530
+  Gate (a) between-arm difference; gate (b) predicts carry-over WITHIN the hand-built arm.
+  A feature must pass BOTH to earn a Stage-2 transplant. gc_all is the negative control:
+  it should pass (a) and FAIL (b); if it passes (b), gate (b) is not discriminating.
+
+  within hand-built: 48 ShapeKnots-confirmed, 482 not
+  within agent:      333 confirmed, 771 not
+
+  feature              agent      hand-built |  (a) raw p  (a) adj p |  (b) AUC  (b) raw p  (b) adj p  verdict
+  gc_cross     0.867+-0.141   0.508+-0.140 |          0   2.93e-73 |    0.716   1.32e-08      0.558  (a) only: fingerprint
+  gc_nest      0.803+-0.211   0.515+-0.215 |   6.21e-06    0.00101 |    0.462      0.492        nan  undefined on 513/530 (no non-crossing pairs)
+  gc_diff     -0.049+-0.141  -0.067+-0.248 |      0.775      0.865 |    0.818     0.0346        nan  undefined on 513/530 (no non-crossing pairs)
+  a_loop       0.963+-0.145   0.364+-0.171 |          0   1.47e-87 |    0.504       0.95      0.176  (a) only: fingerprint
+  decoy        0.003+-0.052   0.060+-0.348 |   0.000148   0.000207 |    0.558     0.0866    0.00263  BOTH -> stage 2
+  gc_all       0.529+-0.145   0.460+-0.094 |    5.7e-31        nan |    0.749   1.87e-10        nan  covariate (adjusted for)
+  perm                    --              -- |         --         -- |       --         --      0.813  adjusted negative control (must be null)
+
+  feature        (b) AUC within AGENT arm (replication of gate b)
+  gc_cross                                                  0.604
+  gc_nest                                                   0.600
+  gc_diff                                                   0.700
+  a_loop                                                    0.491
+  decoy                                                     0.505
+  gc_all                                                    0.557
+
+  ------------------------------------------------------------------------------------------------
+  Features earning a Stage-2 transplant: decoy
+  Stage 2 is the test that counts: bias the operator toward the feature, re-measure carry-over
+  deterministically at 5 seeds, and require it to RISE while r_in does NOT collapse.
+  Six features on one dataset is multiple comparison. Nothing here is read from a bare p<0.05;
+  the gate is the conjunction, and the decision it licenses is a transplant, not a conclusion.
