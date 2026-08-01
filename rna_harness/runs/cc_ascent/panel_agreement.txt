@@ -1,0 +1,21 @@
+panel agreement on 80 native bpRNA pseudoknots (each predictor folds the native's OWN sequence;
+call = its known crossing recovered). Marginal recall:
+  pkiss        16/80 = 0.200
+  probknot      3/80 = 0.037
+  shapeknots    9/80 = 0.113
+  all three     1/80 = 0.013
+
+pairwise Cohen's kappa (chance-corrected; raw agreement shown for contrast):
+  pkiss      ~probknot    kappa=+0.270 [+0.000,+0.524]   raw agreement=0.838 (chance 0.777)
+  pkiss      ~shapeknots  kappa=+0.673 [+0.422,+0.875]   raw agreement=0.912 (chance 0.732)
+  probknot   ~shapeknots  kappa=+0.117 [-0.074,+0.421]   raw agreement=0.875 (chance 0.858)
+
+  tightest pair: pkiss~shapeknots (kappa +0.673)
+  loosest pair:  probknot~shapeknots (kappa +0.117)
+  odd voice out: probknot
+  kappa spread across the three pairs: 0.556
+  -> the panel is structured, not exchangeable: pkiss+shapeknots behave as a correlated
+     block and probknot carries the independent signal, so unanimity over three predictors is
+     nearer a TWO-voice conjunction than a three-voice one.
+
+-> panel_agreement.json

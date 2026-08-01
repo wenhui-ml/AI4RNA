@@ -594,6 +594,27 @@ not statistically independent: all three are computational secondary-structure m
 and structural assumptions, so their errors can correlate. Panel-unanimity is therefore cross-predictor
 consistency under the declared computational panel, not independent physical confirmation or ground truth.
 
+\paragraph{How many independent voices does the panel have? (Measured, not argued.)} The paragraph above is an
+argument from provenance, and a reviewer is entitled to ask for a number. We measure pairwise agreement on the
+$80$ native bpRNA pseudoknots of our own calibration set, where each predictor's call is whether folding a
+native's \emph{own} sequence recovers its known crossing (\texttt{panel\_agreement.py}). We use Cohen's
+$\kappa$ rather than raw agreement because at these marginal rates (pKiss $20\%$, ProbKnot $4\%$, ShapeKnots
+$11\%$) two predictors that both mostly say ``no'' agree $\sim\!84\%$ of the time by construction; $\kappa$
+removes that chance floor. The panel is \textbf{not three exchangeable voices}: pKiss and ShapeKnots agree at
+$\kappa=0.673$ $[0.422,0.875]$, an interval clear of zero, so they behave as a correlated block. The two
+pairings involving ProbKnot are $\kappa=0.270$ $[0.000,0.524]$ and $\kappa=0.117$ $[-0.074,0.421]$, both
+compatible with weak or no agreement.
+\emph{What we do not claim.} It is tempting to read this as ``the panel is two voices, not three'', and we
+resist it, because ProbKnot recovers only $3$ of $80$ natives: every $\kappa$ involving it is poorly
+determined, and whether ProbKnot is a genuinely independent third voice or merely too insensitive to tell
+cannot be settled at $n{=}80$. The defensible statement is the weaker and still consequential one: at least two
+of the three panel members are substantially correlated, so unanimity buys less independent confirmation than
+its arity suggests. This also gives the low $r_{\mathrm{mix}}$ a mechanism rather than leaving it a bare
+number: with pKiss and ShapeKnots correlated and ProbKnot the least sensitive member, the three-way conjunction
+is bound largely by ProbKnot, which is exactly where the gamer's designs die ($2/43$, Table~\ref{tab:contrast}).
+A panel that was \emph{mechanistically} diverse, rather than merely numerous, is the instrument this
+measurement says we do not yet have (\S\ref{sec:disc}, owed experiment~3).
+
 We adjudicate the positive side accordingly. A held-out crossing target counts as realized only under an
 explicit rule, and we report all three: (i) \emph{panel-unanimous} (all three predictors confirm the exact
 crossing pair set) as the primary rate; (ii) the reference (pKiss) rate; and (iii) the cross-predictor
@@ -1795,9 +1816,12 @@ Whether the positive side ports to settings with no decidable hierarchy is open;
 structurally exhausted.} Every positive number here is on Pseudobase++ crossing targets; the structure-aware
 split it admits has $27$ targets in $24$ clusters, so directions replicate but magnitudes do not, and the
 cross-source bpRNA pool gives $0/60$ for our operator and for the SOTA solver alike. \emph{(ii) The positive
-side is model-relative and the panel is mechanistically narrow.} All three predictors share
-nearest-neighbour thermodynamic parameters, and carry-over tracks that shared family rather than correctness
-(Fig.~\ref{fig:carry}); no wet-lab confirmation is attempted. \emph{(iii) The component attribution is
+side is model-relative and the panel is mechanistically narrow, now measured rather than argued.} All three
+predictors share nearest-neighbour thermodynamic parameters; carry-over tracks that shared family rather than
+correctness (Fig.~\ref{fig:carry}); and pairwise agreement on our own natives puts pKiss and ShapeKnots in a
+correlated block ($\kappa=0.673$ $[0.422,0.875]$), so unanimity over three predictors buys less independent
+confirmation than its arity suggests (\S\ref{sec:oracle}). Whether ProbKnot is a genuinely independent third
+voice is undetermined at $n{=}80$, because it recovers only $3$ natives. No wet-lab confirmation is attempted. \emph{(iii) The component attribution is
 partial, and much of the effect is target-side.} The objective is load-bearing on the metric it optimizes and
 not distinguishable from an undirected walk on the metrics it does not, so we report association rather than
 causal attribution, and a search-free margin probe puts $84\%$ of $\Delta_{\mathrm{gamer}}$ on targets a
