@@ -18,6 +18,7 @@
 \usepackage{enumitem}
 \usepackage{placeins}
 \usepackage{tabularx}
+\usepackage{xltabular}   % page-breakable X-column table, for the two front-matter verdict tables
 \newcolumntype{L}{>{\raggedright\arraybackslash}X}
 \usepackage[hidelinks]{hyperref}
 \usepackage[numbers,sort&compress]{natbib}
@@ -85,9 +86,9 @@ The audit returns a six-component \emph{evidence vector} rather than a pass/fail
 decidable, because a pseudoknot-free oracle provably cannot represent a crossing pair. That bounds the prior
 \emph{verifier's range}, and says nothing about the prior policy's generative capacity.
 
-Our central result is cautionary, and it is the measurement we stand behind. An invented, solver-free operator
+Our central result is cautionary. An invented, solver-free operator
 solves $43/60$ crossing targets under the single oracle it optimizes, above a context-free floor of $0/60$;
-under three predictors only $1/60$ survives. The discriminating comparison is paired and conditional. Of those
+under three predictors only $1/60$ survives. The discriminating comparison is paired: of those
 $43$ solves a held-out predictor confirms $2$, against $26$ for a minimum-free-energy solver on the
 \emph{same} $43$ targets ($p{=}8\!\times\!10^{-7}$): oracle-specific over-optimization, measured.
 Re-optimizing for cross-oracle agreement recovers $3$--$8/60$. But we then score every arm on how far its own
@@ -98,15 +99,16 @@ correctness; and a search-free probe of the targets puts $84\%$ of the effect wh
 sequence already succeeds.
 
 For this study the vector reads one exact, three established (one narrowly, one structurally), one weak, one
-not established. An audit that nothing passes is indistinguishable from an audit that cannot see, so we
-include a positive control: frozen LLM-written operators reach $0.302$ carry-over where ours reaches $0.091$,
-on non-overlapping intervals, re-derived per design through a second code path with zero disagreements. The
-instrument discriminates. Our own system is simply the weakest arm it measures. That control also separates
-what ``discovery'' can mean here: an agent-written procedure beats the human-built one under an adjudicator
-no objective can flatter, and tripling the compute allowance reproduces none of it, but four mechanisms
-legible in the agent source transplant into ours without moving the statistic. The difference is real and
-not compute; what it \emph{is} remains unidentified, and we report those as separate rungs rather than as
-one verdict.
+not established. An audit that nothing passes is indistinguishable from an audit that cannot see, so an arm
+that \emph{does} clear the bar is measured identically: frozen LLM-written operators, on the targets they and
+our operator both solved under the same in-loop predicate, carry over at $0.293$ against our $0.095$
+($n{=}951$ paired units, $p{=}5\!\times\!10^{-37}$), re-derived per design through a second code path with
+zero disagreements. The instrument discriminates; our own system is simply the weakest arm it measures. What
+that licenses we report on three rungs rather than as one verdict: a difference under an adjudicator no
+objective can flatter (reached), not bought with compute (reached---tripling the allowance changes nothing),
+mechanism identified and transferable (not reached---four mechanisms legible in the agent source transplant
+into ours without moving the statistic). The difference is real and is not compute; what it \emph{is} remains
+unidentified, and we withhold the word discovery until it is.
 \end{abstract}
 
 \noindent\textbf{Keywords:} automated scientific discovery; self-improving agents; capability acquisition;
@@ -117,16 +119,23 @@ formal language theory; Chomsky hierarchy; RNA inverse design; decidable verific
 \centering\footnotesize
 \setlength{\abovecaptionskip}{4pt}
 \setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.2}
-\captionof{table}{\textbf{The audit's output for this study: the evidence vector $\mathcal A$ of Eq.~\eqref{eq:vector},
+\begin{xltabular}{\linewidth}{@{}>{\raggedright\arraybackslash}p{3.0cm}l L@{}}
+\caption{\textbf{The audit's output for this study: the evidence vector $\mathcal A$ of Eq.~\eqref{eq:vector},
 filled in.} All rates are $r_{\mathrm{mix}}$
-(Eq.~\eqref{eq:metricnames}) unless stated. This is the verdict:
+(Eq.~\eqref{eq:metricnames}) unless stated. This is the verdict on \emph{our own system}:
 \emph{partial audit success---diagnostic crossing evidence, not robust capability acquisition}.
+Table~\ref{tab:rungs} reports the arm that does clear the bar, which this vector has no row for.
 The classification rule, how to count the components, and how to read a mostly-negative vector are stated in
-\S\ref{sec:cert} and applied uniformly throughout.}\label{tab:verdict}
-\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{3.0cm}l L@{}}
+\S\ref{sec:cert} and applied uniformly throughout.}\label{tab:verdict}\\
 \toprule
 \textbf{component} & \textbf{verdict} & \textbf{basis, and what it does \emph{not} show}\\
 \midrule
+\endfirsthead
+\multicolumn{3}{@{}l}{\footnotesize Table~\ref{tab:verdict}, continued.}\\
+\toprule
+\textbf{component} & \textbf{verdict} & \textbf{basis, and what it does \emph{not} show}\\
+\midrule
+\endhead
 $E_{\mathrm{range}}$ (exact exclusion) & \chip{vExact}{exact} &
 \textsc{no counterfactual.} Prop.~\ref{prop:confine}, discharged offline. Bounds the prior \emph{verifier's} range; says nothing about the
 prior policy's generative capacity\\
@@ -141,9 +150,10 @@ monotonically as replication was added (${+}0.080\!\to\!{+}0.056\!\to\!{+}0.048$
 has not converged and that a fourth level of variation (the target set) could carry it to zero. It survives the
 change to a metric-neutral statistic (${+}0.049$, $p{=}6.9\!\times\!10^{-4}$, Fig.~\ref{fig:carry}), though one
 stricter conditioning disagrees. Re-measured in the bit-reproducible, equal-allowance regime it is
-${+}0.067$ $[{+}0.023,{+}0.120]$ with the gamer at $0/60$ on all five seeds (Table~\ref{tab:det}): larger than the
-replicated estimate and no longer exposed to the non-convergence worry, since no execution level remains to
-average away. A search-free target-side probe bounds what it measures: $36$ of the $43$
+${+}0.067$ $[{+}0.023,{+}0.120]$, gamer $0/60$ at all five seeds (Table~\ref{tab:det}). That removes the
+\emph{execution} level, but the level the monotone decline pointed at is the \emph{target set}, and the
+re-run uses the same $60$ targets; the narrower interval reflects one fewer variance component, not more
+evidence. Settled: not an execution-noise artifact. Open: a different corpus. A search-free target-side probe bounds what it measures: $36$ of the $43$
 discordant wins that constitute it ($84\%$) fall on targets a random compatible sequence already solves, and on
 the $30$ targets random sampling cannot reach the paired difference is ${+}0.016$ ($7$ against $0$,
 $p{=}0.016$)---that residue, not ${+}0.048$, is what the operator buys where search is required
@@ -171,6 +181,42 @@ $g_{\mathrm{aut}}$ (verified non-use of packaged inverse-design solvers) & \chip
 carries no counterfactual information, because the solver was never on the method path. Solver-free, \emph{not}
 oracle-free, and \emph{not} evidence that the gain is the system's own\\
 \bottomrule
+\end{xltabular}
+\par\endgroup
+\medskip
+
+\begingroup
+\centering\footnotesize
+\setlength{\abovecaptionskip}{4pt}
+\setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.2}
+\captionof{table}{\textbf{The instrument's other output, which the vector above cannot carry.}
+Table~\ref{tab:verdict} is the audit's verdict on \emph{our} system, so by construction it has no row for the
+arm that does clear the bar. That arm---frozen LLM-written operators (App.~\ref{app:invent}), optimizing the
+same pKiss$\,\wedge\,$ProbKnot predicate, scored by the ShapeKnots predictor held out of every arm's
+loop---is reported here on the three rungs of \S\ref{sec:disc}, which are reachable independently. It is
+simultaneously the positive control that shows the panel is not merely insensitive and the sharpest bound on
+our own result. Quantifier: these are the $2$ of $6$ invented operators with no runtime failures, so the
+claim is about \emph{some} agent-written operators, not the class.}\label{tab:rungs}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{2.55cm}l L@{}}
+\toprule
+\textbf{rung} & \textbf{verdict} & \textbf{basis, and what it does \emph{not} show}\\
+\midrule
+(D1) difference under an adjudicator no objective can flatter & \chip{vEst}{established} &
+Paired and difficulty-matched: on the $951$ (target, cell) units \emph{both} arms solved under the shared
+in-loop predicate, carry-over is $0.293$ vs.\ $0.095$, $b{=}218$ vs.\ $c{=}29$, exact McNemar
+$p{=}5\!\times\!10^{-37}$, risk difference ${+}0.199$ (\texttt{arep\_matched.py}); unmatched rates $0.302$
+$[0.275,0.330]$ vs.\ $0.091$ $[0.068,0.118]$. Re-derived per design through the sweep's own oracle calls with
+zero disagreements. \textsc{Between-system} association, on one pool, with the model-level selection above\\
+(D2) not bought with compute & \chip{vEst}{established} &
+Tripling the pKiss allowance and changing nothing else raises realized pKiss use $82.2\!\to\!196.2$ calls per
+target and moves carry-over from $0.108$ to $0.108$ (Table~\ref{tab:attr}). Rules out the allowance as the
+explanation; does not rule out other resources we did not vary\\
+(D3) mechanism identified and transferable & \chip{vNone}{not established} &
+Four mechanisms legible in the agent source, transplanted one at a time and run deterministically at $5$
+seeds: every interval contains the baseline and none reaches the agents' lower bound of $0.275$
+(Table~\ref{tab:attr}). What the difference \emph{is} remains unidentified, and we withhold the word
+``discovery'' until this rung is reached\\
+\bottomrule
 \end{tabularx}
 \par\endgroup
 \medskip
@@ -193,6 +239,20 @@ pseudoknot-free folding oracle cannot represent a crossing pair, which turns ``t
 be certified through its pseudoknot-free regime'' into a decidable statement rather than a failed search; the
 stronger claim, that the prior policy produces no crossing design under a crossing-aware adjudicator, is a
 separate empirical floor ($0/60$).
+
+\emph{What the hierarchy buys, and what it does not.} It is fair to ask whether ``context-free versus mildly
+context-sensitive'' is doing work that ``pseudoknot-free versus pseudoknotted'' would not. One thing, and it
+is the thing this paper needs: \textbf{the difficulty axis is not ours to choose}. Where a target sits is a
+property of its topology, fixed by \citet{rivaseddy2000,nebelweinberg,katosekikasami2006} before this system,
+this benchmark, or this paper existed. So the negative side cannot be moved by selecting a favourable target
+set, tuning a threshold, or---the failure mode that motivates the whole audit---improving the system and
+recomputing the criterion from the improved system's own fit. A description-length or information-criterion
+gate is computed from the revised system and the evidence it was fitted on, and therefore has no such
+external anchor (\S\ref{sec:related}). That is the entire dividend, and we claim no more: the hierarchy
+supplies an exact, externally fixed exclusion on the verifier's range and a vocabulary for grading targets.
+It supplies nothing on the positive side, where every statement in this paper is model-relative and
+empirical, and it does not license a class-level claim about any finite set of realized designs
+(\S\ref{sec:formal}).
 
 \paragraph{Thesis.} \emph{Under a pseudoknot-aware oracle, a self-improving design agent realizes held-out
 crossing targets via a reusable, solver-free procedure, while its prior \CF-verified repertoire is confined by
@@ -243,6 +303,19 @@ $1/60$ panel-unanimous, a collapse from $43/60$ to $1/60$ that the panel exposes
 of $0/60$.
 Re-optimizing for cross-oracle agreement recovers a small set of mixed-panel-consistent crossings ($3$--$8/60$ over five seeds,
 mean $5.0$, unanimous across three distinct predictors).
+\item \textbf{A positive result on the same instrument, reported on three named rungs}
+(\S\ref{sec:exp}, \S\ref{sec:disc}). An audit nothing passes and an audit that cannot see produce the same
+table, so we measure an arm that \emph{does} clear the bar: frozen LLM-written operators, scored by the
+predictor held out of every arm's loop. On targets \emph{both} arms solved under the same shared in-loop
+predicate, they carry over at $0.293$ against the hand-built operator's $0.095$ (paired, $n{=}951$,
+$b{=}218$ vs.\ $c{=}29$, exact McNemar $p{=}5\!\times\!10^{-37}$), and tripling the pKiss allowance
+reproduces none of it. We separate what that licenses into rungs reachable independently---\textbf{D1}, a
+difference under an adjudicator no objective can flatter; \textbf{D2}, not bought with compute; \textbf{D3},
+mechanism identified and transferable---and report \emph{D1 and D2 established, D3 open}: four mechanisms
+legible in the agent source transplant into ours without moving the statistic. This is simultaneously the
+instrument's positive control and the sharpest statement of our own system's limitation, since $0.302$ is
+reachable on this pool and our operator reaches $0.091$. The comparison criterion we position against
+(\S\ref{sec:related}) does not, on its own reported evidence, reach D1 or D2; D3 is reached by neither.
 \end{enumerate}
 
 \noindent Figure~\ref{fig:arch} shows how these compose into one pipeline: a graded target enters, the agent
@@ -281,7 +354,23 @@ not as a result withheld. The SAT domain
 (App.~\ref{sec:sat}) is a \emph{supplement} that no claim here depends on. Two
 things are \emph{not} claimed: (i) a robust autonomous ascent, since at $1/60$ panel-unanimous the instrument only
 exposes an oracle artifact, and the invention algorithm remains the object under test; (ii) any scientific
-discovery of a new design principle.
+discovery of a new design principle, which by our own standard requires D3 (Table~\ref{tab:rungs}).
+
+\paragraph{The nearest criterion, and where the two differ.} The closest programme is categorical
+self-revising discovery \citep{selfrevising}, which formalizes discovery as the residual beyond a functorial
+transport of prior artifacts and gates it on an MDL/AIC criterion. We state the comparison here, in the terms
+of Table~\ref{tab:rungs}, because it is the reason this paper is shaped as an audit; \S\ref{sec:related}
+gives it in full. An information criterion is computed from the revised system and the evidence that system
+was fitted on. It therefore has no predictor held outside the loop, which is exactly the quantity D1
+requires and exactly the failure mode our $43\!\to\!1$ collapse exhibits: a system can improve a statistic of
+its own fit while a predictor it never optimized sees almost nothing. No compute control is reported, so D2
+is not addressed. And by its authors' own statement the residual measures the \emph{additional bits} a
+revision needs, not the prior regime's incapacity, so there is no counterpart to the exact exclusion of
+Prop.~\ref{prop:confine}. We intend this as a difference in \emph{reported evidence}, not in ambition---a
+categorical account of regime change is doing different work from an audit, and D3 is reached by neither
+line. The claim we do make is narrow and checkable: on the rungs where evidence can be demanded, this paper
+supplies a held-out adjudicator, a compute control, matched baselines, ablations, intervals, and its own two
+unestablished components.
 
 \paragraph{Classification rule, and how to count the components.} \emph{Exact}: proved, discharged offline.
 \emph{Established}: the effect's $95\%$ interval excludes zero at the deepest resampling level run for that
@@ -295,6 +384,9 @@ reader who prefers the conservative variant can reclassify $\Delta_{\mathrm{game
 in the paper changes. \emph{Weak}: directionally consistent, but the interval or the replication does not
 support it. \emph{Not established}: the interval spans zero. By that rule this study returns \textbf{one exact,
 three established, one weak, one not established}, and every count stated elsewhere in this paper is this one.
+The rungs of Table~\ref{tab:rungs} are graded by the same words but are \emph{not} part of this count: they
+score a different arm (the frozen agent-written operators) on a different question (what a difference in
+carry-over licenses), and adding the two tallies would double-count the instrument against itself.
 It should not be read without the second question the rows also answer, flagged \textsc{no counterfactual} and
 \textsc{weak counterfactual} in Table~\ref{tab:verdict}: whether a component is a contrast against an arm that
 could have come out otherwise. Two are not. $E_{\mathrm{range}}$ is a theorem about the instrument's range,
@@ -1157,9 +1249,14 @@ Four results, two of which change what the paper can say.
 
 \emph{(1) $\Delta_{\mathrm{gamer}}$ survives, and grows.} The panel operator reaches $4.0/60$ against the
 gamer's $0/60$ at \emph{every one} of five seeds: $\Delta={+}0.067$ $[{+}0.023,{+}0.120]$, larger than the
-$+0.048$ of the replicated wall-clock estimate and no longer exposed to the monotone-decline worry of
-Table~\ref{tab:verdict}, because there is no execution level left to average away. This is the paper's headline
-difference measured with its main confound deleted rather than bounded.
+$+0.048$ of the replicated wall-clock estimate. This is the paper's execution-noise confound deleted rather
+than bounded---but only that one, and we state the limit precisely rather than let the larger number stand
+for more than it is. The monotone decline of Table~\ref{tab:verdict} was diagnosed as possible
+non-convergence over the levels of variation; determinism removes the \emph{execution} level, whereas the
+level we flagged as able to carry the estimate to zero was the \emph{target set}, and this re-run uses the
+same $60$ targets. The narrower interval likewise reflects a design with one fewer variance component, not
+more evidence. What is settled is that $\Delta_{\mathrm{gamer}}$ is not an artifact of execution noise;
+whether it survives a different corpus is owed experiment~(1).
 
 \emph{(2) $\Delta_{\mathrm{undirected}}$ is now a measured zero, not an underpowered null.} Deleting the
 objective moves $r_{\mathrm{mix}}$ by $+0.0000$, interval $[{-}0.060,{+}0.050]$: the point estimate is exactly
@@ -1500,6 +1597,23 @@ re-executed at $5$ seeds $\times$ $3$ executions, \texttt{agent\_replicate.py}),
 $333/1104=\mathbf{0.302}$ $[0.275,0.330]$ against the hand-built operator's $48/530=0.091$ $[0.068,0.118]$;
 the intervals do not overlap. The three executions inside a seed are \emph{bit-identical} in $5/5$ seeds, so
 unlike our own operator these are reproducible runs.
+
+\emph{Paired, at the standard we impose on the transplant arms.} Those are two conditional rates on two
+different denominators, and Table~\ref{tab:attr}'s caption forbids exactly that reading for every other arm,
+so we apply the same standard here rather than a weaker one to the arm that carries the paper's
+discriminating-power claim. Both arms optimize the same pKiss$\,\wedge\,$ProbKnot predicate and are scored by
+ShapeKnots, held out of both, so restricting to the (target, cell) units where \emph{both} arms cleared
+that shared bar gives a genuinely paired comparison---same target, same nominal seed, same execution index,
+same in-loop bar met---in which the only open question is whether the held-out predictor confirms. On those
+$n{=}951$ units the agent operators carry over at $0.293$ $[0.265,0.323]$ against $0.095$ $[0.077,0.115]$,
+with $b{=}218$ discordant pairs favouring the agents against $c{=}29$ favouring us, exact two-sided McNemar
+$p{=}5.1\!\times\!10^{-37}$, risk difference ${+}0.199$; per model, ${+}0.262$ ($p{=}3.6\!\times\!10^{-26}$)
+and ${+}0.143$ ($p{=}6.4\!\times\!10^{-13}$). Matching costs the point estimate almost nothing ($0.302$ to
+$0.293$), which is itself informative: the advantage was not an artifact of the two arms solving different
+targets (\texttt{arep\_matched.py}). One quantifier the matching does \emph{not} repair: these are the $2$ of
+$6$ invented operators with no runtime failures, a model-level survivorship selection on top of the
+target-level one, so the supported claim is that \emph{some} agent-written operators carry over better, not
+that agent-written operators do.
 Because this number carries the instrument's discriminating power, and because it is produced by a
 different script from the one that measures every other arm, we re-derived it end to end rather than trust
 the agreement of two code paths: starting from the stored sequences and recomputing all three predictors
@@ -1934,14 +2048,25 @@ the allowance and changes nothing else.
 \item[\textnormal{(D3) The mechanism is identified and transfers.}] A property one can name, port into
 another system, and watch reproduce the gain.
 \end{description}
-For the agent-written operators this study reaches \textbf{D1} (carry-over $0.302$ $[0.275,0.330]$ against
-the hand-built $0.108$, non-overlapping) and \textbf{D2} (tripling the pKiss allowance moves carry-over by
+For the agent-written operators this study reaches \textbf{D1}---paired and difficulty-matched on the $951$
+units both arms solved under the shared in-loop predicate, $0.293$ against $0.095$, $b{=}218$ vs.\ $c{=}29$,
+$p{=}5\!\times\!10^{-37}$ (\S\ref{sec:exp}), with unmatched rates $0.302$ $[0.275,0.330]$ against $0.091$
+$[0.068,0.118]$---and \textbf{D2} (tripling the pKiss allowance moves carry-over by
 nothing, Table~\ref{tab:attr}), and does \emph{not} reach \textbf{D3}: four mechanisms legible in the agent
 source were transplanted one at a time and none reproduced the gain. So the honest verdict is
-\emph{D1 and D2 established, D3 open}, not the undifferentiated ``fails the discovery bar'' the single
-threshold implied. We hold ourselves to D3 before using the word discovery, and we note in
-\S\ref{sec:related} that the criterion we position against does not, on its own reported evidence, reach
-D1 or D2 either.
+\emph{D1 and D2 established, D3 open} (Table~\ref{tab:rungs}), not the undifferentiated ``fails the discovery
+bar'' the single threshold implied. Two things bound it and belong in the same breath: the claim is about the
+$2$ of $6$ operators that ran without failures, and D1 is a \emph{between-system} association on one pool, so
+neither rung is a statement about agent-written operators as a class. We hold ourselves to D3 before using
+the word discovery, and we note in \S\ref{sec:related} that the criterion we position against does not, on
+its own reported evidence, reach D1 or D2 either.
+
+\emph{Why this rung split is not special pleading.} It would be, if we had invented the rungs after seeing
+which ones we cleared. The order of events is the reverse: D3 is the bar an earlier draft of this paper set
+for itself as \emph{the} discovery bar, and we still fail it. Splitting it changes no verdict about our own
+system---which reaches none of the three, since its carry-over is the $0.091$ that the positive control is
+measured against---and it lets an arm that clears two rungs be reported as clearing two rungs instead of
+being scored against a threshold it was never claimed to meet.
 
 \paragraph{Complementary to the categorical self-revising line.} The nearest programme is categorical
 self-revising discovery \citep{selfrevising}, which formalizes discovery as the residual beyond a functorial
@@ -1961,19 +2086,19 @@ $1/60$ survives three predictors. The $42$-target gap is invisible to any statis
 and its own oracle, which is the sense in which a one-sided gate and a two-sided audit are complementary
 layers rather than competitors.
 
-\emph{Placed on the D1--D3 rungs, and stated as a difference in evidence rather than in ambition.} An MDL or
-AIC gate is computed from the revised system and the evidence it was fitted on. That is precisely a statistic
-of the kind D1 excludes: there is no predictor held outside the loop, so a system that improves its own
-compression cannot be distinguished from one that adapted to the evidence it is scored on---the failure mode
-our $43\!\to\!1$ collapse exhibits directly. Nor is a compute control reported, so D2 is not addressed. And
-as \citet{selfrevising} state, the residual measures the \emph{additional bits} a revision needs, not the
-prior regime's incapacity, so there is no counterpart to our exact exclusion. We say this as a statement
-about reported evidence, not about the framework's reach: a categorical account of regime change is doing
-different work from an audit, and D3---naming the mechanism---is reached by neither of us. The comparison we
-do claim is narrow and checkable: on the rungs where evidence can be demanded, this paper supplies a
-held-out adjudicator, a compute control, matched baselines, ablations and intervals, and reports its own two
-unestablished components; the case studies of the categorical line report neither baselines nor ablations
-nor significance tests across roughly five runs.
+\emph{Placed on the D1--D3 rungs.} \S\ref{sec:intro} states this comparison, because it is the reason the
+paper is shaped as an audit; three points complete it here. First, the mechanism: an information criterion is
+computed from the revised system and the evidence that system was fitted on, so there is no predictor held
+outside the loop, and a system that improves its own compression cannot be distinguished from one that
+adapted to the evidence it is scored on---which is the $43\!\to\!1$ collapse, exactly. Second, the reach: as
+\citet{selfrevising} state, the residual measures the \emph{additional bits} a revision needs, not the prior
+regime's incapacity, so there is no counterpart to our exact exclusion; this is a difference in reported
+evidence, not in ambition, and D3 is reached by neither of us. Third, the checkable part: on the rungs where
+evidence can be demanded, this paper supplies a held-out adjudicator, a compute control, matched baselines,
+ablations and intervals, and reports its own two unestablished components; the case studies of the
+categorical line report neither baselines nor ablations nor significance tests across roughly five runs.
+We are comparing what each line reports, on one axis each was not designed against, and a reader who thinks
+regime change is the more important question should discount this paragraph accordingly.
 
 \paragraph{An audit layer for AI4S.} The lesson generalizes because the vulnerability does. Most scientific
 oracles a self-improving system optimizes against are fallible surrogates (a docking score, a force field, a
@@ -2063,8 +2188,19 @@ search-free probe of target difficulty puts $84\%$ of it on targets random sampl
 itself tracks shared model family rather than correctness, which bounds what any panel of thermodynamically
 related predictors can certify. The exclusion side is exact and concerns the prior \emph{verifier's} range,
 never the prior policy's capacity. The evidence vector for this study reads one exact, three established, one
-weak, one not established; the instrument, not the system, is what we ask readers to take away, and the
-positive control shows the instrument discriminates even though our system does not clear it by much.
+weak, one not established; the instrument, not the system, is what we ask readers to take away.
+
+\paragraph{And the positive side, at the same strength.} The instrument is not merely insensitive, and
+establishing that produced this paper's one clearly positive measurement. Frozen agent-written operators,
+scored by the predictor held out of every arm's loop and compared on the targets they and our operator both
+solved under the same in-loop bar, carry over at $0.293$ against our $0.095$ ($n{=}951$ paired units,
+$p{=}5\!\times\!10^{-37}$), and tripling the pKiss allowance reproduces none of it. On the rungs of
+Table~\ref{tab:rungs} that is D1 and D2 established and D3 open: four mechanisms legible in the agent source
+transplant into ours without moving the statistic, so what the difference \emph{is} remains unidentified, and
+we do not call it a discovery. It is bounded by the two of six operators that ran without failures and by a
+single pool. We report it at that strength deliberately: an unexplained, compute-controlled, held-out-verified
+difference between an agent-written procedure and a human-written one is a more useful thing to put on the
+record than either a flat null or a claim the evidence does not carry.
 
 \appendix
 \section{Proofs}\label{app:proofs}

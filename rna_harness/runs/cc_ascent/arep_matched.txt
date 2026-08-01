@@ -1,0 +1,36 @@
+====================================================================================================
+POSITIVE CONTROL, PAIRED: carry-over to held-out ShapeKnots, agent-written vs hand-built
+====================================================================================================
+Both arms optimize pKiss AND ProbKnot and are scored by ShapeKnots, held out of both loops.
+Matched cells are (nominal seed, execution index); matched units are targets both arms solved.
+
+  hand-built cells loaded: 15
+  gemini31pro cells loaded: 15
+
+  gemini31pro
+    unmatched (each arm on its own successes)
+      agent       186/507   = 0.367  [0.325,0.410]
+      hand-built   48/530   = 0.091  [0.068,0.118]
+    difficulty-matched (both arms cleared pKiss AND ProbKnot on the same target/cell), n=442
+      agent       161/442   = 0.364  [0.319,0.411]
+      hand-built   45/442   = 0.102  [0.075,0.134]
+      paired McNemar b=127 (agent only), c=11 (hand-built only), exact p=3.609e-26; risk difference +0.2624
+  kimik3 cells loaded: 15
+
+  kimik3
+    unmatched (each arm on its own successes)
+      agent       147/597   = 0.246  [0.212,0.283]
+      hand-built   48/530   = 0.091  [0.068,0.118]
+    difficulty-matched (both arms cleared pKiss AND ProbKnot on the same target/cell), n=509
+      agent       118/509   = 0.232  [0.196,0.271]
+      hand-built   45/509   = 0.088  [0.065,0.117]
+      paired McNemar b=91 (agent only), c=18 (hand-built only), exact p=6.367e-13; risk difference +0.1434
+
+  POOLED over the two models, difficulty-matched, n=951
+    agent       279/951   = 0.293  [0.265,0.323]
+    hand-built   90/951   = 0.095  [0.077,0.115]
+    paired McNemar b=218 (agent only), c=29 (hand-built only), exact p=5.088e-37; risk difference +0.1987
+
+  Note on the quantifier. These are the 2 of 6 invented operators with no runtime failures;
+  the other 4 time out on 19-32 of 60 targets and are excluded. The claim this supports is
+  'some agent-written operators carry over better', not a property of agent-written operators.
