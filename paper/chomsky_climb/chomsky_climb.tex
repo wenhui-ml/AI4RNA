@@ -935,24 +935,20 @@ conventions and remaining robustness checks. Everything is on the $n{=}60$ Pseud
 pool is named; every rate is one of the three metrics of Eq.~\eqref{eq:metricnames}, never a blended
 ``panel'' number.
 
-\paragraph{Setup: an exact difficulty axis, a validated panel, and an exact designability screen.} Three
-properties of the testbed, each of which the audit needs. \emph{(i) The grade is intrinsic and exact.} Each
-target's formal-family type (nested or crossing) and crossing-stem count are properties of the target, fixed
-before design and decidable in $O(|P|^2)$ from the dot-bracket string, never inferred from whether the agent
-solves it. So the graded frontier carries no survivorship bias, and the boundary they mark is the established
-$\CF\!\to\!\MCF$ line (\S\ref{sec:cf}), not a learned proxy. \emph{(ii) Verifier validity is checked before
-verdicts are trusted.} The \CF{} ladder ($\match\supseteq\umfe\supseteq\pfe$) and the pseudoknot panel are
-reused instruments \citep{verifiereconomics}; we run the specificity half here (skeleton designs, expected
-zero crossing recall) and inherit native recall from that companion's calibration. Without this a lenient
-panel could credit skeletons as pseudoknots and manufacture an ascent: the design-domain form of reward
-hacking \citep{skalse2022,gao2023overopt}. \emph{(iii) Undesignable targets are excluded only on an exact
-certificate.} A crossing target no sequence realizes would depress the positive rate for reasons unrelated to
-the repertoire, so we pre-screen, but by rival-structure construction \citep{zhou2024rigende,zhou2025motifs}
-and never on mere solver failure, so hard-but-designable targets stay in. On the primary pool it excludes
-\emph{none}. We also do not infer designability from native provenance: that nature formed $T$ with
-$x_{\mathrm{nat}}$ does not entail $\Omega(x_{\mathrm{nat}})=T$ for our oracles, and our calibration shows it
-usually fails ($\sim\!1\%$ native recall). So oracle-relative designability of the pool is \emph{unknown}, and
-an unsolved target may be a search failure or an oracle-relative impossibility.
+\paragraph{Setup: an exact difficulty axis, a validated panel, and an exact designability screen.}
+\emph{(i) The grade is intrinsic and exact.} Each target's family type and crossing-stem count are properties
+of the target, decidable in $O(|P|^2)$ and never inferred from whether the agent solves it, so the graded
+frontier carries no survivorship bias and the boundary is the established $\CF\!\to\!\MCF$ line
+(\S\ref{sec:cf}), not a learned proxy. \emph{(ii) Verifier validity is checked before verdicts are trusted.}
+The \CF{} ladder and the pseudoknot panel are reused instruments \citep{verifiereconomics}; we run the
+specificity half here (skeleton designs, expected zero crossing recall) and inherit native recall from that
+companion. Without it a lenient panel could credit skeletons as pseudoknots and manufacture an ascent.
+\emph{(iii) Undesignable targets are excluded only on an exact certificate}, by rival-structure construction
+\citep{zhou2024rigende,zhou2025motifs} and never on solver failure, so hard-but-designable targets stay in; on
+the primary pool it excludes none. We also do not infer designability from native provenance, since our
+calibration shows $\Omega(x_{\mathrm{nat}})=T$ usually fails ($\sim\!1\%$ native recall). Oracle-relative
+designability of the pool is therefore \emph{unknown}, and an unsolved target may be a search failure or an
+oracle-relative impossibility.
 
 \paragraph{Positive-side adjudication under oracle-dependence.} Because the pseudoknot verdict is
 oracle-dependent (\S\ref{sec:bg}), a target counts as realized only under an explicit rule: (i)
@@ -1183,19 +1179,16 @@ $-$ complementarity composition & $34.4$ & $+.043$ $[{-}.030,{+}.137]$ & $5.40$ 
 \end{table}
 
 \paragraph{The panel-optimizing operator, and its held-out rate.} The operator whose repair loop optimizes
-agreement between pKiss and ProbKnot solves $34$--$37/60$ on its own two oracles across five seeds, against
-the pKiss-gamer's ProbKnot-robust $2/60$; $3$--$8$ of those (mean $5.0$) are also panel-unanimous, against
-$\sim\!1/60$ for the gamer and $0/60$ for the SOTA solver. Read every band of this form as the range of the
-runs named beside it: pooling all $24$ executions we later ran, the two-oracle rate spans $30$--$39/60$ and
-the three-predictor rate $1$--$9/60$ (mean $3.29$). Panel-unanimity puts two of its three conjuncts inside the
-operator's objective, so it cannot by itself show generalization. On the one genuinely held-out predictor the
-operator is higher at every seed but significant in one of three ($n{=}125$ ID-disjoint targets;
-$\widehat\Delta = {+}0.008, {+}0.056, {+}0.064$; $p = 1.000, 0.092, 0.021$). We record that as
-\emph{weak}, and do not build on it. It is not small in \emph{absolute} terms once given its reference class,
-which is the more useful reading: the same adjudicator recovers only $11.3\%$ of native pseudoknots from
-their own sequences, and confirms our designs at $8.0\%$, about $70\%$ of its own ceiling, against the
-gamer's $3.7\%$ (App.~\ref{app:adjud}). That reframes the size of the held-out signal without changing the
-verdict on it.
+agreement between pKiss and ProbKnot solves $34$--$37/60$ on its own two oracles across five seeds against the
+gamer's ProbKnot-robust $2/60$; $3$--$8$ of those (mean $5.0$) are also panel-unanimous, against $\sim\!1/60$
+for the gamer and $0/60$ for the SOTA solver. Read every band of this form as the range of the runs named
+beside it: pooling all $24$ executions gives $30$--$39/60$ and $1$--$9/60$ (mean $3.29$). Panel-unanimity puts
+two of its three conjuncts inside the operator's objective, so it cannot by itself show generalization. On the
+one genuinely held-out predictor the operator is higher at every seed but significant in one of three ($n{=}125$
+ID-disjoint targets; $\widehat\Delta = {+}0.008, {+}0.056, {+}0.064$). We record that as \emph{weak} and do not
+build on it. In \emph{absolute} terms it is not small once given its reference class: the same adjudicator
+recovers only $11.3\%$ of native pseudoknots from their own sequences and confirms our designs at $8.0\%$,
+about $70\%$ of its own ceiling, against the gamer's $3.7\%$ (App.~\ref{app:adjud}).
 
 \paragraph{$\Delta_{\mathrm{gamer}}$: separated, but by how much depends on the estimator, and we say so.}
 Run on the \emph{same} seeds and targets as the operator, the gamer is panel-unanimous on
@@ -1374,95 +1367,72 @@ discharges the compute-matched (rather than cap-matched) control the previous re
 closes the compute question in both directions: the advantage does not appear when we are given three times
 the allowance, and it does not appear when we are held to the agents' own.
 
-\emph{A structural property of the designs themselves, gated then transplanted.} Composition is excluded and
-compute is excluded, so the surviving shape of the hypothesis is that the accepted designs differ in
-\emph{where} their nucleotides sit relative to the target's pair set. We pre-stated six such features and two
-gates: (a) the feature differs between the arms, and (b) it predicts carry-over \emph{within} the hand-built
-arm, where the program is held fixed. Overall GC went in as a negative control
-(\texttt{d3\_structural.py}). The control earned its place immediately: GC passed gate (b) outright (AUC
-$0.749$, $p{=}1.9\!\times\!10^{-10}$), so an unadjusted gate admits anything GC-correlated and would have
-promoted \texttt{gc\_cross} on the strength of its GC content alone. With both gates adjusted for GC by
-logistic regression, and a permuted feature as the adjusted null ($p{=}0.813$), \texttt{gc\_cross}
-($p{=}0.558$) and \texttt{a\_loop} ($p{=}0.176$) fall to fingerprints; two features turn out undefined on
-$513$ of $530$ designs, because a bare H-type pseudoknot has no non-crossing pairs at all. One survives:
-\texttt{decoy}, the number of off-target windows complementary to the crossing stem's $5'$ arm, of which
-agent designs carry $0.003$ each against our $0.060$.
+\emph{A structural property of the designs, gated then transplanted.} Composition and compute are excluded, so
+the surviving hypothesis is that the accepted designs differ in \emph{where} their nucleotides sit relative to
+the target's pair set. We pre-stated six such features and two gates: (a) the feature differs between the arms,
+and (b) it predicts carry-over \emph{within} the hand-built arm, where the program is held fixed. Overall GC
+went in as a negative control, and earned its place at once by passing gate (b) outright (AUC $0.749$,
+$p{=}1.9\!\times\!10^{-10}$), so an unadjusted gate admits anything GC-correlated. With both gates adjusted for
+GC by logistic regression and a permuted feature as the adjusted null ($p{=}0.813$), \texttt{gc\_cross}
+($p{=}0.558$) and \texttt{a\_loop} ($p{=}0.176$) fall to fingerprints, and two features are undefined on $513$
+of $530$ designs because a bare H-type pseudoknot has no non-crossing pairs. One survives: \texttt{decoy}, the
+count of off-target windows complementary to the crossing stem's $5'$ arm, of which agent designs carry $0.003$
+each against our $0.060$.
 
 That earned a transplant, and the transplant refutes it. \textbf{Our first attempt does not count and we say
-so}: adding \texttt{decoy} as a tiebreak in the acceptance rule left the accepted designs' decoy count
-unchanged ($0.0757\!\to\!0.0761$), so the resulting null tested nothing. By the standard of
-Table~\ref{tab:attr}, a transplant that changes nothing measurable is a bug. Moving the intervention to the
-step that determines the feature, choosing the crossing stem's bases to minimize decoys and still calling no
-oracle, engages properly: decoys fall $0.0757\!\to\!0.0452$ and the designs carrying any halve from
-$12$ to $6$. Carry-over then goes the \emph{wrong way}: $16/177=0.090$ $[0.034,0.157]$ against the baseline's
-$0.108$, paired $b{=}6$ against $c{=}11$ on the $162$ cells both arms solved ($p{=}0.33$), with
-$r_{\mathrm{in}}$ at $35.4/60$ (\texttt{nodecoy.sh}, \texttt{ndc\_stats.py}).
+so}: adding \texttt{decoy} as an acceptance tiebreak left the accepted designs' decoy count unchanged
+($0.0757\!\to\!0.0761$), and by the standard of Table~\ref{tab:attr} a transplant that changes nothing
+measurable is a bug. Moving the intervention to the step that determines the feature, choosing the crossing
+stem's bases to minimize decoys and still calling no oracle, engages properly: decoys fall to $0.0452$ and the
+designs carrying any halve from $12$ to $6$. Carry-over then goes the wrong way, $16/177=0.090$
+$[0.034,0.157]$ against the baseline's $0.108$, with a paired difference of ${-}0.031$ on the $162$ cells both
+arms solved ($p{=}0.33$) and $r_{\mathrm{in}}$ at $35.4/60$.
 
-This is the cleanest failure in the paper and worth naming as a general one. \texttt{decoy} predicts
-carry-over \emph{observationally} within an arm at $p{=}2.6\!\times\!10^{-3}$ after adjusting for
-composition, and \emph{intervening} on it reproduces none of that; if anything it reverses. The two-stage gate
-exists so that an observational association cannot be reported as a mechanism, and here it caught one. An
-attribution stopping at Stage 1, as most feature analyses of learned systems do, would have reported
-\texttt{decoy} as the explanation.
-
-\emph{A seventh test, distributional rather than scalar, and the second observational lead to die under
-intervention.} A reviewer asked the sharpest version of the remaining question: a difference could live in the
-\emph{whole distribution} of accepted designs while every hand-picked scalar came back null. Answering it took
-three designs, and the first two failed their own controls, which is worth recording. Unstratified, all six
-pre-stated quantities came back significant, the signature of a test measuring composition six times over,
-since folding energy per nucleotide is largely GC in energy units. GC-decile stratification did not repair it
-either: the negative control, GC tested against itself within GC bins, came back significant. Caliper-matching
-on GC ($\pm0.01$, no replacement, $399/530$ pairs) finally calibrates it: the control passes at $p{=}0.98$
-with matched mean GC $0.4643$ against $0.4640$. \textbf{And a difference survives at matched composition.} The
-agent operators' designs have an ensemble gap $(\mathrm{MFE}-\mathrm{EFE})/n$ of $0.005$ against our $0.012$
-(KS $D{=}0.466$), with longer unpaired loops ($\max$ $13.9$ against $10.8$): they concentrate the Boltzmann
-ensemble on a single fold, and a dominant fold is one any model confirms
+\emph{A seventh test, distributional rather than scalar.} A reviewer asked the sharpest remaining question: a
+difference could live in the \emph{whole distribution} of accepted designs while every hand-picked scalar came
+back null. Answering it took three designs and the first two failed their own controls. Unstratified, all six
+pre-stated quantities came back significant, the signature of a test measuring composition six times over.
+GC-decile stratification did not repair it: the negative control, GC against itself within GC bins, came back
+significant. Caliper-matching on GC ($\pm0.01$, no replacement, $399/530$ pairs) finally calibrates it, with the
+control at $p{=}0.98$ and matched mean GC $0.4643$ against $0.4640$. \textbf{And a difference survives at
+matched composition}: the agent designs' ensemble gap $(\mathrm{MFE}-\mathrm{EFE})/n$ is $0.005$ against our
+$0.012$ (KS $D{=}0.466$), with longer unpaired loops ($\max$ $13.9$ against $10.8$). They concentrate the
+Boltzmann ensemble on a single fold, and a dominant fold is one any model confirms
 (\texttt{d3\_distributional.py}).
 
 That is a mechanism-shaped lead, and the transplant kills it. Minimizing the ensemble gap where it is
-determined, by choosing the crossing stem's bases plus a tiebreak, using a nested partition function outside
-every arm's objective and outside the counted allowance, engages properly: $0.0126\to0.0080$ per design,
-$60\%$ of the way to the agents' value. Carry-over does not follow: $15/151=0.099$ $[0.043,0.167]$ against
-the baseline's $0.108$, and on the $141$ cells both arms solved the paired difference is \textbf{exactly zero}
-($b{=}7$, $c{=}7$, $p{=}1.0$), with $r_{\mathrm{in}}$ falling $37.0\to30.2$
-(\texttt{dominant.sh}, \texttt{dom\_stats.py}).
-
-\emph{Two independent leads, both composition-controlled, both dead under intervention.} That is now the most
-transferable thing this paper has to say about attributing a capability difference. \texttt{decoy} and the
-ensemble gap each differ between the arms at matched composition, each predicts or plausibly explains
-carry-over, and neither reproduces any of it when the operator is biased toward it. A study that stopped at
-the observational stage, which is where most feature analyses of learned systems stop, would have reported
-either as the mechanism, twice, with a clean $p$-value each time. \textbf{Seven candidates have now been
-excluded by intervention rather than by argument.}
+determined, using a nested partition function outside every arm's objective and outside the counted allowance,
+engages properly ($0.0126\to0.0080$ per design, $60\%$ of the way to the agents' value). Carry-over does not
+follow: $15/151=0.099$ $[0.043,0.167]$ against $0.108$, and on the $141$ cells both arms solved the paired
+difference is \textbf{exactly zero} ($b{=}7$, $c{=}7$, $p{=}1.0$), with $r_{\mathrm{in}}$ falling $37.0\to30.2$
+(\texttt{dominant.sh}, \texttt{dom\_stats.py}). Two independent leads, both composition-controlled, both dead
+under intervention.
 
 \paragraph{What seven interventional tests bought, which is not what we set out to buy.} The mechanism hunt
 failed: the advantage is robust, is not compute in either direction, is not legible in the source, and is not
-reproduced by either property that distinguishes the arms at matched composition. We had been reporting that
-as a confession. It is better read as the paper's most portable result, and reading it that way
-costs no evidence: the numbers are the ones above.
+reproduced by either property that distinguishes the arms at matched composition. We had been reporting that as
+a confession. It is better read as the paper's most portable result, and reading it that way costs no evidence.
 
-\emph{Four times in this study, a statistically supported and mechanistically plausible attribution was
-wrong, and a control built in advance caught it.} (i) \texttt{decoy} differs between the arms at
+\emph{Four times in this study a statistically supported and mechanistically plausible attribution was wrong,
+and a control fixed in advance caught it.} (i) \texttt{decoy} differs between the arms at
 $p{=}2.1\!\times\!10^{-4}$ and predicts carry-over \emph{within} the hand-built arm at
-$p{=}2.6\!\times\!10^{-3}$ after adjusting for composition; biasing the operator toward it moves carry-over
-from $0.108$ to $0.107$ and reverses the sign. (ii) The ensemble gap differs at matched composition with
-$D{=}0.466$ under a calibrated null and has a clean mechanism, since a dominant fold is one any model
-confirms; biasing toward it gives a paired difference of \emph{exactly} zero. (iii) Two successive designs
-of the distributional test were confounded by GC, and in both cases the negative control, not our judgement,
-is what said so. (iv) The agent operators' source asks for $15$ restarts $\times$ $3000$ iterations against
-our $6\times800$, which reads unambiguously as ``they searched harder''; counting realized calls shows they
-spend $4.6$--$10\times$ \emph{fewer}, so the constant in the source pointed the wrong way.
+$p{=}2.6\!\times\!10^{-3}$ after adjusting for composition; biasing toward it moves carry-over from $0.108$ to
+$0.107$ and reverses the sign. (ii) The ensemble gap differs at matched composition with $D{=}0.466$ under a
+calibrated null and has a clean mechanism, and biasing toward it gives a paired difference of \emph{exactly}
+zero. (iii) Two successive designs of the distributional test were confounded by GC, and in both cases the
+negative control, not our judgement, said so. (iv) The agent source asks for $15$ restarts $\times$ $3000$
+iterations against our $6\times800$, which reads as ``they searched harder''; counting realized calls shows
+they spend $4.6$--$10\times$ \emph{fewer}.
 
-\emph{Why that generalizes past RNA.} The standard way to attribute a capability difference in a learned
-system is exactly step one of what we did: find a property that differs between the systems and correlates
-with the outcome, then name it the mechanism. On this dataset that procedure would have produced two
-confident, well-powered, mutually independent false mechanisms, each with a publishable $p$-value, and a third
-and fourth false conclusion from a plausible confound and a source constant. The only thing that separated
-them from real mechanisms was \emph{intervening} on each and re-measuring under a rule fixed in advance. We
-therefore report the two-stage gate as a method rather than as our misfortune: observational screen, then
-transplant, with the transplant's engagement verified before its outcome is read. Its cost is one extra sweep per
-candidate; its benefit is that seven candidate mechanisms are excluded by measurement rather than by argument,
-and none of the exclusions rests on our judgement about which properties matter.
+The standard way to attribute a capability difference in a learned system is step one of what we did: find a
+property that differs between the systems and correlates with the outcome, then name it the mechanism. On this
+dataset that procedure would have produced two confident, well-powered, mutually independent false mechanisms,
+each with a publishable $p$-value, plus two further false conclusions from a plausible confound and a source
+constant. What separated them from real mechanisms was \emph{intervening} on each and re-measuring under a rule
+fixed in advance. We therefore report the two-stage gate as a method rather than as our misfortune:
+observational screen, then transplant, with the transplant's \emph{engagement} verified before its outcome is
+read. Its cost is one extra sweep per candidate; its benefit is that seven candidates are excluded by
+measurement, and no exclusion rests on our judgement about which properties matter.
 
 None of this identifies the mechanism, and we do not soften that: a \emph{discovery}-grade claim on this axis
 needs a transferable design principle, and one cannot transfer what one cannot identify. So we continue to
@@ -2406,14 +2376,6 @@ Kimi-k3 & open & $12$ & $42/60$ & $10$\\
 \end{tabularx}
 \end{table}
 
-\begin{figure}[h]\centering
-\includegraphics[width=0.78\linewidth]{fig_cc_invent.pdf}
-\caption{Training score across revision rounds, one trajectory. Training solve rate ($/16$, disjoint pool) as an
-LLM agent writes, sandbox-runs, and revises a \texttt{design()} operator; the best round is frozen and scored on
-the held-out $60$. A single trajectory for a single model, shown to document the protocol, not to establish
-that the loop reliably improves.}\label{fig:invent}
-\end{figure}
-
 \smallskip\noindent\textbf{Design limits of the six-model comparison, and the stronger design.} Here we record why the six-model comparison is descriptive.
 Each model contributes one temperature-$0.4$ draw with no within-model seed replication, so per-model rates
 carry unquantified sampling variance and the apparent ranking may be noise; the six share one prompt, one
@@ -2428,19 +2390,10 @@ would license the stronger readings: $\ge5$ invention seeds per model, several p
 feedback'' lower control and a ``hand-written recipe'' upper control, per-model failure and cost accounting,
 and a clustering of operator sources. Until then the experiment supports only the narrow statement that six
 single-run agents produced nonzero cross-predictor consistency under a common invention protocol.
-Figure~\ref{fig:invent} shows the learning curve: the agent's training solve rate rises as it folds oracle
-feedback into successive rewrites, and the frozen best round measures $9/60$ under all three predictors on the
-development/evaluation pool. This is the worked example for one model; the analogous frozen results for all six frontier
+The agent's training solve rate rises as it folds oracle feedback into successive rewrites, and the frozen best
+round measures $9/60$ under all three predictors on the development/evaluation pool. This is the worked example for one model; the analogous frozen results for all six frontier
 models (three open, three closed) are summarized in Table~\ref{tab:models}, and every one peaks by round
 $\le5$.
-
-\begin{figure}[t]\centering
-\includegraphics[width=0.72\linewidth]{fig_cc_stringency.pdf}
-\caption{\textbf{Positive-side stringency.} Free-energy gap from the target (pKiss MFE) to the best
-alternative fold, over the mixed-panel-consistent designs. The target is the MFE for all $17$ completed
-designs (eight longer designs timed out) and dominant by $\ge1$\,kcal/mol for $14/17$, under the pKiss energy
-model.}\label{fig:stringency}
-\end{figure}
 
 \section{Oracle Configurations, Hyperparameters, Compute, and Verifier Stringency}\label{app:config}
 \noindent\textbf{Oracle configurations}, all deterministic and replayable with \texttt{DATAPATH} pinned to
@@ -2463,7 +2416,7 @@ already requires the target to be each engine's predicted structure; we add one 
 (App.~\ref{app:config}). For the mixed-panel-consistent designs we enumerate pKiss suboptimals and take the
 free-energy gap $\Delta$ from the target (the MFE) to the best alternative fold. The target is the pKiss MFE
 for all $17$ designs whose enumeration completed within budget, dominant by median $\Delta{=}1.2$\,kcal/mol
-(mean $1.44$), with $14/17$ clearing a $\ge1$\,kcal margin (Fig.~\ref{fig:stringency}). Eight longer designs
+(mean $1.44$), with $14/17$ clearing a $\ge1$\,kcal margin. Eight longer designs
 timed out; since timeout correlates with length, this rung covers the shorter adjudicated designs only, and the
 gap is a property of the pKiss energy model, not a model-independent thermodynamic fact. Within that scope the
 positive verdict is not a marginal coincidence of pair sets: the target is the free-energy-minimum fold by a
