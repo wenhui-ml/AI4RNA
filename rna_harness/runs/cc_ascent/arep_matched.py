@@ -19,13 +19,24 @@ Pairing note. The agent operators are bit-identical across the three executions 
 the hand-built operator is not, so each agent cell is paired against a distinct hand-built execution. That
 averages the hand-built arm's execution noise into the comparison rather than letting one draw stand for it.
 
+Clustering. The 951 matched units are NOT independent: they come from 60 targets x 15 cells x 2 models, so
+one target contributes ~16 correlated observations. A Clopper-Pearson interval and a plain McNemar treat them
+as independent and are therefore anticonservative -- and the rest of this paper does not: the transplant arms
+get target-clustered bootstraps and Delta_gamer gets a three-level one. Applying the loose standard to the one
+arm that carries the paper's positive result would be indefensible, so we report a target-clustered bootstrap
+of the paired difference alongside, and a cluster-robust test that resamples whole targets under the null.
+The binomial numbers are kept only so a reader can see the size of the correction.
+
 Also reports the per-model split, because "agent-written operators reach 0.302" is a claim about the two
 models of six that ran without runtime failures -- a model-level survivorship selection, not only a
 target-level one -- and the paper's quantifier has to say so.
 
 Offline over stored sweeps; no oracle calls.
 """
-import json, math, os, glob
+import json, math, os, glob, random
+
+random.seed(20260801)
+B = 20000
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 os.chdir(HERE)
@@ -95,6 +106,46 @@ def load_handbuilt():
     return out
 
 
+def cluster_boot(per_target):
+    """Percentile bootstrap of the paired difference, resampling TARGETS with replacement.
+
+    per_target[t] = (n_units, agent_hits, hand_hits) aggregated over every cell that target appears in, so a
+    drawn target carries all of its correlated units together. This is the same unit the transplant table
+    uses, which is the point: one standard for every arm.
+    """
+    ids = list(per_target)
+    if not ids:
+        return float("nan"), float("nan")
+    out = []
+    for _ in range(B):
+        n = a = h = 0
+        for _ in ids:
+            u, ai, hi = per_target[ids[random.randrange(len(ids))]]
+            n += u; a += ai; h += hi
+        out.append((a - h) / n if n else 0.0)
+    out.sort()
+    return out[int(0.025 * B)], out[int(0.975 * B)]
+
+
+def cluster_perm(per_target_disc):
+    """Cluster-robust two-sided test: flip the SIGN of every discordant pair in a target together.
+
+    Under the null that the two arms are exchangeable, whole clusters swap, not individual pairs. p is the
+    fraction of permutations whose |b-c| is at least the observed one. This is the honest counterpart to the
+    exact McNemar, which assumes 951 independent units and reports a p-value the design cannot support.
+    """
+    ids = list(per_target_disc)
+    obs = abs(sum(b - c for b, c in per_target_disc.values()))
+    hit = 0
+    for _ in range(B):
+        s = 0
+        for t in ids:
+            b, c = per_target_disc[t]
+            s += (b - c) if random.random() < 0.5 else (c - b)
+        hit += (abs(s) >= obs)
+    return (hit + 1) / (B + 1)
+
+
 def report(label, agent_cells, hand):
     """Unmatched rates on each arm's own successes, then the paired difficulty-matched McNemar."""
     ak = an = hk = hn = 0
@@ -103,6 +154,7 @@ def report(label, agent_cells, hand):
         h = hand.get(cell, {})
         hn += len(h); hk += sum(h.values())
     n = b = c = mk_a = mk_h = 0
+    agg, disc = {}, {}
     for cell, per in agent_cells.items():
         h = hand.get(cell)
         if not h:
@@ -110,8 +162,12 @@ def report(label, agent_cells, hand):
         for t in set(per) & set(h):
             n += 1
             mk_a += per[t]; mk_h += h[t]
-            b += int(per[t] and not h[t])
-            c += int(h[t] and not per[t])
+            bi = int(per[t] and not h[t]); ci = int(h[t] and not per[t])
+            b += bi; c += ci
+            u, ai, hi = agg.get(t, (0, 0, 0))
+            agg[t] = (u + 1, ai + int(per[t]), hi + int(h[t]))
+            bb, cc = disc.get(t, (0, 0))
+            disc[t] = (bb + bi, cc + ci)
     print(f"\n  {label}")
     print(f"    unmatched (each arm on its own successes)")
     print(f"      agent      {ak:4d}/{an:<5d} = {ak/max(1,an):.3f}  "
@@ -126,8 +182,11 @@ def report(label, agent_cells, hand):
           f"[{clopper(mk_a,n):.3f},{clopper(mk_a,n,True):.3f}]")
     print(f"      hand-built {mk_h:4d}/{n:<5d} = {mk_h/n:.3f}  "
           f"[{clopper(mk_h,n):.3f},{clopper(mk_h,n,True):.3f}]")
-    print(f"      paired McNemar b={b} (agent only), c={c} (hand-built only), exact p={mcnemar(b,c):.4g}; "
-          f"risk difference {(b-c)/n:+.4f}")
+    print(f"      paired difference {(b-c)/n:+.4f};  b={b} (agent only), c={c} (hand-built only)")
+    print(f"      [independence-assuming]  exact McNemar p={mcnemar(b,c):.4g}")
+    lo, hi = cluster_boot(agg)
+    print(f"      [target-clustered]       95% CI [{lo:+.4f},{hi:+.4f}]  "
+          f"cluster-permutation p={cluster_perm(disc):.4g}  ({len(agg)} target clusters)")
 
 
 def main():
@@ -149,6 +208,7 @@ def main():
 
     # Pooling across models pools the ROWS, so pair each model's cell against the same hand-built cell.
     n = b = c = mk_a = mk_h = 0
+    agg, disc = {}, {}
     for op in OPS:
         for cell, per in load_agent(op).items():
             h = hand.get(cell)
@@ -157,15 +217,24 @@ def main():
             for t in set(per) & set(h):
                 n += 1
                 mk_a += per[t]; mk_h += h[t]
-                b += int(per[t] and not h[t])
-                c += int(h[t] and not per[t])
+                bi = int(per[t] and not h[t]); ci = int(h[t] and not per[t])
+                b += bi; c += ci
+                u, ai, hi = agg.get(t, (0, 0, 0))
+                agg[t] = (u + 1, ai + int(per[t]), hi + int(h[t]))
+                bb, cc = disc.get(t, (0, 0))
+                disc[t] = (bb + bi, cc + ci)
     print(f"\n  POOLED over the two models, difficulty-matched, n={n}")
     print(f"    agent      {mk_a:4d}/{n:<5d} = {mk_a/n:.3f}  "
           f"[{clopper(mk_a,n):.3f},{clopper(mk_a,n,True):.3f}]")
     print(f"    hand-built {mk_h:4d}/{n:<5d} = {mk_h/n:.3f}  "
           f"[{clopper(mk_h,n):.3f},{clopper(mk_h,n,True):.3f}]")
-    print(f"    paired McNemar b={b} (agent only), c={c} (hand-built only), exact p={mcnemar(b,c):.4g}; "
-          f"risk difference {(b-c)/n:+.4f}")
+    print(f"    paired difference {(b-c)/n:+.4f};  b={b} (agent only), c={c} (hand-built only)")
+    print(f"    [independence-assuming]  exact McNemar p={mcnemar(b,c):.4g}   <-- NOT the design's p")
+    lo, hi = cluster_boot(agg)
+    print(f"    [target-clustered]       95% CI [{lo:+.4f},{hi:+.4f}]  "
+          f"cluster-permutation p={cluster_perm(disc):.4g}  ({len(agg)} target clusters)")
+    print("    The clustered pair is the one to quote: the 951 units come from 60 targets, so the binomial")
+    print("    and exact-McNemar figures are anticonservative and are printed only to show the correction.")
     print("\n  Note on the quantifier. These are the 2 of 6 invented operators with no runtime failures;")
     print("  the other 4 time out on 19-32 of 60 targets and are excluded. The claim this supports is")
     print("  'some agent-written operators carry over better', not a property of agent-written operators.")

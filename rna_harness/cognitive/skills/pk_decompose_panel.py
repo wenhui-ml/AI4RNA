@@ -61,10 +61,19 @@ class DecomposePKPanelTool(Tool):
     # anneal   : add Metropolis acceptance (T0=2.0, cooling 0.997) to the baseline rule.
     # bigpk    : 3x the pKiss allowance and nothing else -- the compute control. If only this moves
     #            carry-over, the agents bought their advantage with compute and it is search, not a principle.
+    # tinypk   : the compute control run the OTHER way, and the one the budget measurement asked for.
+    #            agent_budget.py finds the frozen agent operators realize ~28 and ~13 pKiss calls per target
+    #            against this operator's 128 in the same regime, and one of them writes an explicit
+    #            `budget = [30]` into its own source. So the live hypothesis is no longer "the agents searched
+    #            harder" but its inverse: a search forced to commit early may land in a different region of
+    #            sequence space, one that a predictor outside the loop happens to like. This arm tests it by
+    #            cutting the pKiss allowance to 30 -- kimi-k3's self-imposed number -- and changing nothing
+    #            else. If carry-over rises while r_in does not collapse, that is the first mechanism in this
+    #            paper to move the statistic.
     # Each variant differs from the one above it by exactly one mechanism, so the chain
     #   none -> ungated -> scalar1 -> scalar2 -> anneal
     # attributes the gap one step at a time; `bigpk` sits outside the chain as the compute control.
-    VARIANTS = ("none", "ungated", "scalar1", "scalar2", "anneal", "bigpk")
+    VARIANTS = ("none", "ungated", "scalar1", "scalar2", "anneal", "bigpk", "tinypk")
 
     def __init__(self, skel_wall_s: float = 12.0, repair_wall_s: float = 90.0,
                  max_repair_iters: int = 800, skel_restarts: int = 6,
@@ -100,6 +109,9 @@ class DecomposePKPanelTool(Tool):
             self.max_probknot = max(self.max_probknot, self.max_pkiss)
         if variant == "bigpk":
             self.max_pkiss = self.max_pkiss * 3      # the pure-compute control; deliberately NOT matched
+        if variant == "tinypk":
+            self.max_pkiss = 30                      # kimi-k3's self-imposed budget, transplanted verbatim
+            self.max_probknot = min(self.max_probknot, 30)
         self.cores = 1
         self.budget_s = self.skel_wall_s + self.repair_wall_s
         self.name = (f"pkpanel@{int(self.repair_wall_s)}s" + ("" if ablate == "none" else f"-{ablate}")

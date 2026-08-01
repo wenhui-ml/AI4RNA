@@ -1,0 +1,12 @@
+inverse compute control, deterministic regime, seeds [0, 1, 2, 3, 4], n=60 targets
+
+  arm                                          r_in             carry-over  real pKiss
+  baseline (150-call allowance)            37.0/60   20/ 185 = 0.108 [0.053,0.175]       82.2
+  30-call allowance [inverse control]      15.0/60    8/  75 = 0.107 [0.030,0.203]       26.0
+  450-call allowance [compute control]     37.2/60   20/ 186 = 0.108 [0.053,0.175]      196.2
+
+  frozen agent operators (the target)           ---  333/1104 = 0.302 [0.275,0.330]
+
+  Rule, fixed before the numbers: a mechanism counts only if carry-over rises AND r_in holds
+  near the baseline's 37.0/60. A conditional rate bought by collapsing its own
+  denominator is the artifact this column exists to catch, not a finding.

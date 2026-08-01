@@ -1,0 +1,19 @@
+realized crossing-oracle calls per target, frozen agent operators, seed 0, n=60, 20s cap (the replication's cap)
+
+  operator                pKiss/target  ProbKnot/target  timeouts  median pKiss
+  gemini31pro                     27.8             27.1         0          18.0
+  kimik3                          13.1             13.1         0           8.0
+
+  hand-built reference    pKiss/target
+  hand-built, same 20s regime         128.0
+  hand-built, deterministic          82.2
+  3x allowance (the D2 control)         196.2
+
+  agents' highest realized pKiss use: 27.8 per target
+  hand-built, same 20s regime:        128.0 per target
+  the D2 compute control reaches:     196.2 per target
+  -> the control brackets them by 7.1x, and the direction is the opposite of the
+     worry: the agents spend 4.6x FEWER pKiss calls per target than the hand-built
+     operator they beat, in the same regime. D2 is not merely 'not bought with compute' --
+     the advantage is obtained at a fraction of the compute. That is a stronger claim than
+     the allowance control alone supports, and it is the one the measurement licenses.

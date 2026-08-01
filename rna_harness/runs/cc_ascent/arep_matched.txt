@@ -14,7 +14,9 @@ Matched cells are (nominal seed, execution index); matched units are targets bot
     difficulty-matched (both arms cleared pKiss AND ProbKnot on the same target/cell), n=442
       agent       161/442   = 0.364  [0.319,0.411]
       hand-built   45/442   = 0.102  [0.075,0.134]
-      paired McNemar b=127 (agent only), c=11 (hand-built only), exact p=3.609e-26; risk difference +0.2624
+      paired difference +0.2624;  b=127 (agent only), c=11 (hand-built only)
+      [independence-assuming]  exact McNemar p=3.609e-26
+      [target-clustered]       95% CI [+0.1513,+0.3818]  cluster-permutation p=0.0001  (41 target clusters)
   kimik3 cells loaded: 15
 
   kimik3
@@ -24,12 +26,18 @@ Matched cells are (nominal seed, execution index); matched units are targets bot
     difficulty-matched (both arms cleared pKiss AND ProbKnot on the same target/cell), n=509
       agent       118/509   = 0.232  [0.196,0.271]
       hand-built   45/509   = 0.088  [0.065,0.117]
-      paired McNemar b=91 (agent only), c=18 (hand-built only), exact p=6.367e-13; risk difference +0.1434
+      paired difference +0.1434;  b=91 (agent only), c=18 (hand-built only)
+      [independence-assuming]  exact McNemar p=6.367e-13
+      [target-clustered]       95% CI [+0.0588,+0.2408]  cluster-permutation p=0.0022  (42 target clusters)
 
   POOLED over the two models, difficulty-matched, n=951
     agent       279/951   = 0.293  [0.265,0.323]
     hand-built   90/951   = 0.095  [0.077,0.115]
-    paired McNemar b=218 (agent only), c=29 (hand-built only), exact p=5.088e-37; risk difference +0.1987
+    paired difference +0.1987;  b=218 (agent only), c=29 (hand-built only)
+    [independence-assuming]  exact McNemar p=5.088e-37   <-- NOT the design's p
+    [target-clustered]       95% CI [+0.1077,+0.2973]  cluster-permutation p=5e-05  (42 target clusters)
+    The clustered pair is the one to quote: the 951 units come from 60 targets, so the binomial
+    and exact-McNemar figures are anticonservative and are printed only to show the correction.
 
   Note on the quantifier. These are the 2 of 6 invented operators with no runtime failures;
   the other 4 time out on 19-32 of 60 targets and are excluded. The claim this supports is
