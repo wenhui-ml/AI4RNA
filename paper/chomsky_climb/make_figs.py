@@ -95,13 +95,21 @@ def fig_collapse():
     bars[0].set_facecolor(FAINT_F); bars[0].set_edgecolor(GREY)
     bars[2].set_facecolor(TAN_F);   bars[2].set_edgecolor(TAN_EDGE)
     bars[3].set_facecolor(NEG_F);   bars[3].set_edgecolor(NEG)
+    # Exact binomial (Clopper-Pearson) intervals, drawn because the last bar is a single design and a bare
+    # "43x" annotation would headline a ratio whose denominator is 1 -- the paper says in text that nothing
+    # rests on that ratio, and the figure should not say otherwise.
+    cis = {0: (0.0, 6.0), 1: (32.6, 49.4), 2: (0.4, 11.6), 3: (0.03, 5.4)}
     for x, v in zip(xs, vals):
-        ax.text(x, v + 1.1, f"{v}/60", ha="center", fontsize=9, color=INK)
+        lo, hi = cis[x]
+        ax.plot([x, x], [lo, hi], color=INK, lw=1.0, zorder=4, alpha=0.55)
+        ax.plot([x - 0.09, x + 0.09], [hi, hi], color=INK, lw=1.0, zorder=4, alpha=0.55)
+        ax.text(x, hi + 1.2, f"{v}/60", ha="center", fontsize=9, color=INK)
     ax.axhline(43, ls=(0, (5, 2.5)), color=GREY, lw=0.8, zorder=1)
     ax.text(3.45, 44.0, "DesiRNA (borrowed) 43/60", ha="right", va="bottom", fontsize=7, color=GREY)
-    ax.annotate("", xy=(3, 3.0), xytext=(1, 41.5), zorder=3,
+    ax.annotate("", xy=(3, 6.4), xytext=(1, 41.5), zorder=3,
                 arrowprops=dict(arrowstyle="-|>", color=NEG, lw=1.1, connectionstyle="arc3,rad=-0.30"))
-    ax.text(2.52, 36, "$\\sim 43\\times$ collapse\nunder the panel", ha="center", va="center", fontsize=7.8, color=NEG)
+    ax.text(2.52, 34, "$43 \\to 1$ under three\npredictors, same designs", ha="center", va="center",
+            fontsize=7.8, color=NEG)
     ax.set_xticks(xs); ax.set_xticklabels(labels, fontsize=7.6)
     ax.set_ylim(0, 49); ax.set_yticks([0, 10, 20, 30, 40])
     ax.set_ylabel("verified held-out solves ($/60$)", fontsize=8.5)

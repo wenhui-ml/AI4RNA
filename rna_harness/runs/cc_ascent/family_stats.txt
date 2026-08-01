@@ -1,0 +1,43 @@
+unbounded H-type family T_(n,m), n,m in 3..12 = 100 targets, seeds [0, 1, 2, 3, 4], deterministic
+
+  arm                                             pKiss      panel-unanimous
+  CF floor (REMC, pk-free oracle)            0/300  =0.000      0/300  =0.000
+  gamer (pKiss only)                       500/500  =1.000      9/500  =0.018
+  panel operator (pKiss AND ProbKnot)      371/500  =0.742    167/500  =0.334
+
+  Delta_gamer on 500 paired (target, seed) cells:
+    b=159 (operator only), c=1 (gamer only), exact McNemar p=2.203e-46
+    paired difference +0.3160, target-clustered 95% CI [+0.2580,+0.3780] (100 targets)
+    for contrast, the same quantity on Pseudobase++ is +0.067 [+0.023,+0.120] at its resolution limit
+
+  success vs family parameter (panel-unanimous, pooled over seeds; the uniform-procedure curve)
+     total stem n+m  targets   operator    gamer  CF floor
+                  6        5       0.00     0.00      0.00
+                  7       10       0.00     0.00      0.00
+                  8       15       0.07     0.00      0.00
+                  9       20       0.10     0.00      0.00
+                 10       25       0.12     0.12      0.00
+                 11       30       0.37     0.03      0.00
+                 12       35       0.26     0.06      0.00
+                 13       40       0.35     0.00      0.00
+                 14       45       0.22     0.00      0.00
+                 15       50       0.34     0.00      0.00
+                 16       45       0.24     0.00      0.00
+                 17       40       0.38     0.00      0.00
+                 18       35       0.57     0.03      0.00
+                 19       30       0.37     0.03      0.00
+                 20       25       0.56     0.04      0.00
+                 21       20       0.60     0.00      0.00
+                 22       15       0.60     0.00      0.00
+                 23       10       0.60     0.00      0.00
+                 24        5       0.40     0.00      0.00
+
+    operator, smallest sizes (n+m<=12): 0.186   largest (n+m>=18): 0.529
+    The curve is the evidence about a UNIFORM procedure: a fixed-description operator that holds
+    up as the parameter grows is what a memorized table cannot be and a CF generator provably
+    cannot supply. A curve that decays to zero would instead say the operator has a size limit
+    and the family-level reading is unsupported. We report the curve rather than a headline rate.
+
+    Scope, restated because these numbers are large: one synthetic distribution, uniform
+    topology, no natural sequence constraints, and the exact topology the operator's
+    decompose-compose scaffold was built for. Not comparable to the Pseudobase++ rates.

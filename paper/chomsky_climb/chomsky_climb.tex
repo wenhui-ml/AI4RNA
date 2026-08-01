@@ -1052,8 +1052,11 @@ pseudoknot-free MFE, \emph{blind} $A_{\mathrm{nest}}$ & $4/43$ & designs the nes
 \includegraphics[width=0.78\linewidth]{fig_cc_collapse.pdf}
 \caption{\textbf{The panel exposes oracle-gaming (measured, $n=60$).} The invented operator's single-oracle
 solve rate ($43/60$, matching the borrowed DesiRNA ceiling) collapses to $2$ under a held-out predictor
-and to $1$ panel-unanimous, a collapse from $43/60$ to $1/60$ invisible to a one-sided criterion, above the
-decidable context-free floor of $0/60$.}\label{fig:collapse}
+and to $1$ panel-unanimous, above the decidable context-free floor of $0/60$. Bars carry exact binomial
+intervals, and the collapse is annotated as $43\!\to\!1$ on the \emph{same} designs rather than as a
+``$43\times$'' ratio: the last bar is a single design, so that quotient is unstable and nothing in this paper
+rests on it (\S\ref{sec:exp}). What a one-sided criterion cannot see is the gap, not its
+quotient.}\label{fig:collapse}
 \end{figure}
 
 \paragraph{Oracle-gaming vs.\ oracle-robustness: a contrast with the borrowed solver.} Is the collapse
@@ -1212,18 +1215,18 @@ verdict on it.
 \paragraph{$\Delta_{\mathrm{gamer}}$: separated, but by how much depends on the estimator, and we say so.}
 Run on the \emph{same} seeds and targets as the operator, the gamer is panel-unanimous on
 $\{1,0,0,0,0\}/60$ against $\{8,3,5,5,4\}/60$, and per seed the paired McNemar has $c{=}0$: the gamer never
-solves a target the operator misses. The quantity is estimated four times in this paper and the point estimate
-depends on the design, so we give the whole sequence rather than the flattering member: ${+}0.080$ with no
-execution replication, ${+}0.056$ at $3$ seeds $\times$ $3$ executions, ${+}0.048$ at $5\times3$
-($15$ paired cells, both arms scored inside the same worker call; operator strictly higher in $14/15$
-executions, sign test $p{=}0.0010$; target-level $[{+}.014,{+}.091]$, structural-cluster
-$[{+}.005,{+}.093]$, and $[{+}.000,{+}.109]$ under a deliberately conservative one-execution-per-seed
-variant), and ${+}0.067$ $[{+}0.023,{+}0.120]$ in the deterministic regime with the gamer at $0/60$ at every
-seed (Table~\ref{tab:det}). A point estimate that falls each time the design is tightened is evidence the
-first was optimistic; determinism removes the \emph{execution} level of variation, not the \emph{target-set}
-level the decline pointed at, and its narrower interval reflects one fewer variance component rather than more
-evidence. What is settled is the sign, and that the effect is not an artifact of execution noise. The
-magnitude is not settled, and the search-free probe below removes most of it on a different ground.
+solves a target the operator misses. \textbf{The quantity is estimated four times in this paper and the point
+estimate falls every time the design is tightened}: ${+}0.080$, ${+}0.056$, ${+}0.048$ as execution
+replication is added, then ${+}0.067$ $[{+}0.023,{+}0.120]$ in the bit-reproducible regime with the gamer at
+$0/60$ at every seed (Table~\ref{tab:det}). App.~\ref{app:repro} gives each design, its intervals, and the
+conservative one-execution-per-seed variant that reaches $0.000$. Three readings, and only the first is
+comfortable. Determinism removes the \emph{execution} level of variation but not the \emph{target-set} level
+the decline pointed at, and its narrower interval reflects one fewer variance component rather than more
+evidence. The most robust statement uses no interval at all: the operator is strictly higher in $14$ of $15$
+independent executions and $15$ of $15$ on the structurally disjoint pool. And ${+}0.067$ sits at $77\%$
+power for this design (\S\ref{sec:exp}), i.e.\ at its resolution limit---which is what ``established,
+narrowly'' means in units a reader can check. What is settled is the sign; the magnitude is not, and the
+search-free probe below removes most of it on a different ground.
 
 \emph{Two confounds this comparison exposes rather than removes.} The arms are matched on oracle
 \emph{access} and not on oracle \emph{use}: per target the operator makes $128.0$ pKiss and $63.5$ ProbKnot
@@ -1613,7 +1616,7 @@ count.
 \paragraph{Robustness checks, and the one that bounds every rate here.} \emph{(i) The panel is a low-recall
 instrument.} On $80$ native bpRNA pseudoknots, folding each native's \emph{own} sequence, per-predictor
 crossing recall is pKiss $20\%$, ProbKnot $4\%$, ShapeKnots $11\%$, and the three-way conjunction
-$\mathbf{1\%}$ ($1/80$). Two consequences we carry throughout: a low panel rate is weak evidence of
+$\mathbf{1\%}$ ($1/80$). Two consequences we carry throughout: a low $r_{\mathrm{mix}}$ is weak evidence of
 \emph{absence} of capability, and $r_{\mathrm{mix}}$ is a high-stringency consistency measure, not a lower
 bound on true capability. The predictors also have \emph{no fixed stringency order}: on natives it is
 pKiss\,$>$\,ShapeKnots\,$>$\,ProbKnot, on designs it inverts (DesiRNA's designs are confirmed by ProbKnot
@@ -1637,7 +1640,7 @@ true gap several times larger. Low recall therefore \emph{rescales} the comparis
 and it makes every rate here conservative. The rescaling assumes $\rho$ is common to both arms, which holds
 for $r_{\mathrm{mix}}$ comparisons and \emph{not} for carry-over, whose whole point is that $\rho$ differs by
 arm; we use it only for the former. The real cost of low recall is the one we state elsewhere: a low or zero
-panel rate is weak evidence of \emph{absence}.
+$r_{\mathrm{mix}}$ is weak evidence of \emph{absence}.
 
 \emph{(ii) Generalization, and its limit.} On a second disjoint Pseudobase pool the regime
 repeats ($0/50$ floor, $5/50$ panel-unanimous); on a cross-source bpRNA pool our operator \emph{and} the SOTA
@@ -1647,6 +1650,50 @@ sequence against $50\%$ there---an order of magnitude harder, at matched length,
 predicts our failures. The negative side generalizes across datasets; the positive claim we support is limited
 to the Pseudobase++ distribution. App.~\ref{app:robust} gives both in full, together with two further checks
 that established nothing and are recorded there rather than here.
+
+\paragraph{The one axis that is not structurally exhausted, run at scale.} Every magnitude above is
+unestimable on Pseudobase++, and \S\ref{sec:exp}'s resolution calculation says why in units: at $60$ targets
+$\times$ $5$ seeds the design reaches $80\%$ power at an observed gap of $\approx\!6/60$, and
+$\Delta_{\mathrm{gamer}}$ is $4/60$. But the parameterized family $\mathcal L_{\mathrm H}=\{T_{n,m}\}$ has no
+such ceiling: it is non-context-free for every $m\ge1$, it is the family the class-level reading is about,
+and it is unbounded, so power there is a budget decision rather than a property of a benchmark. An earlier
+revision ran $16$ of its members at one seed and filed them in an appendix as not relied on; that was the
+wrong call. We run the full grid $n,m\in\{3,\dots,12\}$---$100$ targets, five seeds, deterministic, $1500$
+cells (\texttt{family\_grid.py}, \texttt{family\_stats.py}).
+
+The regime reproduces and sharpens. The \CF{} floor is $\mathbf{0/300}$, so the negative side's empirical
+counterpart holds at five times the pool size. The gamer reaches $500/500$ under the oracle it optimizes and
+$9/500$ under three: a collapse on a set where every target is non-\CF{} by construction. The panel operator
+reaches $167/500$. Paired within (target, seed) and clustered on target,
+$\Delta_{\mathrm{gamer}}={+}0.316$ $[{+}0.258,{+}0.378]$, $b{=}159$ against $c{=}1$, exact McNemar
+$p{=}2.2\!\times\!10^{-46}$. \textbf{That is the first estimable magnitude in this paper}, and it is five
+times the Pseudobase++ estimate---which is a statement about the two target sets, not about the operator.
+
+\emph{The success-vs-size curve, and the diagnostic that stops us mis-reading it.} Panel-unanimity rises
+with the family parameter, from $0.186$ at $n{+}m\le12$ to $0.529$ at $n{+}m\ge18$. The flattering reading is
+that a fixed-description operator holds up, or improves, as the family grows. It is wrong, and separating
+$r_{\mathrm{in}}$ from carry-over says so immediately: the operator's own success rate \emph{falls} with
+size ($0.900\to0.736$) while carry-over to the held-out predictor \emph{rises} sharply
+($0.206\to0.718$). What grows is not the procedure's reach but the panel's willingness to confirm---longer
+crossing stems are thermodynamically dominant enough that a predictor which never saw them agrees anyway. So
+the honest reading of the curve is narrower and still useful: there is no size cliff in the confirmed rate up
+to $n{+}m{=}24$, which is what a uniform procedure needs and a memorized table cannot supply, but the
+operator does have a size-related limitation and it is visible in $r_{\mathrm{in}}$.
+
+One asymmetry in that diagnostic is worth keeping, because it is the clearest support in this paper for the
+success-predicate reading. The gamer's pKiss$\to$ProbKnot agreement moves the \emph{other} way with size
+($0.093\to0.036$), so ``longer stems make predictors agree'' is not a blanket effect. Satisfying \emph{two}
+predictors on a long stem selects sequences whose crossing stem genuinely dominates, and those convince the
+third; satisfying one does not. The two-oracle predicate becomes a better proxy for the held-out predictor as
+the structure grows.
+
+\emph{Scope, stated beside the numbers rather than under them.} These rates are not comparable to the
+Pseudobase++ rates and must never be quoted alongside them. This is one synthetic distribution with a uniform
+topology and no natural sequence constraints; it is also the exact topology the operator's decompose--compose
+scaffold was built for, which is a home-field advantage we name rather than discount; and small-size failures
+may be undesignability rather than capability gaps, since we did not run a designability reference on this
+grid. What the family buys is the one thing Pseudobase++ cannot supply at any $n$: a magnitude, on targets
+sharing no structural cluster with anything we developed on. It buys no generalization.
 
 \paragraph{Where this leaves the ascent.} An operator optimizing panel agreement beats the gamer's $1/60$, if
 modestly: $3$--$8/60$ across five seeds, $1$--$9/60$ over all $24$ executions, and
@@ -1782,7 +1829,10 @@ against binding readouts, and to theorem discovery against an exact checker. Whe
 ports to settings with no decidable hierarchy is open; we do not test it.
 
 \paragraph{Limitations, in rough order of how much they bound the contribution.} \emph{(i) One benchmark,
-structurally exhausted.} Every positive number is on Pseudobase++ crossing targets; the structure-aware split
+structurally exhausted---plus one synthetic family that repairs power and nothing else.} The unbounded
+$\mathcal L_{\mathrm H}$ grid gives an estimable magnitude ($100$ targets, ${+}0.316$) but is a single
+uniform topology built for the operator's scaffold, so it speaks to power, not to generalization. Every
+natural-corpus number is on Pseudobase++ crossing targets; the structure-aware split
 it admits has $27$ targets in $24$ clusters, so directions replicate and magnitudes do not, and the
 cross-source pool gives $0/60$ for our operator and the SOTA solver alike. \emph{(ii) The panel is
 mechanistically narrow, now measured rather than argued.} All three predictors share nearest-neighbour
@@ -1800,8 +1850,11 @@ does not separate capability from search}, by construction.
 \paragraph{The experiments this study owes, in priority order.} \textbf{(1) A second, structurally independent
 crossing corpus.} Pseudobase++ holds $251$ targets in $60$ structural clusters of which only $24$ are disjoint
 from our development, so the \emph{magnitude} of every transfer claim here is unestimable on this benchmark
-and no reanalysis fixes that. \textbf{(2) Power}: several hundred targets and $\ge10$ seeds, since the effects
-are a few targets in sixty. \textbf{(3) A non-thermodynamic predictor}, to make the panel mechanistically
+and no reanalysis fixes that. \textbf{(2) Power}: partly discharged, and only where the benchmark allows it. On the unbounded family we
+now run $100$ targets $\times$ $5$ seeds, where $\Delta_{\mathrm{gamer}}$ becomes estimable at
+${+}0.316$ $[{+}0.258,{+}0.378]$ (\S\ref{sec:exp}). On the natural corpus the effects are still a few targets
+in sixty and no amount of seeding fixes that, because the limit is $24$ development-disjoint clusters, not
+compute. \textbf{(3) A non-thermodynamic predictor}, to make the panel mechanistically
 diverse rather than merely numerous. This is the owed experiment we would run first if the environment
 allowed it. All three current members share nearest-neighbour parameters, and \S\ref{sec:oracle} measures the
 consequence: pKiss and ShapeKnots form a correlated block at $\kappa=0.673$, so unanimity over three buys
@@ -2051,9 +2104,15 @@ execution, so this variation inflates intervals but cannot masquerade as a metho
 estimate. (iv) No claim here should be read off a single count; the evidential units are paired differences
 and their intervals.
 
-The operator-invention runs call frontier models through a single provider at temperature~$0.4$; model
-identifiers, per-call token counts and wall-clock are logged in the run JSON, and each frozen \texttt{design}
-program is stored verbatim. The complete harness, exact target IDs and any exclusions, all generated sequences
+The operator-invention runs call frontier models through a single provider (OpenRouter) at
+temperature~$0.4$ with no output cap. Each run's \texttt{invent\_log.json} records the provider-qualified
+model identifier (e.g.\ \texttt{google/gemini-3.1-pro-preview}), the per-round prompt and completion token
+counts, the per-round training score, and every compile or runtime error verbatim; each frozen
+\texttt{design} program is stored in full in \texttt{result.json}. What these logs do \emph{not} contain is a
+provider-side model version hash, because the endpoint does not expose one: a frontier model served behind a
+routed alias is not a fixed artifact, and a re-run months later may not be the same weights. We flag that as
+a reproducibility limit of the invention step specifically. It does not touch any measurement in this paper,
+because every number here is produced by re-executing the \emph{frozen source}, not by re-querying a model. The complete harness, exact target IDs and any exclusions, all generated sequences
 with their per-predictor outputs, the hash/timestamp commitment logs and timeout/failure handling are provided
 as an anonymized archive with the submission.
 
@@ -2076,6 +2135,17 @@ $c=\#\{T:u^{(A)}_T{=}0,u^{(G)}_T{=}1\}$, the exact two-sided $p$-value is
 successes in $N$ trials is $\sum_{j=k}^{N}\binom{N}{j}p_0^{\,j}(1-p_0)^{N-j}$. The three columns of
 Table~\ref{tab:sep} are these tests; the analysis is \texttt{runs/cc\_ascent/stats\_separation.py}, run offline
 on the saved per-target adjudications (no live episodes).
+
+\smallskip\noindent\textbf{$\Delta_{\mathrm{gamer}}$, all four estimates with their designs.} \emph{(i)}
+${+}0.080$, five nominal seeds, one execution each, target bootstrap $[{+}0.040,{+}0.127]$, two-way
+$[{+}0.030,{+}0.140]$. \emph{(ii)} ${+}0.056$, three seeds $\times$ three executions. \emph{(iii)}
+${+}0.048$, five seeds $\times$ three executions $=15$ paired cells, both arms scored inside the same worker
+call; target-level $[{+}0.014,{+}0.091]$, structural-cluster $[{+}0.005,{+}0.093]$, and $[{+}0.000,{+}0.109]$
+under the conservative one-execution-per-seed variant; operator strictly higher in $14/15$ executions, sign
+test $p{=}0.0010$; realized budget per target, gamer $55.2$ pKiss and $0$ ProbKnot against the operator's
+$128.0$ and $63.5$. \emph{(iv)} ${+}0.067$ $[{+}0.023,{+}0.120]$, deterministic, five seeds, one noise-free
+run each. A reader who prefers (iii)'s conservative variant reclassifies the component as weak and nothing
+else in the paper changes.
 
 \smallskip\noindent\textbf{The multi-level bootstrap, specified in full.} ``Resampling targets, seeds and
 executions'' does not determine an estimator. \emph{Estimand}: $\Delta$, the mean over
@@ -2162,7 +2232,7 @@ uncalibrated. We do measure \emph{recall} directly, on $80$ native bpRNA pseudok
 per-predictor crossing recall is pKiss $20\%$, ProbKnot $4\%$, ShapeKnots $11\%$, and the three-way
 conjunction \emph{only $1\%$} ($1/80$). So the panel is a \emph{low-recall} instrument whose
 false-positive behaviour is characterized on one negative class only, and the AND-rule trades away almost all
-recall. Two consequences we carry throughout: because recall is so low, a low or zero panel rate is weak
+recall. Two consequences we carry throughout: because recall is so low, a low or zero $r_{\mathrm{mix}}$ is weak
 evidence of \emph{absence} of capability; and while low recall makes the rate \emph{conservative}, reading it
 as a strict lower bound on true capability would additionally require a calibrated near-zero false-positive
 rate, which one negative class does not establish. So we treat $r_{\mathrm{mix}}$ as a high-stringency
@@ -2186,7 +2256,8 @@ $3$--$8/60$), not general cross-source pseudoknot design. \emph{(iii) Budget.} O
 $\{1,3,1\}/20$: no clean budget trend, dominated by search variance, consistent with oracle-guided search
 rather than a budget-monotone capability.
 
-\paragraph{Growing-parameter extrapolation: run, recorded, not relied on.} A finite target set cannot
+\paragraph{Growing-parameter extrapolation: the earlier $16$-target version.} \emph{Superseded by the
+$100$-target grid of \S\ref{sec:exp}, and kept only so the record shows what was run first.} A finite target set cannot
 establish a class ascent, so we tested the strictly weaker property a finite set cannot exhibit at all:
 freeze the operator on small stems ($n{=}m\le4$) and apply it unchanged to a larger unseen ladder of
 $\mathcal L_{\mathrm H}$ (to $n{=}m{=}14$, length $68$\,nt). The \CF{} floor is $0/16$ throughout and the
