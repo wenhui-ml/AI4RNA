@@ -224,3 +224,32 @@ def test_budget_names_are_closed_and_ordered():
     for name in BUDGETS:
         assert list(BUDGETS[name]) == sorted(BUDGETS[name])
     assert certify_design(HAIRPIN, budget="nonsense").verdict == "invalid_input"
+
+
+def test_calibrated_rule_is_restricted_to_the_topologies_it_was_validated_on():
+    """The crossing-stem rule may not be used on H-type, and the reason is an outside measurement.
+
+    A fourth predictor that never entered the pipeline (RNAPKplex) backs 60.8% of our kissing designs against
+    its own 54.8% [38.7, 70.2] ceiling on kissing natives -- inside the interval. On H-type it backs 29.9%
+    against a 71.1% [62.7, 78.6] ceiling, and a paired comparison over the same 135 targets prefers the
+    NATIVE sequence 65 times to our 20 (p=1.03e-06). Raising k does not fix it (29.9% -> 26.5% at k>=2) and a
+    global energy margin is refuted because it separates the two families in OPPOSITE directions. So the fix
+    is a restriction, not a patch, and this test is what stops the restriction quietly eroding.
+    """
+    from rna_harness.cognitive.certify import (CALIBRATED_RULE_TOPOLOGIES, TOPOLOGY_OPERATING_POINTS,
+                                               _topology_point, calibrated_rule_applies)
+    H = ".((((..[[[)))).....]]]..."                       # one crossing, second helix inside then outside
+    KISS = ".((((....[[[[[[))))......].]]]]]."             # two crossings
+    assert not calibrated_rule_applies(H), "H-type must fall back to the strict panel"
+    assert calibrated_rule_applies(KISS)
+    assert "H-type" not in CALIBRATED_RULE_TOPOLOGIES
+    # the certificate must carry the operating point for THIS family, never a blended average
+    p = _topology_point(H)
+    assert p["topology"] == "H-type" and "panel-unanimous" in p["rule"]
+    assert p["external_agreement"] > 0.9 and p["external_native_ceiling"] < p["external_agreement"]
+    k = _topology_point(KISS)
+    lo, hi = k["external_ceiling_ci95"]
+    assert lo <= k["external_agreement"] <= hi, "kissing passes because it sits inside the outsider's own CI"
+    # an unmeasured family must say so rather than borrow someone else's numbers
+    assert "note" in _topology_point("((((....))))")
+    assert set(TOPOLOGY_OPERATING_POINTS) >= {"kissing / chain", "H-type"}

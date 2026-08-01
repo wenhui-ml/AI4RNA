@@ -13,3 +13,14 @@
     100/128  21.8 min
     110/128  25.5 min
     120/128  28.9 min
+
+=== 128 次运行,判据为出厂的已校准假结判据 ===
+  臂        拓扑类                       交付       $求解器       $思考      中位耗时
+  agent    kissing / chain        55/55     0.1819    0.0859       74s
+  agent    higher-order             7/9     0.8368    0.1316       68s
+  direct   kissing / chain        53/55     0.0663    0.0000       69s
+  direct   higher-order             7/9     0.0112    0.0000       71s
+
+  判决分布:{"agent": {"knot_confirmed": 61, "not_found": 2, "certified": 1}, "direct": {"knot_confirmed": 60, "not_found": 4}}
+
+  wrote rna_harness/runs/ceiling/kissing_e2e.json

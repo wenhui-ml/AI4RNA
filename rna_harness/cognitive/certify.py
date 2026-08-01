@@ -206,6 +206,68 @@ def knot_grade(kr: dict) -> dict:
     return g
 
 
+# WHERE THE CALIBRATED RULE MAY BE USED, and this is a restriction rather than a feature. The rule was built
+# for, calibrated on, and validated on the topologies where the STRICT rule delivers almost nothing -- kissing
+# and higher-order, where strict gives 1 of 55 and 0 of 9. A fourth predictor that never entered the pipeline
+# (RNAPKplex, runs/ceiling/external_judge.py) then measured what it does on each family, against that same
+# judge's own ceiling on NATIVE sequences of the same topology:
+#
+#     kissing / chain   ours 60.8%   its native ceiling 54.8% [38.7, 70.2]   -> inside; paired over 38 shared
+#                                                                               targets it prefers OUR designs
+#                                                                               8 to 2
+#     H-type            ours 29.9%   its native ceiling 71.1% [62.7, 78.6]   -> far below, and paired over the
+#                                                                               135 shared targets the outsider
+#                                                                               backs the NATIVE 65 times to
+#                                                                               our 20, p = 1.03e-06
+#
+# So on H-type the calibrated rule is over-permissive, and the cause is not a missing vote: raising the
+# threshold to k>=2 moves external agreement from 29.9% to 26.5%, i.e. nowhere. A global energy margin was
+# tried too and is refuted -- it separates H-type in the right direction (6.30 against 2.80 kcal/mol) and
+# kissing in the WRONG one (2.20 against 4.50), so any cutoff that fixes one breaks the other.
+#
+# What does work is not a patch but a restriction: on H-type the STRICT rule still delivers, and delivers
+# cleanly. Searching the same pool for a panel-unanimous sequence finds one for 36 of 187 targets, and the
+# outsider backs 35 of those 36 -- 97.2% [85.5, 99.9], above its own native ceiling.
+#
+# The trade is stated rather than hidden. On H-type the calibrated rule issues 187 certificates of which an
+# outsider backs 56; the strict rule issues 36 of which it backs 35. The calibrated rule yields MORE
+# externally-backed certificates in absolute terms. We take the strict one anyway, because a certificate is a
+# CLAIM: issuing 187 claims that an independent judge will not back is the exact behaviour this project
+# criticises single-oracle tools for (43 of 60 claimed, none confirmed). Precision is the product.
+CALIBRATED_RULE_TOPOLOGIES = ("kissing / chain", "higher-order", "crossing (non-H)")
+
+TOPOLOGY_OPERATING_POINTS = {
+    "kissing / chain": {"rule": "knot-recall (k=1, tau=1.0)",
+                        "external_agreement": 0.608, "external_native_ceiling": 0.548,
+                        "external_ceiling_ci95": [0.387, 0.702], "n": 51},
+    "higher-order": {"rule": "knot-recall (k=1, tau=1.0)",
+                     "external_agreement": 0.800, "external_native_ceiling": 0.556,
+                     "external_ceiling_ci95": [0.212, 0.863], "n": 5},
+    "H-type": {"rule": "panel-unanimous (the calibrated rule is NOT used here)",
+               "external_agreement": 0.972, "external_agreement_ci95": [0.855, 0.999],
+               "external_native_ceiling": 0.711, "external_ceiling_ci95": [0.627, 0.786], "n": 36,
+               "why": ("the calibrated rule is over-permissive on this family -- an outsider backs 29.9% of "
+                       "what it accepts against a 71.1% ceiling on natives of the same topology")},
+}
+
+
+def _topology_point(target: str) -> dict:
+    """The operating point for THIS target's family, so a certificate never quotes a global average.
+
+    The rule's error rate depends on topology by a factor of two, so one blended number would be wrong for
+    every family it is shown to."""
+    from ..structure_utils import classify_topology
+    t = classify_topology(target)["topology"]
+    return {"topology": t, **(TOPOLOGY_OPERATING_POINTS.get(t) or
+                              {"note": "no external measurement for this family yet"})}
+
+
+def calibrated_rule_applies(target: str) -> bool:
+    """May the crossing-stem rule be used on this target, or must it meet the strict panel?"""
+    from ..structure_utils import classify_topology
+    return classify_topology(target)["topology"] in CALIBRATED_RULE_TOPOLOGIES
+
+
 SCHEMA_VERSION = "rna-certificate/1.0"
 _PROVENANCE = None
 
@@ -418,14 +480,14 @@ def _certify_sequence_impl(seq: str, target: str) -> Certificate:
                            reason="a required independent oracle could not be run, so this cannot be "
                                   "adjudicated. A missing oracle is not a rejection.")
     kr = _knot_recall(seq, target)
-    if kr["knot_confirmed"]:
+    if kr["knot_confirmed"] and calibrated_rule_applies(target):
         return Certificate("knot_confirmed", target, len(target), kind, sequence=seq,
                            checked_by="crossing stems: " + ", ".join(kr["confirmed_by"]),
                            strictness="knot-recall (k=1, tau=1.0)", rungs_passed=["knot-recall"],
                            cost_usd=solver_cost_usd(time.time() - t0, 1),
                            wait_s=round(time.time() - t0, 2),
                            detail={**v, "knot": kr, "operating_point": KNOT_OPERATING_POINT,
-                                   "grade": knot_grade(kr)},
+                                   "topology": _topology_point(target), "grade": knot_grade(kr)},
                            reason="the crossing stems that make this a pseudoknot are fully reproduced by "
                                   + ", ".join(kr["confirmed_by"]) + ". This is a claim about the KNOT, not "
                                   "the whole structure: the criterion recognises 78.5% of known natural "
@@ -605,7 +667,7 @@ def _certify_design_impl(target: str, budget: str = "standard", seed: int = 0,
                     best_ref_only = (c, v)
 
     w = time.time() - t0
-    if kind == "pseudoknot" and best_knot is not None:
+    if kind == "pseudoknot" and best_knot is not None and calibrated_rule_applies(target):
         c, kr = best_knot
         return Certificate("knot_confirmed", target, len(target), kind, sequence=c,
                            checked_by="crossing stems: " + ", ".join(kr["confirmed_by"]),
@@ -613,7 +675,7 @@ def _certify_design_impl(target: str, budget: str = "standard", seed: int = 0,
                            cost_usd=cost, wait_s=round(w, 2), budget=budget,
                            detail={"tiers_tried": tried, "knot": kr,
                                    "operating_point": KNOT_OPERATING_POINT,
-                                   "grade": knot_grade(kr)},
+                                   "topology": _topology_point(target), "grade": knot_grade(kr)},
                            reason="no candidate reproduced the whole structure under all three predictors, "
                                   "but the crossing stems that make this a pseudoknot are fully reproduced "
                                   "by " + ", ".join(kr["confirmed_by"]) + ". Claim is about the KNOT only; "

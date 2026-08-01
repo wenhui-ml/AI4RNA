@@ -138,3 +138,41 @@ def _is_plain(motif: str) -> bool:
 
 def _iupac_match(base: str, code: str) -> bool:
     return base in _IUPAC.get(code, {code})
+
+
+# --------------------------------------------------------------------------- pseudoknot topology
+# WHY THIS LIVES IN THE LIBRARY NOW. It used to sit in runs/ceiling/pk_topology.py as analysis-only code, and
+# it stayed there while every number about pseudoknots was being reported per topology. That became untenable
+# once an outside judge showed the shipped confirmation rule behaves completely differently by topology:
+# on kissing designs it agrees at 60.8% against its own native ceiling of 54.8% [38.7, 70.2], and on H-type
+# designs at 29.9% against a ceiling of 71.1% [62.7, 78.6] -- p=1.03e-06 on a paired comparison over the same
+# 135 targets. A rule whose error rate depends on topology has to be able to SEE the topology at decision
+# time, not only in a post-hoc analysis script.
+def helices(target: str) -> List[Tuple[int, int, int, int]]:
+    """Maximal stacked runs across every bracket family: (5' start, 5' end, 3' start, 3' end)."""
+    pt = pair_table(target)
+    out = []
+    for i, j in enumerate(pt):
+        if j > i and not (i > 0 and pt[i - 1] == j + 1):
+            k = 0
+            while i + k < len(pt) and pt[i + k] == j - k and j - k > i + k:
+                k += 1
+            out.append((i, i + k - 1, j - k + 1, j))
+    return out
+
+
+def classify_topology(target: str) -> Dict:
+    """Which pseudoknot family this target belongs to. Computed from the structure, never annotated."""
+    H = helices(target)
+    cross = [(a, b) for a in range(len(H)) for b in range(a + 1, len(H))
+             if H[a][0] < H[b][0] < H[a][3] < H[b][3] or H[b][0] < H[a][0] < H[b][3] < H[a][3]]
+    kind = "nested" if not cross else "higher-order"
+    if len(cross) == 1:
+        a, b = cross[0]
+        h1, h2 = (H[a], H[b]) if H[a][0] < H[b][0] else (H[b], H[a])
+        inside_loop = h1[1] < h2[0] < h1[2]
+        outside = h2[3] > h1[3]
+        kind = "H-type" if (inside_loop and outside) else "crossing (non-H)"
+    elif len(cross) == 2:
+        kind = "kissing / chain"
+    return {"n_helices": len(H), "n_crossings": len(cross), "topology": kind}
