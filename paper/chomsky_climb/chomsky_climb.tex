@@ -194,8 +194,11 @@ fallible oracle's verdict for a capability (by an abstaining panel).
 \item A formalization of the object a pumping lemma can constrain, the agent's realizable-target language
 $\Rze{\Omega}{\pi}$ (the structures its policy realizes under an oracle), with an elementary but decidable
 confinement fact over it (Prop.~\ref{prop:confine}), discharged offline rather than searched. We define the
-transferable, autonomous capability and use (rather than re-prove) the MCFG-2 characterization as the witness
-that the unbounded crossing \emph{family} we target is mildly context-sensitive. A single realized target,
+transferable, solver-free capability and \emph{invoke} the MCFG-2 characterization---we re-prove nothing about
+it---as the witness that the unbounded crossing \emph{family} we target is mildly context-sensitive. The one
+thing we do verify is the non-context-freeness of the family we ourselves construct, because no citation covers
+it and because it is what licenses treating a synthetic ladder as a test of the same capability
+(App.~\ref{app:proofs}). A single realized target,
 being finite, is regular and carries no class claim on its own (\S\ref{sec:formal},
 App.~\ref{app:proofs}).
 \item An explicit treatment of the audit's asymmetry (\S\ref{sec:cert},\ref{sec:oracle}): the
@@ -213,6 +216,18 @@ $1/60$ panel-unanimous, a collapse from $43/60$ to $1/60$ that the panel exposes
 of $0/60$.
 Re-optimizing for cross-oracle agreement recovers a small set of mixed-panel-consistent crossings ($3$--$8/60$ over five seeds,
 mean $5.0$, unanimous across three distinct predictors).
+\item \textbf{A two-stage attribution gate, and the finding that its first stage is not enough}
+(\S\ref{sec:exp}). Attributing a capability difference in a learned system is normally done by finding a
+property that differs between the systems and correlates with the outcome. We ran that step under
+composition-adjusted controls and then \emph{intervened} on every property that survived. Four times, a
+statistically supported and mechanistically plausible attribution turned out to be wrong, and a control fixed
+in advance is what caught it---twice a property that differed at matched composition and predicted the outcome
+reproduced none of it when transplanted, once a confound the negative control flagged after we had missed it,
+once a constant in the source that pointed the opposite way from realized behaviour. On this dataset the
+standard procedure would have yielded two independent false mechanisms with clean $p$-values. We report the
+gate (observational screen, then transplant, with the transplant's \emph{engagement} verified before its
+outcome is read) as a method, and the seven candidate mechanisms it excludes as excluded by measurement rather
+than by argument.
 \item \textbf{A positive result on the same instrument, reported on three named rungs}
 (\S\ref{sec:exp}, \S\ref{sec:disc}). An audit nothing passes and an audit that cannot see produce the same
 table, so we measure an arm that \emph{does} clear the bar: frozen LLM-written operators, scored by the
@@ -324,16 +339,16 @@ Chomsky hierarchy \citep{chomsky1956,hopcroftullman1979} orders grammars by gene
 grammars (CFGs) generate exactly the languages recognizable with one stack, of which balanced-bracket (Dyck)
 languages are canonical. The pumping and Ogden lemmas \citep{ogden1968,hopcroftullman1979} give necessary
 conditions for context-freeness, so a word family that cannot be pumped proves a language is not context-free.
-Multiple context-free grammars (MCFGs) \citep{seki1991mcfg} sit just above, with the same weak generative
-capacity as linear context-free rewriting systems (LCFRS); tree-adjoining grammars are a more restricted
-special case \citep{joshi1985tag,vijayshanker1994}. MCFG nonterminals derive tuples of substrings at several
-positions, the machinery for crossing (copy-like) dependencies one stack cannot track, with dimension~2
-sufficing for the crossing patterns we treat. The textbook non-context-free witnesses are the copy language
-$\{\,w\,\#\,w : w\in\Sigma^\ast\}$ and the count language $\{\,a^{n}b^{m}c^{n}d^{m}\,\}$, whose interleaved
-$n\!\cdots\!n$ and $m\!\cdots\!m$ constraints force two substrings to grow in lockstep at separated positions
-\citep{hopcroftullman1979}; dimension~2 supplies exactly this, deriving an ordered pair of strings injected at
-two non-adjacent slots. Specific pseudoknot classes sit in low-dimension MCFG subclasses
-\citep{katosekikasami2006}; we make no claim that every pseudoknot topology is captured at dimension~2.
+Multiple context-free grammars (MCFGs) \citep{seki1991mcfg} sit just above, deriving tuples of substrings at
+several positions---the machinery for crossing dependencies one stack cannot track---with dimension~2
+sufficing for the patterns we treat; the canonical witness is the count language
+$\{\,a^{n}b^{m}c^{n}d^{m}\,\}$, whose interleaved constraints force two substrings to grow in lockstep at
+separated positions \citep{hopcroftullman1979}. \textbf{We invoke this literature rather than extend it}, and
+use exactly two facts from it, both established elsewhere: the crossing family we target is non-context-free
+\citep{nebelweinberg}, and specific pseudoknot classes sit in low-dimension MCFG subclasses
+\citep{katosekikasami2006}. We make no claim that every pseudoknot topology is captured at dimension~2, and
+nothing below turns on the MCFG machinery beyond those two citations---their role is to make the family of
+\S\ref{sec:exp} well defined, not to prove anything new.
 
 \paragraph{RNA secondary structure, folding, inverse design.} An RNA is $x\in\{A,C,G,U\}^n$; a
 \emph{secondary structure} is a set $P$ of base pairs (each index paired at most once). Pairs
@@ -608,10 +623,12 @@ That no resource explains it---only that oracle-call volume does not, in either 
 not count remain open\\
 \addlinespace[2pt]
 (D3) \newline mechanism identified and transferable & \chip{vNone}{not est.} &
-\emph{Not established.} \textbf{Six} mechanisms transplanted one at a time, deterministically at $5$ seeds:
-four legible in the source, a compute control in each direction, and one structural feature that survived a
-GC-adjusted observational gate. Every interval contains the baseline; none reaches the agents' lower bound of
-$0.275$ (Table~\ref{tab:attr}, \S\ref{sec:exp}) &
+\emph{Not established, informatively.} \textbf{Seven} mechanisms transplanted one at a time,
+deterministically at $5$ seeds: four legible in the source, a compute control in each direction, and \emph{two}
+properties that differ between the arms at matched composition and predict or explain carry-over
+observationally. Every interval contains the baseline; none reaches the agents' lower bound of $0.275$. The two
+observational leads are the informative part: each would have been reported as the mechanism by an analysis
+that stopped before intervening (\S\ref{sec:exp}) &
 What the difference \emph{is}. We withhold the word ``discovery'' until this rung is reached, and note in
 \S\ref{sec:related} that the criterion we position against reaches neither D1 nor D2\\
 \bottomrule
@@ -841,7 +858,8 @@ targets, not induced rules. (iv) It does not make the crossing-pair count a gram
 structural covariate that happens to track difficulty. The framing is a source of exactness on one side and a
 vocabulary on the other, and we keep those roles apart throughout.
 
-\paragraph{The boundary is a genuine class boundary (invoked, not re-proved).} $\NESTED$ is context-free
+\paragraph{The boundary is a genuine class boundary (invoked for the general results, verified only for our
+own family).} $\NESTED$ is context-free
 \citep{rivaseddy2000,durbin1998}. We use $\PK=\mathcal T\setminus\NESTED$ for \emph{all} crossing structures
 (a structural set, used as such on the negative side). The formal-language claim is scoped to the specific
 unbounded family: the H-type family $\mathcal L_{\mathrm H}\subseteq\PK$ is non-context-free
@@ -963,7 +981,12 @@ three, with the discriminating comparison paired against an external solver that
 \emph{audits} the system we then built to survive that measurement, reporting each component of the evidence
 vector separately, including the two it does not establish. And it establishes that the instrument
 \emph{discriminates}, by measuring an arm that clears the bar our own does not---which is where this section's
-one clearly positive result lives, and why it is not filed as a supplement. Everything is on the $n{=}60$ Pseudobase++ crossing pool unless a larger or structurally disjoint
+one clearly positive result lives, and why it is not filed as a supplement. The three arguments are kept in
+separate subsections because they are answerable separately and a reader may want only one:
+\S\ref{sec:exp:gaming} is the measurement, \S\ref{sec:exp:ours} the audit of our own operator,
+\S\ref{sec:exp:pc} the positive control and the seven interventional attribution tests,
+\S\ref{sec:exp:pools} what the target sets can support, and \S\ref{sec:exp:stats} the statistical
+conventions and remaining robustness checks. Everything is on the $n{=}60$ Pseudobase++ crossing pool unless a larger or structurally disjoint
 pool is named; every rate is one of the three metrics of Eq.~\eqref{eq:metricnames}, never a blended
 ``panel'' number.
 
@@ -1014,6 +1037,8 @@ higher.) Disagreements trigger abstention; we never treat a single predictor as 
 
 
 % (certificate confusion matrix removed: the undesignability axis is out of scope for this study.)
+
+\subsection{The Measurement: One Fallible Oracle Credits $43$ Designs, Three Credit $1$}\label{sec:exp:gaming}
 
 \paragraph{The naive operator crosses only by gaming the oracle.} We instantiate the full audit on
 the $n=60$ development/evaluation pool with an invented operator (\textsc{pkdecomp}): decompose the target into its
@@ -1138,6 +1163,8 @@ $p{=}8.1\!\times\!10^{-7}$, $\widehat\Delta{=}{+}0.558$ $[{+}0.395,{+}0.721]$}\\
 \end{tabular}
 \end{table}
 
+
+\subsection{The Audit of Our Own System, Which It Largely Fails}\label{sec:exp:ours}
 
 \paragraph{It is a search, and the ablation says which part of it works.} We do not pose this as capability
 \emph{versus} search: the operator is a search, and the useful question is which ingredient carries the gain.
@@ -1348,6 +1375,8 @@ frozen agent-written operators \emph{(the target to explain)} & --- & $\mathbf{3
 \end{tabularx}
 \end{table}
 
+\subsection{Does the Instrument Discriminate? A Positive Control That Becomes a Result}\label{sec:exp:pc}
+
 \paragraph{Does the instrument discriminate, or is it merely insensitive? A positive control.} We have said
 more than once that nothing we build saturates the panel and offered that as evidence of stringency. It is
 not: an audit nothing passes and an audit that cannot detect anything produce the same table, and at
@@ -1512,9 +1541,37 @@ the observational stage---which is where most feature analyses of learned system
 either as the mechanism, twice, with a clean $p$-value each time. \textbf{Seven candidates have now been
 excluded by intervention rather than by argument.}
 
-So the advantage is robust, is not compute in either direction, and is not legible in the source. That is a
-narrower open question than we had, and a more uncomfortable one: a \emph{discovery}-grade claim on this axis
-would need a transferable design principle, and one cannot transfer what one cannot identify. We therefore continue to
+\paragraph{What seven interventional tests bought, which is not what we set out to buy.} The mechanism hunt
+failed: the advantage is robust, is not compute in either direction, is not legible in the source, and is not
+reproduced by either property that distinguishes the arms at matched composition. We had been reporting that
+as a confession. It is better read as the paper's most portable result, and stating it that way costs no
+evidence---the numbers are the ones above.
+
+\emph{Four times in this study, a statistically supported and mechanistically plausible attribution was
+wrong, and a control built in advance caught it.} (i) \texttt{decoy} differs between the arms at
+$p{=}2.1\!\times\!10^{-4}$ and predicts carry-over \emph{within} the hand-built arm at
+$p{=}2.6\!\times\!10^{-3}$ after adjusting for composition; biasing the operator toward it moves carry-over
+from $0.108$ to $0.107$ and reverses the sign. (ii) The ensemble gap differs at matched composition with
+$D{=}0.466$ under a calibrated null and has a clean mechanism---a dominant fold is one any model
+confirms---and biasing toward it gives a paired difference of \emph{exactly} zero. (iii) Two successive designs
+of the distributional test were confounded by GC, and in both cases the negative control, not our judgement,
+is what said so. (iv) The agent operators' source asks for $15$ restarts $\times$ $3000$ iterations against
+our $6\times800$, which reads unambiguously as ``they searched harder''; counting realized calls shows they
+spend $4.6$--$10\times$ \emph{fewer}, so the constant in the source pointed the wrong way.
+
+\emph{Why that generalizes past RNA.} The standard way to attribute a capability difference in a learned
+system is exactly step one of what we did: find a property that differs between the systems and correlates
+with the outcome, then name it the mechanism. On this dataset that procedure would have produced two
+confident, well-powered, mutually independent false mechanisms, each with a publishable $p$-value, and a third
+and fourth false conclusion from a plausible confound and a source constant. The only thing that separated
+them from real mechanisms was \emph{intervening} on each and re-measuring under a rule fixed in advance. We
+therefore report the two-stage gate---observational screen, then transplant, with the transplant's engagement
+verified before its outcome is read---as a method, not as our misfortune. Its cost is one extra sweep per
+candidate; its benefit is that seven candidate mechanisms are excluded by measurement rather than by argument,
+and none of the exclusions rests on our judgement about which properties matter.
+
+None of this identifies the mechanism, and we do not soften that: a \emph{discovery}-grade claim on this axis
+needs a transferable design principle, and one cannot transfer what one cannot identify. So we continue to
 claim no attribution, and no transfer either: on the structurally
 disjoint pool $9.7/27$ and $1.1/27$ targets error out per cell, leaving a denominator filtered towards easy
 targets, and rates there are recorded in App.~\ref{app:invent} and used for nothing. Only two of six models
@@ -1527,6 +1584,8 @@ two replicated agent operators the figures are $76\%$ and $63\%$, so on the $30$
 sequence never reaches they take $45$ and $54$ wins against our $7$. The advantage is therefore not an artifact
 of picking easier targets---it is \emph{larger} on the stratum where search is actually required
 (\texttt{runs/cc\_ascent/pool\_margin.py}).
+
+\subsection{What the Target Sets Will and Will Not Bear}\label{sec:exp:pools}
 
 \paragraph{How much of this is the method, and how much is which targets are easy?} Every rate in this
 section is a property of a method \emph{and} of a target set, and we had no way to separate them, because the
@@ -1637,6 +1696,8 @@ counts for more, not less\\
 
 
 
+
+\subsection{Statistics, Robustness, and Where This Leaves the Ascent}\label{sec:exp:stats}
 
 \paragraph{Statistics.} Rates use a fixed denominator of the full pool: a target on which the three
 predictors disagree counts as not-solved, so abstention withholds a positive claim rather than dropping the
@@ -2035,11 +2096,15 @@ the canonical H-type pseudoknots ($\ell$ a fixed unpaired linker): a nested roun
 a square stem of $m$ pairs. Its pairing skeleton is the interleaving $\{a^{n}b^{m}c^{n}d^{m}\}$ under
 $a{=}\texttt{(},\,b{=}\texttt{[},\,c{=}\texttt{)},\,d{=}\texttt{]}$.
 
-\smallskip\noindent\emph{Non-context-freeness (pumping).} $\{a^nb^mc^nd^m\}$ is not context-free: for pumping
-length $p$, the word $a^pb^pc^pd^p$ has no decomposition $uvwxy$ with $|vwx|\le p,\ |vx|\ge1$ that stays in the language: any $vx$ spanning $\le p$ consecutive symbols meets at most two of the four blocks, so pumping
-breaks one of the equalities $\#a{=}\#c$ or $\#b{=}\#d$ \citep{ogden1968,hopcroftullman1979}. Thus
-$\mathcal L_{\mathrm H}$, inheriting both equalities from its two crossing stems, is non-CF, and no
-single-stack (CF) generator realizes it uniformly.
+\smallskip\noindent\emph{Non-context-freeness, and what is invoked versus verified here.} The general results
+are invoked, not re-proved: that crossing arcs are not context-free is \citet{nebelweinberg}, and that
+pseudoknot classes sit in low-dimension MCFG subclasses is \citet{katosekikasami2006}. What we do verify is the
+witness for \emph{our} family, since we constructed it and no citation covers it: $\mathcal L_{\mathrm H}$
+carries the two equalities $\#a{=}\#c$ and $\#b{=}\#d$ of the count language, and no
+$uvwxy$ decomposition with $|vwx|\le p$ can span more than two of four blocks, so pumping breaks one equality
+\citep{ogden1968,hopcroftullman1979}; hence no single-stack generator realizes the family uniformly. This
+matters for one thing only, and it is the thing \S\ref{sec:exp}'s grid rests on: it is what licenses calling a
+synthetic ladder a test of the same capability rather than an unrelated construction.
 
 \smallskip\noindent\emph{An MCFG of dimension~2 that does.} Two dimension-2 nonterminals each emit a
 \emph{pair} of substrings (the two ends of one stem), and the start rule interleaves them:
