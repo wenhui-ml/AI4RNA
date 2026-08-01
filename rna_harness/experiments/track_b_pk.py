@@ -105,6 +105,14 @@ def build_policies(which):
         pol["always_cheap"] = FixedPolicy([RemcTool(wall_s=30)], name="always_cheap")
     if "always_sota" in which:
         pol["always_sota"] = FixedPolicy([DesirnaTool(timelimit_s=120)], name="always_sota")
+    # R7 M5 / R8: PKX_DETERMINISTIC=1 puts every operator in the counted-budget, RNG-seeded regime, so a
+    # nominal seed fixes the run bit-for-bit AND every arm receives the SAME pKiss allowance. Under the
+    # default (0) the operators keep the historical wall-clock stopping rules, which is what every
+    # measurement up to R7 used. One switch for the whole sweep: mixing regimes across arms would silently
+    # unmatch the budget the ablation is supposed to hold fixed.
+    _det = os.environ.get("PKX_DETERMINISTIC", "0") == "1"
+    _maxpk = int(os.environ.get("PKX_MAXPKISS", "150"))
+
     if "autonomous" in which:
         # The INVENTED MCF operator: decompose T -> CF skeleton -> compose crossing pairs -> pKiss-guided
         # repair. It NEVER calls DesiRNA (nor any external pseudoknot solver), so autonomy is STRUCTURAL:
@@ -116,7 +124,8 @@ def build_policies(which):
         _it = int(os.environ.get("PKD_ITERS", "400"))
         _abl = os.environ.get("PKD_ABLATE", "none")   # P2: none|norepair|nocompose|nodecompose
         pol["autonomous"] = FixedPolicy(
-            [DecomposePKTool(skel_wall_s=_sk, repair_wall_s=_rp, max_repair_iters=_it, ablate=_abl)],
+            [DecomposePKTool(skel_wall_s=_sk, repair_wall_s=_rp, max_repair_iters=_it, ablate=_abl,
+                             deterministic=_det, max_pkiss=_maxpk)],
             name="autonomous")
     if "panel_auto" in which:
         # PANEL-OPTIMIZING operator: optimizes pKiss AND ProbKnot agreement (lexicographic), not a single
@@ -129,7 +138,8 @@ def build_policies(which):
         _pmpb = int(os.environ.get("PKP_MAXPB", "120"))
         pol["panel_auto"] = FixedPolicy(
             [DecomposePKPanelTool(skel_wall_s=_psk, repair_wall_s=_prp, max_repair_iters=_pit,
-                                  panel_gate=_pgate, max_probknot=_pmpb)], name="panel_auto")
+                                  panel_gate=_pgate, max_probknot=_pmpb,
+                                  deterministic=_det, max_pkiss=_maxpk)], name="panel_auto")
     # R4: per-component ablation of the PANEL operator + a matched-budget undirected-search control, each
     # scored under the same panel. Arm name 'panel_<mode>' => DecomposePKPanelTool(ablate=<mode>) at
     # IDENTICAL budgets/oracle access/initialization as panel_auto; only the named component is removed.
@@ -142,7 +152,8 @@ def build_policies(which):
                                       max_repair_iters=int(os.environ.get("PKP_ITERS", "800")),
                                       panel_gate=int(os.environ.get("PKP_GATE", "3")),
                                       max_probknot=int(os.environ.get("PKP_MAXPB", "120")),
-                                      ablate=_mode)], name=f"panel_{_mode}")
+                                      ablate=_mode, deterministic=_det,
+                                      max_pkiss=_maxpk)], name=f"panel_{_mode}")
     if "probknot_auto" in which:
         # P4 symmetry control: optimizes ProbKnot in-loop (analog of autonomous, which optimizes pKiss).
         from ..cognitive.skills.pk_decompose_probknot import DecomposeProbKnotTool

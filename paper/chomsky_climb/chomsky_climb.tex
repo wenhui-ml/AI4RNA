@@ -135,7 +135,10 @@ the conservative one-execution-per-seed variant reaches $0.000$ (Table~\ref{tab:
 monotonically as replication was added (${+}0.080\!\to\!{+}0.056\!\to\!{+}0.048$), which suggests the estimator
 has not converged and that a fourth level of variation (the target set) could carry it to zero. It survives the
 change to a metric-neutral statistic (${+}0.049$, $p{=}6.9\!\times\!10^{-4}$, Fig.~\ref{fig:carry}), though one
-stricter conditioning disagrees. A search-free target-side probe bounds what it measures: $36$ of the $43$
+stricter conditioning disagrees. Re-measured in the bit-reproducible, equal-allowance regime it is
+${+}0.067$ $[{+}0.023,{+}0.120]$ with the gamer at $0/60$ on all five seeds (Table~\ref{tab:det}): larger than the
+replicated estimate and no longer exposed to the non-convergence worry, since no execution level remains to
+average away. A search-free target-side probe bounds what it measures: $36$ of the $43$
 discordant wins that constitute it ($84\%$) fall on targets a random compatible sequence already solves, and on
 the $30$ targets random sampling cannot reach the paired difference is ${+}0.016$ ($7$ against $0$,
 $p{=}0.016$)---that residue, not ${+}0.048$, is what the operator buys where search is required
@@ -147,8 +150,11 @@ ${+}0.013$, three-level interval $[{-}.039,{+}.067]$ over $9$ runs/arm (Table~\r
 objective does not measurably lower $r_{\mathrm{mix}}$; only removing the repair loop entirely does
 (${+}0.056$), so a search is necessary but its \emph{guidance} is not shown load-bearing---confirmed on the
 metric-neutral statistic, where the undirected and oracle-blind walks match the full operator
-(Fig.~\ref{fig:carry}). Matched on nominal
-caps, \emph{not} on realized compute (Table~\ref{tab:budget})\\
+(Fig.~\ref{fig:carry}). Re-measured bit-reproducibly at equal allowance the point estimate is exactly
+$+0.0000$ on $300$ paired cells, $[{-}0.060,{+}0.050]$ (Table~\ref{tab:det}): \emph{measured absent} at this
+pool size rather than merely underpowered, since execution noise can no longer be blamed. Matched on the
+allowance, still \emph{not} on realized use, which cannot be equalized without penalizing success
+(Tables~\ref{tab:budget},~\ref{tab:det})\\
 $\Delta_{\mathrm{held\text{-}out}}$ (held-out oracle) & \chip{vWeak}{weak} &
 $r_{\mathrm{ho}}$ higher each seed but significant in $1$ of $3$ (Table~\ref{tab:sknots}); adjudicator run in an
 unvalidated de-novo mode\\
@@ -1115,7 +1121,10 @@ targets in $60$, and it buys them while spending \emph{fewer} oracle calls than 
 (Table~\ref{tab:budget}), so this is not a budget effect. Deleting the repair loop outright collapses the rate to
 $2.3/60$ ($\Delta=+0.574$), confirming Table~\ref{tab:ablate}'s attribution on a second metric, while removing the
 \CF{}-skeleton decomposition or the complementarity composition changes nothing whose interval excludes
-zero. The scaffolding is inert here too.
+zero, so under wall-clock stopping the scaffolding looks inert here too. That last conclusion does not
+survive removing the noise: bit-reproducibly the decomposition costs ${+}0.093$ $[{+}0.023,{+}0.173]$ on
+$r_{\mathrm{in}}$ (Table~\ref{tab:det}), so it \emph{is} load-bearing on the optimized metric and the
+``inert'' reading was in part a statement about our noise floor.
 
 \emph{On the three-predictor metric ($r_{\mathrm{mix}}$), only the repair loop survives, and directedness
 does not.} Deleting the objective costs ${+}0.013$ with a three-level interval of $[{-}.039,{+}.067]$: not
@@ -1130,6 +1139,40 @@ designs that already satisfy $r_{\mathrm{in}}$, so a ShapeKnots-only column here
 in-objective one and would coincide with $r_{\mathrm{mix}}$ by construction; we therefore do not report
 $r_{\mathrm{ho}}$ in Table~\ref{tab:pablate} and take the unconditional held-out-oracle comparison from the
 separate, larger-pool run of Table~\ref{tab:sknots} instead.
+
+\paragraph{The same ablation with the noise removed rather than averaged over.} Everything above averages over
+execution replicates because the operators terminated on wall-clock. App.~\ref{app:repro} reports the fix
+(counted budgets, and seeding \textsc{ViennaRNA}'s own generator); we then re-ran the whole design under it.
+Each cell of Table~\ref{tab:det} is therefore a \emph{single bit-reproducible} run, which buys seeds instead of
+replicates: $5$ nominal seeds, and the gamer included so the headline comparison is measured in the same regime.
+Four results, two of which change what the paper can say.
+
+\emph{(1) $\Delta_{\mathrm{gamer}}$ survives, and grows.} The panel operator reaches $4.0/60$ against the
+gamer's $0/60$ at \emph{every one} of five seeds: $\Delta={+}0.067$ $[{+}0.023,{+}0.120]$, larger than the
+$+0.048$ of the replicated wall-clock estimate and no longer exposed to the monotone-decline worry of
+Table~\ref{tab:verdict}, because there is no execution level left to average away. This is the paper's headline
+difference measured with its main confound deleted rather than bounded.
+
+\emph{(2) $\Delta_{\mathrm{undirected}}$ is now a measured zero, not an underpowered null.} Deleting the
+objective moves $r_{\mathrm{mix}}$ by $+0.0000$, interval $[{-}0.060,{+}0.050]$: the point estimate is exactly
+zero on $300$ paired cells. The previous null could be blamed on execution noise; this one cannot. We therefore
+strengthen the wording from ``not established'' to \emph{measured absent at this pool size}, while keeping the
+verdict itself unchanged, since an interval of $\pm0.05$ on a $4/60$ base rate still cannot exclude an effect of
+the size the paper is chasing.
+
+\emph{(3) A component that was inert becomes load-bearing.} With noise removed, deleting the \CF{}-skeleton
+decomposition costs ${+}0.093$ $[{+}0.023,{+}0.173]$ on $r_{\mathrm{in}}$, where the wall-clock estimate was
+$+0.059$ with an interval spanning zero. So the decomposition \emph{is} load-bearing on the metric the operator
+optimizes; the earlier ``the scaffolding is inert'' was in part a statement about our noise floor, and we
+withdraw it for $r_{\mathrm{in}}$. It remains inert on $r_{\mathrm{mix}}$ ($+0.010$).
+
+\emph{(4) Matching the allowance does not match realized use, and cannot.} Every arm now receives the same
+$150$-call pKiss allowance, yet realized calls still spread $52.6$--$105.5$ (Table~\ref{tab:det}), because the
+full operator frequently solves and stops while the ablated arms run to the cap. That gap \emph{widened} under
+counted budgets rather than closing. We record the reason plainly: realized compute cannot be equalized without
+making a successful operator keep spending after it has succeeded, which would be a worse experiment. The
+direction is at least unfavourable to us, since the full operator wins $r_{\mathrm{in}}$ while spending fewer
+calls than the arms it beats.
 
 \begin{table}[t]\centering\small
 \setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.15}
@@ -1156,6 +1199,38 @@ $-$ objective, $-$ bias (oracle-blind) & $19.7,23.0,27.0$ & $23.2$ & $\mathbf{+.
 $-$ repair loop entirely & $0.3,0.7,6.0$ & $2.3$ & $\mathbf{+.574}$ $[{+}.433,{+}.711]$ & $0.0,0.0,0.3$ & $0.1$ & $\mathbf{+.056}$ $[{+}.011,{+}.117]$\\
 $-$ \CF{} decomposition (random init) & $32.0,36.0,31.7$ & $33.2$ & $+.059$ $[{-}.028,{+}.156]$ & $4.0,4.0,5.0$ & $4.3$ & $-.015$ $[{-}.078,{+}.044]$\\
 $-$ complementarity composition & $35.3,34.7,37.3$ & $35.8$ & $+.017$ $[{-}.050,{+}.094]$ & $7.3,4.7,1.3$ & $4.4$ & $-.017$ $[{-}.089,{+}.050]$\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{table}[t]\centering\small
+\setlength{\tabcolsep}{3.5pt}\renewcommand{\arraystretch}{1.15}
+\caption{\textbf{The same ablation in the bit-reproducible, equal-allowance regime}: $5$ nominal seeds, one
+\emph{noise-free} run each (no execution replicates needed), gamer included. Counted budgets replace both
+wall-clock caps and \textsc{ViennaRNA}'s own generator is seeded per attempt, so a seed fixes the run
+bit-for-bit; every arm receives the same $150$-call pKiss allowance. $\Delta$ is the paired difference against
+the reference with a two-level bootstrap interval over targets and seeds ($B{=}20{,}000$); \textbf{bold} $=$
+excludes zero. The $r_{\mathrm{in}}$ column is each arm's \emph{own} in-loop predicate, which for the gamer is
+pKiss alone and for the panel arms is pKiss\,$\wedge$\,ProbKnot, so it is \emph{not} comparable across those
+two groups; $r_{\mathrm{mix}}$ is recomputed identically for every arm and is the cross-arm metric. ``real
+pKiss'' is realized calls per target, which still differ because the full operator often solves and stops
+(\S\ref{sec:exp}). (\texttt{panel\_deterministic.sh}, \texttt{det\_stats.py}.)}\label{tab:det}
+\begin{tabularx}{\linewidth}{@{}Lccccc@{}}
+\toprule
+& \multicolumn{2}{c}{$r_{\mathrm{in}}$ (own predicate)} & \multicolumn{2}{c}{$r_{\mathrm{mix}}$ (all three)} & \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}
+\textbf{arm} & \textbf{mean/60} & $\Delta$ [CI] & \textbf{mean/60} & $\Delta$ [CI] & \textbf{real pKiss}\\
+\midrule
+gamer (single-oracle) & $42.6$ & \emph{n/c} & $0.00$ & \textbf{ref} & $52.6$\\
+full operator (reference) & $37.0$ & --- & $4.00$ & --- & $82.2$\\
+\midrule
+\multicolumn{6}{@{}l}{\emph{headline:} full operator $-$ gamer on $r_{\mathrm{mix}}$ $=\mathbf{+.067}$ $[{+}.023,{+}.120]$, gamer $0/60$ at all five seeds}\\
+\midrule
+$-$ objective (undirected) & $28.6$ & $\mathbf{+.140}$ $[{+}.063,{+}.220]$ & $4.00$ & $+.000$ $[{-}.060,{+}.050]$ & $99.5$\\
+$-$ objective, $-$ bias (blind) & $25.4$ & $\mathbf{+.193}$ $[{+}.107,{+}.287]$ & $2.40$ & $+.027$ $[{-}.017,{+}.077]$ & $105.5$\\
+$-$ repair loop entirely & $1.0$ & $\mathbf{+.600}$ $[{+}.487,{+}.707]$ & $0.00$ & $\mathbf{+.067}$ $[{+}.023,{+}.123]$ & $1.0$\\
+$-$ \CF{} decomposition & $31.4$ & $\mathbf{+.093}$ $[{+}.023,{+}.173]$ & $3.40$ & $+.010$ $[{-}.033,{+}.050]$ & $100.1$\\
+$-$ complementarity composition & $34.4$ & $+.043$ $[{-}.030,{+}.137]$ & $5.40$ & $-.023$ $[{-}.080,{+}.030]$ & $90.3$\\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -1825,9 +1900,12 @@ voice is undetermined at $n{=}80$, because it recovers only $3$ natives. No wet-
 partial, and much of the effect is target-side.} The objective is load-bearing on the metric it optimizes and
 not distinguishable from an undirected walk on the metrics it does not, so we report association rather than
 causal attribution, and a search-free margin probe puts $84\%$ of $\Delta_{\mathrm{gamer}}$ on targets a
-random compatible sequence already solves, leaving ${+}0.016$ where search is actually required. \emph{(iv) The
-operators were not bit-reproducible for the runs reported here}, and our first diagnosis of why was wrong
-(App.~\ref{app:repro}); the fix is implemented but postdates the measurements. \emph{(v) The audit does not
+random compatible sequence already solves, leaving ${+}0.016$ where search is actually required. \emph{(iv) Most numbers here were produced by operators that were not
+bit-reproducible}, and our first diagnosis of why was wrong (App.~\ref{app:repro}). The fix is now not only
+implemented but exercised: the ablation and the headline comparison are re-run bit-reproducibly at equal
+allowance (Table~\ref{tab:det}), where $\Delta_{\mathrm{gamer}}$ grows to ${+}0.067$ and
+$\Delta_{\mathrm{undirected}}$ becomes an exact zero. The pool-level and cross-source numbers were not re-run
+that way. \emph{(v) The audit does not
 separate capability from search}, by construction: it separates a search from single-oracle gaming, from
 matched undirected search, and from delegation, and reports each separately.
 
