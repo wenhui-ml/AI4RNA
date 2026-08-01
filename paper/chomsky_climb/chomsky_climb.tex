@@ -156,8 +156,11 @@ pool size rather than merely underpowered, since execution noise can no longer b
 allowance, still \emph{not} on realized use, which cannot be equalized without penalizing success
 (Tables~\ref{tab:budget},~\ref{tab:det})\\
 $\Delta_{\mathrm{held\text{-}out}}$ (held-out oracle) & \chip{vWeak}{weak} &
-$r_{\mathrm{ho}}$ higher each seed but significant in $1$ of $3$ (Table~\ref{tab:sknots}); adjudicator run in an
-unvalidated de-novo mode\\
+weak \emph{as a separation}: $r_{\mathrm{ho}}$ higher each seed but significant in $1$ of $3$
+(Table~\ref{tab:sknots}); adjudicator run in an unvalidated de-novo mode. In \emph{absolute} terms it is not
+small once given its reference class: the judge recovers $11.3\%$ of natives from their own sequences and
+confirms our designs at $8.0\%$, about $70\%$ of its own ceiling, against the gamer's $3.7\%$
+(App.~\ref{app:adjud}). That reframes the size, not the verdict, and the comparison is unstratified\\
 $g_{\mathrm{aut}}$ (verified non-use of packaged inverse-design solvers) & \chip{vEst}{established} &
 \textsc{no counterfactual.} No solver is ever called, so removing it changes nothing. This is a \emph{structural} fact---the ablation
 carries no counterfactual information, because the solver was never on the method path. Solver-free, \emph{not}
@@ -2495,7 +2498,23 @@ panel operator's objective by construction. (iv) Its de-novo exact-match recall 
 $11\%$, and the three-way conjunction's is $1\%$ (App.~\ref{app:data}). This asymmetry governs how its verdicts
 may be read: \emph{passing} ShapeKnots is a strong consistency signal, whereas \emph{failing} it is nearly
 uninformative, so $r_{\mathrm{ho}}$ is best described as \emph{selective agreement with a stringent model}
-rather than a held-out capability rate. Because all three predictors also share thermodynamic parameters their
+rather than a held-out capability rate.
+\emph{Which forces a reference class we had left implicit.} A judge that recovers $11\%$ of ground truth
+cannot confirm most of anything, so reading a design rate against an implicit $100\%$ understates it by
+construction. The defensible reference is the judge's own rate on ground truth under the same predicate and
+configuration (\texttt{heldout\_ceiling.py}). Measured that way, de-novo ShapeKnots recovers
+$9/80=11.3\%$ $[5.3,20.3]$ of natives from their own natural sequences, while it confirms the panel
+operator's designs on the strictly-untouched pool at $8.0\%$ (per seed $6.4,8.8,8.8\%$) and the
+single-oracle gamer's at $3.7\%$. So the held-out judge assents to our designs at roughly $70\%$ of the rate
+it assents to nature's own solutions, with heavily overlapping intervals, whereas the gamer sits near a
+third of that ceiling. \emph{Three caveats keep this an orientation rather than a corrected estimate.} The
+pooled interval ignores that the same $125$ targets recur across seeds, so it is too narrow; the paired
+seed-level test is unchanged and still separates in only one of three seeds (Table~\ref{tab:sknots}); and
+natives and designs are different populations, ours being $372/375$ H-type against $75/80$ natives carrying
+more than five crossing pairs. The sibling line that motivated this reference class found precisely the
+unstratified version of this comparison to be confounded by topology, and our native set carries no
+H-type/kissing label and only five low-crossing members, so we cannot stratify it. The ceiling-relative
+reading therefore changes what $r_{\mathrm{ho}}$'s absolute size means; it does not change its verdict. Because all three predictors also share thermodynamic parameters their
 errors are correlated, measurably so, and
 because the panel's false-positive rate is characterized on one narrow negative class only, we describe every
 positive rate as a high-stringency computational-consistency measure rather than a calibrated lower bound on
