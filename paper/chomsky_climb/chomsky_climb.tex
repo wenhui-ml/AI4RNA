@@ -668,39 +668,29 @@ not statistically independent: all three are computational secondary-structure m
 and structural assumptions, so their errors can correlate. Panel-unanimity is therefore cross-predictor
 consistency under the declared computational panel, not independent physical confirmation or ground truth.
 
-\paragraph{How many independent voices does the panel have? (Measured, not argued.)} The paragraph above is an
-argument from provenance, and a reviewer is entitled to ask for a number. We measure pairwise agreement on the
-$80$ native bpRNA pseudoknots of our own calibration set, where each predictor's call is whether folding a
-native's \emph{own} sequence recovers its known crossing (\texttt{panel\_agreement.py}). We use Cohen's
-$\kappa$ rather than raw agreement because at these marginal rates (pKiss $20\%$, ProbKnot $4\%$, ShapeKnots
-$11\%$) two predictors that both mostly say ``no'' agree $\sim\!84\%$ of the time by construction; $\kappa$
-removes that chance floor. The panel is \textbf{not three exchangeable voices}: pKiss and ShapeKnots agree at
-$\kappa=0.673$ $[0.422,0.875]$, an interval clear of zero, so they behave as a correlated block. The two
-pairings involving ProbKnot are $\kappa=0.270$ $[0.000,0.524]$ and $\kappa=0.117$ $[-0.074,0.421]$, both
-compatible with weak or no agreement.
-\emph{What we do not claim.} It is tempting to read this as ``the panel is two voices, not three'', and we
-resist it, because ProbKnot recovers only $3$ of $80$ natives: every $\kappa$ involving it is poorly
-determined, and whether ProbKnot is a genuinely independent third voice or merely too insensitive to tell
-cannot be settled at $n{=}80$. The defensible statement is the weaker and still consequential one: at least two
-of the three panel members are substantially correlated, so unanimity buys less independent confirmation than
-its arity suggests. This also gives the low $r_{\mathrm{mix}}$ a mechanism rather than leaving it a bare
-number: with pKiss and ShapeKnots correlated and ProbKnot the least sensitive member, the three-way conjunction
-is bound largely by ProbKnot, which is exactly where the gamer's designs die ($2/43$, Table~\ref{tab:contrast}).
-A panel that was \emph{mechanistically} diverse, rather than merely numerous, is the instrument this
-measurement says we do not yet have (\S\ref{sec:disc}, owed experiment~3).
+\paragraph{How many independent voices does the panel have? (Measured, not argued.)} We measure pairwise
+agreement on the $80$ native bpRNA pseudoknots of our calibration set, where each predictor's call is whether
+folding a native's \emph{own} sequence recovers its known crossing (\texttt{panel\_agreement.py}). We use
+Cohen's $\kappa$ rather than raw agreement because at these marginal rates (pKiss $20\%$, ProbKnot $4\%$,
+ShapeKnots $11\%$) two predictors that mostly say ``no'' agree $\sim\!84\%$ of the time by construction. The
+panel is \textbf{not three exchangeable voices}: pKiss and ShapeKnots agree at $\kappa=0.673$ $[0.422,0.875]$,
+an interval clear of zero, so they behave as a correlated block, while the two pairings involving ProbKnot are
+$\kappa=0.270$ $[0.000,0.524]$ and $\kappa=0.117$ $[-0.074,0.421]$. We resist reading this as ``two voices, not
+three'': ProbKnot recovers only $3$ of $80$ natives, so every $\kappa$ involving it is poorly determined and
+whether it is a genuinely independent third voice cannot be settled at $n{=}80$. The defensible statement is
+weaker and still consequential: at least two of three members are substantially correlated, so unanimity buys
+less independent confirmation than its arity suggests. This also gives the low $r_{\mathrm{mix}}$ a mechanism
+rather than leaving it a bare number, since the three-way conjunction is bound largely by ProbKnot, which is
+exactly where the gamer's designs die ($2/43$, Table~\ref{tab:contrast}).
 
-\emph{Does that correlation undercut D1?} A reader is entitled to ask whether ``an adjudicator no objective
-can flatter'' survives $\kappa(\text{pKiss},\text{ShapeKnots})=0.673$: if the held-out judge partly agrees
-with an in-loop one, an arm optimizing pKiss gets some ShapeKnots agreement for free. It does not undercut
-the comparison, and the reason is structural rather than statistical. Both arms in the D1 comparison optimize
-the \emph{same} predicate, pKiss\,$\wedge$\,ProbKnot, and the comparison is conditioned on both having
-satisfied it on the same target. Whatever agreement the correlation hands out is therefore handed to both
-arms equally, and cancels in the paired difference. What the correlation does bound is the \emph{absolute}
-reading: carry-over measures agreement with a partly correlated panel, not correctness, so $0.293$ is not an
-estimate of how often those designs really fold as intended. We use it only as a between-arm contrast and
-never as an accuracy. The same distinction disposes of the mirror worry about $\Delta_{\mathrm{gamer}}$: there
-the two arms optimize \emph{different} predicates, so the correlation does \emph{not} cancel, which is one
-more reason we treat that component as narrow and this one as established.
+\emph{Does that correlation undercut D1?} Not the comparison, and the reason is structural. Both arms in the D1
+comparison optimize the \emph{same} predicate and the comparison is conditioned on both having satisfied it on
+the same target, so whatever agreement the correlation hands out is handed to both arms equally and cancels in
+the paired difference. What it does bound is the \emph{absolute} reading: carry-over measures agreement with a
+partly correlated panel, not correctness, so $0.293$ is not an estimate of how often those designs really fold
+as intended. The same distinction disposes of the mirror worry about $\Delta_{\mathrm{gamer}}$, where the two
+arms optimize \emph{different} predicates so the correlation does not cancel, which is one more reason we treat
+that component as narrow and this one as established.
 
 \emph{Then why not make the least-correlated pair the primary metric?} The answer is structural, not a
 preference. ProbKnot is the member least correlated with the others, so pKiss$\,\wedge\,$ProbKnot is indeed
@@ -842,51 +832,33 @@ $\PK$. It is \emph{transferable} if this holds on targets never used to form $\D
 $\mathcal T$ and remain available; see Rem.~\ref{rem:autonomy}).
 \end{definition}
 
-\begin{remark}[Component attribution strengthens the audit; it is not a necessary condition]\label{rem:attrib}
-We do not require that ablating $\Delta\mathcal O$ \emph{destroy} the held-out rate, for two reasons.
-Conceptually, a component can be genuinely acquired and genuinely load-bearing \emph{as a bundle}
-while no single element is individually necessary (redundancy is normal in search procedures), so an
-all-or-nothing attribution test would reject real acquisitions. Practically, and more importantly, we report
-which attributions we actually ran and how they came out, which for this study is mostly negatively. The
-panel operator's agreement objective is decisive under $r_{\mathrm{in}}$, the two-oracle metric it directly
-optimizes, and is \emph{not} distinguishable from its deletion under $r_{\mathrm{mix}}$, the three-predictor
-metric we report as primary; its decompose/compose scaffolding is inert under both; and the undirected control
-runs at a matched \emph{nominal} cap, not a matched realized compute, so it separates the objective from the
-cap rather than from the budget (\S\ref{sec:exp}, Table~\ref{tab:det}).
-We therefore treat \emph{component attribution as an optional strengthening} of the audit, graded like the rest
-of the verdict (\S\ref{sec:exp}), and state plainly which components are and are not shown to carry the gain
-rather than claiming a complete $\Delta\mathcal O$ ablation. The audit's necessary conditions remain
-Eq.~\eqref{eq:cert}, in which no per-component clause appears.
-\end{remark}
-
-\begin{remark}[The subject of the claim is the oracle-augmented system, not a bare policy]\label{rem:subject}
-Throughout, the entity credited with a capability gain is the \emph{oracle-augmented agentic system under a
-declared protocol}, not a policy in isolation. This matters because the before/after step changes several
-things at once: the policy, the in-loop search objective, access to a crossing-aware oracle, and the
-candidate-selection rule (and, across arms, the realized oracle-call budget; App.~\ref{app:repro}). Our design
-does not decompose that bundle, and \S\ref{sec:exp} shows a matched ablation failing to isolate any single
-component under the primary metric. So a reader should take every ``capability'', ``gain'', and ``new relative
-to the prior self'' in this paper to be a \emph{system-level empirical gain under augmented oracle access}, and
-specifically \emph{not} an identification of autonomous learning inside an agent policy. Where we write
-``agent'' we mean the system; where a claim would only hold of the policy alone, we do not make it.
-\end{remark}
-
 \begin{remark}[``Solver-free'' would have been the better word]\label{rem:autonomy}
-A note on vocabulary before the substance. In this paper ``autonomous'' means exactly one thing, that no packaged
-inverse-design solver is on the method path, and that is a far weaker property than the word carries in the
-agent literature, where it suggests independence from external machinery in general. Our system is not that:
-it queries crossing-aware folding oracles continuously and could not function without them. Where the
-distinction matters below we write \emph{solver-free}, and a reader who mentally substitutes it everywhere
-will not lose anything we intend.
-Before/after differ in \emph{feedback instrument} as well as policy: the prior repertoire is scored through a
-pseudoknot-free channel, the after-policy queries crossing-aware predictors. Acquiring a new feedback
-instrument is part of what happened and we name it as such. Consequently the capability belongs to the
-\emph{oracle-augmented agentic system}: it is autonomous with respect to $\mathcal T=\{$packaged
-inverse-design solvers$\}$, since removing DesiRNA changes nothing and it is never called, and \emph{not}
-autonomous with respect to crossing-aware folding oracles, which are strong external tools it depends on
-throughout. Every ``autonomous'' in this paper means the former. The gamer-versus-panel-operator comparison is
-run at \emph{identical} oracle access precisely so that the crossing-aware channel is held fixed and cannot
-account for the difference between them.
+In this paper ``autonomous'' means exactly one thing, that no packaged inverse-design solver is on the method
+path, and that is far weaker than the word carries in the agent literature. Our system queries crossing-aware
+folding oracles continuously and could not function without them. Where the distinction matters we write
+\emph{solver-free}, and a reader who substitutes it everywhere loses nothing we intend. Two consequences.
+Before/after differ in feedback instrument as well as policy: the prior repertoire is scored through a
+pseudoknot-free channel and the after-policy queries crossing-aware predictors, so acquiring a new feedback
+instrument is part of what happened. And the entity credited with a gain is the oracle-augmented system under a
+declared protocol, not a policy in isolation, because the before/after step changes the policy, the in-loop
+objective, oracle access and the candidate-selection rule at once. Our design does not decompose that bundle,
+and \S\ref{sec:exp} shows a matched ablation failing to isolate any single component under the primary metric.
+Every ``capability'', ``gain'' and ``new relative to the prior self'' below is therefore a system-level
+empirical gain under augmented oracle access, and specifically not an identification of autonomous learning
+inside a policy. The gamer-versus-operator comparison runs at identical oracle access precisely so the
+crossing-aware channel is held fixed.
+\end{remark}
+
+\begin{remark}[Component attribution strengthens the audit; it is not a necessary condition]\label{rem:attrib}
+We do not require that ablating $\Delta\mathcal O$ destroy the held-out rate. A component can be genuinely
+acquired and load-bearing as a bundle while no single element is individually necessary, so an all-or-nothing
+attribution test would reject real acquisitions. What we do instead is report which attributions we ran and how
+they came out, which for this study is mostly negatively: the agreement objective is decisive under
+$r_{\mathrm{in}}$ and not distinguishable from its deletion under $r_{\mathrm{mix}}$; the decompose/compose
+scaffolding is inert under both; and the undirected control runs at a matched nominal cap rather than matched
+realized compute (\S\ref{sec:exp}, Table~\ref{tab:det}). Component attribution is therefore an optional
+strengthening, graded like the rest of the verdict. The audit's necessary conditions remain Eq.~\eqref{eq:cert},
+in which no per-component clause appears.
 \end{remark}
 
 \begin{remark}[What we do and do not specify]\label{rem:scope}
@@ -1802,26 +1774,23 @@ port to a docking score or a binding assay, and we do not pretend otherwise.
 
 \paragraph{Limitations, in rough order of how much they bound the contribution.} \emph{(i) One benchmark,
 structurally exhausted, plus one synthetic family that repairs power and nothing else.} The unbounded
-$\mathcal L_{\mathrm H}$ grid gives an estimable magnitude ($100$ targets, ${+}0.316$) but is a single
-uniform topology built for the operator's scaffold, so it speaks to power, not to generalization. Every
-natural-corpus number is on Pseudobase++ crossing targets; the structure-aware split
-it admits has $27$ targets in $24$ clusters, so directions replicate and magnitudes do not, and the
-cross-source pool gives $0/60$ for our operator and the SOTA solver alike. \emph{(ii) The panel is
-mechanistically narrow, now measured rather than argued.} All three predictors share nearest-neighbour
-parameters; carry-over tracks that shared family rather than correctness (Fig.~\ref{fig:carry}); and pKiss and
-ShapeKnots form a correlated block ($\kappa=0.673$ $[0.422,0.875]$), so unanimity buys less independent
-confirmation than its arity suggests. Whether ProbKnot is a genuinely independent third voice is undetermined
-at $n{=}80$, since it recovers only $3$ natives. No wet-lab confirmation is attempted. \emph{(iii) Attribution
-is partial, and much of $\Delta_{\mathrm{gamer}}$ is target-side}: a search-free probe puts $84\%$ of it on
-targets a random compatible sequence already solves, leaving ${+}0.016$ where search is required.
-\emph{(iv) Most numbers were produced by operators that were not bit-reproducible}, and our first diagnosis of
-why was wrong (App.~\ref{app:repro}). The ablation and the headline comparison are re-run bit-reproducibly at
-equal allowance (Table~\ref{tab:det}); the pool-level and cross-source numbers were not. \emph{(v) The invention step is not fully reproducible.} The six operators were written by frontier models
-behind a routed provider alias that exposes no version hash, so a re-run months later may not query the same
-weights (App.~\ref{app:repro}). Every \emph{measurement} in this paper re-executes frozen source rather than
-re-querying a model, so nothing reported here depends on it. The claim ``an agent can invent such an
-operator'' does, and a replication attempt could fail for reasons outside the protocol. \emph{(vi) The audit
-does not separate capability from search}, by construction.
+$\mathcal L_{\mathrm H}$ grid gives an estimable magnitude but is a single uniform topology built for the
+operator's scaffold, so it speaks to power, not generalization. Every natural-corpus number is on Pseudobase++,
+whose structure-aware split has $27$ targets in $24$ clusters, so directions replicate and magnitudes do not,
+and the cross-source pool gives $0/60$ for our operator and the SOTA solver alike. \emph{(ii) The panel is
+mechanistically narrow, measured rather than argued.} All three predictors share nearest-neighbour parameters;
+carry-over tracks that shared family rather than correctness (Fig.~\ref{fig:carry}); and pKiss and ShapeKnots
+form a correlated block ($\kappa=0.673$), so unanimity buys less independent confirmation than its arity
+suggests. Whether ProbKnot is a genuinely independent third voice is undetermined at $n{=}80$. No wet-lab
+confirmation is attempted. \emph{(iii) Attribution is partial and much of $\Delta_{\mathrm{gamer}}$ is
+target-side}: a search-free probe puts $84\%$ of it on targets a random compatible sequence already solves,
+leaving ${+}0.016$ where search is required. \emph{(iv) Most numbers were produced by operators that were not
+bit-reproducible}, and our first diagnosis of why was wrong (App.~\ref{app:repro}); the ablation and headline
+comparison are re-run bit-reproducibly, the pool-level and cross-source numbers are not. \emph{(v) The
+invention step is not fully reproducible}: the operators were written by frontier models behind a routed alias
+exposing no version hash, so a re-run may not query the same weights. Every measurement re-executes frozen
+source, so nothing reported depends on it, but the claim ``an agent can invent such an operator'' does.
+\emph{(vi) The audit does not separate capability from search}, by construction.
 
 \paragraph{The experiments this study owes, in priority order.} \textbf{(1) A second, structurally independent
 crossing corpus.} Pseudobase++ holds $251$ targets in $60$ structural clusters, only $24$ disjoint from our
@@ -1858,18 +1827,17 @@ side is model-relative.
 \paragraph{The result, stated at the strength the evidence supports.} Under a single pseudoknot oracle an
 invented, solver-free operator reaches $43/60$ on crossing targets, above a decidable context-free floor of
 $0/60$; under three predictors $1/60$ survives. We report that collapse as \emph{oracle-specific
-over-optimization}, and the discriminating evidence for it is paired and conditional. Of the operator's $43$
-pKiss solves a held-out predictor confirms $2$, against $26$ for a minimum-free-energy solver on the same $43$
-targets. That contrast is an \emph{association} between what an arm optimizes and how far its designs carry,
-not a causal localization: the two arms are different methods, not a randomized manipulation of one method's
-oracle. Re-optimizing for cross-oracle agreement recovers a small set of mixed-panel-consistent crossings, and
-on a metric-neutral statistic that gain is narrow, shrinks as replication is added, and is not attributable to
-the search's guidance: matched undirected search is indistinguishable from the full operator, and a
-search-free probe of target difficulty puts $84\%$ of it on targets random sampling already reaches. Carry-over
-itself tracks shared model family rather than correctness, which bounds what any panel of thermodynamically
-related predictors can certify. The exclusion side is exact and concerns the prior \emph{verifier's} range,
-never the prior policy's capacity. The evidence vector for this study reads one exact, three established, one
-weak, one not established; the instrument, not the system, is what we ask readers to take away.
+over-optimization}, and the discriminating evidence is paired: of the operator's $43$ pKiss solves a held-out
+predictor confirms $2$, against $26$ for a minimum-free-energy solver on the same $43$ targets. That contrast is
+an \emph{association} between what an arm optimizes and how far its designs carry, not a causal localization,
+since the two arms are different methods rather than a randomized manipulation of one method's oracle.
+Re-optimizing for cross-oracle agreement recovers a small set of mixed-panel-consistent crossings, and on a
+metric-neutral statistic that gain is narrow, shrinks as replication is added, and is not attributable to the
+search's guidance: matched undirected search is indistinguishable from the full operator, and a search-free
+probe puts $84\%$ of it on targets random sampling already reaches. Carry-over itself tracks shared model family
+rather than correctness, which bounds what any panel of thermodynamically related predictors can certify. The
+exclusion side is exact and concerns the prior \emph{verifier's} range, never the prior policy's capacity. The
+evidence vector reads one exact, three established, one weak, one not established.
 
 \paragraph{And the positive side, at the same strength.} The instrument is not merely insensitive, and
 establishing that produced this paper's one clearly positive measurement. The frozen agent-written operators, solver-free in the narrow sense of Rem.~\ref{rem:autonomy} and not
@@ -2015,60 +1983,34 @@ RNAstructure~$6.6$ for ProbKnot and ShapeKnots (the latter run \emph{de novo}, n
 Python~$3.10$. Each oracle runs in its own pinned conda environment; the harness records the exact command line
 and the raw predictor output for every call. Design seeds are the integers $0$--$4$.
 
-\smallskip\noindent\textbf{Execution-level nondeterminism at a fixed seed: measured, and larger than the method
-effect.} The operators are seeded but \emph{not} bit-reproducible, because their repair loops
-terminate on \emph{wall-clock} budgets and on a per-target ProbKnot call budget, and subprocess timing varies
-with machine load. That was our diagnosis, and it was incomplete in a way worth recording, because it made the
-obvious fix ineffective. Deleting every wall-clock term from the stopping rules leaves the operator
-\emph{still} irreproducible: at a fixed (target, seed), on an idle machine, inside one process, four of four
-targets diverged. The residual cause is that the context-free sub-solve calls \textsc{ViennaRNA}'s
-\texttt{inverse\_fold}, a stochastic search running on \textsc{ViennaRNA}'s \emph{own} global RNG. That
-generator is invisible to \texttt{random.Random(seed)} and its state advances from call to call, so the
-skeleton the repair loop starts from is not a function of our seed. Machine load was a real but secondary
-term. The operators now expose \texttt{deterministic=True}, which (a) replaces both wall-clock caps with
-counted ones (iterations plus a pKiss-call allowance of $150$, above the $142.7$ that the hungriest arm
-realized under the clock, so no arm loses budget and all arms now get the same), and (b) seeds
-\textsc{ViennaRNA}'s generator per attempt. Validated against a $96$-process synthetic load: $4/4$ and $4/4$
-targets bit-identical for the two operators, against $1/4$ and $0/4$ with the default. This settles owed
-experiment~(2) and the compute-matching half of~(3) with one change; the measurements reported in this paper
-predate it and were made under the wall-clock regime, which is why we replicate rather than assume. We
-re-ran every ablation arm \emph{three} times at each of three nominal seeds (\texttt{panel\_replicate.sh};
-$54$ runs) and, for the headline comparison, both arms three more times per seed in a separate paired sweep
-(\texttt{gamer\_vs\_panel\_replicate.sh}), before re-running the whole design deterministically
-(Table~\ref{tab:det}), which is the regime the paper reports.
+\smallskip\noindent\textbf{Execution-level nondeterminism at a fixed seed, and the fix.} Two independent runs
+of the same arm at the same nominal seed gave different counts. Our first diagnosis, subprocess timing under a
+wall-clock cap, was incomplete: the operators also call \textsc{ViennaRNA}'s \texttt{inverse\_fold}, a
+stochastic search on \textsc{ViennaRNA}'s \emph{own} global RNG, which is invisible to
+\texttt{random.Random(seed)} and advances from call to call. The operators now expose
+\texttt{deterministic=True}, which replaces both wall-clock caps with counted ones (iterations plus a $150$-call
+pKiss allowance, above the $142.7$ the hungriest arm realized under the clock) and seeds \textsc{ViennaRNA}'s
+generator per attempt. Validated against a $96$-process synthetic load: $4/4$ and $4/4$ targets bit-identical
+for the two operators against $1/4$ and $0/4$ with the default. Independently confirmed by
+\texttt{family\_grid\_par.py}, which re-runs a serially-produced seed under $50$-way parallelism and finds
+per-target verdicts identical, so a $(\text{target},\text{seed})$ pair fixes the run regardless of what else is
+executing.
 
-\emph{How large execution noise was, and why the paired reading survives it.} Pooling all six independent
-executions per nominal seed (\texttt{exec\_spread.py}), the panel operator's $r_{\mathrm{mix}}$ has a pooled
-within-seed s.d.\ of $\mathbf{2.04/60}$: the \emph{same order} as the execution-replicated method effect of
-$2.87/60$. Enough to make an unpaired comparison of two separately-reported counts meaningless; not enough to
-swamp the paired one ($4.3$ standard errors from zero). The gamer is nearly deterministic ($0$--$1$, mean
-spread $0.3/60$), which is why pairing rescues the comparison even though neither arm's count is individually
-stable. Two mechanisms drive the spread: subprocess timing jitter under a wall-clock cap, and \emph{sweep
-composition}: the ablation sweep ran six arms per worker and the paired sweep two, so the same nominal
-configuration got through $87.3$ versus $130.7$ pKiss calls per target. A wall-clock-budgeted operator's
-result is a function of what else was running beside it, which no seed records. Variance decomposition
-confirms this is not a small term: within-seed s.d.\ $1.05$ on $r_{\mathrm{mix}}$ and $1.84$ on
-$r_{\mathrm{in}}$, against between-seed $1.39$ and $1.07$.
-
-Four consequences we state rather than hide. (i) Per-seed counts in Table~\ref{tab:sep} are single-execution
-draws, to be read with at least $\pm2/60$ granularity. (ii) A bootstrap over targets and seeds only
-understates uncertainty by one level; the wall-clock intervals quoted in \S\ref{sec:exp} therefore use a
-three-level bootstrap that includes executions. (iii) Every such comparison is paired \emph{within} an
-execution, so this variation inflates intervals but cannot masquerade as a method effect or bias a point
-estimate. (iv) No claim here should be read off a single count; the evidential units are paired differences
-and their intervals.
-
-The operator-invention runs call frontier models through a single provider (OpenRouter) at
-temperature~$0.4$ with no output cap. Each run's \texttt{invent\_log.json} records the provider-qualified
-model identifier (e.g.\ \texttt{google/gemini-3.1-pro-preview}), the per-round prompt and completion token
-counts, the per-round training score, and every compile or runtime error verbatim; each frozen
-\texttt{design} program is stored in full in \texttt{result.json}. What these logs do \emph{not} contain is a
-provider-side model version hash, because the endpoint does not expose one: a frontier model served behind a
-routed alias is not a fixed artifact, and a re-run months later may not be the same weights. We flag that as
-a reproducibility limit of the invention step specifically. It does not touch any measurement in this paper,
-because every number here is produced by re-executing the \emph{frozen source}, not by re-querying a model. The complete harness, exact target IDs and any exclusions, all generated sequences
-with their per-predictor outputs, the hash/timestamp commitment logs and timeout/failure handling are provided
-as an anonymized archive with the submission.
+\smallskip\noindent\textbf{How large the noise was, and why the paired reading survived it.} Pooling all six
+independent executions per nominal seed (\texttt{exec\_spread.py}), the panel operator's $r_{\mathrm{mix}}$ has
+a pooled within-seed s.d.\ of $\mathbf{2.04/60}$, the \emph{same order} as the execution-replicated method
+effect of $2.87/60$: enough to make an unpaired comparison of two separately-reported counts meaningless, not
+enough to swamp the paired one ($4.3$ standard errors from zero). The gamer is nearly deterministic
+($0$--$1$, mean spread $0.3/60$), which is why pairing rescues the comparison though neither count is
+individually stable. Two mechanisms drove the spread: subprocess timing jitter, and \emph{sweep composition},
+since the ablation sweep ran six arms per worker and the paired sweep two, so the same nominal configuration got
+through $87.3$ versus $130.7$ pKiss calls per target. A wall-clock-budgeted operator's result is thus a function
+of what else was running beside it, which no seed records. Four consequences we state rather than hide.
+Per-seed counts in Table~\ref{tab:sep} are single-execution draws, to be read with at least $\pm2/60$
+granularity. A bootstrap over targets and seeds only understates uncertainty by one level, so the wall-clock
+intervals quoted in \S\ref{sec:exp} use a three-level bootstrap. Every such comparison is paired \emph{within}
+an execution, so this variation inflates intervals but cannot masquerade as a method effect. And no claim should
+be read off a single count.
 
 \smallskip\noindent\textbf{\CF{} floor measurement.} The floor is the \CF-confined REMC optimizer run on the
 same targets under the same adjudicator, at the same nominal caps as the audited arms. It scores $0/60$ on
@@ -2173,42 +2115,25 @@ raised is thus tested directly and does not materialize. But on $27$ targets tha
 \section{Robustness Checks, the Adjudicator's Reference Class, and Materials}\label{app:support}
 
 \subsection{Robustness checks in full}\label{app:robust}
-\paragraph{Robustness checks: instrument validity, generalization, budget.} Three controls close the
-section. \emph{(i) Verifier validity: one negative control, and recall.} Folding each target's \CF{}
-skeleton under the panel, the panel credits the crossing on $0/60$ skeletons (recovering the nested skeleton on
-$57/60$), whereas a naive $A_{\mathrm{nest}}$ evaluator over-accepts them. We deliberately do \emph{not} call
-this ``high specificity'': skeletons are a single, narrow negative class (the target with its crossing stem
-deleted), and a real negative distribution would also contain near-miss designs, mispaired variants, and
-\emph{alternative} pseudoknot topologies on which the panel is untested. The defensible statement is exactly
-\emph{no observed false positives on the skeleton negative control}; the panel's false-positive rate is
-uncalibrated. We do measure \emph{recall} directly, on $80$ native bpRNA pseudoknots (folding each native's
-\emph{own} sequence and asking whether the panel recovers its known crossing; \texttt{native\_calib.py}):
-per-predictor crossing recall is pKiss $20\%$, ProbKnot $4\%$, ShapeKnots $11\%$, and the three-way
-conjunction \emph{only $1\%$} ($1/80$). So the panel is a \emph{low-recall} instrument whose
-false-positive behaviour is characterized on one negative class only, and the AND-rule trades away almost all
-recall. Two consequences we carry throughout: because recall is so low, a low or zero $r_{\mathrm{mix}}$ is weak
-evidence of \emph{absence} of capability; and while low recall makes the rate \emph{conservative}, reading it
-as a strict lower bound on true capability would additionally require a calibrated near-zero false-positive
-rate, which one negative class does not establish. So we treat $r_{\mathrm{mix}}$ as a high-stringency
-consistency measure, not a bound. \emph{(ii) Generalization and its limit.}
-On a second, disjoint Pseudobase pool (indices
-$60$--$110$) the \CF{} floor is again $0/50$ and the panel operator panel-unanimous on $5/50$, the same
-regime, so it is not overfit to one $60$-target sample. On a cross-source pool (an independent
-bpRNA/ArchiveII-derived set, $60$ targets, size-matched; App.~\ref{app:repro}) the \CF{} floor is again
-$0/60$, and both our operator and the SOTA solver reach $0/60$ panel-unanimous. The per-oracle breakdown does
-\emph{not} let us blame the strictest predictor alone: DesiRNA forms $9/60$ crossings under pKiss but only
-$3/60$ survive ProbKnot, and $0/60$ pass ShapeKnots, so ProbKnot and not just de-novo ShapeKnots
-already rejects most, for the SOTA solver as much as for ours (our operator reaches only $1$--$2/60$ under
-pKiss\,$\wedge$\,ProbKnot on this pool across two runs of the same arm, the wall-clock nondeterminism of
-App.~\ref{app:repro}, and $0/60$ either way). A larger repair budget ($240$\,s, $2500$ iters)
-does not change this. Crucially, the panel's measured $1\%$ recall on native pseudoknots (item (i)) makes a
-cross-source $0/60$ only weakly informative about capability: an instrument that recovers $1\%$ of \emph{native}
-crossings will score near zero on any distribution, so we do not read cross-source failure as absence of
-capability, nor blame a single predictor. The negative side generalizes across datasets; the \emph{positive}
-claim we support is limited to the Pseudobase++ distribution and its H-type family (in-distribution
-$3$--$8/60$), not general cross-source pseudoknot design. \emph{(iii) Budget.} Over $\{60,180,300\}$\,s on a fixed $20$-target subset, panel-unanimous is
-$\{1,3,1\}/20$: no clean budget trend, dominated by search variance, consistent with oracle-guided search
-rather than a budget-monotone capability.
+\S\ref{sec:exp} states the two checks the argument uses. This appendix adds the three details it omits.
+
+\smallskip\noindent\textbf{The skeleton negative control, and why we do not call it specificity.} Folding each
+target's \CF{} skeleton under the panel, the panel credits the crossing on $0/60$ skeletons while recovering the
+nested skeleton on $57/60$, whereas a naive $A_{\mathrm{nest}}$ evaluator over-accepts them. Skeletons are one
+narrow negative class, and a real negative distribution would also contain near-miss designs, mispaired
+variants and \emph{alternative} pseudoknot topologies on which the panel is untested. The defensible statement
+is exactly \emph{no observed false positives on the skeleton negative control}; the false-positive rate is
+uncalibrated, which is why we treat $r_{\mathrm{mix}}$ as a high-stringency consistency measure and not a bound.
+
+\smallskip\noindent\textbf{The cross-source $0/60$, per oracle.} It does not let us blame the strictest
+predictor alone: DesiRNA forms $9/60$ crossings under pKiss but only $3/60$ survive ProbKnot and $0/60$ pass
+ShapeKnots, so ProbKnot and not just de-novo ShapeKnots already rejects most, for the SOTA solver as much as for
+ours (our operator reaches $1$--$2/60$ under pKiss\,$\wedge$\,ProbKnot across two runs of the same arm, and
+$0/60$ either way). A larger repair budget ($240$\,s, $2500$ iterations) does not change it.
+
+\smallskip\noindent\textbf{Budget, which established nothing.} Over $\{60,180,300\}$\,s on a fixed $20$-target
+subset, panel-unanimous is $\{1,3,1\}/20$: no clean budget trend, dominated by search variance, consistent with
+oracle-guided search rather than a budget-monotone capability.
 
 \paragraph{Growing-parameter extrapolation: the earlier $16$-target version.} \emph{Superseded by the
 $100$-target grid of \S\ref{sec:exp}, and kept only so the record shows what was run first.} A finite target set cannot
