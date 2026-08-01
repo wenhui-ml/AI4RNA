@@ -212,20 +212,13 @@ declared solver class (Rem.~\ref{rem:autonomy}).
 
 \begin{figure}[t]\centering
 \includegraphics[width=\linewidth]{fig_cc_architecture.pdf}
-\caption{\textbf{End-to-end architecture.} A target is graded by its nested-versus-crossing family type and
-crossing-stem count and assigned to one of the named pools of Table~\ref{tab:pools}. In Step~1 the design agent (policy $\pi$ over
-reusable operators, optionally calling an external pseudoknot solver) \emph{does} query crossing-aware
-optimization oracles (pKiss, and ProbKnot for the panel operator) inside its repair loop; it then selects a
-candidate and commits it hash-frozen. The seal falls \emph{after} in-loop optimization and \emph{before} any
-\emph{held-out} adjudication, so it forecloses post-hoc selection on the held-out oracle but not overfitting
-to the in-loop ones. Step~2 adjudicates: the pseudoknot-free ladder $\Ocf$ and the mixed panel $\Opk$
-(pKiss and ProbKnot, both in-loop, plus the genuinely held-out ShapeKnots), abstaining on disagreement. The
-audit reports \emph{six} findings grouped on three sides: the positive side ($\Delta_{\mathrm{prior}}$,
-$\Delta_{\mathrm{gamer}}$, $\Delta_{\mathrm{undirected}}$, $\Delta_{\mathrm{held\text{-}out}}$), the exact
-verifier-range exclusion $E_{\mathrm{range}}$ (Prop.~\ref{prop:confine}), and $g_{\mathrm{aut}}$, verified
-non-use of packaged inverse-design solvers. The verdict is the component-wise reading of that vector
-(Table~\ref{tab:verdict}), never a single bit. Only the exclusion is exact; the positive side is
-model-relative.}\label{fig:arch}
+\caption{\textbf{End-to-end architecture.} A target is graded by family type and crossing-stem count and assigned to a
+pool of Table~\ref{tab:pools}. Step~1: the design agent queries crossing-aware oracles (pKiss, and ProbKnot for
+the panel operator) inside its repair loop, then commits a candidate hash-frozen. The seal falls \emph{after}
+in-loop optimization and \emph{before} any held-out adjudication, so it forecloses post-hoc selection on the
+held-out oracle but not overfitting to the in-loop ones. Step~2: the pseudoknot-free ladder $\Ocf$ and the
+mixed panel $\Opk$ adjudicate, abstaining on disagreement. The audit reports six findings
+(Table~\ref{tab:verdict}), never a single bit. Only the exclusion is exact.}\label{fig:arch}
 \end{figure}
 
 \paragraph{Scope: three results, weighted.} A reader should take three things from this paper, and it is
@@ -1020,14 +1013,11 @@ $43$, not $1$.
 
 \begin{table}[t]\centering\small
 \setlength{\tabcolsep}{6pt}\renewcommand{\arraystretch}{1.15}
-\caption{\textbf{Cross-oracle panel adjudication of the invented operator's $43$ pKiss-solves}
-(\S\ref{sec:oracle}). Read the top block down the count column: $43\to2\to1$ as adjudication moves from the
-oracle the operator optimized to predictors it never saw. That collapse is the paper's headline measurement.
-The lower block is the \emph{other} side of the audit and its two numbers are not confirmations of the design:
-all $43$ targets are genuinely crossing ($3$--$9$ crossing pairs each), so a pseudoknot-free fold realizes none
-of them, and the $4$ counts how often the pseudoknot-\emph{blind} predicate would have been fooled. Predicates
-are those of Eq.~\eqref{eq:predicates}; all $43$ satisfy $A_{\mathrm{full}}$ under pKiss
-(\texttt{pk\_bp\_distance}$=0$).}\label{tab:panel}
+\caption{\textbf{Cross-oracle panel adjudication of the invented operator's $43$ pKiss-solves.} Read the top block down
+the count column: $43\to2\to1$ as adjudication moves from the oracle the operator optimized to predictors it
+never saw. The lower block is the exclusion side, and its two numbers are \emph{not} confirmations of the
+design: all $43$ targets are genuinely crossing ($3$--$9$ crossing pairs each), so a pseudoknot-free fold
+realizes none, and the $4$ counts how often the pseudoknot-blind predicate would have been fooled.}\label{tab:panel}
 \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{5.0cm}cL@{}}
 \toprule
 \textbf{adjudicator / predicate} & \textbf{count\,/\,43} & \textbf{what the number counts}\\
@@ -1088,18 +1078,14 @@ thesis: ``forms the pseudoknot'' is deeply model-relative.
 
 \begin{table}[t]\centering\small
 \setlength{\tabcolsep}{6pt}\renewcommand{\arraystretch}{1.15}
-\caption{\textbf{Oracle-gaming vs.\ cross-predictor carry-over} (each arm's $43$ pKiss-solves, re-adjudicated).
-The pKiss-optimizing operator is $13\times$ less ProbKnot-robust than the MFE-optimizing external solver.
-\emph{This is a genuinely paired comparison}: the two pKiss-solved sets are the \emph{same} $43$ targets
-(intersection $43$, Jaccard $1.000$, matched mean crossing-pair count $5.26$), so target composition and
-difficulty cannot explain the gap. Paired McNemar $b{=}25,c{=}1$, exact $p{=}8.1\!\times\!10^{-7}$, paired risk
-difference ${+}0.558$ $[{+}0.395,{+}0.721]$; at the full $n{=}60$ denominator ${+}0.400$ $[{+}0.267,{+}0.533]$
-(\texttt{runs/cc\_ascent/contrast\_paired.py}). Because the arms are two \emph{different methods} rather than a
-randomized manipulation of one method's training oracle, we read this as an \emph{association} between
-pKiss-training and lost ProbKnot agreement, consistent with substantially stronger oracle-specific
-over-optimization by the pKiss-trained method, and not as a causal localization of gaming. Under the full unanimous
-panel neither arm is robust (ShapeKnots, run de novo without probing data, is
-stringent).}\label{tab:contrast}
+\caption{\textbf{Oracle-gaming vs.\ cross-predictor carry-over} (each arm's $43$ pKiss-solves, re-adjudicated). The
+pKiss-optimizing operator is $13\times$ less ProbKnot-robust than the MFE-optimizing external solver. The
+comparison is genuinely paired: the two pKiss-solved sets are the same $43$ targets (Jaccard $1.000$, matched
+mean crossing-pair count $5.26$), so target composition cannot explain the gap. Paired McNemar $b{=}25$,
+$c{=}1$, exact $p{=}8.1\!\times\!10^{-7}$, risk difference ${+}0.558$ $[{+}0.395,{+}0.721]$
+(\texttt{contrast\_paired.py}). Because the arms are two different methods rather than a randomized
+manipulation of one method's training oracle, we read this as an \emph{association}. Under the full unanimous
+panel neither arm is robust.}\label{tab:contrast}
 \begin{tabular}{@{}lccccc@{}}
 \toprule
 \textbf{method (objective)} & \textbf{pKiss} & \textbf{ProbKnot} & \textbf{ShapeKnots} & \textbf{unanimous}
@@ -1168,17 +1154,14 @@ we did not move.
 
 \begin{table}[t]\centering\small
 \setlength{\tabcolsep}{3.5pt}\renewcommand{\arraystretch}{1.15}
-\caption{\textbf{Component ablation and the headline comparison, in the bit-reproducible, equal-allowance regime}: $5$ nominal seeds, one
-\emph{noise-free} run each, so no execution replicates are needed and the gamer is measured in the same
-regime. Counted budgets replace both
-wall-clock caps and \textsc{ViennaRNA}'s own generator is seeded per attempt, so a seed fixes the run
-bit-for-bit; every arm receives the same $150$-call pKiss allowance. $\Delta$ is the paired difference against
-the reference with a two-level bootstrap interval over targets and seeds ($B{=}20{,}000$); \textbf{bold} $=$
-excludes zero. The $r_{\mathrm{in}}$ column is each arm's \emph{own} in-loop predicate, which for the gamer is
-pKiss alone and for the panel arms is pKiss\,$\wedge$\,ProbKnot, so it is \emph{not} comparable across those
-two groups; $r_{\mathrm{mix}}$ is recomputed identically for every arm and is the cross-arm metric. ``real
-pKiss'' is realized calls per target, which still differ because the full operator often solves and stops
-(\S\ref{sec:exp}). (\texttt{panel\_deterministic.sh}, \texttt{det\_stats.py}.)}\label{tab:det}
+\caption{\textbf{Component ablation and the headline comparison, bit-reproducibly at equal allowance}: $5$ nominal
+seeds, one noise-free run each, gamer included. Counted budgets replace wall-clock caps and \textsc{ViennaRNA}'s
+generator is seeded per attempt, so a seed fixes the run bit-for-bit; every arm gets the same $150$-call pKiss
+allowance. $\Delta$ is the paired difference against the reference with a two-level bootstrap over targets and
+seeds ($B{=}20{,}000$); \textbf{bold} excludes zero. $r_{\mathrm{in}}$ is each arm's \emph{own} predicate,
+pKiss alone for the gamer, so it is not comparable across those groups; $r_{\mathrm{mix}}$ is the cross-arm
+metric. ``real pKiss'' is realized calls per target, which differ because the full operator often solves and
+stops. (\texttt{panel\_deterministic.sh}, \texttt{det\_stats.py}.)}\label{tab:det}
 \begin{tabularx}{\linewidth}{@{}Lccccc@{}}
 \toprule
 & \multicolumn{2}{c}{$r_{\mathrm{in}}$ (own predicate)} & \multicolumn{2}{c}{$r_{\mathrm{mix}}$ (all three)} & \\
@@ -1284,32 +1267,26 @@ paper for adding a predictor from a different model class (\S\ref{sec:disc}).
 
 \begin{figure}[t]\centering
 \includegraphics[width=\linewidth]{fig_cc_carry.pdf}
-\caption{\textbf{Conditional carry-over $C$ (Eq.~\eqref{eq:carry}): the metric-neutral comparison.} Each arm
-is scored on the fraction of \emph{its own} successes that a predictor never in \emph{its} loop confirms, so
-the denominators differ by design and that is what makes the statistic neutral. ShapeKnots is in no arm's
-loop, so every row is comparable. Bars are exact binomial (Clopper--Pearson) intervals; counts are
-successes\,/\,own successes. The two rows in colour are the comparison the figure exists to make: the
-hand-built panel operator against the frozen agent-written operators of App.~\ref{app:invent}, which optimize
-the same pKiss\,$\wedge$\,ProbKnot predicate and whose interval does not reach the panel operator's. The
-ProbKnot direction is meaningful only for the two arms that do not optimize it and is reported in
-Table~\ref{tab:contrast} ($26/43$ for DesiRNA against $2/43$ for the gamer). The agent row pools six single
-runs; its two zero-failure models were replicated at $5$ seeds $\times$ $3$ executions, giving
-$0.302$ $[0.275,0.330]$, and serve as this section's positive control.
-(\texttt{runs/cc\_ascent/carryover.py}.)}\label{fig:carry}
+\caption{\textbf{Conditional carry-over $C$ (Eq.~\eqref{eq:carry}): the metric-neutral comparison.} Each arm is scored
+on the fraction of its own successes that a predictor never in its loop confirms, so the denominators differ by
+design and that is what makes the statistic neutral. Bars are exact binomial intervals; counts are successes /
+own successes. The two coloured rows are the comparison the figure exists to make: the hand-built panel
+operator against the frozen agent-written operators of App.~\ref{app:invent}, which optimize the same
+predicate. The ProbKnot direction is meaningful only for the two arms that do not optimize it
+(Table~\ref{tab:contrast}). The agent row pools six single runs; its two zero-failure models replicated at
+$5\times3$ give $0.302$ $[0.275,0.330]$.}\label{fig:carry}
 \end{figure}
 
 \begin{table}[t]\centering\small
 \setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.15}
-\caption{\textbf{Attributing the positive control's advantage: four transplanted mechanisms and a compute
-control, none of which accounts for it.} Each arm is the hand-built panel operator with exactly one mechanism
-taken from the frozen agent-written source added, run deterministically at $5$ seeds on the primary pool, so
-each cell is one noise-free observation. Carry-over is
-$P(\text{de-novo ShapeKnots confirms}\mid\text{the arm's own pKiss}\wedge\text{ProbKnot predicate confirmed})$,
-the statistic no arm's objective can flatter; intervals are percentile bootstraps resampling \emph{targets},
-the clustering unit. $r_{\mathrm{in}}$ is printed beside it because a conditional rate can be inflated by
-collapsing its own denominator: a mechanism counts only if carry-over rises \emph{and} $r_{\mathrm{in}}$ holds.
-Every interval contains the baseline, and none reaches the agents' lower bound of $0.275$.
-(\texttt{attribution.sh}, \texttt{attr\_stats.py}.)}\label{tab:attr}
+\caption{\textbf{Attributing the positive control's advantage: transplanted mechanisms and a compute control, none of
+which accounts for it.} Each arm is the hand-built panel operator with exactly one mechanism from the frozen
+agent-written source added, run deterministically at $5$ seeds. Carry-over is $P(\text{ShapeKnots
+confirms}\mid\text{the arm's own pKiss}\wedge\text{ProbKnot predicate confirmed})$; intervals are percentile
+bootstraps resampling \emph{targets}. $r_{\mathrm{in}}$ is printed beside it because a conditional rate can be
+inflated by collapsing its denominator: a mechanism counts only if carry-over rises \emph{and}
+$r_{\mathrm{in}}$ holds. Every interval contains the baseline and none reaches the agents' lower bound of
+$0.275$. (\texttt{attribution.sh}, \texttt{attr\_stats.py}.)}\label{tab:attr}
 \begin{tabularx}{\linewidth}{@{}Lccc@{}}
 \toprule
 \textbf{arm} & \textbf{$r_{\mathrm{in}}$ mean/60} & \textbf{carry-over} & \textbf{95\% CI (target-clustered)}\\
@@ -2407,20 +2384,14 @@ bottleneck. App.~\ref{app:invent} states which readings of this experiment the d
 
 \begin{table}[t]\centering\small
 \setlength{\tabcolsep}{6pt}\renewcommand{\arraystretch}{1.12}
-\caption{\textbf{An agent invents the operator, across six frontier models} (three open, three closed). Each
-agent, given only primitives and the two crossing oracles (no recipe, no external solver), writes and revises
-a \texttt{design} operator; the frozen best is \emph{adjudicated} by the panel on the development/evaluation
-$60$. Reference points: hand-built
-\texttt{panel\_auto} $34$--$37$ / $3$--$8$; single-oracle gamer $43$ / $1$; \CF{} floor $0$.
-\textbf{Rows are ordered alphabetically, not by score.} These are \emph{one} temperature-$0.4$ draw per model
-with no execution replication, and the two models we later replicated span $10$--$18$ across seeds on this
-metric, a range wider than most of the gaps below. \textbf{Timeouts are charged as failures against the full
-$60$}, which is the conservative accounting and not the one an earlier draft used: four models complete only
-$40$, $41$, $35$ and $28$ targets, and crediting them only on what they finished would rank
-Claude-Opus-4.8 first ($14/40=0.350$) where the charged column ranks Gemini-3.1-pro first ($17/60=0.283$).
-That the ordering flips under an accounting change is the clearest statement of why there is no ordering
-here. What survives both accountings is the only thing we claim from this table: \emph{all six} clear the
-gamer's $1/60$ and the \CF{} floor (\texttt{model\_sensitivity.py}).}\label{tab:models}
+\caption{\textbf{An agent invents the operator, across six frontier models} (three open, three closed). Each agent,
+given only primitives and the two crossing oracles, writes and revises a \texttt{design} operator; the frozen
+best is adjudicated by the panel on the development/evaluation $60$. Reference points: hand-built
+\texttt{panel\_auto} $34$--$37$ / $3$--$8$; gamer $43$ / $1$; \CF{} floor $0$. \textbf{Rows are alphabetical,
+not ranked}, and timeouts are charged as failures against the full $60$. Crediting models only on what they
+finished would rank Claude-Opus-4.8 first ($14/40$); charging timeouts ranks Gemini-3.1-pro first ($17/60$).
+That the order flips under an accounting change is why we claim no order. What survives both is the only claim
+made here: all six clear the gamer and the floor (\texttt{model\_sensitivity.py}).}\label{tab:models}
 \begin{tabularx}{\linewidth}{@{}Llccc@{}}
 \toprule
 agent & weights & train $/16$ & held-out pKiss$\wedge$ProbKnot & \textbf{panel-unanimous $/60$}\\
