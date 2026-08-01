@@ -69,7 +69,7 @@
 
 \title{\textbf{Auditing Discovery Claims:\\A Two-Sided Criterion for Agentic Science}\\[5pt]
 \large With the negative side decidable, instantiated on RNA pseudoknot design,\\
-where optimizing one fallible oracle manufactures a capability claim}
+where one fallible oracle credits $43$ designs and three predictors credit $1$}
 \author[1]{Wenhui Chen\thanks{Corresponding author: \texttt{wenhui.chen@inceptlabs.ai}}}
 \affil[1]{InceptLabs-Shanghai}
 \date{}
@@ -329,8 +329,17 @@ $(i,j),(k,l)$ with $i<k$ \emph{cross} iff $i<k<j<l$; $P$ is \emph{nested} if non
 \emph{pseudoknotted} otherwise. A folding oracle maps a sequence to a structure under a thermodynamic model,
 from base-pair maximization \citep{nussinov1980} through minimum-free-energy dynamic programming
 \citep{zuker1981} and the equilibrium partition function \citep{mccaskill1990} to ViennaRNA
-\citep{lorenz2011}. The standard minimum-free-energy oracle (ViennaRNA, Turner parameters),
-\Ocf, is pseudoknot-free: its output space contains only nested structures ($\operatorname{im}\Ocf\subseteq\NESTED$), and it cannot represent a
+\citep{lorenz2011}. \textbf{We fix \Ocf{} as a named function, not as a software package}: it is
+ViennaRNA's minimum-free-energy fold (\texttt{RNA.fold}, Turner parameters), whose dot-bracket output
+alphabet is $\{\texttt{(},\texttt{)},\texttt{.}\}$. This matters for the scope of Prop.~\ref{prop:confine} and
+we would rather state it here than have it read as an oversight. The same distribution ships
+\texttt{RNAPKplex}, which \emph{does} emit crossings; it is never called anywhere on any path in this work,
+and if a prior system's verifier were \texttt{RNAPKplex} then $\operatorname{im}\Omega\not\subseteq\NESTED$
+and the exclusion would simply not apply to it. That is the correct behaviour of a scoped theorem, not a gap:
+the negative side is a statement about \emph{a declared verifier}, and an audit that let the verifier be
+renegotiated after the fact would establish nothing. The \emph{empirical} prior-policy floor is unaffected
+either way, since it is measured on the prior system as it actually ran. So \Ocf{} is pseudoknot-free: its
+output space contains only nested structures ($\operatorname{im}\Ocf\subseteq\NESTED$), and it cannot represent a
 crossing pair. Inverse design (given $T$, find $x$ with $\mathrm{fold}(x)=T$) is mature, with heuristic
 \citep{busch2006inforna}, ensemble-defect \citep{zadeh2011nupack}, learned \citep{runge2019learna},
 ensemble-optimization \citep{zhou2023samfeo}, and pseudoknot-capable \citep{wirecki2025desirna}
@@ -875,7 +884,13 @@ specifically \emph{not} an identification of autonomous learning inside an agent
 ``agent'' we mean the system; where a claim would only hold of the policy alone, we do not make it.
 \end{remark}
 
-\begin{remark}[Autonomy is relative to a tool class, not absolute]\label{rem:autonomy}
+\begin{remark}[``Solver-free'' would have been the better word]\label{rem:autonomy}
+A note on vocabulary before the substance. In this paper ``autonomous'' means exactly one thing---no packaged
+inverse-design solver is on the method path---and that is a far weaker property than the word carries in the
+agent literature, where it suggests independence from external machinery in general. Our system is not that:
+it queries crossing-aware folding oracles continuously and could not function without them. Where the
+distinction matters below we write \emph{solver-free}, and a reader who mentally substitutes it everywhere
+will not lose anything we intend.
 Before/after differ in \emph{feedback instrument} as well as policy: the prior repertoire is scored through a
 pseudoknot-free channel, the after-policy queries crossing-aware predictors. Acquiring a new feedback
 instrument is part of what happened and we name it as such. Consequently the capability belongs to the
@@ -1605,7 +1620,26 @@ pKiss\,$>$\,ShapeKnots\,$>$\,ProbKnot, on designs it inverts (DesiRNA's designs 
 $60\%$ of the time and by de-novo ShapeKnots $2.3\%$), because agreement measured on designs is dominated by
 model-family sharing between the predictor and the objective that produced the design. Cross-predictor
 agreement on designs is therefore not a property of the predictors alone, and nothing here rests on a
-stringency ranking. \emph{(ii) Generalization, and its limit.} On a second disjoint Pseudobase pool the regime
+stringency ranking. \emph{What can an instrument this insensitive resolve?} A fair question, and one we had not answered. Two
+quantities have to be kept apart, because conflating them is what makes low recall sound fatal.
+\emph{Resolution} is the smallest difference in \emph{observed} rate the design can exclude zero on; it is a
+property of $n$, the pairing and the base rate, and recall does not enter. Simulating the design actually run
+($60$ targets $\times$ $5$ seeds, target-clustered bootstrap, base rate $4/60$;
+\texttt{resolution.py}) gives $80\%$ power at an observed gap of $\approx\!0.100$, i.e.\ $6/60$: the design
+separates $4/60$ from $\approx\!8/60$, and would separate $5/60$ from $15/60$ at power $1.00$, but it cannot
+separate $4/60$ from $5/60$. \emph{This places our own headline where it belongs}: $\Delta_{\mathrm{gamer}}$
+at ${+}0.067$ sits at $77\%$ power, right at the design's resolution limit, which is the same fact as
+``established, narrowly'' stated in units a reader can check. \emph{Attenuation} is the separate question of
+what an observed difference implies about the underlying one, and this is where recall enters: if the panel
+confirms a fraction $\rho$ of designs that are in fact correct and admits few false positives, an observed
+gap $d$ stands for a true gap $d/\rho$, so at $\rho\!=\!0.113$ an observed ${+}0.067$ is consistent with a
+true gap several times larger. Low recall therefore \emph{rescales} the comparison rather than blurring it,
+and it makes every rate here conservative. The rescaling assumes $\rho$ is common to both arms, which holds
+for $r_{\mathrm{mix}}$ comparisons and \emph{not} for carry-over, whose whole point is that $\rho$ differs by
+arm; we use it only for the former. The real cost of low recall is the one we state elsewhere: a low or zero
+panel rate is weak evidence of \emph{absence}.
+
+\emph{(ii) Generalization, and its limit.} On a second disjoint Pseudobase pool the regime
 repeats ($0/50$ floor, $5/50$ panel-unanimous); on a cross-source bpRNA pool our operator \emph{and} the SOTA
 solver both reach $0/60$. The margin probe says most of that is the pool: its median $\Delta_{\mathrm{bp}}$ is
 $0.581$ against the development pool's $0.059$, and $5\%$ of its targets are reachable by a random compatible
@@ -1768,7 +1802,14 @@ crossing corpus.} Pseudobase++ holds $251$ targets in $60$ structural clusters o
 from our development, so the \emph{magnitude} of every transfer claim here is unestimable on this benchmark
 and no reanalysis fixes that. \textbf{(2) Power}: several hundred targets and $\ge10$ seeds, since the effects
 are a few targets in sixty. \textbf{(3) A non-thermodynamic predictor}, to make the panel mechanistically
-diverse rather than merely numerous. \textbf{(4) An explanation for the positive control}, now narrowed rather
+diverse rather than merely numerous. This is the owed experiment we would run first if the environment
+allowed it. All three current members share nearest-neighbour parameters, and \S\ref{sec:oracle} measures the
+consequence: pKiss and ShapeKnots form a correlated block at $\kappa=0.673$, so unanimity over three buys
+less than its arity suggests. A learned pseudoknot predictor---a different architecture trained on different
+data---would break that block rather than add to it, and would test the one thing our panel structurally
+cannot: whether ``carries over'' means anything beyond ``agrees with a thermodynamic model''. No such
+predictor is installed in the environment these runs were produced in, and we do not report an untested
+integration as though it were an arm. \textbf{(4) An explanation for the positive control}, now narrowed rather
 than open. Reviewers have rightly asked what is \emph{left} once four mechanisms and compute are excluded, so
 we state the elimination and the surviving hypothesis space rather than leaving a blank. Excluded by
 measurement: oracle-call volume in \emph{both} directions (the $3\times$ control moves nothing, and the agents
@@ -1785,9 +1826,18 @@ $r_{\mathrm{in}}$ halves (\S\ref{sec:exp}). Not a mechanism, but it delivered th
 by-product. \emph{(b) Structural, not compositional, sequence properties} is also now run and also dead: six pre-stated
 features, GC-adjusted gates with a calibrated null, one survivor (\texttt{decoy}), and a transplant that
 engages and moves carry-over the wrong way (\S\ref{sec:exp}). Six mechanisms have now been excluded by
-measurement rather than by argument. We are no longer able to name a seventh candidate that is both legible
-and testable on this benchmark, and we would rather say that than pad the list; what the difference
-\emph{is} is the open problem this paper hands on. A bit-reproducible operator and a compute-matched control, owed by the previous revision, are discharged
+measurement rather than by argument, and it is worth being precise about what that does and does not leave.
+Three directions have been put to us and we place each. \emph{Finer-grained structural analysis} is what
+Stage 1 already was---six pre-stated features under GC-adjusted gates---and its one survivor reversed under
+intervention, so more features of the same kind would inherit the same failure mode unless they come with a
+mechanism rather than a correlation. \emph{Information-theoretic measures} of non-randomness in the accepted
+designs are genuinely different in kind and we have not tried them; the obstacle is that they are defined on
+distributions, and at $185$ accepted designs per arm any estimator worth the name is underpowered---which
+makes this a consequence of owed experiment~(2), not an independent direction. \emph{Accumulating statistics
+on the synthetic family} is the one that dissolves that obstacle, since $\mathcal L_{\mathrm H}$ is unbounded
+by construction; \S\ref{sec:exp} now runs it at $100$ targets, and it is where we would look next. What we
+will not do is name a seventh candidate we cannot test here in order to leave the reader with a shorter
+list: what the difference \emph{is} is the open problem this paper hands on. A bit-reproducible operator and a compute-matched control, owed by the previous revision, are discharged
 in App.~\ref{app:repro}.
 
 \subsection{Conclusion}\label{sec:conclusion}
@@ -2286,10 +2336,13 @@ $60$. Reference points: hand-built
 \texttt{panel\_auto} $34$--$37$ / $3$--$8$; single-oracle gamer $43$ / $1$; \CF{} floor $0$.
 \textbf{Rows are ordered alphabetically, not by score.} These are \emph{one} temperature-$0.4$ draw per model
 with no execution replication, and the two models we later replicated span $10$--$18$ across seeds on this
-metric, a range wider than most of the gaps below. The column supports ``every model clears the gamer and the
-floor''; it does not support any ordering among them, and we use it for nothing else. Four of the six also
-time out on $19$--$32$ of $60$ targets, so their denominators are not comparable
-either.}\label{tab:models}
+metric---a range wider than most of the gaps below. \textbf{Timeouts are charged as failures against the full
+$60$}, which is the conservative accounting and not the one an earlier draft used: four models complete only
+$40$, $41$, $35$ and $28$ targets, and crediting them only on what they finished would rank
+Claude-Opus-4.8 first ($14/40=0.350$) where the charged column ranks Gemini-3.1-pro first ($17/60=0.283$).
+That the ordering flips under an accounting change is the clearest statement of why there is no ordering
+here. What survives both accountings is the only thing we claim from this table: \emph{all six} clear the
+gamer's $1/60$ and the \CF{} floor (\texttt{model\_sensitivity.py}).}\label{tab:models}
 \begin{tabularx}{\linewidth}{@{}Llccc@{}}
 \toprule
 agent & weights & train $/16$ & held-out pKiss$\wedge$ProbKnot & \textbf{panel-unanimous $/60$}\\
