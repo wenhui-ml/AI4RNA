@@ -1,0 +1,350 @@
+{
+ "sources": [
+  "antaRNA",
+  "IncaRNAtion",
+  "SamFEO",
+  "LMM",
+  "DesiRNA"
+ ],
+ "per_tool": {
+  "antaRNA": {
+   "n_options": 49,
+   "n_requirements": 14,
+   "n_plumbing": 35
+  },
+  "IncaRNAtion": {
+   "n_options": 6,
+   "n_requirements": 2,
+   "n_plumbing": 4
+  },
+  "SamFEO": {
+   "n_options": 19,
+   "n_requirements": 7,
+   "n_plumbing": 12
+  },
+  "LMM": {
+   "n_options": 0,
+   "n_requirements": 0,
+   "n_plumbing": 0
+  },
+  "DesiRNA": {
+   "n_options": 27,
+   "n_requirements": 10,
+   "n_plumbing": 17
+  }
+ },
+ "ours_vs_external": {
+  "composition-GC": "已证实的缺口",
+  "co-transcriptional": "已证实的缺口",
+  "multi-state": "已证实的缺口(两态开关)",
+  "set-level": "已证实的缺口(正交集合)",
+  "temperature": "实测 null",
+  "accessibility": "实测 null",
+  "ensemble-strictness": "实测 null",
+  "forbidden-motif": "实测 null"
+ },
+ "type_counts": {
+  "fold-match": 7,
+  "pseudoknot": 3,
+  "accessibility": 2,
+  "sequence-pin": 2,
+  "composition-GC": 4,
+  "temperature": 2,
+  "forbidden-motif": 3,
+  "undocumented": 4,
+  "unmeasured": 3,
+  "ensemble-strictness": 2,
+  "dimer/oligomer": 1
+ },
+ "n_requirement_options": 33,
+ "measured_fraction": 0.7878787878787878,
+ "rows": [
+  {
+   "flags": [
+    "-Cstr",
+    "--Cstr"
+   ],
+   "help": "Structure constraint using RNA dotbracket notation with fuzzy block constraint. \\n(TYPE: %(type)s)\\n\\n",
+   "type": "fold-match",
+   "tool": "antaRNA"
+  },
+  {
+   "flags": [
+    "-p",
+    "--pseudoknots"
+   ],
+   "help": "Switch to pseudoknot based prediction using pKiss. Check the pseudoknot parameter usage!!!\\n\\n",
+   "type": "pseudoknot",
+   "tool": "antaRNA"
+  },
+  {
+   "flags": [
+    "-pkP",
+    "--pkprogram"
+   ],
+   "help": "",
+   "type": "pseudoknot",
+   "tool": "antaRNA"
+  },
+  {
+   "flags": [
+    "--accessibility"
+   ],
+   "help": "Define an accessibility evaluation block.\\n\\n",
+   "type": "accessibility",
+   "tool": "antaRNA"
+  },
+  {
+   "flags": [
+    "--diff-accessibility"
+   ],
+   "help": "Define an differential accessibility evaluation block.\\n\\n",
+   "type": "accessibility",
+   "tool": "antaRNA"
+  },
+  {
+   "flags": [
+    "-Cseq",
+    "--Cseq"
+   ],
+   "help": "Sequence constraint using RNA nucleotide alphabet {A,C,G,U} and wild-card \\",
+   "type": "sequence-pin",
+   "tool": "antaRNA"
+  },
+  {
+   "flags": [
+    "-tGC",
+    "--tGC"
+   ],
+   "help": "Objective target GC content in [0,1].\\n(TYPE: %(type)s)\\n\\n",
+   "type": "fold-match",
+   "tool": "antaRNA"
+  },
+  {
+   "flags": [
+    "-tGCmax",
+    "--tGCmax"
+   ],
+   "help": "Provides a maximum tGC value [0,1] for the case of uniform distribution sampling. The regular tGC value serves as minimum value.\\n(DEFAULT: %(default)s, TYPE: %(type)s)\\n\\n",
+   "type": "composition-GC",
+   "tool": "antaRNA"
+  },
+  {
+   "flags": [
+    "-tGCvar",
+    "--tGCvar"
+   ],
+   "help": "Provides a tGC variance (sigma square) for the case of normal distribution sampling. The regular tGC value serves as expectation value (mu).\\n(DEFAULT: %(default)s, TYPE: %(type)s)\\n\\n",
+   "type": "composition-GC",
+   "tool": "antaRNA"
+  },
+  {
+   "flags": [
+    "-T",
+    "--temperature"
+   ],
+   "help": "Provides a temperature for the folding algorithms.\\n(DEFAULT: %(default)s, TYPE: %(type)s)\\n\\n",
+   "type": "temperature",
+   "tool": "antaRNA"
+  },
+  {
+   "flags": [
+    "-noGU",
+    "--noGUBasePair"
+   ],
+   "help": "Forbid GU base pairs. \\n\\n",
+   "type": "forbidden-motif",
+   "tool": "antaRNA"
+  },
+  {
+   "flags": [
+    "-t",
+    "--time"
+   ],
+   "help": "Limiting runtime [seconds]\\n(DEFAULT: %(default)s, TYPE: %(type)s)\\n\\n\\n",
+   "type": "temperature",
+   "tool": "antaRNA"
+  },
+  {
+   "flags": [
+    "--tGC",
+    "-tGC"
+   ],
+   "help": "GC content",
+   "type": "composition-GC",
+   "tool": "antaRNA"
+  },
+  {
+   "flags": [
+    "--pseudoknots",
+    "-p"
+   ],
+   "help": "Include Pseudoknots?",
+   "type": "pseudoknot",
+   "tool": "antaRNA"
+  },
+  {
+   "flags": [
+    "--target_structure"
+   ],
+   "help": "(entry-function parameter of call_incarnation)",
+   "type": "fold-match",
+   "tool": "IncaRNAtion"
+  },
+  {
+   "flags": [
+    "--constraints"
+   ],
+   "help": "(entry-function parameter of call_incarnation)",
+   "type": "sequence-pin",
+   "tool": "IncaRNAtion"
+  },
+  {
+   "flags": [
+    "--object",
+    "-o"
+   ],
+   "help": "",
+   "type": "undocumented",
+   "tool": "SamFEO"
+  },
+  {
+   "flags": [
+    "--nomfe"
+   ],
+   "help": "",
+   "type": "undocumented",
+   "tool": "SamFEO"
+  },
+  {
+   "flags": [
+    "--nosm"
+   ],
+   "help": "",
+   "type": "undocumented",
+   "tool": "SamFEO"
+  },
+  {
+   "flags": [
+    "--bp"
+   ],
+   "help": "",
+   "type": "undocumented",
+   "tool": "SamFEO"
+  },
+  {
+   "flags": [
+    "--func"
+   ],
+   "help": "(entry-function parameter of design)",
+   "type": "unmeasured",
+   "tool": "SamFEO"
+  },
+  {
+   "flags": [
+    "--check_mfe"
+   ],
+   "help": "(entry-function parameter of design)",
+   "type": "unmeasured",
+   "tool": "SamFEO"
+  },
+  {
+   "flags": [
+    "--sm"
+   ],
+   "help": "(entry-function parameter of design)",
+   "type": "unmeasured",
+   "tool": "SamFEO"
+  },
+  {
+   "flags": [
+    "-f",
+    "--filename"
+   ],
+   "help": "Name of a file that contains secondary structures and constraints.",
+   "type": "fold-match",
+   "tool": "DesiRNA"
+  },
+  {
+   "flags": [
+    "-sf",
+    "--scoring_function"
+   ],
+   "help": "Scoring functions and weights used to guide the design process, e.g.",
+   "type": "ensemble-strictness",
+   "tool": "DesiRNA"
+  },
+  {
+   "flags": [
+    "-nd",
+    "--negative_design"
+   ],
+   "help": "Use negative design approach. [default = off]",
+   "type": "ensemble-strictness",
+   "tool": "DesiRNA"
+  },
+  {
+   "flags": [
+    "-acgu",
+    "--ACGU"
+   ],
+   "help": "Keep",
+   "type": "composition-GC",
+   "tool": "DesiRNA"
+  },
+  {
+   "flags": [
+    "-o",
+    "--avoid_oligomerization"
+   ],
+   "help": "Designes sequneces that should not tend to oligomerize. Slows down the simulation. [default = off]",
+   "type": "forbidden-motif",
+   "tool": "DesiRNA"
+  },
+  {
+   "flags": [
+    "-d",
+    "--dimer"
+   ],
+   "help": "Design of a homodimer complex, of two strands. [deafult = off, requires input file complying with RNA-RNA complex format]",
+   "type": "dimer/oligomer",
+   "tool": "DesiRNA"
+  },
+  {
+   "flags": [
+    "-tm",
+    "--target_mutations"
+   ],
+   "help": "Targeted mutations. Targets mostly False Negativeas and False Positives. [default = on]",
+   "type": "fold-match",
+   "tool": "DesiRNA"
+  },
+  {
+   "flags": [
+    "-tm_perc_max",
+    "--target_mutations_percentage_max"
+   ],
+   "help": "Highest percentage of targeted mutations applied to lowest temperature replica. Percentage for replicas in between will be set evenly from",
+   "type": "fold-match",
+   "tool": "DesiRNA"
+  },
+  {
+   "flags": [
+    "-tm_perc_min",
+    "--target_mutations_percentage_min"
+   ],
+   "help": "Lowest percentage of targeted mutations applied to highest temperature replica. Percentage for replicas in between will be set evenly from",
+   "type": "fold-match",
+   "tool": "DesiRNA"
+  },
+  {
+   "flags": [
+    "-motifs",
+    "--motif_sequences"
+   ],
+   "help": "Sequence motifs along with their bonuses(-)/penalties(+). Provide comma-separated key,value,key,value sequence.",
+   "type": "forbidden-motif",
+   "tool": "DesiRNA"
+  }
+ ]
+}
