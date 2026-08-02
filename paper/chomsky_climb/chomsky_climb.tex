@@ -1530,64 +1530,34 @@ counts for more, not less\\
 
 
 
-\subsection{Statistics, Robustness, and Where This Leaves the Ascent}\label{sec:exp:stats}
+\subsection{What Every Rate Here Is Bounded By, and the Unbounded Family}\label{sec:exp:stats}
+\paragraph{The panel is a low-recall instrument, and that bounds every number above.} On $80$ native bpRNA
+pseudoknots, folding each native's \emph{own} sequence, per-predictor crossing recall is pKiss $20\%$, ProbKnot
+$4\%$, ShapeKnots $11\%$, and the three-way conjunction $\mathbf{1\%}$ ($1/80$). Two consequences we carry
+throughout: a low $r_{\mathrm{mix}}$ is weak evidence of \emph{absence} of capability, and $r_{\mathrm{mix}}$
+is a high-stringency consistency measure, not a lower bound on true capability. The predictors also have
+\emph{no fixed stringency order}: on natives it is pKiss\,$>$\,ShapeKnots\,$>$\,ProbKnot and on designs it
+inverts, because agreement measured on designs is dominated by model-family sharing between the predictor and
+the objective that produced the design.
 
-\paragraph{Statistics.} Rates use a fixed denominator of the full pool: a target on which the three
-predictors disagree counts as not-solved, so abstention withholds a positive claim rather than dropping the
-target. Every comparison carries an effect size, never a $p$-value alone. Three levels of variation matter
-(target, nominal seed, execution at a fixed seed) and are not interchangeable, so we treat the \emph{deepest}
-interval run for a comparison as primary and label every interval with what was resampled
-(App.~\ref{app:repro} gives nesting, pairing, resampling unit and interval type in full). With five nominal
-seeds the level-1 resampling distribution has few distinct states, so these are \emph{sensitivity intervals}
-and we attach no coverage claim, which is why the most robust statement about $\Delta_{\mathrm{gamer}}$ uses
-no interval at all: the operator is strictly higher in $14$ of $15$ independent executions, and $15$ of $15$
-on the structurally disjoint pool.
-
-\emph{Is the effect carried by a few lucky targets?} $r_{\mathrm{mix}}$ is a low-base-rate conjunction, so we
-checked. Deleting each target in turn moves the paired $\Delta$ within $[{+}0.068,{+}0.081]$ around
-${+}0.080$; the most influential single target moves it by $-0.012$. The successes do concentrate: $25$
-target-seed wins on $13$ distinct targets, the top three accounting for $44\%$, which we report rather than
-treat as $25$ independent wins; but they are not one or two targets, and their mean crossing-pair count
-($5.46$) matches the pool ($5.48$). Targets are also not independent draws: single-linkage clustering at $15\%$
-collapses the $60$ into $18$ clusters, one holding $29$, so we resample clusters, which widens the interval
-from $[{+}0.040,{+}0.127]$ to $[{+}0.024,{+}0.149]$ and still clears zero.
-
-\emph{Quasi-held-out versus exploratory, stated once.} We do not use the word ``confirmatory'': we hold no
-timestamped pre-registration, and a confirmatory held-out analysis would need the evaluation pool disjoint in
-the respect that matters for a structure-conditioned operator, namely structure. \emph{Quasi-held-out}: the
-paired $r_{\mathrm{mix}}$ separation on the $125$ ID-disjoint targets. \emph{Exploratory}: the ShapeKnots-only
-comparison, the crossing-pair-count association, the budget sweep, the six-model invention draws and the
-cross-source pool. No family-wise correction is applied, since these answer different questions on overlapping
-data; no exploratory $p$-value here is a test, and ``significant in $k/3$ seeds'' is a descriptive replication
-count.
-
-\paragraph{Robustness checks, and the one that bounds every rate here.} \emph{(i) The panel is a low-recall
-instrument.} On $80$ native bpRNA pseudoknots, folding each native's \emph{own} sequence, per-predictor crossing
-recall is pKiss $20\%$, ProbKnot $4\%$, ShapeKnots $11\%$, and the three-way conjunction $\mathbf{1\%}$
-($1/80$). Two consequences we carry throughout: a low $r_{\mathrm{mix}}$ is weak evidence of \emph{absence} of
-capability, and $r_{\mathrm{mix}}$ is a high-stringency consistency measure, not a lower bound on true
-capability. The predictors also have \emph{no fixed stringency order}: on natives it is
-pKiss\,$>$\,ShapeKnots\,$>$\,ProbKnot, on designs it inverts, because agreement measured on designs is dominated
-by model-family sharing between the predictor and the objective that produced the design.
-
-\emph{What can an instrument this insensitive resolve?} Two things have to be kept apart. \emph{Resolution} is a
+\emph{What can an instrument this insensitive resolve?} Two things must be kept apart. \emph{Resolution} is a
 property of $n$, the pairing and the base rate, and recall does not enter: simulating the design actually run
 ($60$ targets $\times$ $5$ seeds, target-clustered bootstrap, base rate $4/60$; \texttt{resolution.py}) gives
 $80\%$ power at an observed gap of $\approx\!6/60$, so it separates $4/60$ from $\approx\!8/60$ and $5/60$ from
 $15/60$ at power $1.00$, but not $4/60$ from $5/60$. That places our own headline: $\Delta_{\mathrm{gamer}}$ at
-${+}0.067$ sits at $77\%$ power, at the design's resolution limit, which is ``established, narrowly'' in units a
-reader can check. \emph{Attenuation} is where recall enters: an observed gap $d$ stands for a true gap $d/\rho$,
-so low recall rescales the comparison rather than blurring it and makes every rate here conservative. That
-rescaling assumes $\rho$ is common to both arms, which holds for $r_{\mathrm{mix}}$ and not for carry-over,
+${+}0.067$ sits at $77\%$ power, at the design's resolution limit, which is ``established, narrowly'' in units
+a reader can check. \emph{Attenuation} is where recall enters: an observed gap $d$ stands for a true gap
+$d/\rho$, so low recall rescales the comparison rather than blurring it and makes every rate conservative. The
+rescaling assumes $\rho$ is common to both arms, which holds for $r_{\mathrm{mix}}$ and not for carry-over
 whose point is that $\rho$ differs by arm; we use it only for the former.
 
-\emph{(ii) Generalization, and its limit.} On a second disjoint Pseudobase pool the regime repeats ($0/50$
-floor, $5/50$ panel-unanimous); on a cross-source bpRNA pool our operator \emph{and} the SOTA solver both reach
-$0/60$. The margin probe says most of that is the pool: its median $\Delta_{\mathrm{bp}}$ is $0.581$ against the
-development pool's $0.059$, and $5\%$ of its targets are reachable by a random compatible sequence against
-$50\%$ there. The negative side generalizes across datasets; the positive claim we support is limited to the
-Pseudobase++ distribution. App.~\ref{app:robust} gives both in full, with two further checks that established
-nothing.
+\emph{Generalization, and its limit.} On a second disjoint Pseudobase pool the regime repeats ($0/50$ floor,
+$5/50$ panel-unanimous); on a cross-source bpRNA pool our operator \emph{and} the SOTA solver both reach
+$0/60$. The margin probe says most of that is the pool: its median $\Delta_{\mathrm{bp}}$ is $0.581$ against
+the development pool's $0.059$, and $5\%$ of its targets are reachable by a random compatible sequence against
+$50\%$ there. The negative side generalizes across datasets; the positive claim is limited to the Pseudobase++
+distribution. Statistical conventions, the leave-one-target-out check, the quasi-held-out/exploratory split and
+the per-oracle cross-source breakdown are in App.~\ref{app:repro} and App.~\ref{app:robust}.
 
 \paragraph{The one axis that is not structurally exhausted, run at scale.} Every magnitude above is
 unestimable on Pseudobase++, and the resolution calculation says why in units: the design reaches $80\%$ power
@@ -2015,30 +1985,45 @@ crossing targets, which is an empirical result at a finite budget and not a rest
 Prop.~\ref{prop:confine}: the proposition bounds what the pseudoknot-free \emph{verifier} can certify, the
 floor records what the prior \emph{policy} actually produced.
 
-\smallskip\noindent\textbf{Statistical methodology (Table~\ref{tab:sep}).} Let $u^{(A)}_T\in\{0,1\}$ indicate
-whether arm $A$ realizes held-out target $T$ panel-unanimously, over the pool of size $N=|\mathcal D_{\mathrm{ho}}|=60$.
-\emph{(i) Percentile bootstrap.} A $95\%$ CI for a rate resamples the $N$ targets with replacement $B{=}20{,}000$
-times and takes the $2.5/97.5$ percentiles of $\frac1N\sum_T u^{(A)}_{T^\ast}$. \emph{(ii) Paired McNemar}
-(same targets, arms $A$ vs.\ gamer $G$): with $b=\#\{T:u^{(A)}_T{=}1,u^{(G)}_T{=}0\}$ and
-$c=\#\{T:u^{(A)}_T{=}0,u^{(G)}_T{=}1\}$, the exact two-sided $p$-value is
+\smallskip\noindent\textbf{The three tests behind Table~\ref{tab:sep}.} Let $u^{(A)}_T\in\{0,1\}$ indicate
+whether arm $A$ realizes held-out target $T$ panel-unanimously, over a pool of size $N$. \emph{Percentile
+bootstrap}: a $95\%$ CI for a rate resamples the $N$ targets with replacement $B{=}20{,}000$ times.
+\emph{Paired McNemar} (same targets, arms $A$ vs.\ gamer $G$): with
+$b=\#\{T:u^{(A)}_T{=}1,u^{(G)}_T{=}0\}$ and $c=\#\{T:u^{(A)}_T{=}0,u^{(G)}_T{=}1\}$,
 \begin{equation}\label{eq:mcnemar}
   p_{\mathrm{McN}}=\min\!\Big\{1,\ 2\!\!\sum_{k=0}^{\min(b,c)}\!\binom{b+c}{k}2^{-(b+c)}\Big\} .
 \end{equation}
-\emph{(iii) Fixed-baseline binomial.} Against the gamer rate $p_0{=}1/60$, the one-sided $p$-value for $k$
-successes in $N$ trials is $\sum_{j=k}^{N}\binom{N}{j}p_0^{\,j}(1-p_0)^{N-j}$. The three columns of
-Table~\ref{tab:sep} are these tests; the analysis is \texttt{runs/cc\_ascent/stats\_separation.py}, run offline
-on the saved per-target adjudications (no live episodes).
+\emph{Fixed-baseline binomial}: against the gamer rate $p_0{=}1/60$, the one-sided $p$-value for $k$ successes
+in $N$ trials is $\sum_{j=k}^{N}\binom{N}{j}p_0^{\,j}(1-p_0)^{N-j}$. The analysis is
+\texttt{stats\_separation.py}, run offline on the saved per-target adjudications.
 
-\smallskip\noindent\textbf{$\Delta_{\mathrm{gamer}}$, all four estimates with their designs.} \emph{(i)}
-${+}0.080$, five nominal seeds, one execution each, target bootstrap $[{+}0.040,{+}0.127]$, two-way
-$[{+}0.030,{+}0.140]$. \emph{(ii)} ${+}0.056$, three seeds $\times$ three executions. \emph{(iii)}
-${+}0.048$, five seeds $\times$ three executions $=15$ paired cells, both arms scored inside the same worker
-call; target-level $[{+}0.014,{+}0.091]$, structural-cluster $[{+}0.005,{+}0.093]$, and $[{+}0.000,{+}0.109]$
-under the conservative one-execution-per-seed variant; operator strictly higher in $14/15$ executions, sign
-test $p{=}0.0010$; realized budget per target, gamer $55.2$ pKiss and $0$ ProbKnot against the operator's
-$128.0$ and $63.5$. \emph{(iv)} ${+}0.067$ $[{+}0.023,{+}0.120]$, deterministic, five seeds, one noise-free
-run each. A reader who prefers (iii)'s conservative variant reclassifies the component as weak and nothing
-else in the paper changes.
+\smallskip\noindent\textbf{Statistical conventions.} Rates use a fixed denominator of the full pool: a target
+on which the three predictors disagree counts as not-solved, so abstention withholds a positive claim rather
+than dropping the target. Every comparison carries an effect size, never a $p$-value alone. Three levels of
+variation matter (target, nominal seed, execution at a fixed seed) and are not interchangeable, so we treat the
+\emph{deepest} interval run for a comparison as primary and label every interval with what was resampled. With
+five nominal seeds the level-1 resampling distribution has few distinct states, so these are \emph{sensitivity
+intervals} with no coverage claim, which is why the most robust statement about $\Delta_{\mathrm{gamer}}$ uses
+no interval at all: the operator is strictly higher in $14$ of $15$ independent executions, and $15$ of $15$ on
+the structurally disjoint pool.
+
+\smallskip\noindent\textbf{Is the effect carried by a few lucky targets?} $r_{\mathrm{mix}}$ is a low-base-rate
+conjunction, so we checked. Deleting each target in turn moves the paired $\Delta$ within
+$[{+}0.068,{+}0.081]$ around ${+}0.080$; the most influential single target moves it by $-0.012$. The successes
+do concentrate, $25$ target-seed wins on $13$ distinct targets with the top three accounting for $44\%$, which
+we report rather than treat as $25$ independent wins; but they are not one or two targets, and their mean
+crossing-pair count ($5.46$) matches the pool ($5.48$). Targets are also not independent draws: single-linkage
+clustering at $15\%$ collapses the $60$ into $18$ clusters, one holding $29$, so we resample clusters, which
+widens the interval from $[{+}0.040,{+}0.127]$ to $[{+}0.024,{+}0.149]$ and still clears zero.
+
+\smallskip\noindent\textbf{Quasi-held-out versus exploratory, stated once.} We do not use the word
+``confirmatory'': we hold no timestamped pre-registration, and a confirmatory held-out analysis would need the
+evaluation pool disjoint in the respect that matters for a structure-conditioned operator, namely structure.
+\emph{Quasi-held-out}: the paired $r_{\mathrm{mix}}$ separation on the $125$ ID-disjoint targets.
+\emph{Exploratory}: the ShapeKnots-only comparison, the crossing-pair-count association, the budget sweep, the
+six-model invention draws and the cross-source pool. No family-wise correction is applied, since these answer
+different questions on overlapping data; no exploratory $p$-value here is a test, and ``significant in $k/3$
+seeds'' is a descriptive replication count.
 
 \smallskip\noindent\textbf{The multi-level bootstrap, specified in full.} \emph{Estimand}: $\Delta$, the mean over
 (target, seed, execution) cells of the paired indicator difference between two arms.
