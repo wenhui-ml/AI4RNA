@@ -103,17 +103,24 @@ def fig_collapse():
         lo, hi = cis[x]
         ax.plot([x, x], [lo, hi], color=INK, lw=1.0, zorder=4, alpha=0.55)
         ax.plot([x - 0.09, x + 0.09], [hi, hi], color=INK, lw=1.0, zorder=4, alpha=0.55)
-        ax.text(x, hi + 1.2, f"{v}/60", ha="center", fontsize=9, color=INK)
+        ax.text(x, hi + 1.6, f"{v}/60", ha="center", fontsize=9, color=INK)
+    # The y-limit has to clear the tallest whisker AND its label, or the 43/60 label rides over the title.
+    ax.set_ylim(0, 58); ax.set_yticks([0, 10, 20, 30, 40, 50])
     ax.axhline(43, ls=(0, (5, 2.5)), color=GREY, lw=0.8, zorder=1)
-    ax.text(3.45, 44.0, "DesiRNA (borrowed) 43/60", ha="right", va="bottom", fontsize=7, color=GREY)
-    ax.annotate("", xy=(3, 6.4), xytext=(1, 41.5), zorder=3,
-                arrowprops=dict(arrowstyle="-|>", color=NEG, lw=1.1, connectionstyle="arc3,rad=-0.30"))
-    ax.text(2.52, 34, "$43 \\to 1$ under three\npredictors, same designs", ha="center", va="center",
+    # Reference label goes LEFT, over the empty CF-floor column: the right side is where the 43/60 whisker
+    # and its label now live.
+    ax.text(-0.42, 43.8, "DesiRNA (borrowed) $43/60$", ha="left", va="bottom", fontsize=7, color=GREY)
+    # Straight arrow, not an arc: with a 4:1 aspect the curvature of arc3 is unpredictable in data units and
+    # it was running through the annotation text. Landing point is offset up-left of bar 3 so it clears the
+    # 1/60 label, which sits centred above the whisker.
+    ax.annotate("", xy=(2.70, 9.0), xytext=(1.28, 40.0), zorder=3,
+                arrowprops=dict(arrowstyle="-|>", color=NEG, lw=1.1))
+    # Text sits to the RIGHT of that line (which passes x=1.88 at y=28), in the empty upper-right block.
+    ax.text(2.06, 27.5, "$43 \\to 1$ under three\npredictors, same designs", ha="left", va="center",
             fontsize=7.8, color=NEG)
     ax.set_xticks(xs); ax.set_xticklabels(labels, fontsize=7.6)
-    ax.set_ylim(0, 49); ax.set_yticks([0, 10, 20, 30, 40])
     ax.set_ylabel("verified held-out solves ($/60$)", fontsize=8.5)
-    ax.set_title("The panel exposes oracle-gaming (measured; $n=60$)", fontsize=10, weight="bold", pad=8)
+    ax.set_title("The panel exposes oracle-gaming (measured; $n=60$)", fontsize=10, weight="bold", pad=10)
     ax.spines["top"].set_visible(False); ax.spines["right"].set_visible(False)
     ax.tick_params(length=3)
     _save(fig, "fig_cc_collapse.pdf")

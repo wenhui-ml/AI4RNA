@@ -26,7 +26,11 @@ Verified by compiling the package in a clean directory with no access to the rep
 zero missing-file warnings. Do that again after any change, because a package that builds *here* and not
 *there* is the classic arXiv failure and it is invisible until upload.
 
-To upload: `cd arxiv && tar czf ../chomsky_climb_arxiv.tar.gz .`
+**The upload archive is built for you**: `submission/chomsky_climb_arxiv.tar.gz` (344 KB, 8 entries, `.tex`
+at the archive root where arXiv expects it). `build.sh` then extracts it into a scratch directory with no
+access to this repo and compiles it there; the build aborts if that fails. Two traps this closes: `tar . 
+--exclude='.*'` excludes the `.` entry itself and silently ships an empty archive, and tarring one level too
+high buries the `.tex` inside a folder, which arXiv rejects after upload rather than before.
 
 ---
 

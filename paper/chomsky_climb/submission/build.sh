@@ -32,6 +32,25 @@ cat > $SUB/arxiv/00README.XXX <<'RM'
 % must be pre-built. references.bib is shipped for completeness only.
 RM
 
+# arXiv wants ONE archive of the source directory, not the directory. Build it here rather than leaving it
+# as a documented manual step, because "tar from the wrong level" is the classic upload failure: arXiv
+# expects the .tex at the archive root, not inside a folder.
+# Files listed explicitly: `tar . --exclude='.*'` excludes the '.' entry itself and ships an empty archive,
+# which is silent and looks like success.
+( cd $SUB/arxiv && tar czf ../chomsky_climb_arxiv.tar.gz \
+      chomsky_climb.tex references.bib chomsky_climb.bbl 00README.XXX figs )
+echo "   $SUB/chomsky_climb_arxiv.tar.gz = $(du -k $SUB/chomsky_climb_arxiv.tar.gz | cut -f1) KB, \
+$(tar tzf $SUB/chomsky_climb_arxiv.tar.gz | grep -vc '/$') entries"
+# Compile the archive's contents in a scratch directory with no access to this repo. A package that builds
+# here and not there is invisible until upload, and arXiv gives no second opinion.
+TMP=$(mktemp -d); tar xzf $SUB/chomsky_climb_arxiv.tar.gz -C "$TMP"
+if ( cd "$TMP" && tectonic -X compile chomsky_climb.tex >/dev/null 2>&1 ); then
+  echo "   clean-room compile: OK ($(pdfinfo "$TMP/chomsky_climb.pdf" | awk '/Pages/{print $2}') pages)"
+else
+  echo "   ABORT: the arXiv archive does not compile standalone"; rm -rf "$TMP"; exit 1
+fi
+rm -rf "$TMP"
+
 echo "== 2. code and data supplement (AAAI: <= 50 MB) =="
 rm -f $SUB/aaai/code_and_data.zip
 ( cd "$ROOT" && zip -qr "$OLDPWD/$SUB/aaai/code_and_data.zip" \
