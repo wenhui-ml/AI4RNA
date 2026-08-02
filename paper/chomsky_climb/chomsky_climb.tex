@@ -2040,25 +2040,21 @@ $128.0$ and $63.5$. \emph{(iv)} ${+}0.067$ $[{+}0.023,{+}0.120]$, deterministic,
 run each. A reader who prefers (iii)'s conservative variant reclassifies the component as weak and nothing
 else in the paper changes.
 
-\smallskip\noindent\textbf{The multi-level bootstrap, specified in full.} ``Resampling targets, seeds and
-executions'' does not determine an estimator. \emph{Estimand}: $\Delta$, the mean over
-$(\text{target},\text{seed},\text{execution})$ cells of the paired indicator difference between two arms.
+\smallskip\noindent\textbf{The multi-level bootstrap, specified in full.} \emph{Estimand}: $\Delta$, the mean over
+(target, seed, execution) cells of the paired indicator difference between two arms.
 \emph{Pairing}: the unit is the paired difference formed \emph{inside} one cell, so both arms carry identical
-resampling weights at every level and neither can be resampled against a different target, seed or execution
-than its counterpart. \emph{Level 1}: draw nominal seeds with replacement. \emph{Level 2}: executions are
-\emph{nested} within nominal seed, not crossed with it, so they are drawn inside each drawn seed. We report
-two nesting variants because they answer different questions, \emph{full-nest} draws $3$ executions inside
-each drawn seed, matching the design actually run, and is primary; \emph{one-exec} draws a single execution
-per drawn seed, simulating a smaller study, and is therefore wider and reported as a conservative sensitivity.
-\emph{Level 3}: draw targets with replacement, \emph{synchronously} for every drawn cell and both arms.
-Because the pool clusters (App.~\ref{app:data}) we report level~3 with the target as the unit \emph{and} with
-the structural cluster as the unit (single linkage at $15\%$ normalized dot-bracket distance). \emph{Interval
-type}: percentile, $2.5$/$97.5$ quantiles of $B{=}20{,}000$ replicates. \emph{Why we do not claim frequentist
-coverage}: with three nominal seeds the level-1 resampling distribution has few distinct states, so these are
-\emph{sensitivity intervals}: they report how much the conclusion moves when each level of variation is
-admitted, and we do not use them as tests. \emph{Implementation}: Python \texttt{random} seeded at $20260726$
-in \texttt{pabrep\_stats.py}, \texttt{gvp\_stats.py} and \texttt{cluster\_boot.py}; rerunning those files
-reproduces every interval quoted here.
+resampling weights at every level. \emph{Level 1}: draw nominal seeds with replacement. \emph{Level 2}:
+executions are \emph{nested} within seed and drawn inside each drawn seed; we report two variants,
+\emph{full-nest} (three executions per drawn seed, matching the design run, primary) and \emph{one-exec} (a
+single execution per drawn seed, wider, a conservative sensitivity). \emph{Level 3}: draw targets with
+replacement, \emph{synchronously} for every drawn cell and both arms; because the pool clusters
+(App.~\ref{app:data}) we report this with the target as the unit and with the structural cluster as the unit
+(single linkage at $15\%$ normalized dot-bracket distance). \emph{Interval}: percentile, $2.5$/$97.5$ quantiles
+of $B{=}20{,}000$ replicates. \emph{Why no coverage claim}: with three nominal seeds the level-1 resampling
+distribution has few distinct states, so these are \emph{sensitivity intervals} reporting how much the
+conclusion moves when each level is admitted, and we do not use them as tests. \emph{Implementation}: Python
+\texttt{random} seeded at $20260726$ in \texttt{pabrep\_stats.py}, \texttt{gvp\_stats.py} and
+\texttt{cluster\_boot.py}.
 
 \smallskip\noindent\textbf{Is the index split a \emph{structural} split? (An audit, with a partly negative
 answer.)} Splitting by target index guarantees no target is reused, but it does not guarantee the untouched
@@ -2145,64 +2141,25 @@ ceiling from a search-budget limit, and no claim in this paper rests on it. We r
 from the main text is not selective reporting.
 
 \subsection{Adjudicator choice, abstention scoring, and what ShapeKnots costs}\label{app:adjud}
-\paragraph{Conservative scoring, and the adjudicator's role.} The abstention rule is scored
-\emph{conservatively}: a target whose design the predictors do not unanimously confirm counts as not-solved in
-the full-$60$ denominator, so the panel-unanimous rate is a high-stringency consistency measure, not a selective-prediction accuracy.
-Concretely, on the primary seed the operator produces $37$ designs that both in-loop predictors confirm; on
-$29$ of those the held-out ShapeKnots disagrees (abstained) and on $8$ all three agree, giving the $8/60$
-headline. (ProbKnot, being in the objective, agrees on all $37$; the abstentions are entirely
-ShapeKnots'.) So conditional on non-abstention agreement is high while the abstention rate is large, which is
-exactly why we report the unconditional rate. The target-level cluster bootstrap (Table~\ref{tab:sep}) quantifies target-sampling
-uncertainty; seed-to-seed algorithm variance is reported separately as the five-seed spread and the per-seed
-$n{=}251$ test, in lieu of a full hierarchical model.
+The choice of held-out adjudicator deserves scrutiny because the whole positive side rests on it. ShapeKnots is
+the only crossing-aware predictor in the panel that neither operator optimizes, so it is the only one for which
+``held out'' is true by construction rather than by convention. It also runs here in an \emph{unvalidated
+de-novo mode}: the method was designed to fold under experimental SHAPE constraints
+\citep{hajdin2013shapeknots} and we supply none, so we are using it outside the regime it was calibrated for
+and say so wherever its numbers appear.
 
-\paragraph{Why ShapeKnots is the held-out adjudicator, and what that costs.} The choice deserves scrutiny
-rather than assertion, because ShapeKnots \citep{hajdin2013shapeknots} was designed as a
-\emph{SHAPE-directed} method and we run it \emph{de novo}, with no probing data. Four points, stated so a
-reader can discount them as they see fit. (i) De-novo operation is a supported RNAstructure mode: with the
-SHAPE pseudo-energy term absent the algorithm reduces to a pseudoknot-aware free-energy fold over its
-restricted pseudoknot classes: a
-legitimate predictor, but \emph{not} the configuration in which the original
-paper's accuracy was validated, which used probing data. We therefore make no claim about its de-novo
-accuracy. (ii) It is the only one of our three predictors that we can genuinely hold out: pKiss and ProbKnot
-are both fast enough to sit inside the repair loop and both do, so ShapeKnots is held out partly by \emph{necessity}, since it is too slow to optimize against ($120$\,s timeout, vs.\ $60$\,s for the others), which is
-an implementation fact, not a principled selection. (iii) Its objective is mechanistically distinct from
-ProbKnot's (free energy vs.\ maximum expected accuracy over a partition ensemble). \emph{But mechanistic
-distinctness does not deliver empirical independence, and here it does not.} Measuring pairwise agreement on
-our own natives (\S\ref{sec:oracle}) puts ShapeKnots and pKiss at $\kappa=0.673$ $[0.422,0.875]$: of the three
-pairings, the held-out adjudicator is the one \emph{most} correlated with the very predictor the single-oracle
-gamer optimizes. That cuts against this appendix's own choice and we state it rather than bury it. Two
-consequences. It makes $r_{\mathrm{ho}}$ a \emph{weaker} held-out test than its name suggests, since a design
-tuned to pKiss inherits some of ShapeKnots' assent for free, which is one reason we never rest a claim on
-$r_{\mathrm{ho}}$ alone. And it inverts the naive ranking of panel members: ProbKnot, the least correlated with
-everything ($\kappa=0.270$ and $0.117$) and the least sensitive, is the harshest and most informative member,
-which is why the collapse localizes there ($2/43$, Table~\ref{tab:contrast}). A better instrument would hold
-out the \emph{least} correlated predictor rather than the slowest one; we could not, because ProbKnot is in the
-panel operator's objective by construction. (iv) Its de-novo exact-match recall on \emph{native} pseudoknots is
-$11\%$, and the three-way conjunction's is $1\%$ (App.~\ref{app:data}). This asymmetry governs how its verdicts
-may be read: \emph{passing} ShapeKnots is a strong consistency signal, whereas \emph{failing} it is nearly
-uninformative, so $r_{\mathrm{ho}}$ is best described as \emph{selective agreement with a stringent model}
-rather than a held-out capability rate.
-\emph{Which forces a reference class we had left implicit.} A judge that recovers $11\%$ of ground truth
-cannot confirm most of anything, so reading a design rate against an implicit $100\%$ understates it by
-construction. The defensible reference is the judge's own rate on ground truth under the same predicate and
-configuration (\texttt{heldout\_ceiling.py}). Measured that way, de-novo ShapeKnots recovers
-$9/80=11.3\%$ $[5.3,20.3]$ of natives from their own natural sequences, while it confirms the panel
-operator's designs on the strictly-untouched pool at $8.0\%$ (per seed $6.4,8.8,8.8\%$) and the
-single-oracle gamer's at $3.7\%$. So the held-out judge assents to our designs at roughly $70\%$ of the rate
-it assents to nature's own solutions, with heavily overlapping intervals, whereas the gamer sits near a
-third of that ceiling. \emph{Three caveats keep this an orientation rather than a corrected estimate.} The
-pooled interval ignores that the same $125$ targets recur across seeds, so it is too narrow; the paired
-seed-level test is unchanged and still separates in only one of three seeds; and
-natives and designs are different populations, ours being $372/375$ H-type against $75/80$ natives carrying
-more than five crossing pairs. The sibling line that motivated this reference class found precisely the
-unstratified version of this comparison to be confounded by topology, and our native set carries no
-H-type/kissing label and only five low-crossing members, so we cannot stratify it. The ceiling-relative
-reading therefore changes what $r_{\mathrm{ho}}$'s absolute size means; it does not change its verdict. Because all three predictors also share thermodynamic parameters their
-errors are correlated, measurably so, and
-because the panel's false-positive rate is characterized on one narrow negative class only, we describe every
-positive rate as a high-stringency computational-consistency measure rather than a calibrated lower bound on
-true capability.
+What that costs is stringency we cannot separate from strictness. Given its own reference class the judge is
+not implausibly harsh: it recovers $11.3\%$ $[5.3,20.3]$ of native pseudoknots from their own sequences
+(\texttt{heldout\_ceiling.py}) and confirms our panel operator's designs at $8.0\%$, about $70\%$ of that
+ceiling, against the gamer's $3.7\%$. The low absolute rates are therefore substantially a property of the
+adjudicator, and the \emph{ratio} between arms is the part we read. The comparison is unstratified by length or
+crossing-pair count, so it bounds the size of the held-out signal rather than establishing it.
+
+\emph{Abstention scoring.} A target on which the three predictors disagree counts as not-solved against the
+full-$60$ denominator, so abstention withholds a positive claim rather than dropping the target, and every
+reported rate is conservative in the same direction. That is why $r_{\mathrm{mix}}$ is a high-stringency
+consistency measure rather than a selective-prediction rate: we never report an accuracy conditioned on the
+panel having agreed.
 
 \section{Datasets, Intrinsic Grades, and Materials}\label{app:data}
 Every target's difficulty \emph{grade} is a property of the target fixed before design: its \emph{formal-family
