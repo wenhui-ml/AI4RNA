@@ -869,7 +869,6 @@ the audit then evaluates.
 \end{remark}
 
 
-
 \subsection{Two Impossibilities, Kept Separate}\label{sec:impossible}
 The audit's negative side and undesignability are different statements and must not be conflated.
 Confinement (Prop.~\ref{prop:confine}) is about the repertoire: $\Rze{\Ocf}{\pi_{\mathrm{before}}}$ excludes
@@ -1527,9 +1526,6 @@ counts for more, not less\\
 \end{table}
 
 
-
-
-
 \subsection{What Every Rate Here Is Bounded By, and the Unbounded Family}\label{sec:exp:stats}
 \paragraph{The panel is a low-recall instrument, and that bounds every number above.} On $80$ native bpRNA
 pseudoknots, folding each native's \emph{own} sequence, per-predictor crossing recall is pKiss $20\%$, ProbKnot
@@ -2137,8 +2133,16 @@ What that costs is stringency we cannot separate from strictness. Given its own 
 not implausibly harsh: it recovers $11.3\%$ $[5.3,20.3]$ of native pseudoknots from their own sequences
 (\texttt{heldout\_ceiling.py}) and confirms our panel operator's designs at $8.0\%$, about $70\%$ of that
 ceiling, against the gamer's $3.7\%$. The low absolute rates are therefore substantially a property of the
-adjudicator, and the \emph{ratio} between arms is the part we read. The comparison is unstratified by length or
-crossing-pair count, so it bounds the size of the held-out signal rather than establishing it.
+adjudicator, and the \emph{ratio} between arms is the part we read.
+
+\emph{Three caveats keep that an orientation rather than a corrected estimate.} The pooled interval ignores
+that the same $125$ targets recur across seeds, so it is \textbf{too narrow}; the paired seed-level test is
+unchanged and still separates in only one of three seeds; and natives and designs are different populations,
+ours being $372/375$ H-type against $75/80$ natives carrying more than five crossing pairs. A sibling line
+found precisely the unstratified version of this comparison to be confounded by topology, and our native set
+carries no H-type/kissing label and only five low-crossing members, so we cannot stratify it. The
+ceiling-relative reading therefore changes what $r_{\mathrm{ho}}$'s absolute size means; it does not change
+its verdict.
 
 \emph{Abstention scoring.} A target on which the three predictors disagree counts as not-solved against the
 full-$60$ denominator, so abstention withholds a positive claim rather than dropping the target, and every
@@ -2177,7 +2181,6 @@ excluded so each base is in $\le1$ pair (\texttt{runs/cc\_ascent/bprna\_pk.py}).
 pools are \emph{not} matched on length, pseudoknot subtype, loop-length distribution, base-pair composition,
 motif family, source database, or sequence homology, any of which could drive the drop. The cross-source
 result should therefore be read as a distribution-shift observation with the shift only partly characterized.
-
 
 
 \section{The Operator-Invention Protocol}\label{app:invent}
@@ -2236,34 +2239,6 @@ agents produced nonzero cross-predictor consistency under a common invention pro
 among them. A model comparison would need several draws per model at several temperatures, a shared compute
 budget, and a clustering of operator sources.
 
-\paragraph{The positive verdict is dominant under the pKiss energy model (completed cases).} Panel-unanimity
-already requires the target to be each engine's predicted structure; we add one further rung
-(App.~\ref{app:config}). For the mixed-panel-consistent designs we enumerate pKiss suboptimals and take the
-free-energy gap $\Delta$ from the target (the MFE) to the best alternative fold. The target is the pKiss MFE
-for all $17$ designs whose enumeration completed within budget, dominant by median $\Delta{=}1.2$\,kcal/mol
-(mean $1.44$), with $14/17$ clearing a $\ge1$\,kcal margin. Eight longer designs
-timed out; since timeout correlates with length, this rung covers the shorter adjudicated designs only, and the
-gap is a property of the pKiss energy model, not a model-independent thermodynamic fact. Within that scope the
-positive verdict is not a marginal coincidence of pair sets: the target is the free-energy-minimum fold by a
-real if modest margin. This is as far as computation goes; the verdict stays model-relative, and in-vitro probing is the
-only rung beyond it (App.~\ref{app:config}).
-
- The positive verdict is not
-``the target pairs appear somewhere'': panel-unanimous requires the target to \emph{equal} each method's
-predicted structure: the MFE under pKiss and ShapeKnots, and the maximum-expected-accuracy (MEA) structure
-over a partition-function ensemble under ProbKnot. These are related but not identical notions of a single
-dominant fold (ProbKnot's MEA is not a unique-MFE criterion), so panel-unanimity sits near the
-``unique/dominant fold'' region of the exact\,$\subseteq$\,unique-MFE\,$\subseteq$\,dominance ladder rather than exactly on one rung, agreed by three distinct predictors (thermodynamically
-related, not statistically independent). The next rung is reported as the \emph{conjunction}
-$\text{R2}\wedge[\Delta G\ge\tau]$, since neither condition implies the other. We \emph{climb one rung further and measure it} (\S\ref{sec:exp}, \texttt{runs/cc\_ascent/positive\_stringency.py}): enumerating pKiss suboptimals for
-the mixed-panel-consistent designs, the target is the pKiss MFE for all $17$ that enumerated within budget and is dominant
-over the best alternative fold by a median $1.2$\,kcal/mol ($14/17$ clear $\ge1$\,kcal). The verdict remains
-\emph{model-relative}, since all engines are thermodynamic secondary-structure predictors and not physical
-ground truth. Two further strengthenings are computable with the installed tooling (\texttt{partition},
-\texttt{ProbabilityPlot}, \texttt{pKiss\_probs}): a Boltzmann-probability threshold and a fourth,
-non-thermodynamic (learned) predictor. Physical confirmation (in-vitro probing) is
-the only route past model-relativity and is out of scope here.
-
 \section{Oracle Configurations, Hyperparameters, Compute, and Verifier Stringency}\label{app:config}
 \noindent\textbf{Oracle configurations}, all deterministic and replayable with \texttt{DATAPATH} pinned to
 the RNAstructure data tables: $\Omega_{\mathrm{cf}}$ is ViennaRNA Turner-2004 MFE at $37^\circ$C (env
@@ -2307,8 +2282,6 @@ ground truth. Two further strengthenings are computable with the installed tooli
 \texttt{ProbabilityPlot}, \texttt{pKiss\_probs}): a Boltzmann-probability threshold and a fourth,
 non-thermodynamic (learned) predictor. Physical confirmation (in-vitro probing) is
 the only route past model-relativity and is out of scope here.
-
-\clearpage
 
 \clearpage
 \bibliographystyle{plainnat}
