@@ -659,3 +659,26 @@ def test_calibrate_strict_helpers():
     # a None recall is an oracle that did not run -- never a score of zero
     assert not m.confirmed({"id": "x", "recall": {"pkiss": None, "probknot": None,
                                                   "shapeknots": None}}, 1, 1.0)
+
+
+def test_function_word_guard_passes_when_the_shape_was_supplied():
+    """The guard exists to stop us INVENTING a shape. With the shape given, its premise does not hold.
+
+    Measured before this change: on 96 agent runs the guard refused two phrasings 12 times out of 12 each,
+    BEFORE the model was called once -- "like a riboswitch" tripped on `switch`, "expressed in vivo" tripped
+    on `expressed` -- and both requests carried an explicit dot-bracket. The switch requirement is the
+    most-named of nine across 1676 RNA-design papers with no external tool offering it, so a keyword list was
+    the entire reason our one piece of unique supply could not be reached.
+
+    Passing is not the same as covering it, which is why the note is asserted here too: a certificate about
+    the SHAPE must never be readable as a claim about the FUNCTION.
+    """
+    from rna_harness.cognitive.agent import structures_in
+    from rna_harness.cognitive.intent import functional_request
+    with_shape = "结构 ....((((((....))))))...... ,像核糖开关那样被另一条链触发"
+    without = "我要一条能抑制某个基因表达的 RNA"
+    assert functional_request(with_shape), "the keyword still fires -- the guard is not being disabled"
+    assert functional_request(without)
+    # the discriminator is whether there is a shape to design for at all
+    assert len(structures_in(with_shape)) == 1
+    assert len(structures_in(without)) == 0

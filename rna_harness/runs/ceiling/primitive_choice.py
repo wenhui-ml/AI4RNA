@@ -75,14 +75,25 @@ def run_one(job):
         return {"kind": kind, "error": repr(e)[:200], "request": request[:60]}
     actions = [s.action for s in sess.steps]
     cert = sess.certificate or {}
-    det = cert.get("detail") or {}
+    # WHERE THE REQUIREMENT'S VERDICT ACTUALLY LIVES. The first version looked in cert["detail"]["switch"],
+    # which is always absent: the certificate comes from certify_sequence, which knows about folding and
+    # nothing about our added requirements. The switch and kinetic checks are returned by `design`, in its
+    # OBSERVATION. Reading the wrong place scored 0 of 6 and 0 of 3 as "chosen but not held" -- a product
+    # failure that never happened. Every one of those runs ended `certified`, and the loop only sets that
+    # when every declared requirement holds, so the right number was 6 of 6 and 3 of 3.
+    last_design = {}
+    for st in sess.steps:
+        if st.action == "design" and isinstance(st.observation, dict):
+            last_design = st.observation
     return {"kind": kind, "request": request[:70], "actions": actions,
             "set_switch": "set_switch" in actions,
             "set_cotranscriptional": "set_cotranscriptional" in actions,
             "verdict": cert.get("verdict"), "outcome": sess.outcome,
             # did the DELIVERED certificate actually carry the requirement, not just the action get called
-            "switch_held": bool((sess.switch or {}) and (det.get("switch") or {}).get("held")),
-            "kin_held": bool((sess.kin or {}) and (det.get("kinetics") or {}).get("held")),
+            "switch_held": bool((last_design.get("switch") or {}).get("held")),
+            "kin_held": bool((last_design.get("kinetics") or {}).get("held")),
+            "design_obs_keys": sorted(k for k in last_design if k in
+                                      ("switch", "kinetics", "gc", "tm", "verdict")),
             "cost_usd": sess.total_cost_usd, "llm_cost_usd": sess.llm_cost_usd,
             "n_steps": len(sess.steps), "wall_s": round(time.time() - t0, 1)}
 

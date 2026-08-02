@@ -82,6 +82,7 @@ class Session:
     requested_target: Optional[str] = None           # the FIRST shape proposed -- what the user asked for
     requested_by_user: bool = False                  # True when it came VERBATIM from the request text
     substituted: Optional[dict] = None               # set when the delivered shape is not the requested one
+    unverified_claim: Optional[dict] = None          # a functional claim we design AROUND but never check
     certificate: Optional[dict] = None
     done: bool = False
     outcome: str = ""
@@ -911,13 +912,36 @@ def run(request: str, client=None, model: str = "z-ai/glm-5.2", max_steps: int =
     from .intent import functional_request
     sess = Session(request=request)
     hit = functional_request(request)
-    if hit:
+    if hit and not structures_in(request):
         sess.done, sess.outcome = True, "refused"
         sess.steps.append(Step(0, "refuse", {"word": hit}, {
             "reason": ("the request describes a biological FUNCTION, not a SHAPE. Nothing here can verify "
                        "that a sequence DOES anything, and inventing a shape would produce a certificate "
                        "that is true about the wrong target.")}))
         return _persist(sess, workspace)
+    if hit:
+        # THE GUARD'S PREMISE IS THAT WE WOULD HAVE TO INVENT A SHAPE. When the request already carries an
+        # explicit dot-bracket, there is nothing to invent and the premise does not hold.
+        #
+        # MEASURED, and this is why the exception exists rather than being a matter of taste: on 96 agent
+        # runs the guard refused two request phrasings outright, 12 times out of 12 each, BEFORE the model
+        # was called even once -- "like a riboswitch" tripped on the word switch and "expressed in vivo"
+        # tripped on expressed. Both requests supplied the structure. The switch requirement is the
+        # most-named of nine across 1676 RNA-design papers and no external tool offers it, so this keyword
+        # list was the entire reason our one piece of unique supply could not be reached.
+        #
+        # PROCEEDING IS NOT THE SAME AS COVERING IT. The functional claim stays unverified, and saying so is
+        # the whole point: refusing loses the user an answer they can have, and staying silent would let a
+        # certificate about the SHAPE be read as a claim about the FUNCTION -- which is the confusion the
+        # guard was built to prevent in the first place.
+        sess.unverified_claim = {
+            "word": hit,
+            "means": ("this request also describes a biological FUNCTION. The structure you gave is "
+                      "designed and certified; the function is NOT checked by anything here."),
+        }
+        sess.steps.append(Step(0, "note_unverified", {"word": hit}, {
+            "ok": True, "automatic": "recorded by the harness",
+            **sess.unverified_claim}))
     if client is None:
         from ..llm.openrouter import OpenRouterClient
         client = OpenRouterClient(model=model)
@@ -1170,6 +1194,11 @@ def run(request: str, client=None, model: str = "z-ai/glm-5.2", max_steps: int =
             break
     if not sess.outcome:
         sess.outcome = "out of steps"
+    # AN UNVERIFIED FUNCTIONAL CLAIM MUST REACH THE OUTCOME LINE, not sit in a step nobody reads. The whole
+    # reason the guard was allowed to pass is that we say what the certificate does not cover.
+    if sess.unverified_claim and sess.outcome == "certified":
+        sess.outcome = ("certified (shape only -- the functional claim in the request "
+                        f"[\"{sess.unverified_claim['word']}\"] is NOT verified by anything here)")
     # DID WE ANSWER THE QUESTION THAT WAS ASKED? The certificate is honest about "this sequence folds to THIS
     # structure" -- and says nothing about whether THIS structure is the one the user wanted. Measured: on a
     # request that fixed the shape completely (closing stem 5, two 4-bp branches, 2-nt spacers, exactly 40

@@ -1,0 +1,641 @@
+{
+ "requests": [
+  {
+   "kind": "switch",
+   "text": "我有一个结构 ....((((((....))))))...... ,平时它要保持关闭,但只要环境里出现一段跟它互补的 RNA,它就得打开。请给我一条这样的序列"
+  },
+  {
+   "kind": "switch",
+   "text": "结构 ....((((((....))))))...... 。我要做一个检测用的元件:没有目标 RNA 的时候它折成这个形状,目标 RNA 一来就把茎撬开。序列给我一条"
+  },
+  {
+   "kind": "switch",
+   "text": "我需要一条 RNA,结构是 ....((((((....))))))...... ,它必须能被另一条链触发而改变构象 —— 像核糖开关那样。请设计"
+  },
+  {
+   "kind": "cotrans",
+   "text": "结构 ((((((....)))))) 。这条 RNA 会在细胞里边转录边折叠,我不希望它在合成到一半的时候先折成别的形状再卡住。请给我一条序列"
+  },
+  {
+   "kind": "cotrans",
+   "text": "我要 ((((((....)))))) 这个结构的序列,但它是体内表达的,折叠路径上不能有会把它困住的中间态"
+  },
+  {
+   "kind": "plain",
+   "text": "我有一个结构 ((((((....)))))) ,请给我一条能折叠成它的 RNA 序列"
+  },
+  {
+   "kind": "plain",
+   "text": "请给我一条折叠成 ((((((....)))))) 的序列,GC 含量在 50% 左右"
+  },
+  {
+   "kind": "plain",
+   "text": "结构 ((((((....)))))) ,序列越稳定越好"
+  }
+ ],
+ "summary": {
+  "switch": {
+   "hit": 6,
+   "n": 9,
+   "hit_lo": 0.29929505620854036,
+   "hit_hi": 0.9251453685803082,
+   "false_pos": 0,
+   "n_plain": 9,
+   "fp_lo": 0.0,
+   "fp_hi": 0.3362671168799428,
+   "delivered_holding": 6
+  },
+  "cotrans": {
+   "hit": 3,
+   "n": 6,
+   "hit_lo": 0.11811724875702521,
+   "hit_hi": 0.8818827512429748,
+   "false_pos": 0,
+   "n_plain": 9,
+   "fp_lo": 0.0,
+   "fp_hi": 0.3362671168799428,
+   "delivered_holding": 3
+  }
+ },
+ "rows": [
+  {
+   "kind": "switch",
+   "request": "我需要一条 RNA,结构是 ....((((((....))))))...... ,它必须能被另一条链触发而改变构象 —— 像核糖开关那样。",
+   "actions": [
+    "refuse"
+   ],
+   "set_switch": false,
+   "set_cotranscriptional": false,
+   "verdict": null,
+   "outcome": "refused",
+   "switch_held": false,
+   "kin_held": false,
+   "design_obs_keys": [],
+   "cost_usd": 0.0,
+   "llm_cost_usd": 0.0,
+   "n_steps": 1,
+   "wall_s": 0.0
+  },
+  {
+   "kind": "cotrans",
+   "request": "我要 ((((((....)))))) 这个结构的序列,但它是体内表达的,折叠路径上不能有会把它困住的中间态",
+   "actions": [
+    "refuse"
+   ],
+   "set_switch": false,
+   "set_cotranscriptional": false,
+   "verdict": null,
+   "outcome": "refused",
+   "switch_held": false,
+   "kin_held": false,
+   "design_obs_keys": [],
+   "cost_usd": 0.0,
+   "llm_cost_usd": 0.0,
+   "n_steps": 1,
+   "wall_s": 0.0
+  },
+  {
+   "kind": "plain",
+   "request": "我有一个结构 ((((((....)))))) ,请给我一条能折叠成它的 RNA 序列",
+   "actions": [
+    "use_target",
+    "check_feasible",
+    "design"
+   ],
+   "set_switch": false,
+   "set_cotranscriptional": false,
+   "verdict": "certified",
+   "outcome": "certified",
+   "switch_held": false,
+   "kin_held": false,
+   "design_obs_keys": [
+    "gc",
+    "tm",
+    "verdict"
+   ],
+   "cost_usd": 0.0016195125592973498,
+   "llm_cost_usd": 0.0006036,
+   "n_steps": 3,
+   "wall_s": 17.2
+  },
+  {
+   "kind": "switch",
+   "request": "我有一个结构 ....((((((....))))))...... ,平时它要保持关闭,但只要环境里出现一段跟它互补的 RNA,它就得打开。",
+   "actions": [
+    "use_target",
+    "check_feasible",
+    "set_switch",
+    "design"
+   ],
+   "set_switch": true,
+   "set_cotranscriptional": false,
+   "verdict": "certified",
+   "outcome": "certified",
+   "switch_held": true,
+   "kin_held": false,
+   "design_obs_keys": [
+    "gc",
+    "kinetics",
+    "switch",
+    "tm",
+    "verdict"
+   ],
+   "cost_usd": 0.0034386587411308293,
+   "llm_cost_usd": 0.00241514,
+   "n_steps": 4,
+   "wall_s": 18.1
+  },
+  {
+   "kind": "switch",
+   "request": "结构 ....((((((....))))))...... 。我要做一个检测用的元件:没有目标 RNA 的时候它折成这个形状,目标 RNA ",
+   "actions": [
+    "use_target",
+    "check_feasible",
+    "set_switch",
+    "design"
+   ],
+   "set_switch": true,
+   "set_cotranscriptional": false,
+   "verdict": "certified",
+   "outcome": "certified",
+   "switch_held": true,
+   "kin_held": false,
+   "design_obs_keys": [
+    "gc",
+    "kinetics",
+    "switch",
+    "tm",
+    "verdict"
+   ],
+   "cost_usd": 0.00373542957022349,
+   "llm_cost_usd": 0.00266836,
+   "n_steps": 4,
+   "wall_s": 18.1
+  },
+  {
+   "kind": "cotrans",
+   "request": "结构 ((((((....)))))) 。这条 RNA 会在细胞里边转录边折叠,我不希望它在合成到一半的时候先折成别的形状再卡住。请给我一条",
+   "actions": [
+    "use_target",
+    "check_feasible",
+    "set_cotranscriptional",
+    "design"
+   ],
+   "set_switch": false,
+   "set_cotranscriptional": true,
+   "verdict": "certified",
+   "outcome": "certified",
+   "switch_held": false,
+   "kin_held": true,
+   "design_obs_keys": [
+    "gc",
+    "kinetics",
+    "switch",
+    "tm",
+    "verdict"
+   ],
+   "cost_usd": 0.0036239404169421726,
+   "llm_cost_usd": 0.0024425799999999998,
+   "n_steps": 4,
+   "wall_s": 18.4
+  },
+  {
+   "kind": "plain",
+   "request": "请给我一条折叠成 ((((((....)))))) 的序列,GC 含量在 50% 左右",
+   "actions": [
+    "use_target",
+    "check_feasible",
+    "set_gc_content",
+    "design"
+   ],
+   "set_switch": false,
+   "set_cotranscriptional": false,
+   "verdict": "certified",
+   "outcome": "certified",
+   "switch_held": false,
+   "kin_held": false,
+   "design_obs_keys": [
+    "gc",
+    "kinetics",
+    "switch",
+    "tm",
+    "verdict"
+   ],
+   "cost_usd": 0.0023014903171369766,
+   "llm_cost_usd": 0.0012615600000000001,
+   "n_steps": 4,
+   "wall_s": 9.2
+  },
+  {
+   "kind": "switch",
+   "request": "我需要一条 RNA,结构是 ....((((((....))))))...... ,它必须能被另一条链触发而改变构象 —— 像核糖开关那样。",
+   "actions": [
+    "refuse"
+   ],
+   "set_switch": false,
+   "set_cotranscriptional": false,
+   "verdict": null,
+   "outcome": "refused",
+   "switch_held": false,
+   "kin_held": false,
+   "design_obs_keys": [],
+   "cost_usd": 0.0,
+   "llm_cost_usd": 0.0,
+   "n_steps": 1,
+   "wall_s": 0.0
+  },
+  {
+   "kind": "plain",
+   "request": "结构 ((((((....)))))) ,序列越稳定越好",
+   "actions": [
+    "use_target",
+    "check_feasible",
+    "design"
+   ],
+   "set_switch": false,
+   "set_cotranscriptional": false,
+   "verdict": "certified",
+   "outcome": "certified",
+   "switch_held": false,
+   "kin_held": false,
+   "design_obs_keys": [
+    "gc",
+    "tm",
+    "verdict"
+   ],
+   "cost_usd": 0.0019693617383469476,
+   "llm_cost_usd": 0.00077326,
+   "n_steps": 3,
+   "wall_s": 9.7
+  },
+  {
+   "kind": "cotrans",
+   "request": "我要 ((((((....)))))) 这个结构的序列,但它是体内表达的,折叠路径上不能有会把它困住的中间态",
+   "actions": [
+    "refuse"
+   ],
+   "set_switch": false,
+   "set_cotranscriptional": false,
+   "verdict": null,
+   "outcome": "refused",
+   "switch_held": false,
+   "kin_held": false,
+   "design_obs_keys": [],
+   "cost_usd": 0.0,
+   "llm_cost_usd": 0.0,
+   "n_steps": 1,
+   "wall_s": 0.0
+  },
+  {
+   "kind": "switch",
+   "request": "我有一个结构 ....((((((....))))))...... ,平时它要保持关闭,但只要环境里出现一段跟它互补的 RNA,它就得打开。",
+   "actions": [
+    "use_target",
+    "check_feasible",
+    "set_switch",
+    "design"
+   ],
+   "set_switch": true,
+   "set_cotranscriptional": false,
+   "verdict": "certified",
+   "outcome": "certified",
+   "switch_held": true,
+   "kin_held": false,
+   "design_obs_keys": [
+    "gc",
+    "kinetics",
+    "switch",
+    "tm",
+    "verdict"
+   ],
+   "cost_usd": 0.002133198758398692,
+   "llm_cost_usd": 0.00111312,
+   "n_steps": 4,
+   "wall_s": 9.7
+  },
+  {
+   "kind": "switch",
+   "request": "结构 ....((((((....))))))...... 。我要做一个检测用的元件:没有目标 RNA 的时候它折成这个形状,目标 RNA ",
+   "actions": [
+    "use_target",
+    "check_feasible",
+    "set_switch",
+    "design"
+   ],
+   "set_switch": true,
+   "set_cotranscriptional": false,
+   "verdict": "certified",
+   "outcome": "certified",
+   "switch_held": true,
+   "kin_held": false,
+   "design_obs_keys": [
+    "gc",
+    "kinetics",
+    "switch",
+    "tm",
+    "verdict"
+   ],
+   "cost_usd": 0.0022798487197621662,
+   "llm_cost_usd": 0.00108984,
+   "n_steps": 4,
+   "wall_s": 10.1
+  },
+  {
+   "kind": "plain",
+   "request": "我有一个结构 ((((((....)))))) ,请给我一条能折叠成它的 RNA 序列",
+   "actions": [
+    "use_target",
+    "check_feasible",
+    "design"
+   ],
+   "set_switch": false,
+   "set_cotranscriptional": false,
+   "verdict": "certified",
+   "outcome": "certified",
+   "switch_held": false,
+   "kin_held": false,
+   "design_obs_keys": [
+    "gc",
+    "tm",
+    "verdict"
+   ],
+   "cost_usd": 0.0013762844089719984,
+   "llm_cost_usd": 0.0003882,
+   "n_steps": 3,
+   "wall_s": 8.6
+  },
+  {
+   "kind": "cotrans",
+   "request": "结构 ((((((....)))))) 。这条 RNA 会在细胞里边转录边折叠,我不希望它在合成到一半的时候先折成别的形状再卡住。请给我一条",
+   "actions": [
+    "use_target",
+    "check_feasible",
+    "set_cotranscriptional",
+    "design"
+   ],
+   "set_switch": false,
+   "set_cotranscriptional": true,
+   "verdict": "certified",
+   "outcome": "certified",
+   "switch_held": false,
+   "kin_held": true,
+   "design_obs_keys": [
+    "gc",
+    "kinetics",
+    "switch",
+    "tm",
+    "verdict"
+   ],
+   "cost_usd": 0.0023207133787579008,
+   "llm_cost_usd": 0.0011399000000000001,
+   "n_steps": 4,
+   "wall_s": 10.1
+  },
+  {
+   "kind": "plain",
+   "request": "请给我一条折叠成 ((((((....)))))) 的序列,GC 含量在 50% 左右",
+   "actions": [
+    "use_target",
+    "check_feasible",
+    "set_gc_content",
+    "design"
+   ],
+   "set_switch": false,
+   "set_cotranscriptional": false,
+   "verdict": "certified",
+   "outcome": "certified",
+   "switch_held": false,
+   "kin_held": false,
+   "design_obs_keys": [
+    "gc",
+    "kinetics",
+    "switch",
+    "tm",
+    "verdict"
+   ],
+   "cost_usd": 0.002468436295822991,
+   "llm_cost_usd": 0.0012954400000000001,
+   "n_steps": 4,
+   "wall_s": 10.0
+  },
+  {
+   "kind": "switch",
+   "request": "我需要一条 RNA,结构是 ....((((((....))))))...... ,它必须能被另一条链触发而改变构象 —— 像核糖开关那样。",
+   "actions": [
+    "refuse"
+   ],
+   "set_switch": false,
+   "set_cotranscriptional": false,
+   "verdict": null,
+   "outcome": "refused",
+   "switch_held": false,
+   "kin_held": false,
+   "design_obs_keys": [],
+   "cost_usd": 0.0,
+   "llm_cost_usd": 0.0,
+   "n_steps": 1,
+   "wall_s": 0.0
+  },
+  {
+   "kind": "plain",
+   "request": "结构 ((((((....)))))) ,序列越稳定越好",
+   "actions": [
+    "use_target",
+    "check_feasible",
+    "design"
+   ],
+   "set_switch": false,
+   "set_cotranscriptional": false,
+   "verdict": "certified",
+   "outcome": "certified",
+   "switch_held": false,
+   "kin_held": false,
+   "design_obs_keys": [
+    "gc",
+    "tm",
+    "verdict"
+   ],
+   "cost_usd": 0.0019647246808603075,
+   "llm_cost_usd": 0.00077568,
+   "n_steps": 3,
+   "wall_s": 9.7
+  },
+  {
+   "kind": "cotrans",
+   "request": "我要 ((((((....)))))) 这个结构的序列,但它是体内表达的,折叠路径上不能有会把它困住的中间态",
+   "actions": [
+    "refuse"
+   ],
+   "set_switch": false,
+   "set_cotranscriptional": false,
+   "verdict": null,
+   "outcome": "refused",
+   "switch_held": false,
+   "kin_held": false,
+   "design_obs_keys": [],
+   "cost_usd": 0.0,
+   "llm_cost_usd": 0.0,
+   "n_steps": 1,
+   "wall_s": 0.0
+  },
+  {
+   "kind": "switch",
+   "request": "结构 ....((((((....))))))...... 。我要做一个检测用的元件:没有目标 RNA 的时候它折成这个形状,目标 RNA ",
+   "actions": [
+    "use_target",
+    "check_feasible",
+    "set_switch",
+    "design"
+   ],
+   "set_switch": true,
+   "set_cotranscriptional": false,
+   "verdict": "certified",
+   "outcome": "certified",
+   "switch_held": true,
+   "kin_held": false,
+   "design_obs_keys": [
+    "gc",
+    "kinetics",
+    "switch",
+    "tm",
+    "verdict"
+   ],
+   "cost_usd": 0.002340091181363,
+   "llm_cost_usd": 0.0011091999999999999,
+   "n_steps": 4,
+   "wall_s": 11.0
+  },
+  {
+   "kind": "switch",
+   "request": "我有一个结构 ....((((((....))))))...... ,平时它要保持关闭,但只要环境里出现一段跟它互补的 RNA,它就得打开。",
+   "actions": [
+    "use_target",
+    "check_feasible",
+    "set_switch",
+    "design"
+   ],
+   "set_switch": true,
+   "set_cotranscriptional": false,
+   "verdict": "certified",
+   "outcome": "certified",
+   "switch_held": true,
+   "kin_held": false,
+   "design_obs_keys": [
+    "gc",
+    "kinetics",
+    "switch",
+    "tm",
+    "verdict"
+   ],
+   "cost_usd": 0.0020244731319300335,
+   "llm_cost_usd": 0.0008431199999999999,
+   "n_steps": 4,
+   "wall_s": 11.1
+  },
+  {
+   "kind": "cotrans",
+   "request": "结构 ((((((....)))))) 。这条 RNA 会在细胞里边转录边折叠,我不希望它在合成到一半的时候先折成别的形状再卡住。请给我一条",
+   "actions": [
+    "use_target",
+    "check_feasible",
+    "set_cotranscriptional",
+    "design"
+   ],
+   "set_switch": false,
+   "set_cotranscriptional": true,
+   "verdict": "certified",
+   "outcome": "certified",
+   "switch_held": false,
+   "kin_held": true,
+   "design_obs_keys": [
+    "gc",
+    "kinetics",
+    "switch",
+    "tm",
+    "verdict"
+   ],
+   "cost_usd": 0.0023852330131573147,
+   "llm_cost_usd": 0.00119556,
+   "n_steps": 4,
+   "wall_s": 10.1
+  },
+  {
+   "kind": "plain",
+   "request": "我有一个结构 ((((((....)))))) ,请给我一条能折叠成它的 RNA 序列",
+   "actions": [
+    "use_target",
+    "check_feasible",
+    "design"
+   ],
+   "set_switch": false,
+   "set_cotranscriptional": false,
+   "verdict": "certified",
+   "outcome": "certified",
+   "switch_held": false,
+   "kin_held": false,
+   "design_obs_keys": [
+    "gc",
+    "tm",
+    "verdict"
+   ],
+   "cost_usd": 0.0015597997020615473,
+   "llm_cost_usd": 0.000381,
+   "n_steps": 3,
+   "wall_s": 10.2
+  },
+  {
+   "kind": "plain",
+   "request": "请给我一条折叠成 ((((((....)))))) 的序列,GC 含量在 50% 左右",
+   "actions": [
+    "use_target",
+    "check_feasible",
+    "set_gc_content",
+    "design"
+   ],
+   "set_switch": false,
+   "set_cotranscriptional": false,
+   "verdict": "certified",
+   "outcome": "certified",
+   "switch_held": false,
+   "kin_held": false,
+   "design_obs_keys": [
+    "gc",
+    "kinetics",
+    "switch",
+    "tm",
+    "verdict"
+   ],
+   "cost_usd": 0.002470506159447564,
+   "llm_cost_usd": 0.00128576,
+   "n_steps": 4,
+   "wall_s": 10.5
+  },
+  {
+   "kind": "plain",
+   "request": "结构 ((((((....)))))) ,序列越稳定越好",
+   "actions": [
+    "use_target",
+    "check_feasible",
+    "set_gc_content",
+    "design"
+   ],
+   "set_switch": false,
+   "set_cotranscriptional": false,
+   "verdict": "certified",
+   "outcome": "certified",
+   "switch_held": false,
+   "kin_held": false,
+   "design_obs_keys": [
+    "gc",
+    "kinetics",
+    "switch",
+    "tm",
+    "verdict"
+   ],
+   "cost_usd": 0.004967346539378696,
+   "llm_cost_usd": 0.00376532,
+   "n_steps": 4,
+   "wall_s": 12.7
+  }
+ ]
+}
