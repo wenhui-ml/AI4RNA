@@ -7,6 +7,7 @@ are publication-grade TikZ and live in tikz/*.tex -- do NOT recreate them here (
 Build everything with build_figs.sh. Non-math text uses plain characters; LaTeX symbols live inside $...$.
 """
 import os
+import re
 
 import matplotlib
 # PGF, not Agg: the text is typeset by LaTeX itself, so the data figures carry the same Computer Modern
@@ -126,64 +127,184 @@ def fig_collapse():
     _save(fig, "fig_cc_collapse.pdf")
 
 
+RUNS = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                    "..", "..", "rna_harness", "runs", "cc_ascent"))
+
+# Arm rows in the committed stats outputs look like
+#   "  baseline (hand-built)        37.0/60    20/ 185 = 0.108 [0.053,0.175]  [37, ...]"
+#   "  frozen agent operators (reference)   ---   333/1104 = 0.302 [0.275,0.330]"
+# so one regex reads every attribution table. Parsing them rather than transcribing keeps the figure
+# and the manuscript on the same source of truth: a re-run that moves a number moves the plot.
+_ARM = re.compile(
+    r"^ {2}(\S.*?)\s\s+(?:([\d.]+)/60|-{3})\s+(\d+)/\s*(\d+)\s*=\s*([\d.]+)\s*\[([\d.]+),\s*([\d.]+)\]")
+
+
+def _arms(fname):
+    """-> {arm label: (r_in or None, rate, lo, hi)} for one committed stats .txt."""
+    path = os.path.join(RUNS, fname)
+    if not os.path.exists(path):
+        return {}
+    out = {}
+    for line in open(path):
+        m = _ARM.match(line.rstrip("\n"))
+        if m:
+            lab, rin, _k, _n, rate, lo, hi = m.groups()
+            out[lab.strip()] = (float(rin) if rin else None, float(rate), float(lo), float(hi))
+    return out
+
+
+def fig_attrib():
+    """Every intervention on the hand-built operator, against the arm it is trying to reproduce.
+
+    This is the seven-test attribution study as one picture. The point is not any single arm but the
+    shape of the whole column: nine interventions spanning the objective, the compute allowance in both
+    directions, and the two structural properties that survived a composition-controlled screen, and the
+    carry-over rate does not leave the baseline's interval in any of them, while the agent-written arm
+    sits outside all of them. The right panel carries the rule fixed before the runs -- carry-over must
+    rise AND r_in must hold -- because a conditional rate bought by collapsing its own denominator is the
+    artifact that rule exists to catch, and the 30-call arm is exactly that case.
+    """
+    a = _arms("attr_stats.txt"); t = _arms("tinyctl_stats.txt")
+    n = _arms("ndc_stats.txt"); d = _arms("dom_stats.txt")
+    if not (a and t and n and d):
+        print("  (skip fig_attrib: attribution stats outputs not found)"); return
+
+    # (display label, source dict, key in that file, group)
+    SPEC = [
+        ("hand-built operator (baseline)",        a, "baseline (hand-built)",                    "base"),
+        ("ungated ProbKnot",                      a, "+ ungated ProbKnot",                       "obj"),
+        ("scalar crossing cost",                  a, "+ scalar cost (sym)",                      "obj"),
+        ("scalar cost, FP penalty $\\times2$",    a, "+ scalar, FP x2",                          "obj"),
+        ("annealed acceptance",                   a, "+ annealing",                              "obj"),
+        ("$3\\times$ pKiss allowance",            a, "3x pKiss allowance [compute control]",     "cmp"),
+        ("$30$-call allowance (agents' own)",     t, "30-call allowance [inverse control]",      "cmp"),
+        ("decoy-minimizing stem choice",          n, "+ decoy tiebreak [stage-2 transplant]",    "d3"),
+        ("ensemble-gap minimization",             d, "+ ensemble-dominance bias [stage-2]",      "d3"),
+        ("agent-written operators",               a, "frozen agent operators (reference)",       "agent"),
+    ]
+    rows = [(lab, grp) + src[key] for lab, src, key, grp in SPEC if key in src]
+    if len(rows) != len(SPEC):
+        print("  (skip fig_attrib: an arm is missing from the stats outputs)"); return
+
+    COL = {"base": INK, "obj": MCF, "cmp": TAN_EDGE, "d3": NEG, "agent": CF}
+    base_rate, base_lo, base_hi = rows[0][3], rows[0][4], rows[0][5]
+    base_rin = rows[0][2]
+    ys = list(range(len(rows) - 1, -1, -1))          # first row at the top
+
+    fig, (axL, axR) = plt.subplots(
+        1, 2, figsize=(7.0, 3.15), gridspec_kw={"width_ratios": [2.35, 1.0], "wspace": 0.09})
+
+    # -- left: carry-over to the held-out predictor, with the baseline's interval as a band
+    axL.axvspan(base_lo, base_hi, color=FAINT, alpha=0.16, lw=0, zorder=0)
+    axL.axvline(base_rate, color=GREY, lw=0.8, ls=(0, (3, 2)), zorder=1)
+    for y, (lab, grp, _rin, rate, lo, hi) in zip(ys, rows):
+        c = COL[grp]
+        axL.plot([lo, hi], [y, y], color=c, lw=1.5, alpha=0.85, zorder=3,
+                 solid_capstyle="round")
+        axL.plot([rate], [y], "o", ms=6.0, mfc=tint(c, 0.30), mec=c, mew=1.2, zorder=4)
+    axL.set_yticks(ys)
+    axL.set_yticklabels([lab for lab, *_ in rows], fontsize=7.8)
+    for tick, (_lab, grp, *_r) in zip(axL.get_yticklabels(), rows):
+        tick.set_color(INK if grp in ("base", "agent") else "#3a3a3a")
+    axL.set_ylim(-0.8, len(rows) - 0.2)
+    axL.set_xlim(0.0, 0.40)
+    axL.set_xlabel("carry-over to the held-out predictor (95\\% CI)", fontsize=8)
+    axL.tick_params(axis="y", length=0)
+    axL.grid(axis="x", color=FAINT, lw=0.4, alpha=0.35, zorder=0)
+    for sp in ("top", "right", "left"):
+        axL.spines[sp].set_visible(False)
+    axL.text(base_rate + 0.006, len(rows) - 0.62, "baseline $0.108$ and its interval",
+             fontsize=6.8, color=GREY, va="center")
+
+    # group brackets, so the reader sees WHAT was varied without reading the labels one by one
+    # x in axes coords (left of the tick labels), y in data coords: get_yaxis_transform does exactly that
+    tr = axL.get_yaxis_transform()
+    for grp, name in (("obj", "objective"), ("cmp", "compute"), ("d3", "structure")):
+        gy = [y for y, r in zip(ys, rows) if r[1] == grp]
+        axL.plot([-0.475, -0.475], [min(gy) - 0.30, max(gy) + 0.30], color=COL[grp], lw=1.4,
+                 transform=tr, clip_on=False, zorder=5, solid_capstyle="round")
+        axL.text(-0.493, sum(gy) / len(gy), name, fontsize=6.9, color=COL[grp], rotation=90,
+                 ha="center", va="center", transform=tr, clip_on=False)
+
+    # -- right: the other half of the pre-fixed rule
+    axR.axvline(base_rin, color=GREY, lw=0.8, ls=(0, (3, 2)), zorder=1)
+    for y, (_lab, grp, rin, *_r) in zip(ys, rows):
+        if rin is None:
+            axR.text(2.0, y, "not applicable", fontsize=6.8, color=FAINT, va="center")
+            continue
+        c = COL[grp]
+        axR.plot([0, rin], [y, y], color=tint(c, 0.30), lw=3.4, solid_capstyle="butt", zorder=2)
+        axR.plot([rin], [y], "|", ms=8, color=c, mew=1.3, zorder=3)
+    axR.set_yticks(ys); axR.set_yticklabels([])
+    axR.set_ylim(-0.8, len(rows) - 0.2); axR.set_xlim(0, 61)
+    axR.set_xticks([15, 37])
+    axR.set_xticklabels(["$15$", "$37$"], fontsize=7.5)
+    axR.set_xlabel("$r_{\\mathrm{in}}$ per $60$ targets", fontsize=8)
+    axR.tick_params(axis="y", length=0)
+    for sp in ("top", "right", "left"):
+        axR.spines[sp].set_visible(False)
+    axR.annotate("\\shortstack[l]{denominator collapses;\\\\the rule rejects this arm}",
+                 xy=(15.6, ys[6]), xytext=(39.5, ys[6]), fontsize=6.6, color=NEG,
+                 ha="left", va="center",
+                 arrowprops=dict(arrowstyle="-", color=NEG, lw=0.7, shrinkA=2, shrinkB=3))
+
+    _save(fig, "fig_cc_attrib.pdf")
+    print("  wrote figs/fig_cc_attrib.pdf")
+
+
 def fig_family():
-    """Parameterized non-CF family L_H: capability vs crossing-stem size (n=m), by arm.
-    Reads runs/cc_ascent/family_ood/family_ood.json; classifies each cell as fail / pKiss-only / partial /
-    panel-unanimous. Honest binary-outcome matrix (a 'curve' would over-read binary data)."""
-    import json
-    jp = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..",
-         "rna_harness", "runs", "cc_ascent", "family_ood", "family_ood.json"))
-    if not os.path.exists(jp):
-        print("  (skip fig_family: %s not found)" % jp); return
-    d = json.load(open(jp))
-    diag = sorted([r for r in d["rows"] if r.get("regime") == "diag"], key=lambda r: r["n"])
-    if not diag:
-        print("  (skip fig_family: no diagonal rows yet)"); return
-    sizes = [r["n"] for r in diag]
-    _all = [("always_cheap", "CF floor (REMC, $\\Omega_{cf}$)"),
-            ("panel_auto", "invented operator (autonomous)"),
-            ("always_sota", "DesiRNA (SOTA, borrowed)")]
-    # only plot arms that were actually run (an arm absent from every row was not part of this sweep)
-    present = [(a, lbl) for (a, lbl) in _all if any(r["arms"].get(a) is not None for r in diag)]
-    arms = [(a, lbl, i) for i, (a, lbl) in enumerate(present)]
+    """The success-vs-size curve on the unbounded family, and the separation that stops us mis-reading it.
 
-    def level(cell):
-        if not cell or not cell.get("solved"):
-            return 0                                   # fail
-        p = cell.get("panel") or {}
-        if p.get("unanimous"):
-            return 3                                   # panel-unanimous
-        if p.get("pkiss") and p.get("probknot"):
-            return 2                                   # 2/3 (pKiss & ProbKnot)
-        return 1                                       # pKiss-only
+    The confirmed rate r_mix rises with the family parameter, which reads as a fixed-description operator
+    holding up as the family grows. It is a product: r_mix = r_in x carry-over, and only the second factor
+    is rising. Plotting the factors is the whole argument, and the gamer's pKiss->ProbKnot agreement is on
+    the same axes because it moves the OTHER way, which is what rules out "longer stems just make
+    predictors agree" as a blanket effect. Reads family_diag.txt (100 targets x 5 seeds, deterministic).
+    """
+    path = os.path.join(RUNS, "family_diag.txt")
+    if not os.path.exists(path):
+        print("  (skip fig_family: family_diag.txt not found)"); return
+    xs, rin, carry, gam = [], [], [], []
+    for line in open(path):
+        p = line.split()
+        if len(p) == 4 and p[0].isdigit():
+            xs.append(int(p[0])); rin.append(float(p[1]))
+            carry.append(float(p[2])); gam.append(float(p[3]))
+    if not xs:
+        print("  (skip fig_family: no diagonal rows parsed)"); return
+    mix = [r * c for r, c in zip(rin, carry)]
 
-    COLZ = {0: ("none", FAINT), 1: (MCF, "white"), 2: ("#c9b47e", "white"), 3: (CF, "white")}
-    MK = {0: "x", 1: "o", 2: "o", 3: "o"}
-    fig, ax = plt.subplots(figsize=(7.0, 2.9))
-    for aname, _, row in arms:
-        for r in diag:
-            lv = level(r["arms"].get(aname))
-            fc, ec = COLZ[lv]
-            if lv == 0:
-                ax.plot(r["n"], row, "x", ms=6, color=FAINT, mew=1.2, zorder=3)
-            else:
-                ax.plot(r["n"], row, MK[lv], ms=11, mfc=fc, mec=ec, mew=1.0, zorder=3)
-    ax.set_yticks([row for _, _, row in arms]); ax.set_yticklabels([lbl for _, lbl, _ in arms], fontsize=8)
-    ax.set_ylim(-0.6, len(arms) - 0.4); ax.set_xlim(min(sizes) - 0.6, max(sizes) + 0.6)
-    ax.set_xticks(sizes); ax.set_xlabel("crossing-stem size $n=m$ (bp) on the family $\\mathcal{L}_H$", fontsize=8.5)
-    ax.set_title("Capability vs.\\ stem size on the parameterized non-CF family",
-                 fontsize=10, weight="bold", pad=8)
-    ax.text(sizes[0], -0.42, "CF floor is $0$ for all $n,m$ (Prop.\\,1)", fontsize=6.6, color=FAINT)
-    # legend
-    from matplotlib.lines import Line2D
-    leg = [Line2D([0], [0], marker="x", color="w", mec=FAINT, mew=1.2, ms=7, label="not realized"),
-           Line2D([0], [0], marker="o", color="w", mfc=MCF, mec="white", ms=9, label="pKiss only"),
-           Line2D([0], [0], marker="o", color="w", mfc="#c9b47e", mec="white", ms=9, label="pKiss $\\cap$ ProbKnot"),
-           Line2D([0], [0], marker="o", color="w", mfc=CF, mec="white", ms=9, label="panel-unanimous")]
-    ax.legend(handles=leg, loc="upper center", bbox_to_anchor=(0.5, -0.28), ncol=4,
-              frameon=False, fontsize=7, handletextpad=0.2, columnspacing=1.1)
-    ax.spines["top"].set_visible(False); ax.spines["right"].set_visible(False)
+    fig, ax = plt.subplots(figsize=(7.0, 2.95))
+    ax.grid(axis="y", color=FAINT, lw=0.4, alpha=0.35, zorder=0)
+    ax.plot(xs, mix, color=FAINT, lw=1.2, ls=(0, (3, 2)), zorder=2,
+            label="$r_{\\mathrm{mix}}=r_{\\mathrm{in}}\\times$carry-over (what rises)")
+    ax.plot(xs, rin, color=MCF, lw=1.6, marker="o", ms=3.4, mfc="white", mew=1.1, zorder=4,
+            label="$r_{\\mathrm{in}}$: the operator's own rate")
+    ax.plot(xs, carry, color=CF, lw=1.6, marker="s", ms=3.2, mfc="white", mew=1.1, zorder=4,
+            label="carry-over to the held-out predictor")
+    ax.plot(xs, gam, color=NEG, lw=1.1, ls=(0, (1, 1.6)), marker="^", ms=3.0, zorder=3,
+            label="gamer's pKiss$\\to$ProbKnot agreement (control)")
+
+    ax.set_xlim(min(xs) - 0.4, max(xs) + 0.4); ax.set_ylim(-0.04, 1.17)
+    ax.set_xticks([x for x in xs if x % 2 == 0])
+    ax.set_yticks([0, 0.25, 0.5, 0.75, 1.0])
+    ax.set_xlabel("family parameter $n{+}m$ (crossing-stem size, target set $\\mathcal{L}_{\\mathrm H}$)",
+                  fontsize=8.5)
+    ax.set_ylabel("rate", fontsize=8.5)
+    for sp in ("top", "right"):
+        ax.spines[sp].set_visible(False)
     ax.tick_params(length=3)
+
+    # the two summary strata the text quotes, marked rather than restated
+    ax.axvspan(min(xs) - 0.4, 12.5, color=MCF, alpha=0.05, lw=0, zorder=0)
+    ax.axvspan(17.5, max(xs) + 0.4, color=CF, alpha=0.05, lw=0, zorder=0)
+    ax.text(9.0, 1.07, "$n{+}m\\le12$", fontsize=7, color=GREY, ha="center")
+    ax.text(21.0, 1.07, "$n{+}m\\ge18$", fontsize=7, color=GREY, ha="center")
+    ax.annotate("\\shortstack{the operator's reach falls\\\\while the panel's willingness rises}",
+                xy=(15.0, 0.585), xytext=(14.2, 0.97), fontsize=6.9, color=INK, ha="center",
+                va="center", arrowprops=dict(arrowstyle="-", color=GREY, lw=0.7, shrinkA=2, shrinkB=2))
+    ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.245), ncol=2, frameon=False,
+              fontsize=7, handletextpad=0.5, columnspacing=1.4, handlelength=2.4)
     _save(fig, "fig_cc_family.pdf")
     print("  wrote figs/fig_cc_family.pdf")
 
@@ -277,7 +398,7 @@ def fig_invent():
 
 
 def fig_stringency():
-    """Appendix F: thermodynamic-dominance (energy-gap) histogram of the certified positives."""
+    """Appendix F: thermodynamic-dominance (energy-gap) histogram of the panel-confirmed designs."""
     import json
     p = _cc("positive_stringency.json")
     if not os.path.exists(p):
@@ -293,8 +414,9 @@ def fig_stringency():
     ax.set_ylim(0, 8.6)
     ax.legend(frameon=False, fontsize=7.2, loc="upper right", handlelength=1.7, borderaxespad=0.4)
     ax.set_xlabel("free-energy gap to the best non-target fold (kcal/mol)", fontsize=8.5)
-    ax.set_ylabel("certified designs", fontsize=8.5)
-    ax.set_title("Positive-side stringency: the target is the dominant fold", fontsize=10, weight="bold", pad=8)
+    ax.set_ylabel("panel-confirmed designs", fontsize=8.5)
+    ax.set_title("Positive-side stringency: the target is the pKiss free-energy minimum",
+                 fontsize=10, weight="bold", pad=8)
     ax.spines["top"].set_visible(False); ax.spines["right"].set_visible(False)
     ax.tick_params(length=3); _save(fig, "fig_cc_stringency.pdf"); print("  wrote fig_cc_stringency.pdf")
 
@@ -330,53 +452,66 @@ def fig_sat():
 
 
 def fig_models():
-    """Cross-model (open vs closed) distribution of held-out panel-unanimous rate for the agent-invented operator."""
-    import json, glob
-    paths = [_cc("invent_operator/result.json")] + sorted(glob.glob(_cc("invent_operator/*/result.json")))
-    OPEN = {"z-ai/glm-5.2", "deepseek/deepseek-v4-pro", "moonshotai/kimi-k3"}
-    short = {"z-ai/glm-5.2": "GLM-5.2", "deepseek/deepseek-v4-pro": "DeepSeek-v4-pro", "moonshotai/kimi-k3": "Kimi-k3",
-             "anthropic/claude-opus-4.8": "Claude-Opus-4.8", "openai/gpt-5.6-sol": "GPT-5.6-sol",
-             "google/gemini-3.1-pro-preview": "Gemini-3.1-pro"}
-    seen, rows = set(), []
-    for p in paths:
-        if not os.path.exists(p):
-            continue
-        r = json.load(open(p)); m = r["model"]
-        if m in seen or r.get("heldout_panel_unanimous") is None:
-            continue
-        seen.add(m); rows.append((short.get(m, m), r["heldout_panel_unanimous"], m in OPEN))
-    if not rows:
-        print("  (skip fig_models)"); return
-    rows.sort(key=lambda x: -x[1])
-    labels = [r[0] for r in rows]; vals = [r[1] for r in rows]
-    face = [CF_F if r[2] else MCF_F for r in rows]  # open=green, closed=blue (light fill)
-    edge = [CF if r[2] else MCF for r in rows]       # saturated edge
-    import numpy as np
-    x = np.arange(len(rows))
-    fig, ax = plt.subplots(figsize=(7.0, 3.0))
-    ax.bar(x, vals, width=0.62, color=face, edgecolor=edge, lw=1.1, zorder=3)
-    for xi, v in zip(x, vals):
-        ax.text(xi, v + 0.3, f"{v}", ha="center", fontsize=8, color=INK)
-    # reference band + line drawn faintly; both explained in the legend (no floating in-plot labels)
-    ax.axhspan(3, 8, color=GREY, alpha=0.16, zorder=0)
-    ax.axhline(1, color=NEG, ls=(0, (4, 2)), lw=0.9, zorder=1)
-    ax.set_xticks(x); ax.set_xticklabels(labels, rotation=18, ha="right", fontsize=7.4)
-    ax.set_ylabel("held-out panel-unanimous ($/60$)", fontsize=8.5)
-    ax.set_xlim(-0.65, len(rows) - 0.35)
-    ax.set_ylim(0, 19)
-    ax.set_title("An agent invents a certificate-passing operator across the frontier",
-                 fontsize=10, weight="bold", pad=8)
-    from matplotlib.patches import Patch
-    from matplotlib.lines import Line2D
-    ax.legend(handles=[Patch(fc=MCF_F, ec=MCF, label="closed-weight model"),
-                       Patch(fc=CF_F, ec=CF, label="open-weight model"),
-                       Patch(fc=GREY, alpha=0.16, ec="none", label="hand-built panel_auto (3–8)"),
-                       Line2D([0], [0], color=NEG, ls=(0, (4, 2)), lw=0.9, label="single-oracle gamer (1)")],
-              frameon=False, fontsize=6.9, loc="upper right", handlelength=1.7, labelspacing=0.45,
-              borderaxespad=0.4)
-    ax.spines["top"].set_visible(False); ax.spines["right"].set_visible(False)
-    ax.tick_params(length=3); _save(fig, "fig_cc_models.pdf"); print("  wrote fig_cc_models.pdf")
+    """Six frontier models as agents, under the two accountings, because the order flips between them.
 
+    A bar chart of one accounting would rank the models, and the appendix says explicitly that we claim no
+    ranking: crediting each model only on the targets it finished puts Claude-Opus-4.8 first, charging its
+    timeouts as failures puts Gemini-3.1-pro first. A slope graph is the honest shape, because the crossing
+    lines ARE the finding. The two models that never time out are flat by construction, which is the other
+    half of it: their position is the only one that does not depend on the choice. Reads
+    model_sensitivity.txt.
+    """
+    path = os.path.join(RUNS, "model_sensitivity.txt")
+    if not os.path.exists(path):
+        print("  (skip fig_models: model_sensitivity.txt not found)"); return
+    rows = []
+    for line in open(path):
+        m = re.match(r"^\s{2}(\S+)\s+(\d+)\s+(\d+)\s+(\d+)\s+([\d.]+)\s+([\d.]+)\s*$", line)
+        if m:
+            name, comp, to, unan, per_c, per_60 = m.groups()
+            rows.append((name, int(comp), int(to), int(unan), float(per_c), float(per_60)))
+    if len(rows) != 6:
+        print("  (skip fig_models: parsed %d model rows, expected 6)" % len(rows)); return
+
+    fig, ax = plt.subplots(figsize=(7.0, 3.3))
+    xs = (0.0, 1.0)
+    for name, comp, to, unan, pc, p60 in rows:
+        flat = (to == 0)
+        col = CF if flat else MCF
+        ax.plot(xs, (pc, p60), color=col, lw=1.7 if flat else 1.3,
+                alpha=0.95 if flat else 0.7, zorder=3, solid_capstyle="round")
+        for x, v in zip(xs, (pc, p60)):
+            ax.plot([x], [v], "o", ms=5.4, mfc=tint(col, 0.30), mec=col, mew=1.2, zorder=4)
+        ax.text(-0.035, pc, "%s  $%d/%d$" % (name, unan, comp), fontsize=7.4, color=INK,
+                ha="right", va="center")
+        ax.text(1.035, p60, "$%d/60$  %s" % (unan, name), fontsize=7.4, color=INK,
+                ha="left", va="center")
+
+    gamer = 1.0 / 60.0
+    ax.axhline(gamer, color=NEG, lw=0.9, ls=(0, (3, 2)), zorder=1)
+    ax.text(0.5, gamer + 0.012, "single-oracle gamer, $1/60$", fontsize=7, color=NEG, ha="center",
+            bbox=dict(fc="white", ec="none", pad=1.4))
+    ax.axhspan(3 / 60, 8 / 60, color=FAINT, alpha=0.16, lw=0, zorder=0)
+    ax.text(0.5, 8 / 60 + 0.008, "hand-built \\texttt{panel\\_auto}, $3$--$8/60$",
+            fontsize=7, color=GREY, ha="center", bbox=dict(fc="white", ec="none", pad=1.4))
+
+    ax.set_xlim(-0.44, 1.44); ax.set_ylim(-0.02, 0.40)
+    ax.set_xticks(list(xs))
+    ax.set_xticklabels(["credited on what it finished\n(unanimous / completed)",
+                        "timeouts charged as failures\n(unanimous / $60$)"], fontsize=8)
+    ax.tick_params(axis="x", length=0, pad=6)
+    ax.set_yticks([0, 0.1, 0.2, 0.3])
+    ax.set_ylabel("panel-unanimous rate", fontsize=8.5)
+    ax.grid(axis="y", color=FAINT, lw=0.4, alpha=0.3, zorder=0)
+    for sp in ("top", "right", "bottom"):
+        ax.spines[sp].set_visible(False)
+    from matplotlib.lines import Line2D
+    ax.legend(handles=[Line2D([0], [0], color=CF, lw=1.7, label="no timeouts (position does not depend on the accounting)"),
+                       Line2D([0], [0], color=MCF, lw=1.3, alpha=0.7, label="times out on $19$--$32$ of $60$ targets")],
+              loc="upper center", bbox_to_anchor=(0.5, -0.20), ncol=2, frameon=False,
+              fontsize=7, handletextpad=0.6, columnspacing=1.6, handlelength=2.2)
+    _save(fig, "fig_cc_models.pdf")
+    print("  wrote figs/fig_cc_models.pdf")
 
 
 def fig_carry():
@@ -412,38 +547,82 @@ def fig_carry():
 
 
 def fig_margin():
-    """Where the headline effect sits once targets are split by whether random search reaches them."""
-    fig, ax = plt.subplots(figsize=(7.0, 2.6))
-    groups = [("$\\Delta_{bp}=0$: 30 targets a random\ncompatible sequence already solves",
-               41, 5, "paired $\\Delta=+0.080$"),
-              ("$\\Delta_{bp}>0$: 30 targets random\nsampling never lands on",
-               7, 0, "paired $\\Delta=+0.016$")]
+    """Where the headline effect sits once targets are stratified by how far random search already gets.
+
+    The paper's largest caveat about its own positive result, and it was prose only. Parsed from the Q3 block
+    of pk_margin.txt so the strata cannot drift from the committed run.
+    """
+    path = os.path.join(RUNS, "pk_margin.txt")
+    if not os.path.exists(path):
+        print("  (skip fig_margin: pk_margin.txt not found)"); return
+    rows = re.findall(
+        r"^\s{2}(low|mid|high)\s+Delta[^\n]*?n=(\d+)\s+panel wins\s+(\d+)\s+gamer wins\s+(\d+)"
+        r"\s+paired diff\s+([+-][\d.]+)", open(path).read(), re.M)
+    if len(rows) != 3:
+        print("  (skip fig_margin: parsed %d strata, expected 3)" % len(rows)); return
+    # collapse the middle and hardest thirds into the "Delta_bp > 0" group the text uses, so the figure and
+    # Sec. 5.4 partition the 60 targets the same way: 30 targets a random compatible sequence already hits,
+    # and the 30 it never does.
+    lo = rows[0]
+    hi_n = sum(int(r[1]) for r in rows[1:])
+    hi_p = sum(int(r[2]) for r in rows[1:])
+    hi_g = sum(int(r[3]) for r in rows[1:])
+    rows = [("$\\Delta_{bp}=0$: a random compatible\\\\sequence already solves these",
+             int(lo[1]), int(lo[2]), int(lo[3])),
+            ("$\\Delta_{bp}>0$: random sampling\\\\never lands on these", hi_n, hi_p, hi_g)]
+    tot = sum(r[2] for r in rows)
+
+    fig, ax = plt.subplots(figsize=(7.0, 2.75))
     w = 0.30
-    for i, (lab, panel, gamer, dlab) in enumerate(groups):
-        ax.bar(i - w / 2, panel, width=w, facecolor=MCF_F, edgecolor=MCF, lw=1.1, zorder=2)
-        ax.bar(i + w / 2, gamer, width=w, facecolor=NEG_F, edgecolor=NEG, lw=1.1, zorder=2)
-        ax.text(i - w / 2, panel + 1.0, str(panel), ha="center", fontsize=9, color=INK)
-        ax.text(i + w / 2, gamer + 1.0, str(gamer), ha="center", fontsize=9, color=INK)
-        ax.text(i, max(panel, gamer) + 5.4, dlab, ha="center", fontsize=7.8, color=GREY)
-    ax.text(-0.15, 36.5, "84\\% of the\nheadline effect", ha="center", va="top",
-            fontsize=7.8, color=NEG)
-    ax.set_xticks([0, 1]); ax.set_xticklabels([g[0] for g in groups], fontsize=7.8)
-    ax.tick_params(axis="x", length=0, pad=5)
-    ax.set_xlim(-0.55, 1.55); ax.set_ylim(0, 52)
-    ax.set_ylabel("discordant wins,\n15 executions", fontsize=8)
-    ax.grid(axis="y", color=FAINT, lw=0.4, alpha=0.45, zorder=0)
-    for sp in ("top", "right"):
+    sub = []
+    for i, (lab, n, pw, gw) in enumerate(rows):
+        ax.bar(i - w / 2, pw, w, color=MCF_F, edgecolor=MCF, lw=0.9, zorder=3)
+        ax.bar(i + w / 2, gw, w, color=NEG_F, edgecolor=NEG, lw=0.9, zorder=3)
+        ax.text(i - w / 2, pw + 0.9, "%d" % pw, ha="center", fontsize=7.6, color=INK)
+        if gw:
+            ax.text(i + w / 2, gw + 0.9, "%d" % gw, ha="center", fontsize=7.6, color=INK)
+        sub.append("$n{=}%d$" % n)
+    # Sat in the gap between the two groups on a near-horizontal leader, which reads as a floating label.
+    # Placed directly over the bar it describes instead: proximity does the work and the leader goes away.
+    ax.text(-w / 2, rows[0][2] + 3.2,
+            "\\shortstack{$%.0f\\%%$ of every win\\\\the operator records}" % (100.0 * rows[0][2] / tot),
+            fontsize=7.4, color=MCF, ha="center", va="bottom")
+    ax.set_xticks(range(len(rows)))
+    ax.set_xticklabels(["\\shortstack{%s\\\\[2pt]\\footnotesize %s}" % (r[0], sub[k])
+                        for k, r in enumerate(rows)], fontsize=7.6)
+    ax.tick_params(axis="x", length=0, pad=6)
+    ax.set_ylim(0, 53); ax.set_xlim(-0.62, 1.62)
+    ax.set_ylabel("targets won ($r_{\\mathrm{mix}}$, $15$ executions)", fontsize=8)
+    ax.grid(axis="y", color=FAINT, lw=0.4, alpha=0.35, zorder=0)
+    for sp in ("top", "right", "bottom"):
         ax.spines[sp].set_visible(False)
-    leg = [Rectangle((0, 0), 1, 1, facecolor=MCF_F, edgecolor=MCF, lw=1.0, label="panel operator"),
-           Rectangle((0, 0), 1, 1, facecolor=NEG_F, edgecolor=NEG, lw=1.0, label="gamer (pKiss only)")]
-    ax.legend(handles=leg, loc="upper right", frameon=False, fontsize=7.8, handlelength=1.3)
+    from matplotlib.patches import Patch
+    ax.legend(handles=[Patch(fc=MCF_F, ec=MCF, lw=0.9, label="panel operator"),
+                       Patch(fc=NEG_F, ec=NEG, lw=0.9, label="gamer (pKiss only)")],
+              loc="upper right", frameon=False, fontsize=7.4, handlelength=1.4)
     _save(fig, "fig_cc_margin.pdf")
+    print("  wrote figs/fig_cc_margin.pdf")
 
 
 def fig_paired():
     """The 15 within-cell paired differences. The sign test counts these signs; a row of 15 numbers
-    in a table does not show that 14 of them point one way."""
-    d = [1, 4, 6, 2, 5, 1, 9, 1, 1, 2, 5, 2, 4, -1, 1]
+    in a table does not show that 14 of them point one way.
+
+    Parsed from the per-cell McNemar block of gvp_stats.txt (b = targets only the panel operator gets,
+    c = targets only the gamer gets, so b-c is the cell's paired difference) rather than transcribed. An
+    earlier version of this figure hard-coded the fifteen values, which is the one thing the rest of this
+    project does not permit of a number.
+    """
+    path = os.path.join(RUNS, "gvp_stats.txt")
+    if not os.path.exists(path):
+        print("  (skip fig_paired: gvp_stats.txt not found)"); return
+    txt = open(path).read()
+    # the r_mix section's per-cell block, which precedes the r_in section of the same shape
+    body = txt.split("=== r_mix")[1].split("=== r_in")[0]
+    cells = re.findall(r"s(\d)/e(\d):\s*b=(\d+),\s*c=(\d+)", body)
+    if len(cells) != 15:
+        print("  (skip fig_paired: expected 15 cells, parsed %d)" % len(cells)); return
+    d = [int(b) - int(c) for _s, _e, b, c in sorted(cells)]
     fig, ax = plt.subplots(figsize=(7.0, 2.2))
     for i, v in enumerate(d):
         col = MCF if v > 0 else NEG
@@ -451,7 +630,8 @@ def fig_paired():
         ax.plot([i], [v], "o", ms=5.2, mfc=col, mec="white", mew=0.8, zorder=3)
     ax.axhline(0, color=INK, lw=0.8, zorder=1)
     ax.axhline(sum(d) / len(d), color=GREY, lw=0.8, ls=(0, (4, 2.5)), zorder=1)
-    ax.text(14.6, sum(d) / len(d) + 0.3, "mean $+2.87$", fontsize=7.2, color=GREY, ha="right")
+    ax.text(14.6, sum(d) / len(d) + 0.3, "mean $+%.2f$" % (sum(d) / len(d)),
+            fontsize=7.2, color=GREY, ha="right")
     for s in range(5):
         ax.text(3 * s + 1, 9.4, f"seed {s}", ha="center", fontsize=7.2, color=GREY)
         if s:
@@ -499,6 +679,7 @@ def fig_contrast():
 if __name__ == "__main__":
     fig_oracle()
     fig_collapse()
+    fig_attrib()
     fig_family()
     fig_grade()
     fig_grades()

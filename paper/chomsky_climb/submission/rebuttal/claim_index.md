@@ -34,16 +34,18 @@ number is wrong; regenerate before submitting.
 | Held-out judge's own ceiling | `11.3` | `heldout_ceiling.py` | `heldout_ceiling.txt` | ok | ok |
 | Design resolution at 80% power | `77` | `resolution.py` | `resolution.txt` | ok | ok |
 | Six-model timeout accounting | `19$--$32` | `model_sensitivity.py` | `model_sensitivity.txt` | ok | ok |
-| Search-free probe, share of effect | `84` | `pk_margin.py / pool_margin.py` | `(in-paper; pk_margin.py)` | ok | n/a |
+| Search-free probe, share of effect | `84` | `pk_margin.py` | `pk_margin.txt` | ok | ok |
+| Search-free probe, per-pool margin | `0.176` | `pool_margin.py` | `pool_margin.txt` | ok | ok |
 | Structurally disjoint pool | `b{=}28` | `build_struct_split.py / sdis_stats.py` | `sdis_stats.txt` | ok | ok |
 | Deterministic ablation, headline | `0.067` | `panel_deterministic.sh / det_stats.py` | `det_stats.txt` | ok | ok |
 | Deterministic ablation, undirected | `0.0000` | `panel_deterministic.sh / det_stats.py` | `det_stats.txt` | ok | ok |
 
-29 claims indexed, 0 check failures.
+30 claims indexed, 0 check failures.
 
 ## What is deliberately not in this table
 
 Numbers that exist only as intermediate diagnostics (per-seed counts, per-bin strata) are in the
 output files but not indexed here; the index covers what a reviewer would quote back at us. The
-two numbers marked `n/a` under `output` are produced by scripts whose result is reported inline in
-the manuscript rather than written to a `.txt`, which is a gap we would close before camera-ready.
+rows marked `n/a` under `output` read a glob of per-seed sweep directories rather than one file;
+the directories ship in the supplement. The search-free probe used to be the one claim reported
+inline with no committed output, and it now writes `pk_margin.txt` and `pool_margin.txt`.

@@ -19,10 +19,10 @@ the venue size limit. Both have bitten this project before.
 | `chomsky_climb.tex` | the manuscript |
 | `references.bib` | for completeness; arXiv does not use it |
 | `chomsky_climb.bbl` | **required.** arXiv does not run bibtex, so the bibliography must be pre-built |
-| `figs/*.pdf` | only the four figures the manuscript includes. The repo holds sixteen more from earlier revisions; shipping them would be dead weight |
+| `figs/*.pdf` | only the figures the manuscript includes, resolved from `\includegraphics` at build time. The repo holds others from earlier revisions; shipping them would be dead weight |
 | `00README.XXX` | engine directive (pdflatex) |
 
-Verified by compiling the package in a clean directory with no access to the repo: 48 pages, zero errors,
+Verified by compiling the package in a clean directory with no access to the repo: zero errors,
 zero missing-file warnings. Do that again after any change, because a package that builds *here* and not
 *there* is the classic arXiv failure and it is invisible until upload.
 
@@ -38,22 +38,31 @@ high buries the `.tex` inside a folder, which arXiv rejects after upload rather 
 
 | field | file | status |
 |---|---|---|
-| PDF | `main.pdf` | 48 pp |
-| Code and Data Supplement | `code_and_data.zip` | **1 MB** against a 50 MB limit |
+| PDF | `main.pdf` | 51 pp |
+| Code and Data Supplement | `code_and_data.zip` | **~2 MB** against a 50 MB limit |
 | Reproducibility Checklist | `reproducibility_checklist.md` | answers below; convert to PDF at submission time |
 | Technical Supplement | — | **not built, deliberately: see below** |
 
-### The supplement is 1 MB, and that is the interesting number
+### The supplement is ~2 MB, and that is the interesting number
 
 It holds every logged run behind every number in the paper: `runs/cc_ascent/` in full (per-target JSON for
-all sweeps, the 26 analysis outputs, the frozen agent-written operator sources) plus the five source files a
-reader needs to re-execute them. JSON compresses ~10:1, so 9.4 MB of run data ships as under 1 MB. There was
-never a reason to subset it, and we did not.
+all sweeps, the analysis outputs, the frozen agent-written operator sources) plus the harness source needed
+to re-execute them. JSON compresses ~10:1, so the run data ships small. There was never a reason to subset
+it, and we did not.
+
+**The source list is computed, not curated.** An earlier revision named five files chosen by reading the
+manuscript, and the supplement did not run: the analysis scripts import `benchmarks.rnainvbench`, which
+imports `..constraints`, which nobody had listed, and no `__init__.py` shipped at all, so the package was not
+importable in the first place. `collect_code.py` now walks the import graph from every entry point, so a new
+import ships its target automatically. `build.sh` then extracts the zip into a scratch directory with no
+access to this repo, imports every analysis script there, and re-derives the positive control's `0.293`; it
+aborts if any of that fails. This is the same discipline as the arXiv clean-room compile, and for the same
+reason: a supplement that works here and not there is invisible until a reviewer tries it.
 
 ### Why there is no Technical Supplement
 
 AAAI's technical supplement exists because a 7–9 page main paper cannot carry proofs, full tables and
-ablations. **This manuscript has a 30-page body**, so the split that field expects would require cutting the
+ablations. **This manuscript has a 32-page body**, so the split that field expects would require cutting the
 body by roughly two thirds — which means dropping either the formalisation (§4, the whole negative side) or
 the seven interventional attribution tests (§5.3, the most portable result). Neither is a formatting decision.
 

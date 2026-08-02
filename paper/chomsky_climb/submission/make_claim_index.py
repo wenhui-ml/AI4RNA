@@ -45,7 +45,8 @@ CLAIMS = [
     ("Held-out judge's own ceiling", "11.3", "heldout_ceiling.py", "heldout_ceiling.txt"),
     ("Design resolution at 80% power", "77", "resolution.py", "resolution.txt"),
     ("Six-model timeout accounting", "19$--$32", "model_sensitivity.py", "model_sensitivity.txt"),
-    ("Search-free probe, share of effect", "84", "pk_margin.py / pool_margin.py", "(in-paper; pk_margin.py)"),
+    ("Search-free probe, share of effect", "84", "pk_margin.py", "pk_margin.txt"),
+    ("Search-free probe, per-pool margin", "0.176", "pool_margin.py", "pool_margin.txt"),
     ("Structurally disjoint pool", "b{=}28", "build_struct_split.py / sdis_stats.py", "sdis_stats.txt"),
     ("Deterministic ablation, headline", "0.067", "panel_deterministic.sh / det_stats.py", "det_stats.txt"),
     ("Deterministic ablation, undirected", "0.0000", "panel_deterministic.sh / det_stats.py", "det_stats.txt"),
@@ -75,8 +76,9 @@ def main():
     print("## What is deliberately not in this table\n")
     print("Numbers that exist only as intermediate diagnostics (per-seed counts, per-bin strata) are in the")
     print("output files but not indexed here; the index covers what a reviewer would quote back at us. The")
-    print("two numbers marked `n/a` under `output` are produced by scripts whose result is reported inline in")
-    print("the manuscript rather than written to a `.txt`, which is a gap we would close before camera-ready.")
+    print("rows marked `n/a` under `output` read a glob of per-seed sweep directories rather than one file;")
+    print("the directories ship in the supplement. The search-free probe used to be the one claim reported")
+    print("inline with no committed output, and it now writes `pk_margin.txt` and `pool_margin.txt`.")
     return 1 if bad else 0
 
 

@@ -1,0 +1,11 @@
+=== (1) are the pools difficulty-matched on the search-free coordinate? ===
+pool                                  n  median Delta_norm  frac Delta=0
+development/evaluation (0-59)        60              0.059          0.50
+ID-disjoint (126-250)               125              0.000          0.50
+structurally disjoint (24 clusters)   27              0.176          0.15
+cross-source bpRNA                   60              0.581          0.05
+
+=== (2) do the agent-written operators also win mostly on zero-margin targets? ===
+  gemini31pro  15 cells | r_mix wins on Delta=0 targets  141, on Delta>0 targets   45  ->  76% on zero-margin
+  kimik3       15 cells | r_mix wins on Delta=0 targets   93, on Delta>0 targets   54  ->  63% on zero-margin
+  panel operator 15 cells | r_mix wins on Delta=0   41, on Delta>0    7  ->  85% on zero-margin
