@@ -80,36 +80,38 @@ where one fallible oracle credits $43$ designs and three predictors credit $1$}
 \begin{abstract}
 \noindent When a self-improving AI-for-science system claims a new capability, the evidence is usually a
 benchmark delta, a description-length gate, or a $p$-value. None separates a real gain from extra search, from
-a changed verifier, or from adaptation to a fallible oracle. We build a two-sided audit in a domain where one
-side is a formal fact: a pseudoknot-free oracle provably cannot represent a crossing base pair, so the prior
-\emph{verifier's} range is bounded exactly, offline, before any run, and use it to measure two things. ``New''
-here means new relative to the agent's prior self, never relative to its base model, whose latent competence
-is unauditable and beside the point.
+a changed verifier, or from adaptation to a fallible oracle. We build a two-sided audit where one side is a
+formal fact---a pseudoknot-free oracle provably cannot represent a crossing base pair, so the prior
+\emph{verifier's} range is bounded exactly, offline, before any run. Two conventions, since both are weaker
+than the words suggest: ``new'' is relative to the agent's \emph{prior self}, never to the base model, and
+``solver-free'' means only that no packaged solver is on the method path---external folding oracles are
+queried throughout.
 
-\textbf{First, how far one fallible oracle can inflate a capability claim.} An invented, solver-free operator
-solves $43/60$ crossing RNA targets under the predictor it optimizes, above a context-free floor of $0/60$;
-under three predictors, $1/60$ survives. The discriminating evidence is paired on the \emph{same} $43$
+\textbf{First, how far a single fallible oracle can inflate a capability claim.} An invented, solver-free
+operator solves $43/60$ crossing RNA targets under the predictor it optimizes, above a context-free floor of
+$0/60$; under three predictors, $1/60$ survives. The discriminating evidence is paired on the \emph{same} $43$
 targets: a predictor the operator never saw confirms $2$ of its designs against $26$ for a
 minimum-free-energy solver ($p{=}8\!\times\!10^{-7}$). The gap is invisible to any statistic computed from the
 system and its own oracle, which is what a compression gate or a benchmark delta is.
 
-\textbf{Second, that \emph{two of six} agent-written procedures beat a human-written one under a judge no
-objective can flatter, at a fraction of the compute.} That quantifier is the result's main limit: the other
-four time out on $19$--$32$ of $60$ targets and are excluded, a model-level selection we cannot fully audit.
-On targets both arms solved under the same in-loop predicate the two that ran carry over at $0.293$ against
-our $0.095$ ($n{=}951$ paired units, target-clustered $[{+}0.108,{+}0.297]$, $p{=}5\!\times\!10^{-5}$), while
-spending $4.6$--$10\times$ \emph{fewer} oracle calls. We grade this on three rungs: difference under an
-outside adjudicator (reached), not bought with compute (reached, both directions), mechanism identified and
-transferable (\emph{not} reached: seven candidates tested, and the two that differ at matched composition both fail to reproduce the gain when intervened on).
+\textbf{Second, that agent-written procedures can beat a human-written one under a judge no objective can
+flatter---at a fraction of the compute.} Of six frontier models given only primitives, \emph{the two whose
+operators ran without timeouts} were replicated at depth; on targets they and our operator both solved under
+the same in-loop predicate they carry over at $0.293$ against our $0.095$ ($n{=}951$ paired units,
+target-clustered $[{+}0.108,{+}0.297]$, $p{=}5\!\times\!10^{-5}$), while spending $4.6$--$10\times$
+\emph{fewer} oracle calls. This is a claim about \emph{those two operators}, not about agent-written code as a
+class---the other four were excluded by a selection we cannot fully audit. Three rungs: difference under an
+outside adjudicator (reached), not bought with compute (reached, in both directions), mechanism identified
+and transferable (not reached; seven candidates tested, none moves the statistic).
 
-\textbf{Two limits bound everything above.} The three panel predictors share thermodynamic parameters, and we
-measure the cost rather than assuming it away: the held-out predictor and an in-loop one agree at
-$\kappa{=}0.673$, so no number here is about correct folding rather than about agreement with one model
-family. And the audit is severe on our own operator. Matched undirected search is an exact zero, a search-free probe puts
-$84\%$ of our headline effect where a random sequence already succeeds, and the description the data supports
-is a stochastic search with a better success predicate and no better guidance.
-That is the instrument working on its author. The difference it finds between an agent-written procedure and
-ours is real, is not compute, and is unexplained; we withhold the word discovery until it is not.
+\textbf{The ceiling on all of it is the panel itself.} Its three predictors share nearest-neighbour
+thermodynamic parameters, and two agree at $\kappa{=}0.673$ on our own calibration set, so ``held out'' means
+held out of the optimization loop and \emph{not} mechanistically independent. Every positive number here is
+bounded by that, and a predictor from a different model class is the experiment this study most owes. The audit is
+equally unsparing about our own system: matched undirected search is an exact zero, a search-free probe puts
+$84\%$ of our headline effect on targets a random sequence already solves, and the honest description of our
+operator is a stochastic search with a better success predicate and no better guidance---the instrument
+working on its author.
 \end{abstract}
 
 
@@ -424,32 +426,31 @@ instrument until some arm succeeds: the discriminating power is established by t
 \S\ref{sec:exp}, not by our low score.
 
 
-\paragraph{What each side controls for, and what none of them does.} The limit first, because it is the one
-most easily overclaimed: \emph{this audit does not separate capability from search}. The operator we audit
-\emph{is} a stochastic search against folding oracles, and our own ablation attributes its gain to
-oracle-guided repair (Table~\ref{tab:det}). Nor should the two be opposed: a finite-description search
-procedure that reliably realizes held-out family members is a perfectly good candidate capability. What the
-audit does control for is narrower, and each component excludes a named alternative: target memorization and one-off luck (only partly, since our split is disjoint by
-target identity and not by structure), matched-nominal-cap undirected search, single-oracle gaming, and delegation to a
-packaged solver. No single component supports the word \emph{acquisition}, and neither does their conjunction
-when some are unestablished, which is why the output is the vector of Eq.~\eqref{eq:vector} read
-component-wise. The structure parallels the retrieval/search/discovery distinction of \citet{selfrevising},
-with one amendment: we place our result at \emph{search}, and the audit's job is to \emph{ask} whether that
-search is transferable, separated from undirected search and undelegated, not to certify that it is. On this
-study only the last comes back positive, and only as verified non-use.
+\paragraph{What each side controls for, and what none of them does.} The limit first, because it is the one most
+easily overclaimed: \emph{this audit does not separate capability from search}. The operator we audit \emph{is} a
+stochastic search against folding oracles, and our own ablation attributes its gain to oracle-guided repair
+(Table~\ref{tab:det}). Nor should the two be opposed: a finite-description search procedure that reliably
+realizes held-out family members is a perfectly good candidate capability. What the audit controls for is
+narrower, and each component excludes a named alternative: target memorization and one-off luck (only partly,
+since our split is disjoint by target identity and not by structure), matched-cap undirected search,
+single-oracle gaming, and delegation to a packaged solver. No single component supports the word
+\emph{acquisition}, and neither does their conjunction when some are unestablished, which is why the output is
+the vector of Eq.~\eqref{eq:vector} read component-wise. The structure parallels the
+retrieval/search/discovery distinction of \citet{selfrevising}, with one amendment: we place our result at
+\emph{search}, and the audit's job is to \emph{ask} whether that search is transferable, separated from
+undirected search and undelegated, not to certify that it is. On this study only the last comes back positive,
+and only as verified non-use.
 
-\paragraph{Terminology: six layers, six different verdicts.} The word ``certificate'' has been doing too much
-work, so we fix a vocabulary and keep to it. \textbf{Audit} names the whole protocol of
-Def.~\ref{def:cert}, never a single result. Within it: \textbf{exact exclusion} is the verifier-range theorem
-(Prop.~\ref{prop:confine}), the only exact component; \textbf{empirical gain} is the before/after difference
-under a shared adjudicator; \textbf{verified non-use} is the solver-removal result, always relative to a
-declared tool class, and is an audit of the call graph rather than a counterfactual (Rem.~\ref{rem:autonomy}); \textbf{cross-predictor consistency} is what the panel measures,
-never physical truth; and \textbf{scientific confirmation} (the wet-lab rung) is \emph{not attempted here}. \textbf{We reserve ``certified'' for the exact exclusion
-alone}: a panel verdict is \emph{adjudicated} or \emph{mixed-panel-consistent}, never certified, and no design
-in this paper is described as a certified design. For the same reason we write \emph{mixed-panel-consistent
-crossing} and not ``panel-robust ascent'': two of the three predictors are inside the operator's objective and
-the third has $\sim\!1\%$ native recall, so the conjunction measures agreement with a stringent computational
-panel, not robustness across independent models.
+\paragraph{Terminology.} \textbf{Audit} names the whole protocol of Def.~\ref{def:cert}, never a single result.
+Within it, \textbf{exact exclusion} is the verifier-range theorem (Prop.~\ref{prop:confine}), the only exact
+component; \textbf{empirical gain} is the before/after difference under a shared adjudicator; \textbf{verified
+non-use} is the solver-removal result, relative to a declared tool class and an audit of the call graph rather
+than a counterfactual (Rem.~\ref{rem:autonomy}); \textbf{cross-predictor consistency} is what the panel
+measures, never physical truth; and \textbf{scientific confirmation}, the wet-lab rung, is not attempted.
+\textbf{We reserve ``certified'' for the exact exclusion alone}: a panel verdict is \emph{adjudicated} or
+\emph{mixed-panel-consistent}, and no design here is called certified. For the same reason we write
+\emph{mixed-panel-consistent crossing} and not ``panel-robust ascent'', since two of three predictors are inside
+the operator's objective and the third has $\sim\!1\%$ native recall.
 
 \paragraph{Three metrics, named and kept apart.} A single ``panel'' number conflates quantities of different
 evidential value, so we name all three and report them separately throughout:
@@ -592,22 +593,18 @@ uniformly ``exact'' audit, and report the positive rate with its cross-oracle en
 (\S\ref{sec:oracle}).
 
 \paragraph{Sealed-commitment protocol.} We distinguish three oracle roles: the \emph{optimization} oracles the
-operator queries inside its repair loop (pKiss, and for the panel operator ProbKnot), the \emph{selection} of
-a final candidate, and the \emph{held-out adjudicator} (chiefly ShapeKnots), held out of every loop. For each
-target the agent commits a hash-frozen prediction, either a candidate sequence or an
-explicit abstention claim (\S\ref{sec:impossible}), before the held-out adjudicator is run, so the
-prediction is risky against an oracle it never optimized and post-hoc selection there is foreclosed. Sealing
-does \emph{not} prevent overfitting to the in-loop optimization oracles; on the contrary, our
-$43/60\!\to\!1/60$ collapse (\S\ref{sec:exp}) is exactly such overfitting, which the held-out adjudicator
-exposes. \emph{So what does sealing buy, if the dominant failure is one it does not prevent?} Precisely the
-ability to see that failure. Without a seal, an arm may select among candidates using the held-out predictor,
-and any collapse it would have shown is selected away before adjudication; $43\!\to\!1$ would then be
-unobservable in principle, not merely unobserved. Sealing does not stop in-loop overfitting; it is what makes
-in-loop overfitting \emph{measurable}. We claim no more for it than that. This operationalizes a Lakatosian \emph{risky prediction} \citep{popper1959,lakatos1978}:
-committing before the verdict, including an undesignability claim (\S\ref{sec:impossible}) the oracle may
-refute, makes each target an opportunity to be wrong. It is the design-time analogue of pre-registration and
-of agentic falsification loops \citep{huang2025popper,liu2024aigs}, but with an exact refuter rather than a
-statistical one.
+operator queries inside its repair loop (pKiss, and ProbKnot for the panel operator), the \emph{selection} of a
+final candidate, and the \emph{held-out adjudicator} (chiefly ShapeKnots), held out of every loop. For each
+target the agent commits a hash-frozen prediction, either a candidate sequence or an explicit abstention claim
+(\S\ref{sec:impossible}), before the held-out adjudicator is run, so the prediction is risky against an oracle
+it never optimized and post-hoc selection there is foreclosed. Sealing does \emph{not} prevent overfitting to
+the in-loop oracles; our $43/60\!\to\!1/60$ collapse is exactly such overfitting. \emph{So what does sealing buy
+if the dominant failure is one it does not prevent?} The ability to see that failure. Without a seal an arm may
+select among candidates using the held-out predictor, and any collapse it would have shown is selected away
+before adjudication, making $43\!\to\!1$ unobservable in principle rather than merely unobserved. Sealing does
+not stop in-loop overfitting; it makes in-loop overfitting \emph{measurable}. This operationalizes a Lakatosian
+risky prediction \citep{popper1959,lakatos1978}, the design-time analogue of pre-registration and of agentic
+falsification loops \citep{huang2025popper,liu2024aigs}, but with an exact refuter rather than a statistical one.
 
 \paragraph{The certification procedure and its soundness.} Auditing an ascent requires each component to be
 computed by a stated procedure rather than judged. $E_{\mathrm{range}}$ is discharged offline by
@@ -2241,41 +2238,28 @@ result should therefore be read as a distribution-shift observation with the shi
 
 
 
-\section{The Autonomous Operator-Invention Protocol}\label{app:invent}
-An LLM agent (GLM-5.2, temperature $0.4$, no output cap) is given a documented \emph{primitive API}
-and asked to write one function \texttt{design(target,seed)}; it may not import anything or call an external
-pseudoknot solver. The primitives are: \texttt{fold\_cf} (ViennaRNA MFE, nested), \texttt{inverse\_fold\_cf}
-(nested inverse fold), \texttt{fold\_pkiss\_pairs} and \texttt{fold\_probknot\_pairs} (the two crossing-aware
-oracles, as pair sets), \texttt{target\_pairs} (parse a crossing dot-bracket), \texttt{rand\_seq}, and the
-complement map; plus \texttt{random}/\texttt{math}/\texttt{itertools}. Each candidate is (i) scanned for
-forbidden tokens (\texttt{import}, \texttt{os.}, \texttt{eval}, file/network, dunder access) and rejected if
-present, (ii) \texttt{exec}'d with a restricted \texttt{\_\_builtins\_\_} whitelist, and (iii) run per target
-under a \texttt{SIGALRM} wall-clock cap. It is scored on the disjoint training pool (solved $=$
-pKiss\,$\wedge$\,ProbKnot exact), and the score plus failing examples are fed back for revision over six
-rounds, carrying the full conversation. The best round is frozen and adjudicated on the development/evaluation
-$60$ under the full panel; no solver is exposed, so non-use of the solver class is structural. The agent independently converged on: split the
-target into nested and crossing pairs; enforce Watson--Crick complementarity at paired positions; then greedily
-mutate error positions to minimize a $\lvert T\!\setminus\!P_{\mathrm{pKiss}}\rvert + \lvert T\!\setminus\!P_{\mathrm{ProbKnot}}\rvert
-+ 2(\lvert P_{\mathrm{pKiss}}\!\setminus\!T\rvert + \lvert P_{\mathrm{ProbKnot}}\!\setminus\!T\rvert)$ panel-agreement cost.
-The invented source is archived at \texttt{runs/cc\_ascent/invent\_operator/invented\_design.py}.
+\section{The Operator-Invention Protocol}\label{app:invent}
+An LLM agent (GLM-5.2, temperature $0.4$, no output cap) is given a documented \emph{primitive API} and asked to
+write one function \texttt{design(target,seed)}; it may not import anything or call an external pseudoknot
+solver. The primitives are \texttt{fold\_cf} (ViennaRNA MFE, nested), \texttt{inverse\_fold\_cf},
+\texttt{fold\_pkiss\_pairs} and \texttt{fold\_probknot\_pairs} (crossing-aware pair sets),
+\texttt{target\_pairs}, \texttt{rand\_seq} and \texttt{enforce\_pairs}. Each round the agent's code is executed
+on a $16$-target training pool disjoint from every evaluation pool, the per-target outcomes are returned as
+feedback, and the agent rewrites. The best round by training score is frozen and adjudicated once on the
+development/evaluation $60$; the frozen source is archived at
+\texttt{runs/cc\_ascent/invent\_operator/invented\_design.py}.
 
-\paragraph{Single-run agent-written operators under a common two-oracle development protocol.}
-Rem.~\ref{rem:scope} left the invention algorithm unspecified; the contribution was the audit that
-evaluates it. We gave six frontier LLM agents, three open-weight (GLM-5.2, DeepSeek-v4-pro, Kimi-k3) and three
-closed (Claude-Opus-4.8, GPT-5.6-sol, Gemini-3.1-pro), only low-level primitives (ViennaRNA
-fold/inverse-fold, the pKiss and ProbKnot oracles, sequence utilities) and the task: write, sandbox-execute,
-and revise a reusable \texttt{design(target)} operator (up to $12$ rounds, patience-3 early stop) against a
-training pool disjoint from the held-out, with no recipe and no external solver (App.~\ref{app:invent}). All
-six invent an operator with a nonzero panel-unanimous rate on the held-out $60$: $2$--$17/60$
-(Table~\ref{tab:models}), each above the single observed gamer count ($1/60$) and the
-$0/60$ floor, and four (Gemini $17$, Opus $14$, Kimi $10$, GLM $9$) exceed the hand-built
-\texttt{panel\_auto}'s $3$--$8/60$. These are single temperature-$0.4$ draws per model, so the comparison is
-descriptive (against the observed gamer), not a per-model significance test, and does not support a strict
-model ranking.
-Without the recipe the agents converge on the structure we hand-built: split the target into nested and
-crossing pairs, enforce complementarity, greedily repair against a pKiss\,$\wedge$\,ProbKnot cost. Gains
-saturate early (training rate peaks by round $\le5$; early stop at $5$--$9$), so invention budget is not the
-bottleneck. App.~\ref{app:invent} states which readings of this experiment the design supports; the design's limits and the stronger design that would fix them are in App.~\ref{app:invent}.
+Provenance and its limit. Runs call frontier models through a single provider (OpenRouter) at
+temperature~$0.4$. Each \texttt{invent\_log.json} records the provider-qualified model identifier, per-round
+prompt and completion tokens, per-round training score, and every compile or runtime error verbatim; each frozen
+\texttt{design} program is stored in full in \texttt{result.json}. What the logs cannot contain is a
+provider-side version hash, because the endpoint exposes none: a frontier model behind a routed alias is not a
+fixed artifact. That is a reproducibility limit of the invention step and of nothing measured in this paper,
+since every number here re-executes frozen source rather than re-querying a model.
+
+The agent's training solve rate rises as it folds oracle feedback into successive rewrites, and the frozen best
+round measures $9/60$ under all three predictors. The analogous frozen results for all six frontier models are
+in Table~\ref{tab:models}, and every one peaks by round $\le5$.
 
 \begin{table}[t]\centering\small
 \setlength{\tabcolsep}{6pt}\renewcommand{\arraystretch}{1.12}
@@ -2301,24 +2285,42 @@ Kimi-k3 & open & $12$ & $42/60$ & $10$\\
 \end{tabularx}
 \end{table}
 
-\smallskip\noindent\textbf{Design limits of the six-model comparison, and the stronger design.} Here we record why the six-model comparison is descriptive.
-Each model contributes one temperature-$0.4$ draw with no within-model seed replication, so per-model rates
-carry unquantified sampling variance and the apparent ranking may be noise; the six share one prompt, one
-primitive set, one training pool, and one oracle objective, so they are not six independent experiments and
-strategy convergence may be induced by the shared setup rather than discovered; selecting the best revision
-round is a form of training selection; and the baseline they are compared against is a single observed gamer
-count ($1/60$). We also do not report per-model generation failures, compilation failures, or total token
-cost, and we have not clustered the invented sources, so ``the agents found different strategies'' is untested
-either way. DeepSeek is the weak outlier ($5/16$ train, $2/60$) and the loop is noisy throughout. Every
-invented operator additionally inherits the Pseudobase-topology narrowness of \S\ref{sec:exp}. A design that
-would license the stronger readings: $\ge5$ invention seeds per model, several prompts, a ``no revision
-feedback'' lower control and a ``hand-written recipe'' upper control, per-model failure and cost accounting,
-and a clustering of operator sources. Until then the experiment supports only the narrow statement that six
-single-run agents produced nonzero cross-predictor consistency under a common invention protocol.
-The agent's training solve rate rises as it folds oracle feedback into successive rewrites, and the frozen best
-round measures $9/60$ under all three predictors on the development/evaluation pool. This is the worked example for one model; the analogous frozen results for all six frontier
-models (three open, three closed) are summarized in Table~\ref{tab:models}, and every one peaks by round
-$\le5$.
+\smallskip\noindent\textbf{Design limits of the six-model comparison.} One temperature-$0.4$ draw per model,
+no seed replication, and the two models later replicated span $10$--$18$ on this metric across seeds, a range
+wider than most gaps in Table~\ref{tab:models}. Four of the six also time out on $19$--$32$ of $60$ targets;
+that table charges the timeouts as failures and shows the ordering flipping when they are not
+(\texttt{model\_sensitivity.py}). The experiment therefore supports one statement only, that six single-run
+agents produced nonzero cross-predictor consistency under a common invention protocol, and supports no ordering
+among them. A model comparison would need several draws per model at several temperatures, a shared compute
+budget, and a clustering of operator sources.
+
+\paragraph{The positive verdict is dominant under the pKiss energy model (completed cases).} Panel-unanimity
+already requires the target to be each engine's predicted structure; we add one further rung
+(App.~\ref{app:config}). For the mixed-panel-consistent designs we enumerate pKiss suboptimals and take the
+free-energy gap $\Delta$ from the target (the MFE) to the best alternative fold. The target is the pKiss MFE
+for all $17$ designs whose enumeration completed within budget, dominant by median $\Delta{=}1.2$\,kcal/mol
+(mean $1.44$), with $14/17$ clearing a $\ge1$\,kcal margin. Eight longer designs
+timed out; since timeout correlates with length, this rung covers the shorter adjudicated designs only, and the
+gap is a property of the pKiss energy model, not a model-independent thermodynamic fact. Within that scope the
+positive verdict is not a marginal coincidence of pair sets: the target is the free-energy-minimum fold by a
+real if modest margin. This is as far as computation goes; the verdict stays model-relative, and in-vitro probing is the
+only rung beyond it (App.~\ref{app:config}).
+
+ The positive verdict is not
+``the target pairs appear somewhere'': panel-unanimous requires the target to \emph{equal} each method's
+predicted structure: the MFE under pKiss and ShapeKnots, and the maximum-expected-accuracy (MEA) structure
+over a partition-function ensemble under ProbKnot. These are related but not identical notions of a single
+dominant fold (ProbKnot's MEA is not a unique-MFE criterion), so panel-unanimity sits near the
+``unique/dominant fold'' region of the exact\,$\subseteq$\,unique-MFE\,$\subseteq$\,dominance ladder rather than exactly on one rung, agreed by three distinct predictors (thermodynamically
+related, not statistically independent). The next rung is reported as the \emph{conjunction}
+$\text{R2}\wedge[\Delta G\ge\tau]$, since neither condition implies the other. We \emph{climb one rung further and measure it} (\S\ref{sec:exp}, \texttt{runs/cc\_ascent/positive\_stringency.py}): enumerating pKiss suboptimals for
+the mixed-panel-consistent designs, the target is the pKiss MFE for all $17$ that enumerated within budget and is dominant
+over the best alternative fold by a median $1.2$\,kcal/mol ($14/17$ clear $\ge1$\,kcal). The verdict remains
+\emph{model-relative}, since all engines are thermodynamic secondary-structure predictors and not physical
+ground truth. Two further strengthenings are computable with the installed tooling (\texttt{partition},
+\texttt{ProbabilityPlot}, \texttt{pKiss\_probs}): a Boltzmann-probability threshold and a fourth,
+non-thermodynamic (learned) predictor. Physical confirmation (in-vitro probing) is
+the only route past model-relativity and is out of scope here.
 
 \section{Oracle Configurations, Hyperparameters, Compute, and Verifier Stringency}\label{app:config}
 \noindent\textbf{Oracle configurations}, all deterministic and replayable with \texttt{DATAPATH} pinned to
@@ -2363,6 +2365,8 @@ ground truth. Two further strengthenings are computable with the installed tooli
 \texttt{ProbabilityPlot}, \texttt{pKiss\_probs}): a Boltzmann-probability threshold and a fourth,
 non-thermodynamic (learned) predictor. Physical confirmation (in-vitro probing) is
 the only route past model-relativity and is out of scope here.
+
+\clearpage
 
 \clearpage
 \bibliographystyle{plainnat}
