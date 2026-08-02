@@ -102,6 +102,9 @@ def main():
     ap.add_argument("--n", type=int, default=24)
     ap.add_argument("--timelimit", type=int, default=15)
     ap.add_argument("--workers", type=int, default=6)
+    # THE LESSON FROM deliver_seeds: 51/55 turned out to be the TOP of a five-draw
+    # distribution whose mean was 87.6%. This benchmark's gap number is still one draw.
+    ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--out", default=os.path.join(HERE, "kinetic_bench.json"))
     # RE-DERIVE THE SUMMARY FROM THE ARCHIVED PER-ITEM ROWS, without touching the solver. The threshold sweep
     # was added to this file AFTER the run it is quoted from, so the archived json did not contain the table
@@ -113,7 +116,7 @@ def main():
     from rna_harness.benchmarks.bprna_nested import load_bprna_nested
     rows = [r for r in load_bprna_nested(400) if 25 <= len(str(r["target"])) <= 70]
     sel = rows[:a.n]
-    jobs = [(str(r["id"]), str(r["target"]), a.timelimit, 0) for r in sel]
+    jobs = [(str(r["id"]), str(r["target"]), a.timelimit, a.seed) for r in sel]
     print(f"动力学/共转录:{len(jobs)} 条自然结构,同一批求解器运行两臂读法,"
           f"外加 GC {GC_BAND[0]}-{GC_BAND[1]}% 控制变量\n", flush=True)
 

@@ -86,6 +86,9 @@ def main():
     ap.add_argument("--pool", type=int, default=400)
     ap.add_argument("--timelimit", type=int, default=15)
     ap.add_argument("--workers", type=int, default=6)
+    # THE LESSON FROM deliver_seeds: 51/55 turned out to be the TOP of a five-draw
+    # distribution whose mean was 87.6%. This benchmark's gap number is still one draw.
+    ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--out", default=os.path.join(HERE, "switch_bench.json"))
     ap.add_argument("--analyse-only", action="store_true")
     a = ap.parse_args()
@@ -99,7 +102,7 @@ def main():
         if at is None:
             dropped += 1                  # no stacked stem of WINDOW pairs -- reported, never silently cut
             continue
-        jobs.append((str(r["id"]), str(r["target"]), at, a.timelimit, 0))
+        jobs.append((str(r["id"]), str(r["target"]), at, a.timelimit, a.seed))
         if len(jobs) >= a.n:
             break
     print(f"两态开关:{len(jobs)} 条自然结构,toehold {TOEHOLD} nt + 入侵 {INVADE} 对,"
