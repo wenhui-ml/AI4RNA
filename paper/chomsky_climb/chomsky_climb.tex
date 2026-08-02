@@ -539,18 +539,24 @@ is \emph{not} oracle-free, and not evidence that the gain is the system's own\\
 \centering\footnotesize
 \setlength{\abovecaptionskip}{4pt}
 \setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.2}
-\captionof{table}{\textbf{The instrument's other output, which the vector above cannot carry.}
+\begin{xltabular}{\linewidth}{@{}>{\raggedright\arraybackslash}p{2.5cm}>{\raggedright\arraybackslash}p{2.0cm}L L@{}}
+\caption{\textbf{The instrument's other output, which the vector above cannot carry.}
 Table~\ref{tab:verdict} is the audit's verdict on \emph{our} system, so by construction it has no row for the
 arm that does clear the bar. That arm is the frozen LLM-written operators of App.~\ref{app:invent}, which
 optimize the same pKiss$\,\wedge\,$ProbKnot predicate and are scored by the ShapeKnots predictor held out of
 every arm's loop. We report them on the three independently reachable rungs of \S\ref{sec:disc}. It is
 simultaneously the positive control that shows the panel is not merely insensitive and the sharpest bound on
 our own result. Quantifier: these are the $2$ of $6$ invented operators with no runtime failures, so the
-claim is about \emph{some} agent-written operators, not the class.}\label{tab:rungs}
-\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{2.5cm}>{\raggedright\arraybackslash}p{2.0cm}L L@{}}
+claim is about \emph{some} agent-written operators, not the class.}\label{tab:rungs}\\
 \toprule
 \textbf{rung} & \textbf{verdict} & \textbf{basis} & \textbf{what it does \emph{not} show}\\
 \midrule
+\endfirsthead
+\multicolumn{4}{@{}l}{\footnotesize Table~\ref{tab:rungs}, continued.}\\
+\toprule
+\textbf{rung} & \textbf{verdict} & \textbf{basis} & \textbf{what it does \emph{not} show}\\
+\midrule
+\endhead
 (D1) \newline difference under an adjudicator no objective can flatter & \chip{vEst}{established} &
 Paired and difficulty-matched on the $951$ units \emph{both} arms solved under the shared predicate:
 $0.293$ vs.\ $0.095$, difference ${+}0.199$, target-clustered $[{+}0.108,{+}0.297]$ over $42$ clusters,
@@ -578,7 +584,7 @@ that stopped before intervening (\S\ref{sec:exp}) &
 What the difference \emph{is}. We withhold the word ``discovery'' until this rung is reached, and note in
 \S\ref{sec:related} that the criterion we position against reaches neither D1 nor D2\\
 \bottomrule
-\end{tabularx}
+\end{xltabular}
 \par\endgroup
 \medskip
 
@@ -2247,41 +2253,35 @@ ProbKnot is RNAstructure MEA over the partition ensemble \citep{bellaousov2010pr
 $60$\,s); ShapeKnots is RNAstructure MFE-based run \emph{de novo} with no SHAPE data
 \citep{hajdin2013shapeknots} (env \texttt{rnastr}, $120$\,s).
 
-\noindent\textbf{Operator hyperparameters} (oracle configurations in the oracle configurations above). REMC floor: wall $30$\,s. Design operators (fixed across all
+\noindent\textbf{Operator hyperparameters.} REMC floor: wall $30$\,s. Design operators (fixed across all
 targets, with size-independent budgets): skeleton budget $12$--$20$\,s, repair budget $90$--$120$\,s, $\le800$--$1500$
 repair iterations, ProbKnot gate at $\mathrm{pk\_bp}\le3$. \textbf{Compute.} A single $256$-core host;
 target-level parallelism at $\mathrm{NWORKERS}{=}60$ (the design operators are single-process, so this is
 safe); the entire sweep suite is search-only and incurs \emph{no} model-inference cost, except the invention
 agent (App.~\ref{app:invent}), a few dollars of GLM-5.2.
 
-\smallskip\noindent\textbf{Positive-side stringency (the verifier ladder).}
-\paragraph{The positive verdict is dominant under the pKiss energy model (completed cases).} Panel-unanimity
-already requires the target to be each engine's predicted structure; we add one further rung
-(App.~\ref{app:config}). For the mixed-panel-consistent designs we enumerate pKiss suboptimals and take the
-free-energy gap $\Delta$ from the target (the MFE) to the best alternative fold. The target is the pKiss MFE
-for all $17$ designs whose enumeration completed within budget, dominant by median $\Delta{=}1.2$\,kcal/mol
-(mean $1.44$), with $14/17$ clearing a $\ge1$\,kcal margin. Eight longer designs
-timed out; since timeout correlates with length, this rung covers the shorter adjudicated designs only, and the
-gap is a property of the pKiss energy model, not a model-independent thermodynamic fact. Within that scope the
-positive verdict is not a marginal coincidence of pair sets: the target is the free-energy-minimum fold by a
-real if modest margin. This is as far as computation goes; the verdict stays model-relative, and in-vitro probing is the
-only rung beyond it (App.~\ref{app:config}).
+\smallskip\noindent\textbf{Positive-side stringency (the verifier ladder), and one rung beyond
+panel-unanimity.} Panel-unanimity is already stronger than ``the target pairs appear somewhere'': it requires
+the target to \emph{equal} each method's predicted structure, the MFE under pKiss and ShapeKnots and the
+maximum-expected-accuracy structure over a partition-function ensemble under ProbKnot. Those are related but
+not identical notions of a single dominant fold, since ProbKnot's MEA is not a unique-MFE criterion, so
+panel-unanimity sits near the ``unique/dominant fold'' region of the
+exact\,$\subseteq$\,unique-MFE\,$\subseteq$\,dominance ladder rather than exactly on one rung, agreed by three
+predictors that are thermodynamically related rather than statistically independent.
 
- The positive verdict is not
-``the target pairs appear somewhere'': panel-unanimous requires the target to \emph{equal} each method's
-predicted structure: the MFE under pKiss and ShapeKnots, and the maximum-expected-accuracy (MEA) structure
-over a partition-function ensemble under ProbKnot. These are related but not identical notions of a single
-dominant fold (ProbKnot's MEA is not a unique-MFE criterion), so panel-unanimity sits near the
-``unique/dominant fold'' region of the exact\,$\subseteq$\,unique-MFE\,$\subseteq$\,dominance ladder rather than exactly on one rung, agreed by three distinct predictors (thermodynamically
-related, not statistically independent). The next rung is reported as the \emph{conjunction}
-$\text{R2}\wedge[\Delta G\ge\tau]$, since neither condition implies the other. We \emph{climb one rung further and measure it} (\S\ref{sec:exp}, \texttt{runs/cc\_ascent/positive\_stringency.py}): enumerating pKiss suboptimals for
-the mixed-panel-consistent designs, the target is the pKiss MFE for all $17$ that enumerated within budget and is dominant
-over the best alternative fold by a median $1.2$\,kcal/mol ($14/17$ clear $\ge1$\,kcal). The verdict remains
-\emph{model-relative}, since all engines are thermodynamic secondary-structure predictors and not physical
-ground truth. Two further strengthenings are computable with the installed tooling (\texttt{partition},
-\texttt{ProbabilityPlot}, \texttt{pKiss\_probs}): a Boltzmann-probability threshold and a fourth,
-non-thermodynamic (learned) predictor. Physical confirmation (in-vitro probing) is
-the only route past model-relativity and is out of scope here.
+We climb one rung further and measure it (\texttt{runs/cc\_ascent/positive\_stringency.py}). Enumerating pKiss
+suboptimals for the mixed-panel-consistent designs and taking the free-energy gap $\Delta$ from the target to
+the best alternative fold: the target is the pKiss MFE for all $17$ designs whose enumeration completed within
+budget, dominant by median $\Delta{=}1.2$\,kcal/mol (mean $1.44$), with $14/17$ clearing a $\ge1$\,kcal margin.
+Eight longer designs timed out, and since timeout correlates with length this rung covers the shorter
+adjudicated designs only. The gap is a property of the pKiss energy model, not a model-independent
+thermodynamic fact. Within that scope the positive verdict is not a marginal coincidence of pair sets: the
+target is the free-energy-minimum fold by a real if modest margin.
+
+Two further strengthenings are computable with the installed tooling: a
+Boltzmann-probability threshold (RNAstructure's \texttt{partition} and \texttt{ProbabilityPlot}), and a
+fourth, non-thermodynamic predictor. Physical confirmation by in-vitro probing is the
+only route past model-relativity and is out of scope here.
 
 \clearpage
 \bibliographystyle{plainnat}
