@@ -42,6 +42,7 @@ import os
 import random
 import statistics as st
 import sys
+import zlib
 import time
 from collections import defaultdict
 
@@ -100,7 +101,11 @@ def isomer_family(job):
     pairs = sorted(pair_set(target))
     if len(pairs) < 4:
         return {"task_id": tid, "error": "too few pairs to permute"}
-    rng = random.Random(hash((tid, seed)) & 0xFFFFFFFF)
+    # zlib.crc32, NOT hash(). Python randomises str hashing per process, so hash((tid, seed)) would draw a
+    # DIFFERENT set of isomers on every run -- the construction would not be reproducible even though it
+    # looks seeded. The certificate this project ships distinguishes deterministic re-verification from
+    # non-reproducible search precisely because that distinction keeps getting lost.
+    rng = random.Random(zlib.crc32(f"{tid}|{seed}".encode()))
     base_mult = sorted(parent)
     seen, kept = {parent}, []
     for _ in range(SWAP_TRIES):
@@ -126,10 +131,17 @@ def isomer_family(job):
     lo = [c for c in fam if c["accepted"]]
     hi = [c for c in fam if not c["accepted"]]
     # Judging a family with only one side costs Kinfold time and can contribute nothing to a paired test.
+    # WHICH side is recorded, because dropping them silently is a selection the reader cannot audit: an
+    # all-high-trap family means the criterion accepted nothing for that target, which is a different fact
+    # about the criterion than an all-low-trap family, and averaging them into one "skipped" count erases it.
     if not lo or not hi:
         return {"task_id": tid, "n": len(target), "n_isomers": len(fam),
                 "gc": round(gc_percent(parent), 4),
-                "skipped": "one-sided family (no contrast)", "wall_s": round(time.time() - t0, 1)}
+                "skipped": "all-accepted (no high-trap isomer)" if hi == [] else
+                           "all-rejected (no low-trap isomer)",
+                "skipped_side": "low" if hi == [] else "high",
+                "trap_fraction_median": round(st.median([c["trap_fraction"] for c in fam]), 4),
+                "wall_s": round(time.time() - t0, 1)}
     for c in fam:
         c["kinfold"] = kinfold_reach(c["seq"], target)
     return {"task_id": tid, "n": len(target), "n_isomers": len(fam),
@@ -154,8 +166,24 @@ def report_isomer(R, out):
             fams.append({"task_id": r["task_id"], "n": r["n"], "gc": r["gc"],
                          "low": st.mean(lo), "high": st.mean(hi),
                          "n_low": len(lo), "n_high": len(hi)})
+    # ATTRITION IS PART OF THE RESULT. A paired test is unbiased WITHIN the families it uses, but which
+    # families survive is a selection the reader has to be able to see -- so the drop-outs are reported by
+    # cause and by side, and the surviving families' length and GC are printed next to the dropped ones'.
+    err = [r for r in R if r.get("error")]
+    sk = [r for r in R if r.get("skipped")]
     print(f"\n=== 同分异构体零假设 ===")
-    print(f"  可用家族 {len(fams)};单侧家族(无对比度,已跳过){skipped}")
+    print(f"  可用家族 {len(fams)};单侧家族(无对比度,已跳过){skipped};出错 {len(err)}")
+    from collections import Counter
+    for k, v in Counter(r["error"][:44] for r in err).most_common(4):
+        print(f"    出错 {v:>3}  {k}")
+    for k, v in Counter(r["skipped"] for r in sk).most_common(4):
+        print(f"    单侧 {v:>3}  {k}")
+    if fams and sk:
+        print(f"    参与检验的家族 长度中位 {st.median([f['n'] for f in fams]):.0f} "
+              f"GC 中位 {st.median([f['gc'] for f in fams]):.1f}  |  "
+              f"被丢弃的 长度中位 {st.median([r['n'] for r in sk]):.0f} "
+              f"GC 中位 {st.median([r['gc'] for r in sk]):.1f}")
+        print("    -> 结论只对【同时存在低陷阱与高陷阱异构体】的家族成立,而那批更短、GC 更低")
     if len(fams) < 6:
         print("  !! 家族太少,不下结论 —— 报为样本不足,不报为 null")
         json.dump({"mode": "isomer", "families": fams, "rows": R}, open(out, "w"),
@@ -172,7 +200,9 @@ def report_isomer(R, out):
     print(f"    均值 {dif.mean():+.1%}   中位 {np.median(dif):+.1%}   "
           f"95% CI [{dif.mean()-1.96*se:+.1%}, {dif.mean()+1.96*se:+.1%}]")
     print(f"    接受更好 {int((dif>0).sum())}   更差 {int((dif<0).sum())}   持平 {int((dif==0).sum())}")
-    print(f"    Wilcoxon p={p:.3g}")
+    # Ties are DROPPED by scipy's default zero_method, so the n a reader sees must not be the n the test used.
+    n_tie = int((dif == 0).sum())
+    print(f"    Wilcoxon p={p:.3g}   (持平 {n_tie} 个被 scipy 默认丢弃,实际参与检验 {len(dif)-n_tie})")
     allc = [(c["trap_fraction"], c["kinfold"]["reach"])
             for r in R if not r.get("error") and not r.get("skipped")
             for c in r["candidates"] if c.get("kinfold")]
@@ -283,7 +313,8 @@ def run_gcpin(src, out):
               - st.mean([y["trap_fraction"] for y in v["r"]])) for _, v in use]
     print(f"  层内差 均值 {dif.mean():+.1%}  中位 {np.median(dif):+.1%}  "
           f"95% CI [{dif.mean()-1.96*se:+.1%}, {dif.mean()+1.96*se:+.1%}]  p={p:.3g}")
-    print(f"  接受更好 {int((dif>0).sum())}  更差 {int((dif<0).sum())}  持平 {int((dif==0).sum())}")
+    print(f"  接受更好 {int((dif>0).sum())}  更差 {int((dif<0).sum())}  持平 {int((dif==0).sum())}"
+          f"   (持平项被 scipy 默认丢弃,实际参与检验 {int((dif!=0).sum())})")
     print(f"  层内 trap_fraction 差 中位 {np.median(tg):.3f}  <- 对比度;太小则这个检验本来就看不见东西")
     # A NULL WITHOUT A POWER STATEMENT IS NOT A RESULT. It is the difference between "we looked and it is not
     # there" and "we could not have seen it if it were".
