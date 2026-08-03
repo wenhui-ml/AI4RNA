@@ -95,7 +95,10 @@ def main():
     # ---- 3+4. register-shift decoys ---------------------------------------------------------------
     for tag, label, note in (("shift_higher.json", "higher-order", ""),
                              ("shift_htype.json", "H-type",
-                              "  注意:H-type 现在走【严格规则】,所以这里测的是另一条规则,不能与 kissing 并列")):
+                              "  注意:shift_decoy 直接调 _knot_recall,测的是【标定规则】本身 —— 而产品在 H-type\n"
+                              "  上已改走严格规则。所以这一格回答的是:标定规则在 H-type 上位置特异吗?\n"
+                              "  它此前在 H-type 上的问题是【对外部裁判过松】(29.9% vs 71.1%),那是另一种失效;\n"
+                              "  这一格把两种失效分开了。")):
         p = os.path.join(SEEDS, tag)
         print(f"\n[{'3' if 'higher' in tag else '4'}] 移位诱饵 —— {label}")
         if note:
