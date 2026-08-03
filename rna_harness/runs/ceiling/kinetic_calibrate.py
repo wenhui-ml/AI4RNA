@@ -97,6 +97,115 @@ def kinfold_reach(seq: str, target: str, traj: int = TRAJ, grow: float = GROW,
     return {"reach": reached / ended, "n_traj": ended, "n_reached": reached}
 
 
+def confound_controls(R):
+    """The pre-registered comparison is CONFOUNDED, and pooling trajectories hides it twice over.
+
+    Two problems, both fatal to the headline number if left alone:
+
+    1. LENGTH. Accepted candidates average 47 nt and rejected ones 55 nt. Kinfold grows the chain at a fixed
+       rate inside a fixed simulation time, so a longer chain has strictly less time left to fold after it
+       finishes being transcribed. Length alone would manufacture the entire gap.
+    2. PSEUDO-REPLICATION. 20 trajectories of one sequence are not 20 independent observations, and up to 12
+       candidates from one target are not 12 independent sequences. Trajectory-pooled Clopper-Pearson
+       intervals are therefore far too narrow -- they are the reason the pre-registered intervals looked
+       so cleanly disjoint.
+
+    Three controls, each of which can fail on its own:
+
+      within-target pairing  -- same target means IDENTICAL length and IDENTICAL structure, so the paired
+                                difference cannot be a length effect. This is the decisive one.
+      length strata          -- uses the targets that contribute only one group, which pairing discards.
+      cluster-robust OLS     -- keeps every point, adjusts for length and GC together, and prices the
+                                standard error at the level things actually repeat: the target.
+
+    Reported whatever it says. If the paired gap collapses, the headline was a length artefact and must be
+    withdrawn, and that is the finding.
+    """
+    import statistics as st
+
+    import numpy as np
+    from scipy.stats import mannwhitneyu, spearmanr, t as tdist, wilcoxon
+
+    rows = [r for r in R if not r.get("error")]
+    allc = [(r["task_id"], r["n"], x) for r in rows for x in r["candidates"] if x["kinfold"]]
+    if len(allc) < 20:
+        return None
+    out = {}
+
+    # --- 1. within-target pairing: length and structure are held EXACTLY, not approximately -------------
+    pairs = []
+    for r in rows:
+        cs = [x for x in r["candidates"] if x["kinfold"]]
+        a = [x["kinfold"]["reach"] for x in cs if x["accepted"]]
+        b = [x["kinfold"]["reach"] for x in cs if not x["accepted"]]
+        if a and b:
+            pairs.append((st.mean(a), st.mean(b)))
+    print(f"\n  === 混杂控制 ===\n  [1] 同 target 内配对(长度与结构完全一致):{len(pairs)} 个 target 同时有接受与拒绝")
+    if len(pairs) >= 6:
+        da = np.array([p[0] for p in pairs]); db = np.array([p[1] for p in pairs])
+        diff = da - db
+        pw = float(wilcoxon(da, db, alternative="greater")[1])
+        print(f"      配对差 均值 {diff.mean():+.1%}  中位 {np.median(diff):+.1%}   "
+              f"接受更好 {int((diff > 0).sum())}/{len(diff)}   Wilcoxon p={pw:.3g}")
+        out["paired"] = {"n_targets": len(pairs), "mean_gap": float(diff.mean()),
+                         "median_gap": float(np.median(diff)),
+                         "n_better": int((diff > 0).sum()), "wilcoxon_p": pw}
+
+    # --- 2. length strata: recovers the targets pairing had to throw away ------------------------------
+    print("  [2] 长度分层(每层内部再比,层内长度差异已很小):")
+    strata = []
+    for lo_, hi_ in ((25, 40), (40, 50), (50, 60), (60, 71)):
+        g = [x for _, n, x in allc if lo_ <= n < hi_]
+        a = [x["kinfold"]["reach"] for x in g if x["accepted"]]
+        b = [x["kinfold"]["reach"] for x in g if not x["accepted"]]
+        if len(a) >= 3 and len(b) >= 3:
+            pv = float(mannwhitneyu(a, b, alternative="greater")[1])
+            strata.append({"lo": lo_, "hi": hi_, "n_acc": len(a), "n_rej": len(b),
+                           "gap": st.mean(a) - st.mean(b), "p": pv})
+            print(f"      [{lo_},{hi_})  接受 {st.mean(a):.1%} (n={len(a):>3})  "
+                  f"拒绝 {st.mean(b):.1%} (n={len(b):>3})  差 {st.mean(a)-st.mean(b):+.1%}  p={pv:.2g}")
+        else:
+            print(f"      [{lo_},{hi_})  样本不足(接受 {len(a)} 拒绝 {len(b)})—— 不报,不当成 0")
+    out["length_strata"] = strata
+
+    # --- 3. cluster-robust OLS: everything at once, errors priced at the target level -------------------
+    Y = np.array([x["kinfold"]["reach"] for _, _, x in allc])
+    T = np.array([x["trap_fraction"] for _, _, x in allc])
+    L = np.array([float(n) for _, n, _ in allc])
+    G = np.array([x["gc"] for _, _, x in allc])
+    X = np.column_stack([np.ones_like(Y), T, L, G])
+    b, *_ = np.linalg.lstsq(X, Y, rcond=None)
+    resid = Y - X @ b
+    XtXi = np.linalg.inv(X.T @ X)
+    gid = {t: i for i, t in enumerate(sorted({t for t, _, _ in allc}))}
+    gi = np.array([gid[t] for t, _, _ in allc])
+    meat = np.zeros((X.shape[1], X.shape[1]))
+    for g in set(gi.tolist()):
+        m = gi == g
+        u = (X[m] * resid[m, None]).sum(0)
+        meat += np.outer(u, u)
+    ng = len(set(gi.tolist()))
+    V = XtXi @ meat @ XtXi * (ng / (ng - 1))
+    se = np.sqrt(np.diag(V))
+    print(f"  [3] OLS 到达率 ~ trap + 长度 + GC,标准误按 target 聚类({ng} 簇):")
+    coef = {}
+    for nm, co, s in zip(("const", "trap", "len", "gc"), b, se):
+        pv = float(2 * (1 - tdist.cdf(abs(co / s), ng - 1)))
+        coef[nm] = {"coef": float(co), "se": float(s), "p": pv}
+        print(f"      {nm:6s} {co:+.5f}  se {s:.5f}  p={pv:.3g}")
+    out["cluster_ols"] = coef
+    out["confounder_balance"] = {
+        "gc_accepted": float(G[T <= 0.10].mean()), "gc_rejected": float(G[T > 0.10].mean()),
+        "len_accepted": float(L[T <= 0.10].mean()), "len_rejected": float(L[T > 0.10].mean()),
+        "spearman_len_reach": float(spearmanr(L, Y)[0]), "spearman_gc_reach": float(spearmanr(G, Y)[0])}
+    print(f"      两组本来就不平衡:长度 {L[T<=0.10].mean():.1f} vs {L[T>0.10].mean():.1f} nt,"
+          f" GC {G[T<=0.10].mean():.1f}% vs {G[T>0.10].mean():.1f}%")
+    print(f"      trap 在真实取值范围内(0.05->0.45)预测下降 {abs(b[1])*0.40:.1%};"
+          f" 长度每 +10 nt 下降 {abs(b[2])*10:.1%}")
+    out["effect_over_realistic_range"] = float(abs(b[1]) * 0.40)
+    return out
+
+
 def work(job):
     tid, target, timelimit, seed = job
     from rna_harness.benchmarks.kinetic_suite import TRAP_FRACTION_MAX, cotranscriptional, gc_percent
@@ -138,7 +247,16 @@ def main():
     ap.add_argument("--workers", type=int, default=8)
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--out", default=os.path.join(HERE, "kinetic_calibrate.json"))
+    ap.add_argument("--reanalyze", default=None,
+                    help="re-score an existing json without re-running Kinfold; the raw rows are the data, "
+                         "so a change of ANALYSIS must never require a change of MEASUREMENT")
     a = ap.parse_args()
+    if a.reanalyze:
+        prev = json.load(open(a.reanalyze))
+        prev["controls"] = confound_controls(prev["rows"])
+        json.dump(prev, open(a.reanalyze, "w"), ensure_ascii=False, indent=1)
+        print(f"\n  updated {a.reanalyze}")
+        return
     if not os.path.exists(KINFOLD):
         print(f"!! 找不到外部裁判 {KINFOLD} —— 不要用我们自己的前缀 MFE 顶替,那是自证。")
         return
@@ -204,7 +322,9 @@ def main():
                   f"   (负相关 = 陷阱越多、到达越少,方向正确)")
         except Exception:                                                      # noqa: BLE001
             rho, p = None, None
+    controls = confound_controls(R)
     json.dump({"criterion": f"trap_fraction <= {TRAP_FRACTION_MAX}", "judge": "Kinfold --grow",
+               "controls": controls,
                "traj_per_seq": TRAJ, "sim_time": SIM_TIME, "grow": GROW,
                "accepted": {"reached": ah, "traj": at_, "rate": ar, "lo95": alo, "hi95": ahi},
                "rejected": {"reached": rh, "traj": rt, "rate": rr, "lo95": rlo, "hi95": rhi},
