@@ -1,0 +1,32 @@
+同分异构体零假设:881 条异构体,来自 59 个家族
+  注意:这批的到达率是【标记式】的旧口径(低估),但两个判据用的是同一批数值,比较仍成立
+
+    100/881  0.0 min
+    200/881  0.0 min
+    300/881  0.0 min
+    400/881  0.0 min
+    500/881  0.0 min
+    600/881  0.1 min
+    700/881  0.1 min
+    800/881  0.1 min
+    881/881  0.1 min
+
+=== 与 Kinfold 到达率的 Spearman(越负越好)===
+  trap_fraction    rho=-0.401  p=2.1e-35  <- 今天的规则
+  ens_mean         rho=-0.597  p=2.5e-86
+  ens_max          rho=-0.573  p=3.7e-78
+  ens_frac_0.1     rho=-0.581  p=1.6e-80
+  ens_frac_0.25    rho=-0.577  p=1.7e-79
+  ens_frac_0.5     rho=-0.554  p=5.6e-72
+  ens_frac_1.0     rho=-0.524  p=2.2e-63
+  ens_frac_2.0     rho=-0.514  p=1.4e-60
+
+  最强的系综变体:ens_mean(rho=-0.597)
+  |rho(ens_mean)| - |rho(trap_fraction)| = +0.196  95% [+0.149, +0.243]  单侧 p=0
+  -> 系综版更强
+
+  [零假设] 家族内配对:低陷阱减高陷阱的到达率
+    trap_fraction    +10.7%  更好 46/59  p=5.37e-07
+    ens_mean         +20.2%  更好 52/59  p=1.23e-10
+
+  wrote /data/wenhui/openclaude_rna/rna_harness/runs/ceiling/ensemble_trap_isomer.json
