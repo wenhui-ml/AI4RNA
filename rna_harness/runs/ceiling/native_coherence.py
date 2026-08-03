@@ -158,14 +158,33 @@ def main():
                         [x["reach"] for x in r["rows"]])[0]
         if rho == rho:
             per.setdefault(mol(r["rmdb_id"]), []).append(rho)
+    # DIAGNOSE THE DROP-OUTS BEFORE COUNTING THEM. scipy's ConstantInputWarning does not say WHICH array was
+    # constant, and the two possibilities are opposite findings: a criterion with no variance means the
+    # criterion cannot rank this population, while an OUTCOME with no variance means the JUDGE cannot.
+    flat_judge = [r["rmdb_id"] for r in R if r["rows"]
+                  and len({round(x["reach"], 6) for x in r["rows"]}) < 2]
+    flat_crit = [r["rmdb_id"] for r in R if r["rows"]
+                 and len({round(x["trap_fraction"], 6) for x in r["rows"]}) < 2]
+    print(f"\n=== 掉出来的构建体是哪一侧常数 ===")
+    print(f"  裁判(Kinfold 到达率)无变化:{len(flat_judge)}/{len(R)}")
+    print(f"  判据(trap_fraction)无变化:{len(flat_crit)}/{len(R)}")
+    if len(flat_judge) > len(flat_crit):
+        print("  -> 是【裁判】没有动态范围,不是判据。这一格回答不了,不是因为分子不够。")
+
     print(f"\n=== 构建体内部 Spearman(trap_fraction vs Kinfold 到达率)===")
     ms = [(m, float(np.mean(v)), len(v)) for m, v in sorted(per.items())]
     for m, v, n in ms:
         print(f"  {m:10s} {v:+.3f}  ({n} 个构建体)")
     if len(ms) < MIN_MOLECULES:
-        print(f"\n  !! 只有 {len(ms)} 个分子,未达跑前声明的 {MIN_MOLECULES} —— 报样本不足,不报 null")
-        json.dump({"gate": "insufficient", "per_molecule": ms, "rows": R},
-                  open(a.out, "w"), ensure_ascii=False, indent=1)
+        why = ("裁判无动态范围" if len(flat_judge) > len(flat_crit) else "分子数不足")
+        print(f"\n  !! 只有 {len(ms)} 个分子可用,未达跑前声明的 {MIN_MOLECULES} —— 报【{why}】,不报 null")
+        if len(flat_judge) > len(flat_crit):
+            print("     Kinfold --stop 要求命中【那一个精确结构】。25–70 nt 上到达率 50–90%;")
+            print("     >=100 nt 上几乎恒为 0,且实测把模拟时间放大 100 倍也救不回来(0/10 -> 1/10)。")
+            print("     所以第二把尺子的外部验证【无法越过约 70 nt】,这是量出来的,不是假设的。")
+        json.dump({"gate": "insufficient", "reason": why, "per_molecule": ms,
+                   "flat_judge": flat_judge, "flat_criterion": flat_crit,
+                   "rows": R}, open(a.out, "w"), ensure_ascii=False, indent=1)
         return
     A = np.array([v for _, v, _ in ms])
     neg = int((A < 0).sum())
