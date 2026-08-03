@@ -253,3 +253,35 @@ def test_calibrated_rule_is_restricted_to_the_topologies_it_was_validated_on():
     # an unmeasured family must say so rather than borrow someone else's numbers
     assert "note" in _topology_point("((((....))))")
     assert set(TOPOLOGY_OPERATING_POINTS) >= {"kissing / chain", "H-type"}
+
+
+def test_swap_isomer_preserves_the_base_multiset_exactly():
+    """The isomer null is only a control BECAUSE composition is preserved by construction.
+
+    Every earlier composition control in this project was a SELECTION -- a GC band, then GC matched per
+    target -- and each one leaked: the band left a 3.2-point gap inside it, and the per-target matching left
+    only 29 usable strata. Transposing the two partners of a target pair cannot change the multiset at all,
+    which is what makes this null able to say something the others could not.
+
+    If a refactor ever breaks that invariant, the null silently becomes a composition comparison again and
+    would still produce a plausible-looking number. This test is the thing standing between those two.
+    """
+    import random
+    import sys
+    from pathlib import Path
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "runs" / "ceiling"))
+    from kinetic_nulls import swap_isomer
+    from rna_harness.benchmarks.kinetic_suite import gc_percent, pair_set
+
+    seq = "GGGCAUAGCUUCGGCUAUGCCC"
+    tgt = "((((((((....)))))))).."
+    pairs = sorted(pair_set(tgt))
+    rng = random.Random(7)
+    changed = 0
+    for _ in range(40):
+        iso = swap_isomer(seq, pairs, rng, 0.6)
+        assert sorted(iso) == sorted(seq), "transposition changed the multiset -- the control is void"
+        assert gc_percent(iso) == gc_percent(seq)
+        assert len(iso) == len(seq)
+        changed += iso != seq
+    assert changed > 0, "a control that never varies the arrangement tests nothing"

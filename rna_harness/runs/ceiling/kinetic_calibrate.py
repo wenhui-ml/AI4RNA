@@ -246,6 +246,9 @@ def main():
     ap.add_argument("--timelimit", type=int, default=15)
     ap.add_argument("--workers", type=int, default=8)
     ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--pool", type=int, default=400,
+                    help="how deep to read the bpRNA loader; recorded in the output so a later "
+                         "reanalysis can recover the same targets")
     ap.add_argument("--out", default=os.path.join(HERE, "kinetic_calibrate.json"))
     ap.add_argument("--reanalyze", default=None,
                     help="re-score an existing json without re-running Kinfold; the raw rows are the data, "
@@ -263,7 +266,7 @@ def main():
 
     from rna_harness.benchmarks.bprna_nested import load_bprna_nested
     from rna_harness.benchmarks.kinetic_suite import TRAP_FRACTION_MAX
-    rows = [r for r in load_bprna_nested(400) if 25 <= len(str(r["target"])) <= 70][:a.n]
+    rows = [r for r in load_bprna_nested(a.pool) if 25 <= len(str(r["target"])) <= 70][:a.n]
     jobs = [(str(r["id"]), str(r["target"]), a.timelimit, a.seed) for r in rows]
     print(f"共转录判据的外部验证:{len(jobs)} 条自然结构\n"
           f"  判据 trap_fraction <= {TRAP_FRACTION_MAX}(早已声明);外部裁判 Kinfold --grow,"
@@ -325,7 +328,7 @@ def main():
     controls = confound_controls(R)
     json.dump({"criterion": f"trap_fraction <= {TRAP_FRACTION_MAX}", "judge": "Kinfold --grow",
                "controls": controls,
-               "traj_per_seq": TRAJ, "sim_time": SIM_TIME, "grow": GROW,
+               "traj_per_seq": TRAJ, "pool": a.pool, "sim_time": SIM_TIME, "grow": GROW,
                "accepted": {"reached": ah, "traj": at_, "rate": ar, "lo95": alo, "hi95": ahi},
                "rejected": {"reached": rh, "traj": rt, "rate": rr, "lo95": rlo, "hi95": rhi},
                "gap": gap, "intervals_disjoint": disjoint, "trend": trend,
