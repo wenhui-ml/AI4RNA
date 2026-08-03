@@ -1,0 +1,41 @@
+重算 1596 条候选的逐前缀陷阱几何(与 Kinfold 到达率同一批,折叠调用完全共用)
+
+    200/1596  0.0 min
+    400/1596  0.0 min
+    600/1596  0.0 min
+    800/1596  0.0 min
+    1000/1596  0.0 min
+    1200/1596  0.0 min
+    1400/1596  0.1 min
+    1596/1596  0.1 min
+
+=== 1596 条可用,来自 133 个靶标 ===
+
+  每个定义与 Kinfold 到达率的 Spearman(越负越好;trap_fraction 是【今天的规则】):
+    trap_fraction          rho=-0.469  p=5e-88  <- 今天的规则
+    sticky_fraction        rho=+0.014  p=0.58
+    nonsticky_fraction     rho=-0.481  p=4e-93
+    persist_1              rho=-0.469  p=5e-88
+    persist_3              rho=-0.480  p=1e-92
+    persist_5              rho=-0.487  p=1.2e-95
+    persist_10             rho=-0.472  p=1.8e-89
+    persist_20             rho=-0.391  p=1.6e-59
+    sticky_persist_1       rho=+0.014  p=0.58
+    sticky_persist_3       rho=-0.009  p=0.71
+    sticky_persist_5       rho=-0.018  p=0.47
+    sticky_persist_10      rho=-0.008  p=0.76
+    sticky_persist_20      取值几乎不变,跳过
+    max_run                rho=-0.437  p=2e-75
+
+  [预注册 1] 黏性 vs 非黏性:黏性是否更强?
+    |rho(黏性)| - |rho(非黏性)| = -0.445  95% [-0.519, -0.357]  单侧 p=1
+    -> 分不开 —— 二分在 RNA 上不成立,报 null,不去找第三种切法
+
+  [预注册 2] 尺度:L>=5 的持续性是否强过 L=1(= 今天的规则)?
+    最强的尺度是 L=5(rho=-0.487)
+    |rho(L=5)| - |rho(L=1)| = +0.018  95% [+0.003, +0.033]  单侧 p=0.006
+    -> 尺度是缺的那味料
+
+  今天规则数进去的那些陷阱里,【黏性】占比 中位 0.0%
+
+  wrote /data/wenhui/openclaude_rna/rna_harness/runs/ceiling/trap_geometry_predict.json
