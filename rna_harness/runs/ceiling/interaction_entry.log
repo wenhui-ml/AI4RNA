@@ -1,0 +1,36 @@
+第三个领域入场检查:120 对(设计序列 + 其内部窗口的反向互补触发链)
+  四家:RNAduplex / RNAcofold(ViennaRNA)· IntaRNA(自有代码库,ViennaRNA 参数)· bifold(RNAstructure)
+  P2 杀死条件:逐对 kappa 普遍 >= 0.8 = 这个领域其实有共识,换领域
+
+    25/120  0.0 min
+    50/120  0.0 min
+    75/120  0.0 min
+    100/120  0.0 min
+    120/120  0.0 min
+
+=== P1 能不能跑 ===
+  RNAduplex  120/120   来源:ViennaRNA
+  RNAcofold  120/120   来源:ViennaRNA
+  IntaRNA    120/120   来源:IntaRNA(ViennaRNA 参数)
+  bifold     120/120   来源:RNAstructure
+
+=== P2 它们互不一致吗(逐对 Cohen's kappa,逐位点)===
+  RNAduplex~IntaRNA        kappa=+0.955   逐对精确重合 Jaccard=0.948
+  RNAcofold~bifold         kappa=+0.944   逐对精确重合 Jaccard=0.917
+  RNAduplex~bifold         kappa=+0.819   逐对精确重合 Jaccard=0.790
+  RNAduplex~RNAcofold      kappa=+0.810   逐对精确重合 Jaccard=0.788  <- 同一软件包
+  RNAcofold~IntaRNA        kappa=+0.804   逐对精确重合 Jaccard=0.783
+  IntaRNA~bifold           kappa=+0.804   逐对精确重合 Jaccard=0.773
+
+  kappa >= 0.8 的对:6/6  ['RNAduplex~RNAcofold', 'RNAduplex~IntaRNA', 'RNAduplex~bifold', 'RNAcofold~IntaRNA', 'RNAcofold~bifold', 'IntaRNA~bifold']
+
+=== P3 严格判据(四家给出【完全相同】的相互作用)能交付多少 ===
+  55/120 = 45.8%
+
+=== 入场判定 ===
+  P1 至少 3 家能跑          通过(4 家)
+  P2 互不一致              不过 —— 这个领域有共识,换领域
+  P3 严格判据交付不了       不过 —— 用严格判据即可,不需要标定
+  -> 不进入。门槛不放宽,换领域。
+
+  wrote /data/wenhui/openclaude_rna/rna_harness/runs/ceiling/interaction_entry.json
