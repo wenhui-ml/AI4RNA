@@ -87,6 +87,17 @@ def parse_rdat(text: str):
     The prefix is taken from the file's own annotation rather than sliced out of the full sequence, so a
     construct whose intermediates are not simple prefixes cannot silently be treated as if they were -- it is
     checked below and dropped instead.
+
+    THE FIRST VERSION OF THIS FUNCTION HAD A REAL BUG AND IT LANDED ON THE ONE MOLECULE THAT DISAGREED.
+    It assumed a value at index i belongs to sequence index i, uniformly. Across these files that assumption
+    does not hold: OFFSET ranges over 10, 0 and -3, SEQPOS is numbered from -9 in some files, and -- the part
+    that actually bites -- two constructs (FLUORSW, SRPECLI) report k-1 values for a transcript of length k
+    while every other construct reports k. A row that is one value short is either positions 1..k-1 or
+    2..k, and picking wrong shifts that construct's entire result by one nucleotide.
+
+    So the number of values is reported per row and the ambiguity is resolved once per construct, by the
+    reference structure against the FULL-LENGTH data -- never by our own prefix MFE, which would let the
+    thing being tested choose its own alignment.
     """
     lines = text.splitlines()
     seq = next((l.split("\t", 1)[1].strip() for l in lines if l.startswith("SEQUENCE")), None)
@@ -104,14 +115,17 @@ def parse_rdat(text: str):
         elif l.startswith("DATA:"):
             i = int(l.split("\t")[0].split(":")[1])
             data[i] = [x for x in l.split("\t")[1:] if x != ""]
+    seqpos = [x for x in next((l for l in lines if l.startswith("SEQPOS")), "").split("\t")[1:]
+              if x.strip()]
     out = {}
     for i, vals in data.items():
         k, kind, pre = ann.get(i, (None, None, None))
         if kind != "REACTIVITY" or k is None or not pre:
             continue
         r = [float(x) if x not in ("", "NA", "nan") else None for x in vals]
-        out[k] = {"prefix": pre, "reactivity": r}
-    return {"sequence": seq, "lengths": out}
+        out[k] = {"prefix": pre, "reactivity": r, "n_values": len(r)}
+    return {"sequence": seq, "lengths": out, "n_seqpos": len(seqpos),
+            "offset": int(next((l.split("\t")[1] for l in lines if l.startswith("OFFSET")), "0"))}
 
 
 def shape_target(seq: str, react):
@@ -144,6 +158,31 @@ def shape_target(seq: str, react):
     return s if len(s) == len(seq) else None
 
 
+def resolve_shift(seq, target, react_full):
+    """Which sequence index does value j belong to? Decided by the REFERENCE, on the full-length data.
+
+    Deliberately not decided by prefix MFE: letting the model under test pick the alignment that flatters it
+    is the same class of error as choosing a threshold after seeing both arms. Returns the shift and the two
+    AUROCs so a reader can see whether the choice was clear or a coin flip.
+    """
+    from rna_harness.benchmarks.kinetic_suite import pair_set
+    paired = {i for p in pair_set(target) for i in p}
+    best, table = None, {}
+    for sh in (0, 1):
+        lab, sc = [], []
+        for j, v in enumerate(react_full):
+            i = j + sh
+            if v is None or not (0 <= i < len(seq)):
+                continue
+            lab.append(i not in paired)
+            sc.append(v)
+        a = auroc(lab, sc)
+        table[sh] = a
+        if a is not None and (best is None or a > table[best]):
+            best = sh
+    return best or 0, table
+
+
 def auroc(labels, scores):
     """P(score of a positive > score of a negative), ties counted as half. None if a class is empty."""
     pos = [s for l, s in zip(labels, scores) if l]
@@ -159,6 +198,7 @@ def auroc(labels, scores):
 
 def score_construct(rid: str, rec, min_lengths: int):
     is_dms = "_DMS_" in rid
+    _ = rec.get("n_seqpos")
     from rna_harness.benchmarks.kinetic_suite import pair_set
     seq, L = rec["sequence"], rec["lengths"]
     full = max(L) if L else 0
@@ -174,6 +214,15 @@ def score_construct(rid: str, rec, min_lengths: int):
     if not target:
         return {"rmdb_id": rid, "skipped": "RNAstructure did not produce a reference"}
     tgt_pairs = pair_set(target)
+    shift, shift_table = resolve_shift(seq, target, L[full]["reactivity"])
+
+    # A REFERENCE THAT CANNOT EXPLAIN THE DATA IT WAS FIT TO EXPLAINS NOTHING. Five constructs came back
+    # under 0.65 on their own full-length reactivity, one of them at 0.507 -- indistinguishable from chance --
+    # and they were being reported alongside references at 0.78 as if the two were the same kind of evidence.
+    ref_quality = shift_table.get(shift)
+    if ref_quality is None or ref_quality < 0.65:
+        return {"rmdb_id": rid, "skipped": f"参照解释不了它自己的全长数据 AUROC={ref_quality}",
+                "ref_quality": ref_quality}
 
     import RNA
     rows = []
@@ -181,8 +230,9 @@ def score_construct(rid: str, rec, min_lengths: int):
         if k == full:
             continue                                        # the reference was derived from this one
         pre, rv = L[k]["prefix"], L[k]["reactivity"]
-        n = min(len(pre), len(rv))
-        idx = [i for i in range(n) if rv[i] is not None]
+        pos = {j + shift: v for j, v in enumerate(rv) if v is not None and 0 <= j + shift < len(pre)}
+        rv = pos                                        # now keyed by SEQUENCE index, not by column
+        idx = sorted(pos)
         if len(idx) < 15:
             continue
         mfe = RNA.fold(pre)[0]
@@ -234,7 +284,9 @@ def score_construct(rid: str, rec, min_lengths: int):
                      "per_base": per_base}
         rows.append({"k": k, "trap": bool(off), "n_off_pairs": len(off),
                      "auroc_mfe": a_m, "auroc_tgt": a_t, "n_scored": len(idx), "focus": focus})
-    return {"rmdb_id": rid, "n": len(seq), "target": target, "n_lengths": len(rows), "rows": rows}
+    return {"rmdb_id": rid, "n": len(seq), "target": target, "n_lengths": len(rows),
+            "shift": shift, "shift_table": shift_table, "ref_quality": ref_quality,
+            "offset": rec.get("offset"), "rows": rows}
 
 
 def report(R, out):
