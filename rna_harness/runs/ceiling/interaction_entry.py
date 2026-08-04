@@ -50,6 +50,9 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.abspath(os.path.join(HERE, "..", "..", ".."))
 sys.path.insert(0, REPO)
 
+from rna_harness.instrument import (check_duplex_antiparallel, check_pair_set,   # noqa: E402
+                                    run_controls)
+
 VPK = "/home/ubuntu/miniconda3/envs/vpk/bin"
 INTA = "/home/ubuntu/miniconda3/envs/inta/bin/IntaRNA"
 RNASTR = "/home/ubuntu/miniconda3/envs/rnastr/bin"
@@ -181,7 +184,15 @@ def work(job):
     out = {"task_id": tid, "a": a, "b": b}
     for name, fn in TOOLS.items():
         p = fn(a, b)
-        out[name] = None if p is None else sorted(map(list, p))
+        if p is not None:
+            # Both of this file's parser bugs are now impossible rather than merely fixed: a reused position
+            # or an out-of-range index raises, and a parallel duplex raises. The second is the whole reason
+            # the P2 verdict nearly came out backwards.
+            checked = check_pair_set(p, len(a), len(b), name=f"{name}:{tid}")
+            check_duplex_antiparallel(checked, name=f"{name}:{tid}")
+            out[name] = [list(x) for x in checked]
+        else:
+            out[name] = None
     return out
 
 
@@ -208,6 +219,28 @@ def main():
     if missing:
         print(f"!! 缺少 {missing} —— 入场检查不能用替代品凑数,退出。")
         return
+
+    # POSITIVE AND NEGATIVE CONTROL ON EVERY TOOL, EVERY RUN. bifold once returned an empty set on every
+    # input, and an empty set scores kappa exactly 0.000 against everyone -- which reads as total
+    # disagreement, i.e. as P2 passing. A tool that fails either control does not get to vote.
+    POS = ("GGGAAACCCUUUGGGAAACCC", "GGGUUUCCC")
+    NEG = ("AAAAAAAAAAAAAAAAAAAAA", "AAAAAAAAA")
+    controls = {}
+    for name, fn in TOOLS.items():
+        cr = run_controls(name, fn, POS, NEG,
+                          positive_ok=lambda v: v is not None and len(v) >= 4,
+                          negative_ok=lambda v: v is not None and len(v) == 0)
+        controls[name] = {"positive_ok": cr.positive_ok, "negative_ok": cr.negative_ok,
+                          "usable": cr.usable, "note": cr.note}
+        print(f"  对照 {name:10s} 正 {cr.positive_ok}  负 {cr.negative_ok}"
+              f"{'' if cr.usable else '   <- 不可用,不参与判决'}")
+    unusable = [n for n, c in controls.items() if not c["usable"]]
+    if unusable:
+        print(f"\n!! {unusable} 未通过对照 —— 它们的输出不进入 P2/P3,先修工具再跑。")
+        json.dump({"gate": "controls", "controls": controls}, open(a.out, "w"),
+                  ensure_ascii=False, indent=1)
+        return
+    print()
 
     d = json.load(open(a.src))
     jobs = []
@@ -297,7 +330,7 @@ def main():
     print(f"  P3 严格判据交付不了       {'通过' if p3_ok else '不过 —— 用严格判据即可,不需要标定'}")
     verdict = len(usable) >= 3 and p2_ok and p3_ok
     print(f"  -> {'可以进入,按协议做步骤 1-6' if verdict else '不进入。门槛不放宽,换领域。'}")
-    json.dump({"gate": "entry", "ran": ran, "usable": usable, "kappa": ks, "jaccard": jac,
+    json.dump({"gate": "entry", "controls": controls, "ran": ran, "usable": usable, "kappa": ks, "jaccard": jac,
                "strict_delivery": rate, "P1": len(usable) >= 3, "P2": p2_ok, "P3": p3_ok,
                "enter": bool(verdict), "window": WINDOW, "rows": R},
               open(a.out, "w"), ensure_ascii=False, indent=1)
