@@ -272,7 +272,72 @@ def stable_seed(*parts: object) -> int:
 
 
 # ---------------------------------------------------------------------------------------------------------
-# 8. a binary kill-gate sitting on top of a continuous statistic
+# 8. a rate matrix used as a master-equation generator
+# ---------------------------------------------------------------------------------------------------------
+def check_generator(rates, energies: Sequence[float], start: int, rt: float = 0.0019872 * 310.15,
+                    name: str = "generator") -> Dict[str, object]:
+    """A rate matrix is only a usable generator if it is irreducible AND obeys detailed balance.
+
+    TWO DEFECTS THIS EXISTS FOR, both found within ten minutes of each other while trying to build a second
+    kinetic judge out of `barriers`.
+
+    ORIENTATION. rates.out from barriers is [source][target] and carries a nonzero self-rate on the diagonal.
+    Reading it the other way round, or exponentiating it with the diagonal left in, produces populations that
+    look plausible and are wrong. Detailed balance decides the orientation empirically -- the median log
+    deviation was 0.019 one way and 8.792 the other, which is not a judgement call.
+
+    REDUCIBILITY. With --max 12 the matrix came back in TWO disconnected components, the open chain in one
+    and the ground state in the other. Long-time populations then converge to the Boltzmann distribution
+    WITHIN the start's component, not the global one -- so a target sitting in the other component scores
+    population zero forever, as an artefact of truncation rather than as kinetics. Comparing against global
+    Boltzmann made a correct solver look broken; the restricted comparison agreed to 0.0045.
+
+    Returns the diagnosis; raises only when the matrix cannot be a generator at all.
+    """
+    import numpy as np
+    from scipy.sparse import csr_matrix
+    from scipy.sparse.csgraph import connected_components
+    R = np.array(rates, dtype=float)
+    if R.ndim != 2 or R.shape[0] != R.shape[1]:
+        raise InstrumentError(f"{name}: rate matrix is not square")
+    n = R.shape[0]
+    diag_nonzero = bool(np.any(np.diag(R) != 0))
+    np.fill_diagonal(R, 0.0)
+    G = np.asarray(energies, dtype=float)[:n]
+    err = []
+    for i in range(n):
+        for j in range(n):
+            if i != j and R[i, j] > 0 and R[j, i] > 0:
+                err.append(abs(math.log(R[i, j] / R[j, i]) + (G[j] - G[i]) / rt))
+    db = float(np.median(err)) if err else float("nan")
+    flipped = []
+    for i in range(n):
+        for j in range(n):
+            if i != j and R[i, j] > 0 and R[j, i] > 0:
+                flipped.append(abs(math.log(R[j, i] / R[i, j]) + (G[j] - G[i]) / rt))
+    db_flipped = float(np.median(flipped)) if flipped else float("nan")
+    lab = connected_components(csr_matrix(((R > 0) | (R.T > 0)).astype(int)), directed=False)[1]
+    comp = [int(i) for i in np.where(lab == lab[start])[0]]
+    out = {"n": n, "diagonal_was_nonzero": diag_nonzero,
+           "detailed_balance_err": db, "detailed_balance_err_if_transposed": db_flipped,
+           # `db == db` is True for every non-NaN, so the original short-circuited to True always and the
+           # orientation check never fired. Its own test caught it on the first run, which is the point.
+           "orientation_ok": bool(math.isnan(db) or db <= db_flipped),
+           "n_components": int(lab.max() + 1), "irreducible": bool(lab.max() == 0),
+           "start_component": comp, "start_component_size": len(comp)}
+    if not out["orientation_ok"]:
+        raise InstrumentError(
+            f"{name}: detailed balance fits the TRANSPOSED matrix ({db_flipped:.3f} vs {db:.3f}) -- "
+            f"the rate matrix is being read in the wrong direction")
+    if not out["irreducible"]:
+        out["warning"] = (f"reducible: {out['n_components']} components; long-time populations converge to "
+                          f"Boltzmann WITHIN component {comp}, and anything outside it is zero by "
+                          f"construction, not by kinetics")
+    return out
+
+
+# ---------------------------------------------------------------------------------------------------------
+# 9. a binary kill-gate sitting on top of a continuous statistic
 # ---------------------------------------------------------------------------------------------------------
 def gate_margin(values: Sequence[float], threshold: float, n_boot: int = 2000,
                 seed: int = 0) -> Dict[str, object]:

@@ -159,3 +159,38 @@ def test_a_gate_decided_within_noise_is_reported_as_a_knife_edge():
     assert not edge["decisive"] and "knife edge" in edge["verdict"]
     clear = gate_margin([0.95, 0.96, 0.94, 0.97, 0.95, 0.96], 0.80)
     assert clear["decisive"] and clear["verdict"] == "clear" and clear["margin"] > 0.1
+
+
+# --- 9. a rate matrix used as a master-equation generator -------------------------------------------------
+def test_generator_checks_orientation_and_irreducibility():
+    """Two defects found ten minutes apart while trying to build a second kinetic judge out of `barriers`.
+
+    Orientation: rates.out is [source][target] with a nonzero self-rate on the diagonal; read the other way
+    the populations look plausible and are wrong. Detailed balance decides it -- median log deviation 0.019
+    one way, 8.792 the other.
+
+    Reducibility: at --max 12 the matrix came back in two disconnected components with the open chain in one
+    and the ground state in the other, so the long-time limit is Boltzmann WITHIN the start's component.
+    Comparing against global Boltzmann made a correct solver look broken.
+    """
+    import numpy as np
+    from rna_harness.instrument import check_generator
+    RT = 0.0019872 * 310.15
+    G = [-10.0, -8.0, -6.0]
+    R = np.zeros((3, 3))
+    R[0, 1] = 1.0                                          # 0 -> 1
+    R[1, 0] = R[0, 1] * np.exp(-(G[0] - G[1]) / RT)        # detailed balance
+    R[1, 2] = 1.0
+    R[2, 1] = R[1, 2] * np.exp(-(G[1] - G[2]) / RT)
+    ok = check_generator(R, G, start=2)
+    assert ok["irreducible"] and ok["orientation_ok"] and ok["detailed_balance_err"] < 1e-6
+
+    with pytest.raises(InstrumentError, match="wrong direction"):
+        check_generator(R.T, G, start=2)
+
+    split = np.zeros((4, 4))
+    split[0, 1] = 1.0
+    split[1, 0] = split[0, 1] * np.exp(-(G[0] - G[1]) / RT)
+    split[2, 3] = split[3, 2] = 1.0                        # a second, disconnected component
+    d = check_generator(split, G + [-6.0], start=2)
+    assert not d["irreducible"] and d["n_components"] == 2 and "by construction" in d["warning"]
