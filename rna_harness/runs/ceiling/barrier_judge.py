@@ -60,14 +60,22 @@ sys.path.insert(0, HERE)
 from rna_harness.instrument import check_generator, run_controls                # noqa: E402
 
 BT = "/home/ubuntu/miniconda3/envs/bt/bin"
-SUBOPT_E = 8.0            # kcal/mol above MFE; declared
-MINH = 2.0                # barriers minimum barrier height for a macrostate; declared
+# NOT A DECLARED CONSTANT ANY MORE, AND THAT WAS A REPEAT OFFENCE. -e 8 was declared without measuring what
+# energy window a CONNECTED landscape needs, and at -e 8 the generator came back reducible, which made the
+# positive control score zero and produced a premature "this judge fails P1". Measured afterwards on two
+# designs: -e 8 gives 3 components, -e 12 gives 7, -e 16 gives ONE, in 0.3 s. -e 20 goes back to 9 on one of
+# them, so wider is not monotonically better and a fixed value cannot be right.
+# This is the same defect class as the theta grid declared an order of magnitude below its quantity's scale,
+# and instrument.scale_then_threshold exists precisely for it -- I had already written the check and did not
+# use it. So the window is now SEARCHED per sequence until check_generator reports irreducible.
+SUBOPT_E_GRID = (8.0, 12.0, 16.0, 20.0, 24.0)
+MINH = 1.0                # measured: minh 2 produced no rates.out on 4 of 6 designs; minh 1 always did
 MAXSTATES = 50            # declared
 TIMES = (1e0, 1e2, 1e4, 1e6, 1e9)
 JUDGE_T = 1e6             # the declared operating point; the sweep is reported alongside
 
 
-def landscape(seq: str, timeout_s: float = 600.0):
+def landscape(seq: str, e: float, timeout_s: float = 600.0):
     """Macrostates, their energies, their structures and the rate matrix. None if the pipeline did not run.
 
     None is never zero here: an enumeration that blew up and a molecule that cannot fold are opposite
@@ -75,7 +83,7 @@ def landscape(seq: str, timeout_s: float = 600.0):
     """
     try:
         with tempfile.TemporaryDirectory() as d:
-            sub = subprocess.run([f"{BT}/RNAsubopt", "-e", str(SUBOPT_E), "-s", "--noLP"],
+            sub = subprocess.run([f"{BT}/RNAsubopt", "-e", str(e), "-s", "--noLP"],
                                  input=f"{seq}\n", capture_output=True, text=True,
                                  timeout=timeout_s, cwd=d)
             if sub.returncode != 0 or not sub.stdout:
@@ -98,7 +106,7 @@ def landscape(seq: str, timeout_s: float = 600.0):
             rows = [r for r in rows if len(r) >= 3 and r[0].isdigit()][:R.shape[0]]
             if len(rows) != R.shape[0]:
                 return None
-            return {"n_subopt": n_sub, "rates": R,
+            return {"n_subopt": n_sub, "subopt_e": e, "rates": R,
                     "structures": [r[1] for r in rows], "energies": [float(r[2]) for r in rows]}
     except Exception:                                                          # noqa: BLE001
         return None
@@ -108,18 +116,37 @@ def target_population(seq: str, target: str, times=TIMES):
     """Population of the macrostate whose representative IS the target, over time. None if unscoreable."""
     import numpy as np
     from scipy.linalg import expm
-    L = landscape(seq)
+    # Search the energy window rather than declaring it: the smallest window that yields an IRREDUCIBLE
+    # generator containing the target. A reducible generator scores anything outside the start's component at
+    # zero by truncation, and reporting that as "does not fold" is the error this file warned itself about.
+    L, diag, chosen = None, None, None
+    for e in SUBOPT_E_GRID:
+        cand = landscape(seq, e)
+        if not cand:
+            continue
+        if target not in cand["structures"]:
+            L = L or cand
+            continue
+        st = int(np.argmax(cand["energies"]))
+        d = check_generator(cand["rates"], cand["energies"], start=st, name=f"barriers@e{e}")
+        L, diag, chosen = cand, d, e
+        if d["irreducible"]:
+            break
     if not L:
         return None
     structs, G = L["structures"], L["energies"]
-    if target not in structs:
+    if diag is None or target not in structs:
         # the target is not a local minimum of this landscape, so there is no macrostate to score.
         # Reported as unscoreable rather than as population zero.
         return {"unscoreable": "target is not a macrostate representative", "n_states": len(structs),
-                "n_subopt": L["n_subopt"]}
+                "n_subopt": L["n_subopt"], "subopt_e": L["subopt_e"]}
+    if not diag["irreducible"]:
+        # every window in the grid left it reducible -- say so instead of returning a population
+        return {"unscoreable": f"generator reducible at every window up to e={chosen} "
+                               f"({diag['n_components']} components)",
+                "n_states": len(structs), "n_subopt": L["n_subopt"], "subopt_e": chosen}
     ti = structs.index(target)
     start = int(np.argmax(G))                     # highest-energy macrostate, the open-chain proxy
-    diag = check_generator(L["rates"], G, start=start, name="barriers")
     R = np.array(L["rates"], dtype=float)
     np.fill_diagonal(R, 0.0)
     M = R.T.copy()
@@ -130,7 +157,7 @@ def target_population(seq: str, target: str, times=TIMES):
     for t in times:
         p = expm(M * t) @ p0
         pops[f"t{t:.0e}"] = float(p[ti])
-    return {"n_states": len(G), "n_subopt": L["n_subopt"], "target_state": ti,
+    return {"n_states": len(G), "n_subopt": L["n_subopt"], "subopt_e": chosen, "target_state": ti,
             "start_state": start, "same_component": bool(ti in diag["start_component"]),
             "irreducible": diag["irreducible"], "n_components": diag["n_components"],
             "detailed_balance_err": diag["detailed_balance_err"],
@@ -160,13 +187,37 @@ def main():
     pos_seq = "GGGGAAAACCCCUUUUGGGGAAAACCCC"
     import RNA
     pos_tgt = RNA.fold(pos_seq)[0]
-    neg_seq = "A" * len(pos_seq)
-    neg_tgt = pos_tgt
+    # THE NEGATIVE CONTROL TOOK TWO ATTEMPTS TO GET RIGHT, and both failures are the same shape: it passed
+    # for a reason that had nothing to do with discrimination.
+    #   (1) poly-A. RNAsubopt gives one structure, barriers finds zero saddles and writes no rates.out, so
+    #       target_population returned None -- and the predicate accepted None as a pass. A completely broken
+    #       install would have "passed" identically. None means the pipeline did not run.
+    #   (2) A "foreign" sequence and target of the same length. It scored 0.88, because the target I picked
+    #       happened to be that sequence's own MFE.
+    # What the control has to test is whether the judge says yes to EVERYTHING. So it now uses the positive
+    # sequence's own landscape and asks for a HIGH-ENERGY macrostate of it, which is kinetically inaccessible
+    # from the open chain and must score near zero.
+    neg_seq = pos_seq
+    _L = None
+    for _e in SUBOPT_E_GRID:
+        _L = landscape(neg_seq, _e)
+        if _L and len(_L["energies"]) >= 4:
+            break
+    if not _L:
+        print("!! 连正对照序列的地形都建不出来 —— 无法构造负对照,退出。")
+        return
+    import numpy as _np
+    _order = _np.argsort(_L["energies"])          # ascending: index 0 is the ground state
+    neg_tgt = _L["structures"][int(_order[-2])]   # second-highest energy macrostate
+    print(f"  负对照靶标 = 同一条序列的次高能宏观态 "
+          f"({_L['energies'][int(_order[-2])]:.2f} vs 基态 {min(_L['energies']):.2f} kcal/mol)")
     cr = run_controls("barriers-judge", lambda s, t: target_population(s, t),
                       (pos_seq, pos_tgt), (neg_seq, neg_tgt),
                       positive_ok=lambda v: bool(v) and v.get("judge", 0) > 0.5,
-                      negative_ok=lambda v: (not v) or v.get("unscoreable") is not None
-                      or v.get("judge", 1) < 0.05)
+                      # a run that produced nothing is NOT a pass -- that is the conflation this project
+                      # keeps catching in other people's results and just committed itself
+                      negative_ok=lambda v: bool(v) and (v.get("unscoreable") is not None
+                                                         or v.get("judge", 1) < 0.05))
     print(f"  正对照(设计序列折到自己的 MFE)  {cr.positive_ok}"
           f"   布居={None if not cr.positive_value else round(cr.positive_value.get('judge', -1), 4)}")
     print(f"  负对照(poly-A 折到同一结构)      {cr.negative_ok}")
@@ -267,8 +318,8 @@ def main():
                   f"布居 {s['judge']:.3f}  {r['wall_s']}s")
     print("\n  这条曲线区分两个完全不同的结论:70 nt 上限是【物理】还是【枚举】。")
 
-    json.dump({"gate": "ok", "subopt_e": SUBOPT_E, "minh": MINH, "max_states": MAXSTATES,
-               "judge_time": JUDGE_T, "n_short": len(short), "n_scoreable": len(ok),
+    json.dump({"gate": "ok", "minh": MINH, "max_states": MAXSTATES,
+               "judge_time": JUDGE_T, "subopt_e_grid": list(SUBOPT_E_GRID), "n_short": len(short), "n_scoreable": len(ok),
                "n_unscoreable": len(uns), "n_dead": len(dead), "n_reducible": len(red),
                "spearman_vs_kinfold": rho, "rows": R}, open(a.out, "w"),
               ensure_ascii=False, indent=1)
