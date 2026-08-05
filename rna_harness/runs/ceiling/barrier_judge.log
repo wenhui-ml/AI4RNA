@@ -1,0 +1,32 @@
+=== P1 正负对照(每次运行都跑)===
+  负对照靶标 = 同一条序列的次高能宏观态 (-7.50 vs 基态 -14.00 kcal/mol)
+  两个对照谓词都已证明【能够失败】(拿 None / 空 / 饱和 输入验过)
+  正对照(设计序列折到自己的 MFE)  True   布居=0.9558
+  负对照(同一序列的次高能宏观态)    True   布居=0.0
+  -> P1 通过
+
+共 60 个任务:30 条短设计(与 Kinfold 同一批) + 30 个长度可行性点
+
+    10/60  0.0 min
+    20/60  0.1 min
+    30/60  0.2 min
+    40/60  7.8 min
+    50/60  15.1 min
+    60/60  22.4 min
+
+=== 短设计 30 条:可打分 28,靶标不是宏观态 2,流水线跑不动 0 ===
+  生成元可约的 0/28  —— 可约时分量外布居恒为 0 是【截断】造成的,不是动力学
+
+=== 这个裁判在这批上【没有可用跨度】(0.9885..0.9998),相关不予报告 ===
+  28/28 都严格介于 0 与 1 之间,但整个输出只跨 ~2 个百分点。
+  在这种分布上算出的 rho 无论多少都不能解读 —— 不是【判据不预测重折叠】,
+  是【这个裁判在这批设计上分不出高下】。而这本身是个结论:
+  这些设计【从开链重折叠】几乎总能到达目标,难的是共转录。
+  对比 Kinfold 访问式在同一批上的 10% 分位 0.27 —— 那是可用跨度。
+  barriers 布居 中位 0.998   Kinfold 访问式 中位 0.975
+Traceback (most recent call last):
+  File "/data/wenhui/openclaude_rna/rna_harness/runs/ceiling/barrier_judge.py", line 467, in <module>
+    main()
+  File "/data/wenhui/openclaude_rna/rna_harness/runs/ceiling/barrier_judge.py", line 403, in main
+    print(f"  Spearman rho={rho:+.3f}  p={p:.3g}")
+TypeError: unsupported format string passed to NoneType.__format__

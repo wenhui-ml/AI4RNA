@@ -79,6 +79,12 @@ def test_one_nonzero_construct_is_not_dynamic_range():
     """WOULD HAVE FLIPPED A VERDICT. "not all zero" let 1/17 print "dynamic range recovered" at sd 0.059."""
     assert not has_dynamic_range([0.0] * 16 + [0.25])
     assert has_dynamic_range([0.0, 1.0, 0.3, 0.5, 0.6, 0.2, 0.9, 0.4, 0.1])
+    # SECOND VERSION, and its absence almost shipped a wrong claim. The barriers refolding judge returned
+    # 0.9787..0.9979 -- every value strictly between 0 and 1, so the first version passed it -- and a
+    # correlation against it came out rho=+0.169, p=0.39, which reads as "the criterion does not predict
+    # refolding". The truth is a 1.9-point range, so nothing is detectable either way.
+    saturated = [0.9787, 0.98, 0.985, 0.99, 0.993, 0.995, 0.997, 0.9979] * 4
+    assert not has_dynamic_range(saturated), "a judge spanning 2 points has no usable range"
 
 
 # --- 3. statistics at the wrong level of replication -----------------------------------------------------
@@ -194,3 +200,49 @@ def test_generator_checks_orientation_and_irreducibility():
     split[2, 3] = split[3, 2] = 1.0                        # a second, disconnected component
     d = check_generator(split, G + [-6.0], start=2)
     assert not d["irreducible"] and d["n_components"] == 2 and "by construction" in d["warning"]
+
+
+# --- 10. the checks that were written and then not used --------------------------------------------------
+def test_a_control_that_cannot_fail_is_rejected():
+    """Both negative controls I wrote today passed for reasons unrelated to discrimination.
+
+    poly-A made the pipeline return None and the predicate accepted None as a pass -- a completely broken
+    install would have passed identically. The second attempt used a "foreign" target that turned out to be
+    that sequence's own MFE and scored 0.88.
+    """
+    from rna_harness.instrument import assert_control_can_fail
+    too_permissive = lambda v: True                                            # noqa: E731
+    with pytest.raises(InstrumentError, match="cannot fail"):
+        assert_control_can_fail(too_permissive, [None, {}, {"judge": 1.0}])
+    # the real defect: accepting None, which means "the pipeline did not run"
+    accepts_none = lambda v: (not v) or v.get("judge", 1) < 0.05               # noqa: E731
+    with pytest.raises(InstrumentError, match="cannot fail"):
+        assert_control_can_fail(accepts_none, [None])
+    strict = lambda v: bool(v) and v.get("judge", 1) < 0.05                    # noqa: E731
+    assert_control_can_fail(strict, [None, {}, {"judge": 1.0}])                # must not raise
+
+
+def test_a_threshold_cannot_be_used_before_its_scale_is_measured():
+    """SUBOPT_E = 8.0 and theta in {0.1..2.0} were both declared without calling scale_then_threshold,
+
+    which already existed. Writing a check and not using it is indistinguishable from not having it.
+    """
+    from rna_harness.instrument import Declared
+    d = Declared("theta", [0.1, 0.25, 0.5, 1.0, 2.0])
+    with pytest.raises(InstrumentError, match="before its scale"):
+        _ = d.value
+    with pytest.raises(InstrumentError, match="misses the observed scale"):
+        _ = d.against([12.0, 18.0, 24.0]).value
+    ok = Declared("share", [0.2, 0.5, 0.8]).against([0.47, 0.56, 0.64])
+    assert list(ok.value) == [0.2, 0.5, 0.8] and ok.scale["straddles_scale"]
+
+
+def test_entry_population_must_be_the_deployment_population():
+    """P2 said "measure whether they disagree" and never said on which population, and the population decided
+
+    the answer: on perfect-complement triggers all six kappas cleared 0.80 and strict already delivered 45.8%.
+    """
+    from rna_harness.instrument import assert_population_is_deployment
+    assert_population_is_deployment("natural sRNA-mRNA pairs", "natural sRNA-mRNA pairs")
+    with pytest.raises(InstrumentError, match="declare the deployment population"):
+        assert_population_is_deployment("perfect-complement triggers", "natural sRNA-mRNA pairs")

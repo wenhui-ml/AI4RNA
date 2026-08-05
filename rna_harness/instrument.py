@@ -127,6 +127,82 @@ def run_controls(tool: str, fn: Callable, positive: tuple, negative: tuple,
     return ControlResult(tool, bool(positive_ok(pv)), bool(negative_ok(nv)), pv, nv)
 
 
+def assert_control_can_fail(predicate: Callable[[object], bool], degenerate: Sequence[object],
+                            name: str = "control") -> None:
+    """A control that cannot fail is not a control. Prove the predicate rejects something before trusting it.
+
+    BOTH OF MY NEGATIVE CONTROLS TODAY PASSED FOR REASONS UNRELATED TO DISCRIMINATION, and that is what this
+    exists for -- not a hypothetical.
+
+      poly-A gave RNAsubopt one structure, barriers found zero saddles and wrote no rates.out, so the judge
+      returned None -- and the predicate accepted None as a pass. A completely broken install would have
+      "passed" identically. None means the pipeline did not run; it is not evidence about folding.
+
+      The second attempt used a "foreign" sequence and target of the same length. It scored 0.88, because the
+      target I picked happened to be that sequence's own MFE.
+
+    Pass the degenerate values the predicate MUST reject -- None, an empty result, a saturated result. If it
+    accepts all of them, the control is decorative and the run stops here rather than producing a number.
+    """
+    accepted = []
+    for d in degenerate:
+        try:
+            if predicate(d):
+                accepted.append(d)
+        except Exception:                                                      # noqa: BLE001
+            pass                                    # raising on garbage is a legitimate rejection
+    if len(accepted) == len(degenerate):
+        raise InstrumentError(
+            f"{name}: predicate accepted every degenerate input {accepted!r} -- a control that cannot fail "
+            f"is not a control")
+
+
+@dataclass
+class Declared:
+    """A threshold that refuses to be used unless it was built against the quantity's measured scale.
+
+    scale_then_threshold already existed and I declared SUBOPT_E = 8.0 and theta in {0.1..2.0} without calling
+    it -- twice, on the same defect class. Writing a check and not using it is indistinguishable from not
+    having it, so the value is now unreachable until the scale has been measured.
+    """
+    name: str
+    grid: Sequence[float]
+    _scale: Optional[Dict[str, object]] = None
+
+    def against(self, sample: Sequence[float]) -> "Declared":
+        self._scale = scale_then_threshold(sample, self.grid, name=self.name)
+        return self
+
+    @property
+    def value(self) -> Sequence[float]:
+        if self._scale is None:
+            raise InstrumentError(
+                f"{self.name}: threshold used before its scale was measured -- call .against(sample) first")
+        if not self._scale["straddles_scale"]:
+            raise InstrumentError(f"{self.name}: {self._scale['verdict']}")
+        return self.grid
+
+    @property
+    def scale(self) -> Dict[str, object]:
+        if self._scale is None:
+            raise InstrumentError(f"{self.name}: scale not measured")
+        return self._scale
+
+
+def assert_population_is_deployment(entry: str, deployment: str, name: str = "population") -> None:
+    """The population an entry check runs on must be the population the criterion will sign for.
+
+    The protocol's P2 said "measure whether the predictors disagree" and never said ON WHICH POPULATION, and
+    the answer turned out to be decided by it: on perfect-complement triggers -- the easiest case in the
+    domain -- all six pairwise kappas cleared 0.80 and the strict rule already delivered 45.8%. That is in the
+    protocol as prose; this puts it in code.
+    """
+    if entry != deployment:
+        raise InstrumentError(
+            f"{name}: entry check ran on '{entry}' but the criterion will sign for '{deployment}' -- "
+            f"declare the deployment population and test on it, or state the mismatch as a scope limit")
+
+
 def constancy(values: Sequence[float]) -> Dict[str, object]:
     """Which side is constant, and at which end -- because a warning that omits this inverts the finding.
 
@@ -147,18 +223,30 @@ def constancy(values: Sequence[float]) -> Dict[str, object]:
 
 
 def has_dynamic_range(values: Sequence[float], min_fraction_between: float = 1 / 3,
-                      min_count: int = 3) -> bool:
-    """A judge is usable only when a real share of the population sits strictly between the two extremes.
+                      min_count: int = 3, min_spread: float = 0.10) -> bool:
+    """A judge is usable only when a real share of the population sits strictly between the extremes AND the
+    spread is large enough to detect anything.
 
     "Not all zero" is far too weak: one nonzero construct out of seventeen gives sd 0.059 and was reported as
     dynamic range recovered. Both degenerate directions are equally useless -- a judge that says 1.0 for
     everything tells you nothing that one saying 0.0 does not.
+
+    THE SPREAD REQUIREMENT IS THE SECOND VERSION, AND ITS ABSENCE ALMOST SHIPPED A WRONG CLAIM. The barriers
+    refolding judge returned populations spanning 0.9787 to 0.9979 -- 28 of 28 "strictly between 0 and 1", so
+    the first version passed it -- and a correlation against it came out rho=+0.169, p=0.39. Reported as
+    written that would have read "the criterion does not predict refolding". The truth is that the judge has
+    a 1.9-percentage-point range on this population, so NO correlation is detectable either way. Compare
+    Kinfold on the same designs: 10th percentile 0.27, i.e. a usable spread.
     """
     v = [float(x) for x in values]
     if not v:
         return False
     between = sum(1 for x in v if 0 < x < 1)
-    return between >= max(min_count, math.ceil(min_fraction_between * len(v)))
+    if between < max(min_count, math.ceil(min_fraction_between * len(v))):
+        return False
+    q = sorted(v)
+    lo, hi = q[max(0, int(0.10 * len(q)) - 1)], q[min(len(q) - 1, int(0.90 * len(q)))]
+    return (hi - lo) >= min_spread
 
 
 # ---------------------------------------------------------------------------------------------------------
