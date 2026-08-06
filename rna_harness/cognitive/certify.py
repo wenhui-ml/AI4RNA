@@ -176,52 +176,72 @@ KNOT_OPERATING_POINT = {
 ORACLE_KAPPA = {"pkiss~probknot": 0.324, "pkiss~shapeknots": 0.359, "probknot~shapeknots": 0.743,
                 "effective_independent_sources": 2}
 
-# WHAT EACH GRADE IS WORTH TO AN OUTSIDER, measured rather than asserted (runs/ceiling/knotty_judge.py and
-# ceiling_and_coverage.py; 4388 designs over 250 targets, every one of which already clears the shipped k>=1
-# floor). Two judges that took no part in any rule adjudicate: RNAPKplex (ViennaRNA, heuristic helix
-# assembly) and Knotty (exact sparsified DP, HotKnots DP09 parameters). They are NOT redundant with each
-# other -- Cohen's kappa 0.341 -- which is what makes the pair worth quoting.
+# WHAT EACH GRADE IS WORTH TO AN OUTSIDER, measured rather than asserted (runs/ceiling/knotty_judge.py,
+# ceiling_and_coverage.py, ipknot_judge.py; 4388 designs over 250 targets, every one of which already clears
+# the shipped k>=1 floor). THREE judges that took no part in any rule adjudicate, chosen to span the field's
+# algorithm classes rather than to be three binaries:
 #
-# A raw agreement rate is uninterpretable on its own, because every predictor in this field misses most of
-# nature. So each rate is quoted against that same judge's own rate on NATIVE sequences (n=186), measured in
-# the same run:
+#     RNAPKplex   heuristic helix assembly              Turner-family energies
+#     Knotty      exact sparsified DP                   HotKnots DP09 energies
+#     IPknot      integer programming over base-pair    LinearPartition-C probabilities -- LEARNED, not
+#                 probabilities                         thermodynamic
 #
-#     RNAPKplex  66.7% [59.4, 73.4]      Knotty  73.7% [66.7, 79.8]      both agreeing  62.4% [55.0, 69.3]
+# They are pairwise NON-redundant -- Cohen's kappa 0.341, 0.109, 0.113 -- which is what makes quoting all
+# three worth anything. All three run at defaults; tuning a judge while looking at its agreement with our
+# designs is the error already on this project's record.
 #
-# The pattern is a STEP, not a slope, and it is the single most useful thing a caller can be told here:
-# k=1 and k=2 sit at roughly half the ceiling, while k=3 sits ABOVE it on all three references.
+# A raw agreement rate is uninterpretable alone, because every predictor in this field misses most of nature.
+# So each rate is quoted against that same judge's own rate on NATIVE sequences (n=186), measured in the same
+# runs: RNAPKplex 66.7% [59.4, 73.4], Knotty 73.7% [66.7, 79.8], IPknot 46.2% [38.9, 53.7].
 #
-# WHY THE FLOOR IS STILL k>=1 despite that. Raising it to k=3 would put 68.0% of targets (170 of 250) from
-# "has a certificate" to "has none", and k=1/k=2 are not established as WRONG -- they are established as
-# less recognisable to two outside instruments than nature is. Withdrawing an answer is a real cost to a
-# caller who has no other way to get one. So the floor holds and the grade carries the number instead.
-_NATIVE_CEILING = {"rnapkplex": 0.667, "knotty": 0.737, "both": 0.624, "n_native": 186,
+# WHAT REPLICATES ACROSS ALL THREE, and it is the single most useful thing a caller can be told here:
+# there is a STEP at k=3. Going k=2 -> k=3 gains +64.6, +36.4 and +29.0 points respectively, while k=1 -> k=2
+# gains only +0.6, +2.1 and +5.5. Most of what the panel knows is spent in the last vote.
+#
+# WHAT DOES NOT REPLICATE, recorded here because an earlier version of this comment asserted it. "k=3 sits
+# ABOVE the judge's native ceiling" held for RNAPKplex (1.47x) and Knotty (1.14x) and FAILS for IPknot
+# (0.84x) -- it was a property of the first two judges, and the pre-registration in ipknot_judge.py (P2)
+# killed it. Likewise "k=2 is not measurably better than k=1" was true of the first two judges and is false
+# of the third (4.6% -> 10.1%). Whether a grade clears an outside instrument's own bar is JUDGE-DEPENDENT;
+# only the ordering and the size of the k=3 step survive all three.
+#
+# WHY THE FLOOR IS STILL k>=1. Raising it to k=3 would put 68.0% of targets (170 of 250) from "has a
+# certificate" to "has none", and k=1/k=2 are not established as WRONG -- they are established as less
+# recognisable to outside instruments than nature is. Withdrawing an answer is a real cost to a caller who
+# has no other way to get one. So the floor holds and the grade carries the numbers instead.
+_NATIVE_CEILING = {"rnapkplex": 0.667, "knotty": 0.737, "ipknot": 0.462, "both_pk_kn": 0.624, "n_native": 186,
+                   "pairwise_kappa": {"rnapkplex~knotty": 0.341, "rnapkplex~ipknot": 0.109,
+                                      "knotty~ipknot": 0.113},
                    "note": "each judge's own rate on NATIVE pseudoknots -- the reference every rate below "
-                           "must be read against, NOT a correctness rate"}
+                           "must be read against, NOT a correctness rate. The three judges are pairwise "
+                           "non-redundant, so they are three views and not one repeated"}
 
 KNOT_GRADES = {
     3: {"grade": "k=3", "agreeing_oracles": 3, "sensitivity_on_known_structures": 0.432,
-        "outside_agreement": {"n": 146, "rnapkplex": 0.979, "knotty": 0.842, "both": 0.836,
-                              "vs_native_ceiling": {"rnapkplex": 1.47, "knotty": 1.14, "both": 1.34}},
-        "means": "all three predictors reproduce the crossing stems. Two independent outside judges "
-                 "recognise these designs MORE often than they recognise natural pseudoknots (1.14x and "
-                 "1.47x their own native ceilings). Note that two panel members (ProbKnot and ShapeKnots) "
-                 "agree with each other at kappa=0.74, so this is closer to two independent votes than "
-                 "to three"},
+        "outside_agreement": {"n": 146, "rnapkplex": 0.979, "knotty": 0.842, "ipknot": 0.390,
+                              "vs_native_ceiling": {"rnapkplex": 1.47, "knotty": 1.14, "ipknot": 0.84}},
+        "means": "all three predictors reproduce the crossing stems, and this is where the evidence "
+                 "actually steps up -- every one of three non-redundant outside judges recognises these "
+                 "designs far more often than it recognises k=2 designs (+64.6, +36.4, +29.0 points). "
+                 "Whether that clears the judge's OWN rate on natural pseudoknots depends on the judge: "
+                 "1.47x and 1.14x for two of them, 0.84x for the third. Note that two panel members "
+                 "(ProbKnot and ShapeKnots) agree with each other at kappa=0.74, so this is closer to two "
+                 "independent votes than to three"},
     2: {"grade": "k=2", "agreeing_oracles": 2, "sensitivity_on_known_structures": 0.636,
-        "outside_agreement": {"n": 1759, "rnapkplex": 0.333, "knotty": 0.478, "both": 0.257,
-                              "vs_native_ceiling": {"rnapkplex": 0.50, "knotty": 0.65, "both": 0.41}},
-        "means": "two of three predictors agree; one dissents or could not run. Outside recognition is "
-                 "about half the native ceiling and is NOT measurably better than k=1 -- the useful step "
-                 "is at k=3, not here. Which two agreed still matters: pKiss plus either of the others is "
-                 "more independent evidence than ProbKnot plus ShapeKnots"},
+        "outside_agreement": {"n": 1759, "rnapkplex": 0.333, "knotty": 0.478, "ipknot": 0.101,
+                              "vs_native_ceiling": {"rnapkplex": 0.50, "knotty": 0.65, "ipknot": 0.22}},
+        "means": "two of three predictors agree; one dissents or could not run. The gain over k=1 is real "
+                 "but small under every outside judge (+0.6, +2.1, +5.5 points) -- far less than the step "
+                 "from k=2 to k=3. Which two agreed still matters: pKiss plus either of the others is more "
+                 "independent evidence than ProbKnot plus ShapeKnots"},
     1: {"grade": "k=1", "agreeing_oracles": 1, "sensitivity_on_known_structures": 0.785,
-        "outside_agreement": {"n": 2483, "rnapkplex": 0.327, "knotty": 0.458, "both": 0.215,
-                              "vs_native_ceiling": {"rnapkplex": 0.49, "knotty": 0.62, "both": 0.34}},
+        "outside_agreement": {"n": 2483, "rnapkplex": 0.327, "knotty": 0.458, "ipknot": 0.046,
+                              "vs_native_ceiling": {"rnapkplex": 0.49, "knotty": 0.62, "ipknot": 0.10}},
         "means": "exactly one predictor reproduces the crossing stems -- this is the shipped floor, and it "
-                 "is the grade most exposed to a single predictor's bias. Two outside judges recognise "
-                 "these designs at about half the rate they recognise natural pseudoknots. That is not a "
-                 "demonstration that they are wrong, but it is the weakest evidence this pipeline ships"},
+                 "is the grade most exposed to a single predictor's bias. All three outside judges "
+                 "recognise these designs well below their own rate on natural pseudoknots (0.49x, 0.62x, "
+                 "0.10x). That is not a demonstration that they are wrong, but it is the weakest evidence "
+                 "this pipeline ships, and the caller should read it as such"},
 }
 
 
