@@ -1,0 +1,39 @@
+=== wrapper 自检(先验工具,再用它判任何东西)===
+  ✓  9 对,交叉=True(期望 True)   known H-type pseudoknot -> crossing pairs expected
+  ✓  5 对,交叉=False(期望 False)   the tool's own example -> nested, no crossing pairs
+  ✓  0 对,交叉=False(期望 False)   poly-A -> no pairs at all; a negative control that MUST be able to pass
+  ✓ 动态范围:三个用例给出 3 种不同的配对数(全相同则说明它对输入不敏感,任何下游结论都无效)
+
+=== 用第五裁判 Knotty 重判 4034 条唯一序列(来自 753 次设计)===
+    RNAPKplex 与 ShapeKnots 同属【先找螺旋再拼】启发式;Knotty 是精确 DP + HotKnots DP09 参数
+
+    500/4034  0.5 min
+    1000/4034  1.0 min
+    1500/4034  1.5 min
+    2000/4034  1.9 min
+    2500/4034  2.1 min
+    3000/4034  2.6 min
+    3500/4034  3.2 min
+    4000/4034  3.6 min
+    4034/4034  5.3 min
+  跑通 4033/4034(失败 1 条 —— 记为【未跑】,绝不当作否决)
+  两个外部裁判都判过的设计 4388 条,来自 250 个靶标
+
+=== P2 两个外部裁判是不是同一个来源 ===
+  RNAPKplex 确认率 35.1%   Knotty 确认率 47.9%   逐条一致 67.5%
+  Cohen's kappa = 0.341   -> 不冗余,是两个可用的独立视角  (预注册门槛 <0.8)
+
+=== P1 / P3 同靶标配对,标签换成 Knotty ===
+  P1 ShapeKnots 确认 vs 未确认            134 靶标  差 +21.8%  p=5.11e-16   好105 差12 平17
+  P3 面板一致(3家) vs 分裂                   80 靶标  差 +18.1%  p=2.16e-09   好67 差8 平5
+  对照 家数2vs1(都排除 SK)                  176 靶标  差 +10.3%  p=2.03e-06   好106 差44 平26
+
+=== 出厂规则在新裁判下的精确率/召回 ===
+  面板一致(现行)           命中   146 条  精确率  84.2%(未命中  46.6%)  召回   5.9%
+  ShapeKnots 确认      命中   822 条  精确率  74.0%(未命中  41.8%)  召回  29.0%
+
+=== 预注册判决 ===
+  P1 通过 —— ShapeKnots 的优势在一个算法类完全不同的裁判上复现,不是方法亲缘
+  P2 kappa=0.341 < 0.8,两个裁判不冗余
+
+  wrote /data/wenhui/openclaude_rna/rna_harness/runs/ceiling/knotty_judge.json
