@@ -18,6 +18,7 @@ from __future__ import annotations
 import os
 import subprocess
 import tempfile
+from functools import lru_cache
 from shutil import which
 from typing import Optional, Set, Tuple
 
@@ -111,6 +112,44 @@ def pkiss_pairs(seq: str, timeout_s: float = 60.0) -> Optional[PairSet]:
 
 # oracle registry: name -> callable(seq)->PairSet|None
 ORACLES = {"pkiss": pkiss_pairs, "probknot": probknot_pairs, "shapeknots": shapeknots_pairs}
+
+
+# --------------------------------------------------------------------------- one fold per sequence
+# EVERY call below spawns a subprocess, and the certify loop asked for the same three folds of the same
+# candidate TWICE: once through _panel_verdict (is the whole structure reproduced?) and again through
+# _knot_recall (are the crossing stems reproduced?). Those are two questions about ONE prediction, so the
+# prediction is computed once here and both questions are answered from it.
+#
+# The counter is not decoration. The change that motivated this cache also makes certify() grade every
+# candidate instead of stopping at the first one that clears the floor, and "we got better certificates"
+# would be worthless if it quietly cost more oracle time. The count is what turns that into a checkable
+# claim rather than an assurance.
+_ORACLE_CALLS = {"pkiss": 0, "probknot": 0, "shapeknots": 0}
+
+
+def oracle_call_counts() -> dict:
+    """Subprocess folds actually performed, per oracle. Cache hits do not count -- that is the point."""
+    return dict(_ORACLE_CALLS)
+
+
+def reset_oracle_call_counts() -> None:
+    for k in _ORACLE_CALLS:
+        _ORACLE_CALLS[k] = 0
+
+
+@lru_cache(maxsize=8192)
+def _oracle_pairs_cached(seq: str):
+    out = {}
+    for name, fn in ORACLES.items():
+        _ORACLE_CALLS[name] += 1
+        out[name] = fn(seq)
+    return out
+
+
+def oracle_pairs(seq: str) -> dict:
+    """The three predictors' pair sets for one sequence, computed once. `None` means that oracle failed
+    to run, which is never a rejection -- the distinction every caller here depends on."""
+    return dict(_oracle_pairs_cached(seq))
 
 
 def forms_target(pairs: Optional[PairSet], target: str) -> Optional[bool]:
