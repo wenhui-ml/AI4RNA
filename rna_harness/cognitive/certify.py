@@ -106,9 +106,29 @@ from ..structure_utils import has_pseudoknot
 # Budget tiers in DesiRNA -t seconds. Chosen from the measured curve on Eterna100-V2 (runs/ceiling):
 #   t=5s 72/100 at $0.00211   t=15s 77   t=60s 81   t=180s 84   -- and the cascade reaches 84 for $1.0041
 # so "cheap" is not a crippled mode: it already answers 72% of targets in about 9 seconds.
+#
+# STANDARD DROPPED ITS 180s TIER, and that tier was 40.8% of all solver wall clock. Measured over the four
+# arms in runs/ceiling/ladder_truncation.py and then confirmed prospectively on 131 pseudobase targets that
+# played no part in choosing it (ladder_confirm.py), because the point was picked after seeing the first
+# curve and ratifying it there would have been retuning a threshold after seeing the result:
+#
+#     arm         delivered  certified  mean grade  wall clock
+#     (5,)            79        48        2.00        14.2%
+#     (5,15,60)      102        71        2.74        59.2%     +0.74 grade for 45% more clock
+#     (5,15,60,180)  105        74        2.84       100.0%     +0.10 grade for 41% more clock
+#
+# Dropping 180s costs 7 certificates and gains 4 (sign p=0.274) and moves the mean grade by +0.099 with a
+# 95% interval of [-0.103, +0.302] (p=0.166) -- neither is distinguishable from nothing, while the saving
+# is not close. `best_effort` keeps 180s and everything above it, so a caller who wants that spend can still
+# ask for it; what changed is that they are no longer charged for it by default.
+#
+# The ladder is NOT worthless -- (5,) to (5,15,60) buys +0.74 grade, and over 251 targets the full ladder
+# beats (5,) by +0.749 (p=1.4e-11). The value lives in the 15s and 60s tiers. Of 61 targets the ladder
+# improves, 47 go from having no certificate at all to having one; only 14 are k improving inside
+# knot_confirmed. Budget mostly buys DELIVERY, not a better grade on something already delivered.
 BUDGETS = {
     "cheap": (5,),
-    "standard": (5, 15, 60, 180),
+    "standard": (5, 15, 60),
     "best_effort": (5, 15, 60, 180, 600, 1800),
 }
 DISCLAIMER = ("`certified` means the sequence folds to the target under the stated computational model. "
