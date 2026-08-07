@@ -299,9 +299,15 @@ _INTERVENTION = {
                                             "spearman_rho": 0.396, "p": 0.0147, "n_targets": 17,
                                             "pre_registered": False,
                                             "note": "run after the per-pair result; supported, not established"},
-    "not_a_stability_artifact": {"partial_rho_controlling_pair_strength": 0.240, "p": 7.71e-04},
+    "not_a_stability_artifact": {"partial_rho_controlling_pair_strength": 0.240, "p": 7.71e-04,
+                                 "n_designs": 60},
+    # Also re-done within design. The pooled figure here was 1.8e-27 over 4,688 pairs -- the same
+    # pseudo-replication as above, found by the guard test rather than by me.
     "negative_control": {"what": "150 tested pairs the design's own sequence cannot form",
-                         "median_rescue": 0.196, "vs_complementary": 0.452, "p": 1.8e-27},
+                         "median_rescue": 0.196, "vs_complementary": 0.452,
+                         "within_design_median_diff": 0.162, "p": 0.0014, "n_designs": 31,
+                         "pooled_RETRACTED": {"p": 1.8e-27, "why": "4,688 pairs from 160 molecules "
+                                              "are not 4,688 independent observations"}},
     "scope": ("20 Round-3 targets (P01-P20), designs 52-100 nt with a median of 100, 9 design methods. "
               "DesiRNA is not among them, so this validates the CRITERION, not our designs. Does not "
               "extend to the 240 nt range where our own failures live"),

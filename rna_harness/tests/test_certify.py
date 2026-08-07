@@ -351,3 +351,57 @@ def test_intervention_numbers_are_wired_and_monotone():
         _INTERVENTION["negative_control"]["vs_complementary"], \
         "the negative control must sit BELOW real pairs, or the assay proves nothing"
     assert "52-100 nt" in _INTERVENTION["scope"], "the shipped scope once said 52 nt; it is 52-100"
+
+
+def test_no_statistic_ships_without_its_cluster_count():
+    """A p-value in the certificate must carry the number of INDEPENDENT units it was computed over.
+
+    On 2026-08-07 this file shipped `p = 2.05e-28` for a per-pair comparison. It came from a Mann-Whitney
+    over 1,412 base pairs drawn from 160 molecules, treated as 1,412 independent observations. Pairs inside
+    one molecule share its fold, its normalisation and its sequencing batch; the real number of independent
+    units was ~15, and the same comparison done within design gives p = 0.047. The certificate quoted a
+    fabricated strength to users for several hours, and only a later audit caught it.
+
+    "Be careful next time" does not survive a tired afternoon. This test does. Every dict in the shipped
+    constants that carries a p-value must also carry a cluster count, and any p small enough that it could
+    only have come from pooling must be justified by a cluster count large enough to support it.
+
+    The rule is deliberately crude -- it cannot tell a correctly-clustered analysis from a wrong one. What
+    it CAN do is make the specific failure that happened impossible to repeat silently.
+    """
+    from rna_harness.cognitive.certify import _INTERVENTION, KNOT_GRADES, _NATIVE_CEILING
+
+    CLUSTER_KEYS = ("n_designs", "n_targets", "n_clusters", "n", "n_native", "n_crossing_pairs")
+    offenders = []
+
+    def walk(node, path):
+        if isinstance(node, dict):
+            keys = [k for k in node if isinstance(k, str)]      # some dicts are keyed by grade (an int)
+            ps = [k for k in keys if k == "p" or k.endswith("_p") or k.startswith("p_")]
+            if ps:
+                if not any(c in node for c in CLUSTER_KEYS):
+                    offenders.append(f"{path}: p-value with no cluster count "
+                                     f"(one of {CLUSTER_KEYS} is required)")
+                else:
+                    n = next(node[c] for c in CLUSTER_KEYS if c in node)
+                    for k in ps:
+                        v = node[k]
+                        if isinstance(v, (int, float)) and v < 1e-10 and n < 1000:
+                            offenders.append(f"{path}.{k} = {v:g} on n={n}: a p this small on this few "
+                                             f"units is the signature of pooling non-independent "
+                                             f"observations")
+            for k, v in node.items():
+                walk(v, f"{path}.{k}")
+        elif isinstance(node, (list, tuple)):
+            for i, v in enumerate(node):
+                walk(v, f"{path}[{i}]")
+
+    for name, obj in (("_INTERVENTION", _INTERVENTION), ("KNOT_GRADES", KNOT_GRADES),
+                      ("_NATIVE_CEILING", _NATIVE_CEILING)):
+        walk(obj, name)
+
+    # The retracted figure is deliberately kept in the constants as a record. It is exempt BY NAME so the
+    # exemption is visible and cannot quietly cover a new offender.
+    offenders = [o for o in offenders if "RETRACTED" not in o]
+    assert not offenders, "statistics shipped without the units they were computed over:\n  " + \
+        "\n  ".join(offenders)
