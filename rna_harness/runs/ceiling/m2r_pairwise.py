@@ -104,10 +104,22 @@ def load(path):
         idx = {c: i for i, c in enumerate(next(r)) if c in want}
         rows = [{c: x[i] for c, i in idx.items()} for x in r]
 
+    # `mutA` empty does NOT mean wild type. Rows with ids like `P01_MPNN-RFdiff_G33C_WT` carry an empty
+    # mutA and yet differ from the wild type at exactly one position -- they are single mutants whose id
+    # names the pair they accompany. The first version of this function took the first mutA-empty row per
+    # design; it happened to land on the true wild type for all 160 designs because file order puts it
+    # first, but that was luck, not logic. The wild type is the row whose id carries no mutation code, and
+    # the assertion below turns a future ordering change from a silent wrong answer into a crash.
+    import re
+    mut_code = re.compile(r"_[ACGU]\d+[ACGU](?:_|$)")
     wt = {}
     for d in rows:
-        if not d["mutA"]:
-            wt.setdefault((d["puzzle"], d["method"]), d)
+        if d["mutA"] or mut_code.search(d["id"].split(" (")[0] + "_"):
+            continue
+        wt.setdefault((d["puzzle"], d["method"]), d)
+    for k, w in wt.items():
+        assert not mut_code.search(w["id"].split(" (")[0] + "_"), \
+            f"folded a mutant as the wild type for {k}: {w['id']}"
 
     designs = {}
     for k, w in wt.items():

@@ -304,13 +304,15 @@ def test_ensemble_entropy_tiebreaker_direction_and_failure_mode():
 
 
 def test_intervention_numbers_are_wired_and_monotone():
-    """The certificate must carry the error rate measured against the MOLECULE, not only against models.
+    """The certificate must carry the error rate measured against the MOLECULE, and carry its threshold too.
 
     `false_accept_on_random_sequences` = 0.4% is measured against random sequences, a null so weak that
-    surviving it means very little. The mutate-map-rescue figure asks the same question of pairs that a real
-    molecule declined to form, and it is 14.1% at k=3 -- 35x larger. Three ways this could silently break:
-    the field could stop being emitted, it could stop moving with the grade (the whole point is that it
-    does, unlike the random-sequence number), or it could face the wrong way.
+    surviving it means very little. The mutate-map-rescue figure asks the same question of pairs a real
+    molecule declined to form. Four ways this could silently break: the field stops being emitted; it stops
+    moving with the grade (the whole point is that it does, unlike the random-sequence number); the
+    threshold-conditional point estimate gets quoted without its sweep, which an earlier version of this
+    block did; or the per-design ladder claim gets restated at the strength of the per-pair one, which is a
+    different and much stronger measurement.
     """
     from rna_harness.cognitive.certify import knot_grade, _INTERVENTION
     rates = []
@@ -324,8 +326,24 @@ def test_intervention_numbers_are_wired_and_monotone():
     assert rates[-1] > 0.004 * 10, (
         "the reality-facing rate is an order of magnitude above the random-sequence rate; if it has "
         "collapsed to the same scale, the wrong number is being quoted")
-    lo, hi = _INTERVENTION["ci95_cluster_bootstrap"]
-    assert lo < _INTERVENTION["false_accept_vs_reality_at_k3"] < hi
+
+    fa = _INTERVENTION["false_accept_vs_reality_at_k3"]
+    lo, hi = fa["ci95_cluster_bootstrap"]
+    assert lo < fa["value"] < hi
+    sweep = _INTERVENTION["pair_absent_threshold_sweep_k3"]
+    assert sweep[fa["threshold"]] == fa["value"], "the headline number must be the sweep entry at its own cut"
+    assert max(sweep.values()) > 3 * min(sweep.values()), (
+        "the sweep exists to show the point estimate is threshold-driven; if it has flattened, the "
+        "warning attached to the number is no longer true")
+
+    tf = _INTERVENTION["per_pair_ordering_threshold_free"]
+    lad = _INTERVENTION["certificate_ladder_ordered_in_vitro"]
+    assert tf["p"] < lad["p"] / 1000, (
+        "the per-pair result is orders of magnitude stronger than the per-design one; if they have drifted "
+        "together, one of them is being reported at the other's strength")
+    assert lad["pre_registered"] is False, "the per-design test was post-hoc and must keep saying so"
+
     assert _INTERVENTION["negative_control"]["median_rescue"] < \
         _INTERVENTION["negative_control"]["vs_complementary"], \
         "the negative control must sit BELOW real pairs, or the assay proves nothing"
+    assert "52-100 nt" in _INTERVENTION["scope"], "the shipped scope once said 52 nt; it is 52-100"

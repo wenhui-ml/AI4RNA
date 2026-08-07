@@ -252,28 +252,50 @@ _NATIVE_CEILING = {"rnapkplex": 0.667, "knotty": 0.737, "ipknot": 0.462, "both_p
 #     2 oracles           n=456                 0.470    19.3%
 #     3 oracles           n=453                 0.491    14.1%
 #
-# So the shipped ladder is ordered in the tube, not only in our models (within-design Spearman rho +0.275,
-# p = 5.8e-05), and it survives controlling for base-pair stability (partial rho +0.240, p = 7.7e-04) --
-# the panel is reading structure, not GC content.
+# TWO LEVELS, AND THEY MUST NOT BE CONFLATED -- the first version of this block did conflate them.
+#   per PAIR   how many oracles recover THIS pair. Strong: k=3 pairs beat k=0 pairs at p = 2.1e-28, with no
+#              threshold involved, and it survives controlling for base-pair stability (partial rho +0.240,
+#              p = 7.7e-04) -- the panel is reading structure, not GC content.
+#   per DESIGN what the certificate's k actually is: how many oracles recover ALL crossing pairs at tau=1.0.
+#              Supported but far weaker, and measured AFTER the pair-level result rather than pre-registered:
+#              within-target Spearman +0.396 over 17 targets, p = 0.0147. "Supported", not "established".
 #
 # THE UNCOMFORTABLE HALF. `false_accept_on_random_sequences` = 0.004 was measured against RANDOM SEQUENCES,
 # a null so weak that passing it means very little: a random sequence has no reason to form a pseudoknot.
-# Against pairs the molecule itself declines to form, the panel's unanimous verdict is wrong 14.1% of the
-# time. Both numbers are reported, and callers should read the second one.
+# Asked of pairs a real molecule declines to form, the panel is wrong far more often -- HOW often depends
+# entirely on where "declines to form" is cut, so the cut travels with the number:
+#
+#     rescue <  0.00   k=3 pairs   2.4% absent      k=0 pairs 15.7%
+#     rescue <  0.25               14.1%                      52.4%
+#     rescue <  0.50               51.7%                      78.7%
+#
+# The 0.25 in the original pre-registration was justified as "OpenKnot's own reactivity cut for paired".
+# That was a category error -- OpenKnot's 0.25 cuts normalised SHAPE REACTIVITY, while rescue_factor is a
+# fraction of restored RMSD. The digits coincide; the quantities do not. The threshold-free statement is
+# the one that carries weight, and it is the Mann-Whitney above.
 _INTERVENTION = {
     "assay": "mutate-map-rescue (compensatory double mutants, 2A3 SHAPE)",
     "source": "eternagame/OpenKnotAIDesignData OK7a_M2R_data.v4.5.1 (Apache-2.0)",
     "n_crossing_pairs": 1412, "n_designs": 160, "n_targets": 20,
     "median_rescue_by_k": {0: 0.233, 1: 0.394, 2: 0.470, 3: 0.491},
-    "pair_absent_rate_by_k": {0: 0.524, 1: 0.322, 2: 0.193, 3: 0.141},
-    "false_accept_vs_reality_at_k3": 0.141, "ci95_cluster_bootstrap": [0.101, 0.186],
-    "ladder_is_ordered_in_vitro": {"spearman_rho": 0.275, "p": 5.83e-05, "n_designs": 74},
+    "per_pair_ordering_threshold_free": {"test": "Mann-Whitney, k=3 pairs vs k=0 pairs", "p": 2.05e-28,
+                                         "median_rescue": [0.491, 0.233]},
+    "pair_absent_rate_by_k_at_0.25": {0: 0.524, 1: 0.322, 2: 0.193, 3: 0.141},
+    "pair_absent_threshold_sweep_k3": {0.0: 0.024, 0.1: 0.040, 0.2: 0.102, 0.25: 0.141,
+                                       0.3: 0.192, 0.4: 0.342, 0.5: 0.517},
+    "false_accept_vs_reality_at_k3": {"value": 0.141, "threshold": 0.25,
+                                      "ci95_cluster_bootstrap": [0.101, 0.186],
+                                      "warning": "point estimate is threshold-driven; quote the sweep"},
+    "certificate_ladder_ordered_in_vitro": {"level": "per design (this is the certificate's k)",
+                                            "spearman_rho": 0.396, "p": 0.0147, "n_targets": 17,
+                                            "pre_registered": False,
+                                            "note": "run after the per-pair result; supported, not established"},
     "not_a_stability_artifact": {"partial_rho_controlling_pair_strength": 0.240, "p": 7.71e-04},
     "negative_control": {"what": "150 tested pairs the design's own sequence cannot form",
                          "median_rescue": 0.196, "vs_complementary": 0.452, "p": 1.8e-27},
-    "scope": ("20 Round-3 targets, 52 nt designs, 9 design methods -- DesiRNA is not among them, so this "
-              "validates the CRITERION, not our designs. Does not extend to 240 nt. 'Pair absent' uses "
-              "rescue < 0.25, OpenKnot's own reactivity cut for 'paired' -- still a thresholded criterion"),
+    "scope": ("20 Round-3 targets (P01-P20), designs 52-100 nt with a median of 100, 9 design methods. "
+              "DesiRNA is not among them, so this validates the CRITERION, not our designs. Does not "
+              "extend to the 240 nt range where our own failures live"),
 }
 
 KNOT_GRADES = {
@@ -318,7 +340,7 @@ def knot_grade(kr: dict) -> dict:
     # ...and the same question asked of the molecule instead of of another model. Quoted at THIS k, because
     # unlike the random-sequence figure it actually moves with the grade.
     g["intervention"] = dict(_INTERVENTION)
-    g["pair_absent_rate_vs_reality"] = _INTERVENTION["pair_absent_rate_by_k"].get(min(3, max(1, k)))
+    g["pair_absent_rate_vs_reality"] = _INTERVENTION["pair_absent_rate_by_k_at_0.25"].get(min(3, max(1, k)))
     g["shipped_threshold"] = "k>=1"
     g["oracle_agreement_kappa"] = ORACLE_KAPPA
     g["which_agreed"] = list(kr.get("confirmed_by") or [])
