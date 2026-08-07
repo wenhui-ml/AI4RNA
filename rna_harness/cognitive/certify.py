@@ -253,9 +253,14 @@ _NATIVE_CEILING = {"rnapkplex": 0.667, "knotty": 0.737, "ipknot": 0.462, "both_p
 #     3 oracles           n=453                 0.491    14.1%
 #
 # TWO LEVELS, AND THEY MUST NOT BE CONFLATED -- the first version of this block did conflate them.
-#   per PAIR   how many oracles recover THIS pair. Strong: k=3 pairs beat k=0 pairs at p = 2.1e-28, with no
-#              threshold involved, and it survives controlling for base-pair stability (partial rho +0.240,
-#              p = 7.7e-04) -- the panel is reading structure, not GC content.
+#   per PAIR   how many oracles recover THIS pair, compared WITHIN a design because pairs inside one molecule
+#              share its fold, its normalisation and its batch. Within-design Spearman of oracle count with
+#              rescue: +0.275, p = 5.8e-05 over 74 designs, and it survives controlling for base-pair
+#              stability (partial rho +0.240, p = 7.7e-04) -- the panel is reading structure, not GC content.
+#              AN EARLIER VERSION OF THIS BLOCK QUOTED p = 2.1e-28 HERE. That came from a Mann-Whitney over
+#              1,412 pooled pairs, which treats 1,412 pairs from 160 molecules as 1,412 independent
+#              observations. It is pseudo-replication and the number was never real; the same comparison
+#              done within design over the 15 designs carrying both strata gives +0.042 at p = 0.047.
 #   per DESIGN what the certificate's k actually is: how many oracles recover ALL crossing pairs at tau=1.0.
 #              Supported but far weaker, and measured AFTER the pair-level result rather than pre-registered:
 #              within-target Spearman +0.396 over 17 targets, p = 0.0147. "Supported", not "established".
@@ -278,8 +283,12 @@ _INTERVENTION = {
     "source": "eternagame/OpenKnotAIDesignData OK7a_M2R_data.v4.5.1 (Apache-2.0)",
     "n_crossing_pairs": 1412, "n_designs": 160, "n_targets": 20,
     "median_rescue_by_k": {0: 0.233, 1: 0.394, 2: 0.470, 3: 0.491},
-    "per_pair_ordering_threshold_free": {"test": "Mann-Whitney, k=3 pairs vs k=0 pairs", "p": 2.05e-28,
-                                         "median_rescue": [0.491, 0.233]},
+    "per_pair_ordering_threshold_free": {
+        "test": "within-design Spearman, oracles-confirming-this-pair vs rescue_factor",
+        "rho": 0.275, "p": 5.83e-05, "n_designs": 74,
+        "pooled_mannwhitney_RETRACTED": {"p": 2.05e-28, "why": "pseudo-replication: 1412 pairs from 160 "
+                                         "molecules are not 1412 independent observations"},
+        "same_comparison_within_design": {"median_diff": 0.042, "p": 0.0469, "n_designs": 15}},
     "pair_absent_rate_by_k_at_0.25": {0: 0.524, 1: 0.322, 2: 0.193, 3: 0.141},
     "pair_absent_threshold_sweep_k3": {0.0: 0.024, 0.1: 0.040, 0.2: 0.102, 0.25: 0.141,
                                        0.3: 0.192, 0.4: 0.342, 0.5: 0.517},

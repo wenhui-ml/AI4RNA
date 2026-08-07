@@ -338,9 +338,13 @@ def test_intervention_numbers_are_wired_and_monotone():
 
     tf = _INTERVENTION["per_pair_ordering_threshold_free"]
     lad = _INTERVENTION["certificate_ladder_ordered_in_vitro"]
-    assert tf["p"] < lad["p"] / 1000, (
-        "the per-pair result is orders of magnitude stronger than the per-design one; if they have drifted "
-        "together, one of them is being reported at the other's strength")
+    assert tf["p"] < lad["p"], (
+        "the per-pair result is measured on more clusters than the per-design one and should be the "
+        "stronger of the two; if they have swapped, one is being reported at the other's strength")
+    assert tf["p"] > 1e-10, (
+        "a p below 1e-10 on 74 clusters is the signature of the pseudo-replication this field was "
+        "corrected for -- pooled-pair statistics must never come back into this slot")
+    assert "pooled_mannwhitney_RETRACTED" in tf, "the retraction must stay visible, not be tidied away"
     assert lad["pre_registered"] is False, "the per-design test was post-hoc and must keep saying so"
 
     assert _INTERVENTION["negative_control"]["median_rescue"] < \
