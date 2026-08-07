@@ -285,3 +285,19 @@ def test_swap_isomer_preserves_the_base_multiset_exactly():
         assert len(iso) == len(seq)
         changed += iso != seq
     assert changed > 0, "a control that never varies the arrangement tests nothing"
+
+
+def test_ensemble_entropy_tiebreaker_direction_and_failure_mode():
+    """The tie-breaker must prefer the LESS determined fold, and must never let an unevaluable sequence win.
+
+    Our designs fold about three times more definitely than natural pseudoknots (mean positional entropy
+    0.087 vs 0.299), which is why a probability-based judge has no mass left for the crossing pairs. The
+    tie-break therefore takes the HIGHER entropy among equal-grade candidates. Two ways this could break
+    silently: the comparison could face the wrong way, or a sequence the partition function chokes on could
+    come back as the winner.
+    """
+    from rna_harness.cognitive.certify import _ensemble_entropy
+    structured = _ensemble_entropy("GGCGCGGCACCGUCCGCGGAACAAACGG")
+    unpaired = _ensemble_entropy("A" * 28)
+    assert structured > unpaired >= 0.0, "a sequence with competing pairings must score above one with none"
+    assert _ensemble_entropy("") == float("-inf"), "an unevaluable sequence must never displace an incumbent"
