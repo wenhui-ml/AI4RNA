@@ -238,6 +238,44 @@ _NATIVE_CEILING = {"rnapkplex": 0.667, "knotty": 0.737, "ipknot": 0.462, "both_p
                            "must be read against, NOT a correctness rate. The three judges are pairwise "
                            "non-redundant, so they are three views and not one repeated"}
 
+# The first error rate this project has ever measured against PHYSICAL REALITY rather than against another
+# model. Every number above it is an agreement rate between predictors; this one is not.
+#
+# Mutate-map-rescue asks a causal question about ONE base pair (i, j): break i and the protection at j should
+# vanish; restore the pair with a compensating mutation at j and the protection should come back.
+# `rescue_factor` is the fraction of the SHAPE perturbation the double mutant restores -- 0 means no evidence
+# the pair exists, 1 means fully restored. On 1,412 crossing pairs from 160 designs across 20 targets
+# (OpenKnot OK7a M2R, runs/ceiling/m2r_pairwise.py), graded by the same three oracles the rule uses:
+#
+#     0 oracles confirm   n=267   median rescue 0.233    52.4% of these pairs simply do not exist
+#     1 oracle            n=236                 0.394    32.2%
+#     2 oracles           n=456                 0.470    19.3%
+#     3 oracles           n=453                 0.491    14.1%
+#
+# So the shipped ladder is ordered in the tube, not only in our models (within-design Spearman rho +0.275,
+# p = 5.8e-05), and it survives controlling for base-pair stability (partial rho +0.240, p = 7.7e-04) --
+# the panel is reading structure, not GC content.
+#
+# THE UNCOMFORTABLE HALF. `false_accept_on_random_sequences` = 0.004 was measured against RANDOM SEQUENCES,
+# a null so weak that passing it means very little: a random sequence has no reason to form a pseudoknot.
+# Against pairs the molecule itself declines to form, the panel's unanimous verdict is wrong 14.1% of the
+# time. Both numbers are reported, and callers should read the second one.
+_INTERVENTION = {
+    "assay": "mutate-map-rescue (compensatory double mutants, 2A3 SHAPE)",
+    "source": "eternagame/OpenKnotAIDesignData OK7a_M2R_data.v4.5.1 (Apache-2.0)",
+    "n_crossing_pairs": 1412, "n_designs": 160, "n_targets": 20,
+    "median_rescue_by_k": {0: 0.233, 1: 0.394, 2: 0.470, 3: 0.491},
+    "pair_absent_rate_by_k": {0: 0.524, 1: 0.322, 2: 0.193, 3: 0.141},
+    "false_accept_vs_reality_at_k3": 0.141, "ci95_cluster_bootstrap": [0.101, 0.186],
+    "ladder_is_ordered_in_vitro": {"spearman_rho": 0.275, "p": 5.83e-05, "n_designs": 74},
+    "not_a_stability_artifact": {"partial_rho_controlling_pair_strength": 0.240, "p": 7.71e-04},
+    "negative_control": {"what": "150 tested pairs the design's own sequence cannot form",
+                         "median_rescue": 0.196, "vs_complementary": 0.452, "p": 1.8e-27},
+    "scope": ("20 Round-3 targets, 52 nt designs, 9 design methods -- DesiRNA is not among them, so this "
+              "validates the CRITERION, not our designs. Does not extend to 240 nt. 'Pair absent' uses "
+              "rescue < 0.25, OpenKnot's own reactivity cut for 'paired' -- still a thresholded criterion"),
+}
+
 KNOT_GRADES = {
     3: {"grade": "k=3", "agreeing_oracles": 3, "sensitivity_on_known_structures": 0.432,
         "outside_agreement": {"n": 146, "rnapkplex": 0.979, "knotty": 0.842, "ipknot": 0.390,
@@ -277,6 +315,10 @@ def knot_grade(kr: dict) -> dict:
     k = len(kr.get("confirmed_by") or [])
     g = dict(KNOT_GRADES.get(min(3, max(1, k)), KNOT_GRADES[1]))
     g["false_accept_on_random_sequences"] = 0.004      # identical at every k -- see the comment above
+    # ...and the same question asked of the molecule instead of of another model. Quoted at THIS k, because
+    # unlike the random-sequence figure it actually moves with the grade.
+    g["intervention"] = dict(_INTERVENTION)
+    g["pair_absent_rate_vs_reality"] = _INTERVENTION["pair_absent_rate_by_k"].get(min(3, max(1, k)))
     g["shipped_threshold"] = "k>=1"
     g["oracle_agreement_kappa"] = ORACLE_KAPPA
     g["which_agreed"] = list(kr.get("confirmed_by") or [])

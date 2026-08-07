@@ -301,3 +301,31 @@ def test_ensemble_entropy_tiebreaker_direction_and_failure_mode():
     unpaired = _ensemble_entropy("A" * 28)
     assert structured > unpaired >= 0.0, "a sequence with competing pairings must score above one with none"
     assert _ensemble_entropy("") == float("-inf"), "an unevaluable sequence must never displace an incumbent"
+
+
+def test_intervention_numbers_are_wired_and_monotone():
+    """The certificate must carry the error rate measured against the MOLECULE, not only against models.
+
+    `false_accept_on_random_sequences` = 0.4% is measured against random sequences, a null so weak that
+    surviving it means very little. The mutate-map-rescue figure asks the same question of pairs that a real
+    molecule declined to form, and it is 14.1% at k=3 -- 35x larger. Three ways this could silently break:
+    the field could stop being emitted, it could stop moving with the grade (the whole point is that it
+    does, unlike the random-sequence number), or it could face the wrong way.
+    """
+    from rna_harness.cognitive.certify import knot_grade, _INTERVENTION
+    rates = []
+    for k in (1, 2, 3):
+        g = knot_grade({"confirmed_by": ["pkiss", "probknot", "shapeknots"][:k]})
+        assert g["intervention"]["assay"].startswith("mutate-map-rescue")
+        assert g["intervention"]["n_crossing_pairs"] > 0
+        rates.append(g["pair_absent_rate_vs_reality"])
+    assert rates == sorted(rates, reverse=True), (
+        f"more agreeing oracles must mean fewer pairs the molecule refuses to form, got {rates}")
+    assert rates[-1] > 0.004 * 10, (
+        "the reality-facing rate is an order of magnitude above the random-sequence rate; if it has "
+        "collapsed to the same scale, the wrong number is being quoted")
+    lo, hi = _INTERVENTION["ci95_cluster_bootstrap"]
+    assert lo < _INTERVENTION["false_accept_vs_reality_at_k3"] < hi
+    assert _INTERVENTION["negative_control"]["median_rescue"] < \
+        _INTERVENTION["negative_control"]["vs_complementary"], \
+        "the negative control must sit BELOW real pairs, or the assay proves nothing"
