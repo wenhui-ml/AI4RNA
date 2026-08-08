@@ -1,6 +1,36 @@
 #!/usr/bin/env python3
 """Was a better sequence already in the pool? Score every candidate and re-run the placement.
 
+RETRACTED 2026-08-08 by `rerank_audit.py` and `rerank_audit_ourpools.py`. THE HEADLINE THIS SCRIPT PRODUCED
+-- "+0.250 crossed-pair F1, better on 51 of 57 targets, p = 2.6e-10" -- IS A TAUTOLOGY. C1 selects the pool
+maximum by RNet crossed-pair F1 and then reports the gain in RNet crossed-pair F1, so max >= median is
+arithmetic and the test cannot come out negative. The p-value is a function of how many targets had a
+non-zero difference and nothing else: feeding the same Wilcoxon 51 arbitrary positive numbers and 6 zeros
+reproduces p = 2.65e-10, and feeding it 51 differences of 1e-9 gives 4.8e-13. This is the same
+selection-on-the-metric error that was caught in C3 on the day and missed here, in the headline.
+
+    What the number decomposes into, over the 47 targets actually delivered:
+        shipped  - pool median = +0.032, 27/47, p = 0.137   our selector, indistinguishable from a coin flip
+        pool max - pool median = +0.211, 47/47, p = 1.2e-09 positive by construction; carries no information
+        pool max - shipped     = +0.184, 41/47              the headline, which is the sum of the two
+
+    What an independent judge says. On real designs that have BOTH the RNet score and a wet-lab measurement,
+    ranking a homogeneous pool by RNet and taking the argmax is worth -0.30 OpenKnot points in saturated
+    pools (Eterna: 77% already at F1 = 1.000, a median of 78 tied at the top) and +0.55 points in
+    unsaturated ones (M2: 0% saturated, 2 tied). Our own pools sit at 3.9% saturated with a median of 10
+    tied, i.e. the M2 regime, so the honest ceiling on this whole idea is about +0.55 wet-lab points --
+    below the 1.0-point bar that was pre-registered for it, which is a KILL.
+
+    Also retracted: the "+1.74 wet-lab points" quoted alongside this result on 2026-08-07. It was computed
+    ad hoc, never written to disk, and no artifact reproduces it. `rerank_audit.py` is its persisted
+    replacement and disagrees with it.
+
+    NOT retracted: that our selector is no better than a random draw from the pool, and that the 11th-of-14
+    placement is real. See `ruler_bias.py` -- the novelty-matched comparison shows the loss is in what we
+    GENERATE, not in what we choose.
+
+The script is kept as run, because the retraction is only checkable against it.
+
 RUNS IN THE RibonanzaNet venv. Stage A (`pool_rerank.py`) kept every candidate the product's own ladder
 produced for the 57 OpenKnot targets; what the product actually returned is read from
 `leaderboard_ours.json`, the same seed and ladder, so nothing is re-derived.

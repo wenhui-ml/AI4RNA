@@ -13,8 +13,10 @@ is only defensible BECAUSE of the reproduction check, and it is the reason that 
 THREE FAIRNESS PROBLEMS, all declared before any number was computed. Each of them cuts against a different
 party and none is allowed to be quietly dropped.
 
-  0. OUR ONE DESIGN IS ALREADY A SELECTED ONE. The product screens ~131 internal candidates and returns
-     its best; each of their rows is a single submission that went straight into the tube. So "ours vs
+  0. OUR ONE DESIGN IS ALREADY A SELECTED ONE. The product screens a MEDIAN OF 302 internal candidates on
+     these targets (range 41-922; the "~131" quoted in earlier runs was measured on a different, shorter
+     target set and understates this bias) and returns its best; each of their rows is a single submission
+     that went straight into the tube. So "ours vs
      their per-target median" compares our best-of-131 against their typical submission, which favours US,
      while "ours vs their per-target best" compares our one against their best-of-hundreds, which favours
      THEM. Neither is the answer. Both are reported, and the truth is bracketed between them -- stating one
