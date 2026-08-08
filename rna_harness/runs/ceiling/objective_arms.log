@@ -1,0 +1,31 @@
+求解器:/home/ubuntu/miniconda3/envs/rna/bin/python /data/wenhui/DesiRNA/DesiRNA.py
+最少交叉 19 个(交叉数 8-18),最多交叉 19 个(30-88)
+4 个臂 x 38 个靶标 = 152 次;步数 30,哈希种子已钉住,臂是唯一变量
+
+  base       -sf Ed-Epf:1.0
+  mcc        -sf Ed-Epf:0.5,1-MCC:0.5
+  recall     -sf Ed-Epf:0.5,1-recall:0.5
+  negdesign  -sf Ed-Epf:1.0 -nd on
+
+    10/152  1.4 min
+    20/152  1.6 min
+    30/152  2.8 min
+    40/152  3.8 min
+    50/152  4.3 min
+    60/152  9.0 min
+    70/152  13.2 min
+    80/152  15.9 min
+    90/152  17.4 min
+    100/152  18.5 min
+    110/152  19.2 min
+    120/152  21.2 min
+    130/152  24.4 min
+    140/152  25.4 min
+    150/152  26.5 min
+    152/152  27.2 min
+  base       候选数中位 200
+  mcc        候选数中位 200
+  recall     候选数中位 200
+  negdesign  候选数中位 200
+
+  wrote /data/wenhui/openclaude_rna/rna_harness/runs/ceiling/objective_arms_pools.json   (下一步:用 rnet venv 跑 objective_arms_score.py)
