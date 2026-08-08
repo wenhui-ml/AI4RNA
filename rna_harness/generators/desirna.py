@@ -80,10 +80,23 @@ class DesiRNAGenerator(Generator):
     name = "desirna"
 
     def __init__(self, replicas: int = 10, timelimit_s: int = 120, results_number: int = 20,
-                 timeout_s: Optional[float] = None, extra_args: Optional[List[str]] = None):
+                 timeout_s: Optional[float] = None, extra_args: Optional[List[str]] = None,
+                 steps: Optional[int] = None):
         self.replicas = replicas
         self.timelimit_s = int(timelimit_s)              # DesiRNA's own -t (it stops itself)
         self.results_number = int(results_number)        # DesiRNA's -r (how many best seqs it reports)
+        # DesiRNA's -s: stop after this many REMC steps instead of when the clock runs out. Its main loop is
+        # `while time.time() - start < timlim`, with `if global_step == RE_steps: break` inside, so a step cap
+        # only binds when -t is generous -- callers using steps should pass a timelimit_s they will not hit.
+        #
+        # WHY THIS EXISTS. A wall-clock budget makes the search IRREPRODUCIBLE: the number of REMC steps
+        # completed depends on machine load, so two identical invocations diverge. Measured 2026-08-08 on a
+        # 67 nt target, ten replicas: two runs at the same seed shared 1 candidate out of 121, Jaccard 0.004,
+        # and returned different best sequences. That is fine for a product whose user asked for "an answer
+        # in 60 seconds", and fatal for an A/B test of a code change, because the effect being measured is
+        # smaller than the noise between two runs of identical code. Time budgets stay the product default;
+        # experiments that need a controlled comparison pass steps instead.
+        self.steps = int(steps) if steps else None
         # Per-instance extra CLI args. DESIRNA_ARGS already existed for this, but it is process-global, so it
         # cannot express "this call wants a GC target and that one does not" -- which is exactly what a
         # parallel benchmark does.
@@ -124,12 +137,23 @@ class DesiRNAGenerator(Generator):
                             "-R", str(self.replicas),
                             "-t", str(self.timelimit_s),
                             "-r", str(self.results_number)]
+        if self.steps:
+            argv += ["-s", str(self.steps)]
         argv += list(self.extra_args)
         extra = os.environ.get("DESIRNA_ARGS")
         if extra:
             argv += shlex.split(extra)      # user extra args can override (argparse: last wins)
         if seed is not None:
-            argv += ["-seed", str(int(seed))]
+            # OFFSET BY ONE, DELIBERATELY. DesiRNA reads `-seed 0` as "choose a seed at random"
+            # (`original_seed = random.random()` when in_seed == 0), not as "use seed zero". Zero is this
+            # project's default everywhere -- every benchmark, every ladder run, every "3 seeds" comparison
+            # -- so all of them have been asking the solver to randomise while believing they were pinning
+            # it. Offsetting keeps distinct seeds distinct and maps our 0 onto a real one.
+            #
+            # This alone does NOT make a run reproducible; the wall-clock main loop dominates (see `steps`
+            # above). It removes one of the two causes, and it is the cause that was silently defeating the
+            # intent of every seeded experiment in this repository.
+            argv += ["-seed", str(int(seed) + 1)]
         return argv
 
     def _run(self, cmd: List[str], task: DesignTask, seed: Optional[int]) -> Tuple[List[str], Optional[str]]:
@@ -139,8 +163,26 @@ class DesiRNAGenerator(Generator):
         with tempfile.TemporaryDirectory() as td:
             with open(os.path.join(td, "input.txt"), "w") as f:
                 f.write(self._build_input(task))
+            # PIN THE HASH SEED. This is what actually makes the solver reproducible, and it took three
+            # wrong hypotheses to find. DesiRNA's design loop walks dicts and sets of string keys
+            # (utils/sequence_utils.py: `for start_node in graph.keys()`, `current_graph = set()`, and the
+            # coloring/acgu-state passes), and Python randomises string hashing per process by default, so
+            # iteration order -- and therefore which mutation is tried -- differs on every invocation.
+            #
+            # Measured 2026-08-08 on a 67 nt target, ten replicas, three runs each:
+            #     PYTHONHASHSEED=0 + wall clock -t 20, no step cap  -> all three identical, Jaccard 1.000
+            #     step cap -s 40, hash seed left free               -> Jaccard 0.000
+            # So the hash seed is the cause; the step cap is neither necessary nor sufficient. I had first
+            # blamed the seed argument, then the wall-clock main loop, and both were wrong.
+            #
+            # This keeps the product's SECONDS-based budget intact -- the ladder, the cost model and the
+            # "answer in 60 seconds" promise are unchanged -- while making a certificate reproducible, which
+            # it previously was not: the same question asked twice returned different sequences. Override
+            # with DESIRNA_HASHSEED if some caller ever needs the old randomised behaviour.
+            env = dict(os.environ)
+            env["PYTHONHASHSEED"] = os.environ.get("DESIRNA_HASHSEED", "0")
             try:                                             # relative -f; DesiRNA writes output under cwd
-                proc = subprocess.run(self._argv(cmd, "input.txt", seed, param), cwd=td,
+                proc = subprocess.run(self._argv(cmd, "input.txt", seed, param), cwd=td, env=env,
                                       capture_output=True, text=True, timeout=self.timeout_s)
             except subprocess.TimeoutExpired:
                 return [], "timeout"

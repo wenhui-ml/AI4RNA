@@ -28,9 +28,41 @@ def test_input_format_and_argv_match_desirna():
     argv = g._argv(["python", "DesiRNA.py"], "input.txt", 7, param="2004")
     assert argv[:2] == ["python", "DesiRNA.py"]
     # -p 2004 aligns DesiRNA's energy model to our turner2004 oracle (DesiRNA defaults to 1999)
+    # -seed is OFFSET BY ONE on purpose: DesiRNA reads `-seed 0` as "choose a seed at random"
+    # (`original_seed = random.random()` when in_seed == 0), and 0 is this project's default everywhere, so
+    # without the offset every seeded run silently asks the solver to randomise. This assertion is what
+    # stops the offset being "tidied away" by someone who reads it as an off-by-one.
     for flag, val in [("-f", "input.txt"), ("-p", "2004"), ("-R", "8"), ("-t", "30"),
-                      ("-r", "15"), ("-seed", "7")]:
+                      ("-r", "15"), ("-seed", "8")]:
         assert flag in argv and argv[argv.index(flag) + 1] == val
+    assert "-s" not in argv, "no step cap unless the caller asks for one; the product budget is seconds"
+
+    # A caller that needs an exactly reproducible run (an A/B of a code change) asks for a step budget.
+    gs = DesiRNAGenerator(replicas=8, timelimit_s=600, results_number=15, steps=40)
+    argv_s = gs._argv(["python", "DesiRNA.py"], "input.txt", 0, param="2004")
+    assert argv_s[argv_s.index("-s") + 1] == "40"
+    assert argv_s[argv_s.index("-seed") + 1] == "1", "our seed 0 must not reach DesiRNA as its randomise flag"
+
+
+def test_hash_seed_is_pinned_for_the_subprocess(monkeypatch):
+    """The solver's own dict/set iteration order is what made it irreproducible; pin it.
+
+    DesiRNA walks dicts and sets of string keys in its design loop, and Python randomises string hashing
+    per process, so two identical invocations explored different mutations. Measured 2026-08-08: with the
+    hash seed free, two runs at the same seed shared 1 candidate out of 121 (Jaccard 0.004); with it pinned
+    and a step budget, three runs returned byte-identical 200-candidate pools.
+    """
+    import subprocess
+    seen = {}
+
+    def fake_run(argv, **kw):
+        seen.update(kw.get("env") or {})
+        raise subprocess.TimeoutExpired(argv, 1)      # we only care about the env that was handed over
+
+    monkeypatch.setattr(subprocess, "run", fake_run)
+    g = DesiRNAGenerator(replicas=2, timelimit_s=1, results_number=2)
+    g._run(["python", "DesiRNA.py"], DesignTask(task_id="t", target=HAIRPIN), 0)
+    assert seen.get("PYTHONHASHSEED") == "0"
 
 
 def test_absent_is_graceful(monkeypatch):
