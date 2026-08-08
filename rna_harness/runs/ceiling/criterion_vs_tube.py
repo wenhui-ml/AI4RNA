@@ -8,10 +8,19 @@ score 0.816). A generator, though, is only ever as good as the thing it optimise
 thermodynamic panel -- pKiss, ProbKnot, ShapeKnots, agreeing on the crossing stems. So the question under
 the gap is whether that panel tracks reality at all.
 
-    I have twice quoted "our panel correlates with the tube at +0.155, RibonanzaNet at +0.364" as though it
-    were measured. It is not. There is no artifact on disk for either number, exactly as there was none for
-    the "+1.74 wet-lab points" retracted this morning. Two unsourced numbers in two days is a pattern, and
-    the fix is to measure it once, properly, and write it down.
+    CORRECTION, 2026-08-08, after this script had already run. The header previously said that "our panel
+    correlates with the tube at +0.155, RibonanzaNet at +0.364" was unsourced. That was wrong, and the
+    mistake was mine: I grepped for it and piped the result through `head -5`, which cut the hits in docs/.
+    Both numbers are real and on disk -- `openknot_grade_vs_shape.json` holds `results/H1/median = 0.1546`
+    and `results/rnet_median = 0.3635`, from the H1/H3 tests of 2026-08-07. Only the "+1.74 wet-lab points"
+    retracted this morning is genuinely unsourced; that retraction stands, re-checked without the truncation.
+
+    So this script is not a first measurement, it is a SECOND and different one, and the difference is the
+    interesting part. H1 correlated the wet lab against our GRADE -- the discrete certificate level k that
+    we actually ship. G2 below correlates it against the panel's CONTINUOUS mean crossing recall, the
+    quantity the grade is computed from. Same panel, same oracles, same kind of data; +0.155 discretised
+    against +0.263 continuous. Nothing was added. The certificate throws that difference away when it rounds
+    the panel's recall into a level.
 
 WHAT MAKES THIS ANSWERABLE. OpenKnot publishes 34,750 real designs that were actually synthesised, each with
 a measured `target_openknot_score`. Our panel can be run on those same sequences. So both criteria can be
