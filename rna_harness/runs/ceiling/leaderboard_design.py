@@ -136,9 +136,16 @@ def main():
     from concurrent.futures import ProcessPoolExecutor, as_completed
     jobs = [(p, v["target"], a.budget, a.seed) for p, v in sorted(T.items())]
     R, t0 = [], time.time()
+    ckpt = a.out + ".partial"
     with ProcessPoolExecutor(max_workers=a.workers) as ex:
         for n, f in enumerate(as_completed([ex.submit(work, j) for j in jobs]), 1):
             R.append(f.result())
+            # Checkpoint every result. This script holds an hour of solver-plus-panel work in memory and
+            # writes only after the optional rescue phase, so a crash anywhere in between destroys all of
+            # it -- the same trap `pool_rerank.py` was fixed for. Written to a sidecar so a failed run can
+            # never be mistaken for a complete one.
+            json.dump({"budget": a.budget, "seed": a.seed, "targets": T, "rows": R, "partial": True},
+                      open(ckpt, "w"), ensure_ascii=False)
             if n % 5 == 0 or n == len(jobs):
                 print(f"    {n}/{len(jobs)}  {(time.time()-t0)/60:.1f} min", flush=True)
 
