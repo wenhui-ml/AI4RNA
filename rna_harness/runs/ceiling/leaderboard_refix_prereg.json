@@ -1,0 +1,44 @@
+{
+ "written_before_any_result_exists": true,
+ "date": "2026-08-08",
+ "what_changed": "DesiRNAGenerator._run no longer scrapes trajectory_files/*_traj.csv, *_replicas.csv and *_random.csv as candidates. Nothing else in the product changed. Same seed (0), same budget ladder (standard, then --rescue at best_effort on the failures), same 57 modal targets, same panel, same judge.",
+ "why_rerun": "trajectory_contamination_score.py measured the fix on the POOL: median 0.792 -> 0.822, and the gap to novelty-matched peers -0.155 -> -0.123. The product does not ship the pool, it ships one panel-selected sequence, so the effect on DELIVERY is unmeasured. That is the only untested link.",
+
+ "baseline_to_beat": {
+  "source": "leaderboard_ours.json + leaderboard_score.json, same seed and flags, contaminated adapter",
+  "delivered": "47/57",
+  "median_crossed_pair_F1_of_delivered": 0.816,
+  "L1_median_diff_vs_all_real_designs": -0.200,
+  "L1_p": 0.99999998,
+  "methods_we_beat": ["3DRNA", "Rosetta", "Rosetta-LoRes"],
+  "placement": "11th of 14"
+ },
+
+ "tests": {
+  "F1": {
+   "claim": "delivery quality improves",
+   "stat": "per-target crossed-pair F1, fixed minus contaminated, paired over the 57 targets, Wilcoxon one-sided greater",
+   "pass": "p < 0.025",
+   "note": "a target delivered by one arm and not the other scores 0.0 in the arm that failed it, so coverage changes are not silently dropped"
+  },
+  "F2": {
+   "claim": "coverage improves",
+   "stat": "count of targets returning a sequence",
+   "pass": "descriptive; reported either way, no threshold"
+  },
+  "F3": {
+   "claim": "placement moves",
+   "stat": "L1 median diff against the per-target median of all real designs excluding Struct2SeQ-SHAPE, and the count of methods we beat",
+   "pass": "descriptive. A placement change is NOT claimed as a capability gain unless F1 also passes, because the leaderboard metric saturates and rank is a coarse readout of it"
+  }
+ },
+
+ "declared_in_advance": [
+  "The judge (RibonanzaNet crossed-pair F1) is the same quantity on both arms and neither arm was selected on it, so this is not the max-vs-median tautology that killed the pool-rerank headline on 2026-08-08. The selector in both arms is the thermodynamic panel, which is independent of the judge.",
+  "Expected effect is SMALL. The pool-level gain was +0.008 median (33/57, p=3.3e-05) because contamination is only 8.3% of the pool at the 60 s tier. The panel already rejects most trajectory states, so most of the pool-level gain may already be absorbed by selection and the delivered gain could be zero.",
+  "A null result here is a real result and will be reported as one. It would mean the contamination fix is a correctness fix rather than a quality fix -- we stop shipping states the solver rejected, without shipping better ones.",
+  "The three methods we beat are the older physics designers. If that set does not change, say so plainly rather than looking for a rank that moved."
+ ],
+
+ "cost": "$0 API. Local solver, local panel, local CPU judge."
+}
