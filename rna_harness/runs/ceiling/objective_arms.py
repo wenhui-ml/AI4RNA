@@ -20,7 +20,29 @@ already set. So a structure-agreement term rewards forming the crossing pairs in
 term does not. `-nd on` attacks the same failure from the other side by penalising competing folds.
 
     ARMS. base `Ed-Epf:1.0` (what ships) / mcc `Ed-Epf:0.5,1-MCC:0.5` / recall `Ed-Epf:0.5,1-recall:0.5` /
-    negdesign `Ed-Epf:1.0` with `-nd on`.
+    mcc_only `1-MCC:1.0` / negdesign `Ed-Epf:1.0` with `-nd on`.
+
+FIRST RUN RETRACTED, 2026-08-08, and with it the claim that the mechanism was refuted. The `mcc` and
+`recall` arms produced BYTE-IDENTICAL pools on 38 of 38 targets, which two different objectives cannot do.
+The cause is a bug in DesiRNA: `parse_scoring_functions` had its `return` indented inside the parsing loop,
+so every multi-term scoring function silently collapsed to its first term.
+
+    -sf Ed-Epf:0.5,1-MCC:0.5      parsed to  [('Ed-Epf', 0.5)]
+    -sf Ed-Epf:0.5,1-recall:0.5   parsed to  [('Ed-Epf', 0.5)]
+
+Both arms therefore contained NO structure term whatsoever; they were `Ed-Epf` at half weight, run twice.
+So "adding structure agreement does nothing, therefore the mechanism is wrong" was not measured -- the
+intervention never happened. The mechanism is untested again, not refuted. Patched locally (the `-sf` help
+text advertises exactly this syntax and `get_scoring_function` already loops over the returned list, so the
+intent is unambiguous); the patch is documented in that file.
+
+    `mcc_only` uses a SINGLE-term scoring function, which parsed correctly even before the patch. It is
+    there so the conclusion does not rest on my patch being right: if the mixed arms and mcc_only disagree
+    about whether structure agreement helps, the patch is the first suspect.
+
+The negdesign result is unaffected -- `-nd on` is a separate flag that never goes through this parser -- but
+it is being re-run alongside so every arm comes from one comparable batch. Noted for follow-up: negdesign
+gave pools identical to base on 9 of 38 targets, so on those the flag changed nothing at all.
 
 PRE-REGISTERED, before any arm ran. Reproducible by construction: step budget plus pinned hash seed, so
 every arm sees the same solver machinery and arm is the only thing that varies. Paired within target.
@@ -66,8 +88,27 @@ ARMS = {
     "base":      "-sf Ed-Epf:1.0",
     "mcc":       "-sf Ed-Epf:0.5,1-MCC:0.5",
     "recall":    "-sf Ed-Epf:0.5,1-recall:0.5",
+    "mcc_only":  "-sf 1-MCC:1.0",          # single term: parses correctly with or without the patch
     "negdesign": "-sf Ed-Epf:1.0 -nd on",
 }
+
+
+def _assert_scoring_parses():
+    """Fail loudly if the multi-term objectives collapse, instead of silently testing the same arm twice.
+
+    The first run of this file reported that structure agreement does nothing, on the strength of two arms
+    that had silently become identical. A guard is cheaper than the retraction was.
+    """
+    import subprocess
+    probe = ("import sys; sys.path.insert(0, '/data/wenhui/DesiRNA');"
+             "from utils.stats_inputs_outputs import parse_scoring_functions as f;"
+             "print(len(f('Ed-Epf:0.5,1-MCC:0.5')))")
+    py = (os.environ.get("DESIRNA_CMD") or "python").split()[0]
+    out = subprocess.run([py, "-c", probe], capture_output=True, text=True).stdout.strip()
+    assert out == "2", (
+        f"DesiRNA parses a two-term scoring function into {out!r} components, not 2. The multi-term arms "
+        f"would collapse to their first term and this run would compare identical arms -- see the "
+        f"retraction note in this file's header.")
 
 
 def work(item):
@@ -104,7 +145,8 @@ def main():
 
     cmd = os.environ.get("DESIRNA_CMD")
     assert cmd and os.path.exists(cmd.split()[-1]), "DESIRNA_CMD unset"
-    print(f"求解器:{cmd}")
+    _assert_scoring_parses()
+    print(f"求解器:{cmd}(多项目标函数解析已校验)")
 
     T = targets()
     nc = {p: len(crossing(pk_pairs(v["target"]))) for p, v in T.items()}
