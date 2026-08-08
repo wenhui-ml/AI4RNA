@@ -198,9 +198,13 @@ class DesiRNAGenerator(Generator):
             # answers by 0.107 crossed-pair F1, on 46 of 57 targets, p = 2.8e-06. At 300 s the three trace
             # files held 1,450 sequences each against 20 real answers, which is why longer runs came back
             # WORSE on our own panel as well as on RibonanzaNet.
+            # Collected as an ORDERED list rather than two blobs, because certify_design selects the first
+            # candidate in pool order that the panel accepts -- so which file a sequence came from and where
+            # it sits in the walk both decide what gets delivered. Keeping walk order lets the experiment
+            # hatch below reproduce the old behaviour exactly instead of approximating it with
+            # "all answers, then all trace", which would be a different ordering and a different A/B.
             TRACE = ("_traj.csv", "_replicas.csv", "_random.csv")
-            reported = (proc.stdout or "") + "\n" + (proc.stderr or "")
-            trace = ""
+            chunks = [((proc.stdout or "") + "\n" + (proc.stderr or ""), False)]
             for root, _dirs, files in os.walk(td):
                 for fn in sorted(files):                     # sorted: reproducible across filesystems
                     if fn == "input.txt":
@@ -209,10 +213,10 @@ class DesiRNAGenerator(Generator):
                         text = open(os.path.join(root, fn), errors="ignore").read()
                     except Exception:
                         continue
-                    if any(fn.endswith(s) for s in TRACE):
-                        trace += "\n" + text
-                    else:
-                        reported += "\n" + text
+                    chunks.append((text, any(fn.endswith(s) for s in TRACE)))
+            reported = "\n".join(t for t, is_trace in chunks if not is_trace)
+            trace = "\n".join(t for t, is_trace in chunks if is_trace)
+            walk_order = "\n".join(t for t, _ in chunks)
 
             def scrape(blob, seen):
                 out = []
@@ -224,6 +228,17 @@ class DesiRNAGenerator(Generator):
                 return out
 
             seen = set()
+            if os.environ.get("DESIRNA_SCRAPE_TRACE") == "1":
+                # EXPERIMENT-ONLY ESCAPE HATCH, not a supported mode. Restores the pre-2026-08-08 scrape,
+                # which read the trace files in walk order alongside the answers, so an A/B can hold the
+                # solver fixed and vary ONLY this. Selection in certify_design is "first candidate in pool
+                # order that the panel accepts", so the scrape changes delivery through ordering as well as
+                # membership, and reimplementing that selection to compare arms would risk diverging from
+                # the thing being measured. Toggling here keeps both arms on the real code path, and reads
+                # the recorded WALK ORDER so the restored arm is the old behaviour rather than a re-ordering
+                # of it ("all answers, then all trace" would be a third thing, and a different A/B).
+                seqs = scrape(walk_order, seen)
+                return seqs[:200], (None if seqs else f"no length-{n} ACGU sequence in DesiRNA output")
             seqs = scrape(reported, seen)
             if not seqs:
                 # Never regress to zero candidates: if a DesiRNA version names its outputs differently, the
