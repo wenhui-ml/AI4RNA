@@ -230,6 +230,11 @@ def main():
                # design rather than whether the design works.
                "designs": [{"puzzle": r["puzzle"], "method": r["method"], "wet": r["wet"],
                             "f1c": r["f1c"], "panel_mean": r["panel_mean"],
+                            # panel_k is the certificate's own rung (how many oracles hit recall 1.0). The
+                            # first dump omitted it, which left panel_operating_point.py unable to score the
+                            # k>=2 / k>=3 rungs -- i.e. unable to answer whether a GRADED certificate beats
+                            # a single threshold. Kept now.
+                            "panel_k": r["panel_k"],
                             "confirmed": r["confirmed"]} for r in R]},
               open(a.out, "w"), ensure_ascii=False, indent=1)
     print(f"\n  wrote {a.out}")
