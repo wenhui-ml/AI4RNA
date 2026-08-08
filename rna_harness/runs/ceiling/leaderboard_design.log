@@ -1,0 +1,41 @@
+求解器:/home/ubuntu/miniconda3/envs/rna/bin/python /data/wenhui/DesiRNA/DesiRNA.py
+OpenKnot 靶标 57 个,长度 48-240 nt
+用产品出厂预算 `standard`(用户真正拿到的那条阶梯),seed=0
+
+    5/57  5.4 min
+    10/57  16.6 min
+    15/57  20.6 min
+    20/57  22.5 min
+    25/57  26.6 min
+    30/57  30.4 min
+    35/57  35.5 min
+    40/57  40.4 min
+    45/57  55.1 min
+    50/57  93.1 min
+    55/57  104.8 min
+    57/57  113.7 min
+
+=== 我们的交付 ===
+  knot_confirmed      39
+  not_found           10
+  certified            7
+  cannot_certify       1
+  拿到序列的靶标 47/57
+  中位耗时 1144.5s,总成本 $0.7480
+  未拿到序列:['P01', 'P11', 'P16', 'Q04', 'Q18', 'Q19', 'Q20', 'W03', 'W04', 'W13']
+  -> 这些在打分阶段【计为失败】,不是缺失数据
+
+=== 声明为次要:对 10 个失败靶标再跑 best_effort ===
+    1/10
+    2/10
+    3/10
+    4/10
+    5/10
+    6/10
+    7/10
+    8/10
+    9/10
+    10/10
+  best_effort 救回 1/10
+
+  wrote /data/wenhui/openclaude_rna/rna_harness/runs/ceiling/leaderboard_ours.json   (下一步:用 rnet venv 跑 leaderboard_score.py)

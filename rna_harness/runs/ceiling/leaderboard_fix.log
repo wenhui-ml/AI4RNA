@@ -1,0 +1,16 @@
+求解器:/home/ubuntu/miniconda3/envs/rna/bin/python /data/wenhui/DesiRNA/DesiRNA.py
+OpenKnot 靶标 57 个,长度 48-240 nt
+用产品出厂预算 `standard`(用户真正拿到的那条阶梯),seed=0
+
+只跑 ['P06', 'W06'](审计后靶标串已改为众数,其余 55 个不受影响,不重跑)
+    2/2  8.7 min
+
+=== 我们的交付 ===
+  certified            1
+  not_found            1
+  拿到序列的靶标 1/2
+  中位耗时 19.4s,总成本 $0.0141
+  未拿到序列:['P06']
+  -> 这些在打分阶段【计为失败】,不是缺失数据
+
+  merged ['P06', 'W06'] into rna_harness/runs/ceiling/leaderboard_ours.json
