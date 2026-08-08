@@ -42,6 +42,17 @@ the retracted p = 2.05e-28. Correlations are computed within target and combined
         KILL: no difference, or ours is better -> the criterion is NOT the bottleneck and the gap is in the
         search or in the metric, so this whole line closes and the next move is elsewhere.
 
+    G3 IS PARTLY CONFOUNDED AND THE CORRECTED NUMBER IS +1.90, NOT +4.75. Found on review the same day by
+    `criterion_review.py`. G3 below compares confirmed against unconfirmed WITHIN TARGET but not within
+    METHOD, and the panel's confirmation rate varies enormously across the pipelines -- 70.6% of Struct2SeQ
+    designs, 67.3% of Eterna's, 0.0% of 3DRNA's -- while those same arms differ in wet-lab score by up to
+    29 points on their own. So part of "confirmed beats unconfirmed" was "Eterna beats 3DRNA".
+    Recomputed inside (target, method) cells, so every comparison is between designs from the same pipeline
+    for the same puzzle: +1.90 points, better on 41 of 58 cells, p = 1.2e-04. The effect survives; 60% of
+    its headline size was composition. Quote +1.90.
+        Limitation of the controlled estimate: only 58 cells carry >= 3 designs on each side, and they are
+        dominated by the two largest arms, so +1.90 is measured mostly within Eterna and M2.
+
     G3  DOES OUR CERTIFICATE MEAN ANYTHING IN A TUBE (equally important, reported whatever G2 says).
         Within target, wet-lab score of designs our panel confirms (k >= 1 oracle at recall 1.0, the shipped
         operating point) versus designs it does not. Wilcoxon over targets on the within-target difference.
@@ -211,7 +222,15 @@ def main():
                       "wetlab_diff_median": st.median(dd) if dd else None, "p": p3, "pass": g3,
                       "wins": sum(1 for x in dd if x > 0)},
                "G4": {"n_targets": len(agree), "rho_median": st.median(agree)},
-               "per_target": {x[0]: {"rho_rnet": x[1], "rho_panel": x[2], "n": x[3]} for x in rows}},
+               "per_target": {x[0]: {"rho_rnet": x[1], "rho_panel": x[2], "n": x[3]} for x in rows},
+               # Every adjudicated design, kept so the METHOD confound can be tested without paying the
+               # 23 minutes again. G3 compares confirmed against unconfirmed within target but NOT within
+               # method, and the methods differ in wet-lab score by more than the effect being claimed, so
+               # the aggregate alone cannot rule out that the panel is reading which pipeline produced the
+               # design rather than whether the design works.
+               "designs": [{"puzzle": r["puzzle"], "method": r["method"], "wet": r["wet"],
+                            "f1c": r["f1c"], "panel_mean": r["panel_mean"],
+                            "confirmed": r["confirmed"]} for r in R]},
               open(a.out, "w"), ensure_ascii=False, indent=1)
     print(f"\n  wrote {a.out}")
 
