@@ -238,7 +238,18 @@ def wilcoxon(vals, alt="greater"):
         return w, None, n
     z = (w - mu + 0.5) / sd
     p2 = math.erfc(abs(z) / math.sqrt(2))
-    return w, (p2 if alt == "two-sided" else (p2 / 2 if wp > wm else 1 - p2 / 2)), n
+    if alt == "two-sided":
+        return w, p2, n
+    if alt == "greater":
+        return w, (p2 / 2 if wp > wm else 1 - p2 / 2), n
+    if alt == "less":
+        # Computed by negating rather than as 1 - p_greater, so the continuity correction lands on the
+        # same side of the statistic it does for "greater". Until 2026-08-08 this branch did not exist and
+        # `alt="less"` silently fell through to the "greater" formula: `overoptimization.py` reported
+        # p = 1 for a decline visible on 44 of 57 targets, which is the p-value for the OPPOSITE claim.
+        # Anything not recognised now raises, because a wrong-tailed p-value looks exactly like a null.
+        return wilcoxon([-v for v in vals], "greater")
+    raise ValueError(f"unknown alternative {alt!r}; use 'greater', 'less' or 'two-sided'")
 
 
 def main():

@@ -146,21 +146,47 @@ class DesiRNAGenerator(Generator):
                 return [], "timeout"
             except Exception as e:  # launch failure (bad DESIRNA_CMD etc.)
                 return [], f"launch-failed: {e}"
-            blob = (proc.stdout or "") + "\n" + (proc.stderr or "")
-            for root, _dirs, files in os.walk(td):           # DesiRNA writes results to a SUBDIR
-                for fn in files:                             # (trajectory_files/*_best_fasta.fas, *_results.csv)
+            # DesiRNA writes its RANKED ANSWERS to *_results.csv, *_mid_results.csv, *_best_fasta.fas and
+            # *_best_str -- `-r` of them -- and separately writes the raw optimisation trace to
+            # trajectory_files/*_traj.csv, *_replicas.csv and *_random.csv. Until 2026-08-08 this scrape
+            # read every file and kept the first 200 length-n strings it found, so intermediate states the
+            # solver had already rejected were handed back as candidates and could be certified and
+            # returned to a user. Measured on 57 OpenKnot targets at the 60 s tier
+            # (runs/ceiling/trajectory_contamination*.py): the trace states are worse than the reported
+            # answers by 0.107 crossed-pair F1, on 46 of 57 targets, p = 2.8e-06. At 300 s the three trace
+            # files held 1,450 sequences each against 20 real answers, which is why longer runs came back
+            # WORSE on our own panel as well as on RibonanzaNet.
+            TRACE = ("_traj.csv", "_replicas.csv", "_random.csv")
+            reported = (proc.stdout or "") + "\n" + (proc.stderr or "")
+            trace = ""
+            for root, _dirs, files in os.walk(td):
+                for fn in sorted(files):                     # sorted: reproducible across filesystems
                     if fn == "input.txt":
                         continue
                     try:
-                        blob += "\n" + open(os.path.join(root, fn), errors="ignore").read()
+                        text = open(os.path.join(root, fn), errors="ignore").read()
                     except Exception:
-                        pass
-            seqs, seen = [], set()
-            for m in re.findall(r"[ACGUacgu]{%d}" % n, blob):   # any length-n ACGU string = candidate
-                s = m.upper().replace("T", "U")
-                if s not in seen:
-                    seen.add(s)
-                    seqs.append(s)
+                        continue
+                    if any(fn.endswith(s) for s in TRACE):
+                        trace += "\n" + text
+                    else:
+                        reported += "\n" + text
+
+            def scrape(blob, seen):
+                out = []
+                for m in re.findall(r"[ACGUacgu]{%d}" % n, blob):
+                    s = m.upper().replace("T", "U")
+                    if s not in seen:
+                        seen.add(s)
+                        out.append(s)
+                return out
+
+            seen = set()
+            seqs = scrape(reported, seen)
+            if not seqs:
+                # Never regress to zero candidates: if a DesiRNA version names its outputs differently, the
+                # trace is still better than nothing, and the caller re-adjudicates everything anyway.
+                seqs = scrape(trace, seen)
             return seqs[:200], (None if seqs else f"no length-{n} ACGU sequence in DesiRNA output")
 
     def _verify_best(self, task: DesignTask, seqs: List[str]) -> Tuple[Optional[str], int]:
