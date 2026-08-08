@@ -136,6 +136,26 @@ BUDGETS = {
 DISCLAIMER = ("`certified` means the sequence folds to the target under the stated computational model. "
               "It is not a claim about behaviour in vitro or in vivo.")
 # Measured operating point of the pseudoknot panel (runs/ceiling/calibrate.py, 250 natives vs 250 randoms).
+SCREEN_OPERATING_POINT = {
+    "threshold": 0.1,
+    "quantity": "mean recall of the target's CROSSING pairs, averaged over the oracles that ran",
+    "what_it_is": "a REJECTION SCREEN, not a confirmation. It answers 'did the predictors see anything of "
+                  "this pseudoknot at all', which is a different and weaker claim than the rungs above it.",
+    "calibrated_on": "4,560 OpenKnot designs that were actually synthesised, each carrying a measured "
+                     "target_openknot_score (runs/ceiling/panel_operating_point*.py)",
+    "why_this_point": "the panel's frontier is NOT monotone. Accepting here takes 83.0% of real designs "
+                      "against the strict rung's 57.8% and separates wet-lab outcome BETTER, +3.37 points "
+                      "against +1.93, under held-out validation (threshold chosen on half the targets, "
+                      "measured on the half that had no part in choosing it, 200 splits, better on 144). "
+                      "Tightening past 0.7 mean recall stops separating at all and inverts (-0.07, -0.28).",
+    "transfers_to_our_designs": "checked, because everything above was measured on other people's "
+                                "molecules: inside our own pools the screen separates RibonanzaNet "
+                                "crossed-pair F1 by +0.174 median, 7 of 11 targets, p = 0.0104",
+    "limits": "measured on the field's molecules and on 44-73 (target, method) cells; our own designs have "
+              "no wet-lab counterpart and never will. On 4 of 11 of our targets the screen does not "
+              "separate at all. It is the weakest rung and is labelled as such.",
+}
+
 PANEL_OPERATING_POINT = {
     "rule": "at least 3 of 3 oracles exact (k=3, d=0)",
     "sensitivity_on_known_structures": 0.008,
@@ -494,7 +514,7 @@ def provenance() -> dict:
 
 @dataclass
 class Certificate:
-    verdict: str                      # certified | knot_confirmed | cannot_certify | not_found | invalid_input
+    verdict: str                      # certified | knot_confirmed | knot_screened | cannot_certify | not_found | invalid_input
     target: str
     n: int
     kind: str                         # nested | pseudoknot | invalid
@@ -801,6 +821,7 @@ def _certify_design_impl(target: str, budget: str = "standard", seed: int = 0,
     best_bp = None                             # closest miss, so `not_found` can say HOW close it got
     best_ref_only = None                       # a candidate the reference oracle accepts but the panel does not
     best_knot = None                           # a candidate whose CROSSING STEMS are fully reproduced
+    best_screen = None                         # first candidate clearing the wet-lab-calibrated screen
     n_screened = 0                             # unique candidates adjudicated across every tier, cumulative
     for tl in tiers:
         a0 = time.time()
@@ -859,8 +880,12 @@ def _certify_design_impl(target: str, budget: str = "standard", seed: int = 0,
                 # `grade_max=False` restores the old first-clearing behaviour. It exists so the change can
                 # be measured against itself on the same candidate stream rather than argued about, and it
                 # is not a product option -- the shipped default is the better one.
+                # Computed once per candidate and shared with the screen below. It is free either way --
+                # oracle_pairs() already folded this candidate for the panel verdict above, so this costs
+                # set intersections rather than subprocesses -- and computing it unconditionally keeps the
+                # screen from needing its own copy or a guess about whether one exists.
+                kr = _knot_recall(c, target)
                 if best_knot is None or grade_max:
-                    kr = _knot_recall(c, target)
                     if kr["knot_confirmed"]:
                         if best_knot is None or len(kr["confirmed_by"]) > len(best_knot[1]["confirmed_by"]):
                             best_knot = (c, kr)
@@ -879,6 +904,17 @@ def _certify_design_impl(target: str, budget: str = "standard", seed: int = 0,
                             # occurs, and costs 0.6-1.0% of one candidate's panel folds.
                             if _ensemble_entropy(c) > _ensemble_entropy(best_knot[0]):
                                 best_knot = (c, kr)
+                # THE SCREEN. Kept as the FIRST candidate that clears it, not the best, and that is a
+                # measured choice rather than a lazy one: ranking every survivor by (k, mean recall) was
+                # compared against taking the first on the 14 targets this rung exists for, and ranking was
+                # NOT better -- paired difference +0.000, better on 5 of 14, p = 0.277, with the point
+                # estimate favouring first-pass (0.823 against 0.734). Ranking a 200-candidate pool at
+                # 240 nt costs about 3.2 hours of adjudication; first-pass costs the seconds already spent
+                # getting here. The panel decides WHETHER to answer far better than WHICH answer to give.
+                if best_screen is None:
+                    vals = [x for x in kr["per_oracle"].values() if x is not None]
+                    if vals and sum(vals) / len(vals) >= SCREEN_OPERATING_POINT["threshold"]:
+                        best_screen = (c, kr, sum(vals) / len(vals))
                 if best_ref_only is None and v["reference_only"]:
                     best_ref_only = (c, v)
 
@@ -908,6 +944,38 @@ def _certify_design_impl(target: str, budget: str = "standard", seed: int = 0,
                                   "have returned one of these as the answer. Reported as UNCONFIRMED rather "
                                   "than wrong: the same panel recovers only 32%/6%/8% of NATIVE structures "
                                   "exactly, so non-confirmation is weak evidence against a design.")
+    # THE SCREEN RUNG, below both confirmation rungs and above returning nothing. It exists because the
+    # strict rung was calibrated in silico -- 0.4% false accept against random sequences -- and had never
+    # been checked against an outcome. Against 4,560 synthesised molecules it turns out to be the wrong half
+    # of the panel's signal: "the oracles saw NOTHING of this pseudoknot" is a strong, reliable rejection,
+    # while "one oracle saw ALL of it" is a noisy acceptance. On the 14 OpenKnot targets that previously
+    # returned nothing, this rung answers all 14, at a median crossed-pair F1 of 0.823.
+    #
+    # It deliberately does NOT count as a confirmation anywhere in this codebase: every internal consumer
+    # tests `verdict in ("certified", "knot_confirmed")`, so the agent's repair loop keeps working and the
+    # CLI still exits non-zero. A caller gets a sequence and an explicit statement of how weak the claim is,
+    # instead of being told nothing was found when something was.
+    if kind == "pseudoknot" and best_screen is not None:
+        c, kr, mean_recall = best_screen
+        return Certificate("knot_screened", target, len(target), kind, sequence=c,
+                           checked_by="screen: mean crossing-pair recall over pKiss, ProbKnot, ShapeKnots",
+                           strictness=f"screen (mean recall >= {SCREEN_OPERATING_POINT['threshold']})",
+                           rungs_passed=["screen"], cost_usd=cost, wait_s=round(w, 2), budget=budget,
+                           detail={"tiers_tried": tried, "knot": kr, "mean_recall": round(mean_recall, 3),
+                                   "n_candidates_screened": n_screened,
+                                   "operating_point": SCREEN_OPERATING_POINT,
+                                   "topology": _topology_point(target)},
+                           reason="NOT CONFIRMED. No candidate had its crossing stems fully reproduced by "
+                                  "any single predictor, so the stronger rungs do not apply. This sequence "
+                                  f"cleared a weaker screen instead: the predictors recovered {mean_recall:.0%} "
+                                  "of the crossing pairs on average, above the point where they recover "
+                                  "essentially none. That screen was calibrated against wet-lab outcomes on "
+                                  "4,560 synthesised molecules, where designs clearing it scored +3.37 "
+                                  "OpenKnot points higher than designs failing it under held-out validation "
+                                  "-- better separation than the strict rung's +1.93, which is why it is "
+                                  "offered rather than withheld. It remains the weakest claim this tool "
+                                  "makes: treat it as a lead to test, not as a verified design.")
+
     nxt = {"cheap": "standard", "standard": "best_effort"}.get(budget)
     # What a larger budget is actually worth, measured (runs/ceiling/wall.py). Of the 16 Eterna100 targets
     # unsolved at t<=180s, extending to t<=1800s solved 7 and left 9 -- and four of those nine sit at bp=1-2
