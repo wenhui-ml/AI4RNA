@@ -1,0 +1,23 @@
+{
+ "written_before_the_run_starts": true,
+ "date": "2026-08-08",
+ "supersedes": {
+  "leaderboard_ours.json": "the original 47/57 at median crossed-pair F1 0.816, 11th of 14. Run with the contaminated scrape AND an unpinned hash seed, so it is a single draw from an irreproducible solver.",
+  "leaderboard_refix_prereg.json": "the A/B it set up compared two separate runs of that irreproducible solver, which cannot work. Its stage A reached 43/57 and was stopped mid-rescue; the log is kept as leaderboard_fixed_ABORTED.log and its JSON was never written, because that script only wrote at the end -- the trap the checkpoint commit fixed afterwards. No conclusion is drawn from it."
+ },
+
+ "what_this_run_is": "A clean, REPRODUCIBLE baseline. Fixed scrape (answers only, no trajectory files), PYTHONHASHSEED pinned in the solver subprocess, seed offset so our 0 no longer lands on DesiRNA's randomise sentinel, shipped `standard` ladder (5, 15, 60) at the seed a real user gets. Nothing else changed.",
+
+ "why_it_is_worth_two_hours": "Every previous placement was a single draw from a solver that could not be re-run. This one can. From here a code change can be A/B-ed against a fixed baseline instead of against noise, which is the capability that was missing all day.",
+
+ "declared_before_running": [
+  "The scrape fix is already measured, under a controlled A/B with a byte-identical solver trajectory: coverage 33/57 against 34/57, delivered quality paired difference +0.000, p = 0.554, 7 of 57 targets changed. So this run is NOT expected to move the placement, and it is not being run to find a gain. If the placement improves, the controlled A/B says that is not the scrape fix and the cause must be found before it is claimed.",
+  "The rescue phase is deliberately omitted. On the original run best_effort recovered 1 target of 10 and cost more wall time than the entire standard ladder; the aborted rerun spent over three hours reaching 9 of 14. Coverage here will therefore be compared against the original's STANDARD-phase figure, not against its post-rescue 47.",
+  "Reproducibility is improved but not guaranteed under a wall-clock budget: step count still drifts with machine load. Across three targets the delivered answer matched on two and the candidate pool never matched exactly. Exact reproducibility needs the step budget, which is not what the product ships. This baseline is therefore near-reproducible, and that qualifier travels with it.",
+  "A placement that does not move is the expected outcome and will be reported as such rather than re-cut until something looks like progress."
+ ],
+
+ "will_report": ["delivered count", "median crossed-pair F1 of delivered", "L1 median diff against the per-target median of all real designs excluding Struct2SeQ-SHAPE", "which methods we beat"],
+
+ "cost": "$0 API. Local solver, local panel, local CPU judge. The `cost_usd` figure the script prints is imputed CPU accounting at $0.05/vCPU-hour, not spend."
+}
