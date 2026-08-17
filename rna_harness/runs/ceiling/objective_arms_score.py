@@ -105,12 +105,25 @@ def main():
               f"-> {'通过' if m1 else 'KILL —— 目标函数不是小假结被忽略的原因'}")
         hv = hi.get(arm, {})
         if m1 and hv.get("delta_vs_base") is not None:
-            ratio = abs(v["delta_vs_base"]) / max(1e-9, abs(hv["delta_vs_base"]))
-            print(f"  M2 同一臂在对照组:{hv['delta_vs_base']:+.1%}(最少交叉端是它的 {ratio:.1f} 倍)")
-            mech = ratio >= 2.0
-            print(f"  {'机制成立 —— 效应集中在小假结上,与「能量项忽略小假结」一致' if mech else '机制不成立 —— 两端帮助相当,这个旋钮也许有用,但我给的解释是错的'}")
+            # COMPARE ON THE SIGNED SCALE, NOT ON MAGNITUDES. The first version divided |low| by |high|,
+            # which reads an OPPOSITE effect in the control as a large ratio: -7.3 against +1.5 came out as
+            # "4.9x", when the honest statement is that the control moved the wrong way and there is no
+            # ratio to take. Magnitudes also make a control that HELPS MORE (say -20 against -7) look like
+            # 0.4x rather than like the refutation it would be.
+            lo_d, hi_d = v["delta_vs_base"], hv["delta_vs_base"]
+            if hi_d >= 0:
+                mech, how = True, (f"对照组根本没有改善({hi_d:+.1%}),效应只出现在小假结端"
+                                   f"({lo_d:+.1%})")
+                ratio = None
+            else:
+                ratio = lo_d / hi_d          # both negative: >1 means the low end improved more
+                mech = ratio >= 2.0
+                how = (f"两端都改善,小假结端是对照端的 {ratio:.1f} 倍"
+                       f"({lo_d:+.1%} 对 {hi_d:+.1%})")
+            print(f"  M2 同一臂在对照组:{hi_d:+.1%} —— {how}")
+            print(f"  {'机制成立 —— 效应集中在小假结上,与「小假结被忽略」一致' if mech else '机制不成立 —— 两端帮助相当,这个旋钮也许有用,但我给的解释是错的'}")
             out["mechanism_supported"] = bool(mech)
-            out["ratio_low_over_high"] = ratio
+            out["low_vs_high"] = {"low_delta": lo_d, "high_delta": hi_d, "ratio": ratio}
         base_med = lo["base"]["median"]
         print(f"  M3 池中位 base {base_med:.3f} -> `{arm}` {v['median']:.3f} "
               f"({'未以中位质量换取' if v['median'] >= base_med - 0.02 else '注意:中位质量被换掉了一部分'})")
