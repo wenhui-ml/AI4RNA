@@ -84,7 +84,9 @@ def main():
     }
     rng = random.Random(a.seed)
     out = {}
-    for N in (20, 50, 100):
+    # N must not exceed the per-target sample in the source dump (80), or the target set is empty and the
+    # medians below have nothing to reduce. Guarded rather than assumed: the first run crashed on N=100.
+    for N in (10, 20, 50, 75):
         per = {k: {} for k in list(rules) + ["oracle"]}
         for p, rs in sorted(by.items()):
             if len(rs) < N:
@@ -102,7 +104,10 @@ def main():
             for name in per:
                 if acc[name]:
                     per[name][p] = st.mean(acc[name])
-        ps = sorted(set.intersection(*[set(per[k]) for k in per]))
+        ps = sorted(set.intersection(*[set(per[k]) for k in per])) if all(per.values()) else []
+        if len(ps) < 6:
+            print(f"=== 池大小 N={N}:只有 {len(ps)} 个靶标够大,跳过 ===\n")
+            continue
         print(f"=== 池大小 N={N}({len(ps)} 个靶标)===")
         print(f"  {'排序规则':10s} {'实测中位':>9s} {'对 first':>9s} {'更好':>8s} {'p':>10s}")
         row = {}
@@ -137,8 +142,13 @@ def main():
     print(f"  oracle 仍比 first 高 +3.67 分。**oracle − first 不是可达空间,它是可达空间加上噪声取最大的膨胀。**")
     print(f"  任何排序规则的收益要和 first 比,不要和 oracle 比。\n")
 
-    n20 = out.get("20", {})
-    print(f"=== 判读(以 N=20 为准,最接近产品实际筛后存活量)===")
+    # REFERENCE N IS MEASURED, NOT GUESSED. The first version read the verdict off N=20 and called that
+    # "closest to the product's post-screen survivor count", which was an assumption. Counted on our own
+    # 14 rescued pools: pool size median 111 (31-200) and SURVIVOR count median 52 (2-152). So N=50 is the
+    # operating point, and the verdict is read there. It happens to be the N at which V1 fails, so fixing
+    # the assumption moved the answer against the change -- which is the reason to fix it before reading.
+    n20 = out.get("50", {})
+    print(f"=== 判读(以 N=50 为准 —— 实测我们自己的筛后存活量中位 52 条)===")
     if n20:
         head = n20["oracle"]["median"] - n20["first"]["median"]
         got = n20["rnet"]["vs_first"]
