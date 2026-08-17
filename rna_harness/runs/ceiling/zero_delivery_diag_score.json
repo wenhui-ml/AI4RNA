@@ -1,0 +1,126 @@
+{
+ "good_threshold": 0.5,
+ "per_target": {
+  "P02": {
+   "verdict": "knot_confirmed",
+   "delivered": 0.0,
+   "n_pool": 200,
+   "pool_best": 1.0,
+   "pool_median": 0.5450928381962865,
+   "n_good": 104,
+   "diagnosis": "选择失败"
+  },
+  "P03": {
+   "verdict": "knot_confirmed",
+   "delivered": 0.0,
+   "n_pool": 200,
+   "pool_best": 1.0,
+   "pool_median": 0.7303030303030302,
+   "n_good": 136,
+   "diagnosis": "选择失败"
+  },
+  "P09": {
+   "verdict": "knot_confirmed",
+   "delivered": 0.0,
+   "n_pool": 201,
+   "pool_best": 0.888888888888889,
+   "pool_median": 0.0,
+   "n_good": 30,
+   "diagnosis": "选择失败"
+  },
+  "P10": {
+   "verdict": "knot_screened",
+   "delivered": 0.0,
+   "n_pool": 200,
+   "pool_best": 0.9230769230769231,
+   "pool_median": 0.6206896551724138,
+   "n_good": 129,
+   "diagnosis": "选择失败"
+  },
+  "P14": {
+   "verdict": "knot_confirmed",
+   "delivered": 0.0,
+   "n_pool": 200,
+   "pool_best": 1.0,
+   "pool_median": 0.888888888888889,
+   "n_good": 176,
+   "diagnosis": "选择失败"
+  }
+ },
+ "selection_failures": [
+  "P02",
+  "P03",
+  "P09",
+  "P10",
+  "P14"
+ ],
+ "generation_failures": [],
+ "confirmed_false_positives": [
+  "P02",
+  "P03",
+  "P09",
+  "P14"
+ ],
+ "trace": {
+  "P02": {
+   "n_confirmed": 156,
+   "confirmed_f1_median": 0.6342857142857143,
+   "confirmed_f1_max": 1.0,
+   "pool_best": {
+    "i": 3,
+    "f1c": 1.0,
+    "panel_mean": 0.6666666666666666,
+    "panel_k": 2,
+    "confirmed": true
+   }
+  },
+  "P03": {
+   "n_confirmed": 173,
+   "confirmed_f1_median": 0.7586206896551724,
+   "confirmed_f1_max": 1.0,
+   "pool_best": {
+    "i": 1,
+    "f1c": 1.0,
+    "panel_mean": 0.3333333333333333,
+    "panel_k": 1,
+    "confirmed": true
+   }
+  },
+  "P09": {
+   "n_confirmed": 10,
+   "confirmed_f1_median": 0.07692307692307693,
+   "confirmed_f1_max": 0.631578947368421,
+   "pool_best": {
+    "i": 2,
+    "f1c": 0.888888888888889,
+    "panel_mean": 0.75,
+    "panel_k": 0,
+    "confirmed": false
+   }
+  },
+  "P10": {
+   "n_confirmed": 0,
+   "confirmed_f1_median": null,
+   "confirmed_f1_max": null,
+   "pool_best": {
+    "i": 166,
+    "f1c": 0.9230769230769231,
+    "panel_mean": 0.0,
+    "panel_k": 0,
+    "confirmed": false
+   }
+  },
+  "P14": {
+   "n_confirmed": 107,
+   "confirmed_f1_median": 0.9090909090909091,
+   "confirmed_f1_max": 1.0,
+   "pool_best": {
+    "i": 0,
+    "f1c": 1.0,
+    "panel_mean": 0.625,
+    "panel_k": 1,
+    "confirmed": true
+   }
+  }
+ }
+}

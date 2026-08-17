@@ -719,7 +719,9 @@ def _nested_rungs(seq: str, target: str) -> List[str]:
 def _ensemble_entropy(seq: str) -> float:
     """Mean positional entropy of the sequence's nested ensemble -- how UNDECIDED its fold is.
 
-    Only ever called to break a tie between two candidates of the same grade, so the partition function is
+    Called to break a tie between two candidates of the same grade -- and, when CERTIFY_POOL_DUMP is set,
+    once per adjudicated candidate so the tie-break can be replayed offline. That hatch is off in the
+    product, so on the shipped path this is still tie-only. The partition function is
     not paid for on the common path. A failure returns -inf so a sequence we cannot evaluate never displaces
     an incumbent we could.
     """
@@ -762,6 +764,40 @@ def _knot_recall(seq: str, target: str) -> dict:
     full = [k for k, v in out.items() if v is not None and v >= 1.0]      # tau = 1.0, the strictest point
     return {"per_oracle": out, "n_cross": len(cross), "confirmed_by": full,
             "knot_confirmed": bool(full)}
+
+
+def _pool_dump(target: str, seq: str, kr: dict, tier, n: int) -> None:
+    """EXPERIMENT ESCAPE HATCH. Off unless CERTIFY_POOL_DUMP names a writable directory.
+
+    WHY IT HAD TO EXIST. Selection experiments kept re-collecting pools with a standalone helper and then
+    reasoning about what the product "would have picked". That is unsound here: the shipped ladder is
+    WALL-CLOCK limited, so how many candidates a tier returns depends on machine load, and a re-collection
+    under a different load is a different pool. Measured on the five zero-delivery targets: the product
+    reported 302-412 screened where a re-run produced 312-451, so the two are neither equal nor nested.
+    Only a dump taken inside the product's own process, in the same run, is the pool it actually screened.
+
+    Records every adjudicated candidate with the quantities the shipped rule reads -- the per-oracle
+    recalls, which oracles confirmed, and the ensemble entropy the tie-breaker compares -- so any selection
+    rule can be replayed offline against what was really on the table.
+
+    Never raises into the product path: a dump failure must not change a verdict.
+    """
+    d = os.environ.get("CERTIFY_POOL_DUMP")
+    if not d:
+        return
+    try:
+        import hashlib
+        import json as _json
+        os.makedirs(d, exist_ok=True)
+        key = hashlib.sha1(target.encode()).hexdigest()[:16]
+        with open(os.path.join(d, f"{key}.jsonl"), "a") as fh:
+            fh.write(_json.dumps({"seq": seq, "tier": tier, "i": n,
+                                  "per_oracle": kr["per_oracle"], "n_cross": kr["n_cross"],
+                                  "confirmed_by": kr["confirmed_by"],
+                                  "knot_confirmed": kr["knot_confirmed"],
+                                  "entropy": _ensemble_entropy(seq)}) + "\n")
+    except Exception:                                                          # noqa: BLE001
+        pass
 
 
 def _panel_verdict(seq: str, target: str) -> dict:
@@ -885,6 +921,7 @@ def _certify_design_impl(target: str, budget: str = "standard", seed: int = 0,
                 # set intersections rather than subprocesses -- and computing it unconditionally keeps the
                 # screen from needing its own copy or a guess about whether one exists.
                 kr = _knot_recall(c, target)
+                _pool_dump(target, c, kr, tl, n_screened)         # no-op unless CERTIFY_POOL_DUMP is set
                 if best_knot is None or grade_max:
                     if kr["knot_confirmed"]:
                         if best_knot is None or len(kr["confirmed_by"]) > len(best_knot[1]["confirmed_by"]):
