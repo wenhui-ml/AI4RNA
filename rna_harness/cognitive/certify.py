@@ -755,15 +755,37 @@ def _knot_recall(seq: str, target: str) -> dict:
     accept on random sequences (runs/ceiling/calibrate.py). `None` means the oracle failed to run, which is
     never a rejection.
     """
-    from ..benchmarks.rnainvbench import _round_only, pk_pairs
+    from ..benchmarks.rnainvbench import _round_only, crossing_pairs, pk_pairs
     from ..oracles_pk import oracle_pairs
     cross = pk_pairs(target) - pk_pairs(_round_only(target))
-    out = {}
+    out, prec, f1s, npred = {}, {}, {}, {}
     for name, ps in oracle_pairs(seq).items():                 # one fold per sequence, shared with the
         out[name] = None if (ps is None or not cross) else len(ps & cross) / len(cross)   # panel verdict
+        # PRECISION, OBSERVABLE ONLY -- added 2026-08-18, deliberately NOT read by any verdict. `out` above
+        # is the shipped quantity and is untouched: a target crossing pair counts as recovered if the oracle
+        # predicts that PAIR, whether or not the pair still crosses anything in the oracle's own structure.
+        # These three are the F1-consistent view of the same folds, at zero extra cost, and they exist
+        # because the shipped criterion cannot see over-prediction. Measured over 4,560 synthesised OpenKnot
+        # designs: the panel predicts a median of 10.7 crossing pairs at precision 0.154, and comparing that
+        # recall against the release's crossed-pair F1 accounted for the ENTIRE apparent loss of the panel to
+        # RibonanzaNet at matched coverage (within (target, method) cells: +2.9 points and p = 0.014 on the
+        # recall column, +0.0 points and p = 0.40 on this one). Changing the verdict to use them is a
+        # separate, product-facing decision and is not taken here -- this patch only stops throwing the
+        # number away, so that decision can be made on measured ground.
+        if ps is None or not cross:
+            prec[name] = f1s[name] = npred[name] = None
+            continue
+        pc = crossing_pairs(ps)
+        hit = len(pc & cross)
+        r_c = hit / len(cross)
+        p_c = (hit / len(pc)) if pc else 0.0
+        prec[name] = p_c
+        f1s[name] = (2 * r_c * p_c / (r_c + p_c)) if (r_c + p_c) > 0 else 0.0
+        npred[name] = len(pc)
     full = [k for k, v in out.items() if v is not None and v >= 1.0]      # tau = 1.0, the strictest point
     return {"per_oracle": out, "n_cross": len(cross), "confirmed_by": full,
-            "knot_confirmed": bool(full)}
+            "knot_confirmed": bool(full),
+            "per_oracle_precision": prec, "per_oracle_f1": f1s, "n_pred_cross": npred}
 
 
 def _pool_dump(target: str, seq: str, kr: dict, tier, n: int) -> None:
@@ -795,6 +817,11 @@ def _pool_dump(target: str, seq: str, kr: dict, tier, n: int) -> None:
                                   "per_oracle": kr["per_oracle"], "n_cross": kr["n_cross"],
                                   "confirmed_by": kr["confirmed_by"],
                                   "knot_confirmed": kr["knot_confirmed"],
+                                  # additive: lets a replay score a precision-aware rule without paying for
+                                  # the folds again. Readers key by name, so older dumps stay loadable.
+                                  "per_oracle_precision": kr["per_oracle_precision"],
+                                  "per_oracle_f1": kr["per_oracle_f1"],
+                                  "n_pred_cross": kr["n_pred_cross"],
                                   "entropy": _ensemble_entropy(seq)}) + "\n")
     except Exception:                                                          # noqa: BLE001
         pass

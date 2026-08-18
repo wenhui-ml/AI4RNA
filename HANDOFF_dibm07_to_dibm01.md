@@ -22,20 +22,51 @@ dibm07 明天 10:00 从 slurm 下线,本地盘 `/data` 随节点消失(存储 de
 
 ---
 
-## 2. 环境重建(在 dibm01 上)
+## 2. 环境重建(在 dibm01 上)—— 2026-08-18 已完成并验证
+
+conda 环境不在 `/data` 里,所以 rsync 一个都没带过来:dibm01 上原本 `rna` / `pk` / `rnastr` / `vpk` /
+`ipk` / `bt` / `inta` **全部不存在**,`import RNA` 在所有现存环境里都失败。已按 chomsky_climb 复现附录里
+钉住的版本重建,七个环境全部装好并冒烟通过:
 
 ```bash
-# 求解器
+conda create -n rna    -c conda-forge -c bioconda python=3.10 viennarna=2.7.2 numpy pandas matplotlib scipy dill multiprocess pytest
+conda create -n vpk    -c conda-forge -c bioconda viennarna=2.7.2      # RNAPKplex + Kinfold(故意与在环内的 oracle 分开)
+conda create -n pk     -c conda-forge -c bioconda pkiss=2.3.0
+conda create -n rnastr -c conda-forge -c bioconda rnastructure=6.6     # ProbKnot + ShapeKnots + data_tables
+conda create -n ipk    -c conda-forge gsl=2.7 openblas glpk            # 只为给预编译的 ipknot 提供动态库
+conda create -n bt     -c conda-forge -c bioconda barriers viennarna=2.7.2
+conda create -n inta   -c conda-forge -c bioconda intarna
+/home/ubuntu/miniconda3/envs/rna/bin/pip install 'mcp<2'
+/data/wenhui/rnet_env/bin/pip install scipy
+
 export DESIRNA_CMD="/home/ubuntu/miniconda3/envs/rna/bin/python /data/wenhui/DesiRNA/DesiRNA.py"
+```
 
-# 两个 venv 的分工(踩过的坑,别再踩)
-#   rna 环境   有 ViennaRNA + 氧化物二进制,没有 torch  -> 跑求解器和面板
-#   rnet_env   有 torch + RibonanzaNet,没有 RNA 模块    -> 只跑打分
-#   所有两阶段脚本都是按这个分工写的:xxx.py 用 rna,xxx_score.py 用 rnet_env
-/home/ubuntu/miniconda3/envs/rna/bin/python     # 注意:conda 里【没有】名为 rnet 的环境
-/data/wenhui/rnet_env/bin/python                # RibonanzaNet 是普通 venv
+**两个版本坑,各花了一个调试轮次:**
+- `viennarna` 在 **bioconda**,不在 conda-forge(`conda search -c conda-forge viennarna` 什么都搜不到)。
+- `gsl` 必须是 **2.7**:预编译的 `/data/wenhui/pk_judges/ipknot/build/ipknot` 链的是 `libgsl.so.25`,
+  当前 gsl 2.8 只给 `.so.28`,裸装 gsl 会让 ipknot 加载不起来(`ipknot_judge.py` 靠
+  `LD_LIBRARY_PATH=envs/ipk/lib` 补齐 gsl/openblas/glpk 三个库)。
+- `mcp` 必须 **<2**:`rna_harness/mcp/motif_server.py` import 的 `mcp.server.fastmcp` 在 mcp 2.0 里删了,
+  裸装 `mcp` 会让 pytest 连收集都过不去。
 
-# scipy 只在 rna / base 里有,rnet_env 里没有(label_calibration.py 需要 scipy)
+**两个 venv 的分工(踩过的坑,别再踩)**
+```
+rna 环境   有 ViennaRNA + oracle 二进制,没有 torch   -> 跑求解器和面板
+rnet_env   有 torch + RibonanzaNet,没有 RNA 模块     -> 只跑打分(dibm01 上是 CPU 版 torch 2.13,比 dibm07 慢)
+所有两阶段脚本都是按这个分工写的:xxx.py 用 rna,xxx_score.py 用 rnet_env
+注意:conda 里【没有】名为 rnet 的环境;RibonanzaNet 是 /data/wenhui/rnet_env 这个普通 venv
+```
+
+**重建后的验证(全部通过,$0,纯本地):**
+```
+pytest rna_harness/tests          252 passed / 3 skipped(3 个 skip 都是"工具存在所以跳过缺失分支")
+ipknot / Knotty self_test()       True / True(预编译二进制随 /data 一起过来了,不用重编)
+oracles_pk 三判据面板             pKiss / ProbKnot / ShapeKnots 都返回配对集
+RibonanzaNet-SS                   0 缺失键,CPU 上跑通
+certify.py 端到端                 nested 与 pseudoknot 两个靶标都 8 秒内 CERTIFIED,面板全票,
+                                  版本行里 pKiss / RNAstructure 6.6 都在
+DesiRNA 的 parse_scoring_functions 补丁随 rsync 存活,不要重打
 ```
 
 **核数上限 160**(硬约束)。DesiRNA 每个 job fork 10 个副本,所以 `--workers` 最多 14–16。
@@ -109,6 +140,11 @@ ls /data/wenhui/_dibm07_claude_state/dot_claude/projects/-data-wenhui-openclaude
 # 本对话完整 transcript(72 MB)
 /data/wenhui/_dibm07_claude_state/dot_claude/projects/-data-wenhui-openclaude-rna/a26f6ec5-7bf6-4442-b1f1-d17e22916349.jsonl
 ```
+
+**2026-08-18 已完成:** 32 个记忆文件已逐个比对后合入 dibm01 的
+`/home/ubuntu/.claude/projects/-data-wenhui-openclaude-rna/memory/`(与本机原有的 2 个文件**没有任何文件名冲突**,
+一个都没覆盖),`MEMORY.md` 重写为两边并集并按"人 / 在跑的线 / 已完成的发现 / 环境坑"分组。下面这条过期项在
+`project-rna-ceiling-branch.md` 里已经改正,保留此段只为记录当时的判断。
 
 **记忆里有一条已知过期,恢复后要改:** `project-rna-ceiling-branch.md` 写着「Eterna100 是 64/100」,
 那是旧管线(`_archive_runs/eterna_paired/memon/`)的陈数;现在的事实是 **DesiRNA 解出 99/100,

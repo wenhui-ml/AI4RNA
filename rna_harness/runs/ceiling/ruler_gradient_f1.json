@@ -1,0 +1,154 @@
+{
+ "G1": {
+  "frac_within_noise_of_cut": 0.1926963711529628,
+  "n_duplicated_molecules": 31,
+  "wet_spread_max": 14.1111111111111,
+  "wet_spread_median": 3.0
+ },
+ "G2": {
+  "f1c": {
+   "high": {
+    "median": 0.08361534203559066,
+    "n": 27
+   },
+   "low": {
+    "median": 0.38681315309878084,
+    "n": 56
+   },
+   "mid": {
+    "median": 0.11806286507528552,
+    "n": 54
+   }
+  },
+  "panel": {
+   "high": {
+    "median": -0.0005970123718839326,
+    "n": 57
+   },
+   "low": {
+    "median": 0.2619839969266851,
+    "n": 50
+   },
+   "mid": {
+    "median": 0.07176737545991155,
+    "n": 55
+   }
+  }
+ },
+ "G3": {
+  "inside_panel_confirmed": {
+   "block_owner": "panel",
+   "n_designs_in_block": 2514,
+   "n_targets": 45,
+   "p_two_sided": 4.589093756235942e-06,
+   "positive": 39,
+   "probe": "f1c",
+   "rho_median": 0.3145991943065064
+  },
+  "inside_panel_saturated": {
+   "block_owner": "panel",
+   "n_designs_in_block": 0,
+   "n_targets": 0,
+   "probe": "f1c"
+  },
+  "inside_rnet_saturated": {
+   "block_owner": "f1c",
+   "n_designs_in_block": 1584,
+   "n_targets": 50,
+   "p_two_sided": 0.09879767144364483,
+   "positive": 29,
+   "probe": "panel",
+   "rho_median": 0.048596724096780286
+  }
+ },
+ "G4": {
+  "base_fail": 0.2971979788700046,
+  "n": 4354,
+  "paired_stack_cov30": {
+   "better": 13,
+   "median": 0.0,
+   "n": 57,
+   "p_two_sided": 0.9655051159510857
+  },
+  "points": [
+   {
+    "cov": 0.1,
+    "panel": 0.1034482758620689,
+    "panel_minus_rnet": -0.06101149425287358,
+    "realized": 0.09990813045475425,
+    "rnet": 0.16445977011494248,
+    "stack": 0.1586206896551728,
+    "stack_minus_rnet": -0.005839080459769691
+   },
+   {
+    "cov": 0.2,
+    "panel": 0.16647531572904758,
+    "panel_minus_rnet": 0.0002296211251439917,
+    "realized": 0.20004593477262286,
+    "rnet": 0.1662456946039036,
+    "stack": 0.15154994259471904,
+    "stack_minus_rnet": -0.014695752009184548
+   },
+   {
+    "cov": 0.3,
+    "panel": 0.16385911179173016,
+    "panel_minus_rnet": -0.0014395099540586431,
+    "realized": 0.2999540652273771,
+    "rnet": 0.1652986217457888,
+    "stack": 0.1661562021439515,
+    "stack_minus_rnet": 0.0008575803981626939
+   },
+   {
+    "cov": 0.5,
+    "panel": 0.1915480018373904,
+    "panel_minus_rnet": 0.008075333027101228,
+    "realized": 0.5,
+    "rnet": 0.18347266881028917,
+    "stack": 0.18144235186035787,
+    "stack_minus_rnet": -0.0020303169499313045
+   }
+  ]
+ },
+ "G5": {
+  "n_cells": 448,
+  "n_usable": 83,
+  "points": [
+   {
+    "cov": 0.3,
+    "n": 83,
+    "panel_minus_rnet": {
+     "median": 0.0,
+     "p_two_sided": 0.3996260248303621,
+     "panel_or_stack_better": 34,
+     "worse": 37
+    },
+    "stack_minus_rnet": {
+     "median": 0.0,
+     "p_two_sided": 0.5349148458570916,
+     "panel_or_stack_better": 22,
+     "worse": 26
+    }
+   },
+   {
+    "cov": 0.5,
+    "n": 83,
+    "panel_minus_rnet": {
+     "median": 0.0027777777777777124,
+     "p_two_sided": 0.15153268752086785,
+     "panel_or_stack_better": 34,
+     "worse": 42
+    },
+    "stack_minus_rnet": {
+     "median": 0.0,
+     "p_two_sided": 0.47732500973884473,
+     "panel_or_stack_better": 16,
+     "worse": 22
+    }
+   }
+  ]
+ },
+ "exploratory": true,
+ "note": "Fixes D2 (tie-aware matched coverage) and D3 (duplicate molecules) of novelty_stratified_ruler.py. The recall-vs-F1 asymmetry is NOT fixed here; see panel_f1_designs.py.",
+ "panel_column": "panel_f1",
+ "pre_registered": false
+}

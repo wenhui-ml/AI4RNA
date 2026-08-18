@@ -117,6 +117,29 @@ def n_pk_pairs(struct: str) -> int:
     return len(pk_pairs(struct)) - len(pk_pairs(_round_only(struct)))
 
 
+def crossing_pairs(pairs) -> set:
+    """The pairs in a pair SET that cross at least one other pair in the same set.
+
+    This is the predicted-side counterpart of `pk_pairs(T) - pk_pairs(_round_only(T))`: for a TARGET the
+    crossing pairs are the ones the pseudoknot brackets carry, and for a PREDICTION there are no brackets to
+    read, only geometry. A pair (i,j) crosses (k,l) when exactly one of k,l lies inside (i,j).
+
+    Needed because the shipped certificate measured only RECALL of the target's crossing pairs and therefore
+    could not see over-prediction: measured over 4,560 synthesised OpenKnot designs the panel predicts a
+    median of 10.7 crossing pairs at a median precision of 0.154. Comparing that recall against the release's
+    crossed-pair F1 is comparing two different statistics, and the comparison accounted for the whole of the
+    panel's apparent loss to RibonanzaNet (runs/ceiling/ruler_gradient{,_f1}.json).
+    """
+    ps = sorted(pairs)
+    out = set()
+    for a, (i, j) in enumerate(ps):
+        for k, l in ps[a + 1:]:
+            if i < k < j < l or k < i < l < j:
+                out.add((i, j))
+                out.add((k, l))
+    return out
+
+
 def load_pseudobase(path: Optional[str] = None, limit: Optional[int] = None,
                     with_constraints: bool = True) -> List[DesignTask]:
     """Load Pseudobase++ (RNAInvBench) pseudoknot design tasks. The IUPAC restraint becomes
