@@ -56,6 +56,14 @@ here (crossing count terciles, length terciles, saturation of either ruler) rath
 Struct2SeQ-SHAPE excluded throughout: it optimises against RibonanzaNet, so it is not a fair test of whether
 RibonanzaNet is right.
 
+!! 2026-08-19 AUDIT (arbitration_audit.py): A1's HEADLINE IS RETRACTED AS A CONSTANT. boot_ci weights cells by
+   their pair count, and the ten largest cells hold 45.3% of all 7,858 pairs while the median cell holds 4. With
+   one vote per cell the same data give 53.8% [48.5, 59.3] -- the interval spans 0.5. So "the tube sides with the
+   learned ruler 57.6% of the time" is a property of a few large cells, not a constant over cells. Clustering
+   fixed DEPENDENCE; it does not fix WEIGHTING, and those are two separate corrections. A3's strata inherit the
+   same defect. What survives is not here but in arbitration_magnitude.py's conditional, re-measured under both
+   weightings by the audit.
+
 COST: $0. Arithmetic over files already on disk.
 """
 from __future__ import annotations

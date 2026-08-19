@@ -36,6 +36,21 @@ The development half is reported too, and if development and holdout disagree th
 same standing limitation as everything else in this chain: measured on other people's molecules, because our
 own designs have no tube score.
 
+!! 2026-08-19 AUDIT (arbitration_audit.py): READ THESE THREE CORRECTIONS BEFORE QUOTING ANY NUMBER BELOW.
+   1. A5b's top bin 75.1% is INFLATED BY THE CONFIDENCE DEFINITION. |dz| is delta/sigma_cell, so a cell whose
+      panel is nearly constant turns a numerically negligible panel difference into a huge "confidence". Under
+      in-cell RANK differences (immune to sigma) the top bin is 64.1% [54.9, 73.2]; with one vote per cell,
+      63.9% (z) and 60.5% (rank). The defensible figure is ~60-64%, not 75%.
+   2. A4's FAILURE IS REAL, NOT UNDERPOWERED -- the audit measured what this file never did: FOLLOW_CONFIDENT
+      changes the decision on 2,631 of 4,605 holdout pairs (57.1%), with a maximum attainable gain of +27.8%.
+      The -1.5% is a measured negative.
+   3. "THE PANEL'S CONFIDENCE CARRIES NO INFORMATION" WAS TOO STRONG. Binning on panel confidence alone, the
+      top bin gives learned-right 54.0% pair-weighted but 39.1% [29.6, 48.3] per cell -- the second clears 0.5
+      from BELOW, i.e. it points at following the PANEL there. Weighting-dependent, so unestablished, but it is
+      not a coin flip and must not be described as one.
+   A5's declared monotonicity holds in 3 of the 4 definition x weighting combinations and fails under
+   rank x pair-weighted (bin 3 dips). The surviving claim is a TOP-BIN effect, not a clean gradient.
+
 COST: $0. Arithmetic over files already on disk.
 """
 from __future__ import annotations
