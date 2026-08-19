@@ -993,6 +993,23 @@ def _certify_design_impl(target: str, budget: str = "standard", seed: int = 0,
                             # exactly 34-34, and picking on GC was significantly WORSE (14-32), which is
                             # what rules out plain composition. Entropy is computed only when a tie actually
                             # occurs, and costs 0.6-1.0% of one candidate's panel folds.
+                            #
+                            # NOTHING ABOVE SURVIVED AUDIT, and the paragraph is kept only so the history is
+                            # legible. Four independent readings of this rule now exist and NONE supports it:
+                            #   (1) the numbers above are 1 of 9 direction tests on the same pools; the best
+                            #       p = 0.0362 does not clear the family-wise 0.05/9 = 0.0056, and RNAPKplex
+                            #       runs the WRONG way (6 wins / 11 losses). audit_week.py, objection 2.
+                            #   (2) on 51 HELD-OUT targets under the same judge family, deleting the rule is
+                            #       a non-event: k_first - shipped mean3 -0.003, p = 0.83, and INVERTING it
+                            #       moves mean3 by 0.001. selector_heldout_all.json.
+                            #   (3) on RibonanzaNet's ruler the direction is REVERSED and significantly so:
+                            #       k_lowent +0.080 (p = 0.012); deleting it +0.042 (p = 0.054).
+                            #   (4) against measured OpenKnot scores, on THIS rule's own equal-grade
+                            #       population, pre-registered: null, and well-powered -- every interval is
+                            #       narrower than the 4.1-point tube noise floor. tiebreak_direction.json.
+                            # The code is left ALONE because removing a rule is a product decision and this
+                            # comment is not the place to take it; what is fixed here is the claim, which
+                            # cited (1) as settled evidence for three weeks.
                             if _ensemble_entropy(c) > _ensemble_entropy(best_knot[0]):
                                 best_knot = (c, kr)
                 # THE SCREEN. Kept as the FIRST candidate that clears it, not the best, and that is a
