@@ -1,0 +1,41 @@
+{
+  "id": "A12",
+  "date_utc": "2026-08-19",
+  "title": "出厂打平器的方向,对着物理测量的一次预注册检验",
+  "why_now": [
+    "certify.py 在【同等级】(k = 达到全交叉召回的判官数)候选之间,偏好【更高】的系综熵。",
+    "它当初的证据全部来自 IPknot/Knotty/RNAPKplex —— 与面板同属热力学家族的判官:IPknot 21.8%->27.0%(29 胜 16 负, 符号 p=0.0362)、Knotty 62.1%->67.3%(p=0.077)、RNAPKplex 52.8%->50.8%(不显著)。",
+    "A11 第一次把这个量对着【测量】看:四个点估计全为负,样本 3 上显著为负。但 A11 的人群是【RNet 顶端并列块】和【面板分顶端并列块】,都不是出厂规则真正开火的那个人群。",
+    "所以这一条是这两天唯一指向「产品可能有错」的线索,必须在改产品之前,在出厂口径的人群上测一次。"
+  ],
+  "population": {
+    "definition": "每个 (靶标, 方法) 格内,先取 knot_confirmed(k>=1)的分子,再取其中 k 最大的那一块 —— 这正是 certify.py 的 best_knot 打平所面对的集合。",
+    "not_this": "不是同 f1c、不是同面板分。那两个是 A11 测过的人群,与出厂规则的口径不同。",
+    "filters_reused_unchanged_from_A11": {"MIN_BLOCK": 4, "MIN_DISTINCT_WET": 3},
+    "samples_required": "样本2(panel_f1_fresh.json)与样本3(panel_f1_third.json),两批分子不相交,每批都是一次完整检验;只在一批上成立不算结果(A7 的教训)。",
+    "counted_before_any_outcome_was_computed": {
+      "sample2": {"designs": 9120, "cells": 483, "knot_confirmed": 5163, "usable_cells": 145, "molecules_in_usable_blocks": 1624},
+      "sample3": {"designs": 4526, "cells": 443, "knot_confirmed": 2595, "usable_cells": 62, "molecules_in_usable_blocks": 569}
+    }
+  },
+  "primary_test": {
+    "name": "规则的实际选择 vs 随机打平",
+    "statistic": "每格:wet(块内熵最大的那条) − mean(块内所有条的 wet)。后者就是随机打平的期望值。",
+    "unit": "格(独立单位 = 格,不是分子)",
+    "estimator": "格内差值的中位数;对格做聚类 bootstrap(4000 抽),双侧 95% 区间",
+    "declared_direction": "出厂规则主张这个差值为【正】。区间取双侧,是为了让「显著为负」也能被记录 —— 那正是本次要抓的东西。"
+  },
+  "secondary_tests": [
+    {"name": "熵 vs wet 的块内秩相关", "note": "与 A11 同一估计量(Spearman,块内,格中位数,聚类 bootstrap),为了可比"},
+    {"name": "argmax 熵 − argmin 熵", "note": "同一格内两端对比,方向检验的功效更高"},
+    {"name": "合并两批", "note": "仅作参考;两批各自的结论优先"}
+  ],
+  "outcomes_fixed_in_advance": {
+    "direction_confirmed": "两批的主检验中位数都为正且区间排除 0 → 出厂规则的方向在物理上站得住,A11 的负号是人群造成的。",
+    "direction_inverted": "两批的主检验中位数都为负且区间排除 0 → 方向反了。这是一条【产品级】发现,记录并上报,但不在本次运行里改代码:改产品是另一个决定。",
+    "null": "其余一切情况 → 打平器对着测量【读不到东西】。注意这【不】等于可以删掉它:它当初的证据是 IPknot/Knotty/RNAPKplex 的一致率,那是另一个结果变量,本次没有反驳它。null 的正确读法是给它的主张【划定范围】——在同族判官上有效,在测量上未证实。",
+    "no_data": "任一批可用格 < 20 → 记「无数据、无结论」,不记为 null。"
+  },
+  "multiplicity_stated_not_corrected": "熵对着 wet 的检验,这是第三个人群(A11 已测 RNet 顶端块、面板分顶端块)。本次给出的 p / 区间不做跨人群校正,但必须与前两个人群的结果一起读:如果只有这一个人群显著,那是人群的性质,不是熵的性质。",
+  "cost": "$0,离线。只在并列块内算 ViennaRNA 配分函数。"
+}
