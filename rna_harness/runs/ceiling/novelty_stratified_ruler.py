@@ -155,6 +155,43 @@ def replay_fresh(seed: int, per_target: int, old_seed: int = 0, old_per_target: 
     return jobs, wild
 
 
+def replay_third(seed: int, per_target: int, verbose: bool = True):
+    """The THIRD disjoint sample: designs neither the 80/target nor the 160/target sample ever touched.
+
+    `replay_fresh` excludes ONE prior sample, so it cannot build this one -- a third sample must exclude the
+    exploratory sample (seed 0, 80/target) AND the confirmatory sample (replay_fresh(0, 160, 0, 80)). Written
+    out explicitly rather than as a general mechanism, because the only thing that matters here is that the
+    exclusion is complete, and an explicit pair of calls can be asserted while a clever one cannot.
+
+    Why a third sample exists at all: the frozen operating point was fitted on sample 1 and confirmed on
+    sample 2, so any evaluation of a SELECTOR built from that point needs molecules neither has seen. 19,977
+    eligible designs remain and every target can supply at least 47.
+    """
+    s1, wild = replay_sample(0, 80)
+    s2, _ = replay_fresh(0, 160, 0, 80)
+    taken = {(p, s, m) for p, s, _f, _w, m in s1} | {(p, s, m) for p, s, _f, _w, m in s2}
+    pool = collections.defaultdict(list)
+    for p, s, f1c, wet, m in _all_eligible():
+        if (p, s, m) not in taken:
+            pool[p].append((s, f1c, wet, m))
+    rng = random.Random(20_000 + seed)                   # a third stream, distinct from both prior ones
+    jobs, short = [], []
+    for p, rows in sorted(pool.items()):
+        if len(rows) < per_target:
+            short.append((p, len(rows)))
+        for s, f1c, wet, m in rng.sample(rows, min(per_target, len(rows))):
+            jobs.append((p, s, f1c, wet, m))
+    got = {(p, s, m) for p, s, _f, _w, m in jobs}
+    assert not (got & taken), f"third sample overlaps a prior sample on {len(got & taken)} designs"
+    assert len(got) == len(jobs), "third sample contains a duplicate (puzzle, sequence, method)"
+    if verbose:
+        print(f"  第三批:{len(jobs)} 条,{len({j[0] for j in jobs})} 个靶标;"
+              f"与前两批({len(taken)} 条)交集 {len(got & taken)}(断言为 0)")
+        if short:
+            print(f"    剩余不足 {per_target} 条、按剩余全取的靶标 {len(short)} 个: {short[:5]}")
+    return jobs, wild
+
+
 def _all_eligible():
     """Every SN_filter=1 design whose target matches ours and which carries both an RNet F1 and a tube score."""
     from leaderboard_design import targets
