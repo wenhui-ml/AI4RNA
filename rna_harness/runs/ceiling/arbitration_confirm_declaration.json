@@ -1,0 +1,24 @@
+{
+ "declared_utc_note": "cuts frozen from the 184-cell exploratory set BEFORE the fresh sample is scored",
+ "source": "criterion_vs_tube.json sample (seed 0, 80/target) x panel_f1_designs.json",
+ "n_cells": 184,
+ "n_pairs": 7858,
+ "margin_tube_noise": 3.0,
+ "primary_confidence": "in-cell rank difference (sigma-immune)",
+ "cut_rank_top_quartile": 0.2313432835820895,
+ "cut_rank_bottom_quartile": -0.17857142857142852,
+ "secondary_confidence": "in-cell z difference (as published, known to be sigma-inflated)",
+ "cut_z_top_quartile": 0.5967861358938216,
+ "cut_z_bottom_quartile": -1.0916480215931208,
+ "primary_estimator": "one vote per cell, cluster bootstrap 95% CI",
+ "secondary_estimator": "pair-weighted, cluster bootstrap 95% CI",
+ "success": "top-bin per-cell CI excludes 0.5 from above",
+ "one_sidedness": "bottom-bin per-cell CI must NOT exclude 0.5 from above",
+ "old_exploratory_values_being_tested": {
+  "rank_top_bin_percell": 0.605,
+  "rank_top_bin_weighted": 0.641,
+  "z_top_bin_percell": 0.639,
+  "z_top_bin_weighted": 0.751,
+  "rank_bottom_bin_percell": 0.503
+ }
+}
