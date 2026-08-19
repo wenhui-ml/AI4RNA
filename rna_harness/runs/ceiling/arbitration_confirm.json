@@ -1,0 +1,165 @@
+{
+ "declaration": {
+  "declared_utc_note": "cuts frozen from the 184-cell exploratory set BEFORE the fresh sample is scored",
+  "source": "criterion_vs_tube.json sample (seed 0, 80/target) x panel_f1_designs.json",
+  "n_cells": 184,
+  "n_pairs": 7858,
+  "margin_tube_noise": 3.0,
+  "primary_confidence": "in-cell rank difference (sigma-immune)",
+  "cut_rank_top_quartile": 0.2313432835820895,
+  "cut_rank_bottom_quartile": -0.17857142857142852,
+  "secondary_confidence": "in-cell z difference (as published, known to be sigma-inflated)",
+  "cut_z_top_quartile": 0.5967861358938216,
+  "cut_z_bottom_quartile": -1.0916480215931208,
+  "primary_estimator": "one vote per cell, cluster bootstrap 95% CI",
+  "secondary_estimator": "pair-weighted, cluster bootstrap 95% CI",
+  "success": "top-bin per-cell CI excludes 0.5 from above",
+  "one_sidedness": "bottom-bin per-cell CI must NOT exclude 0.5 from above",
+  "old_exploratory_values_being_tested": {
+   "rank_top_bin_percell": 0.605,
+   "rank_top_bin_weighted": 0.641,
+   "z_top_bin_percell": 0.639,
+   "z_top_bin_weighted": 0.751,
+   "rank_bottom_bin_percell": 0.503
+  }
+ },
+ "n_designs": 8787,
+ "n_cells": 281,
+ "n_pairs": 34284,
+ "tube_noise_median_fresh": 4.096989966555199,
+ "A1_replication": {
+  "\u5168\u90e8\u914d\u5bf9": {
+   "n": 34284,
+   "n_cells": 281,
+   "weighted": [
+    0.6041302065103256,
+    0.5411865693816237,
+    0.6615214697483972
+   ],
+   "percell": [
+    0.527731092053476,
+    0.48845760377690006,
+    0.5666526727709399
+   ],
+   "percell_clears_half_above": false,
+   "percell_clears_half_below": false,
+   "weighted_clears_half_above": true
+  }
+ },
+ "\u79e9(\u4e3b)": {
+  "cut_lands_at_fresh_quantile": [
+   0.2531793256329483,
+   0.7566795006416988
+  ],
+  "\u5e95\u6863": {
+   "n": 8680,
+   "n_cells": 224,
+   "weighted": [
+    0.5622119815668203,
+    0.48174739609667305,
+    0.6311005302456444
+   ],
+   "percell": [
+    0.48891917731981915,
+    0.44085928891306214,
+    0.5362888757769646
+   ],
+   "percell_clears_half_above": false,
+   "percell_clears_half_below": false,
+   "weighted_clears_half_above": false
+  },
+  "\u4e2d\u6863": {
+   "n": 17262,
+   "n_cells": 251,
+   "weighted": [
+    0.591878113775924,
+    0.5315035296596776,
+    0.6481998882413986
+   ],
+   "percell": [
+    0.55427816869172,
+    0.5077880798663177,
+    0.5988902060936124
+   ],
+   "percell_clears_half_above": true,
+   "percell_clears_half_below": false,
+   "weighted_clears_half_above": true
+  },
+  "\u9876\u6863": {
+   "n": 8342,
+   "n_cells": 209,
+   "weighted": [
+    0.6730999760249341,
+    0.5918342474101158,
+    0.7426292407108239
+   ],
+   "percell": [
+    0.5596812275057393,
+    0.504647534757631,
+    0.6131742923934661
+   ],
+   "percell_clears_half_above": true,
+   "percell_clears_half_below": false,
+   "weighted_clears_half_above": true
+  }
+ },
+ "z(\u6b21)": {
+  "cut_lands_at_fresh_quantile": [
+   0.2306323649515809,
+   0.7798973281997433
+  ],
+  "\u5e95\u6863": {
+   "n": 7907,
+   "n_cells": 195,
+   "weighted": [
+    0.5213102314404957,
+    0.40834993660568736,
+    0.6226272784412319
+   ],
+   "percell": [
+    0.45642937300610703,
+    0.4017586304321305,
+    0.50981218009184
+   ],
+   "percell_clears_half_above": false,
+   "percell_clears_half_below": false,
+   "weighted_clears_half_above": false
+  },
+  "\u4e2d\u6863": {
+   "n": 18831,
+   "n_cells": 241,
+   "weighted": [
+    0.5972067335776113,
+    0.5336833350660152,
+    0.6554527899176745
+   ],
+   "percell": [
+    0.562989509260516,
+    0.5173573336087548,
+    0.6090812227452527
+   ],
+   "percell_clears_half_above": true,
+   "percell_clears_half_below": false,
+   "weighted_clears_half_above": true
+  },
+  "\u9876\u6863": {
+   "n": 7546,
+   "n_cells": 207,
+   "weighted": [
+    0.7081897694142593,
+    0.6210512853306049,
+    0.7791504719600222
+   ],
+   "percell": [
+    0.5661885872437593,
+    0.5105982568057459,
+    0.6192892383180996
+   ],
+   "percell_clears_half_above": true,
+   "percell_clears_half_below": false,
+   "weighted_clears_half_above": true
+  }
+ },
+ "CONFIRMED": true,
+ "ONE_SIDED": true
+}
