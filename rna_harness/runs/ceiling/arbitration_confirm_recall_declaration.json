@@ -1,0 +1,25 @@
+{
+ "test": "A7 —— 判据在【出厂】的面板量上是否成立",
+ "why": "确认跑用的 panel_f1 是 2026-08-19 加的观测列。出厂的筛档读的是 mean crossing recall(panel_recall_product)。如果判据只在观测列上成立,它对产品没有用。",
+ "declared_utc_note": "切点取自旧 184 格样本的【召回列】,在新样本的召回列被看之前冻结",
+ "panel_key": "panel_recall_product",
+ "n_cells": 169,
+ "n_pairs": 7196,
+ "margin_tube_noise": 3.0,
+ "primary_confidence": "in-cell rank difference (sigma-immune)",
+ "cut_rank_top_quartile": 0.1640625,
+ "cut_rank_bottom_quartile": -0.2181818181818182,
+ "secondary_confidence": "in-cell z difference",
+ "cut_z_top_quartile": 0.37531608144429374,
+ "cut_z_bottom_quartile": -1.1951296173438044,
+ "primary_estimator": "one vote per cell, cluster bootstrap 95% CI",
+ "secondary_estimator": "pair-weighted, cluster bootstrap 95% CI",
+ "success": "top-bin per-cell CI excludes 0.5 from above",
+ "one_sidedness": "bottom-bin per-cell CI must NOT exclude 0.5 from above",
+ "old_exploratory_values_being_tested": {
+  "note": "这一列没有探索期数值 —— 从未在召回列上做过分档。对照物是 panel_f1 列的确认结果。",
+  "rank_top_bin_percell": 0.56,
+  "rank_bottom_bin_percell": 0.489
+ },
+ "declared_failure_meaning": "若召回列上顶档不越过 0.5,则判据是【观测列专有】的,不能用于产品,且 A6 的通过必须标注为依赖非出厂统计量。"
+}
