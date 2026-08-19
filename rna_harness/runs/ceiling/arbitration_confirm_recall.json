@@ -1,0 +1,166 @@
+{
+ "declaration": {
+  "test": "A7 \u2014\u2014 \u5224\u636e\u5728\u3010\u51fa\u5382\u3011\u7684\u9762\u677f\u91cf\u4e0a\u662f\u5426\u6210\u7acb",
+  "why": "\u786e\u8ba4\u8dd1\u7528\u7684 panel_f1 \u662f 2026-08-19 \u52a0\u7684\u89c2\u6d4b\u5217\u3002\u51fa\u5382\u7684\u7b5b\u6863\u8bfb\u7684\u662f mean crossing recall(panel_recall_product)\u3002\u5982\u679c\u5224\u636e\u53ea\u5728\u89c2\u6d4b\u5217\u4e0a\u6210\u7acb,\u5b83\u5bf9\u4ea7\u54c1\u6ca1\u6709\u7528\u3002",
+  "declared_utc_note": "\u5207\u70b9\u53d6\u81ea\u65e7 184 \u683c\u6837\u672c\u7684\u3010\u53ec\u56de\u5217\u3011,\u5728\u65b0\u6837\u672c\u7684\u53ec\u56de\u5217\u88ab\u770b\u4e4b\u524d\u51bb\u7ed3",
+  "panel_key": "panel_recall_product",
+  "n_cells": 169,
+  "n_pairs": 7196,
+  "margin_tube_noise": 3.0,
+  "primary_confidence": "in-cell rank difference (sigma-immune)",
+  "cut_rank_top_quartile": 0.1640625,
+  "cut_rank_bottom_quartile": -0.2181818181818182,
+  "secondary_confidence": "in-cell z difference",
+  "cut_z_top_quartile": 0.37531608144429374,
+  "cut_z_bottom_quartile": -1.1951296173438044,
+  "primary_estimator": "one vote per cell, cluster bootstrap 95% CI",
+  "secondary_estimator": "pair-weighted, cluster bootstrap 95% CI",
+  "success": "top-bin per-cell CI excludes 0.5 from above",
+  "one_sidedness": "bottom-bin per-cell CI must NOT exclude 0.5 from above",
+  "old_exploratory_values_being_tested": {
+   "note": "\u8fd9\u4e00\u5217\u6ca1\u6709\u63a2\u7d22\u671f\u6570\u503c \u2014\u2014 \u4ece\u672a\u5728\u53ec\u56de\u5217\u4e0a\u505a\u8fc7\u5206\u6863\u3002\u5bf9\u7167\u7269\u662f panel_f1 \u5217\u7684\u786e\u8ba4\u7ed3\u679c\u3002",
+   "rank_top_bin_percell": 0.56,
+   "rank_bottom_bin_percell": 0.489
+  },
+  "declared_failure_meaning": "\u82e5\u53ec\u56de\u5217\u4e0a\u9876\u6863\u4e0d\u8d8a\u8fc7 0.5,\u5219\u5224\u636e\u662f\u3010\u89c2\u6d4b\u5217\u4e13\u6709\u3011\u7684,\u4e0d\u80fd\u7528\u4e8e\u4ea7\u54c1,\u4e14 A6 \u7684\u901a\u8fc7\u5fc5\u987b\u6807\u6ce8\u4e3a\u4f9d\u8d56\u975e\u51fa\u5382\u7edf\u8ba1\u91cf\u3002"
+ },
+ "n_designs": 8787,
+ "n_cells": 267,
+ "n_pairs": 33112,
+ "tube_noise_median_fresh": 4.096989966555199,
+ "A1_replication": {
+  "\u5168\u90e8\u914d\u5bf9": {
+   "n": 33112,
+   "n_cells": 267,
+   "weighted": [
+    0.6180538777482484,
+    0.5543706020328382,
+    0.6716302952503209
+   ],
+   "percell": [
+    0.5226219092780251,
+    0.4806999514631362,
+    0.5662193406451594
+   ],
+   "percell_clears_half_above": false,
+   "percell_clears_half_below": false,
+   "weighted_clears_half_above": true
+  }
+ },
+ "\u79e9(\u4e3b)": {
+  "cut_lands_at_fresh_quantile": [
+   0.2532012563421116,
+   0.7461947330273013
+  ],
+  "\u5e95\u6863": {
+   "n": 8384,
+   "n_cells": 202,
+   "weighted": [
+    0.5363788167938931,
+    0.46185698359611405,
+    0.605275553462082
+   ],
+   "percell": [
+    0.45334940516801564,
+    0.39748633370142905,
+    0.5079721107273443
+   ],
+   "percell_clears_half_above": false,
+   "percell_clears_half_below": false,
+   "weighted_clears_half_above": false
+  },
+  "\u4e2d\u6863": {
+   "n": 16324,
+   "n_cells": 239,
+   "weighted": [
+    0.6119823572653761,
+    0.5468047527296083,
+    0.6654647435897436
+   ],
+   "percell": [
+    0.5287581718340365,
+    0.48251178007310486,
+    0.5724221279772439
+   ],
+   "percell_clears_half_above": false,
+   "percell_clears_half_below": false,
+   "weighted_clears_half_above": true
+  },
+  "\u9876\u6863": {
+   "n": 8404,
+   "n_cells": 187,
+   "weighted": [
+    0.7113279390766302,
+    0.6144642382345121,
+    0.7835130970724191
+   ],
+   "percell": [
+    0.5795249228789935,
+    0.5230342922732071,
+    0.6340701515669888
+   ],
+   "percell_clears_half_above": true,
+   "percell_clears_half_below": false,
+   "weighted_clears_half_above": true
+  }
+ },
+ "z(\u6b21)": {
+  "cut_lands_at_fresh_quantile": [
+   0.24981879681082386,
+   0.7832205846822904
+  ],
+  "\u5e95\u6863": {
+   "n": 8272,
+   "n_cells": 184,
+   "weighted": [
+    0.5176499032882012,
+    0.41250326968349466,
+    0.619562000591891
+   ],
+   "percell": [
+    0.4608530443982796,
+    0.4044616844197311,
+    0.5170741297370502
+   ],
+   "percell_clears_half_above": false,
+   "percell_clears_half_below": false,
+   "weighted_clears_half_above": false
+  },
+  "\u4e2d\u6863": {
+   "n": 17662,
+   "n_cells": 216,
+   "weighted": [
+    0.6143132148114596,
+    0.5525348579429438,
+    0.6723487106131044
+   ],
+   "percell": [
+    0.5472548793889873,
+    0.4979121152587558,
+    0.5934838548011188
+   ],
+   "percell_clears_half_above": false,
+   "percell_clears_half_below": false,
+   "weighted_clears_half_above": true
+  },
+  "\u9876\u6863": {
+   "n": 7178,
+   "n_cells": 190,
+   "weighted": [
+    0.7429646140986347,
+    0.6342961487383798,
+    0.8178202923473775
+   ],
+   "percell": [
+    0.569665875995406,
+    0.5123428463704627,
+    0.6253887930243651
+   ],
+   "percell_clears_half_above": true,
+   "percell_clears_half_below": false,
+   "weighted_clears_half_above": true
+  }
+ },
+ "CONFIRMED": true,
+ "ONE_SIDED": true
+}
