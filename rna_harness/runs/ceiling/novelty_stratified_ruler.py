@@ -127,6 +127,59 @@ def replay_sample(seed: int, per_target: int):
     return jobs, wild
 
 
+def replay_fresh(seed: int, per_target: int, old_seed: int = 0, old_per_target: int = 80):
+    """Sample `per_target` designs per target that the (old_seed, old_per_target) sample never touched.
+
+    random.sample(rows, 160) is NOT a superset of random.sample(rows, 80) at the same seed, so a disjoint
+    holdout cannot be had by raising --per-target. The old sample is replayed, removed by (puzzle, sequence,
+    method), and the fresh draw comes from what is left. Returns the same tuple shape as replay_sample.
+    """
+    old, _ = replay_sample(old_seed, old_per_target)
+    taken = {(p, s, m) for p, s, _f, _w, m in old}
+    _, wild = replay_sample(old_seed, 1)                # cheap: rebuilds `wild` without a second CSV pass
+    pool = collections.defaultdict(list)
+    for p, s, f1c, wet, m in _all_eligible():
+        if (p, s, m) not in taken:
+            pool[p].append((s, f1c, wet, m))
+    rng = random.Random(10_000 + seed)                  # a different stream from replay_sample's
+    jobs, short = [], []
+    for p, rows in sorted(pool.items()):
+        if len(rows) < per_target:
+            short.append((p, len(rows)))
+        for s, f1c, wet, m in rng.sample(rows, min(per_target, len(rows))):
+            jobs.append((p, s, f1c, wet, m))
+    if short:
+        print(f"  注意:{len(short)} 个靶标剩余不足 {per_target} 条,按剩余全取 {short[:5]}")
+    overlap = {(p, s, m) for p, s, _f, _w, m in jobs} & taken
+    assert not overlap, f"fresh sample overlaps the old one on {len(overlap)} designs"
+    return jobs, wild
+
+
+def _all_eligible():
+    """Every SN_filter=1 design whose target matches ours and which carries both an RNet F1 and a tube score."""
+    from leaderboard_design import targets
+    T = targets()
+    csv.field_size_limit(10 ** 9)
+    per = collections.defaultdict(list)
+    with open(DATA, newline="") as fh:
+        r = csv.reader(fh)
+        idx = {k: i for i, k in enumerate(next(r))}
+        for x in r:
+            if x[idx["SN_filter"]] != "1":
+                continue
+            p, s, m = x[idx["puzzle"]], x[idx["design_sequence"]], x[idx["method"]]
+            if p not in T or not s or x[idx["target_structure"]] != T[p]["target"]:
+                continue
+            try:
+                f1c = float(x[idx["RNet_F1_crossed_pair"]])
+                wet = float(x[idx["target_openknot_score"]])
+            except (TypeError, ValueError):
+                continue
+            per[p].append((p, s, f1c, wet, m))
+    # the >=20 eligibility gate is a property of the TARGET and must match replay_sample's
+    return [row for p, rows in sorted(per.items()) if len(rows) >= 20 for row in rows]
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--src", default=os.path.join(HERE, "criterion_vs_tube.json"))

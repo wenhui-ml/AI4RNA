@@ -95,7 +95,7 @@ def work(item):
     if not vals:
         return {"puzzle": puz, "error": "all oracles failed to run"}
     mean = lambda k: sum(v[k] for v in vals) / len(vals)                       # noqa: E731
-    return {"puzzle": puz, "method": method, "wet": wet, "f1c": f1c,
+    return {"puzzle": puz, "seq": seq, "method": method, "wet": wet, "f1c": f1c,
             "panel_recall_product": mean("recall_product"),
             "panel_recall": mean("recall"), "panel_precision": mean("precision"),
             "panel_f1": mean("f1"), "panel_f1_max": max(v["f1"] for v in vals),
@@ -109,13 +109,19 @@ def main() -> int:
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--per-target", type=int, default=80)
     ap.add_argument("--limit", type=int, default=0, help="smoke mode: only the first N designs")
+    ap.add_argument("--fresh", type=int, default=0,
+                    help="confirmatory mode: sample this many per target from designs the (--seed, 80) "
+                         "sample never touched. Disjointness is asserted, not assumed.")
     ap.add_argument("--out", default=os.path.join(HERE, "panel_f1_designs.json"))
     a = ap.parse_args()
 
     from leaderboard_design import targets
-    from novelty_stratified_ruler import replay_sample
+    from novelty_stratified_ruler import replay_fresh, replay_sample
     T = targets()
-    jobs_raw, wild = replay_sample(a.seed, a.per_target)
+    if a.fresh:
+        jobs_raw, wild = replay_fresh(a.seed, a.fresh, old_seed=a.seed, old_per_target=a.per_target)
+    else:
+        jobs_raw, wild = replay_sample(a.seed, a.per_target)
     jobs = [(p, s, T[p]["target"], f1c, wet, m) for p, s, f1c, wet, m in jobs_raw]
     if a.limit:
         jobs = jobs[:a.limit]
@@ -137,7 +143,7 @@ def main() -> int:
     # ---- identity check against the stored recall column -----------------------------------------------
     src = json.load(open(os.path.join(HERE, "criterion_vs_tube.json")))
     n_cmp, n_bad = 0, 0
-    if not a.limit and len(R) == len(src["designs"]):
+    if not a.limit and not a.fresh and len(R) == len(src["designs"]):
         for r, d in zip(R, src["designs"]):
             if "error" in r:
                 continue
@@ -148,6 +154,7 @@ def main() -> int:
               + ("  ✓" if n_bad == 0 else "  ✗ 召回的定义没对上,后续分析不可用"))
 
     json.dump({"n": len(ok), "n_failed": len(bad), "seed": a.seed, "per_target": a.per_target,
+               "fresh_per_target": a.fresh,
                "recall_identity_checked": n_cmp, "recall_identity_mismatches": n_bad,
                "designs": ok}, open(a.out, "w"), indent=1)
     print(f"写出 {a.out}")
