@@ -1,0 +1,144 @@
+=== [nested/build] 开始 05:44:56Z ===
+    25/250 靶标,已成格 25
+    50/250 靶标,已成格 50
+    75/250 靶标,已成格 75
+    100/250 靶标,已成格 100
+    125/250 靶标,已成格 125
+    150/250 靶标,已成格 150
+    175/250 靶标,已成格 175
+    200/250 靶标,已成格 200
+    225/250 靶标,已成格 225
+    250/250 靶标,已成格 249
+  20s 预算内凑不满 7 条诱饵的靶标 6 个(其中不足 2 条、整格丢弃的 1 个)
+    最难的几个(靶标, 长度, 拿到几条): [('pseudobase:89', 48, 0), ('pseudobase:221', 137, 3), ('pseudobase:88', 108, 3), ('pseudobase:91', 62, 3), ('pseudobase:232', 64, 4), ('pseudobase:22', 64, 6)]
+[nested] 格 249,序列 1976,每格 4–8 条(中位 8);长度档 60
+写出 /data/wenhui/openclaude_rna/rna_harness/runs/ceiling/a9_nested_pop.json
+=== [nested/build] 结束 rc=0 05:52:31Z ===
+=== [nested/rnet] 开始 05:52:31Z ===
+[nested] 1976 条过 RibonanzaNet,14 进程
+constructing 9 ConvTransformerEncoderLayers
+  载入 /data/wenhui/rnet_weights/RibonanzaNet-SS.pt:缺失 0 个键,多余 0 个
+constructing 9 ConvTransformerEncoderLayers
+  载入 /data/wenhui/rnet_weights/RibonanzaNet-SS.pt:缺失 0 个键,多余 0 个
+constructing 9 ConvTransformerEncoderLayers
+  载入 /data/wenhui/rnet_weights/RibonanzaNet-SS.pt:缺失 0 个键,多余 0 个
+constructing 9 ConvTransformerEncoderLayers
+  载入 /data/wenhui/rnet_weights/RibonanzaNet-SS.pt:缺失 0 个键,多余 0 个
+constructing 9 ConvTransformerEncoderLayers
+  载入 /data/wenhui/rnet_weights/RibonanzaNet-SS.pt:缺失 0 个键,多余 0 个
+constructing 9 ConvTransformerEncoderLayers
+  载入 /data/wenhui/rnet_weights/RibonanzaNet-SS.pt:缺失 0 个键,多余 0 个
+constructing 9 ConvTransformerEncoderLayers
+  载入 /data/wenhui/rnet_weights/RibonanzaNet-SS.pt:缺失 0 个键,多余 0 个
+constructing 9 ConvTransformerEncoderLayers
+  载入 /data/wenhui/rnet_weights/RibonanzaNet-SS.pt:缺失 0 个键,多余 0 个
+constructing 9 ConvTransformerEncoderLayers
+  载入 /data/wenhui/rnet_weights/RibonanzaNet-SS.pt:缺失 0 个键,多余 0 个
+constructing 9 ConvTransformerEncoderLayers
+  载入 /data/wenhui/rnet_weights/RibonanzaNet-SS.pt:缺失 0 个键,多余 0 个
+constructing 9 ConvTransformerEncoderLayers
+  载入 /data/wenhui/rnet_weights/RibonanzaNet-SS.pt:缺失 0 个键,多余 0 个
+constructing 9 ConvTransformerEncoderLayers
+  载入 /data/wenhui/rnet_weights/RibonanzaNet-SS.pt:缺失 0 个键,多余 0 个
+constructing 9 ConvTransformerEncoderLayers
+  载入 /data/wenhui/rnet_weights/RibonanzaNet-SS.pt:缺失 0 个键,多余 0 个
+constructing 9 ConvTransformerEncoderLayers
+  载入 /data/wenhui/rnet_weights/RibonanzaNet-SS.pt:缺失 0 个键,多余 0 个
+  完成 1976/1976,0.5 分钟
+=== [nested/rnet] 结束 rc=0 05:53:03Z ===
+=== [nested/panel] 开始 05:53:03Z ===
+[nested] 1976 条过三家出厂判官,24 进程
+    400/1976  0.2 min
+    800/1976  1.0 min
+    1200/1976  1.0 min
+    1600/1976  1.0 min
+    1976/1976  1.1 min
+  成功 1976,失败 0
+  写出 /data/wenhui/openclaude_rna/rna_harness/runs/ceiling/a9_nested_panel.json
+=== [nested/panel] 结束 rc=0 05:54:08Z ===
+=== [nested/analyse] 开始 05:54:08Z ===
+[nested] 格 249,序列 1976;独立单位 = 格
+
+=== 出厂列(主) panel_recall_product;切点复用 顶 0.16406 底 -0.21818(未重拟合)===
+  可用格 89(丢弃 30),相悖的(野生型,难零假设)配对 186
+  底档 n=   24 单位 16  跟学习型正确率 6.2% [0.0%,18.8%]  ✓下越
+  中档 n=  142 单位 78  跟学习型正确率 3.8% [0.0%,9.0%]  ✓下越
+  顶档 n=   20 单位 18  跟学习型正确率 5.6% [0.0%,16.7%]  ✓下越
+  【主检验】对比 顶−底 = -0.7%  聚类 CI [-16.7%,+15.5%]  跨过 0
+
+=== 观测列(次) panel_f1;切点复用 顶 0.23134 底 -0.17857(未重拟合)===
+  可用格 85(丢弃 33),相悖的(野生型,难零假设)配对 177
+  底档 n=   30 单位 22  跟学习型正确率 4.5% [0.0%,13.6%]  ✓下越
+  中档 n=  139 单位 75  跟学习型正确率 4.0% [0.0%,9.3%]  ✓下越
+  顶档 n=8 —— 太少,不给数
+  【主检验】对比 顶−底 = -4.5%  聚类 CI [-15.4%,+0.0%]  跨过 0
+
+=== 判定([nested],按声明)===
+  主检验(对比排除 0): ✗ 不成立
+  次检验(顶档越过 0.5,更保守): ✗ 不成立
+  按声明:人群天生偏向面板,失败【不可归因】,记为「测过、未拿到」而不是判据被反驳。
+
+写出 /data/wenhui/openclaude_rna/rna_harness/runs/ceiling/arbitration_a9_nested.json
+=== [nested/analyse] 结束 rc=0 05:54:10Z ===
+=== [crossnative/build] 开始 05:54:10Z ===
+[crossnative] 格 211,序列 1384,每格 3–8 条(中位 7);长度档 32
+写出 /data/wenhui/openclaude_rna/rna_harness/runs/ceiling/a9_crossnative_pop.json
+=== [crossnative/build] 结束 rc=0 05:54:10Z ===
+=== [crossnative/rnet] 开始 05:54:10Z ===
+[crossnative] 1384 条过 RibonanzaNet,14 进程
+constructing 9 ConvTransformerEncoderLayers
+  载入 /data/wenhui/rnet_weights/RibonanzaNet-SS.pt:缺失 0 个键,多余 0 个
+constructing 9 ConvTransformerEncoderLayers
+  载入 /data/wenhui/rnet_weights/RibonanzaNet-SS.pt:缺失 0 个键,多余 0 个
+constructing 9 ConvTransformerEncoderLayers
+  载入 /data/wenhui/rnet_weights/RibonanzaNet-SS.pt:缺失 0 个键,多余 0 个
+constructing 9 ConvTransformerEncoderLayers
+  载入 /data/wenhui/rnet_weights/RibonanzaNet-SS.pt:缺失 0 个键,多余 0 个
+constructing 9 ConvTransformerEncoderLayers
+  载入 /data/wenhui/rnet_weights/RibonanzaNet-SS.pt:缺失 0 个键,多余 0 个
+constructing 9 ConvTransformerEncoderLayers
+  载入 /data/wenhui/rnet_weights/RibonanzaNet-SS.pt:缺失 0 个键,多余 0 个
+constructing 9 ConvTransformerEncoderLayers
+  载入 /data/wenhui/rnet_weights/RibonanzaNet-SS.pt:缺失 0 个键,多余 0 个
+constructing 9 ConvTransformerEncoderLayers
+  载入 /data/wenhui/rnet_weights/RibonanzaNet-SS.pt:缺失 0 个键,多余 0 个
+constructing 9 ConvTransformerEncoderLayers
+  载入 /data/wenhui/rnet_weights/RibonanzaNet-SS.pt:缺失 0 个键,多余 0 个
+constructing 9 ConvTransformerEncoderLayers
+  载入 /data/wenhui/rnet_weights/RibonanzaNet-SS.pt:缺失 0 个键,多余 0 个
+constructing 9 ConvTransformerEncoderLayers
+  载入 /data/wenhui/rnet_weights/RibonanzaNet-SS.pt:缺失 0 个键,多余 0 个
+constructing 9 ConvTransformerEncoderLayers
+  载入 /data/wenhui/rnet_weights/RibonanzaNet-SS.pt:缺失 0 个键,多余 0 个
+constructing 9 ConvTransformerEncoderLayers
+  载入 /data/wenhui/rnet_weights/RibonanzaNet-SS.pt:缺失 0 个键,多余 0 个
+constructing 9 ConvTransformerEncoderLayers
+  载入 /data/wenhui/rnet_weights/RibonanzaNet-SS.pt:缺失 0 个键,多余 0 个
+  完成 1384/1384,0.2 分钟
+=== [crossnative/rnet] 结束 rc=0 05:54:25Z ===
+=== [crossnative/panel] 开始 05:54:25Z ===
+[crossnative] 1384 条过三家出厂判官,24 进程
+    400/1384  0.1 min
+    800/1384  0.2 min
+    1200/1384  0.3 min
+    1384/1384  0.3 min
+  成功 1384,失败 0
+  写出 /data/wenhui/openclaude_rna/rna_harness/runs/ceiling/a9_crossnative_panel.json
+=== [crossnative/panel] 结束 rc=0 05:54:44Z ===
+=== [crossnative/analyse] 开始 05:54:44Z ===
+[crossnative] 格 211,序列 1384;独立单位 = 长度档(格之间共用分子)
+
+=== 出厂列(主) panel_recall_product;切点复用 顶 0.16406 底 -0.21818(未重拟合)===
+  可用格 35(丢弃 61),相悖的(野生型,难零假设)配对 55
+  按声明:相悖配对 < 100 → 无数据,记无结论。
+
+=== 观测列(次) panel_f1;切点复用 顶 0.23134 底 -0.17857(未重拟合)===
+  可用格 47(丢弃 59),相悖的(野生型,难零假设)配对 76
+  按声明:相悖配对 < 100 → 无数据,记无结论。
+
+=== 判定([crossnative],按声明)===
+  无数据 → 无结论。
+
+写出 /data/wenhui/openclaude_rna/rna_harness/runs/ceiling/arbitration_a9_crossnative.json
+=== [crossnative/analyse] 结束 rc=0 05:54:44Z ===
+=== 全链完成 05:54:44Z ===
