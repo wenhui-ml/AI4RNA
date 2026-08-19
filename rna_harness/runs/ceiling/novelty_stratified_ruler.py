@@ -192,6 +192,58 @@ def replay_third(seed: int, per_target: int, verbose: bool = True):
     return jobs, wild
 
 
+def replay_fourth(seed: int, per_cell: int, verbose: bool = True):
+    """The FOURTH disjoint sample, and the only one drawn PER (target, method) CELL rather than per target.
+
+    Why the sampling unit changes. A13 asked how much each layer of the panel's ladder buys, and its estimator
+    is a within-set contrast on the SAME molecules: mean(quality | confirmed) - mean(quality | whole cell).
+    Pooling methods would let a method that is both more confirmable and better in the tube masquerade as the
+    boundary carrying information, so the cell must stay (target, method) -- and then a per-TARGET draw caps
+    the cell at whatever share that method happens to hold. Sample 2 drew 160 per target and the median cell
+    came out at EIGHT molecules, which is why 89 of 287 cells had the confirmed set equal to the whole cell
+    and the term under test was a structural zero. Drawing per CELL fixes the size instead of leaving it to
+    the library's method mix.
+
+    Excludes samples 1, 2 and 3 explicitly -- not cleverly -- and asserts the exclusion.
+    """
+    s1, wild = replay_sample(0, 80)
+    s2, _ = replay_fresh(0, 160, 0, 80)
+    s3, _ = replay_third(0, 80, verbose=False)
+    taken = {(p, s, m) for g in (s1, s2, s3) for p, s, _f, _w, m in g}
+    # DEDUPLICATE FIRST. `_all_eligible()` holds 373 keys that appear more than once (up to 21 times) --
+    # replicate MEASUREMENTS of one design, with different wet scores. Sampling from the raw list can draw
+    # the same design twice, which the duplicate assert below would catch but which should not happen at all.
+    # Replicates are averaged, exactly as `load_fresh` does downstream. `replay_sample` / `_fresh` / `_third`
+    # are deliberately NOT touched: they got away with this and must stay byte-reproducible.
+    agg = collections.defaultdict(list)
+    for p, s, f1c, wet, m in _all_eligible():
+        if (p, s, m) not in taken:
+            agg[(p, s, m)].append((f1c, wet))
+    pool = collections.defaultdict(list)
+    for (p, s, m), vs in agg.items():
+        assert len({round(f, 9) for f, _w in vs}) == 1, f"same design, different RNet F1: {p} {m}"
+        pool[(p, m)].append((s, vs[0][0], sum(w for _f, w in vs) / len(vs)))
+    rng = random.Random(30_000 + seed)                   # a fourth stream, distinct from all prior ones
+    jobs, short = [], []
+    for (p, m), rows in sorted(pool.items()):
+        if len(rows) < per_cell:
+            short.append(((p, m), len(rows)))
+            continue                                     # a SHORT cell is dropped, not part-filled: a cell
+                                                         # whose size is set by the library is the defect
+        for s, f1c, wet in rng.sample(rows, per_cell):    # this sample exists to remove
+            jobs.append((p, s, f1c, wet, m))
+    got = {(p, s, m) for p, s, _f, _w, m in jobs}
+    assert not (got & taken), f"fourth sample overlaps a prior sample on {len(got & taken)} designs"
+    assert len(got) == len(jobs), "fourth sample contains a duplicate (puzzle, sequence, method)"
+    if verbose:
+        cells = {(p, m) for p, _s, _f, _w, m in jobs}
+        print(f"  第四批(按格抽,每格 {per_cell} 条):{len(jobs)} 条,{len(cells)} 个 (靶标,方法) 格,"
+              f"{len({j[0] for j in jobs})} 个靶标;与前三批({len(taken)} 条)交集 {len(got & taken)}(断言为 0)")
+        print(f"    供不满 {per_cell} 条、【整格丢弃】的格 {len(short)} 个"
+              f"(丢弃是故意的:格大小必须由声明决定,不由库的方法配比决定)")
+    return jobs, wild
+
+
 def _all_eligible():
     """Every SN_filter=1 design whose target matches ours and which carries both an RNet F1 and a tube score."""
     from leaderboard_design import targets

@@ -112,6 +112,10 @@ def main() -> int:
     ap.add_argument("--third", type=int, default=0,
                     help="third-sample mode: this many per target from designs NEITHER the (--seed, 80) nor "
                          "the 160/target confirmatory sample touched. Disjointness from BOTH is asserted.")
+    ap.add_argument("--fourth", type=int, default=0,
+                    help="fourth-sample mode: this many per (target, METHOD) CELL from designs none of the "
+                         "three prior samples touched. Per-cell, not per-target, because A13's estimator is "
+                         "a within-cell contrast and a per-target draw left the median cell at 8 molecules.")
     ap.add_argument("--fresh", type=int, default=0,
                     help="confirmatory mode: sample this many per target from designs the (--seed, 80) "
                          "sample never touched. Disjointness is asserted, not assumed.")
@@ -119,9 +123,11 @@ def main() -> int:
     a = ap.parse_args()
 
     from leaderboard_design import targets
-    from novelty_stratified_ruler import replay_fresh, replay_sample, replay_third
+    from novelty_stratified_ruler import replay_fresh, replay_sample, replay_third, replay_fourth
     T = targets()
-    if a.third:
+    if a.fourth:
+        jobs_raw, wild = replay_fourth(a.seed, a.fourth)
+    elif a.third:
         jobs_raw, wild = replay_third(a.seed, a.third)
     elif a.fresh:
         jobs_raw, wild = replay_fresh(a.seed, a.fresh, old_seed=a.seed, old_per_target=a.per_target)
@@ -148,7 +154,7 @@ def main() -> int:
     # ---- identity check against the stored recall column -----------------------------------------------
     src = json.load(open(os.path.join(HERE, "criterion_vs_tube.json")))
     n_cmp, n_bad = 0, 0
-    if not a.limit and not a.fresh and not a.third and len(R) == len(src["designs"]):
+    if not a.limit and not a.fresh and not a.third and not a.fourth and len(R) == len(src["designs"]):
         for r, d in zip(R, src["designs"]):
             if "error" in r:
                 continue
@@ -159,7 +165,7 @@ def main() -> int:
               + ("  ✓" if n_bad == 0 else "  ✗ 召回的定义没对上,后续分析不可用"))
 
     json.dump({"n": len(ok), "n_failed": len(bad), "seed": a.seed, "per_target": a.per_target,
-               "fresh_per_target": a.fresh, "third_per_target": a.third,
+               "fresh_per_target": a.fresh, "third_per_target": a.third, "fourth_per_cell": a.fourth,
                "recall_identity_checked": n_cmp, "recall_identity_mismatches": n_bad,
                "designs": ok}, open(a.out, "w"), indent=1)
     print(f"写出 {a.out}")
