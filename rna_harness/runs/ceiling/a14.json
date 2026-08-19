@@ -1,0 +1,162 @@
+{
+ "declaration": {
+  "id": "A14",
+  "date_utc": "2026-08-19",
+  "title": "A13 的确认版:在【格大小由声明决定】的第四批分子上,对着试管分重测三层分解",
+  "relationship_to_A13": {
+   "A13_verdict": "null(按声明)",
+   "why_that_null_carried_no_information": "A13 的功效门槛写的是「可用单位 < 20 记无数据」,而它应该写「三层能分开的单位 < 20」。人群2 的格中位只有 8 条分子,于是样本2 有 89/287 个格 conf==整格(A 结构性恒等于 0)、87 个 块==conf(B 恒等于 0),能同时表达 A 和 B 的格只有 48%(样本3 35%)。中位数于是测的是「格有多大」而不是「尺子」,CI 塌成 [0,0]。**这与 A9 的声明缺陷同一类:只给总量设了门槛,没给真正进入检验的量设门槛。**",
+   "what_is_NOT_reused": "A13 人群2 的均值(A +0.368/+0.355,B −0.333/−0.146)【已经被我看过】。所以本次不是盲检,而是【换一个格大小充足的新人群重做】,并如实标注这一点。",
+   "A13_pop1_stands": "A13 人群1(真实池、RNet 判)的层是分开的(块 3 / confirmed 48 / 整池 200),它的读数是可解读的,且按声明单独一路不足以定论。本次补的正是它缺的那一路:试管判 + 层分得开。"
+  },
+  "population": {
+   "definition": "第四批:前三批(18,100 条)一条都没碰过的分子,按 (靶标, 方法) 格抽,【每格恰好 24 条】。",
+   "counted_before_any_outcome": {
+    "分子": 2640,
+    "格": 110,
+    "靶标": 53,
+    "与前三批交集": 0,
+    "供不满 24 条被整格丢弃的格": 358
+   },
+   "why_per_cell_not_per_target": "A/B 是同一批分子上的组内对比,合并方法会让「某个方法既更容易被确认、又本来更好」冒充成边界携带信息。所以格必须是 (靶标,方法);而按靶标抽会让格大小由库的方法配比决定 —— 样本2 抽 160/靶标,格中位就是 8。",
+   "known_limitation": "丢掉 358 个格,留下的 110 个是【该方法在库里贡献了 >=24 条设计】的格。这不混杂组内估计(A/B 都是格内对比),但它限制外推:结论适用于代表性好的方法。"
+  },
+  "estimator": {
+   "decomposition": "A = mean(wet|confirmed) − mean(wet|整格);B = mean(wet|顶端块) − mean(wet|confirmed);恒等式 A+B ≡ mean(wet|顶端块) − mean(wet|整格),代码断言",
+   "why_means": "均值不被集合大小抬高,所以不需要任何选择偏差校正,也不需要 oracle。",
+   "C_not_measured": "打平器那一项(C)本次【不测】:熵不在这些文件里,而 A12 已在同等级人群上单独测过(null)。明确记为未测,不记为 0。",
+   "unit": "格;并给【按靶标】聚类的更保守版本(110 个格分布在 53 个靶标上)",
+   "interval": "格 bootstrap 4000 抽,双侧 95%,报中位与均值"
+  },
+  "power_floor_corrected": {
+   "rule": "门槛设在【三层能分开的格】上,不是总格数:要求 conf ⊊ 整格 且 块 ⊊ conf 的格 >= 20,否则记无数据。",
+   "reported": "A 与 B 各自的退化格数(结构性零)必须在日志里打印出来,不能只报总数。"
+  },
+  "declared_directions": {
+   "A": "正(阳性对照)。若 A 不排除 0,则这条链在这个人群上整体读不出东西,B 不予解读。",
+   "B": "【不声明方向】—— 这是要问的新问题。A13 人群1 上 B = +0.015 [+0.000,+0.072] 跨过 0;人群2 的均值为负但那是退化中位数下的均值,不作为先验。"
+  },
+  "outcomes_fixed_in_advance": {
+   "gradient_at_the_low_end": "A 排除 0 为正,B 不排除 0 → 尺子的信息坐在「有没有被确认」这个边界上,顶端的等级阶梯买不到东西。与 A13 人群1 同向 → 两路(RNet 池 + 试管)一致,许可把 `argmax |confirmed_by|` 降级为「任一 confirmed」,选择交给面板之外的量(k_first,已测非劣 p=0.83)。",
+   "gradient_at_the_top": "B 排除 0 为正 → 等级阶梯携带信息,顶端值得守;那么损失在块内,而块内无可读信号(A11/A12),唯一动作是在生成阶段把块做小。",
+   "grade_ladder_is_harmful": "B 排除 0 为【负】→ 取最高等级把试管分弄【差】了。这是产品级发现,记录并上报,本次不改代码。",
+   "null": "A 不排除 0 → 无结论(不解读 B)。",
+   "no_data": "三层能分开的格 < 20。"
+  },
+  "cost": "$0,离线。2640 条分子过三家面板神谕(pKiss/ProbKnot/ShapeKnots),按前几批的速率约 20-40 分钟 CPU;试管分与 RNet 分都是库里已测好的,不重算。不调任何 API。"
+ },
+ "n_designs": 2639,
+ "n_cells": 86,
+ "n_both_nondegenerate": 64,
+ "degenerate": {
+  "无 confirmed(整格无法进检验)": 24,
+  "conf == 整格 → A 结构性为 0": 11,
+  "块 == conf → B 结构性为 0": 11
+ },
+ "floor": 20,
+ "primary": {
+  "A": {
+   "n": 64,
+   "median": 0.5504427637579781,
+   "mean": 1.196148813804435,
+   "n_pos": 46,
+   "n_neg": 18,
+   "ci": [
+    0.1292830854707887,
+    0.8164634536610436
+   ],
+   "excludes_zero": true,
+   "excludes_zero_positive": true,
+   "excludes_zero_negative": false
+  },
+  "B": {
+   "n": 64,
+   "median": 0.4475840485517466,
+   "mean": 0.045402362917521866,
+   "n_pos": 37,
+   "n_neg": 27,
+   "ci": [
+    -0.11802810715856538,
+    1.5311116785835992
+   ],
+   "excludes_zero": false,
+   "excludes_zero_positive": false,
+   "excludes_zero_negative": false
+  },
+  "A_plus_B": {
+   "n": 64,
+   "median": 1.0165405329382722,
+   "mean": 1.241551176721957,
+   "n_pos": 43,
+   "n_neg": 21,
+   "ci": [
+    0.3420496115103191,
+    2.142528887156864
+   ],
+   "excludes_zero": true,
+   "excludes_zero_positive": true,
+   "excludes_zero_negative": false
+  }
+ },
+ "all_cells": {
+  "A": {
+   "n": 86,
+   "median": 0.19344299794273212,
+   "mean": 1.0226336391077153,
+   "n_pos": 52,
+   "n_neg": 23,
+   "ci": [
+    0.0028185714557693586,
+    0.5999078728448026
+   ],
+   "excludes_zero": true,
+   "excludes_zero_positive": true,
+   "excludes_zero_negative": false
+  },
+  "B": {
+   "n": 86,
+   "median": 0.04333212756978355,
+   "mean": -0.006660145426521251,
+   "n_pos": 43,
+   "n_neg": 32,
+   "ci": [
+    0.0,
+    0.4475840485517466
+   ],
+   "excludes_zero": false,
+   "excludes_zero_positive": false,
+   "excludes_zero_negative": false
+  }
+ },
+ "by_puzzle": {
+  "A": {
+   "n": 38,
+   "median": 0.5095383179622281,
+   "mean": 1.1135848480904178,
+   "n_pos": 28,
+   "n_neg": 10,
+   "ci": [
+    0.14261778040606998,
+    0.9491114152381002
+   ],
+   "excludes_zero": true,
+   "excludes_zero_positive": true,
+   "excludes_zero_negative": false
+  },
+  "B": {
+   "n": 38,
+   "median": 0.22816922030161635,
+   "mean": 0.33286337616827244,
+   "n_pos": 20,
+   "n_neg": 18,
+   "ci": [
+    -0.7864768442537198,
+    1.228491397857141
+   ],
+   "excludes_zero": false,
+   "excludes_zero_positive": false,
+   "excludes_zero_negative": false
+  }
+ },
+ "verdict": "gradient_at_the_low_end"
+}
