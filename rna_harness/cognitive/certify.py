@@ -154,6 +154,26 @@ SCREEN_OPERATING_POINT = {
     "limits": "measured on the field's molecules and on 44-73 (target, method) cells; our own designs have "
               "no wet-lab counterpart and never will. On 4 of 11 of our targets the screen does not "
               "separate at all. It is the weakest rung and is labelled as such.",
+    # AGAINST GROUND TRUTH, measured 2026-08-19 (runs/ceiling/calibrate_precision.py). Everything above is
+    # about SEPARATION -- whether designs clearing the screen score better in the tube. That is a different
+    # question from whether the screen can be fooled, and until now the screen had no answer to it while the
+    # strict rung above has had one since it was built. Measured on the two populations of `calibrate.py`'s
+    # 250-structure set -- NOT the 93-native held-out set the strict rung's headline 78.5% comes from, so see
+    # `versus_the_strict_rung` before comparing anything: 250 wild-type sequences of the Pseudobase targets
+    # (a pass is SENSITIVITY, since the wild type really does form the published structure) and one random
+    # ACGU sequence per native at the same length (a pass is a FALSE ACCEPT).
+    "sensitivity_on_known_structures": 0.904,          # 226/250, Clopper-Pearson 95% [86.1%, 93.8%]
+    "false_accept_on_random_sequences": 0.040,         # 10/250,  Clopper-Pearson 95% [1.9%, 7.2%]
+    "versus_the_strict_rung": "on THESE SAME two populations the confirm rung is 84.0% [78.9, 88.3] "
+                              "sensitive at 0.4% [0.0, 2.2] false accept, so the screen buys +6.4 points of "
+                              "sensitivity and pays TEN TIMES the false accepts. Read that as a same-"
+                              "population comparison and nothing more: the confirm rung's HEADLINE "
+                              "sensitivity is 78.5%, a held-out figure on the 93 natives whose sequence can "
+                              "be recovered, and the two differ by denominator rather than by protocol "
+                              "quality -- see KNOT_OPERATING_POINT['note']. The screen has no held-out "
+                              "counterpart yet, so its 90.4% is the in-sample number and is not directly "
+                              "comparable to 78.5%. A caller who needs the claim to be hard to fool must "
+                              "use `knot_confirmed`; this rung is for when nothing else answered.",
 }
 
 PANEL_OPERATING_POINT = {
@@ -179,7 +199,14 @@ KNOT_OPERATING_POINT = {
     "false_accept_nested_ci95": [0.000, 0.039],
     "false_accept_nested_n": 92,
     "false_accept_dinucleotide_shuffle": 0.007,
-    "false_accept_on_random_sequences": 0.000,
+    # CORRECTED 2026-08-19. This field said 0.000, which contradicted this file's own comment 15 lines below
+    # ("the false-accept rate is 0.004 at k=1, k=2 AND k=3 alike") and the calibration it cites. One random
+    # sequence in 250 does clear this rung; `calibrate_precision.py` reproduced it independently on the same
+    # populations. Rounding a measured 1/250 down to zero is the kind of number a reviewer is entitled to
+    # catch, so it is stated with its denominator and interval.
+    "false_accept_on_random_sequences": 0.004,
+    "false_accept_on_random_ci95": [0.000, 0.022],
+    "false_accept_on_random_n": 250,
     "scope": "the CROSSING STEMS only -- this says nothing about the rest of the structure",
     "note": ("sensitivity is unchanged from tau=1.0 down to 0.9: these predictors get a knot entirely right "
              "or entirely wrong. Composing this with an exact nested-skeleton check was tried and refuted "
@@ -1037,8 +1064,15 @@ def _certify_design_impl(target: str, budget: str = "standard", seed: int = 0,
                                   "4,560 synthesised molecules, where designs clearing it scored +3.37 "
                                   "OpenKnot points higher than designs failing it under held-out validation "
                                   "-- better separation than the strict rung's +1.93, which is why it is "
-                                  "offered rather than withheld. It remains the weakest claim this tool "
-                                  "makes: treat it as a lead to test, not as a verified design.")
+                                  "offered rather than withheld. HOW OFTEN IT CAN BE FOOLED, measured on the "
+                                  "same two populations the strict rung was calibrated on: it accepts 4.0% "
+                                  "of RANDOM sequences (10 of 250, 95% CI 1.9-7.2), against 0.4% (1 of "
+                                  "250) for `knot_confirmed` -- ten times as many -- while recognising "
+                                  "90.4% of known natural structures against that rung's 84.0% on the same "
+                                  "set. Both screen figures are in-sample; the screen has no held-out "
+                                  "calibration yet. It remains the weakest "
+                                  "claim this tool makes: treat it as a lead to test, not as a verified "
+                                  "design.")
 
     nxt = {"cheap": "standard", "standard": "best_effort"}.get(budget)
     # What a larger budget is actually worth, measured (runs/ceiling/wall.py). Of the 16 Eterna100 targets
