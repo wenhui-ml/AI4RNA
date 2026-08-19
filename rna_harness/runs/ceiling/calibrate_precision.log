@@ -1,0 +1,33 @@
+=== [calibrate_precision] 开始 11:09:19Z ===
+野生型条目 209 个,Pseudobase 靶标 251 个,按(长度,配对集)匹配上 250 条
+共 500 条(野生型 + 同长随机),16 进程
+    100/500  0.2 min
+    200/500  0.2 min
+    300/500  0.2 min
+    400/500  0.5 min
+    500/500  0.5 min
+
+  可用:野生型 250,随机 250
+
+规则                                       灵敏度(野生型)      假收率(随机)   判读
+SHIPPED k>=1 recall==1                     84.0%         0.4%
+max f1 >= 0.3                              87.2%         0.8%
+max f1 >= 0.4                              86.0%         0.4%  <- 假收不升、灵敏度更高
+max f1 >= 0.5                              81.6%         0.0%
+max f1 >= 0.6                              64.4%         0.0%
+max f1 >= 0.7                              36.4%         0.0%
+max f1 >= 0.8                              13.2%         0.0%
+max f1 >= 0.9                               0.0%         0.0%
+max f1 >= 1.0                               0.0%         0.0%
+k>=1 recall==1 AND prec >= 0.1             74.0%         0.0%
+k>=1 recall==1 AND prec >= 0.2             74.0%         0.0%
+k>=1 recall==1 AND prec >= 0.3             72.8%         0.0%
+k>=1 recall==1 AND prec >= 0.4             63.2%         0.0%
+k>=1 recall==1 AND prec >= 0.5             46.8%         0.0%
+SCREEN mean recall >= 0.1                  90.4%         4.0%
+
+  出厂点:灵敏度 84.0%,假收率 0.4%(档案里记的是 84.0% / 0.4%;差异来自匹配上的野生型条数与随机种子,以本次为准)
+  没有带箭头的行 = 没有一条规则在不牺牲另一半的前提下更好,那么换判据就是一次取舍,而不是一次改进。
+
+写出 /data/wenhui/openclaude_rna/rna_harness/runs/ceiling/calibrate_precision.json
+=== [calibrate_precision] 结束 rc=0 11:09:48Z ===

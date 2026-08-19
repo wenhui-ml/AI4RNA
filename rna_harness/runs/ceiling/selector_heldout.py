@@ -64,8 +64,15 @@ REPO = os.path.abspath(os.path.join(HERE, "..", "..", ".."))
 sys.path.insert(0, REPO)
 sys.path.insert(0, HERE)
 
-ARMS = ["shipped", "screen_first", "rnet_gated", "rnet_screen", "rnet_top10", "rnet_top20",
-        "random"]
+# k_first / k_lowent / k_recall / recall were added after the first held-out run, because that run's
+# instrument disagreement points at the CONFIRMED-vs-SCREENED axis and not at the who-chooses axis: under
+# the thermodynamic judges every arm that picks INSIDE the panel's confirmed set scores the same (rnet_gated
+# minus shipped +0.013 p = 0.62; random inside the gate minus shipped -0.012 p = 0.52) while screen_first,
+# which does not require confirmation, loses (-0.036 p = 0.040) -- the exact reverse of what RibonanzaNet
+# says about the same arms. k_first is the arm that satisfies both readings: stay inside the confirmed set,
+# order by the solver rather than by the entropy tie-breaker.
+ARMS = ["shipped", "k_first", "k_lowent", "k_recall", "recall", "screen_first",
+        "rnet_gated", "rnet_screen", "rnet_top10", "rnet_top20", "random"]
 
 
 def crossing_subset(pairs):
@@ -252,7 +259,9 @@ def main() -> int:
                        ("screen_first", "shipped"), ("rnet_screen", "screen_first"),
                        ("rnet_top10", "screen_first"), ("rnet_top20", "screen_first"),
                        ("rnet_top10", "rnet_gated"), ("panel_f1", "screen_first"),
-                       ("panel_f1", "rnet_gated"), ("random", "shipped")):
+                       ("panel_f1", "rnet_gated"), ("k_first", "shipped"),
+                       ("k_first", "screen_first"), ("k_first", "rnet_gated"),
+                       ("k_recall", "shipped"), ("random", "shipped")):
             d = []
             for p in elig:
                 x, y = val(hi, p), val(lo, p)
