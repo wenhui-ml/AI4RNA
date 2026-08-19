@@ -1,0 +1,40 @@
+{
+ "declaration": {
+  "test": "A8 —— 判据对着【确定真值】的绝对准确率(真值不是试管)",
+  "why": "A6/A7 都是拿判据去对 OpenKnot 的实测试管分,而试管本身有 4.1 分的复测噪声,只能给相对表现。④ 的造判据协议要求绝对灵敏度。天然野生型确实形成已发表结构,同长随机序列基本不形成(严格档实测假收 0.4%),所以(野生型, 随机)这一对的正确答案是确定的,不带噪声。",
+  "population": "calibrate_precision.py 的同一批 Pseudobase 野生型(按(长度,配对集)匹配,括号约定无关),每条配 7 条同长随机 ACGU 序列 —— 格大小 8,与确认样本的典型格相当",
+  "cell": "一个靶标 = 一个格(1 野生型 + 7 随机)",
+  "ground_truth": "(野生型, 随机) 配对里野生型正确;随机-随机配对没有真值,全部排除",
+  "no_margin": "不设边距 —— 真值是确定的,没有复测噪声要躲",
+  "cuts_reused_not_refitted": {
+   "panel_recall_product": {
+    "top": 0.16406,
+    "bottom": -0.21818
+   },
+   "panel_f1": {
+    "top": 0.2313432835820895,
+    "bottom": -0.17857142857142852
+   }
+  },
+  "primary": "出厂列 panel_recall_product × 秩差自信 × 每格一票聚类 bootstrap",
+  "secondary": "观测列 panel_f1,同口径",
+  "success": "顶档每格一票区间从上方越过 0.5",
+  "one_sidedness": "底档区间【不得】从上方越过 0.5",
+  "declared_null_outcome": "若两把尺子在野生型-随机上几乎从不相悖(相悖配对 < 100),则本检验无数据,按无结论记录,不许改人群或改切点去凑出配对。",
+  "declared_failure_meaning": "若顶档不越过 0.5,则判据只在试管这个有噪声的代理上成立,拿不到绝对灵敏度,④ 这一格仍不记 ✅。",
+  "cost": "$0,本地。RNet 约 4 分钟(2000 条),面板约 15 分钟。"
+ },
+ "panel_recall_product": {
+  "n_cells": 14,
+  "n_pairs": 15,
+  "n_cells_dropped": 95,
+  "verdict": "no_data_as_declared"
+ },
+ "panel_f1": {
+  "n_cells": 15,
+  "n_pairs": 16,
+  "n_cells_dropped": 98,
+  "verdict": "no_data_as_declared"
+ },
+ "A8_PASS": null
+}

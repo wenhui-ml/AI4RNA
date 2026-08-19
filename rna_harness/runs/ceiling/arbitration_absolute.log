@@ -1,0 +1,75 @@
+=== [rnet] 开始 05:28:56Z ===
+2000 条序列过 RibonanzaNet,14 进程
+    170/2000  0.1 min
+    340/2000  0.1 min
+    510/2000  0.1 min
+    680/2000  0.3 min
+    850/2000  0.5 min
+    1020/2000  0.5 min
+    1190/2000  0.6 min
+    1360/2000  0.6 min
+    1530/2000  0.6 min
+    1700/2000  0.6 min
+    1870/2000  0.6 min
+constructing 9 ConvTransformerEncoderLayers
+  载入 /data/wenhui/rnet_weights/RibonanzaNet-SS.pt:缺失 0 个键,多余 0 个
+constructing 9 ConvTransformerEncoderLayers
+  载入 /data/wenhui/rnet_weights/RibonanzaNet-SS.pt:缺失 0 个键,多余 0 个
+constructing 9 ConvTransformerEncoderLayers
+  载入 /data/wenhui/rnet_weights/RibonanzaNet-SS.pt:缺失 0 个键,多余 0 个
+constructing 9 ConvTransformerEncoderLayers
+  载入 /data/wenhui/rnet_weights/RibonanzaNet-SS.pt:缺失 0 个键,多余 0 个
+constructing 9 ConvTransformerEncoderLayers
+  载入 /data/wenhui/rnet_weights/RibonanzaNet-SS.pt:缺失 0 个键,多余 0 个
+constructing 9 ConvTransformerEncoderLayers
+  载入 /data/wenhui/rnet_weights/RibonanzaNet-SS.pt:缺失 0 个键,多余 0 个
+constructing 9 ConvTransformerEncoderLayers
+  载入 /data/wenhui/rnet_weights/RibonanzaNet-SS.pt:缺失 0 个键,多余 0 个
+constructing 9 ConvTransformerEncoderLayers
+  载入 /data/wenhui/rnet_weights/RibonanzaNet-SS.pt:缺失 0 个键,多余 0 个
+constructing 9 ConvTransformerEncoderLayers
+  载入 /data/wenhui/rnet_weights/RibonanzaNet-SS.pt:缺失 0 个键,多余 0 个
+constructing 9 ConvTransformerEncoderLayers
+  载入 /data/wenhui/rnet_weights/RibonanzaNet-SS.pt:缺失 0 个键,多余 0 个
+constructing 9 ConvTransformerEncoderLayers
+  载入 /data/wenhui/rnet_weights/RibonanzaNet-SS.pt:缺失 0 个键,多余 0 个
+constructing 9 ConvTransformerEncoderLayers
+  载入 /data/wenhui/rnet_weights/RibonanzaNet-SS.pt:缺失 0 个键,多余 0 个
+constructing 9 ConvTransformerEncoderLayers
+  载入 /data/wenhui/rnet_weights/RibonanzaNet-SS.pt:缺失 0 个键,多余 0 个
+constructing 9 ConvTransformerEncoderLayers
+  载入 /data/wenhui/rnet_weights/RibonanzaNet-SS.pt:缺失 0 个键,多余 0 个
+完成 2000/2000,0.6 分钟 -> /data/wenhui/openclaude_rna/rna_harness/runs/ceiling/arbitration_absolute_rnet.json
+=== [rnet] 结束 rc=0 05:29:35Z ===
+=== [panel] 开始 05:29:35Z ===
+2000 条序列过三家出厂判官,24 进程
+    200/2000  0.1 min
+    400/2000  0.2 min
+    600/2000  0.5 min
+    800/2000  1.2 min
+    1000/2000  1.2 min
+    1200/2000  1.5 min
+    1400/2000  1.5 min
+    1600/2000  1.5 min
+    1800/2000  1.5 min
+    2000/2000  1.5 min
+  成功 2000,失败 0
+写出 /data/wenhui/openclaude_rna/rna_harness/runs/ceiling/arbitration_absolute_panel.json
+=== [panel] 结束 rc=0 05:31:03Z ===
+=== [analyse] 开始 05:31:03Z ===
+格 250,序列 2000;RNet 打分 2000,面板打分 2000
+
+=== 出厂列(主) panel_recall_product;切点复用 顶 0.16406 底 -0.21818(未重拟合)===
+  可用格 14(丢弃 95),相悖的(野生型,随机)配对 15
+  按声明:相悖配对 < 100 → 本检验【无数据】,记无结论。两把尺子在野生型-随机上几乎不相悖。
+
+=== 观测列(次) panel_f1;切点复用 顶 0.23134 底 -0.17857(未重拟合)===
+  可用格 15(丢弃 98),相悖的(野生型,随机)配对 16
+  按声明:相悖配对 < 100 → 本检验【无数据】,记无结论。两把尺子在野生型-随机上几乎不相悖。
+
+=== 判定(按声明,主口径 = 出厂列 × 秩差 × 每格一票)===
+  无数据,按声明记无结论 —— ④ 这一格仍缺绝对灵敏度。
+
+写出 /data/wenhui/openclaude_rna/rna_harness/runs/ceiling/arbitration_absolute.json
+=== [analyse] 结束 rc=0 05:31:03Z ===
+=== 全链完成 05:31:03Z ===
