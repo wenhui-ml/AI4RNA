@@ -32,6 +32,8 @@ def one(item):
     from selector_heldout import crossing_subset
     import importlib
     cross = pk_pairs(target) - pk_pairs(_round_only(target))
+    if not cross:
+        return puz, seq, {"error": "target has no crossing pairs -- caller passed a bad target string"}
     out = {}
     for nm in names:
         mod, fn = JUDGES[nm]
@@ -61,7 +63,13 @@ def main() -> int:
     need = sorted({(r["puzzle"], r["seq"]) for r in D["designs"]})
     print(f"第四批 {len(D['designs'])} 条,唯一 (靶标,序列) {len(need)} 条;判官 {names};{a.workers} 进程",
           flush=True)
-    jobs = [(p, s, str(T[p]), names) for p, s in need if p in T]
+    # `targets()` returns a dict PER PUZZLE, not a string: T[p] is
+    # {'puzzle': ..., 'round': ..., 'target': '.[[[[{.((((((]]]]...'}. The first version of this file passed
+    # str(T[p]) -- the dict's repr -- into pk_pairs(), so `cross` was parsed out of Python punctuation and
+    # every judge scored ~0 (ipknot returned exactly 0.0 on 2627 of 2639 molecules). It produced a full run,
+    # a verdict and a JSON, and nothing raised. `panel_f1_designs.py` has the guard that would have caught it,
+    # so it is copied below: a target with no crossing pairs is a bug in the caller, never a datum.
+    jobs = [(p, s, T[p]["target"], names) for p, s in need if p in T]
     print(f"  靶标能对上的 {len(jobs)}/{len(need)}", flush=True)
 
     from concurrent.futures import ProcessPoolExecutor
@@ -71,9 +79,15 @@ def main() -> int:
             J[f"{p}\t{s}"] = o
             if n % 200 == 0 or n == len(jobs):
                 print(f"    {n}/{len(jobs)}  {(time.time()-t0)/60:.1f} min", flush=True)
+    err = [k for k, v in J.items() if "error" in v]
+    assert not err, f"{len(err)} 条的靶标没有交叉对 —— 调用方传错了结构串,例:{err[:2]}"
     for nm in names:
         bad = sum(1 for v in J.values() if v[nm] is None)
-        print(f"  {nm:8s} 失败 {bad}/{len(J)} = {bad/max(1,len(J)):.1%}")
+        vals = [v[nm] for v in J.values() if v[nm] is not None]
+        import statistics as _st
+        print(f"  {nm:8s} 失败 {bad}/{len(J)} = {bad/max(1,len(J)):.1%};"
+              f"取值种类 {len({round(x,6) for x in vals})},均值 {_st.mean(vals):.4f} —— "
+              f"【若取值种类个位数且均值≈0,就是靶标串传错了,不要当结果读】")
     json.dump(J, open(out, "w"), indent=1)
     print(f"写出 {out}")
     return 0
