@@ -290,6 +290,65 @@ def replay_fifth(seed: int, per_cell: int, verbose: bool = True):
     return jobs, wild
 
 
+def replay_sixth(seed: int, per_cell: int, verbose: bool = True):
+    """The SIXTH disjoint sample, and the first one whose per-cell size was chosen to open NEW CELLS.
+
+    Rule 35 exists because of the fifth sample: I wrote that pooling would take the cell count from 110 to
+    170 by adding 110 and 60, and never checked whether the grouping keys overlapped.  All sixty of the
+    fifth sample's cells were already among the fourth's, because the fourth had taken twenty-four from
+    every cell holding twenty-four, so whatever still held twenty-four was by construction a cell it had
+    already used.  The union was 110.
+
+    Measured before this was written, not after: at per_cell=10 the library opens 149 cells, of which 89
+    overlap the fourth and 60 overlap the fifth, leaving exactly SIXTY cells no prior sample has touched.
+    The union of fourth, fifth and sixth is 170 -- the same number as before, now derived instead of added.
+    Those sixty new cells hold a median of 14 unused designs, minimum 10, which is what fixes per_cell here.
+
+    The cost is real and runs the other way: ten molecules per cell makes a cell far likelier to degenerate,
+    since the three layers can only differ when the confirmed set is neither empty nor the whole cell and
+    the top block is not the whole confirmed set.  Whether sixty noisy cells beat sixty-eight quieter ones
+    cannot be settled in advance, which is why the declaration makes the BLIND arm primary on the grounds
+    of blindness rather than on a power claim I would only have to retract again.
+
+    Excludes samples 1, 2, 3, 4 and 5 explicitly -- not cleverly -- and asserts the exclusion.
+    """
+    s1, wild = replay_sample(0, 80)
+    s2, _ = replay_fresh(0, 160, 0, 80)
+    s3, _ = replay_third(0, 80, verbose=False)
+    s4, _ = replay_fourth(0, 24, verbose=False)
+    s5, _ = replay_fifth(0, 24, verbose=False)
+    taken = {(p, s, m) for g in (s1, s2, s3, s4, s5) for p, s, _f, _w, m in g}
+    prior_cells = {(p, m) for g in (s4, s5) for p, _s, _f, _w, m in g}
+    agg = collections.defaultdict(list)
+    for p, s, f1c, wet, m in _all_eligible():
+        if (p, s, m) not in taken:
+            agg[(p, s, m)].append((f1c, wet))
+    pool = collections.defaultdict(list)
+    for (p, s, m), vs in agg.items():
+        assert len({round(f, 9) for f, _w in vs}) == 1, f"same design, different RNet F1: {p} {m}"
+        pool[(p, m)].append((s, vs[0][0], sum(w for _f, w in vs) / len(vs)))
+    rng = random.Random(50_000 + seed)                   # a sixth stream, distinct from all prior ones
+    jobs, short = [], []
+    for (p, m), rows in sorted(pool.items()):
+        if len(rows) < per_cell:
+            short.append(((p, m), len(rows)))
+            continue
+        for s, f1c, wet in rng.sample(rows, per_cell):
+            jobs.append((p, s, f1c, wet, m))
+    got = {(p, s, m) for p, s, _f, _w, m in jobs}
+    assert not (got & taken), f"sixth sample overlaps a prior sample on {len(got & taken)} designs"
+    assert len(got) == len(jobs), "sixth sample contains a duplicate (puzzle, sequence, method)"
+    cells = {(p, m) for p, _s, _f, _w, m in jobs}
+    fresh_cells = cells - prior_cells
+    if verbose:
+        print(f"  第六批(按格抽,每格 {per_cell} 条):{len(jobs)} 条,{len(cells)} 个 (靶标,方法) 格,"
+              f"{len({j[0] for j in jobs})} 个靶标;与前【五】批({len(taken)} 条)交集 {len(got & taken)}(断言为 0)")
+        print(f"    其中【没有任何前批碰过的新格】{len(fresh_cells)} 个 —— 这是唯一的盲臂(第 35 条)")
+        print(f"    与第四/第五批共格的 {len(cells & prior_cells)} 个;三批格并集 {len(cells | prior_cells)}")
+        print(f"    供不满 {per_cell} 条、整格丢弃的格 {len(short)} 个")
+    return jobs, wild
+
+
 def _all_eligible():
     """Every SN_filter=1 design whose target matches ours and which carries both an RNet F1 and a tube score."""
     from leaderboard_design import targets

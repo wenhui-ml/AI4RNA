@@ -112,6 +112,10 @@ def main() -> int:
     ap.add_argument("--third", type=int, default=0,
                     help="third-sample mode: this many per target from designs NEITHER the (--seed, 80) nor "
                          "the 160/target confirmatory sample touched. Disjointness from BOTH is asserted.")
+    ap.add_argument("--sixth", type=int, default=0,
+                    help="sixth-sample mode: this many per (target, METHOD) CELL from designs none of the "
+                         "five prior samples touched. per_cell is set to 10 because that is what opens the "
+                         "60 cells no prior sample has entered -- see rule 35 and replay_sixth's docstring.")
     ap.add_argument("--fifth", type=int, default=0,
                     help="fifth-sample mode: this many per (target, METHOD) CELL from designs none of the "
                          "four prior samples touched. Exists to raise the CELL COUNT, not the cell size: "
@@ -128,9 +132,11 @@ def main() -> int:
     a = ap.parse_args()
 
     from leaderboard_design import targets
-    from novelty_stratified_ruler import replay_fifth, replay_fresh, replay_sample, replay_third, replay_fourth
+    from novelty_stratified_ruler import replay_fifth, replay_sixth, replay_fresh, replay_sample, replay_third, replay_fourth
     T = targets()
-    if a.fifth:
+    if a.sixth:
+        jobs_raw, wild = replay_sixth(a.seed, a.sixth)
+    elif a.fifth:
         jobs_raw, wild = replay_fifth(a.seed, a.fifth)
     elif a.fourth:
         jobs_raw, wild = replay_fourth(a.seed, a.fourth)
@@ -161,7 +167,7 @@ def main() -> int:
     # ---- identity check against the stored recall column -----------------------------------------------
     src = json.load(open(os.path.join(HERE, "criterion_vs_tube.json")))
     n_cmp, n_bad = 0, 0
-    if (not a.limit and not a.fresh and not a.third and not a.fourth and not a.fifth
+    if (not a.limit and not a.fresh and not a.third and not a.fourth and not a.fifth and not a.sixth
             and len(R) == len(src["designs"])):
         for r, d in zip(R, src["designs"]):
             if "error" in r:
@@ -174,7 +180,7 @@ def main() -> int:
 
     json.dump({"n": len(ok), "n_failed": len(bad), "seed": a.seed, "per_target": a.per_target,
                "fresh_per_target": a.fresh, "third_per_target": a.third, "fourth_per_cell": a.fourth,
-               "fifth_per_cell": a.fifth,
+               "fifth_per_cell": a.fifth, "sixth_per_cell": a.sixth,
                "recall_identity_checked": n_cmp, "recall_identity_mismatches": n_bad,
                "designs": ok}, open(a.out, "w"), indent=1)
     print(f"写出 {a.out}")

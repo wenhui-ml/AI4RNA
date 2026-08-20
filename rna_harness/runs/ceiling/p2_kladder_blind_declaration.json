@@ -1,0 +1,66 @@
+{
+  "id": "P2",
+  "name": "kladder_blind_arm",
+  "date": "2026-08-20",
+  "status": "pre-registered, no data",
+  "cost_usd": 0,
+  "offline": true,
+  "one_line": "P1 关掉了 ④ 的一行 ⏳,但它的功效说法被我自己撤回了两次。P2 是那次关闭的【盲臂复核】—— 而且它【可以把那一行重新打开】,这是本周第一个能让分数【下降】的实验。",
+
+  "rule_35_applied_to_itself_before_writing": {
+    "why": "第 35 条是被第五批逼出来的:我把 110 和 60 直接相加写成『合池到 170 格』,从没检查过分组键有没有重叠。实测第五批 60 个格【全部】落在第四批的 110 个里,并集仍是 110,可分开单位只从 64 到 68。",
+    "measured_now_not_after": "per_cell=10 时:第六批 130 格,与第四/第五批共格 70,【没有任何前批碰过的新格 60 个】,三批格并集 170。那个『170』现在是推出来的,不是加出来的。",
+    "new_cells_supply": "这 60 个新格剩余供应中位 14 条、最小 10 —— per_cell=10 就是被这个最小值钉死的"
+  },
+
+  "arms": {
+    "primary_BLIND": {
+      "cells": 60,
+      "designs": 600,
+      "what": "任何前批都没碰过的格。这是唯一的盲臂。",
+      "why_primary": "不是因为功效更高 —— 而是因为它是盲的。§八 第 34 条要求主人群按功效选,但它的【代价条款】在这里更重:合池 170 格里 110 个已经被 A13/A14/A15/P1 看过(65%)。我已经因为『我们拿到了功效』这句话撤回过一次,不会再拿一个功效说法当主检验的理由。"
+    },
+    "secondary_POOLED": {
+      "cells": "<= 170",
+      "what": "第四批 + 第五批 + 第六批全部,格按 (靶标, 方法) 合并",
+      "why_secondary": "最大功效臂,但含已看过的数据"
+    },
+    "conflict_rule": "两臂方向相反时【以盲臂为准】,并明写。"
+  },
+
+  "the_cost_that_runs_the_other_way": {
+    "what": "每格只有 10 条分子,格【退化】的概率显著上升 —— 三层能分开要求 conf 非空、conf != 整格、块 != conf。",
+    "cannot_be_predicted": "退化率取决于面板的 k,而 k 要折叠才知道。所以我【不预测】它,跑完实测并报出。",
+    "floor": "三层能分开的格 >= 20,否则判无数据。门槛落在【真正进检验的那个量】上(A13 那个声明缺陷的修正版)。",
+    "honest_ranking": "60 个吵的格 对 68 个安静的格,谁功效高【事前判不了】。所以盲臂当主检验靠的是盲,不是功效。"
+  },
+
+  "estimator": {
+    "identical_to_A13_A14_A15_P1": "格 = (靶标, 方法);conf = grade >= 1;kmax = max(grade | conf);blk = {conf 里 grade == kmax};A = mean(conf) − mean(整格);B = mean(blk) − mean(conf)",
+    "judge_primary": "r['f1c'](RibonanzaNet,学习型、无能量模型、与面板不共用误差路径)",
+    "judge_secondary": "r['wet'](实测试管),±1.5 分辨率原样带出",
+    "forbidden_judge": "IPknot + RNAPKplex —— 与面板共用能量模型族,那正是这一行卡住的原因。A15 的 +0.0181 就是那层循环。",
+    "hard_identity_assert": "A + B ≡ mean(blk) − mean(整格),违反即不可读",
+    "bootstrap": "按格聚类 4000 次;【第 35 条后半:必须同时报精确并列个数与 10/25/75/90 分位】,因为中位数的 bootstrap 区间会被并列钉死,窄不等于功效高"
+  },
+
+  "outcomes": {
+    "confirms_P1": "盲臂 B 的 CI 跨 0 -> P1 的关闭成立,这次是【在盲数据上】成立。④ 保持 24/29 = 82.8%",
+    "REOPENS_the_row": "盲臂 B 的 CI 排除 0 且为正 -> 【P1 的关闭是过早的】,那一行必须退回 ⏳,④ 从 24/29 = 82.8% 【降回】24/30 = 80%,并在周报里就地撤回 P1 的判定",
+    "reverses": "盲臂 B 的 CI 排除 0 且为负 -> k=max 偏好是【有害】的,这比 null 更强,而且直接指向产品:那条规则应当被删,不是被简化",
+    "no_data": "三层能分开的格 < 20 -> 无数据,那一行退回 ⏳(因为 P1 的关闭理由需要盲臂支持),④ 降回 24/30 = 80%"
+  },
+
+  "this_is_the_first_experiment_this_week_that_can_lower_the_score": {
+    "note": "P1 有一个我明确指出过的怪癖:成立与否都涨分,因为现行口径下 ⏳ 比『已解决的负向』更伤分。**P2 没有这个怪癖** —— 它的两个结局里有两个会让分数【降回 80%】。这一点写在跑之前,免得事后被读成我在挑必赢的实验。"
+  },
+
+  "forbidden": [
+    "看到结果后把主检验从盲臂换成合池臂",
+    "用 IPknot+RNAPKplex 做判官",
+    "只报中位数区间而不报并列个数与分位数",
+    "在盲臂 no_data 时保留 24/29 —— P1 的关闭理由需要盲臂支持"
+  ],
+
+  "cost": {"api_usd": 0, "offline": true, "n_designs": 1300, "n_oracle_calls": 3900, "eta_min": "6-8"}
+}
