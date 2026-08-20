@@ -1,0 +1,41 @@
+{
+ "id": "D4S",
+ "name": "domain4_linker_smoke",
+ "date": "2026-08-20",
+ "status": "pre-registered, no data",
+ "cost_usd": 0,
+ "offline": true,
+ "one_line": "④ 真正记的是【造判据的领域范围】,而 A 节只有 3 行。第四个领域的第一步不是实验,是回答『它的环外校准物是什么』—— 本次就检验那个校准物到底存不存在。",
+ "why_this_is_the_right_first_step": {
+  "what_earned_rows_1_to_3": "领域一(假结面板)的校准物是【试管】;领域二(共转录折叠)是【Kinfold】;领域三(验证器仲裁)是【留出的逐对判断】。三行都是靠一个【从未入环的外部裁判】挣到的。",
+  "so_the_gate_is": "第四个领域在做任何实验之前必须先有环外校准物,否则它就是第 5 个『引不到出处』的行 —— 而现有的 4 个已经在分母里压着分数。",
+  "candidate_domain": "switch(两态开关)。判据是真缺的:要求是『自由折叠 == 靶标 且 5 个被侵入的茎配对全部被 trigger 结合』,而『这个开关会不会切换』没有公认验证器。",
+  "why_IntaRNA_is_NOT_enough": "IntaRNA 3.4.1 在 inta 环境里,是不同的算法族(可及性 + 种子延伸),但它自己报 『using Vienna RNA package 2.7.0』—— 【与 RNAcofold 共用同一套 Turner 参数】。算法独立,能量模型不独立。这正是本周一直在追的共用误差路径:pKiss/IPknot/RNAPKplex 全是热力学家族,所以领域一非要试管不可。",
+  "the_only_candidate_left": "RibonanzaNet 打在【加 linker 的串联构造】上:学习型、没有能量模型,与整个热力学家族不共用误差路径。但 linker 这个技巧本身【从未验证过】。"
+ },
+ "what_is_being_tested": "linker 构造能不能让一个能量模型无关的判官看见【链间】结合。这【不是】关于开关设计好不好的检验,是关于校准物存不存在的检验。",
+ "design": {
+  "population": "switch_bench.json 的 72 行;取 free.chosen 里 held == true 的那些(RNAcofold 认为 trigger 结合了被侵入的茎),它们带 sequence / trigger / complex_structure",
+  "true_side": "构造 = sequence + LINKER + trigger;链间真配对从 complex_structure 里读(i < len(seq) <= j)。【性质在这一侧为真】",
+  "false_side": "同一行,把 trigger 【打乱】(同组成、乱序,固定种子)后重跑同一构造。【性质在这一侧为假】",
+  "linker": "AAAAAAAA(8 个 A)",
+  "judge": "RibonanzaNet-SS,pairwise_logits + pairs_from_logits(thresh 0.5, min_loop 3),逐字复用 rnet_reproduce.py 的入口",
+  "observable": "链间召回 = |预测链间对 ∩ 真链间对| / |真链间对|;真侧与假侧【逐行配对】相减",
+  "rule_29_compliance": "§八 第 29 条:smoke 的用例必须落在待验证性质【为真】的那一侧,并把该性质断言出来。这里真侧是 held == true 的行,并且断言真链间对非空 —— 我上一次(p_X)挑了一个嵌套例子去『验证』交叉约束,那次 smoke 通过了一个它根本没测的东西。"
+ },
+ "outcomes": {
+  "calibrator_exists": "真侧链间召回 − 假侧,配对 bootstrap 的 CI 排除 0 且为正 -> linker 构造能让 RNet 看见链间结合,【第四个领域有环外校准物】,可以立下一个声明去真正造那个判据",
+  "calibrator_absent": "CI 跨 0 -> linker 构造给不出能量模型无关的链间读数,【第四个领域按这条路走不通】。这本身就是交付物:它把『开领域四』从一个想法变成一个有据的否定,而且花的是一晚上而不是一周",
+  "void": "held == true 的行 < 10,或真链间对为空的行占多数 -> 人群不足,不给数"
+ },
+ "forbidden": [
+  "换 linker 长度/组成后重跑并只报好的那次",
+  "把 IntaRNA 当环外校准物 —— 它与 RNAcofold 共用 Vienna 2.7.0 的 Turner 参数",
+  "在 calibrator_absent 的情形下继续往领域四投入,除非先找到另一个能量模型无关的裁判"
+ ],
+ "prior_looks_declared": {
+  "one_true_side_case": "跑之前我在 1 个真侧案例(task_id 4110)上试过整条链路,只为确认 RibonanzaNet 能加载并在串联构造上出结果:权重缺失 0 键,预测出 9 个链间配对 (11,53)…(19,45)。这是【对真侧一个案例的偷看】,方向与假设一致,如实记录。",
+  "not_blind": "所以不是盲检。假侧(trigger 打乱)一个案例都没看过,而【真−假的配对差】才是被检验的量。",
+  "environment_note": "torch 不在 rna/vpk 环境里;RibonanzaNet 用 /home/ubuntu/miniconda3/envs/wh-llm/bin/python 跑(该环境有 torch + yaml)。这一条记下来是因为跑前才发现,差点浪费一整晚。"
+ }
+}

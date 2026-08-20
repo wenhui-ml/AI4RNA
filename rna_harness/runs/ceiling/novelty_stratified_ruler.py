@@ -244,6 +244,52 @@ def replay_fourth(seed: int, per_cell: int, verbose: bool = True):
     return jobs, wild
 
 
+def replay_fifth(seed: int, per_cell: int, verbose: bool = True):
+    """The FIFTH disjoint sample, drawn per (target, method) CELL like the fourth, and it exists for ONE
+    reason: to raise the CELL COUNT for the k-ladder's upper half, not the cell size.
+
+    The plan recorded in the report's next-steps list said to make cells bigger -- 82 targets could supply
+    40 designs each.  That figure was measured before the fourth sample consumed 2,640 designs, and it is
+    wrong now.  After samples 1-4 the library holds 12,610 unused designs in 466 cells, and the counts are:
+    60 cells at >=24, 50 at >=30, 33 at >=40, 20 at >=50.  Every one of those is FEWER cells than the
+    fourth sample's 110, so a bigger-cell fifth sample on its own is WORSE powered, not better -- the
+    fourth sample already took the best-supplied cells.  Power in the B term scales with sqrt(n_cells), so
+    the move is to keep the cell size at 24 and POOL, taking 110 + 60 = 170 cells.
+
+    Excludes samples 1, 2, 3 and 4 explicitly -- not cleverly -- and asserts the exclusion.
+    """
+    s1, wild = replay_sample(0, 80)
+    s2, _ = replay_fresh(0, 160, 0, 80)
+    s3, _ = replay_third(0, 80, verbose=False)
+    s4, _ = replay_fourth(0, 24, verbose=False)
+    taken = {(p, s, m) for g in (s1, s2, s3, s4) for p, s, _f, _w, m in g}
+    agg = collections.defaultdict(list)
+    for p, s, f1c, wet, m in _all_eligible():
+        if (p, s, m) not in taken:
+            agg[(p, s, m)].append((f1c, wet))
+    pool = collections.defaultdict(list)
+    for (p, s, m), vs in agg.items():
+        assert len({round(f, 9) for f, _w in vs}) == 1, f"same design, different RNet F1: {p} {m}"
+        pool[(p, m)].append((s, vs[0][0], sum(w for _f, w in vs) / len(vs)))
+    rng = random.Random(40_000 + seed)                   # a fifth stream, distinct from all prior ones
+    jobs, short = [], []
+    for (p, m), rows in sorted(pool.items()):
+        if len(rows) < per_cell:
+            short.append(((p, m), len(rows)))
+            continue
+        for s, f1c, wet in rng.sample(rows, per_cell):
+            jobs.append((p, s, f1c, wet, m))
+    got = {(p, s, m) for p, s, _f, _w, m in jobs}
+    assert not (got & taken), f"fifth sample overlaps a prior sample on {len(got & taken)} designs"
+    assert len(got) == len(jobs), "fifth sample contains a duplicate (puzzle, sequence, method)"
+    if verbose:
+        cells = {(p, m) for p, _s, _f, _w, m in jobs}
+        print(f"  第五批(按格抽,每格 {per_cell} 条):{len(jobs)} 条,{len(cells)} 个 (靶标,方法) 格,"
+              f"{len({j[0] for j in jobs})} 个靶标;与前【四】批({len(taken)} 条)交集 {len(got & taken)}(断言为 0)")
+        print(f"    供不满 {per_cell} 条、整格丢弃的格 {len(short)} 个")
+    return jobs, wild
+
+
 def _all_eligible():
     """Every SN_filter=1 design whose target matches ours and which carries both an RNet F1 and a tube score."""
     from leaderboard_design import targets

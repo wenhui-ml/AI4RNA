@@ -1,0 +1,53 @@
+{
+  "id": "P1",
+  "name": "kladder_upper_half_power",
+  "date": "2026-08-20",
+  "status": "pre-registered, no data",
+  "cost_usd": 0,
+  "offline": true,
+  "one_line": "④ 的两个 ⏳ 里唯一我能动的那个:『证书 k 阶梯的上半(k=max 相对 k>=1)携带信息』。它缺的是功效,不是想法 —— 但我原先写下的功效方案是错的,先更正它。",
+
+  "correction_to_the_plan_before_running_it": {
+    "what_the_report_said": "§九 第 9 项:『把格做大』,库里还剩 12,700 条,能供 >=40 条的格有 82 个",
+    "what_is_actually_true": "那个数是在第四批消耗 2,640 条【之前】测的。前四批已占用 20,740 条,剩余 12,610 条分布在 466 个格里:>=24 的格 60 个、>=30 的 50 个、>=40 的 33 个、>=50 的 20 个。",
+    "why_it_matters": "【每一种都比第四批的 110 格更少】。B 项的功效随 sqrt(格数) 走,所以『把格做大』的第五批单独跑,功效反而【更差】—— 第四批已经把供应最好的格用掉了。",
+    "so_the_design_changes": "格大小保持 24 不变,靠【合池】把格数从 110 提到 170(第四批 110 + 第五批 60)。这不是把方案改好看,是把一个错的可行性数字改对。"
+  },
+
+  "the_real_blocker_is_the_judge_not_the_n": {
+    "state": "A13(RibonanzaNet 判) B = +0.0150 [+0.0000,+0.0719] 勉强跨 0;A14(试管判) B = +0.4476 [−0.1180,+1.5311] 跨 0;A15(IPknot+RNAPKplex 判) B = +0.0181 [+0.0002,+0.0524] 排除 0。",
+    "why_A15_cannot_close_the_row": "A15 的判官与被测的面板【共用能量模型族】,所以它的一致不能读成『面板是对的』—— 这是循环。这一行至今是 ⏳ 正是因为唯一排除 0 的那一路是循环的。",
+    "so_the_primary_judge_is_RibonanzaNet": "它是学习型、【没有】能量模型,与面板不共用误差路径;而且 ceiling_probe 已量出它是我们手上信噪比最好的独立列(单列净 R² 0.164,全部 21 根热力学列合起来 0.103)。试管作为次口径同报,并把它 ±1.5 的分辨率原样带出。"
+  },
+
+  "populations": {
+    "fifth_sample": {"per_cell": 24, "expected_cells": 60, "expected_designs": 1440,
+      "disjoint_from": "样本1/2/3/第四批(replay_fifth 显式排除并断言交集为 0)"},
+    "primary": "合池 = 第四批 + 第五批,预期 170 格",
+    "primary_chosen_for_POWER_not_freshness": "这是 §八 第 34 条(今天刚写的)第一次被执行:主人群按功效选,并把代价写出来 —— 【第四批那一半不是盲的】,它已经被 A13/A14/A15 分析过。第五批单独作为【新鲜臂】同报。",
+    "cost_of_pooling_stated": "如果合池的结论与第五批单独臂的结论方向相反,以【第五批单独臂】为准并明写,因为它是唯一未被看过的那一半。"
+  },
+
+  "estimator": {
+    "identical_to_A13_A14_A15": "逐字复用:格 = (靶标, 方法);conf = grade(r) >= 1;kmax = max(grade | conf);blk = {conf 里 grade == kmax};A = mean(conf) − mean(整格);B = mean(blk) − mean(conf)",
+    "quality_primary": "r['f1c'](RibonanzaNet 交叉配对 F1)",
+    "quality_secondary": "r['wet'](实测 OpenKnot 分),分辨率 ±1.5 原样带出",
+    "hard_identity_assert": "A + B ≡ mean(blk) − mean(整格),违反即结果不可读(A13 已有这条断言,继续用)",
+    "power_floor": "【三层能分开】的格 >= 20 —— 不是『可用格 >= 20』。这是 A13 那个声明缺陷的修正版(§八),门槛必须落在真正进检验的那个量上。",
+    "bootstrap": "按格聚类,4000 次"
+  },
+
+  "outcomes": {
+    "closes_as_capability": "主判官(RNet)下 B 的 CI 排除 0 且为正 -> ④ 的那一行 ⏳ 变 ✅,24/30 -> 25/30 = 83.3%",
+    "closes_as_refuted": "B 的 CI 跨 0 -> 该行判为已测的负向结论,进 §三之七之二 背景,分母降到 29 -> 24/29 = 82.8%",
+    "no_data": "三层能分开的格 < 20 -> 仍是 ⏳,分数不动,并明写『库供不起这个功效』",
+    "note_both_resolutions_raise_the_score": "在现行口径下 ⏳ 比『已解决的负向』更伤分,所以成立与否都涨分。这一点必须随结论一起写,否则读起来像我在挑一个必赢的实验。"
+  },
+
+  "forbidden": [
+    "看到结果后换判官",
+    "把 IPknot+RNAPKplex(与面板共用能量模型族)提为主判官 —— 那正是这一行卡住的原因",
+    "在合池与第五批单独臂方向相反时采用合池的结论",
+    "把 no_data 讲成『没有效应』"
+  ]
+}
