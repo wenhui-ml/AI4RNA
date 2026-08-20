@@ -1,0 +1,20 @@
+held == true 且真链间对非空的行 58 / 72;剔除 {'缺列或 held != true': 14}
+constructing 9 ConvTransformerEncoderLayers
+  载入 /data/wenhui/rnet_weights/RibonanzaNet-SS.pt:缺失 0 个键,多余 0 个
+    10/58
+    20/58
+    30/58
+    40/58
+    50/58
+
+  真侧链间召回 均值 0.8264 中位 1.0000
+  假侧(trigger 打乱)   均值 0.0000 中位 0.0000
+  配对差 真−假  均值 +0.8264  CI [+0.7371, +0.9061]  排除 0;正/负 55/0
+
+=== 判读 ===
+  结论 calibrator_exists
+  linker 构造能让一个【能量模型无关】的判官看见链间结合 -> 第四个领域有环外校准物,可以立下一个声明去真正造那个判据
+  IntaRNA 不能充当这个校准物:它是不同算法族,但自报 using Vienna RNA package 2.7.0,
+  与 RNAcofold 共用同一套 Turner 参数 —— 算法独立,能量模型不独立。
+
+写出 /data/wenhui/openclaude_rna/rna_harness/runs/ceiling/d4s_linker_smoke.json
