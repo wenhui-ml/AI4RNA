@@ -1,0 +1,162 @@
+{
+ "verdict": "no_data",
+ "why": "盲臂三层能分开的格 < 20 -> 无数据。按声明,那一行【退回 ⏳】,④ 从 24/29 = 82.8% 降回 24/30 = 80% —— 因为 P1 的关闭理由需要盲臂支持",
+ "n_blind_cells": 58,
+ "n_blind_designs": 580,
+ "arms": {
+  "盲臂(主检验 —— 没人看过的 60 个格)": {
+   "rnet": {
+    "no_data": true,
+    "n_live": 19,
+    "degenerate": {
+     "无 confirmed(整格无法进检验)": 23,
+     "块 == conf → B 结构性为 0": 10,
+     "conf == 整格 → A 结构性为 0": 6
+    }
+   },
+   "tube": {
+    "no_data": true,
+    "n_live": 19,
+    "degenerate": {
+     "无 confirmed(整格无法进检验)": 23,
+     "块 == conf → B 结构性为 0": 10,
+     "conf == 整格 → A 结构性为 0": 6
+    }
+   }
+  },
+  "合池臂(次要,最大功效但含已看过的数据)": {
+   "rnet": {
+    "n_live": 88,
+    "degenerate": {
+     "无 confirmed(整格无法进检验)": 46,
+     "conf == 整格 → A 结构性为 0": 15,
+     "块 == conf → B 结构性为 0": 19
+    },
+    "A": {
+     "n": 88,
+     "median": 0.02391810651513543,
+     "mean": 0.04364981415377173,
+     "n_pos": 73,
+     "n_neg": 13,
+     "ci": [
+      0.019037206058229117,
+      0.02804894932474722
+     ],
+     "excludes_zero": true,
+     "excludes_zero_positive": true,
+     "excludes_zero_negative": false
+    },
+    "B": {
+     "n": 88,
+     "median": 0.0,
+     "mean": -0.018486397453794504,
+     "n_pos": 42,
+     "n_neg": 40,
+     "ci": [
+      -0.004085719569610513,
+      0.004603759754877146
+     ],
+     "excludes_zero": false,
+     "excludes_zero_positive": false,
+     "excludes_zero_negative": false
+    },
+    "B_spread": {
+     "n": 88,
+     "exact_zeros": 6,
+     "exact_zero_frac": 0.0682,
+     "centre5": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0014
+     ],
+     "p10": -0.1374,
+     "p25": -0.0257,
+     "p75": 0.0225,
+     "p90": 0.066
+    },
+    "B_by_puzzle": {
+     "n": 42,
+     "median": -0.00013327721661055003,
+     "mean": -0.020814925531165106,
+     "n_pos": 19,
+     "n_neg": 21,
+     "ci": [
+      -0.00815406826223512,
+      0.0022471910112360494
+     ],
+     "excludes_zero": false,
+     "excludes_zero_positive": false,
+     "excludes_zero_negative": false
+    }
+   },
+   "tube": {
+    "n_live": 88,
+    "degenerate": {
+     "无 confirmed(整格无法进检验)": 46,
+     "conf == 整格 → A 结构性为 0": 15,
+     "块 == conf → B 结构性为 0": 19
+    },
+    "A": {
+     "n": 88,
+     "median": 0.4261479457639652,
+     "mean": 1.01698219299991,
+     "n_pos": 64,
+     "n_neg": 24,
+     "ci": [
+      0.2714090846190871,
+      0.6383056133833307
+     ],
+     "excludes_zero": true,
+     "excludes_zero_positive": true,
+     "excludes_zero_negative": false
+    },
+    "B": {
+     "n": 88,
+     "median": 0.19132820107546422,
+     "mean": -0.10909136189057039,
+     "n_pos": 48,
+     "n_neg": 40,
+     "ci": [
+      -0.33232395755079835,
+      1.0694444444444429
+     ],
+     "excludes_zero": false,
+     "excludes_zero_positive": false,
+     "excludes_zero_negative": false
+    },
+    "B_spread": {
+     "n": 88,
+     "exact_zeros": 0,
+     "exact_zero_frac": 0.0,
+     "centre5": [
+      0.1435,
+      0.1476,
+      0.235,
+      0.3385,
+      0.3697
+     ],
+     "p10": -4.9825,
+     "p25": -1.9321,
+     "p75": 2.3345,
+     "p90": 3.9464
+    },
+    "B_by_puzzle": {
+     "n": 42,
+     "median": -0.024719339679784014,
+     "mean": -0.24307364983707677,
+     "n_pos": 21,
+     "n_neg": 21,
+     "ci": [
+      -0.9148186682315889,
+      1.1384778287552049
+     ],
+     "excludes_zero": false,
+     "excludes_zero_positive": false,
+     "excludes_zero_negative": false
+    }
+   }
+  }
+ }
+}
