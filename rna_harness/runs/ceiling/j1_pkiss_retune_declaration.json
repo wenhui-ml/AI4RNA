@@ -1,0 +1,68 @@
+{
+  "id": "J1",
+  "name": "pkiss_retune",
+  "date": "2026-08-20",
+  "status": "pre-registered, no data on the test population",
+  "cost_usd": 0,
+  "offline": true,
+  "one_line": "D1 顺带看到:pKiss 的 --Kpenalty 在两个拓扑上同时降伪交叉、升真召回,而 --Hpenalty 的默认 9 向下没量程、向上是破坏性的。J1 问的是这个【判据侧】的观察能不能变成【湿实验尺子上】的一点真收益 —— 而且先说清楚它大概不能。",
+
+  "provenance_and_what_is_not_blind": {
+    "where_the_idea_came_from": "d1_penalty_crossover.log 的 1 维扫描表(A 群 = 238 条 Pseudobase 设计)。D1 的主检验是 no_data、镜像检验是 no_specificity,所以【D1 本身不成立】;J1 用的只是它顺带产生的一个水平量观察,不继承它的任何结论。",
+    "not_blind": "候选配置集是【看过那两张表之后】挑的,所以在判据侧不是盲的。",
+    "what_IS_clean": "挑配置用的是 Pseudobase 人群(238 条,无湿实验标签);J1 的检验人群是我们自己的设计池(有湿实验标签)。两个人群不相交,配置的选择没有碰过湿实验数据。",
+    "baselines_already_known_on_the_test_population": "ceiling_probe 已经在这个人群上测过出厂配置的净 R^2:F0(出厂档位 k) 0.047(第四批)/0.036(样本2)/0.045(样本3);F2(面板 21 列) 0.103/0.086/0.087。这些是【基线】,不是本次结论,但我知道它们,如实记录。",
+    "never_seen": "任何重调配置下的列,在这个人群上从未算过。"
+  },
+
+  "candidates_frozen": {
+    "C0": {"H": 9, "K": 12, "role": "出厂默认 = 现任"},
+    "C1": {"H": 9, "K": 14, "role": "只把 K 推到 D1 里那条曲线的好端"},
+    "C2": {"H": 6, "K": 14, "role": "H 下调(D1 显示 4-9 是平的,下调不花代价)+ K 高"},
+    "C3": {"H": 4, "K": 14, "role": "H 推到便宜的极端"},
+    "C4": {"H": 12, "K": 14, "role": "【方向性负对照】D1 显示 Hpen>=10 会把真交叉拆掉(recall 0.99->0.55),所以 C4 必须【更差】"}
+  },
+  "candidate_set_is_frozen": "看到任何检验人群的结果之后不许增删候选、不许调 H/K 的取值。",
+
+  "void_gate": {
+    "rule": "对每个候选 Ci,统计【k 发生改变的设计条数】。若某个 Ci 的这个计数为 0,则该配置在这个人群上什么都没做,它的任何数值结果作废、不许报。",
+    "why_this_form": "A16 的作废闸门写错过一次:它拿『GC 的区间排除 0』这个【统计量】当『旗子生效了没有』的代理,而当时手上已经有一个无歧义的直接观察(0/171 条序列相同)。这次闸门直接放在那个无歧义的直接观察上 —— k 改了几条 —— 不放在任何统计量上。",
+    "also_report_unconditionally": "每个候选下 k 的分布(k=0/1/2/3 各多少条)、以及 pKiss 的 recall_product 跨过 1.0 的方向(升/降各多少条)"
+  },
+
+  "test": {
+    "population_primary": {"name": "第四批", "n_designs": 2640, "n_cells": 110, "note": "与前三批互斥(已断言)"},
+    "population_replication": {"name": "样本3", "n_designs": 4526},
+    "unit_of_clustering": "细胞(靶标 x 方法);cluster bootstrap 2000 次",
+    "estimator": "与 R1/ceiling_probe 同一套:细胞内去均值(cell fixed effects),净 R^2 = 观测 R^2 − 细胞内置换零模型的 R^2 均值。复用 r1_info_ladder.py 的 feats / r2_within / demean_by_cell,不重写。",
+    "level_1_PRIMARY": {
+      "quantity": "netR2[F0 under Ci] − netR2[F0 under C0]",
+      "F0": "k = 1,2,3 的哑变量(k=0 是参照),即【出厂判据自己的那个量】",
+      "why_primary": "k 是真正出厂的东西,而且改动作用在一个 3 水平变量上,不会像 21 列那样被稀释,所以功效比 level 2 高"
+    },
+    "level_2_SECONDARY": {
+      "quantity": "netR2[F2 under Ci] − netR2[F2 under C0]",
+      "F2": "面板全部 21 列;只有 pKiss 的 5 列随配置改变,【维数完全相同】,所以 R^2 可以直接比,不存在嵌套特征集必然单调那个假象",
+      "note": "R1 的教训:嵌套特征集里 in-sample R^2 单调是精确代数、不是假设。这里靠等维数回避,不靠置换。"
+    },
+    "multiple_comparisons": "C1/C2/C3 是三个假设 -> Bonferroni 0.05/3 = 0.0167。C4 是方向性对照,不计入校正。",
+    "columns_recomputed_with_the_SAME_definitions": "recall_product / recall / precision / f1 / n_pred_cross / n_pred_total,逐字复用 panel_f1_designs.py 的定义(含 crossing_subset 与两种 recall 的区分),否则比的不是同一个东西。probknot 与 shapeknots 的列直接沿用已有 JSON,不重跑。"
+  },
+
+  "outcomes": {
+    "void": "某个候选的 k 改变条数为 0 -> 该候选作废;若 C1 C2 C3 全部作废 -> 整个 J1 作废",
+    "void_control": "C4 的 level-1 差值不显著为负 -> D1 那个『Hpen>=10 拆掉真交叉』的读法【没有传递到这个人群】,J1 的前提不成立,任何候选的正结果都不许写成收益",
+    "gain": "C1/C2/C3 中至少一个的 level-1 差值 CI 在校正水平上排除 0 且为正,【并且】C4 显著为负",
+    "null": "没有候选的 CI 排除 0 -> 出厂的 pKiss 配置在湿实验尺子上不是这样能改进的",
+    "worse": "某候选显著为负 -> 重调是有害的,出厂配置比我以为的更接近局部最优"
+  },
+
+  "power_stated_before_running__and_it_is_the_honest_ceiling": {
+    "detectable": "110 个细胞。ceiling_probe 在这个人群上给出的 ΔR^2 区间宽度是 ±0.02 量级。所以 J1 只能探测【0.01 量级以上】的净 R^2 变化。",
+    "expected_effect_is_probably_smaller": "F0 的净 R^2 总共只有 0.047,而 pKiss 是三个判官之一。重调它能移动的量很可能是几个千分点 —— 【小于这个实验的探测下限】。",
+    "so_null_means_what": "如果结论是 null,那是一句【功效陈述】,不是『没有效应』的证据。这一条必须原样写进结论,不许把 null 讲成『出厂配置已经最优』。",
+    "and_even_a_gain_does_not_change_the_week": "ceiling_probe 的结论摆在那里:整个热力学面板 21 列净 R^2 = 0.103,RibonanzaNet 单列 f1c = 0.164,F2∪f1c = 0.196。J1 就算全胜,动的也是 0.047 这一档里的几个千分点,【不改变本周的主线】—— 判据侧真正的量在那条学习出来的列上,不在罚项里。"
+  },
+
+  "cost": {"api_usd": 0, "offline": true, "n_pkiss_runs": "4 个新配置 x (2640 + 4526) = 28664", "workers": 20, "eta_min": "50-70"}
+}
