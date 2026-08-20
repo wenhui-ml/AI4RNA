@@ -1,0 +1,100 @@
+{
+  "id": "D3",
+  "name": "operating_point_stability",
+  "date": "2026-08-20",
+  "status": "pre-registered, no data on the test population",
+  "cost_usd": 0,
+  "offline": true,
+  "one_line": "不问判官说了什么,问它说的东西在【它自己承认的不确定性】下稳不稳。pKiss 的 --help 原话:『Thermodynamic energy parameters for pseudoknots have not been measured in a wet lab, yet』—— 所以参数不确定性不是我假设的,是工具作者承认的。",
+
+  "why_this_is_the_deng_move_and_the_earlier_one_was_not": {
+    "what_died": "D1 的 ln L* = ΔG_pk/(3RT):被自己的数据否掉(Spearman(P_drop, ln L) = −0.302,符号相反),而且那次测量还被两参数混杂污染(见 d1_audit.md)。",
+    "what_survived": "邓煜的证明不去逐项评估那些个别不可控的环图项 —— 他问的是【这个和稳不稳】。搬过来:不问判官的点预测,问点预测对参数扰动的敏感度。这是他的【动作】,不是他的结论。",
+    "and_it_is_measured_not_hypothesised": "在 A 群(238 条)的出厂点 (H9,K12) ±1~2 kcal 邻域上已量到:23/238 = 9.7% 的分子交叉集会改变;稳定组与不稳定组【在出厂点的真交叉召回中位都是 1.000】,但不稳定组的邻域召回极差中位是 0.684(稳定组 0.000)。即:出厂判据对两组都说『满召回』,而其中十分之一只要动 1 kcal 就位移 0.68。",
+    "caveat_on_that_number": "9.7% 是在一个 86.4% 被 pkiss 自己筛过的人群上测的(d1_audit.md 第 3 节),所以它很可能是【下界】;干净人群上的真实比率未知,可能更高也可能更低,本实验会重新测。"
+  },
+
+  "rule_32_does_not_apply_here_and_here_is_why": "第 32 条(扫一个参数时另一个必须固定在扫描范围外足够远处)是为了【把效应归因给某一个参数】。D3 不做任何归因 —— 它测的是『我们实际出厂的那一个点上,答案稳不稳』,H 与 K 的相互作用【本来就是要被包含进去的】。另外紧邻模板全程保持 K > H(最近处 (9,11) 仍有 K−H = 2),所以测到的不稳定【不是】类别切换边界被跨过造成的。",
+
+  "stencil_frozen": {
+    "shipped": [9, 12],
+    "neighbours": [[8, 12], [10, 12], [9, 11], [9, 13]],
+    "size": "±1 kcal/mol,紧邻盒",
+    "frozen": "看到任何结果后不许扩大模板、不许加点、不许改步长"
+  },
+
+  "hard_identity_gate_before_anything_else": {
+    "rule": "在出厂点 (9,12) 重新折叠后,用 panel_f1_designs.py 的定义重算 pKiss 的 recall_product,与面板 JSON 里【已存的那一列】逐条比对。不一致条数 > 0 ⇒ 整个 D3 不可用,不许报任何结果。",
+    "why": "panel_f1_designs.py 自己就带这个 identity check(recall_identity_mismatches),A15 那次事故正是因为判官被喂了错东西却照样跑完并写出 JSON。这里的模板全靠『我重折的出厂点 == 出厂那一列』这个前提,所以它必须是一道硬闸门,不是一句注释。"
+  },
+
+  "population": {
+    "primary": {"name": "第四批", "file": "panel_f1_fourth.json", "n_designs": 2640, "n_cells": 110},
+    "replication": {"name": "样本3", "file": "panel_f1_third.json", "n_designs": 4526},
+    "how_it_was_selected__rule_33": "第 33 条(人群刻画必须包含它是怎么被选出来的)对自己生效,已查源码 novelty_stratified_ruler._all_eligible():入选条件是 (a) SN_filter == 1 —— 这是 OpenKnot 数据集对【湿实验测量信噪比】的筛,(b) 靶标与我们的一致,(c) 同时带 RibonanzaNet F1 与试管分数,(d) 靶标级闸门:该靶标至少 20 条合格设计。第四批再按 (靶标, 方法) 细胞抽样并显式排除样本 1/2/3。",
+    "clean_for_this_knob": "以上四条【没有任何一条涉及判官】—— 特别是不涉及 pKiss。所以这个人群对本次要拧的旋钮是干净的,这正是 D1 主人群失败的地方(那批 86.4% 由 pkiss 确认过)。",
+    "residual_selection_to_declare": "人群仍然被两件事筛过:湿实验测量质量(SN_filter)与『RibonanzaNet 出了预测』。两者都不涉及 pKiss,但它们意味着结论只对【有可用湿实验读数的分子】成立。"
+  },
+
+  "new_columns": {
+    "unstable": "模板内任一点的交叉集与出厂点不同 -> 1,否则 0",
+    "n_flip": "模板 4 个邻点中交叉集与出厂点不同的个数(0..4)",
+    "rec_range": "模板 5 个点上真交叉召回的极差(max − min)",
+    "k_flip": "pKiss 对出厂档位 k 的贡献(recall_product >= 1)在模板内是否改变 -> 1/0",
+    "count": 4,
+    "note": "只要 4 列。列数刻意小,因为嵌套加列时样本内 R^2 必然单调(R1 的教训:那是精确代数),列越多假象越大。"
+  },
+
+  "level_1_PRIMARY__the_bar_is_the_highest_thing_we_have": {
+    "quantity": "netR2[F2 ∪ f1c ∪ 稳定性 4 列] − netR2[F2 ∪ f1c]",
+    "why_this_bar": "ceiling_probe 立的杆是 F2 ∪ f1c = 0.196(第四批)/0.180(样本2)/0.154(样本3)。不许拿 0.047(出厂档位) 或 0.103(面板 21 列) 当基线 —— 那是给自己放水。R2 的 gap 列就是在这个杆下只剩 +0.0012 才露出真面目的。",
+    "estimator": "与 R1/ceiling_probe 同一套:细胞内去均值,净 R^2 = 观测 R^2 − 细胞内置换零模型 R^2 均值;cluster bootstrap 按细胞 2000 次",
+    "mandatory_self_check": "嵌套 ⇒ 样本内 R^2 单调不减,精确代数。违反 > 0 处 ⇒ 估计量坏了,不报结果。",
+    "known_baselines": {"第四批": 0.196, "样本2": 0.180, "样本3": 0.154}
+  },
+
+  "required_control__if_this_fails_the_column_is_not_new": {
+    "what": "面板【自己的分歧】列,同样 4 列:三家判官 recall 的标准差、n_pred_cross 的标准差、f1 的极差、与多数不一致的判官数。全部从已有 JSON 直接算,不重跑。",
+    "two_sided_test": "(a) 稳定性在 F2 ∪ f1c ∪ 分歧 之上还加不加?(b) 分歧在 F2 ∪ f1c ∪ 稳定性 之上还加不加?",
+    "declared_reading": "若稳定性的增量在加入分歧后【消失】,则它只是『判官们意见不一致』的换皮,结论写 `redundant`,【不许】写成新列。这一条不许事后删除。"
+  },
+
+  "void_gate__direct_observation_not_a_statistic": {
+    "rule": "模板内交叉集发生改变的分子条数。为 0 ⇒ 什么都没测,整个 D3 作废。",
+    "report_unconditionally": "n_flip 的分布(0/1/2/3/4 各多少条)、unstable 的比率、k_flip 的比率 —— 无论结论如何都要报",
+    "lineage": "A16 把这个闸门放在一个统计量上(GC 区间排除 0)而当时手上已有无歧义的直接观察;第 33 条之后这类闸门一律放在直接观察上。"
+  },
+
+  "level_2_SECONDARY__the_product_question": {
+    "population": "出厂判据说【已确认】的分子(k >= 1)",
+    "quantity": "wet(unstable=0) − wet(unstable=1),细胞内对比(细胞固定效应),cluster bootstrap 按细胞",
+    "predicted_direction": "不稳定的更差",
+    "if_it_holds": "这是一条可以直接接进出厂的【弃权规则】—— 而弃权是本项目唯一还没被占的判据动作(A7 已撤回,A10 说判据改不动决定)",
+    "power_warning": "不稳定基线率约一成,所以 k>=1 且 unstable 的子群会很小。n 在跑时实测并报出;若该子群 < 30 条,level 2 判为无数据,不许用它讲故事。"
+  },
+
+  "outcomes": {
+    "void": "模板内交叉集改变的分子为 0",
+    "identity_fail": "出厂点重折与面板已存列不一致 > 0 条 -> 整个 D3 不可用",
+    "new_column": "level 1 的增量在【加入分歧对照之后】CI 仍排除 0 且为正",
+    "redundant": "level 1 的增量在加入分歧对照后消失 -> 只是判官分歧的换皮",
+    "null": "level 1 的增量 CI 含 0",
+    "abstain_rule": "level 2 的差值 CI 排除 0 且方向为『不稳定更差』(与 level 1 的结论独立成立或不成立)"
+  },
+
+  "forbidden": [
+    "看到结果后扩大或平移模板",
+    "看到结果后改 unstable / n_flip / rec_range / k_flip 任何一个的定义",
+    "删掉或弱化分歧对照",
+    "在 redundant 情形下把 level 1 的增量写成新列",
+    "把基线换成 0.047 或 0.103 —— 杆立在 0.196"
+  ],
+
+  "honest_ceiling": {
+    "base_rate_bounds_the_effect": "不稳定率约一成,所以即便这一列在那些分子上完美,池化后的净 R^2 增量也是有界的。本实验不会把 0.196 变成 0.4。",
+    "what_would_still_be_worth_it": "它的价值不在 R^2 的大小,在【正交性】:面板那 21 列全都是同一个参数点上的点预测,RibonanzaNet 那一列根本没有罚项 —— 没有任何一列告诉选择器『这个分子的判决是任意的』。这也是为什么主检验的杆必须立在 0.196:只有在那之上还站得住,正交性才是真的。",
+    "and_level_2_is_the_part_that_could_ship": "level 1 是『这一列含不含信息』,level 2 是『能不能改变一个决定』。A10 说判据改不动决定,弃权是唯一没试过的动作。"
+  },
+
+  "cost": {"api_usd": 0, "offline": true, "n_folds": "7157 条唯一序列 x 5 个模板点 = 35785(J1 的缓存与本模板无交集)", "workers": 20, "eta_min": "60-75"}
+}
