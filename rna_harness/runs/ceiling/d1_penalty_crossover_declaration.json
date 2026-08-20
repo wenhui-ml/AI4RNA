@@ -1,0 +1,113 @@
+{
+  "id": "D1",
+  "name": "penalty_crossover",
+  "date": "2026-08-20",
+  "status": "pre-registered, no data",
+  "cost_usd": 0,
+  "offline": true,
+  "one_line": "邓煜式:把『组合多重性 vs 几何小量』的赛跑搬到 RNA 上,而小量在 pKiss 里是一个命令行参数 —— 拧动它,交叉点应当按 ln L* = ΔG_pk/(3RT) 平移。检验的是【斜率】,不是位置。",
+
+  "derivation": {
+    "correspondence": "邓煜(Deng-Hani-Ma)从牛顿方程推 Boltzmann:碰撞历史展开成图,树图(无重碰)可控,环图(重碰)项数组合爆炸但每项带几何小量 eps^(d-1);可控当且仅当小量赢。RNA 对应:嵌套结构 = 树图(O(L^3) DP 精确);交叉配对(genus>=1) = 环图(NP-hard,只能启发式判官)。",
+    "multiplicity": "genus <= g 的 RNA 结构计数 N_g(L) ~ c_g * L^(3g-3/2) * lambda^L (Vernizzi-Orland-Zee / Bon 等)。所以 g -> g+1 的边际多重性增益是 L^3,熵增 = 3 ln L。注意:这是【多项式】增益,不是指数 —— 这一点与我 8-20 早先用 REM 得到的『两边都是 L 的外延量,L 里没有阈值』一致,不矛盾:外延项 lambda^L 在两边同时出现被约掉,留下的正是这个多项式。",
+    "smallness": "每加一个假结付一次初始化罚项 ΔG_pk。pKiss 把它做成参数 --Hpenalty (默认 9 kcal/mol) 与 --Kpenalty (默认 12);pKiss 的 --help 自己写明『Thermodynamic energy parameters for pseudoknots have not been measured in a wet lab, yet』。ShapeKnots 有 -p1 0.35 / -p2 0.65;ProbKnot 是 MEA,penalty 旗数 0,即 ΔG_pk = 0。",
+    "inequality": "失控 <=> 3 * RT * ln L > ΔG_pk。等价的极值论版本(更诚实):候选交叉螺旋数 ~ L^3,若螺旋自由能有指数尾、尺度 ~ RT,则最好的【伪】候选的增益随 max(L^3 抽样) ~ 3 RT ln L 增长;一旦超过 ΔG_pk,伪交叉就会被 MFE 收进来。",
+    "prediction": "ln L*(ΔG_pk) = ΔG_pk / (3 RT) + const",
+    "RT_kcal_per_mol": 0.61637,
+    "RT_note": "37 C, R = 0.0019872 kcal/(mol K), T = 310.15 K",
+    "predicted_slope_per_kcal": 0.54080,
+    "intercept_is_NOT_predicted": "推导丢掉了 O(1) 常数 c_g 和 lambda^L 的配比,所以 L* 带一个未知的乘性常数 => ln L* 带一个未知的加性常数。【只有斜率是被预言的,截距不是。】任何以『L* 的绝对位置对不上』为由的判读都无效,反之亦然:位置对上了也不算证据。",
+    "exponent_readout": "measured_exponent = 1 / (RT * slope);推导预言 3。无论结论如何都要把实测指数带 CI 报出来。"
+  },
+
+  "observable": {
+    "primary": "spurious = 1 if |C_pred \\ C_true| > 0 else 0",
+    "C_pred": "pKiss --mode mfe 输出结构的交叉配对集(pk_pairs 解析,与面板同一个解析器)",
+    "C_true": "靶标结构的交叉配对集(同一个解析器)",
+    "why_this_one": "它永不出现 0/0。罚项拉高时 pKiss 少报交叉,极限是一个都不报 -> spurious = 0(受控端);罚项拉低时伪交叉涌入 -> spurious = 1(失控端)。两端都单调有定义。用 precision 会在『一个交叉都不报』时变成 0/0。",
+    "must_also_report": "同一次运行的真交叉召回 recall = |C_pred ∩ C_true| / |C_true|。若 L* 的平移其实是『交叉全都消失了』而不是『伪交叉出现了』,recall 会同步塌掉 —— 这一列是给读者用来否掉这种解释的,必须报,不许只报 spurious。"
+  },
+
+  "populations": {
+    "A_primary": {
+      "source": "kissing_deliver.json rows (task_id + sequence) x pk_topology.json rows (topology, n)",
+      "n": 238,
+      "composition": "H-type 187, kissing/chain 51",
+      "excluded": "higher-order 5 (拓扑过少且分类含糊);无 sequence 的 8 条",
+      "L_range": [21, 137],
+      "L_median": 38,
+      "why_primary": "唯一同时具备(a) 21-137 的 L 覆盖、(b) 拓扑标签、(c) 已有序列 的人群。拓扑标签是安慰剂对照的前提。",
+      "seq_target_length_mismatches": 0
+    },
+    "B_secondary": {
+      "source": "panel_f1_fourth.json + panel_f1_third.json designs, leaderboard_design.targets()",
+      "n_targets": 57,
+      "designs_per_target": 8,
+      "selection": "按 (puzzle) 内 seq 字典序取前 8 条,不用随机数,可复现",
+      "L_range": [48, 240],
+      "why_secondary": "我们自己的分子、有湿实验标签,但 L 偏在 L* 之上(48-60 只有 3 个靶标),而且我已经在这个人群上看过 3 条(见 prior_looks)"
+    },
+    "combined_lnL_span_nats": 2.44
+  },
+
+  "intervention": {
+    "sweep_H": {"vary": "--Hpenalty", "grid": [4,5,6,7,8,9,10,11,12,14], "hold": "--Kpenalty 12"},
+    "sweep_K": {"vary": "--Kpenalty", "grid": [4,5,6,7,8,9,10,11,12,14], "hold": "--Hpenalty 9"},
+    "grid_rationale": "L* 要落在人群 L 窗内才可定位:ΔG_pk* = 3RT ln L 给出 A 群 5.63(L=21)-9.09(L=137)、B 群 7.16(L=48)-10.13(L=240)。并集 5.6-10.1,所以主网格取 5-11 每 1 kcal 一格;4 与 14 是两端的饱和锚点,预期在那里 L* 不可定位,这本身是一致性检查。",
+    "grid_is_frozen": "看到任何结果之后不许加点、不许改格距。",
+    "mode": "pKiss --mode mfe",
+    "timing_measured": "L=48 0.16s, L=100 0.30s, L=240 5.6s (单进程)",
+    "workers": 24,
+    "n_runs": "A: 238 x 10 x 2 = 4760;B: 57 x 8 x 10 x 2 = 9120;合计 13880"
+  },
+
+  "estimator": {
+    "L_star": "对每个 (sweep, 罚项值, 拓扑类) 单独做 spurious ~ logit(b0 + b1 * ln L);L* = exp(-b0/b1)",
+    "CI": "按靶标做 cluster bootstrap,2000 次",
+    "locatable_rule": "b1 <= 0,或拟合出的 L* 落在该人群实测 L 范围之外 -> 该格点判为【L* 不可定位】并从斜率拟合中剔除;剔除个数必须报。这条规则在看数据之前写死,防止事后挑点。",
+    "slope_fit": "ln L* 对罚项值做加权最小二乘,权重 = bootstrap 方差的倒数;斜率 CI 由同一套 bootstrap 传递",
+    "min_locatable_points": 4,
+    "specificity_statistic": "matched_slope / cross_slope 的比值,带 bootstrap CI —— 比『两个斜率各自检验』功效高,因为两条臂共用同一批 bootstrap 抽样"
+  },
+
+  "predictions": {
+    "P1_slope": "sweep_H 里 H-type 的 ln L* 对 Hpenalty 斜率 > 0,预言值 0.5408",
+    "P2_specificity": "sweep_H 里 kissing 的斜率 ~ 0;sweep_K 里 H-type 的斜率 ~ 0。即【拧 H 的旋钮只能推动 H-type 的交叉点】。这一条是把邓煜机制与平凡替代解释『序列越长就是越难』区分开的唯一手段 —— 平凡解释预言两类一起动、且与旋钮无关。",
+    "P3_exponent": "1/(RT * slope) 的 CI 覆盖 3"
+  },
+
+  "outcomes": {
+    "no_data": "H-type 在 sweep_H 里可定位格点 < 4",
+    "dead": "matched slope 的 CI 含 0 —— 旋钮推不动交叉点,则不存在『多重性 vs 小量』的赛跑,D1 及其下游(D2 重新求和 / D3 独立性失效)全线关闭",
+    "inverted": "matched slope 显著为负 —— 机制方向相反,推导错",
+    "no_specificity": "matched slope 显著为正,但 cross slope 也同向显著 —— 效应不是罚项特异的,最可能就是『越长越难』,【邓煜机制不成立】,只能报成一个平凡的长度效应",
+    "mechanism_yes_exponent_no": "P1 与 P2 都过,但实测指数的 CI 排除 3 —— 赛跑存在,指数 3g 错;把实测指数当成结论报出来",
+    "confirmed": "P1 P2 P3 全过"
+  },
+
+  "forbidden": [
+    "看到结果后重新调 RT、指数 3、或 ΔG_pk 的取值",
+    "看到结果后增删网格点或改 spurious 的定义",
+    "用 L* 的绝对位置(截距)做任何判读 —— 推导没有预言它",
+    "在 no_specificity 情形下把结论写成『长度效应支持了机制』"
+  ],
+
+  "power_stated_before_running": {
+    "matched_arm": "H-type 187 个靶标,每个 1 条序列;10 个格点。斜率的杠杆来自 ln L 跨 1.88 nat(A 群),对应 3.5 kcal/mol 的 ΔG_pk 量程。",
+    "placebo_arm": "kissing 只有 51 个靶标 —— 【功效弱】。『cross slope 的 CI 含 0』在 51 个单位上不等于『它确实不动』;这就是为什么特异性的主统计量取 matched/cross 的比值而不是两次独立检验。这一条限制必须原样带进结论。",
+    "honest_ceiling": "这个实验最多能说明『判官的失控点由它自己的罚项按某个幂律控制』。它【不】说明湿实验里的分子行为,也【不】直接提高任何交付指标。它的产品价值要等 D1 成立之后才存在(见 downstream)。"
+  },
+
+  "prior_looks_declared": [
+    "pk_topology.json 的聚合量:by_topology 的 n / median_len / single_claims / panel_confirms / unconfirmable,以及我自己按 L 分箱统计的 panel_confirms 与 single_oracle_claims(251 个原生靶标)。两者都不涉及 pKiss 罚项,也不涉及 spurious。",
+    "我在 B 群的 3 条设计上跑过 pKiss,罚项取 {6,9,12},看到了 MFE 结构串和能量:W08(L=48) 在 9->12 之间丢掉交叉、退回嵌套;P18(L=100) 与 Q20(L=240) 在 6->12 全程保住交叉,能量按罚项精确平移。这是对 B 群 3 个单位 x 3 个格点的一次偷看,已记录在案;A 群(主人群)完全未动。",
+    "两个人群的 L 分布都是跑之前测的(人群刻画),不算偷看结论。"
+  ],
+
+  "not_blind": "不是盲检。上面第二条偷看的方向与 P1 一致,这会让我对 B 群的结果产生偏向,所以 B 群只作次要人群,主判读全部落在 A 群。",
+
+  "downstream_only_if_confirmed": {
+    "D2": "重新求和而不是取 argmax:邓煜不删坏项,他把环图重新求和。对应做法是在 genus 1 上受限枚举嵌套骨架的交叉补全并求配分和,得到一个与面板、与 RibonanzaNet 【都不】共用误差路径的新列(R2 的 gap 列被 F2∪f1c 吞掉只剩 +0.0012,就是共用误差路径的反面教材)。",
+    "D3": "把失控点做成产品信号:若 L* 由罚项按幂律控制,则对每个长度可以【反解】出把该靶标推回受控区所需的罚项,即一个按长度标定的判官;同时 L > L* 的靶标上面板的『判官误差独立』假设按构造失效,这直接给出『什么时候不要相信 k』。"
+  }
+}
