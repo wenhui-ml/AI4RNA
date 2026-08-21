@@ -94,6 +94,29 @@ def marginals(item):
         return {"puzzle": puz, "error": repr(exc)[:140]}
 
 
+def _dedup(rows, panel_key):
+    """load_fresh's dedup, inline, so no temp file is written into the repo.
+
+    Kept byte-compatible with arbitration_confirm.load_fresh: drop the RNet-optimised method, group by
+    (puzzle, seq), average `wet` over replicates, assert the panel score agrees across replicates.
+    """
+    from arbitration_confirm import RNET_OPTIMISED
+    rows = [r for r in rows if r["method"] != RNET_OPTIMISED]
+    g = collections.defaultdict(list)
+    for r in rows:
+        g[(r["puzzle"], r["seq"])].append(r)
+    out, spreads = [], []
+    for _kk, cp in g.items():
+        if len(cp) > 1:
+            spreads.append(max(x["wet"] for x in cp) - min(x["wet"] for x in cp))
+            assert len({round(x[panel_key], 9) for x in cp}) == 1, "same molecule, different panel score"
+        r = dict(cp[0])
+        r["wet"] = sum(x["wet"] for x in cp) / len(cp)
+        r["panel"] = r[panel_key]
+        out.append(r)
+    return out, spreads, {}
+
+
 def load_pop(fn):
     """load_fresh, but tolerate the base sample carrying no `seq`.
 
@@ -116,12 +139,7 @@ def load_pop(fn):
         print(f"  顺序连接断言({fn} 无 seq 列):{len(raw)} 条,不一致 0", flush=True)
         for (_p, sq, _f, _w, _m), d in zip(jobs, raw):
             d["seq"] = sq
-        tmp = path + ".seqjoined.tmp.json"
-        json.dump({"n_failed": 0, "designs": raw}, open(tmp, "w"))
-        try:
-            return load_fresh(tmp, "panel_recall_product")
-        finally:
-            os.replace(tmp, tmp)          # keep it; the deny-delete hook forbids removal
+        return _dedup(raw, "panel_recall_product")
     return load_fresh(path, "panel_recall_product")
 
 

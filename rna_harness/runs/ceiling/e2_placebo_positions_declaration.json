@@ -1,0 +1,56 @@
+{
+ "id": "E2",
+ "name": "ensemble_marginals_with_a_purpose_aligned_gate",
+ "date": "2026-08-21",
+ "status": "pre-registered, no data",
+ "cost_usd": 0, "offline": true,
+ "spec_version": "rule 38 + 39 + 40 + 41",
+ "one_line": "E1 的 K1/K2 在四人群 16/16 排除 0,而它自己的 K3 触发了。本实验把闸门写对:K3 测的是【单独强度】,而声明的目的是【增量】—— 换成一个真正对齐目的的闸门:同宽度的【安慰剂位置块】。",
+
+ "rule_41_this_declaration_exists_because_of_it": {
+  "the_rule": "打死条件必须与实验【声明的目的】对齐。",
+  "what_went_wrong_in_E1": "E1 的目的写的是『加一根不在现有族里的列』—— 那是增量问题,由 K2 回答。而 K3 问的是『E 作为独立预测器是否比一个平凡计数强』。单独弱、增量正,是【互补信息】的标准形态:骑在基线上的块在 B+C 之上加不出东西,而 E 在四个人群上都加出了(+0.012 ~ +0.034,八个区间全排除 0)。",
+  "why_i_did_not_just_re_read_E1": "今天已经有四次『我的打死条件测错了东西』(G4 K2、G5 K2、G5 抢位外推、E1 K3),而每次都是在结果对我有利时才发现的。事后改口径与事后换观测量是同一种病,所以 E1 保持『结果强、被自己的声明判不过』,由本实验重新判。",
+  "K3_is_not_deleted_it_is_demoted": "E 单独 vs C 单独仍然计算并报出,但作为【观测量】,不作为打死条件。删掉一个不利的数与把它降级是两件事,这里做的是后者。"
+ },
+
+ "the_gate_that_replaces_it__and_it_asks_a_question_E1_never_asked": {
+  "the_worry_K3_was_gesturing_at": "增量到底是『交叉臂的可及性』带来的,还是『这条分子的集合本来就松散』带来的?后者与假结无关,是一个通用的柔性度量。",
+  "why_acc_arms_vs_bg_was_not_enough": "E1 里我用 acc_arms 减去全分子平均可及性来做分子内归一化。那是一个【调整】,不是一个【对照】—— 它不能回答『把同样的统计量算在别的位置上,会不会一样好』。",
+  "E_rand__the_placebo_block": "把完全相同的 5 个统计量,算在一组【随机位置】上,位置个数与该分子交叉臂的核苷酸数【相同】。随机种子由序列本身决定(确定性、可复现,不用 Math.random 这类不可复现的源)。",
+  "the_gate": "净ΔR²(B+C+E − B+C) 与 净ΔR²(B+C+E_rand − B+C) 不可分辨 ⇒ 信号是『集合松散』而非『假结臂可及』,构造无假结特异性。",
+  "this_is_the_house_pattern": "与 J1 的 C4 方向性负对照、D1 的 spurious 观测量同一套:一个应当【没有】效应的方向,量出来给出噪声底。"
+ },
+
+ "kill_conditions__each_names_the_purpose_clause_it_tests_and_an_input_that_would_NOT_fire_it": {
+  "K1": {"tests": "目的第一句:相对现有列族有增量", "fires": "净ΔR²(B+E − B) 含 0",
+         "non_firing_input": "E1 已在四人群测到 +0.012~+0.037 全排除 0;若换一个交叉臂可及性方差极小的人群则会含 0 —— 可双向"},
+  "K2": {"tests": "目的第二句:相对平凡组成对照有增量", "fires": "净ΔR²(B+C+E − B+C) 含 0",
+         "non_firing_input": "同上;这是 E1 唯一对齐目的的那条,保留不动"},
+  "K3new_placebo": {"tests": "目的第三句(E1 缺的那句):增量具有【假结特异性】",
+         "fires": "净ΔR²(B+C+E − B+C) 与 净ΔR²(B+C+E_rand − B+C) 的【配对差】区间含 0",
+         "non_firing_input": "若交叉臂的可及性系统性高于随机位置(E1 主人群 acc_arms_vs_bg 中位为正,说明确有差异),配对差可以排除 0 —— 可双向,不是恒真"},
+  "K4": {"tests": "结论不得由那 23.4% 骨架不可形成的分子驱动", "fires": "E_free 与 E_full 的 K2 结论相反",
+         "non_firing_input": "E1 实测两版同向,所以这条已知可以不触发"},
+  "K5_replication": {"tests": "结论必须可复现", "fires": "主人群排除 0 但三个复现人群里排除 0 的少于 2 个",
+         "non_firing_input": "E1 实测 4/4,所以已知可以不触发"},
+  "frozen": "看到任何数字后不许加列、不许换对照、不许改随机位置的抽法、不许把配对差换成非配对比较"
+ },
+
+ "paired_not_unpaired__rule_39": {
+  "matched_on": "同一批分子、同一格结构、同一套格内去均值与格内置换零、【同一次 bootstrap 重抽】算 E 与 E_rand 的差值(配对)。列数相同(各 5 列),所以置换零的偏移量级可比。",
+  "NOT_matched_on": "位置的【身份】—— 这正是被测的那一个维度,故意不匹配。",
+  "control_must_not_use_the_treatment_definition": "E_rand 的位置由序列哈希驱动的伪随机数生成,【不】参考交叉集,只借用它的【个数】。个数必须借,否则两块宽度不同、可及性的统计量方差不可比。已检查:构造里没有用到 E 的任何取值。"
+ },
+
+ "domain__rule_38_second__and_rule_40_for_the_new_field": {
+  "E_rand_positions": "随机位置总是有定义(只要 n >= 交叉臂个数)。若某分子的交叉臂个数 >= 序列长度,抽不出同样多的【不同】位置 ⇒ 抛异常,不静默缩小。已预判:交叉臂个数远小于 L,但闸门保留并计数。",
+  "seed": "seed = 该分子序列的确定性哈希。可复现,且与试管分数、与任何判据列无关。",
+  "does_it_reach_the_output": "不。E2 只写 runs/ceiling 下的 JSON,不进 certify.py,不进证书 —— 这是第 40 条要求回答的那一问。"
+ },
+
+ "population": {"primary": "基准 4,560", "replication": ["panel_f1_third.json", "panel_f1_fourth.json", "panel_f1_fresh.json"],
+  "how_selected__rule_33": "同 E1;不涉及判官、不涉及配分函数,对本实验干净。"},
+
+ "what_this_cannot_do__unchanged_from_E1": "E 的列全在 Turner 族内,与面板共用能量参数 ⇒ 不是独立判官,【不修】问题 (b)。抬能力侧,不抬判官独立性。"
+}
