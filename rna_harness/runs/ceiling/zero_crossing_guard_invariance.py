@@ -32,6 +32,12 @@ TUBE_PASS = 80.0
 POPS = (("基准4560(主)", "panel_f1_designs.json"), ("样本3", "panel_f1_third.json"),
         ("第四批", "panel_f1_fourth.json"), ("样本2", "panel_f1_fresh.json"))
 VERDICT_KEYS = ("per_oracle", "n_cross", "confirmed_by", "knot_confirmed")
+# The certificate embeds kr WHOLE -- certify.py builds detail={**v, "knot": kr, ...} at three call sites --
+# so two added keys ARE an output change even though no verdict reads them. "Zero change to shipped
+# behaviour" was too strong: the VERDICT is unchanged, the emitted field SET grows by two. Same precedent as
+# the 2026-08-18 precision patch, which added three observable keys the same way, but it has to be stated as
+# an additive change rather than as no change. This check now compares the whole key set, not four keys.
+EXPECTED_NEW_KEYS = {"confirmed_by_zero_crossing_guarded", "zero_crossing_votes_withdrawn"}
 
 
 def head_knot_recall():
@@ -94,7 +100,18 @@ def main() -> int:
         for k in VERDICT_KEYS:
             if a.get(k) != b.get(k):
                 mism.append((r["puzzle"], k, a.get(k), b.get(k)))
-    print(f"   出厂判决四个键({', '.join(VERDICT_KEYS)})比对 {checked} 条:不一致 {len(mism)}")
+        # every key the old version had must be present AND equal; the new keys must be exactly the two
+        # declared ones, so a third slipping in is a failure rather than a curiosity
+        for k in a:
+            if a[k] != b.get(k):
+                mism.append((r["puzzle"], f"shared:{k}", a[k], b.get(k)))
+        extra = set(b) - set(a)
+        if extra != EXPECTED_NEW_KEYS:
+            mism.append((r["puzzle"], "keyset", sorted(EXPECTED_NEW_KEYS), sorted(extra)))
+    print(f"   出厂判决四个键 + 全部共有键 + 键集合,比对 {checked} 条:不一致 {len(mism)}")
+    print(f"   证书字段集合:【加法式】变更 —— 新增恰好 {sorted(EXPECTED_NEW_KEYS)},无键丢失、无共有键改值。")
+    print(f"   注:certify.py 用 detail={{**v, 'knot': kr, ...}} 把 kr 整体嵌进证书,所以这两个键【会出现在证书里】。")
+    print(f"   所以正确说法是『判决零变化 + 证书字段加二』,不是『零变化』。")
     if mism:
         for m in mism[:5]:
             print(f"     {m}")
@@ -137,7 +154,10 @@ def main() -> int:
     print("      所以旗标默认关闭,开启前必须先重跑那次校准。")
     print("   => 方向是对的(被剥离那批试管通过率约 0.34~0.47,而 confirmed 全体约 0.80),但方向对不等于可以上线。")
 
-    json.dump({"flag_off_identical": True, "keys_compared": list(VERDICT_KEYS),
+    json.dump({"flag_off_verdict_identical": True, "certificate_field_set": "additive: +2 observable keys",
+               "not_zero_change": "certify.py embeds kr whole via detail={**v, 'knot': kr}; the VERDICT is "
+                                  "unchanged but the emitted field set grows by two",
+               "keys_compared": list(VERDICT_KEYS) + ["all shared keys", "full key set"],
                "n_cases": checked, "mismatches": 0, "blast_radius": out,
                "default": "off", "env_flag": "CERTIFY_ZERO_CROSSING_GUARD=1",
                "may_not_ship_until": "the 84.0%/0.4% operating point and the per-grade sensitivities "

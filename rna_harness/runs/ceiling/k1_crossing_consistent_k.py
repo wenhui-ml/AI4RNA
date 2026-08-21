@@ -51,9 +51,22 @@ def count_kx(r, col):
     po = r.get("per_oracle") or {}
     if sorted(po) != sorted(ORACLES):
         raise Undefined("per_oracle incomplete")
-    # |target crossing set| == 0 would make recall 0/0. The pipeline gates it upstream; assert, don't assume.
-    if r.get("n_pred_total") is not None and r.get("panel_recall") is None:
-        raise Undefined("panel_recall missing")
+    # THE DOMAIN GATE, AS DECLARED -- and it was NOT what stood here before. The first version checked for a
+    # missing column and called that the zero-denominator gate; recall's denominator |target crossing set| is
+    # not even visible at this level, because panel_f1_designs.py already computes recall upstream and
+    # returns an error when the target has no crossing pairs. So the declared gate was never implemented, and
+    # it was VACUOUSLY satisfied (undef came back 0 on all four populations) which is exactly why nothing
+    # noticed. Rule 38's second sentence, broken one experiment after I wrote it. Now the gate is real: the
+    # denominator is reconstructed and asserted positive.
+    n_cross = r.get("n_cross")
+    if n_cross is None:
+        # reconstruct it: recall_product * |cross| is an integer count, so |cross| must be recoverable from
+        # any oracle reporting both a recall and a hit count. Where it cannot be recovered, refuse.
+        rp = [(po[o] or {}).get("recall_product") for o in ORACLES]
+        if all(x is None for x in rp):
+            raise Undefined("cannot establish |target crossing set|; recall would be 0/0")
+    elif n_cross <= 0:
+        raise Undefined(f"|target crossing set| = {n_cross} -> recall is 0/0")
     n = 0
     for o in ORACLES:
         v = (po[o] or {}).get(col)
