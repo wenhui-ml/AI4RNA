@@ -1,0 +1,74 @@
+{
+ "id": "E3",
+ "name": "target_referencing_vs_size_matched_random_reference",
+ "date": "2026-08-21",
+ "status": "SUPERSEDED before any outcome was observed -- see amendment_2026_08_21",
+ "cost_usd": 0,
+ "offline": true,
+ "spec_version": "rule 38 + 39 + 40 + 41",
+ "one_line": "E2 把正向侧那条线的位置指到了两根【引用靶标骨架】的列上,但那是推断不是测量。本实验把处理组缩到只有那两根列,配一个【引用一个同尺寸随机可形成结构】的等宽安慰剂 —— 直接问:要紧的是【这个】结构,还是【任何】同尺寸的嵌套结构。",
+ "what_E2_established_and_what_it_did_not": {
+  "established": "E_free(等宽安慰剂)四人群 K3new 全部含 0 ⇒ 交叉臂可及性的假结特异性【未建立】,随机位置拿到 35%~88%。我原来的物理假设被自己的对照否掉了。",
+  "inferred_not_measured": "加上 ensemble_defect(骨架) 与 pr_structure(骨架) 之后,处理组四人群【全部约翻倍】(+0.0119→+0.0274 / +0.0153→+0.0335 / +0.0141→+0.0311 / +0.0147→+0.0267)而安慰剂不动(两升两降)。最简约的读法是特异信号在这两根列上。",
+  "why_E2_could_not_measure_it": "E2 的安慰剂里【没有】任何 skeleton 基的对应物,所以它的 K3new 回答的是『臂+骨架 vs 随机位置』,不是『骨架引用 vs 非靶标引用』。这是内容不对称,不是宽度问题(宽度已被各块自己的置换零校正)。"
+ },
+ "the_two_blocks__equal_width_by_construction": {
+  "S_treatment": "[ensemble_defect(靶标骨架), pr_structure(靶标骨架)] —— 2 列。",
+  "S_rand_placebo": "同样两个量,但算在【一个随机生成、该序列可形成、配对数与靶标骨架相同】的嵌套结构上 —— 2 列。",
+  "how_the_placebo_structure_is_built": "贪心随机:反复抽 (i,j),要求 (a) 碱基可配(GC/AU/GU)、(b) |i−j| >= 4、(c) 与已选配对不交叉、(d) 位点未被占用,直到配对数等于靶标骨架的配对数。种子由序列的确定性哈希给出,可复现。",
+  "why_formable_matters_and_is_not_optional": "若安慰剂结构含非标准配对,pr_structure 会因为一个平凡理由恒等于 0,安慰剂就退化成常数,K2 会因为一个愚蠢的原因『通过』。所以【可形成】是安慰剂的必要构造条件,不是装饰。",
+  "why_matched_pair_count_matters": "ensemble_defect 与 pr_structure 的量级都随配对数变化。不匹配配对数,比较的就是尺寸不是引用对象。"
+ },
+ "rule_39__what_matches_and_what_does_not": {
+  "matched_on": "列数(2 vs 2)、配对数、可形成性、同一批分子、同一格结构、同一套格内去均值与格内置换零、【同一次 bootstrap 重抽】算配对差。",
+  "NOT_matched_on": "结构的【身份】—— 一个是靶标要的那个嵌套骨架,一个是随机的。这正是被测的那一个维度,故意不匹配。",
+  "control_must_not_use_the_treatment_definition": "安慰剂结构的生成只用序列(可配性)与靶标骨架的【配对数】,不参考骨架的任何位置。已检查。"
+ },
+ "kill_conditions__rule_41_each_names_the_purpose_clause__rule_38_each_names_a_non_firing_input": {
+  "K1": {
+   "tests": "这两根列到底有没有增量",
+   "fires": "净ΔR²(B+C+S − B+C) 含 0",
+   "non_firing_input": "E2 已量到加上它们后处理组四人群全部翻倍,所以增量存在是有先例的 —— 可双向"
+  },
+  "K2_main": {
+   "tests": "本实验的核心:增量是否来自【引用靶标】而非【引用任何同尺寸结构】",
+   "fires": "配对差 [净ΔR²(B+C+S − B+C)] − [净ΔR²(B+C+S_rand − B+C)] 含 0 ⇒ 要紧的不是这个结构,只是『集合有多集中』这个通用性质",
+   "non_firing_input": "靶标骨架是设计者【瞄准】的结构,而随机结构不是;若集合真的向靶标集中,两者的 ensemble_defect 会系统性不同 —— 这是可测的,不是恒真"
+  },
+  "K3_replication": {
+   "tests": "可复现",
+   "fires": "主人群排除 0 而三个复现人群里排除 0 的少于 2 个",
+   "non_firing_input": "E2 的 K2 四人群 4/4,同一族观测量的复现有先例"
+  },
+  "frozen": "看到任何数字后不许改安慰剂的生成规则、不许改列的组成、不许把配对差换成非配对比较、不许换人群"
+ },
+ "void_gates": {
+  "1_placebo_non_degeneracy": "安慰剂两列必须在格内有方差:要求【至少 90% 的格】里两列的 IQR 都 > 0。不足 ⇒ 整个 E3 作废(不是『通过』)。这道闸门存在的理由写在上面:退化的安慰剂会让 K2 因愚蠢的原因通过。",
+  "2_equal_width_asserted": "代码断言 S 与 S_rand 各 2 列。不等宽 ⇒ 中止。",
+  "3_domain_raises_not_returns": "若某分子无法生成【配对数相同且可形成】的随机嵌套结构 ⇒ 抛异常并计数,不静默降低配对数。",
+  "4_population_is_the_formable_subset_by_construction": "S 需要靶标骨架可形成,所以人群就是那 77% 子集。这不是选择偏倚的隐藏,是该量的定义域,必须在结论里写明。",
+  "5_nested_monotonicity": "B ⊆ B+C ⊆ B+C+S 与 B+C ⊆ B+C+S_rand 的样本内 R² 必须单调不减(精确代数)。违反 ⇒ 估计量坏了,中止。"
+ },
+ "population": {
+  "primary": "基准 4,560 的骨架可形成子集",
+  "replication": [
+   "panel_f1_third.json",
+   "panel_f1_fourth.json",
+   "panel_f1_fresh.json"
+  ],
+  "how_selected__rule_33": "同 E1/E2,不涉及判官与配分函数。"
+ },
+ "observables_not_gates": "ensemble_defect 与 pr_structure 【各自单独】的增量,以及两者的相关性 —— 只报,不作为打死条件(第 41 条:本实验声明的目的是『引用对象是否要紧』,不是『哪一根列更强』)。",
+ "what_this_cannot_do": "仍在 Turner 族内 ⇒ 不是独立判官,【不修】问题 (b)。抬能力侧,不抬判官独立性。",
+ "amendment_2026_08_21": {
+  "what_was_inspected_and_what_was_not": "只看了安慰剂【自身】的分布(pr_structure 与 ensemble_defect 的量级、抽样成功率),【没有】看任何与试管分数的关系。所以这不是看到结果再改口径,是发现仪器坏了不许出厂。",
+  "defect_1_domain_loss": "贪心抽样在 600 条 smoke 里 385 条(64%)抽不出【配对数相同且可形成】的随机嵌套结构 -> 定义域损失过半。",
+  "defect_2_the_fatal_one": "pr_structure(随机结构) 实测 1e-27 ~ 1e-35,而 pr_structure(靶标骨架) 1e-7 ~ 3e-1。这【不是抽样不好,是构造性必然】:指数多的嵌套结构里任何随机一个的概率都天文级地小,只有靠近 MFE 的才有可观概率。",
+  "why_that_makes_the_gate_vacuous": "于是『靶标 vs 随机』这个比较是平凡的 —— 它只会说『被设计过的结构比随机结构概率高』。真,但空,不是『引用靶标要紧』。原声明的 void gate 1(格内 IQR > 0)【太弱】,1e-34 与 1e-27 数值上不同、物理上都是零,它会放过一个退化的安慰剂。",
+  "the_replacement_and_why_it_asks_the_right_question": "安慰剂改为【嵌套 MFE】:P_mfe = [ensemble_defect(MFE), pr_structure(MFE)]。(a) 概率量级可比,无抽样失败;(b) ensemble_defect(MFE) 恰好就是【集合有多集中】,也就是本实验本来要控制掉的那个『通用集中度』替代假设本身;(c) 它是【保守】的 —— MFE 是概率最高的结构,安慰剂占优势,靶标若仍胜出证据更强。",
+  "the_original_block_is_kept_as_an_observable": "原随机结构块在可定义的分子上仍然计算并报出,标注为【构造性退化】,不作为闸门。删掉一个坏对照与把它降级是两件事,这里做后者。",
+  "gate_rewritten": "K2 改为:配对差 [净dR2(B+C+S - B+C)] - [净dR2(B+C+P_mfe - B+C)] 含 0 ⇒ 要紧的是集合集中度,不是引用靶标。",
+  "non_firing_input_for_the_new_K2": "ensemble_defect(靶标) 中位 0.17~0.51 而 ensemble_defect(MFE) 必然更小(MFE 是众数),两者在格内都有实质方差 -> 配对差可正可负,不是恒真。",
+  "void_gate_1_rewritten": "安慰剂两列必须在格内有【实质】方差:要求 >= 90% 的格里 pr_mfe 的 IQR > 1e-9 且 ed_mfe 的 IQR > 1e-4。原来的 '> 0' 太弱。"
+ }
+}
