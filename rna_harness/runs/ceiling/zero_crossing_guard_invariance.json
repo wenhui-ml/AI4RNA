@@ -1,0 +1,53 @@
+{
+ "flag_off_identical": true,
+ "keys_compared": [
+  "per_oracle",
+  "n_cross",
+  "confirmed_by",
+  "knot_confirmed"
+ ],
+ "n_cases": 12,
+ "mismatches": 0,
+ "blast_radius": {
+  "panel_f1_designs.json": {
+   "n": 4560,
+   "confirmed_by_changed": 550,
+   "frac_changed": 0.1206,
+   "votes_withdrawn": 723,
+   "verdict_flipped": 162,
+   "frac_flipped": 0.0355,
+   "stripped_tube_pass": 0.4568
+  },
+  "panel_f1_third.json": {
+   "n": 4526,
+   "confirmed_by_changed": 515,
+   "frac_changed": 0.1138,
+   "votes_withdrawn": 700,
+   "verdict_flipped": 161,
+   "frac_flipped": 0.0356,
+   "stripped_tube_pass": 0.4658
+  },
+  "panel_f1_fourth.json": {
+   "n": 2640,
+   "confirmed_by_changed": 307,
+   "frac_changed": 0.1163,
+   "votes_withdrawn": 429,
+   "verdict_flipped": 93,
+   "frac_flipped": 0.0352,
+   "stripped_tube_pass": 0.3441
+  },
+  "panel_f1_fresh.json": {
+   "n": 9120,
+   "confirmed_by_changed": 1031,
+   "frac_changed": 0.113,
+   "votes_withdrawn": 1416,
+   "verdict_flipped": 315,
+   "frac_flipped": 0.0345,
+   "stripped_tube_pass": 0.4476
+  }
+ },
+ "default": "off",
+ "env_flag": "CERTIFY_ZERO_CROSSING_GUARD=1",
+ "may_not_ship_until": "the 84.0%/0.4% operating point and the per-grade sensitivities are re-measured on the guarded column",
+ "premise_retracted": "k1_audit.md said this touches only 7 designs and needs no recalibration; measured it changes confirmed_by for ~12% and flips knot_confirmed for ~3.5%"
+}

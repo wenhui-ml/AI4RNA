@@ -810,9 +810,40 @@ def _knot_recall(seq: str, target: str) -> dict:
         f1s[name] = (2 * r_c * p_c / (r_c + p_c)) if (r_c + p_c) > 0 else 0.0
         npred[name] = len(pc)
     full = [k for k, v in out.items() if v is not None and v >= 1.0]      # tau = 1.0, the strictest point
+
+    # THE ZERO-CROSSING GUARD. An oracle can reach recall_product 1.0 while predicting NO crossing pair at
+    # all: the shipped column counts a target crossing pair as recovered if the oracle predicts that PAIR,
+    # crossing or not, so reproducing every one of them as a purely NESTED structure scores 1.000. Measured
+    # on the seed-0 sample, 7 designs carry k=3 -- unanimous confirmation -- with zero crossing pairs
+    # predicted by anyone (runs/ceiling/g5_k3_read.md). Confirming a pseudoknot on a prediction that
+    # contains no pseudoknot is a categorical error, not a marginal one.
+    #
+    # OFF BY DEFAULT, AND HERE IS WHY. I first recommended this as a small fix that would touch only those
+    # 7 designs and therefore need no recalibration (runs/ceiling/k1_audit.md). That was wrong by two orders
+    # of magnitude: the guard is PER ORACLE, and a design can have the panel predicting crossings while one
+    # member predicts none. Measured on four populations it withdraws 723/700/429/1416 votes, changes
+    # confirmed_by for 12.06/11.38/11.63/11.30% of designs, and flips knot_confirmed from True to False for
+    # 3.55/3.56/3.52/3.45%. That voids the shipped 84.0% sensitivity / 0.4% false accept operating point and
+    # the per-grade sensitivities (0.432/0.636/0.785) exactly as a definition change would, so it may not be
+    # switched on until that calibration is re-run.
+    #
+    # The evidence that it is pointed the right way, kept separate from the decision: the designs it would
+    # strip pass the tube at 0.457/0.466/0.344/0.448 against about 0.80 for the confirmed population.
+    # Until the calibration lands this is an OBSERVABLE, read by no verdict -- the same discipline the
+    # 2026-08-18 precision patch used.
+    guarded = [k for k in full if npred.get(k)]
+    # Count the withdrawal BEFORE the reassignment below. Computing it afterwards made the observable read
+    # 0 whenever the flag was on -- found by the functional check in
+    # runs/ceiling/zero_crossing_guard_invariance.py, not by reading the diff.
+    withdrawn = len(full) - len(guarded)
+    if os.environ.get("CERTIFY_ZERO_CROSSING_GUARD") == "1":
+        full = guarded
     return {"per_oracle": out, "n_cross": len(cross), "confirmed_by": full,
             "knot_confirmed": bool(full),
-            "per_oracle_precision": prec, "per_oracle_f1": f1s, "n_pred_cross": npred}
+            "per_oracle_precision": prec, "per_oracle_f1": f1s, "n_pred_cross": npred,
+            # observable only: what the guard WOULD do, so the decision can be made on measured ground
+            "confirmed_by_zero_crossing_guarded": guarded,
+            "zero_crossing_votes_withdrawn": withdrawn}
 
 
 def _pool_dump(target: str, seq: str, kr: dict, tier, n: int) -> None:
