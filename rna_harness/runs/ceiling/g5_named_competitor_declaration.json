@@ -1,0 +1,43 @@
+{
+ "id": "G5",
+ "name": "list_the_123_and_name_the_competitor",
+ "date": "2026-08-21",
+ "status": "pre-registered, no data",
+ "cost_usd": 0,
+ "offline": true,
+ "one_line": "把 G2 那 123 条逐条列出来交叉核对面板 —— 并且顺手把 36b 那个缺陷修掉:用【一个能点名的嵌套竞争者】替换【整个嵌套集合】,让指控从『集合 vs 单结构』变成『单结构 vs 单结构』。",
+
+ "why_this_exists": {
+  "the_deliverable": "G2 那 123 条(骨架可形成、被出厂面板确认、γ*<0)是本周唯一一批不花湿实验就能拿去质询判官的样本。要能质询,就必须逐条可读:序列、哪几家判官确认了、它们预测了什么、试管读数多少。",
+  "the_repair": "g2_audit.md 第五节的第 36b 条:F_nested <= E_skeleton 是恒等式,所以 γ* 是把【集合量】减【单结构量】,符号恒定 ⇒ 那不是比较,是偏置。修法是把集合换成一个【能点名的】单结构。"
+ },
+
+ "the_new_observable": {
+  "gamma_dagger": "γ† = E_MFE_nested − E_skeleton − dG_stack,其中 E_MFE_nested = ViennaRNA 的嵌套 MFE 结构的能量(RNA.fold),即嵌套世界【最好的那一个】结构,而不是整个集合。",
+  "why_it_is_strictly_stronger": "E_MFE_nested >= F_nested 恒成立(单结构能量不低于集合自由能),所以 γ† >= γ*。于是 γ†<0 是比 γ*<0 更强的条件:满足它的分子【输给一个可以打印出来的具体结构】,不是输给一个总和。",
+  "why_that_matters_for_the_indictment": "对着面板说『你确认的这条设计,输给这一个嵌套结构,能量差 X kcal/mol,结构长这样』是可核对的;说『它输给所有嵌套结构的总和』不是。",
+  "both_thresholds_reported": "γ† < 0(原始)与 γ† < +2.4(按 g3_audit.md 第五节的 dG_stack 偏差修正)。修正只会让计数变多,两个都报。"
+ },
+
+ "void_gates": {
+  "1_join_asserted": "panel_f1_designs.json 与 criterion_vs_tube.json 与 replay_sample(0,80) 三者顺序必须逐条一致,按 (puzzle, method, wet, f1c) 比对。不一致 > 0 ⇒ 作废。",
+  "2_inequality_identity": "γ† >= γ* 必须逐条成立(容差 1e-6)。任何一条违反 ⇒ 估计量坏了,作废。这是本实验自带的自检,理由是 E_MFE >= F_nested 是恒等式。",
+  "3_skeleton_formable": "只保留骨架全为标准配对(GC/AU/GU)的设计 —— g2_audit.md 那道新闸门。被剔除的条数报出来。",
+  "4_confirmed_by_consistent": "从 per_oracle 的 recall_product 重算的 k 必须与 criterion_vs_tube.json 存的 panel_k 逐条一致。不一致 > 0 ⇒ 作废。",
+  "5_no_silent_failures": "折叠或求值失败的条数报出来。"
+ },
+
+ "kill_conditions_frozen_before_looking": {
+  "K1": "γ† < 0 的条数为 0 ⇒ 单竞争者版本在本人群上无咬合力,那 123 条的指控只能停在『输给总和』这个弱形式上,不许升级。",
+  "K2": "γ† < 0 组的试管通过率【不低于】γ* < 0 组 ⇒ 更强的条件没有换来更差的实测结果,说明这个加强是空的。",
+  "frozen": "看到任何数字后不许改阈值、不许换竞争者定义(必须是嵌套 MFE,不许挑一个更有利的结构)。"
+ },
+
+ "what_this_is_not": {
+  "1": "**不是**对 G1 那个 NULL 的翻案。γ† 仍然含 dG_stack,而 G1 已测出整条线的排序信息可由交叉茎 GC 计数复现。本实验不报任何排序相关,也不声称 γ† 比 GC 计数好 —— 除非另开声明去测。",
+  "2": "**不是**『面板误收』的证明。g2_audit.md 已撤回那个说法。γ†<0 证明的是『在这套记账下输给一个具体的嵌套结构』,而自由能差说的是相对布居,不是不可能。",
+  "3": "输出是一份【可核对的清单】,它的价值在于每一行都能被人独立复核,不在于一个汇总统计量。"
+ },
+
+ "population": "G2 的那一批:replay_sample(0,80) 的 4,560 条,骨架可形成、面板 confirmed、γ*<0 的 123 条。选择过程不涉及任何判官(rule 33 已在 G2 声明里查过)。"
+}
