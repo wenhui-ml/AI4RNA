@@ -69,13 +69,24 @@ def work(item):
         # how different is the named competitor from the intended skeleton
         sp, mp = pk_pairs(skel), pk_pairs(mfe_s)
         shared = len(sp & mp)
+        # Does the named competitor actually COMPETE? A nested MFE that merely closes extra pairs
+        # ELSEWHERE is not a competitor -- gamma+ < 0 then just compares a bigger structure against a
+        # smaller one. A competitor that takes the very nucleotides the crossing stem needs is the nested
+        # alternative that EATS the pseudoknot. This column separates the two, and the k=3 read showed the
+        # split is not incidental: over the 82 it runs from 0 to all.
+        cnt = {x for p in cross for x in p}
+        snt = {x for p in sp for x in p}
+        mnt = {x for p in mp for x in p}
+        stolen = [n for n in cnt if n in mnt and n not in snt]
     except Exception as exc:                                                   # noqa: BLE001
         return {"puzzle": puz, "error": repr(exc)[:120]}
     return {"puzzle": puz, "method": method, "seq": seq, "wet": wet, "f1c": f1c, "L": len(seq),
             "nc_skel": nc, "F_nested": round(f, 2), "E_mfe": round(mfe_e, 2), "mfe_struct": mfe_s,
             "E_skeleton": round(e, 2), "dG_stack": round(dg, 2), "n_cross_stacks": len(terms),
             "gc_cross": gc, "gamma_star": round(f - e - dg, 2), "gamma_dag": round(mfe_e - e - dg, 2),
-            "skel_pairs": len(sp), "mfe_shares_skel_pairs": shared}
+            "skel_pairs": len(sp), "mfe_shares_skel_pairs": shared,
+            "cross_nt": len(cnt), "stolen_nt": len(stolen),
+            "stolen_frac": round(len(stolen) / len(cnt), 3) if cnt else None}
 
 
 def main() -> int:
@@ -191,20 +202,24 @@ def main() -> int:
           f"{'/'.join(str(sum(1 for r in dag24 if r['panel_k']==k)) for k in (1,2,3))} |\n\n")
         w("列的含义:`k` 面板确认数;`确认者` 哪几家判官;`γ*` 对集合;`γ†` 对单个 MFE 结构;\n")
         w("`GC` 交叉茎里的 G-C 配对数(G1 测出它单独就能复现整条线的排序信息,放在这里供对照);\n")
-        w("`共享` = 嵌套 MFE 与靶标骨架共享的配对数 / 骨架配对总数 —— 竞争者离预期结构有多远。\n\n")
+        w("`共享` = 嵌套 MFE 与靶标骨架共享的配对数 / 骨架配对总数 —— 竞争者离预期结构有多远;\n")
+        w("**`抢位` = 嵌套 MFE 用掉了【交叉茎需要、而骨架里本来空着】的核苷酸数 / 交叉茎需要的总数。**\n")
+        w("**抢位 = 0 ⇒ 这个『竞争者』根本不跟假结争碱基,γ†<0 只是拿大结构比小结构,应当剔除。**\n")
+        w("抢位越接近 1 ⇒ 它就是『把假结吃掉的那个嵌套替代品』,即真正的竞争者。见 `g5_k3_read.md`。\n\n")
         cur = None
         for r in L:
             if r["panel_k"] != cur:
                 cur = r["panel_k"]
                 w(f"\n## k = {cur}(共 {sum(1 for x in L if x['panel_k']==cur)} 条)\n\n")
-                w("| # | 靶标 | 方法 | L | γ\\* | **γ†** | E_MFE | E_skel | dG_stack | GC | 共享 | 试管 | |\n")
-                w("|---|---|---|---|---|---|---|---|---|---|---|---|---|\n")
+                w("| # | 靶标 | 方法 | L | γ\\* | **γ†** | E_MFE | E_skel | dG_stack | GC | 共享 | **抢位** | 试管 | |\n")
+                w("|---|---|---|---|---|---|---|---|---|---|---|---|---|---|\n")
                 n = 0
             n += 1
             w(f"| {n} | {r['puzzle']} | {r['method'][:22]} | {r['L']} | {r['gamma_star']:+.2f} | "
               f"**{r['gamma_dag']:+.2f}** | {r['E_mfe']:.2f} | {r['E_skeleton']:.2f} | "
               f"{r['dG_stack']:.2f} | {r['gc_cross']} | "
-              f"{r['mfe_shares_skel_pairs']}/{r['skel_pairs']} | {r['wet']:.1f} | "
+              f"{r['mfe_shares_skel_pairs']}/{r['skel_pairs']} | "
+              f"**{r['stolen_nt']}/{r['cross_nt']}** | {r['wet']:.1f} | "
               f"{'通过' if r['wet']>=TUBE_PASS else '**失败**'} |\n")
         w("\n---\n\n## 序列与竞争者结构(供独立复核)\n\n")
         w("每条给出序列、靶标骨架、以及**嵌套 MFE 这个具体竞争者**。任何人可以用 ViennaRNA 重跑三行验证。\n\n")
