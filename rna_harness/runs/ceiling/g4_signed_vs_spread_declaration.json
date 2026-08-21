@@ -1,0 +1,66 @@
+{
+ "id": "G4",
+ "name": "signed_disagreement_vs_unsigned_spread",
+ "date": "2026-08-21",
+ "status": "pre-registered, no data",
+ "cost_usd": 0,
+ "offline": true,
+ "one_line": "构造二:把面板的聚合从【计数】换成【带符号的分歧结构】。问的不是『分歧有没有用』,而是『带符号的分歧结构相对无符号的离散度,多说了什么』。",
+
+ "why_this_runs_last_and_what_the_first_three_did_to_it": {
+  "order": "3 -> 1 -> 2 -> 4,由 docs/weekly-report/2026-08-21-analysis.md 第七节冻结。",
+  "G3": "通过。近似误差的分子间变动是 γ* 跨靶标变动的 0.29 倍,且与交叉螺旋规模无关。顺带量到 dG_stack 把稳定化算多约 2.4 kcal/mol。",
+  "G1": "NULL。γ* 的靶标内 ρ = +0.3766 [+0.3101,+0.4373],方向对、排除 0,但 M2 − GC计数 = −0.0020 [−0.0791,+0.0728] 含 0 —— 整个信号可用『交叉茎里有几个 G-C 配对』复现。",
+  "G2": "K2 触发,并且审计撤回了『可证的面板误收』这个说法:那批分子里 67.5% 在试管里【通过】;而且 22.5% 的设计根本形不成靶标骨架,γ*<0 那一栏里这类占 50%。",
+  "so_construction_one_is_done": "构造一作为【预测器】和【否决证明】都已判掉。构造二是这条线上剩下的最后一项,而它与 γ* 完全无关 —— 它动的是面板的聚合方式,不是能量记账。"
+ },
+
+ "the_objection_i_must_raise_against_myself_first": {
+  "what": "F2 已含三家判官全部 15 根细列。【线性模型本来就能组出任何成对差】,所以带符号的差作为线性特征增量【精确为零】。",
+  "consequence": "任何增量只可能来自【非线性】部分:哪一家是离群者、符号模式是什么。所以两个新块都必须是原始列的非线性函数,否则这个实验没有内容。",
+  "and_that_is_also_why_this_is_a_small_effect_experiment": "分析文档第五节自己写了这一条,并因此把构造二排在构造一之后。这里不改这个定位。"
+ },
+
+ "the_claim_being_tested__stated_as_it_survived_review": {
+  "what_was_retracted_on_8_21": "『带符号的差把共用项精确相消,而离散度只部分相消』—— 错。共用项对三家判官是同一个数,所以它在离散度里也精确消掉(见分析文档 1.1 节)。",
+  "what_survived": "一条【信息论】的、不是【相消】的说法:带符号的成对差【决定】离散度,反之不成立(差保留了『是哪一家离群、往哪个方向』)。",
+  "so_the_sharp_prediction_is_a_pair_of_nested_comparisons": "若『带符号 ⊃ 无符号』在信息上成立,那么在同一个估计量里:(a) 在无符号块之上再加带符号块【应当有增量】;(b) 在带符号块之上再加无符号块【应当没有增量】。两条都是嵌套比较,所以样本内 R² 单调性是精确代数,自检成立。",
+  "note_the_asymmetry_is_the_whole_test": "只测 (a) 是不够的 —— 那只说明带符号块有用。(b) 才是『无符号是带符号的函数』这个断言本身。这是 g1_audit.md 那条教训(嵌套方向要两个方向都做)在本声明里的执行。"
+ },
+
+ "feature_blocks": {
+  "B_baseline": "F2 全部(k 的 3 个哑变量 + 三家 recall_product + 三家 × {recall, precision, f1, n_pred_cross, n_pred_total})+ f1c(RibonanzaNet)。这就是 0.196 那根杆的口径:F2 ∪ f1c。",
+  "S_unsigned_spread": "对 (recall, precision, f1, n_pred_cross) 各算跨三家的 std 与极差(max−min),共 8 列。全是绝对值/离散度,不含任何『是哪一家』的信息。",
+  "D_signed_structure": "argmax 判官哑变量 3 列 + argmin 判官哑变量 3 列 + 三个成对差的符号(±1/0)3 列,共 9 列。全是符号/身份,不含量级。",
+  "dimensions_are_reported": "S 是 8 列,D 是 9 列,量级相近但不相等 —— 所以【必须】靠格内置换零来扣掉『特征个数本身买到的 R²』,不能直接比样本内 R²。"
+ },
+
+ "estimator": {
+  "same_as_R1_D3_A13": "格内(靶标 × 方法)去均值吸收靶标难度与方法构成;格内置换零(置换的是试管分,格内)扣掉特征个数买到的 R²;单位是【格】,cluster bootstrap 走格。",
+  "self_check_is_exact_algebra": "B ⊆ BS ⊆ BSD 且 B ⊆ BD ⊆ BSD,所以样本内 R² 必须单调不减。任何一处违反 ⇒ 估计量坏了,不报结果,直接中止。",
+  "cell_floor": "每格 >= 3 条分子(F2 的自由度需要);格数 < 20 ⇒ 该人群无数据。",
+  "dof_gate": "格内去均值后自由度 <= 0 ⇒ 无数据。BSD 有 39 列,这道闸门在小人群上会真的触发,不是装饰。"
+ },
+
+ "population": {
+  "primary": {"name": "样本3", "file": "panel_f1_third.json"},
+  "why_sample_3_is_primary__rule_34": "第 34 条:线索出现在哪个人群,那个人群就是主人群。这条线的经验线索是 D3 的【对照臂】(面板自身的非线性分歧列)越过了 F2 ∪ f1c = 0.196 那根杆 —— +0.0040 [+0.0006, +0.0103] —— 而那是在样本 3 上测到的。所以样本 3 是主,不是第四批。",
+  "replication": [{"name": "第四批", "file": "panel_f1_fourth.json"}, {"name": "样本2", "file": "panel_f1_fresh.json"}],
+  "how_it_was_selected__rule_33": "SN_filter == 1 + 靶标与我们一致 + 同时带 RibonanzaNet F1 与试管分数 + 靶标级至少 20 条合格设计;各样本之间显式互斥。不涉及本实验要拧的任何东西。",
+  "residual_selection": "结论只对『有可用湿实验读数的分子』成立。"
+ },
+
+ "kill_conditions_frozen_before_looking": {
+  "K1": "净 R²(BSD) − 净 R²(BS) 的聚类区间含 0 ⇒ 带符号结构相对无符号离散度【没有增量】⇒ 动作三的这条转译不成立,构造二判掉(分析文档第七节第 4 项自己写的打死条件)。",
+  "K2": "净 R²(BSD) − 净 R²(BD) 的区间【排除 0 且为正】⇒ 无符号离散度携带了带符号结构没有的东西 ⇒ 『带符号决定离散度』这个前提在本估计量下被违反,必须原样报成前提被反驳,不许绕过。",
+  "K3": "BS 与 BD 相对 B 都没有增量 ⇒ 整条线是空的,面板的分歧结构(带符号或不带)都读不出试管信息。",
+  "replication_rule": "主人群上触发而复现人群上不触发(或反之)⇒ 结论只能报成『主人群上如此,未复现』,不许合池。",
+  "frozen": "看到任何数字之后不许改块的定义、不许加列、不许换人群、不许把置换零换成别的零。"
+ },
+
+ "what_i_will_not_claim_even_if_it_passes": {
+  "1": "不会说这证明了『判官共用误差在带符号差里相消』。那个相消论证已在 8-21 撤回(线性化,不是定理),本实验测的是【预测增量】,不是相消。",
+  "2": "不会把增量说成方向性突破。分析文档已把构造二定位成小效应实验,量级上它与 D3 对照臂的 +0.0040 同级。",
+  "3": "不会去碰 argmax |confirmed_by| —— 那条的功效声明已经撤回过一次,与本实验的 argmax 判官哑变量【不是同一个东西】,这里点出来免得以后混。"
+ }
+}

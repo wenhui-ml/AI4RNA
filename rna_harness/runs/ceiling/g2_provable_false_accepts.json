@@ -1,0 +1,102 @@
+{
+ "n": 4560,
+ "n_confirmed": 2635,
+ "n_failed": 0,
+ "gates": {
+  "join_mismatches": 0,
+  "identity_mismatches": 0,
+  "confirmed_semantics_ok": true
+ },
+ "primary": {
+  "原始 γ* < 0": {
+   "threshold": 0.0,
+   "n_below": 828,
+   "n_below_and_confirmed": 226,
+   "by_panel_k": {
+    "1": 128,
+    "2": 62,
+    "3": 36
+   },
+   "frac_of_confirmed": 0.08577,
+   "n_targets_touched": 30
+  },
+  "修正 γ* < +2.4": {
+   "threshold": 2.4,
+   "n_below": 1161,
+   "n_below_and_confirmed": 393,
+   "by_panel_k": {
+    "1": 246,
+    "2": 98,
+    "3": 49
+   },
+   "frac_of_confirmed": 0.14915,
+   "n_targets_touched": 34
+  }
+ },
+ "secondary": {
+  "原始 γ* < 0": {
+   "n_low": 226,
+   "n_high": 2409,
+   "pass_low": 0.6195,
+   "pass_high": 0.8086,
+   "gap_gamma": -0.1892,
+   "ci_gap_gamma": [
+    -0.2837,
+    -0.0865
+   ],
+   "gc_cut": 4,
+   "quantile": 0.0858,
+   "n_gc_low": 288,
+   "n_gc_high": 2347,
+   "pass_gc_low": 0.5972,
+   "pass_gc_high": 0.8164,
+   "gap_gc": -0.2191,
+   "ci_gap_gc": [
+    -0.3479,
+    -0.0829
+   ],
+   "gamma_minus_gc": 0.03,
+   "ci_diff": [
+    -0.0828,
+    0.1571
+   ],
+   "n_boot_used": 2000
+  },
+  "修正 γ* < +2.4": {
+   "n_low": 393,
+   "n_high": 2242,
+   "pass_low": 0.6183,
+   "pass_high": 0.8229,
+   "gap_gamma": -0.2046,
+   "ci_gap_gamma": [
+    -0.3069,
+    -0.0898
+   ],
+   "gc_cut": 5,
+   "quantile": 0.1491,
+   "n_gc_low": 469,
+   "n_gc_high": 2166,
+   "pass_gc_low": 0.6439,
+   "pass_gc_high": 0.8246,
+   "gap_gc": -0.1806,
+   "ci_gap_gc": [
+    -0.3096,
+    -0.0506
+   ],
+   "gamma_minus_gc": -0.024,
+   "ci_diff": [
+    -0.1409,
+    0.0991
+   ],
+   "n_boot_used": 2000
+  }
+ },
+ "kills": {
+  "K1": false,
+  "K2": true,
+  "K3": false
+ },
+ "verdict": "count_only_no_empirical_support",
+ "carried_weakening": "G1 已测出构造一不携带超出平凡 GC 计数的排序信息,所以本实验的价值完全押在能量算术本身正确上,来自 G1 的独立经验支持为零。",
+ "correction_is_indicative": "+2.4 由 G3 在【嵌套】类比上量出;嵌套环闭合与交叉环闭合是不同的物理项,故修正阈值是指示性的,不是精确的。"
+}

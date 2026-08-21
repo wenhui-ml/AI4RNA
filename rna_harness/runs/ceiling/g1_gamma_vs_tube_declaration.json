@@ -1,0 +1,63 @@
+{
+ "id": "G1",
+ "name": "gamma_star_vs_in_vitro_ranking",
+ "date": "2026-08-21",
+ "status": "pre-registered, no data",
+ "cost_usd": 0,
+ "offline": true,
+ "one_line": "γ* 低的分子应当在试管里更容易失败。只用排序,不拟合 γ。而且不是问『γ* 和试管有没有关系』,是问『γ* 比一个平凡的稳定性先验多告诉了什么』。",
+ "why_it_runs_second": "顺序 3 -> 1 -> 2 -> 4 由 docs/weekly-report/2026-08-21-analysis.md 第七节冻结。第 3 项(G3)已跑完并审计:近似误差的分子间变动是 γ* 跨靶标变动的 0.29 倍,且与交叉螺旋规模无关(ρ=+0.006),所以跨规模外推不断。G3 没打死构造一。",
+
+ "the_gate_g3_says_does_not_transfer": {
+  "what_g3_froze": "IQR(resid_A) vs 【跨靶标】的 IQR(γ*) = 7.870,比值 0.292,通过。",
+  "why_that_is_the_wrong_comparison_for_this_run": "本实验的检验是【靶标内】的 —— γ* 的靶标间差异(P01 的 7.5 vs P19 的 43.6)对本实验是混杂而不是信号。靶标内的 γ* 离散度必然小于 7.870,所以 G3 的通过不自动传递(见 g3_audit.md 第六节,是我跑完 G3 之后自己发现并自报的)。",
+  "so_this_run_adds_its_own_gate": "报【每靶标 IQR(γ*) 的中位】,与 G3 量到的噪声底 IQR(resid_A) = 2.300 直接比。若中位靶标内 IQR(γ*) < 2.300 ⇒ 本检验整体处在噪声底之下,任何相关系数都必须带着这一句一起报,不许单独引用。",
+  "i_do_not_touch_the_frozen_g3_condition": "G3 的三条打死条件已冻结,不改。这里是新增的、属于本实验的闸门。"
+ },
+
+ "nested_model_comparison__the_real_question": {
+  "why": "γ* = F_nested − E_skeleton − dG_stack。如果一条设计的骨架本来就很弱(E_skeleton 接近 0),γ* 自动很大。那么 γ* 可能只是『嵌套集合比预定骨架好多少』的代理 —— 一个与假结毫无关系的错折倾向度量。本项目在检索热启动那条线上已经吃过一次这种教训(相对一个通用 GC-硬度先验为 NULL)。",
+  "M0": "F_nested 单独 —— 平凡的稳定性先验",
+  "M1": "F_nested − E_skeleton —— 嵌套世界的余量,【不含任何假结项】",
+  "M2": "γ* = F_nested − E_skeleton − dG_stack —— 完整构造",
+  "the_pre_registered_question": "M2 是否胜过 M1,M1 是否胜过 M0。这三个是嵌套的(每一层只多减一项),所以比较是干净的。",
+  "the_sharp_kill": "若 M2 不胜过 M1(配对 cluster bootstrap 的差值区间含 0)⇒ dG_stack 一项没有贡献,构造里【假结专属的那部分内容不可测】。这比『γ* 与试管无关』是一个尖锐得多的打死条件,因为它能在 γ* 整体有相关的情况下依然判定假结部分是空的。"
+ },
+
+ "estimator": {
+  "primary": "每靶标内 Spearman(预测量, target_openknot_score),再对靶标取均值。靶标内,因为靶标既决定 γ* 的量级又决定试管分的量级。",
+  "ci": "对【靶标】做 cluster bootstrap(2000 次),这与 A13/A14/D3 用的是同一套。区间报在均值上,不报在中位上 —— 第 35 条:中位区间会被并列值钉住,而这里靶标数只有几十个。",
+  "paired_differences": "M2 − M1 与 M1 − M0 用【同一次 bootstrap 重抽】算,配对,不许分别抽。",
+  "direction_predicted_before_looking": "γ* 越高 ⇒ 假结越有余地胜过嵌套世界 ⇒ 越可能按预期折叠 ⇒ 试管分越高。预测【正号】。负号是一个需要解释的结果,不是一个可以改口叙述的结果。",
+  "also_reported_but_labelled_confounded": "合池 Spearman(不分靶标)一并报出,并明确标注它被靶标混杂,不作为结论依据。"
+ },
+
+ "population": {
+  "source": "replay_sample(seed=0, per_target=80),即 criterion_vs_tube.json 那一批 4,560 条 —— 分析文档第七节第 1 项说的就是这一批。",
+  "how_it_was_selected__rule_33": "SN_filter == 1(OpenKnot 对湿实验信噪比的筛)+ 靶标与我们一致 + 同时带 RibonanzaNet F1 与试管分数 + 靶标级至少 20 条合格设计。【不涉及任何判官】,对本实验干净。",
+  "residual_selection": "结论只对『有可用湿实验读数的分子』成立。",
+  "per_target_floor": "每靶标至少 20 条有效设计才计入,不足的报出来并剔除。"
+ },
+
+ "void_gates": {
+  "1_identity_against_a_stored_record": "本次算出的 γ* 必须与 gamma_star_reproduce.json 里已存的 53 行逐条一致(同一条 best-wet 设计,容差 0.011)。不一致条数 > 0 ⇒ 整个 G1 作废。这是 D3 那道硬闸门的同款:模板全靠『我重算的 == 已存的』这个前提。",
+  "2_no_silent_failures": "pf() / energy_of_struct 失败或靶标无交叉配对的条数必须报出来。",
+  "3_variance_exists": "任何靶标内若某个预测量是常数(IQR = 0),Spearman 无定义,该靶标对该模型剔除并报出条数。",
+  "4_no_target_dominates": "报每靶标 n 的分布。若任一靶标占有效样本 > 15%,均值要同时报『去掉它』的版本。"
+ },
+
+ "kill_conditions_frozen_before_looking": {
+  "K1": "M2 的均值 Spearman 的 cluster bootstrap 区间含 0 ⇒ γ* 对现实无预测力,构造一按分析文档第七节弃掉。",
+  "K2": "M2 − M1 的区间含 0 ⇒ dG_stack 无贡献,假结专属部分不可测(见上)。",
+  "K3": "M1 − M0 的区间也含 0 ⇒ 连『嵌套余量』都不比平凡稳定性多说什么,整条线是稳定性先验的重新包装。",
+  "frozen": "看到任何数字之后不许改方向预测、不许换聚合方式、不许把靶标内换成合池。"
+ },
+
+ "how_this_run_conditions_item_2": {
+  "the_linkage_must_be_declared_now_not_later": "第 2 项(γ* < 0 却被面板判为 knot_confirmed 的分子 = 不需湿实验的可证误收)是一个【逻辑】断言,不是经验预测。但它的前提是这套能量记账在现实里说得通。",
+  "if_K1_fires": "第 2 项仍可计数,但【不许】称为『可证的面板误收』—— 它降级为『面板与嵌套世界比较的一处分歧,且没有证据说明哪一边对』。",
+  "if_K1_passes": "第 2 项按原样报,并且必须【同时报原始与修正两个计数】:g3_audit.md 第五节量到 γ* 被系统性高估约 2.4 kcal/mol,修正后的阈值等价于 γ*_computed < +2.4,可证否决的分子只会变多。"
+ },
+
+ "what_would_make_me_report_a_negative_result": "如果 M2 不胜 M1,我要写的结论是『构造一里假结专属的那一项不可测』,并且停在这里 —— 不去换一个更复杂的 dG_stack 实现然后重跑同一个检验。换实现要另开声明。"
+}

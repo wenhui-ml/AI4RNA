@@ -1,0 +1,74 @@
+{
+ "id": "G3",
+ "name": "dG_stack_approximation_error_bound",
+ "date": "2026-08-21",
+ "status": "pre-registered, no data",
+ "cost_usd": 0,
+ "offline": true,
+ "one_line": "gamma* 里唯一的近似项是 dG_stack。本实验在【这个近似为真的那一侧】量它的误差:在嵌套结构上,同一个加性分解的残差是【精确可测的】,因为那里没有假结项。",
+ "why_this_runs_first": "docs/weekly-report/2026-08-21-analysis.md 第七节自己定的顺序是 3 -> 1 -> 2 -> 4,理由写在文档里:如果近似误差和信号同量级,后面三项全是白跑。这是 8-20 那次教训(界线要写成会被执行的检查项)的执行 —— 8-20 上午我写下『我们这里没有小参数』,当天下午就推了一条需要把罚项当小参数的定律。这一次界线是一个会返回数字并且能打死主构造的实验。",
+
+ "the_property_being_validated": {
+  "claim": "E(结构) = E(骨架) + dG_stack(被摘掉的螺旋) + 残差,且【残差可以当成一个可迁移的标量】。",
+  "where_it_is_used": "gamma* = F_nested - E_skeleton - dG_stack(交叉)。若残差随分子大幅变动,gamma* 的分子间差异就不可分辨。",
+  "the_true_side__rule_29": "对一个【嵌套】结构,假结项恒等于 0,于是同一个分解里的残差可以被【精确测出来】:E_full 与 E_skel 两边都是 ViennaRNA 的精确求值。所以用例落在『这个分解为真』的那一侧,而且这个性质在实验里被断言出来(见 void 闸门第 1 条)。"
+ },
+
+ "two_arms_because_they_kill_different_downstream_items": {
+  "A_whole_helix": {
+   "operation": "取靶标骨架 _round_only(target)(纯嵌套),从中摘掉【一整条螺旋】,摘法与 _round_only 摘交叉配对完全同构(把括号改成点)。",
+   "which_helix": "选骨架里堆叠数与该分子【交叉集堆叠数】最接近的那一条 —— 让类比在规模上匹配,而不是随手挑一条。匹配质量(|nst_helix - nst_cross|)要逐条报出来。",
+   "resid_A": "E_full - E_skel_minus_helix - dG_stack(helix)"
+  },
+  "B_single_outermost_pair": {
+   "operation": "只摘掉一条螺旋【最外侧的那一个】配对(它的 (i+1,j-1) 仍在)。结构仍是嵌套的,变化被压到最小。",
+   "resid_B": "E_full - E_minus_1bp - stack(那一个堆叠项)",
+   "why_this_arm_exists": "它把误差隔离到【每个堆叠一份】的量级上:摘掉最外侧配对改变的正是被省掉的那三样东西(悬挂末端/末端错配、环尺寸依赖、部分同轴堆叠)。A 臂给整条螺旋的总误差,B 臂给『每堆叠误差』,后者乘以 n_stack 才能外推到不同规模的交叉螺旋。"
+  }
+ },
+
+ "observables_and_which_downstream_item_each_one_kills": {
+  "mean_resid": {
+   "what": "残差的中位/均值 —— 一个常数偏移。",
+   "kills": "第 2 项(gamma* < 0 的符号检验)。常数偏移把零点整体挪动,所以它【直接】决定『gamma* 为负』这个判定可不可信。对第 1 项(只用排序)无害。"
+  },
+  "spread_resid": {
+   "what": "残差的 IQR / std / p10-p90 极差。",
+   "kills": "第 1 项(gamma* 与试管分数的排序关系)。若残差的分子间变动与 gamma* 的分子间变动同量级,gamma* 的排序就是噪声的排序。"
+  },
+  "per_stack_resid": {
+   "what": "B 臂残差,以及 A 臂残差除以 n_stack。",
+   "kills": "跨规模外推。整个 gamma* 表里 n_stack 从 3 跑到 24,若每堆叠误差不接近常数,大螺旋分子的 gamma* 误差会被系统性放大。"
+  }
+ },
+
+ "kill_conditions_frozen_before_looking": {
+  "hard_kill": "IQR(resid_A) >= IQR(gamma*)(同一批 53 个靶标上算) ⇒ 构造一的分辨率不够,第 1/2/4 项全部不许跑,必须先修 dG_stack。",
+  "soft_kill": "IQR(resid_A) > 0.5 * IQR(gamma*) ⇒ 第 1 项仍可跑,但必须把这个噪声底带在结论里一起报,并且不许声称任何小于该噪声底的效应。",
+  "sign_test_gate": "|median(resid_A)| > 3 kcal/mol ⇒ 第 2 项(gamma* < 0 的可证否决)不许报,因为零点位置本身不可信。",
+  "frozen": "看到任何数字之后不许改这三条,不许换比较基准,不许把 IQR 换成别的散度。"
+ },
+
+ "declared_limitation_stated_before_running": {
+  "what_this_arm_cannot_bound": "嵌套类比里的残差含【闭合一个嵌套环】的环熵代价;假结里的残差含【闭合一个交叉环】的代价。这是两个不同的物理项。",
+  "consequence": "本实验只界住那些【在嵌套世界里有对应物】的成分(悬挂末端/末端错配、同轴堆叠、环尺寸依赖),它给出总误差变动性的一个【下界】。交叉专属的那一部分【按定义就是 gamma】,不在本实验射程内。",
+  "so_the_logic_is_one_sided_too": "本实验能打死主构造,不能确认它 —— 与构造一本身的单侧性一致(分析文档 1.2 节)。这一条必须写在跑之前,不许跑完再补。"
+ },
+
+ "void_gates": {
+  "1_zero_removal_identity": "不摘任何东西时 resid 必须【恒等于 0】(浮点容差 1e-6)。任何一条不为 0 ⇒ 整个 G3 作废。这就是把『被验证的性质』在 smoke 里断言出来的那一步。",
+  "2_nested_validity": "每个骨架串与每个摘除后的串都必须是合法嵌套结构(括号配平),且 ViennaRNA 求值不报错。失败条数 > 0 ⇒ 作废。",
+  "3_removal_is_not_a_noop": "摘除必须真的改变结构。n_removed == 0 的条数要报出来并从统计里剔除;若剔除后 n < 20 ⇒ 本实验无数据,不许报结论。",
+  "4_lonely_pairs": "摘除后留下孤立单配对的条数要报出来 —— ViennaRNA 对孤立配对的求值不代表真实物理,这类分子单独列出并同时报『含/不含它们』两版结果。",
+  "5_gamma_star_reproduces": "gamma_star.py --reproduce 必须先通过(已跑:12/12 published rows OK, 0 mismatches, gamma_star_reproduce.json)。不通过则 G3 无意义。"
+ },
+
+ "population": {
+  "source": "panel_f1_fourth.json 里每个靶标试管分最高的一条设计,与分析文档第五节那张表【同一批】,共 53 个带交叉配对的靶标(发表的那张表只列了 P 系列 12 行)。",
+  "how_it_was_selected__rule_33": "SN_filter == 1(湿实验信噪比筛)+ 靶标与我们一致 + 同时带 RibonanzaNet F1 与试管分数 + 靶标级至少 20 条合格设计;第四批再按 (靶标, 方法) 细胞抽样并排除样本 1/2/3。选择过程【不涉及任何判官】,对本实验干净。",
+  "residual_selection": "结论只对『有可用湿实验读数的分子』成立。",
+  "note_on_scale": "本实验只用每靶标一条设计(n=53),因为观测量是【能量分解的算术误差】,不是群体统计量 —— 它对同一靶标的不同设计不独立地重复没有意义。n=53 对 IQR 够,对尾部不够,尾部只报不解释。"
+ },
+
+ "what_would_make_me_report_a_negative_result": "如果 resid 的散度就是和 gamma* 同量级,我要写的结论是『构造一在当前 dG_stack 实现下分辨率不够』,并且【停在这里】,不去把 dG_stack 换成一个更复杂的猜测然后继续 —— 换实现要另开一个声明。"
+}

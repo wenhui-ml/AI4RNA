@@ -1,0 +1,59 @@
+{
+ "id": "G2",
+ "name": "provable_panel_false_accepts",
+ "date": "2026-08-21",
+ "status": "pre-registered, no data",
+ "cost_usd": 0,
+ "offline": true,
+ "naming_collision_note": "criterion_vs_tube.json 内部把它自己的几道闸门叫 G2/G3/G4。那是那个文件的局部键名,与本周 G1/G2/G3 这三个实验编号【无关】。这里点出来是为了以后读 JSON 时不混。",
+ "one_line": "γ* < 0 的分子里,有多少被面板判为 knot_confirmed。每一条都是一次【不需要湿实验】就能指出的面板误收 —— 前提是这套能量算术本身对。",
+
+ "why_this_still_runs_after_G1_came_back_null": {
+  "what_G1_killed": "分析文档第五节那条『可被打死的预测』。γ* 的靶标内均值 ρ = +0.3766 [+0.3101,+0.4373],方向对、区间排除 0,三条冻结条件一条没触发 —— 但审计(g1_audit.md)测出这 +0.38 可以用『交叉茎里有几个 G-C 配对』完整复现:M2 − GC计数 = −0.0020 [−0.0791,+0.0728] 含 0。所以按本项目判例这叫 NULL:构造一不携带超出平凡计数的排序信息。",
+  "why_item_2_is_not_killed_by_that": "第 2 项是【逻辑】断言,不是排序断言:F_nested > E_skeleton + dG_stack ⇒ 在任何正的 γ 下靶标都输给精确算出的嵌套集合。一个单侧否决器不需要与一个连续分数相关才成立 —— 排序含量与阈值跨越是两件事。",
+  "the_weakening_that_must_be_carried": "构造一已被测出不携带超出平凡计数的排序信息,所以第 2 项的价值【完全押在能量算术本身正确】上,来自 G1 的独立经验支持是零。这一条必须写进结论,不许省。"
+ },
+
+ "the_two_thresholds_both_must_be_reported": {
+  "raw": "γ*_computed < 0",
+  "corrected": "γ*_computed < +2.4。g3_audit.md 第五节量到 dG_stack 把稳定化算多了约 2.4 kcal/mol(A 臂残差中位 +2.400),所以真实 γ* = γ*_computed − 2.4,修正后的等价阈值是 +2.4。",
+  "direction_of_the_correction": "修正只会让可证否决的分子【变多】,不会变少。两个计数都报,不许只报有利的那个。",
+  "and_the_correction_is_itself_approximate": "那 2.4 是从【嵌套】类比里测的;嵌套环闭合与交叉环闭合是两个不同的物理项。所以修正阈值要标成『指示性』,不是『精确』。"
+ },
+
+ "primary_observable__logical_no_correlation": {
+  "what": "面板判 confirmed(panel_k >= 1,即出厂地板)而 γ* < 阈值的设计条数与占比。",
+  "kill": "若为 0 条 ⇒ 这个单侧检验在我们人群上无咬合力(分析文档第七节第 2 项自己写的打死条件)。",
+  "reported_alongside": "按 panel_k = 1/2/3 分层报。k=3 的一条比 k=1 的一条重得多 —— 那是三家判官一致确认、却被精确嵌套比较否掉的分子。"
+ },
+
+ "secondary_observable__does_the_tube_back_the_rejector": {
+  "what": "在面板 confirmed 的设计里,比较 γ* < 阈值 与 γ* >= 阈值 两组的试管通过率(通过线 80.0,OpenKnot 自己的及格线,本项目全程在用)。",
+  "the_control_G1_forces_me_to_include": "同一个对比,但把切分变量换成【交叉茎 GC 配对计数】,切点取在同一个分位上。若 γ* 的切分不优于 GC 的切分 ⇒ 这个否决器的经验支持就是 G1 那个 NULL,主观测量的计数只与能量算术等值,不再多。",
+  "kill": "γ* 切分与 GC 切分的差值区间含 0 ⇒ 不许声称否决器有独立的经验支持。",
+  "ci": "对【靶标】做 cluster bootstrap(2000 次),配对差值用同一次重抽。与 A13/A14/D3/G1 同一套。"
+ },
+
+ "void_gates": {
+  "1_join_must_be_asserted_not_assumed": "criterion_vs_tube.json 的 designs 与 replay_sample(0,80) 的顺序必须逐条一致,按 (puzzle, method, wet, f1c) 四元组比对。不一致条数 > 0 ⇒ 整个 G2 作废。两个文件都没有 seq,所以这个连接只能靠顺序,而靠顺序就必须断言。",
+  "2_identity_against_stored_gamma": "重算的 γ* 必须与 gamma_star_reproduce.json 的 53 行一致(容差 0.011)。",
+  "3_confirmed_semantics_checked": "已查:confirmed == (panel_k >= 1),交叉表 {(0,False):1925,(1,True):1141,(2,True):1105,(3,True):389},无例外。若本次重读不再成立 ⇒ 作废。",
+  "4_no_silent_failures": "γ* 计算失败或靶标无交叉配对的条数报出来。",
+  "5_group_floors": "任一被比较的组 n < 30 ⇒ 该组只报计数不报率;靶标数 < 20 ⇒ 不报 cluster bootstrap。"
+ },
+
+ "population": {
+  "source": "replay_sample(seed=0, per_target=80) 那 4,560 条,与 G1 同一批。",
+  "how_it_was_selected__rule_33": "SN_filter == 1 + 靶标与我们一致 + 同时带 RibonanzaNet F1 与试管分数 + 靶标级至少 20 条合格设计。不涉及任何判官,对本实验干净 —— 这一点对本实验尤其要紧,因为本实验要指控的正是判官。",
+  "residual_selection": "结论只对『有可用湿实验读数的分子』成立。"
+ },
+
+ "kill_conditions_frozen_before_looking": {
+  "K1": "(confirmed & γ* < 0) 计数为 0 ⇒ 单侧检验在本人群无咬合力。",
+  "K2": "γ* 切分的试管通过率对比与 GC 切分不可分辨(差值含 0)⇒ 否决器无独立经验支持,只剩能量算术。",
+  "K3": "γ* < 阈值组的试管通过率【不低于】γ* >= 阈值组 ⇒ 否决器方向反了,这比无支持更糟,必须原样报。",
+  "frozen": "看到任何数字之后不许改阈值、不许改通过线 80.0、不许换聚合方式。"
+ },
+
+ "what_i_will_not_do": "不会因为计数少就把阈值往上调到出现足够多条为止。两个阈值(0 与 +2.4)在这里冻结,+2.4 的来源是 G3 独立量出来的,不是为了凑数选的。"
+}
