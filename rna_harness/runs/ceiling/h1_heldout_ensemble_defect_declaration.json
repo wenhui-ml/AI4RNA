@@ -1,0 +1,60 @@
+{
+ "id": "H1",
+ "name": "heldout_ensemble_defect",
+ "date": "2026-08-21",
+ "status": "pre-registered, no data",
+ "cost_usd": 0, "offline": true,
+ "spec_version": "rule 38 + 39 + 40 + 41",
+ "one_line": "E3 测的是【样本内净 R²】。本实验问的是完全不同的一个问题:把 ensemble_defect(靶标骨架) 接进判据,它在【没见过的靶标】上还成不成立。",
+
+ "why_in_sample_net_R2_is_not_enough": {
+  "what_E3_measured": "样本内 R² 减去格内置换零。置换零扣掉的是『特征个数本身买到的 R²』,它【不】扣掉『在同一批分子上拟合又在同一批上评估』。",
+  "what_this_measures_instead": "在训练时【完全没出现过的靶标】上的预测表现。这是判据要真正被接进产品时唯一相关的量。",
+  "so_this_can_fail_even_though_E3_passed": "E3 的 +0.024 是可复现的样本内增量,四人群 4/4;但它对新靶标能不能外推,E3 一个字也没说。"
+ },
+
+ "the_primary_metric_is_leak_free_by_construction": {
+  "the_leak_that_a_naive_heldout_R2_has": "本项目的估计量是【格内去均值】。若留出整格再算 R²,评估时需要该格自己的 y 均值 —— 那是每格泄漏一个数。",
+  "the_metric_that_avoids_it_entirely": "**留出格【内】的成对排序准确率**:对留出格里每一对分子 (i,j),看模型预测的差与试管分数的差是否同号。格效应在【差】里精确消掉,所以完全不需要该格的 y 均值。",
+  "why_this_is_the_right_estimand_anyway": "产品要做的事就是【在同一个靶标里挑一条设计】,那正是格内排序,不是跨格的绝对预测。",
+  "secondary_reported_with_its_leak_declared": "留出格内去均值的 R² 也报,但明确标注它用了每格一个 y 均值,故只作次要。"
+ },
+
+ "splits": {
+  "unit": "按【靶标】切分,不按分子、不按格 —— 同一靶标的另一条设计比一个新靶标容易得多,按分子切会把难度洗掉。",
+  "scheme": "200 次随机划分,每次训练靶标 70% / 留出 30%,种子固定可复现(与本项目 selector_heldout 的 200 次划分同一惯例)。",
+  "leakage_gate": "每次划分都断言留出靶标与训练靶标的交集为空;非空 ⇒ 整个 H1 作废。"
+ },
+
+ "blocks": {
+  "BC": "F2 ∪ f1c(22 列)+ 交叉茎 GC 计数 + 整体 GC 比例(2 列)—— E3 的基线,原样不动。",
+  "BC_ed": "BC + ensemble_defect(靶标骨架) —— 处理组,只加那一根列。",
+  "BC_mfe": "BC + ensemble_defect(嵌套 MFE) —— **把 E3 的保守安慰剂带进留出设定**。E3 里它只带 +0.0045/+0.0058,若在留出上它拿到与处理组同样的增量,说明外推靠的是『集合集中度』而不是『离预定结构多远』。"
+ },
+
+ "kill_conditions__rule_41_purpose_is_generalisation__rule_38_each_names_a_non_firing_input": {
+  "K1": {"tests": "目的:在没见过的靶标上还成不成立",
+    "fires": "200 次划分上 [排序准确率(BC_ed) − 排序准确率(BC)] 的均值区间含 0 ⇒ 不外推,不许接进判据",
+    "non_firing_input": "E3 已在四个人群上测到样本内增量,若该增量来自一个跨靶标稳定的物理量,留出上应当保留 —— 可双向"},
+  "K2": {"tests": "外推是否假结/靶标特异",
+    "fires": "[BC_ed − BC] 与 [BC_mfe − BC] 的【配对差】(同一次划分)含 0 ⇒ 外推靠的是集合集中度,不是引用靶标",
+    "non_firing_input": "E3 的样本内配对差 +0.0155~+0.0219 四人群全排除 0,所以留出上有分离的先例"},
+  "K3": {"tests": "可复现", "fires": "主人群排除 0 而三个复现人群里排除 0 的少于 2 个",
+    "non_firing_input": "E3 复现 3/3"},
+  "frozen": "看到任何数字后不许改划分比例、不许改划分次数、不许换指标、不许加列、不许换人群"
+ },
+
+ "void_gates": {
+  "1_no_target_leakage": "每次划分断言训练/留出靶标集合无交集。",
+  "2_metric_uses_no_heldout_cell_mean": "主指标只用留出格【内】的成对差,代码里不得出现留出 y 的均值。断言实现里没有对留出 y 取均值。",
+  "3_floors": "留出格里分子数 < 2 的格无法成对,剔除并计数;某次划分若可用成对数 < 500,该次划分作废并计数。",
+  "4_ties": "试管分数并列的对(差为 0)无法定方向,剔除并计数 —— 第 35 条:并列必须报出来,不许静默算成对或错。",
+  "5_population_domain": "人群仍是【骨架可形成】的 77% 子集(ensemble_defect(骨架) 的定义域),必须在结论里写明,不许与全人群的 0.196 混引。"
+ },
+
+ "population": {"primary": "基准 4,560 的骨架可形成子集",
+  "replication": ["panel_f1_third.json", "panel_f1_fourth.json", "panel_f1_fresh.json"],
+  "how_selected__rule_33": "同 E1/E2/E3,不涉及判官与配分函数。"},
+
+ "what_this_cannot_do": "仍在 Turner 族内 ⇒ 不是独立判官,不修问题 (b)。而且『能外推』不等于『该上线』—— 接进出厂判据要改动决定,那需要重新校准(见 k1_audit.md 的同一条)。本实验只判外推,不判上线。"
+}

@@ -1,0 +1,83 @@
+{
+ "id": "H2",
+ "name": "heldout_cluster_ci",
+ "date": "2026-08-21",
+ "status": "pre-registered, no data on the primary population",
+ "cost_usd": 0,
+ "offline": true,
+ "spec_version": "rule 38 + 39 + 40 + 41 + 42",
+ "one_line": "H1 冻的 K1 是【均值区间】,代码算的是【200 个划分值的分位】—— 两个不同的量,所以 H1 的 K1/K2 作废(不是未通过)。H2 用写对的区间重测,而且在 H1 一次都没碰过的人群上。",
+
+ "why_this_experiment_exists_and_why_it_is_not_a_re_read": {
+  "the_defect": "声明 K1 原文『[…] 的均值区间含 0』。实现是 `q(v) = [sorted(v)[int(.025n)], sorted(v)[int(.975n)]]`,即 200 个划分值本身的 2.5/97.5 分位 —— 单次划分的预测区间,宽度里含『哪些靶标落进留出集』这项蒙特卡洛方差。均值的不确定区间不是这个东西。",
+  "so_H1_status": "H1 的 K1/K2 【作废】。冻结的量从未被计算过,所以既不能读成通过也不能读成未通过。",
+  "why_voiding_is_dangerous_here": "『看到不利数字之后宣布作废』正是可以用来洗掉失败的动作。所以这条作废只有配一次【在我没看过的人群上、用写对的区间】的重测才算数。H1 的四个人群我全看过了,在同一批数据上换区间重算无论结果如何都不是盲测。",
+  "the_blind_populations": "panel_f1_sixth.json(1300 条 / 130 格 / 49 靶标)与 panel_f1_fifth.json(1440 条 / 60 格 / 42 靶标)—— E1/E2/E3/H1 一次都没读过。",
+  "why_sixth_is_primary": "靶标数 49 > 42,格数 130 > 60。靶标数就是 cluster bootstrap 的 cluster 数,cluster 数是这个区间的功效来源。这个选择只看人群形状(格数/靶标数),在任何结果之前写下,与结果无关。"
+ },
+
+ "the_corrected_interval": {
+  "estimand": "E[留出格内成对排序准确率增量],不确定性来自【靶标是从靶标总体里抽的】。",
+  "per_target_statistic": "对每个靶标 t:g_t = 在所有把 t 划入留出集的划分上,仅用 t 自己的格算出的成对排序准确率增量的均值。",
+  "interval": "对【靶标】做 cluster bootstrap(有放回重抽靶标,B=5000),取 mean_t g_t 的 2.5/97.5 分位。cluster = 靶标 = 抽样单位。",
+  "what_this_removes": "『哪些靶标恰好落进留出集』的蒙特卡洛方差(划分次数→∞ 时它归零,它不是估计量的不确定性)。",
+  "what_this_keeps": "靶标之间的真实异质性 —— 那【就是】估计量的不确定性。",
+  "IT_MAY_BE_WIDER_NOT_NARROWER": "如果靶标间异质性大,写对的区间会比 H1 的分位区间【更宽】。这一条在看到任何数字之前写下:若 K1 依然 FIRES,H1 的作废什么也没救回来,结论就是这根列不外推。不许因为方向不利再换一次区间。",
+  "also_reported": "H1 的分位区间照旧算出来一起报,标注清楚它是单次划分预测区间,只为与 h1_audit.md 的表对得上。"
+ },
+
+ "blocks": {
+  "BC": "F2 ∪ f1c(22 列)+ 交叉茎 GC 计数 + 整体 GC 比例(2 列)—— 与 E3/H1 完全相同,不动。",
+  "BC_ed": "BC + ensemble_defect(靶标骨架) —— 处理组,只加那一根列。",
+  "BC_mfe": "BC + ensemble_defect(嵌套 MFE) —— 保守安慰剂,原样沿用。"
+ },
+ "control_statement__rule_39": {
+  "what_it_matches": "同一个函数(ViennaRNA ensemble_defect)、同一个配分函数、同一个『拿一个参考结构去量集合』的角色、同一个列数(+1)。",
+  "what_it_does_not_match": "参考结构不是靶标。它是同一序列自己的嵌套 MFE。",
+  "it_does_not_use_the_treatment_definition": "安慰剂的参考结构与靶标骨架无关(不由骨架构造、不含骨架的碱基对集合)。",
+  "an_exact_zero_is_an_alarm_not_a_pass": "H1 上安慰剂增量是 +0.0000/−0.0003/−0.0007/+0.0014。这么干净的零要在 H2 复查:若安慰剂在 H2 也精确为 0 且处理组也为 0,先怀疑列没接上,而不是宣布安慰剂成功。所以加闸门 7。"
+ },
+
+ "kill_conditions": {
+  "K1": {
+   "tests": "目的:在没见过的靶标上还成不成立",
+   "fires": "主人群(第六批)上 mean_t g_t(ed) 的【靶标 cluster bootstrap 95% 区间】含 0 ⇒ 不外推",
+   "the_decision_line_verbatim": "K1 = not (ci_boot[0] > 0 or ci_boot[1] < 0),其中 ci_boot 来自 boot_ci(靶标 g_t 向量)",
+   "non_firing_input": "H1 的四个人群方向一致、胜率 175/195/200/197,若靶标间异质性不大,写对的区间应当排除 0 —— 可双向"
+  },
+  "K2": {
+   "tests": "外推是否靶标特异",
+   "fires": "同一区间用在【每靶标的配对差】g_t(ed) − g_t(mfe) 上,含 0 ⇒ 外推靠集合集中度不是引用靶标",
+   "the_decision_line_verbatim": "K2 = not (ci_boot_paired[0] > 0 or ci_boot_paired[1] < 0)",
+   "non_firing_input": "E3 的样本内配对差四人群全排除 0"
+  },
+  "K3": {
+   "tests": "可复现(盲人群之间)",
+   "fires": "主人群排除 0 而第五批不排除 0 ⇒ 复现不足",
+   "non_firing_input": "两个盲人群来自同一库同一采样器,若效应真实应当同号"
+  },
+  "not_counted_for_any_K": "H1 的四个人群会用写对的区间一并跑出来,但只作【非盲参考】报出,不参与任何 K。",
+  "frozen": "看到任何数字后不许改区间构造、不许改 B、不许改划分比例/次数、不许换指标、不许加列、不许换主人群、不许把非盲人群提升为复现"
+ },
+
+ "void_gates": {
+  "1_no_target_leakage": "每次划分断言训练靶标集与留出靶标集无交集。",
+  "2_metric_uses_no_heldout_cell_mean": "主指标只用留出格内的成对差。断言:运行文件里对 y 取均值只出现在训练循环内,行号在结果里报出。",
+  "3_floors": "(a) 某靶标在某划分里可用成对数 < 30 ⇒ 该(靶标,划分)跳过并计数;(b) 某靶标可用划分数 < 20 ⇒ 该靶标不产生 g_t,剔除并计数;(c) 产生 g_t 的靶标数 < 20 ⇒ 无数据(cluster 地板,与 FLOOR_CELLS=20 同一量级)。",
+  "4_ties": "试管分数或预测并列的对剔除并计数,报出比例。",
+  "5_population_domain": "人群仍是【骨架可形成】子集;ensemble_defect(骨架) 在其余分子上无定义。结论里必须写明,不许与全人群的 0.196 混引。",
+  "6_bootstrap_is_over_targets_not_molecules": "断言 bootstrap 的重抽单位数 == 产生 g_t 的靶标数。若代码里重抽的是分子或格,整个 H2 作废。",
+  "7_columns_are_actually_wired": "断言 ed_skel 与 ed_mfe 两列在人群内的方差 > 0 且两列不相等(相关系数 < 0.999)。若安慰剂精确为零同时该断言失败,是列没接上,不是安慰剂成功。"
+ },
+
+ "population": {
+  "primary_blind": "panel_f1_sixth.json",
+  "replication_blind": "panel_f1_fifth.json",
+  "non_blind_reference": ["panel_f1_designs.json", "panel_f1_third.json", "panel_f1_fourth.json", "panel_f1_fresh.json"],
+  "how_selected__rule_33": "同 E1/E2/E3/H1,不涉及判官与配分函数。"
+ },
+
+ "rule_42_gate": "运行前把上面 K1/K2 的 `the_decision_line_verbatim` 与运行文件里那两行逐字对照一次,对照结果写进审计。H1 的教训:闸门读得再细,不读判决式等于没读。",
+
+ "what_this_cannot_do": "仍在 Turner 族内 ⇒ 不是独立判官,不修判官独立性。『能外推』不等于『该上线』:接进出厂判据要改动决定,那需要重新校准(见 k1_audit.md 同一条)。本实验只判外推。"
+}
