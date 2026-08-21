@@ -107,7 +107,7 @@ def run_pop(name, path, draws, nperm, seed):
         cols[id(r)] = b[0] + b[1] + b[2]
         cells[(r["puzzle"], r["method"])].append(r)
     rows = [(c, g) for c, g in cells.items() if len(g) >= 3]
-    print(f"\n=== {name} ===")
+    print(f"\n=== {name} ===", flush=True)
     print(f"  分子 {len(rec)},列不全被丢 {dropped};格 {len(rows)}(每格 >=3);列数 B={nB} S={nS} D={nD}")
     if len(rows) < FLOOR_CELLS:
         print(f"  低于下限 {FLOOR_CELLS} 格 -> 无数据")
@@ -154,22 +154,13 @@ def run_pop(name, path, draws, nperm, seed):
     # net-R^2 increments, cluster bootstrap over cells. Net, not raw: the blocks differ in width.
     net = {nm: obs[nm] - nul[nm][0] for nm in SETS}
 
-    def inc(sel_rows, a, b):
-        yy, XX, cc = demean_by_cell(sel_rows, cols)
+    def raw_inc(sel_rows, a, b):
+        """RAW in-sample increment on a resample. The permutation offset is a constant (same feature
+        counts, same cell structure), so it is estimated ONCE on the full sample below and subtracted
+        from both the point estimate and the interval -- shifting a CI by a constant keeps its width."""
+        yy, XX, _cc = demean_by_cell(sel_rows, cols)
         ra, rb = r2_within(yy, XX[:, SETS[a]]), r2_within(yy, XX[:, SETS[b]])
-        if ra is None or rb is None:
-            return None
-        # subtract the permutation null for BOTH sets, drawn on this resample
-        na, nb = [], []
-        r2 = np.random.default_rng(seed + 1)
-        for _ in range(12):                      # cheap null inside the bootstrap; the point estimate uses nperm
-            yp = yy.copy()
-            for c in range(cc.max() + 1):
-                m = cc == c
-                yp[m] = r2.permutation(yp[m])
-            na.append(r2_within(yp, XX[:, SETS[a]]))
-            nb.append(r2_within(yp, XX[:, SETS[b]]))
-        return (rb - float(np.mean(nb))) - (ra - float(np.mean(na)))
+        return None if (ra is None or rb is None) else rb - ra
 
     out = {"n_cells": len(rows), "n_mol": int(len(y)), "dof": int(dof), "n_cols": {k: len(v) for k, v in SETS.items()},
            "r2": obs, "null": {k: v[0] for k, v in nul.items()},
@@ -180,19 +171,21 @@ def run_pop(name, path, draws, nperm, seed):
              ("    净ΔR²(BS−B)  无符号相对基线", "B", "BS"),
              ("    净ΔR²(BD−B)  带符号相对基线", "B", "BD"))
     for lab, a, b in TESTS:
-        pt = inc(rows, a, b)
+        off = nul[b][0] - nul[a][0]                    # what feature count alone buys, estimated once
+        pt = raw_inc(rows, a, b) - off
         bs = []
         for _ in range(draws):
             sel = [rows[prng.randrange(len(rows))] for _ in range(len(rows))]
-            v = inc(sel, a, b)
+            v = raw_inc(sel, a, b)
             if v is not None:
-                bs.append(v)
+                bs.append(v - off)
         bs.sort()
         lo, hi = bs[int(0.025 * len(bs))], bs[min(len(bs) - 1, int(0.975 * len(bs)))]
         excl = lo > 0 or hi < 0
-        print(f"  {lab:42s} {pt:+.4f}  聚类CI [{lo:+.4f}, {hi:+.4f}]{'  排除 0' if excl else '  含 0'}")
+        print(f"  {lab:42s} {pt:+.4f}  聚类CI [{lo:+.4f}, {hi:+.4f}]"
+              f"{'  排除 0' if excl else '  含 0'}   (置换零偏移 {off:+.4f})", flush=True)
         out[a + "->" + b] = {"delta": pt, "ci": [lo, hi], "excludes_zero": bool(excl),
-                             "positive": bool(lo > 0)}
+                             "positive": bool(lo > 0), "null_offset": off, "n_boot": len(bs)}
     return out
 
 
