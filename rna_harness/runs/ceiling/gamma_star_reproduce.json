@@ -63,15 +63,6 @@
    "n_cross": 5,
    "gamma_star": 11.54
   },
-  "P09": {
-   "L": 68,
-   "F_nested": -26.77,
-   "E_skeleton": -9.5,
-   "dG_stack": -10.3,
-   "n_stack": 6,
-   "n_cross": 8,
-   "gamma_star": -6.97
-  },
   "P10": {
    "L": 76,
    "F_nested": -27.9,
@@ -89,15 +80,6 @@
    "n_stack": 5,
    "n_cross": 6,
    "gamma_star": 7.36
-  },
-  "P12": {
-   "L": 100,
-   "F_nested": -29.95,
-   "E_skeleton": -25.1,
-   "dG_stack": -16.8,
-   "n_stack": 8,
-   "n_cross": 9,
-   "gamma_star": 11.95
   },
   "P13": {
    "L": 100,
@@ -125,15 +107,6 @@
    "n_stack": 12,
    "n_cross": 14,
    "gamma_star": 24.17
-  },
-  "P16": {
-   "L": 100,
-   "F_nested": -42.95,
-   "E_skeleton": -36.2,
-   "dG_stack": -41.9,
-   "n_stack": 16,
-   "n_cross": 20,
-   "gamma_star": 35.15
   },
   "P17": {
    "L": 100,
@@ -189,15 +162,6 @@
    "n_cross": 6,
    "gamma_star": 11.66
   },
-  "Q04": {
-   "L": 166,
-   "F_nested": -69.22,
-   "E_skeleton": -55.5,
-   "dG_stack": -6.7,
-   "n_stack": 2,
-   "n_cross": 4,
-   "gamma_star": -7.02
-  },
   "Q05": {
    "L": 137,
    "F_nested": -49.45,
@@ -215,15 +179,6 @@
    "n_stack": 11,
    "n_cross": 14,
    "gamma_star": 21.14
-  },
-  "Q07": {
-   "L": 116,
-   "F_nested": -41.11,
-   "E_skeleton": -42.7,
-   "dG_stack": -12.6,
-   "n_stack": 5,
-   "n_cross": 6,
-   "gamma_star": 14.19
   },
   "Q08": {
    "L": 128,
@@ -314,15 +269,6 @@
    "n_stack": 9,
    "n_cross": 11,
    "gamma_star": 23.43
-  },
-  "Q20": {
-   "L": 240,
-   "F_nested": -68.52,
-   "E_skeleton": -8.9,
-   "dG_stack": -50.1,
-   "n_stack": 21,
-   "n_cross": 27,
-   "gamma_star": -9.52
   },
   "W01": {
    "L": 88,
@@ -479,6 +425,17 @@
   }
  },
  "mismatches": [],
- "published_absent": [],
- "reproduces": true
+ "published_absent": [
+  "P09",
+  "P12"
+ ],
+ "undefined_domain": {
+  "P09": "non-canonical pairs: 0 in the skeleton, 2 in the crossing stem -- E_skeleton and/or dG_stack meaningless",
+  "P12": "non-canonical pairs: 1 in the skeleton, 0 in the crossing stem -- E_skeleton and/or dG_stack meaningless",
+  "P16": "non-canonical pairs: 0 in the skeleton, 1 in the crossing stem -- E_skeleton and/or dG_stack meaningless",
+  "Q04": "non-canonical pairs: 2 in the skeleton, 0 in the crossing stem -- E_skeleton and/or dG_stack meaningless",
+  "Q07": "non-canonical pairs: 1 in the skeleton, 0 in the crossing stem -- E_skeleton and/or dG_stack meaningless",
+  "Q20": "non-canonical pairs: 1 in the skeleton, 0 in the crossing stem -- E_skeleton and/or dG_stack meaningless"
+ },
+ "reproduces": false
 }

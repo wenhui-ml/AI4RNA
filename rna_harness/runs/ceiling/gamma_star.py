@@ -38,6 +38,34 @@ sys.path.insert(0, HERE)
 
 import RNA                                                                     # noqa: E402
 
+CANON = {frozenset("GC"), frozenset("AU"), frozenset("GU")}
+
+
+class Undefined(ValueError):
+    """gamma* is not defined for this (sequence, target) pair.
+
+    Rule 38, second half: name an input for which the quantity is undefined and check the code RAISES
+    rather than returning a number. Both ViennaRNA entry points this module uses will happily evaluate a
+    non-canonical pair -- `energy_of_struct` charges a penalty, and `eval_int_loop` on an A-A stack returns
+    +1.30 -- so nothing downstream would have noticed. 22.5% of the OpenKnot designs cannot form the target
+    skeleton at all and were half of the gamma*<0 column (g2_audit.md); a further 10.6% cannot form the
+    crossing stem, which nothing gated at all until g_review_0821.md found it.
+    """
+
+
+def check_domain(seq: str, target: str) -> None:
+    """Raise unless `seq` can actually form every pair the target asks for, crossing pairs included."""
+    from rna_harness.benchmarks.rnainvbench import _round_only, pk_pairs
+    if len(seq) != len(target):
+        raise Undefined(f"length {len(seq)} != target {len(target)}")
+    bad_skel = [(i, j) for (i, j) in pk_pairs(_round_only(target))
+                if frozenset({seq[i], seq[j]}) not in CANON]
+    bad_cross = [(i, j) for (i, j) in crossing_set(target)
+                 if frozenset({seq[i], seq[j]}) not in CANON]
+    if bad_skel or bad_cross:
+        raise Undefined(f"non-canonical pairs: {len(bad_skel)} in the skeleton, "
+                        f"{len(bad_cross)} in the crossing stem -- E_skeleton and/or dG_stack meaningless")
+
 # The published table, section five of docs/weekly-report/2026-08-21-analysis.md. Kept here so the
 # reproduction is an assertion against a frozen record rather than against whatever the code prints today.
 PUBLISHED = {
@@ -72,8 +100,15 @@ def stack_terms(seq: str, pairs) -> list:
     return out
 
 
-def gamma_star(seq: str, target: str) -> dict:
-    """One molecule's gamma*, with every component reported separately so the approximate one is visible."""
+def gamma_star(seq: str, target: str, strict: bool = True) -> dict:
+    """One molecule's gamma*, with every component reported separately so the approximate one is visible.
+
+    `strict` (the default) enforces the domain: a sequence that cannot form the target's pairs raises
+    rather than returning a number. Pass strict=False only to reproduce a pre-rule-38 population-wide
+    figure, and say so when you quote it.
+    """
+    if strict:
+        check_domain(seq, target)
     cross = crossing_set(target)
     from rna_harness.benchmarks.rnainvbench import _round_only
     skel = _round_only(target)
@@ -103,13 +138,17 @@ def main() -> int:
     from leaderboard_design import targets
     T = targets()
     best = best_wet_per_target()
-    rows, mism = {}, []
+    rows, mism, undef = {}, [], {}
     print(f"{'target':6} {'L':>4} {'F_nested':>9} {'E_skel':>8} {'dG_stack':>9} {'nst':>4} {'gamma*':>8}   published")
     for p in sorted(best):
         tgt = T[p]["target"]
         if not crossing_set(tgt):
             continue
-        g = gamma_star(best[p]["seq"], tgt)
+        try:
+            g = gamma_star(best[p]["seq"], tgt)
+        except Undefined as exc:                                               # noqa: PERF203
+            undef[p] = str(exc)
+            continue
         rows[p] = g
         pub = PUBLISHED.get(p)
         tag = ""
@@ -123,9 +162,13 @@ def main() -> int:
         print(f"{p:6} {g['L']:4d} {g['F_nested']:9.2f} {g['E_skeleton']:8.2f} {g['dG_stack']:9.2f} "
               f"{g['n_stack']:4d} {g['gamma_star']:8.2f}{tag}")
     extra = sorted(set(PUBLISHED) - set(rows))
+    print(f"\n  定义域闸门(第 38 条):{len(undef)} 个靶标的 best-wet 设计形不成靶标配对,已抛出而非返回数")
+    for p, why in sorted(undef.items()):
+        print(f"    {p}: {why}")
     print(f"\n  reproduced {len(rows)} rows, published {len(PUBLISHED)}, "
           f"mismatches {len(mism)}, published-but-absent {extra}")
     json.dump({"rows": rows, "mismatches": mism, "published_absent": extra,
+               "undefined_domain": undef,
                "reproduces": not mism and not extra},
               open(os.path.join(HERE, "gamma_star_reproduce.json"), "w"), indent=1)
     return 0 if (not mism and not extra) else 1
