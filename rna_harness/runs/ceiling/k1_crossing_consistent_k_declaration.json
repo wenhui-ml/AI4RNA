@@ -1,0 +1,69 @@
+{
+ "id": "K1x",
+ "name": "crossing_consistent_k",
+ "date": "2026-08-21",
+ "status": "pre-registered, no data",
+ "cost_usd": 0,
+ "offline": true,
+ "spec_version": "rule 38 —— 本声明是第一份按新规格写的:每条打死条件旁边必须写出【使它不触发的一个具体输入】,每个量必须写出定义域并检查代码在域外报错",
+ "one_line": "出厂的 k 用 recall_product 数(判官预测了那个配对就算找回,不管它还交不交叉)。改成用【交叉一致的 recall】数。这是一个会改动决定的口径变更,所以先量它改动了什么,再谈要不要改。",
+
+ "what_triggered_this": {
+  "the_finding": "g5_k3_read.md 第二节:7 条设计 panel_k=3(三家一致确认),而 n_pred_cross=0 —— 三家判官一致确认了一个它们一个交叉配对都没预测的分子。全部落在 k=3,k=1 与 k=2 各 0 条。",
+  "the_mechanism_is_in_the_definition_not_in_a_bug": "recall_product 把『靶标的某个交叉配对被找回』定义成『判官预测了那个配对』,不管该配对在预测里还交不交叉。于是判官可以把靶标的交叉配对全部以【纯嵌套】方式预测出来,recall_product 照样给 1.000。",
+  "why_only_at_k_equals_3": "n_pred_cross==0 要求三家都没预测出交叉;三家 recall_product 都=1.0 要求三家都把靶标交叉配对全预测出来。只有『全部以嵌套方式预测』这一种退化情形同时满足。k=1/2 时另外几家会贡献交叉预测。",
+  "scale_stated_honestly": "7 条 = confirmed 的 0.27%。罕见,但是范畴性错误,且全部集中在证书对外展示为最强证据的那一档(k=3 全体 389 条,占 1.80%)。"
+ },
+
+ "the_two_definitions": {
+  "k_shipped": "该判官的 recall_product >= 1.0 的家数。recall_product = |预测的配对 ∩ 靶标交叉集| / |靶标交叉集| —— 预测里那个配对交不交叉【不管】。",
+  "k_x_proposed": "该判官的 recall >= 1.0 的家数。recall = |预测的【交叉】配对 ∩ 靶标交叉集| / |靶标交叉集| —— 要求那个配对在判官自己的预测里【仍然交叉】。",
+  "both_columns_already_on_disk": "panel_f1_designs.py 早已同时算出这两列,并且 recall_product 那一列做过与出厂 JSON 的恒等校验。所以本实验不需要重折任何序列,只是换一列去数。"
+ },
+
+ "domain__rule_38_second_sentence": {
+  "an_input_for_which_k_x_is_undefined": "|靶标交叉集| = 0 的靶标 ⇒ recall 的分母为 0。已查:本项目全程对『靶标无交叉配对』直接 return error(panel_f1_designs.work 第一段),所以这类输入到不了这里;本实验仍要显式计数并报出。",
+  "the_trap_i_did_NOT_walk_into_and_why": "若把 k_x 定成用 precision 或 f1 来数,就会撞上真正的 0/0:n_pred_cross==0 的 94/4560 条里 precision 是 0/0。**recall 的分母是 |靶标交叉集|(恒 > 0),所以只用 recall 是有定义的。** 这一条是跑之前查的,不是跑完补的。",
+  "a_gate_that_does_NOT_apply_here_and_why_not": "gamma_star.check_domain(骨架与交叉茎必须全为标准配对)**不适用于本实验**。那道闸门保护的是【能量】量(E_skeleton / dG_stack);k_x 只关心【判官预测了什么】,与该设计能否形成靶标配对无关。**明确写出来,免得把上一份声明的闸门反射性地照抄过来。**",
+  "code_must_raise": "k_x 的实现在 |靶标交叉集| = 0 时必须抛异常,不许返回 0。"
+ },
+
+ "primary_observables": {
+  "1_reclassification_matrix": "k(行)× k_x(列)的 4×4 计数表,以及总改动条数与占比。",
+  "2_tube_error_rate_by_grade": "两种口径下各档的试管失败率(通过线 80.0)。出厂那条链是 not_found / knot_screened / knot_confirmed = 51.7% / 34.1% / 20.8%,单调且靶标聚类 p=4.7e-6。这里报的是 k=0/1/2/3 的版本,两种口径并列。",
+  "3_the_seven": "那 7 条在 k_x 下落到哪一档。",
+  "4_monotonicity": "两种口径下『档位越高、试管失败率越低』的单调性有没有被破坏,以及最高档与最低档的差值。"
+ },
+
+ "kill_conditions_with_the_non_firing_input_written_out__rule_38_first_sentence": {
+  "K1_cosmetic": {
+   "fires_when": "k → k_x 改动的设计 < 1% ⇒ 这是一次装饰性改名,不值得动一个会改判的口径。",
+   "an_input_under_which_it_does_NOT_fire": "一个『判官普遍把靶标的交叉配对以嵌套方式预测出来』的人群 —— 那里 recall_product 与 recall 会大面积分歧,改动远超 1%。已知 94/4560 条 n_pred_cross=0,这类分歧至少存在,所以这条不是恒真的。"
+  },
+  "K2_makes_it_worse": {
+   "fires_when": "k_x 的『档位越高失败率越低』单调性被破坏,或最高档与最低档的失败率差值比 k 小 ⇒ 换口径让证书变差,不许换。",
+   "an_input_under_which_it_does_NOT_fire": "那 7 条 k=3 且零交叉预测的分子试管通过率是 0.571,而 k=3 全体是 0.848 —— 把它们从最高档移走会【提高】最高档的通过率,所以单调性有变强的可能。这条能双向落地。"
+  },
+  "K3_does_not_fix_what_it_was_proposed_for": {
+   "fires_when": "那 7 条在 k_x 下仍然是 3 ⇒ 换口径没有解决提出它的那个问题。",
+   "an_input_under_which_it_does_NOT_fire": "这 7 条按定义 n_pred_cross=0,所以三家的交叉一致 recall 都必然是 0.000,k_x 必然是 0。**这条【几乎必然不触发】—— 我把它保留为一道断言式自检,并在此明确标注它接近恒真,不把它当作证据。**"
+  },
+  "frozen": "看到任何数字后不许改两个定义、不许改通过线 80.0、不许改 1% 这个门槛。"
+ },
+
+ "what_this_experiment_can_and_cannot_decide": {
+  "can": "换口径改动了多少判决,以及换了之后证书对试管的分辨力是变好还是变差。",
+  "cannot": "不能决定是否上线。出厂的分级还挂着【在已知结构上的灵敏度 0.432 / 0.636 / 0.785】与【84.0% 灵敏度 / 0.4% 误收】那个校准操作点,那些全是在 recall_product 口径上量的。**换口径会让它们全部失效,必须另开一次校准。** 本实验的产出是『该不该去做那次校准』的依据,不是口径变更本身。",
+  "so_the_deliverable_is_a_recommendation_not_a_patch": "不改任何出厂代码。"
+ },
+
+ "population": {
+  "primary": {"name": "基准 4,560(seed 0, 80/靶标)", "file": "panel_f1_designs.json",
+              "why": "出厂证书的试管失败率就是在这一批上量的,所以口径变更的影响必须先在同一批上看。"},
+  "replication": [{"name": "样本3", "file": "panel_f1_third.json"},
+                  {"name": "第四批", "file": "panel_f1_fourth.json"},
+                  {"name": "样本2", "file": "panel_f1_fresh.json"}],
+  "how_it_was_selected__rule_33": "SN_filter == 1 + 靶标与我们一致 + 同时带 RibonanzaNet F1 与试管分数 + 靶标级至少 20 条合格设计。",
+  "selection_is_NOT_clean_for_this_knob__stated_up_front": "本实验拧的旋钮就是判官口径,而人群的入选条件不涉及判官 —— 这一点是干净的。**但被比较的两列都来自同一次折叠(同一批预测)**,所以这不是两次独立测量,是同一份预测的两种读法。这正是本实验成立的前提(配对比较),也是它的边界(它不能说明判官本身准不准)。"
+ }
+}
