@@ -1,0 +1,44 @@
+{
+ "id": "T1",
+ "name": "topology_strata_feasibility",
+ "date": "2026-08-21",
+ "status": "pre-registered, no data",
+ "cost_usd": 0, "offline": true,
+ "spec_version": "rule 38 + 39 + 40",
+ "one_line": "动作二的【正确】用法:劈分【人群】,不是劈分能量。按拓扑分层,看判据表现是否分类别地不同 —— 如果不同,才有『精确可算的主部 + 只需被界住的余部』这个结构。",
+ "scope_is_a_measurement_not_a_design": {
+  "what_this_is": "可行性测量。它回答『各拓扑类的行为是否足够不同,值得分类别处理』。",
+  "what_this_is_NOT": "它【不】设计任何精确判定程序。那是设计工作,不是后台任务,而且在本测量出结果之前不该做 —— 若各类行为没差别,就没有可劈的东西。",
+  "why_the_split_is_on_the_population": "今天我把动作二用在能量上(γ* 劈成骨架+堆叠+未知),失败了。邓煜劈的是【指标集】:树图能精确算,环图只需被界住。搬过来,我们的指标集是【靶标的拓扑类】,不是一个分子的能量项。"
+ },
+ "prior_evidence_that_this_is_not_a_fishing_trip": {
+  "already_in_the_product": "certify.py 的 TOPOLOGY_OPERATING_POINTS 已经按类记录了外部一致率:H 型 0.972 [0.855,0.999]、higher-order 0.800、kissing/chain 0.608 —— 差了近两倍,而且 H 型那一行的规则注明『the calibrated rule is NOT used here』,即产品已经在对它特殊处理。",
+  "so_the_direction_is_already_validated": "本实验要量的是【判据的信息量】按类怎么分布,而不是重新发现『按类不同』。"
+ },
+ "declared_limitation_up_front": {
+  "cluster_counts": "H 型只有 9 个【靶标】。对靶标做 cluster bootstrap 在 9 个簇上不可靠,所以单位取【格】(靶标×方法),与 R1 一致:H 型有 720 条设计,格数上限 9×方法数,预期在 R1 的地板 20 格之上 —— 但这必须由代码报出来并在不足时判无数据,不许估。",
+  "design_counts": "higher-order 2640 条 / 33 靶标;kissing/chain 1200 / 15;H 型 720 / 9(基准人群)。",
+  "so_the_smallest_class_carries_the_weakest_interval": "H 型的区间必然最宽。任何『H 型更好』的读法都必须把区间宽度一起报。"
+ },
+ "observables": {
+  "1_net_r2_by_class": "每个拓扑类内,`F2 ∪ f1c` 的净 R²(格内去均值 + 格内置换零)。这是那根 0.196 杆的分类别版本。",
+  "2_headroom_by_class": "每类的试管失败率与判据净 R² —— 哪一类判据已接近该类自己的上限(没什么可赚),哪一类还差得远(该在那儿干活)。",
+  "3_unanimity_behaviour_by_class": "每类里 k=3 的占比与其试管失败率,以及 k 的单调性是否成立。K1x 已量到出厂 k 在两个人群上最高档比次高档更差 —— 本实验问这是不是某一类特有的。",
+  "4_where_an_exact_decision_could_live": "只报事实,不下结论:哪一类同时具备(a)判据净 R² 高、(b)k=3 的试管失败率低、(c)外部一致率高。**这三条同时成立才值得去设计判定程序。**"
+ },
+ "kill_conditions_with_the_non_firing_input__rule_38_first": {
+  "K1": {"fires": "三类的净 R² 区间彼此重叠 ⇒ 没有分类别处理的依据,B 这条线到此为止,不进入设计阶段。",
+         "input_under_which_it_does_NOT_fire": "TOPOLOGY_OPERATING_POINTS 已记录外部一致率 0.608 / 0.800 / 0.972,近两倍差距 ⇒ 分层有差异是有先例的,这条不是恒真的。"},
+  "K2": {"fires": "任一类格数 < 20 ⇒ 该类无数据,只报计数不报率。",
+         "input_under_which_it_does_NOT_fire": "H 型 720 条设计分布在 9 靶标 × 多方法上,格数预期 > 20 —— 但由代码判定,不由我估。"},
+  "K3": {"fires": "判据净 R² 最高的那一类,恰好是试管失败率也最高的那一类 ⇒ 『高 R²』只是『该类更难所以方差更大』的产物,不是判据更好。",
+         "input_under_which_it_does_NOT_fire": "两者可以同向也可以反向,是纯经验问题。这条是我今天学到的『span 变宽只是更挑』的同类防线。"},
+  "frozen": "看到任何数字后不许改分类、不许合并类别、不许换估计量。"
+ },
+ "domain__rule_38_second": {
+  "an_input_for_which_the_quantity_is_undefined": "classify_topology 对某个靶标返回未知类别 ⇒ 该靶标不得被静默归入任何一类,必须单列并计数。代码抛异常而非归入 'other'。",
+  "already_checked_before_running": "57 个靶标全部落入三类(higher-order 33 / kissing-chain 15 / H-type 9),无未知类别。仍保留闸门。"
+ },
+ "population": {"primary": "基准 4,560", "replication": ["panel_f1_third.json", "panel_f1_fourth.json", "panel_f1_fresh.json"],
+   "how_selected__rule_33": "同 E1。拓扑是靶标的属性,不由选择过程决定,对本实验干净。"}
+}
