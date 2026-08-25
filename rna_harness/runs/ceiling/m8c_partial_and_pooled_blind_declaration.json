@@ -1,0 +1,79 @@
+{
+ "id": "M8c",
+ "name": "length_net_of_spread_and_a_blind_arm_that_can_actually_decide",
+ "date": "2026-08-25",
+ "status": "pre-registered, no data computed",
+ "cost_usd": 0,
+ "offline": true,
+ "spec_version": "rule 38-61 + 【绝不退缩】口径",
+
+ "one_line": "M8b 欠了三样东西才允许引用:把 wet 离散度扣掉后长度还剩多少、一条**算过检出力**的盲臂、以及面板与 GC 方向相反的说法。本份补前两样,第三样只观测不解释。",
+
+ "the_three_debts_from_m8b": {
+  "debt_1": "rho(len, 格内 wet 标准差) 在核心四人群是 −0.39 ~ −0.52,**比 rho(len, capture^GC) 的 −0.28 ~ −0.35 还强**。长度可能只是离散度的影子。",
+  "debt_2": "盲臂半宽 0.331 / 0.364 对效应 −0.3065,**比值 < 1,无裁决力**(第 61 条就是从这儿长出来的)。",
+  "debt_3": "面板在两个盲人群上对长度是 **+0.1162 / +0.4187**(正),与 GC_only 相反。**本份只把它测准,不解释。**"
+ },
+
+ "rule_61_power_computed_BEFORE_running": {
+  "pooled_blind_arm": "把第五批(40 靶标)与第六批(31 靶标)合并 = **71 靶标**。合并前**在各自人群内做秩标准化**,避免人群间水平差冒充相关。",
+  "expected_half_width": "Fisher-z 近似 1.96/sqrt(71−3) = **0.238**",
+  "effect_to_detect": "发现样本效应 **−0.3065**",
+  "ratio": "0.3065 / 0.238 = **1.29 > 1 ⇒ 本臂有裁决力**",
+  "and_the_honest_caveat": "偏相关会**减小**效应(那正是本实验的目的)。若真实偏相关只有 −0.20,比值降到 0.84,**本臂对那个量级仍然无裁决力**。**这一句必须在裁定里照引,不许只报比值 1.29。**"
+ },
+
+ "primary_object": {
+  "statistic": "**偏 Spearman** rho(len, capture^GC | wet_sd):三个量各自转秩,长度与 capture 分别对 wet_sd 做最小二乘残差化,再取残差的相关",
+  "direction_pre_registered": "负(承自 M8b,理由不变)",
+  "why_partial_not_stratify": "靶标数 31~56,分层会把每层压到不可判。残差化用满样本。",
+  "interval": "靶标 cluster bootstrap 95%,**单假设,不做 Bonferroni**;报 50 种子翻转率"
+ },
+
+ "arms": {
+  "arm_main": "偏相关 rho(len, capture^GC | wet_sd),逐人群 + **合并盲臂(71 靶标)**",
+  "arm_raw": "不扣离散度的原始 rho(len, capture^GC),用于报出扣掉了多少",
+  "arm_spread_CIRCULARITY_FLAGGED": {
+   "what": "rho(wet_sd, capture^GC) 本身",
+   "the_circularity": "**wet_sd 由 wet 算出,而 capture 的分母(可得增益)也是 wet 分布的泛函 ⇒ 这一臂带已知循环风险,不与干净的长度臂平起平坐,不进主判据。**",
+   "the_empirical_reason_to_think_the_channel_is_weak": "M4d 实测纯噪声模型的 capture 水平是 +0.0020(22 列)与 +0.0142(2 列)。**若存在『离散度 → capture 水平』的机械通道,噪声模型也该显出来,它没有。** y 上的噪声只会衰减相关,不会制造相关。**这是理由,不是证明。**"
+  },
+  "arm_A": "同一分析跑在面板 capture^A 上(债三,只测不解释)",
+  "arm_placebo": "靶标间打乱的长度,同一条规则",
+  "arm_noise_12": "12 根靶标级 N(0,1),同一条规则,只数负向(第 53/60 条:方向已声明)"
+ },
+
+ "kill_conditions_each_with_what_its_firing_excludes": {
+  "K0": {"fires": "12 根噪声在合并盲臂上负向排除 0 的 >= 2/12 ⇒ 整轮作废",
+         "rule_59_excludes": "排除【偏相关流程会从无信号的列里造出负相关】"},
+  "K1": {"fires": "**合并盲臂**的偏相关区间上界 >= 0 ⇒ 写 `blind_null_on_partial`",
+         "rule_59_excludes": "排除【扣掉离散度之后长度仍然有效】—— 主假设"},
+  "K2": {"fires": "偏相关的点估计 <= 原始相关的一半(绝对值)⇒ 写 `mostly_spread_not_length`",
+         "rule_59_excludes": "排除【长度是独立于离散度的通道】"},
+  "K3": {"fires": "安慰剂在合并盲臂上负向排除 0 ⇒ 整轮归属作废",
+         "rule_59_excludes": "排除【任何靶标级列在偏相关下都会负向】"},
+  "K4": {"fires": "面板 capture^A 在合并盲臂上**正向**排除 0 ⇒ 裁定串写 `panel_goes_the_other_way`",
+         "rule_59_excludes": "**不排除任何东西 —— 记号**,把债三钉在裁定串上,防止它被忘掉"}
+ },
+
+ "void_gates": {
+  "V1_no_wet_in_len": "target_len 只由靶标结构算出",
+  "V2_no_leak": "泄漏 0/200 逐人群报出",
+  "V3_degenerate": "退化格按 M4 口径剔除",
+  "V4_rule_51": "报 50 种子翻转率",
+  "V5_rule_60": "方向已声明 ⇒ 单侧计数在此有定义;**计数器逐量指定,不全表共用**",
+  "V6_rule_58": "对照臂与主臂设置逐项相同",
+  "V7_rule_61": "**盲臂的预期分辨力与效应量比值已在跑前算出并写在上面**",
+  "V8_pooling": "合并前在各人群内秩标准化;报出合并前后两个人群各自的偏相关,不许只报合并值"
+ },
+
+ "must_fire_probes": {
+  "P0_recover_m8b": {"fires": "原始相关 arm_raw 与 M8b 的六个值逐一相差 < 0.02"},
+  "P1_partial_is_partial": {"fires": "残差化之后 rho(残差 len, wet_sd) 与 rho(残差 capture, wet_sd) 的绝对值都 < 0.01"},
+  "P2_pool_is_not_a_level_artefact": {"fires": "合并盲臂上 rho(人群指示变量, capture 秩) 的绝对值 < 0.05"},
+  "void_if_any_probe_does_not_fire": "第 54 条。"
+ },
+
+ "expected_runtime": "六人群 x 2 个块,预计 20-30 分钟,$0",
+ "cost_statement": "本次运行完全离线,不调用任何 API,花费 $0。"
+}
