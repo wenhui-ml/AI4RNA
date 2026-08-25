@@ -1,0 +1,59 @@
+{
+ "id": "M2",
+ "name": "invariant_split",
+ "date": "2026-08-25",
+ "status": "pre-registered, no data",
+ "cost_usd": 0,
+ "offline": true,
+ "spec_version": "rule 38-49 + 第 50 条 + 【绝不退缩】口径",
+ "one_line": "邓煜移动二:按不变量把指标集切成【可精确计算的主项】+【只需要界的余项】。我一整天把靶标间异质性(g_t 的 sd 0.037~0.071,是效应的 2~6 倍)当噪声平均掉,然后从那个平均值推出『57 个靶标锁死一切低于 +0.02 的效应』。本实验去找那个真的能切开的不变量。",
+
+ "why_this_exists__the_pessimism_it_reopens": {
+  "what_I_concluded_and_why_it_was_a_pooled_artifact": "我写过:『本库 MDE 地板 +0.0096,被 57 个靶标锁死;ensemble_defect 是 1.43 倍地板 ⇒ 永久模糊;再加人群没用』。**那句话对【平均】成立,对【选对的子集】不成立**,而我把一个 pooled-average 的产物当成了关于这个库的普遍定理。",
+  "the_arithmetic_that_reopens_it": "第六批 ensemble_defect 的逐靶标 g_t:P03 +0.124 / P01 +0.089 …… W03 −0.068 / P13 −0.051,跨度 0.19。全体平均 +0.006 在 42 个 cluster 上是 0.54 倍 MDE(判不动);而若主项是 15 个靶标、效应 +0.10,MDE = 1.96·0.037/√15 = 0.0187,**效应/MDE = 5.3(判得动)**。",
+  "why_T1_failing_does_not_close_this": "T1 试的是【拓扑类别】这一个猜测,K1 触发。移动二要求的是【去找】那个不变量,不是猜一个然后失败就收工。T1 的失败只否掉了拓扑,没否掉『存在能切开的不变量』。"
+ },
+
+ "the_object_being_explained": {
+  "what": "每个靶标 t 的 g_t = 在把 t 划入留出集的所有划分上,仅用 t 自己的格算出的【ensemble_defect 增量】的均值(H2/C1 同一构造)。",
+  "populations_and_n": "四个人群各自产出一套 g_t(靶标 42~57 个),**合并后按靶标取均值,cluster 数上限 57**。",
+  "why_this_is_the_right_object": "它就是被 pooled 掉的那个量。解释它 = 找主项。"
+ },
+
+ "candidate_invariants__all_computable_from_the_TARGET_alone_no_wet_no_oracle": {
+  "list": ["L 序列长度", "n_cross 交叉配对数", "n_skel 骨架配对数", "cross_frac = n_cross/(n_cross+n_skel)",
+           "n_stems 交叉茎数", "max_stem_len 最长交叉茎", "span 交叉跨度中位数",
+           "topo_class 拓扑类(高阶/kissing/H型 —— T1 那个,作为已知失败项一并放进来)",
+           "formable_rate 该靶标下【骨架可形成】设计的比例",
+           "gc_headroom 该靶标交叉茎位置上可形成 G-C 的比例上限"],
+  "rule_33_note": "全部只由靶标结构与序列构造,**不用试管分数、不用判官输出** ⇒ 不可能通过 g_t 泄漏。",
+  "rule_50_note": "十项里 6 项来自结构(模型侧)、2 项来自数据结构(formable_rate / gc_headroom)、2 项来自测量装置的可及性(span / max_stem_len 决定探针能不能分辨)。三个来源都有。"
+ },
+
+ "the_procedure": {
+  "step1_screen": "对每个候选不变量单独回归 g_t,报 Spearman ρ 与靶标 cluster bootstrap 区间。**这一步是筛选,不是判定。**",
+  "step2_split": "取 step1 里区间排除 0 且 |ρ| 最大的那一个,按其中位数把靶标切成两半,分别报该半上的 ensemble_defect 效应、MDE 与效应/MDE。",
+  "step3_honest_multiplicity": "step1 试了 10 个候选 ⇒ **必须报 Bonferroni 后的阈值(0.05/10 = 0.005)**,并且 step2 的切分在**留出的人群上**复算(主人群选不变量,三个复现人群只执行那个已选定的切分,不许重选)。",
+  "step4_null": "对**随机切分**(把靶标随机分两半,重复 200 次)报效应/MDE 的分布 —— 若真实切分的效应/MDE 落在随机切分分布的 95% 以内,则这个不变量没有切开任何东西。"
+ },
+
+ "kill_conditions": {
+  "K1": {"tests": "存不存在能切开的不变量", "fires": "step1 里没有任何候选的区间在 Bonferroni 阈值下排除 0",
+         "MANDATORY_LABEL": "**触发时写 `no_invariant_found_among_these_ten`,绝不写『不存在能切开的不变量』** —— 十个候选不是全空间。"},
+  "K2": {"tests": "切开之后主项判不判得动", "fires": "主项半边的 效应/MDE < 2",
+         "non_firing_input": "算术上 15 靶标 @ +0.10 给 5.3 倍"},
+  "K3": {"tests": "切分是不是随机也能做到", "fires": "真实切分的 效应/MDE 落在随机切分分布的 95% 以内 ⇒ 这个不变量什么也没切开"},
+  "K4": {"tests": "复现", "fires": "主人群选定的切分,在三个复现人群里主项 效应/MDE ≥ 2 的少于 2 个"}
+ },
+ "void_gates": {
+  "1_no_leakage_into_the_invariant": "断言每个候选不变量只是 (target 结构, 该靶标下的设计序列集合) 的函数,不含 wet、不含判官输出。**探针:把 mean(wet) 当成第 11 个候选塞进去,它必须在 step1 里显著 —— 若不显著说明筛选流程本身没有检出力。**",
+  "2_selection_on_primary_only": "不变量的【选择】只在主人群做;复现人群只执行,不重选。断言复现路径不调用 step1。",
+  "3_cluster_floor": "任一半边靶标数 < 15 ⇒ 该切分作废并计数。",
+  "4_multiplicity_reported": "报出候选个数与 Bonferroni 阈值,不许只报最好那个的裸 p。"
+ },
+ "populations": {"primary": "panel_f1_fresh.json(样本2)",
+   "replication": ["panel_f1_designs.json","panel_f1_third.json","panel_f1_fourth.json"],
+   "blindness": "没有盲人群;被测的【量】是新的(g_t 从未被当成被解释量),测试不是盲的。"},
+ "what_a_positive_result_would_mean": "一个只由靶标结构决定的不变量,把库切成一半【判得动】、一半【只需给界】。那会把『57 个靶标锁死一切』这条我自己下的普遍定理,降格成『对平均成立』—— 而所有九条『分不开』的线都可以在主项上重问一次。",
+ "what_this_cannot_do": "不改变 ensemble_defect 在全人群上的裁定(H2 的 does_not_generalise 仍然是那个口径下的结论)。只判『有没有主项』,不判上线。"
+}

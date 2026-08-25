@@ -1,0 +1,53 @@
+{
+ "id": "M4",
+ "name": "selection_currency",
+ "date": "2026-08-25",
+ "status": "pre-registered, no data",
+ "cost_usd": 0,
+ "offline": true,
+ "spec_version": "rule 38-49 + 第 50 条 + 【绝不退缩】口径",
+ "one_line": "邓煜移动四:长程 = 短程 + 误差传播控制。十二个实验测的全是【一次性打分】的净 R² / 成对准确率,而产品做的是 top-1-of-n 选择。本实验把 0.60 的成对准确率翻译成产品货币:从 n 条候选里选一条,期望试管分数比随机高多少、离最优还差多少。",
+
+ "why_the_currency_matters": {
+  "the_mismatch": "净 R² 与成对准确率是【全序】的度量;产品只要【最大那一个】。一根加 +0.03 成对准确率的列可能改变零个 top-1 选择,反过来也成立。**十二个实验没有一个测过这件事。**",
+  "the_amplification_question": "top-1-of-n 是一个极值统计量,+0.03 的成对准确率在 n=20 上的放大倍数【事先未知】,而它是唯一与产品相关的数。",
+  "the_error_propagation_half": "移动四的第二半:多轮设计里,同一靶标上判据的误差是【相关】的(同一失败模式),不会像独立噪声那样被平均掉。本实验测【单轮】的选择价值,并把『误差跨轮相关』作为写明的未测项,不假装测了。"
+ },
+
+ "the_estimator": {
+  "procedure": "按【靶标】70/30 切分训练/留出(200 次划分,与 H2/C1/M3 同一惯例)。在每个留出格里,对 n ∈ {2,5,10,20}:无放回抽 n 条设计,取模型预测最高的那条,记录它的真实 wet;重复 200 次抽样取均值。",
+  "three_reference_lines": {"random": "随机抽一条的期望 wet(= 该格 wet 均值)",
+                            "oracle": "该 n 条里真实 wet 最高的那条(可达上界)",
+                            "model": "模型选出的那条"},
+  "primary_quantity": "**捕获率 = (model − random) / (oracle − random)** —— 该格该 n 下,判据拿到了『可得增益』的百分之几。格内量纲自洽,靶标难度自动约掉。",
+  "interval": "对【靶标】cluster bootstrap(B=5000)的均值区间;每个对比同时报自己的 MDE = 该区间半宽(M3 修正版口径)。",
+  "ties": "wet 并列时 oracle 取任一;若 oracle == random(全格 wet 相同)该格该次抽样作废并计数。"
+ },
+
+ "blocks": {"A": "T2 = 出厂面板 F2 ∪ f1c(22 列)",
+            "A_G": "A + gc_cross + gc_frac(C1 里唯一站上 MDE 的那两根)",
+            "A_ed": "A + ensemble_defect(靶标骨架),仅骨架可形成子集",
+            "GC_only": "只用 gc_cross + gc_frac 两列 —— **最便宜的基线**"},
+
+ "kill_conditions": {
+  "K1": {"tests": "出厂判据在产品货币下有没有价值", "fires": "A 的捕获率在 n=10 上区间含 0",
+         "MANDATORY_LABEL": "触发时写 `unresolved`,不是 `refuted`"},
+  "K2": {"tests": "那两根 GC 列在产品货币下加不加得动", "fires": "A_G − A 的捕获率差区间含 0 或低于自身 MDE"},
+  "K3": {"tests": "放大还是衰减", "fires": "捕获率随 n 单调不增 ⇒ 『top-1-of-n 会放大小优势』这个猜测不成立",
+         "non_firing_input": "极值统计量通常随 n 放大差距,但这是猜测,不是已知"},
+  "K4": {"tests": "复现", "fires": "主人群的 K1/K2 结论在三个复现人群里复现少于 2 个"}
+ },
+ "void_gates": {
+  "1_leakage": "分子级 + 靶标级双查,全 200 次划分;对偶义务:故意按格切分时靶标级必须报警。",
+  "2_no_heldout_y_mean": "模型只在训练集上拟合;留出的 wet 只用于【评分】(记录被选中那条的 wet 与 oracle),不进入任何拟合。报出取 y 均值的行号。",
+  "3_floors": "格内设计数 < n 的格跳过并计数;产生 g_t 的靶标 < 20 ⇒ 无数据。",
+  "4_degenerate_cells": "oracle == random 的格(全格 wet 相同)作废并计数 —— 捕获率在那里无定义。",
+  "5_denominator_sign": "断言 oracle − random > 0 才计入;若 ≤ 0 说明抽样或排序写错,该次作废并计数。**探针:把 model 换成【真实 wet】,捕获率必须恒等于 1.0;换成【负的真实 wet】必须 ≤ 0。两个探针都不过 ⇒ 整个实验作废。**"
+ },
+ "populations": {"primary": "panel_f1_fresh.json(样本2)",
+   "replication": ["panel_f1_designs.json","panel_f1_third.json","panel_f1_fourth.json"],
+   "blindness": "没有盲人群;被测的【量】是新的(捕获率从未算过),测试不是盲的。"},
+ "what_this_cannot_do": ["不测多轮复合 —— 误差跨轮相关这一半是写明的未测项,不许说本实验覆盖了移动四的全部。",
+   "不判上线:改动出厂决定要先过那三张表的重新校准。",
+   "人群仍是 OpenKnot 玩家设计,不是 DesiRNA 输出 —— 捕获率转移到真身人群的先验低,必须随结论一起写。"]
+}

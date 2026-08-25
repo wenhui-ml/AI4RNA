@@ -1,0 +1,128 @@
+{
+ "id": "M3",
+ "name": "gc_cancelled",
+ "date": "2026-08-21",
+ "status": "pre-registered, no data",
+ "cost_usd": 0,
+ "offline": true,
+ "spec_version": "rule 38-49 + 第 50 条(每个模型假设配一个数据结构的和一个测量装置的) + 【绝不退缩】口径",
+ "one_line": "邓煜移动三:逐项界不住时找【相消】。今天我十几次说『又被 GC 追平』,而那是在回归里【线性扣除】GC。本实验改为【按构造消去】:只在 gc_cross 与 gc_frac 完全相同的格内设计对上评分,GC 列对预测差的贡献恒等于 0。问的是正向问题——【GC 消掉之后,还有什么能排序】。",
+ "why_this_exists__the_correction_it_carries": {
+  "what_I_got_wrong_today": "十二个结果里只有三个是真证伪(γ* 作为拒收器 67.5% 通过试管;『可证的面板误收』同据;pr_structure 符号为负)。其余九个是【这台仪器在我选的池化口径下分不开】,而我把它们全写成了收工。",
+  "the_worst_case": "『γ* 被一个 GC 计数追平』被我说了十几遍并写进提交、审计、周报与记忆。真实数字是 γ*−GC = −0.0020,区间 **[−0.0791, +0.0728]** —— 宽到能装下两倍效应。那不是追平,是没测出来。已在记忆 [[feedback-never-retreat-positive-discovery]] 与 [[project-gamma-star-gc-null]] 更正。",
+  "so_this_run_reopens": "把那九条『分不开』的线,在一个 GC 不可能是解释的构造下重问一次。",
+  "why_exact_cancellation_beats_controlling_for_it": "回归里加 GC 只是线性扣除,残余相关仍可携带 GC。若两条设计的 gc_cross 与 gc_frac 【完全相等】,任何线性模型中 GC 两列对【预测差】的贡献精确为 0,与它们的系数怎么拟合无关。这是构造性的,不是统计性的。"
+ },
+ "the_estimator": {
+  "metric": "留出格【内】成对排序准确率,**只计入 GC 配平的对**(gc_cross 相等 且 round(gc_frac,3) 相等)。预测并列记 0.5,只剔试管并列(C1 修正后的口径,分母对所有块相同)。",
+  "splits": "按【靶标】70/30,200 次划分,种子固定。",
+  "interval": "对【靶标】做 cluster bootstrap(B=5000)的均值区间(H2 写对的那个)。",
+  "MDE": "每人群报 1.96·sd(g_t)/√cluster,并与每个『含 0』结论并列(第 48/49 条)。",
+  "null": "无信息列零点必须在【要加进去的那个块的宽度上】、用【实际要加的列数】标定(第 45 条修订版:块宽与列数都不可外推,每列代价还是次线性的)。R=12 次抽样。"
+ },
+ "arms": {
+  "arm1_formable_subset": {
+   "population": "骨架可形成子集(ensemble_defect 的定义域)",
+   "blocks": {
+    "A": "T2 = F2 ∪ f1c(22 列)",
+    "A_ed": "A + ensemble_defect(靶标骨架)",
+    "A_G": "A + gc_cross + gc_frac —— **内建的必须为零对照**"
+   },
+   "shape_checked_before_freezing": "GC 配平对 14736/3730/3983/2413,≥30 对的靶标 56/50/48/35 —— 只看对数与覆盖,未看任何与试管的关系"
+  },
+  "arm2_full_population": {
+   "population": "全人群(T2 与 E5 对所有设计都有定义)",
+   "blocks": {
+    "A": "T2",
+    "A_E5": "A + acc_arms, acc_arms_min, acc_arms_vs_bg, entropy_cross, mean_bp_dist",
+    "A_G": "A + gc_cross + gc_frac —— **同一个必须为零对照**"
+   },
+   "shape_checked_before_freezing": "GC 配平对 47867/10849/12171/10412,≥30 对的靶标 57/57/57/42"
+  }
+ },
+ "kill_conditions": {
+  "K0_the_built_in_must_be_zero_control": {
+   "tests": "相消到底有没有生效",
+   "fires": "`A_G − A` 在 GC 配平对上的区间**排除 0** ⇒ **相消失效,本人群整个作废**",
+   "the_decision_line_verbatim": "K0 = ex(P, 'A_G_minus_A')",
+   "non_firing_input": "在配平对上 GC 两列对预测差的贡献精确为 0,所以只应剩下『加两列改变了其他系数』这一点点二阶效应,应当含 0 —— 可双向",
+   "why_this_is_not_vacuous": "若我把配平条件写错(比如只配平了 gc_frac 没配平 gc_cross),这条会响。第 47 条的对偶义务:实现里另跑一次【故意只配平 gc_frac】的探针,它必须让 K0 响。"
+  },
+  "K1_arm1": {
+   "tests": "GC 消掉之后 ensemble_defect 还排不排得动",
+   "fires": "`A_ed − A` 区间含 0",
+   "the_decision_line_verbatim": "K1 = not ex(P1, 'A_ed_minus_A')",
+   "non_firing_input": "它在不配平的留出上有 +0.014(6 人群同号,5/6 排除 0)",
+   "MANDATORY_LABEL": "**K1 触发时,裁定写 `unresolved_after_gc_cancellation`,绝不写 `refuted`。** 并且必须同时报该人群 MDE 与效应/MDE 比。"
+  },
+  "K2_arm2": {
+   "tests": "GC 消掉之后那五根自由集合边际列还排不排得动",
+   "fires": "`A_E5 − A` 区间含 0",
+   "the_decision_line_verbatim": "K2 = not ex(P2, 'A_E5_minus_A')",
+   "non_firing_input": "E1 里 K1/K2 曾 16/16 排除 0(样本内)",
+   "MANDATORY_LABEL": "同 K1:含 0 ⇒ `unresolved`,不是 `refuted`。"
+  },
+  "K3": {
+   "tests": "可复现",
+   "fires": "主人群排除 0 而三个复现人群里排除 0 的少于 2 个"
+  },
+  "K4": {
+   "tests": "测量够不够格",
+   "fires": "被比较量 < 该人群 MDE ⇒ 报『测不出』并退出计票(C1 的同一条)"
+  },
+  "frozen": "看到任何数字后不许改配平条件、不许改块、不许改划分比例/次数、不许换区间构造、不许换主人群"
+ },
+ "void_gates__each_with_an_input_that_must_trip_it": {
+  "1_leakage": {
+   "check": "分子级 + 靶标级双查,全 200 次划分",
+   "must_trip": "故意按格切分 ⇒ 靶标级必须报警"
+  },
+  "2_no_heldout_y_mean": {
+   "check": "主指标只用留出格内成对差;报出取 y 均值的行号",
+   "note": "人工核对,不是运行时闸门"
+  },
+  "3_floors": {
+   "check": "每靶标 GC 配平对 >=30、每靶标可用划分 >=20、产生 g_t 的靶标 >=20"
+  },
+  "4_ties": {
+   "check": "试管并列剔除并报;各块预测并列率单独报(记 0.5)"
+  },
+  "5_matching_is_exact": {
+   "check": "断言每个计入的对满足 gc_cross 完全相等 且 round(gc_frac,3) 完全相等",
+   "must_trip": "探针:只配平 gc_frac 的版本必须让 K0 响"
+  },
+  "6_bootstrap_unit": {
+   "check": "n == 产生 g_t 的靶标数 且 != 格数 且 != 分子数(C1 的非空转版)"
+  },
+  "7_null_width_matched": {
+   "check": "无信息列按 A 的宽度(22)、按实际加的列数(1/2/5)标定"
+  }
+ },
+ "populations": {
+  "primary": "panel_f1_fresh.json(样本2)",
+  "replication": [
+   "panel_f1_designs.json",
+   "panel_f1_third.json",
+   "panel_f1_fourth.json"
+  ],
+  "why_primary__rule_44": "cluster 数(57)与分子数(8746)同时最大,本库唯一两者都取最大的选择,不存在『优化一个放弃一个』。",
+  "blindness": "**没有盲人群**:H2/C1 读过全部六个。被测的【量】是新的(GC 配平对上的排序从未测过),【测试】不是盲的。不许把前者说成后者。"
+ },
+ "what_a_positive_result_would_mean": "一根在 GC 精确相消下仍能排序的列,**按构造满足第 48 条**(不可能是被 GC 追平的),而且它落在那 79.9% 未被触及的可解释方差里。那会是这条线上第一个正向、且不需要再辩护 GC 的结果。",
+ "what_this_cannot_do": "仍在 Turner 族内 ⇒ 不修判官独立性。只量信息量,不判上线(改动出厂决定要先过那三张表的重新校准)。",
+ "amendments_before_any_deciding_population_ran": {
+  "found_in": "以第四批(复现人群)做全流程冒烟时发现,主人群一次没跑过。",
+  "A_MDE_was_self_inconsistent": {
+   "defect": "MDE 原本算成 1.96·sd(A 块每靶标【准确率】)/√n,而区间是用【对比量】的每靶标值 bootstrap 出来的。冒烟里因此出现逻辑上不可能的标签:A_ed−A = +0.0202 【区间排除 0】却被标成【<MDE 测不出】。",
+   "fix": "MDE = 1.96·sd(该对比量的每靶标值)/√n —— 即该 bootstrap 区间自己的半宽。这样『排除 0』与『高于 MDE』按定义等价,不再自相矛盾。",
+   "direction_disclosure": "**这个修正让检验更【容易】通过(正确的 MDE 更小),是危险方向,所以理由必须站在逻辑上:一个区间不可能既排除 0 又低于分辨力。与任何结果无关。**",
+   "affects_C1_too": "C1 的 K4 用的是同一个错误定义(MDE 来自 T2 准确率的 sd),因此 C1 的 `not_measurable` 裁定建立在一个自相矛盾的量上。**这不在本声明的授权范围内 —— 不许顺手重读 C1,要改必须另开声明。** 本声明只记录该缺陷。"
+  },
+  "B_probe_replaced": {
+   "defect": "第 47 条的对偶义务原定为『只配平 gc_frac』,冒烟里它【没有】让 K0 响(+0.0005 含 0)。原因:格内 gc_frac 取三位小数几乎钉死 GC 计数,所以那不是真扰动。",
+   "fix": "改为【完全不配平】的探针(所有格内对都计入)。那里 GC 确实携带信号(C1 测到 +0.025),**A_G−A 必须排除 0**,否则这条内建对照根本测不出 GC 存在与否,闸门作废。",
+   "keep_old_probe": "只配 gc_frac 那个仍然跑并报出,标注为『未能触发,因为它不是真扰动』,不删除。"
+  },
+  "C_K0_scope": "声明原文 K0 = ex(P,'A_G_minus_A') 是单数;实现里对【两臂】取或(任一臂响即作废)。这是更严,不是更松,记录在此。"
+ }
+}
