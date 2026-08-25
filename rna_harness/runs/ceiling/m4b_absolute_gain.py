@@ -27,7 +27,7 @@ sys.path.insert(0, REPO); sys.path.insert(0, HERE)
 from e1_ensemble_marginals import base_block                                      # noqa: E402
 from h1_heldout_ensemble_defect import fit_predict                                # noqa: E402
 import h2_heldout_cluster_ci as H                                                 # noqa: E402
-from m2b_gt_target_property import fold                                           # noqa: E402
+from m1c_skeleton_bookkeeping import build                                        # noqa: E402
 from m4_selection_currency import e_oracle, e_model                               # noqa: E402
 
 POPS = (("样本2(主)", "panel_f1_fresh.json"), ("基准4560", "panel_f1_designs.json"),
@@ -184,14 +184,16 @@ def main() -> int:
     R, FOLDS = {}, {}
     print("\n=== M4b 主臂:绝对增益 model − random(wet 原单位),退化格保留 ===", flush=True)
     for _j, (nm, fn) in enumerate(POPS):
-        keep, M = fold(fn, a.workers); FOLDS[fn] = (keep, M)
+        keep, M = build(fn, a.workers); FOLDS[fn] = (keep, M)   # M4 用的同一个构建器,逐格可比
         R[fn] = run_pop(nm, keep, M, a.splits, a.seed)
         json.dump({"selfcheck": worst, "main": R}, open(a.out, "w"), indent=1, ensure_ascii=False)
 
     P = R[PRIMARY]
     print("\n=== 必响探针(第 54 条)===", flush=True)
     keep, M = FOLDS[PRIMARY]
-    sp = max(30, a.splits // 4)
+    # 探针必须与主臂同划分数。少划分 ⇒ 区间更宽 ⇒ P2(噪声臂必须含 0)更容易通过 —— **宽松方向**,
+    # 一根必响探针不许比它要保护的主臂更弱。与 M3c 第 155 行同一个修正。
+    sp = a.splits
     PR = {p: run_pop(f"探针 {p}", keep, M, sp, a.seed, probe=p) for p in ("oracle", "anti", "noise")}
     ns_ok = [n for n in NS if f"A@{n}" in PR["oracle"] and f"ORACLE_minus_rand@{n}" in PR["oracle"]]
     d0 = max(abs(PR["oracle"][f"A@{n}"]["mean"] - PR["oracle"][f"ORACLE_minus_rand@{n}"]["mean"])
