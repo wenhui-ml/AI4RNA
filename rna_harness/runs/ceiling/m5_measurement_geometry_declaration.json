@@ -1,0 +1,71 @@
+{
+ "id": "M5",
+ "name": "fourth_family_measurement_geometry",
+ "date": "2026-08-25",
+ "status": "pre-registered, no data computed",
+ "cost_usd": 0,
+ "offline": true,
+ "spec_version": "rule 38-54(第 53 条改写版) + 【绝不退缩】口径",
+ "one_line": "前三个表示族全部测空,而那个不变量确实存在(M2b arm2 用经验 g_t 切开了库,半间差 p=0.0002)。第四族换一个问法:不问【靶标是什么】,问【在这个靶标上,试管与面板各自处在什么状态】—— 测量几何。",
+
+ "why_the_first_three_families_are_out": {
+  "family_1_target_structure": "M2 + M2d,13 个候选(含数据量族),带**被证明的检出力**(冻结探针 rho +0.5287,p 0.0002)。无一通过 Bonferroni。**分辨力约 |rho| ≳ 0.45,所以是『没有强的』,不是『没有』。**",
+  "family_2_data_quantity": "n_cells / n_designs / n_pairs:回归 p 0.22~0.68,切分 p 0.90 / 0.64。K4 不触发。",
+  "family_3_predicted_pair_set": "M1(交叉配对集合)分类 − 塌缩 +0.0048 含 0;M1c(骨架集合)+0.0011 含 0。**保留指标集记账两次都没打赢求和。**",
+  "but_the_invariant_exists": "M2b arm2:用另外三个人群的 g_t 排序、在从未被选择碰过的第四个人群上评估,主项 +0.0334 对余项 −0.0010,半间差 +0.0344,置换 p 0.0002。M2d 又测出跨人群 rho 坐在衰减上限的 84%。**东西在那儿,我说不出它是什么。**"
+ },
+
+ "the_fourth_family": {
+  "idea": "g_t = 『在靶标 t 上,把 ensemble_defect 加进面板能提升多少排序』。它不是靶标的函数,是**靶标 × 试管 × 面板**三者交互的函数。前三族全在问『靶标是什么』。第四族问的是**测量几何**:试管在这个靶标上分不分得开?面板在这个靶标上还剩多少没做对?那根新列在这个靶标上到底变不变?",
+  "candidates": [
+   "wet_sd      格内 wet 的标准差(试管在这个靶标上的动态范围)",
+   "tie_rate    格内成对里 Δwet == 0 的比例(试管分不开的比例)",
+   "hard_frac   格内成对里 |Δwet| 低于全库中位数的比例",
+   "wet_mean    平均试管分(**M2 里选错的那根探针,继续跑并报出,不作检出力证据**)",
+   "base_acc    基础面板在该靶标上的成对准确率(面板做得多好)",
+   "base_room   1 − base_acc(还剩多少没做对)",
+   "pred_sd     基础面板预测在格内的标准差(面板在这里有没有意见)",
+   "ed_sd       **ensemble_defect 这根列本身在格内的标准差** —— 若它在这个靶标上不变,加它就不可能改任何排序",
+   "ed_range    ed 列格内极差的均值",
+   "oracle_room 格内 (max wet − mean wet) 的均值(可得增益的绝对量,M4 的分子)"
+  ],
+  "count": 10,
+  "bonferroni": "0.05/10 = 0.005,区间取 99.5%"
+ },
+
+ "the_leakage_problem_and_the_construction_that_solves_it": {
+  "the_trap": "`base_acc` 是 g_t = A_ed − A 的**其中一项**。在同一批数据上把 g_t 与 A 相关,是均值回归的机械产物:A 因噪声偏低,A_ed − A 就因噪声偏高。**同理 `wet_sd` 等也由 wet 构造,而 g_t 也由 wet 构造。**",
+  "the_construction": "**留一人群交叉拟合**。评估人群 p 的 g_t 只与【另外三个人群】上算出的候选值相关。四个人群**分子级零重叠**(M2b 闸门 V1 已验:六对全部 = 0),所以候选与被解释量来自完全不同的设计。四种轮换各算一次 rho,报**四者均值**及其置换零分布。",
+  "why_this_also_raises_power": "轮换用满了全部数据,而不是只用一个人群;n 仍是靶标数(≤57),但每个 rho 的测量噪声下降。"
+ },
+
+ "the_benchmark_that_is_also_the_must_fire_probe": {
+  "column": "`__BENCHMARK_gt_other_pops` = 另外三个人群的 g_t 均值 —— **就是 M2b arm2 用的那个经验不变量**",
+  "role_1_probe": "它**必须**通过 Bonferroni。不通过 ⇒ 本次筛选无检出力,**整个实验作废(第 54 条),不许事后换探针。**",
+  "role_2_yardstick": "它是**要被解释的那个东西**。任何候选解释了多少,就看它的 rho 相对这根基准的 rho 占多少。**这比一根合成探针强:它是真的,而且它正是我们想弄明白的那个量。**"
+ },
+
+ "kill_conditions": {
+  "K0": {"tests": "筛选有没有检出力", "fires": "基准列没通过 Bonferroni ⇒ **整个实验作废**",
+         "the_decision_line_verbatim": "K0 = not scr['__BENCHMARK_gt_other_pops']['passes']"},
+  "K1": {"tests": "第四族里有没有能解释它的列", "fires": "十个候选无一通过 Bonferroni",
+         "MANDATORY_LABEL": "**触发时写 `no_invariant_found_in_measurement_geometry`,绝不写『不存在』** —— 十个不是全空间,而且要同时报出本次筛选的分辨力"},
+  "K2": {"tests": "通过的那根切不切得开库", "fires": "用最优候选(在另外三个人群上算)按中位数切分评估人群的 g_t,**半间差**的靶标 cluster bootstrap 区间含 0",
+         "note": "半间差是随机切分下唯一期望为 0 的统计量(第 53 条那次复核的结论)。基准列在这个统计量上给 +0.0344,p=0.0002 —— 那是要追平的数。"},
+  "K3": {"tests": "解释了多少", "fires": "最优候选的 |rho| < 基准列 |rho| 的一半 ⇒ 它至多解释了那个不变量的一小部分"}
+ },
+ "void_gates": {
+  "V1_cross_fitting": "断言每个候选值只来自【非评估人群】的记录;评估人群的任何一行都不进入候选的计算。四人群分子级零重叠已由 M2b 闸门 V1 验过(六对全 0),本次复验并报出。",
+  "V2_rule_54": "基准列没响 ⇒ 作废,不许换探针",
+  "V3_rule_51": "每个『区间是否含 0』的裁定报 50 个 bootstrap 种子下的翻转率",
+  "V4_multiplicity": "报候选个数与 Bonferroni 阈值,不许只报最好那个的裸 p",
+  "V5_resolution_reported": "**必须报出本次筛选的分辨力**(基准列的 rho 与其 Bonferroni 区间半宽),否则 K1 的触发读不出边界",
+  "V6_scoring": "打分用 C1 修正版:共同对集、预测并列记 0.5"
+ },
+ "populations": {"four": ["panel_f1_fresh.json", "panel_f1_designs.json", "panel_f1_third.json", "panel_f1_fourth.json"],
+   "rotation": "四种留一轮换,每种都报;主结论用四者均值",
+   "blindness": "**没有盲人群。** H2/C1 读过全部六个。第五批/第六批在 GC 配平构造下不可用,本实验不用 GC 配平,故一并跑但若靶标数不足 cluster 地板则按闸门跳过。"},
+ "what_a_positive_result_would_mean": "**说出那个不变量是什么。** 到现在它只有经验形式(『另外三个人群的 g_t』),不能外推到没测过的靶标。一根测量几何的列能解释它,就把它变成可计算、可预测、可用来决定在哪些靶标上值得加这根列的东西。",
+ "what_this_cannot_do": "不改任何冻结裁定。不判上线。仍在 Turner 族内。",
+ "frozen": "看到任何数字之后:不许改候选清单与 Bonferroni 阈值、不许改交叉拟合构造、不许换基准列、不许改划分比例/次数、不许换主人群轮换方式。"
+}
