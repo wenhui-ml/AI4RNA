@@ -1,0 +1,50 @@
+{
+ "id": "M2b",
+ "name": "gt_target_property_and_empirical_split",
+ "date": "2026-08-25",
+ "status": "pre-registered, written AFTER seeing M2's K1 fire and BEFORE computing anything in this file",
+ "cost_usd": 0,
+ "offline": true,
+ "spec_version": "rule 38-51 + 【绝不退缩】口径",
+
+ "what_M2_actually_measured_and_what_it_did_not": {
+  "fired": "K1 -> `no_invariant_found_among_these_ten`. 十个靶标结构不变量,|rho| 最大 +0.2497(max_stem_len,置换 p 0.062)。",
+  "the_power_the_screen_actually_had": "构造性探针在 rho=+0.535 上以 p=0.0002 响。99.5% 区间半宽约 0.36 ⇒ **本次筛选只能分辨 |rho| >= 0.4 左右的不变量**。所以 M2 测到的是『没有强不变量』,**不是**『没有不变量』;max_stem_len 的 +0.25 是 `unresolved`,不是 0。",
+  "why_ten_structural_columns_was_the_wrong_family": "这十列全部来自【靶标的预测配对集合】这一个表示族 —— 与 20.1% 天花板复核里指认的瓶颈是同一个族。用同一个族的十个函数去解释另一个族解释不了的残差,先验上就该失败。"
+ },
+
+ "the_question_this_run_asks_instead": "**g_t 到底是不是靶标的性质?** 靶标间 sd 0.030~0.044 是效应的 2~3 倍。若这个离散度在【不同设计人群之间可复现】,那不变量一定存在(只是不在结构族里),而且【经验 g_t 本身】就能当那个不变量用;若不可复现,那个离散度就是估计噪声,汇总平均本来就是对的估计量 —— 这会【提高】我对汇总 +0.015 的信心,而不是降低。两条路都出结论,没有一条是『测不出』。",
+
+ "arm1_is_g_t_reproducible": {
+  "statistic": "四个人群两两之间 g_t 的 Spearman rho(6 对),只在两个人群都产生了 g_t 的靶标上算。",
+  "attenuation_denominator": "任何跨人群 rho 的上限是 sqrt(rel_a * rel_b)。两种信度都报,且都标清楚测的是什么:",
+  "rel_MC": "同一人群内,把 200 次划分按奇/偶拆成两组各自求 g_t,两组的 rho -> **只含蒙特卡洛噪声,是信度的上界**",
+  "rel_cell": "同一人群内,把每个靶标的【格】随机对半分,两半各自求 g_t,两半的 rho -> **含设计抽样噪声,这才是跨人群 rho 该比的分母**(Spearman-Brown 校正到全长)",
+  "null": "把靶标标签置换 5000 次,报跨人群 rho 的零分布"
+ },
+
+ "arm2_the_usable_form__empirical_invariant_split": {
+  "why": "移动二不要求不变量必须是结构的。若 g_t 可复现,那么【在另外三个人群上测到的 g_t】就是一个不用碰主人群的不变量。",
+  "selection": "用 基准4560 + 样本3 + 第四批 的 g_t 平均值给靶标排序,**主人群 panel_f1_fresh 的任何数据都不进入选择**",
+  "split": "按选择集 g_t 的中位数把靶标切成主项/余项,阈值在看主人群结果之前写进 json",
+  "evaluation": "在主人群上,分别报两半的 g_t 均值、MDE、效应/MDE",
+  "leak_argument": "靶标共享,但设计不共享(闸门 V1 断言分子级零重叠)。选择只用另外三个人群的湿实验分数,主人群的湿实验分数不进入选择的任何一步。"
+ },
+
+ "kill_conditions": {
+  "K1": {"tests": "g_t 是不是靶标的性质", "fires": "6 对跨人群 rho 的均值落在置换零分布 95% 以内",
+         "MANDATORY_LABEL": "触发时写 `between_target_spread_is_estimation_noise` —— 并且**必须同时写明这是对汇总估计量的正向支持**,不是又一个『测不出』"},
+  "K2": {"tests": "arm2 的主项判不判得动", "fires": "主人群主项半边的 效应/MDE < 2"},
+  "K3": {"tests": "经验切分是不是随机也能做到", "fires": "真实切分的主项 效应/MDE 落在 200 次随机切分分布的 95% 以内"},
+  "K4": {"tests": "方向", "fires": "arm2 主项半边的均值符号为负(选高的一半反而更差)"}
+ },
+ "void_gates": {
+  "V1_no_molecule_overlap": "四个人群两两之间分子级重叠必须为 0(按 (puzzle, method, seq) 三元组)。非 0 则跨人群 rho 作废。",
+  "V2_reliability_must_be_measurable": "rel_cell 的区间必须排除 0,否则本仪器连信度都测不出,arm1 的分母无意义 -> 作废,不写裁定",
+  "V3_rule_47_dual": "arm1 必须带一个【一定会响】的输入:同一人群的奇/偶划分半分(rel_MC),它测的是同一批数据,rho 必须显著为正。不响则筛选流程本身无检出力。",
+  "V4_rule_51_flip": "每一个『区间是否含 0』的裁定都报 50 个 bootstrap 种子下的翻转率;翻转率非 0 则该裁定记为仪器读数",
+  "V5_selection_never_touches_primary": "断言 arm2 的选择路径不读 panel_f1_fresh 的任何行"
+ },
+ "what_this_cannot_do": "不改 H2 在其自身汇总口径下的 `does_not_generalise`(那是盲人群第六批的裁定,本次主人群是非盲的样本2)。不判上线。",
+ "what_a_positive_result_would_mean": "存在一个不用靶标结构、只用另一批设计的湿实验读数就能算出来的不变量,把库切成【判得动】的主项和【只需给界】的余项 —— 那就是移动二要的东西,而且它同时给出一条可执行的选择规则。"
+}
