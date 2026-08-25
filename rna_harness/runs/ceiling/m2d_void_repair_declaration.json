@@ -1,0 +1,48 @@
+{
+ "id": "M2d",
+ "name": "void_repair_reliability_and_screen",
+ "date": "2026-08-25",
+ "status": "pre-registered, no data computed",
+ "cost_usd": 0,
+ "offline": true,
+ "spec_version": "rule 38-54(第 53 条改写版) + 【绝不退缩】口径",
+ "one_line": "兑现两个作废。作废只有配上重测才算数,否则就是洗失败 —— H1→H2 的老路。",
+
+ "what_is_being_repaired": {
+  "void_1_M2b_arm1": {
+   "verdict_status": "**VOID by V2**:rel_cell 四个人群区间全含 0(样本3 干脆算不出)。跨人群 rho=+0.4355 不能拿去下裁定。",
+   "root_cause": "**估计量选错了**:我把【格】对半分,每个靶标平均只有 5.9 个格,对半后剩 ~3 个,半长 g_t 的噪声远大于全长。它不是『信度低』,是『测不动』。",
+   "repair": "改为**在每个格内部把【设计】对半分**。格数、靶标数全部保持不变,只是每个格用一半的设计。格内平均 19.5 条设计 ⇒ 每半 ~10 条,格内对数从 ~190 降到 ~45,**仍远高于 30 的成对地板**。用 Spearman-Brown 校正回全长。",
+   "must_fire_input": "**同一批设计不做任何拆分,复制两份算 g_t,两者 rho 必须 ≈ 1.0**(> 0.99)。不满足说明这套 g_t 管线本身不确定,整个实验作废。"
+  },
+  "void_2_M2_gate1": {
+   "verdict_status": "**VOID by void gate 1**:声明里的必响探针 `mean(wet)` 没响(rho −0.0199,p 0.891),我事后补了一根会响的探针给那一跑背书 —— 那是**事后判据救活自己的负结论**,与在 M3 上事后判据打折自己的正结果同一个错误的镜像。",
+   "repair_A_frozen_probe": "**在跑之前冻死**必响探针:合成不变量 = g_t + 高斯噪声(尺度 1.6×sd(g_t)),真实 rho ≈ 0.5。它**必须**在筛选里以 Bonferroni 阈值显著。**不响 ⇒ 本次作废(第 54 条),不许再换。** `mean(wet)` 仍然跑并报出,标注为『原声明里选错的探针,不作检出力证据』。",
+   "repair_B_rule50_gap": "M2 的十个候选**全部来自靶标结构族**,而复核 R3 已证明数据量计数(n_cells / n_designs / n_pairs)当时根本不在候选里 —— 那是第 50 条的缺口。本次候选 = 原十个 + 这三个 = **13 个**,Bonferroni 阈值 0.05/13 = 0.003846,区间取 99.615%。"
+  }
+ },
+
+ "the_object": "与 H2/M2/M2b 同一构造的逐靶标 g_t(留出格内成对排序准确率的 ensemble_defect 增量)。**打分规则改用 C1 的修正版:共同对集、预测并列记 0.5**(复核 R2 已量:丢弃口径与共同对集口径的 g_t 相关 0.998,差 0.35%,但规则该是对的)。",
+
+ "kill_conditions": {
+  "K1": {"tests": "信度到底测不测得出来", "fires": "修好之后 rel_design 的区间在任一人群仍含 0",
+         "MANDATORY_LABEL": "触发时写 `reliability_still_not_measurable`,并明写 M2b arm1 **维持作废**"},
+  "K2": {"tests": "跨人群 rho 相对信度上限是高是低", "fires": "跨人群 rho 均值 > sqrt(rel_a·rel_b) 的均值 × 1.05 ⇒ 相关超过了信度允许的上限,说明有共享混杂,arm1 仍不可信"},
+  "K3": {"tests": "13 个候选里有没有能切开的不变量", "fires": "没有任何候选在 Bonferroni 阈值下排除 0 且置换 p < 0.003846",
+         "MANDATORY_LABEL": "**触发时写 `no_invariant_found_among_these_thirteen`,绝不写『不存在』** —— 13 个不是全空间"},
+  "K4": {"tests": "数据量族是不是那个被漏掉的答案", "fires": "三根数据量列里有任何一根通过 Bonferroni ⇒ 之前的『结构不变量为空』其实是选错了族"}
+ },
+ "void_gates": {
+  "V1_frozen_power_probe": "合成探针必须在筛选里以 Bonferroni 阈值显著。**不响 ⇒ 整个实验作废,不许事后换探针。**",
+  "V2_reliability_pipeline_probe": "不拆分的两份复制 rho 必须 > 0.99",
+  "V3_leakage": "分子级 + 靶标级双查,全 200 次划分",
+  "V4_rule_51": "每个『区间是否含 0』的裁定报 50 个 bootstrap 种子下的翻转率",
+  "V5_multiplicity": "报候选个数与 Bonferroni 阈值,不许只报最好那个的裸 p",
+  "V6_no_leak_into_invariants": "13 个候选全部只是 (靶标结构, 该靶标下的设计序列集合) 的函数,不含 wet、不含判官输出。**合成探针是唯一的例外,它按构造含 g_t,只作检出力用,不许当作发现。**"
+ },
+ "populations": {"primary": "panel_f1_fresh.json(样本2)",
+   "others": ["panel_f1_designs.json", "panel_f1_third.json", "panel_f1_fourth.json"],
+   "blindness": "**没有盲人群。** H2/C1 读过全部六个。"},
+ "what_this_cannot_do": "不改 H2/M3/M1/M1c/M4 的任何冻结裁定。不判上线。M2 与 M2b arm1 的**原裁定仍然是作废** —— 本次是新的一跑,不是把它们改判。",
+ "frozen": "看到任何数字之后:不许改信度估计量、不许改候选清单与 Bonferroni 阈值、不许换探针、不许改划分比例/次数、不许换主人群。"
+}
