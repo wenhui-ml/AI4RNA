@@ -1,0 +1,69 @@
+{
+ "id": "M1c",
+ "name": "skeleton_indexset_bookkeeping_vs_ensemble_defect",
+ "date": "2026-08-25",
+ "status": "pre-registered, no data computed",
+ "cost_usd": 0,
+ "offline": true,
+ "spec_version": "rule 38-52 + 第 53 条(改写版:只数同侧) + 第 54 条 + 【绝不退缩】口径",
+ "one_line": "M1 测出交叉配对指标集是空的,而我标成『安慰剂』的骨架指标集打出了 +0.0159 排除 0。那个标签在设计时就错了(M3 的胜出列 ensemble_defect(骨架) 本来就是骨架量)。本实验把骨架指标集放到主臂上,问那个本来就该问的问题:在骨架上,保留分类记账打不打得过把它求和掉。",
+
+ "what_M1_established_and_what_it_did_not": {
+  "established": "交叉配对指标集上分类记账 +0.0007 含 0,且打不过自己的塌缩(+0.0048 含 0)。**这一族现在是被测过的空集,不再是『没试过』。** 它同时解释了 M2:M2 的十个候选全部构造在交叉配对集合上。",
+  "not_established": "骨架臂 +0.0159 [+0.0042,+0.0282] 与 ensemble_defect 的 +0.0140 区间大面积重叠,而且**宽度没配平(7 列对 1 列)**。『分类比 ensemble_defect 更好』**从未被测过** —— M1 里根本没有 A_skelC7 − A_ed 这个对比量。",
+  "the_arithmetic_that_is_only_a_motive": "按点估计粗校(7 列废列代价 −0.0044,1 列约 −0.0004):+0.0203 对 +0.0144。**这是点估计算术,没有区间,只能当动机。**"
+ },
+
+ "the_two_summaries_of_ONE_index_set": {
+  "index_set": "靶标骨架(圆括号)配对集合 pk_pairs(_round_only(target))",
+  "summary_1_kept": "7 根分类列(M1 的同一套类,p_stem_sh 已被 V7 作废):p_min / p_term / p_int / p_span_lo / p_span_hi / p_stem_lo / p_worststem,全部在骨架配对的 p_ij 上算",
+  "summary_2a_collapsed_ed": "ensemble_defect(骨架) —— M3 的胜出列,**主比较对象**",
+  "summary_2b_collapsed_mean": "mean p_ij over 骨架配对 —— 同一指标集最朴素的塌缩,**次要比较对象**",
+  "width_matching": "两个塌缩臂都**补 6 根噪声补到 7 列**(C1 的 T0pad 修法)。**不配平就又变成 7 列比 1 列。**"
+ },
+
+ "kill_conditions": {
+  "K0": {"tests": "GC 相消有没有失效", "fires": "`A_G − A` 在配平对上区间排除 0 ⇒ 本人群作废",
+         "the_decision_line_verbatim": "K0 = ex(P, 'A_G')",
+         "must_fire_input": "探针:完全不配平地跑一遍,K0 必须响(M1 测到 +0.0297)"},
+  "K1": {"tests": "骨架分类记账相对基础面板有没有增量", "fires": "`A_skelC7 − A` 区间含 0",
+         "the_decision_line_verbatim": "K1 = not ex(P, 'A_skelC7')",
+         "must_fire_input": "探针:7 根分类列换成 7 根噪声,K1 必须响"},
+  "K2": {"tests": "**主判据:分类记账打不打得过 ensemble_defect**", "fires": "`A_skelC7 − A_ed_pad` 区间含 0",
+         "the_decision_line_verbatim": "K2 = not ex(P, 'skelC7_minus_edpad')",
+         "must_fire_input": "探针:把 7 根分类列换成 [ed_skel + 6 根新噪声] —— 与比较臂**同构造、只换噪声抽样**,K2 必须响",
+         "MANDATORY_LABEL": "触发时写 `classification_does_not_beat_ensemble_defect`,**绝不写 `refuted`**;含 0 = 这台仪器在这个宽度上分不开两种摘要"},
+  "K3": {"tests": "宽度混杂", "fires": "`A_skelC7 − A` 的均值不超过 12 根 7 列噪声臂的零点中心 + 其 95 分位"},
+  "K4": {"tests": "指标集是不是骨架特异的", "fires": "`A_crossC7 − A`(M1 已测 +0.0007)在本次也排除 0 且量级 >= `A_skelC7 − A` 的一半 ⇒ 两个指标集一样好,骨架不特异"},
+  "K5": {"tests": "复现", "fires": "主人群 K1 不触发,而其余五个人群里 `A_skelC7 − A` 排除 0 的少于 3 个。**第 53 条改写版:复现计数必须与每个人群的【同侧】噪声触发根数一起报;某人群同侧触发 >= 2/12 则该人群作废并明写。**"}
+ },
+
+ "secondary_reported_not_gated": {
+  "S1": "`A_skelC7 − A_pall_pad`:分类是否打得过同一指标集最朴素的均值。**报区间,不进裁定**(避免多重性)。",
+  "S2": "`A_ed_pad − A_pall_pad`:ensemble_defect 相对朴素均值多买到什么。报区间,不进裁定。",
+  "S3": "`A_crossC7 − A`:M1 的交叉配对臂,继续跑并报出,**不删**。"
+ },
+
+ "void_gates": {
+  "V1_leakage": "分子级 + 靶标级双查,全 200 次划分;非 0 则作废",
+  "V2_not_degenerate": "7 根骨架分类列每根方差 > 0 且与 mean p 的 |相关| < 0.999;并**照实报出每根的相关**。M1 里散文(0.99)与判决数(0.999)冲突过,本次判决数仍是 **0.999**,冲突照旧记录,不在看到数之后往对自己有利的方向解释。",
+  "V3_imputation": "报骨架七类各自的填补比例;**>30% 的类作废并计数**,宽度配平随之收缩(M1 的 V7 同款)",
+  "V4_rule_51": "每一个『区间是否含 0』的裁定都报 50 个 bootstrap 种子下的翻转率",
+  "V5_rule_53_rewritten": "每个人群报 12 根 7 列噪声臂里**与被宣称效应同侧**的触发根数。**不许再用双侧计数**(M1 里双侧计数误作废了基准4560)。",
+  "V6_rule_47_54": "K0/K1/K2 三个必响输入全部真的跑并报响没响。**任一没响 -> 本次运行作废,不许事后换探针给这一跑背书。**",
+  "V7_rule_48": "第 48 条按构造过关:全部评估只在 gc_cross 与 gc_frac 完全相等的对上。仍报每根分类列与 gc_cross 的相关作记录。"
+ },
+
+ "populations": {
+  "primary": "panel_f1_fresh.json(样本2)",
+  "replication": ["panel_f1_designs.json", "panel_f1_third.json", "panel_f1_fourth.json",
+                  "panel_f1_fifth.json", "panel_f1_sixth.json"],
+  "blindness_stated_honestly": "**没有盲人群。** 第五批/第六批是 M1/M2/M3 这条线从未读过的,但 **H2 读过它们** —— 口径是『本条线未读』,**不是『盲』**。任何写法都必须带这句。",
+  "subset": "只用骨架可形成子集(与 M3 臂1 / M1 同一子集),这样 ensemble_defect(骨架) 有定义。"
+ },
+
+ "what_a_positive_result_would_mean": "在同一个指标集上,保留分类记账比 ensemble_defect 这个求和多买到排序力 —— 那才是移动一真正兑现:表示是瓶颈,而且给出了怎么换。",
+ "what_a_K2_firing_would_mean": "`ensemble_defect` 已经把这个指标集里能提的都提走了。**那不是失败,那是把移动一在这条线上关掉的合法理由** —— 而且是四步里第一次有一步被【测出来】关掉,不是被放弃。",
+ "what_this_cannot_do": "不改 M1/M3/H2/M2b 的任何冻结裁定。不判上线。仍在 Turner 族内。",
+ "frozen": "看到任何数字之后:不许改类的定义与填补规则、不许改配平条件、不许改宽度配平方式、不许改划分比例/次数、不许换区间构造、不许换主人群、不许动 K2 这条主判据、不许把次要对比量提升成裁定。"
+}
