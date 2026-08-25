@@ -1,0 +1,95 @@
+{
+ "id": "M4b",
+ "name": "absolute_gain_not_the_ratio",
+ "date": "2026-08-25",
+ "status": "pre-registered, no data computed",
+ "cost_usd": 0,
+ "offline": true,
+ "spec_version": "rule 38-56 + 【绝不退缩】口径",
+ "one_line": "`m4_audit.md` 第五节自己写明的未测项:M4 只报了【比值】(捕获率),没有单独记录【绝对增益 model − random】。捕获率在 n≈5 见顶、n=20 掉到 7.9%,但那是分母(oracle)变强造成的,完全可能绝对增益仍在上升。**要回答『n 该开多大』必须先测绝对增益。**",
+ "why_the_ratio_cannot_answer_it": {
+  "identity": "capture(n) = (E_model(n) − E_rand(n)) / (E_oracle(n) − E_rand(n)). 分子分母都随 n 变。",
+  "what_M4_measured": "只有这个比值。",
+  "the_confound_verbatim_from_m4_audit": "『原因是分母:n 越大 oracle 越强,而模型选中的那条跟不上。』 —— 这句话说的是比值下降的机制,它对分子的走向【没有任何约束】。",
+  "the_product_question": "产品要开多大的候选池,取决于**多拿到的湿实验读数**,不取决于我拿到了可得增益的百分之几。**分子才是货币,比值是诊断。**"
+ },
+ "primary_object": {
+  "estimand": "AG(n) = E_model(n) − E_rand(n),单位是 wet 的原单位,不是百分比",
+  "construction": "与 M4 完全相同的闭式精确期望:E_rand(n) = 格内 wet 均值(与 n 无关);E_model(n) = 均匀 n 子集下 argmax-预测项的 wet 期望,预测并列按均匀随机取一条精确计入",
+  "aggregation": "先在格(puzzle × method)内算,再到靶标级均值,靶标 cluster bootstrap 区间",
+  "n_grid": [
+   2,
+   5,
+   10,
+   20,
+   50
+  ],
+  "also_reported_so_the_ratio_is_reconstructable": "E_oracle(n) − E_rand(n) 与 capture(n),逐 n 报出,便于与 M4 对齐",
+  "cell_set": "全部满足 V2(格内行数 >= n)的格,**不剔除退化格**;M4 口径子集作为次要量并列报出"
+ },
+ "blocks": {
+  "A": "出厂面板 22 列",
+  "A_G": "A + 两根 GC 列",
+  "A_ed": "A + ensemble_defect(骨架)",
+  "GC_only": "只有两根 GC 列",
+  "note": "与 M4 同一套块,便于逐格对齐。A_pall 不再补 —— M1e 已证明它与 ed 是同一根列(rho −0.964),再报一次是重复计数。"
+ },
+ "kill_conditions": {
+  "K1": {
+   "tests": "面板在大池上还买不买得到东西",
+   "fires": "AG_A(20) 区间含 0 ⇒ 22 列面板在 n=20 上买不到可测的增益"
+  },
+  "K2": {
+   "tests": "绝对增益到底是升是降",
+   "fires": "AG_A(n) 在 2→50 上**不是单调不减** ⇒ 存在一个最优 n,把它报出来",
+   "MANDATORY_LABEL": "本条**不是证伪**。触发时写 `absolute_gain_peaks_at_n=K`,并明确:这是【在没有成本模型的前提下】的形状描述。"
+  },
+  "K3": {
+   "tests": "复现",
+   "fires": "三个复现人群里 AG_A(10) 排除 0 的少于 2 个"
+  },
+  "K4": {
+   "tests": "GC 的第五次出现在绝对货币上还成不成立",
+   "fires": "AG_GConly(n) 在**任一** n 上 >= AG_A(n) 且两者区间不重叠 ⇒ 两根列在绝对增益上也打赢二十二根列,必须写进裁定串"
+  }
+ },
+ "must_fire_probes": {
+  "P0_oracle_identity": {
+   "input": "把 model 的预测换成真实 wet",
+   "fires": "AG_model(n) 与 (E_oracle(n) − E_rand(n)) 的最大绝对差 < 1e-9,四个 n 全部",
+   "sidedness_rule_56": "恒等式检验,绝对值,双侧正确"
+  },
+  "P1_negative_control": {
+   "input": "把 model 的预测换成【负的】真实 wet",
+   "fires": "AG(n) <= 0,四个 n 全部",
+   "sidedness_rule_56": "已知方向:反向排序必然不优于随机。**单侧**。"
+  },
+  "P2_random_identity": {
+   "input": "把 model 的预测换成一根 N(0,1)",
+   "fires": "AG(n) 区间在四个 n 上全部含 0",
+   "sidedness_rule_56": "一根与 wet 独立的列的期望增益恰为 0,无已知非零方向,双侧正确"
+  },
+  "void_if_any_probe_does_not_fire": "第 54 条。替换探针只能进下一份声明。"
+ },
+ "void_gates": {
+  "V1_degenerate": "**改**:退化格(oracle == random)不作废,AG 记 0,并计数报出;M4 口径(剔除退化格)作为次要量同时报出。见跑前修正案 A。",
+  "V2_size": "格内可用行数 < n 的 (格,n) 跳过并计数",
+  "V3_closed_form": "闭式期望在跑之前与全枚举对照 >= 300 组含并列的随机例子,报最大绝对差,超过 1e-9 则整轮作废",
+  "V4_rule_51": "每个区间裁定报 50 个 bootstrap 种子下的翻转率",
+  "V5_rule_55": "bootstrap 重抽单位是靶标,断言 nb == len(used)",
+  "V6_units": "AG 一律报 wet 原单位并同时报格内 wet 的标准差,否则『+0.03』读不出大小"
+ },
+ "the_boundary_I_must_not_cross": {
+  "verbatim": "**本实验测的是增益曲线的形状,不是『n 该开多大』的答案。** 后者 = 增益曲线 ∩ 每条候选的成本。成本模型是另一个输入,本实验里没有,**不许把 AG 的峰值直接当成推荐的 n**。",
+  "also": "与 M4 一样:没有盲人群,只用骨架可形成子集,仍在 Turner 族内。**只量信息量,不判上线。**"
+ },
+ "expected_runtime": "四人群 x 5 个 n x 4 个块 + 3 组探针,闭式期望无蒙特卡洛,预计 10-20 分钟,$0",
+ "cost_statement": "本次运行完全离线,不调用任何 API,花费 $0。",
+ "pre_run_amendment_A_degenerate_cells": {
+  "found": "读 `m4_selection_currency.py` 的 capture() 时发现:`if o - r <= 0: return None` —— oracle == random 的格被作废(主人群 61 个)。",
+  "why_it_must_not_be_copied": "那道闸门是【比值】的性质:分母为 0 时捕获率无定义。**绝对增益在同一批格上定义得好好的,它就等于 0。** 照抄就等于系统性地删掉增益必为 0 的格,**主对象朝上偏**。",
+  "the_fix": "M4b 的主口径**保留**这些格(AG 记 0)。同时报一份 **M4 口径的子集**(剔除退化格)作为次要量,专供与 M4 的比值对齐。两个数都要引,不许只引一个。",
+  "direction_disclosure": "这个修正让主对象**变小**(朝零),是**不利方向** —— 但方向不是选择理由,理由是『比值的闸门不能当量的闸门』。",
+  "amended_before_any_data": true
+ }
+}

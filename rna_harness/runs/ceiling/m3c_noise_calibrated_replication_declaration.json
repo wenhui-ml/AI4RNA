@@ -1,0 +1,81 @@
+{
+ "id": "M3c",
+ "name": "noise_calibrated_replication_on_the_paired_contrast",
+ "date": "2026-08-25",
+ "status": "pre-registered, no NEW data computed (see the disclosure below -- four populations are NOT blind)",
+ "cost_usd": 0,
+ "offline": true,
+ "spec_version": "rule 38-56 + 【绝不退缩】口径",
+
+ "one_line": "`rigor_calibration_0825.md` 第六节第 2 条答应的那一份:主对象换成配对差,复现判据从裸『区间排除 0』改成【逐人群噪声校准阈值】,把 M3 的 K3 那个不可信的复现计数重判。",
+
+ "what_is_being_re_judged": {
+  "the_untrustworthy_count": "M3 的 K3 记的是『四人群里 1 个排除 0』。校准审计已证明支撑这个计数的仪器在样本3 上不稳(种子翻转 119/200 = 59.5%)、且双侧假阳 3/12。",
+  "why_the_old_rule_is_wrong": "『区间排除 0』把【检出力随人群变】当成【效应随人群变】。同一个真效应,在一个噪声本底更宽的人群上会被判成不复现;在一个本底更窄的人群上会被判成复现。**判据必须按每个人群自己的噪声本底缩放,而不是按同一个 0。**",
+  "not_a_rescue": "本次修正**同时可能让复现计数上升或下降**:阈值抬高会砍掉勉强排除 0 的人群,分母加到 6 会加进两个从未在本线读过的人群。方向不是我选的。"
+ },
+
+ "DISCLOSURE_this_is_only_half_blind": {
+  "what_I_have_already_seen": "`m3b_placebo_on_matched.json` 已经在四个核心人群上算出了 A_ed / A_mfe / A_pair / 12 根噪声臂的全部数字,我读过。**所以对那四个人群,这不是预注册,是重判。**",
+  "what_is_genuinely_blind": "第五批 `panel_f1_fifth.json` 与第六批 `panel_f1_sixth.json` 在【本条线的配平构造上】一次都没算过。它们是这条新判据唯一的盲测。",
+  "why_the_threshold_definition_cannot_be_tuned": "阈值定义为【12 根噪声臂里同侧均值的最大值】—— 一个没有自由参数的量。我没有 k、没有分位数、没有窗口可以调。这是把『不可调』当作『看过数据之后仍可信』的唯一理由。",
+  "the_one_thing_I_am_not_allowed_to_do": "跑完之后不许再动阈值定义、不许再加人群、不许把 A_pair 换回 A_ed 当主对象。第 42 条。"
+ },
+
+ "primary_object": {
+  "column": "A_pair = 逐次划分的 (A_ed − A) − (A_mfe − A),在 M3 自己的【精确 GC 配平对】上",
+  "why_paired_not_A_ed": "`m2_audit.md` 第九节答应的『主对象换配对差』。A_ed 里混着一般集合集中度;配对差把它按构造相消,剩下的才是骨架特异的那部分。M3b 已证明主人群上 A_pair +0.0122 与 A_ed +0.0140 几乎等量 —— 但那是一个人群的观测,不是判据。",
+  "estimand": "逐靶标留出成对排序准确率增量的靶标级均值;区间为靶标 cluster bootstrap。"
+ },
+
+ "the_new_replication_rule_frozen_verbatim": {
+  "tau_p": "tau_p = max(0, max_j mean(A_n{j}))  —— 该人群 12 根噪声臂里【与被宣称效应同侧(正)】的最大均值。若 12 根全为负,tau_p = 0。",
+  "replicates_p": "replicates(p) = (mean(A_pair) > tau_p) AND (ci_lo(A_pair) > 0) AND (seed_flip(A_pair) >= 45/50)",
+  "the_decision_line_verbatim": "rep = sum(1 for p in POPS if R[p]['A_pair']['mean'] > tau[p] and R[p]['A_pair']['ci'][0] > 0 and R[p]['A_pair']['flip'] >= 45)",
+  "rule_53_compliance": "tau 只数同侧。一根噪声列可靠地【伤害】排序(M1e 实测 −0.0022 排除 0),负向触发不是假阳,不进 tau。",
+  "rule_51_compliance": "seed_flip >= 45/50 是把【区间裁定本身的稳定性】写进判据 —— 样本3 那个 119/200 在新判据下会自己出局,不需要我事后指认它。"
+ },
+
+ "must_fire_probes": {
+  "P0_construction": {
+   "tests": "配对差的相消是不是真的相消",
+   "input": "把安慰剂列换成 ed_skel 的一份精确拷贝",
+   "fires": "主人群 |mean(A_pair)| < 1e-9",
+   "sidedness_rule_56": "这是恒等式检验,不是效应检验,双侧(绝对值)是正确的。"
+  },
+  "P1_detection_power": {
+   "tests": "这套流程还测得动一个真效应吗",
+   "input": "把安慰剂列换成一根 N(0,1)(于是 A_pair ≈ A_ed − A_noise)",
+   "fires": "主人群 A_pair 区间【正向】排除 0",
+   "sidedness_rule_56": "已知方向:真列为正、噪声列为负或零,所以差应为正。**单侧**。第 56 条。"
+  },
+  "P2_gc_cancellation": {
+   "tests": "GC 相消还在不在",
+   "input": "无(主臂自带的 A_G)",
+   "fires": "主人群 A_G 区间含 0",
+   "sidedness_rule_56": "精确配平后 GC 列在对内为常数,没有已知的非零方向,双侧正确。"
+  },
+  "void_if_any_probe_does_not_fire": "第 54 条:任一必响探针不响 ⇒ 本次运行作废,不许在本份声明里换探针。替换探针只能进下一份。"
+ },
+
+ "kill_conditions": {
+  "K0": {"tests": "仪器会不会无中生有", "fires": "主人群 12 根噪声臂里【同侧】排除 0 的 >= 2/12 ⇒ 整个实验作废"},
+  "K1": {"tests": "相消之后还剩不剩", "fires": "主人群 A_pair 区间含 0 ⇒ 骨架特异的那部分不存在"},
+  "K2": {"tests": "重判之后的复现", "fires": "六个人群里按新判据复现的 < 3 ⇒ 写 `underreplicated`"},
+  "K3": {"tests": "归属", "fires": "安慰剂 A_mfe 自己在 >= 3 个人群上通过同一条新判据,且其六人群均值 >= A_pair 均值的一半 ⇒ 主张范围从骨架收到一般集合集中度"},
+  "K4": {"tests": "盲测", "fires": "第五批与第六批【都】不复现 ⇒ 无论核心四人群怎么样,裁定串必须带 `blind_pair_null`"}
+ },
+
+ "void_gates": {
+  "V1_scoring": "C1 修正版:共同对集、预测并列记 0.5、精确 GC 配平(gc_cross 与 gc_frac 都相等)",
+  "V2_no_leak": "分子级泄漏计数必须为 0/200,逐人群报出",
+  "V3_rule_46": "12 根噪声臂与主臂同批划分、同一套 fit_predict",
+  "V4_rule_51": "每个区间裁定报 50 个 bootstrap 种子下的翻转率,并写进判据",
+  "V5_rule_55": "bootstrap 重抽单位是靶标,断言 nb == len(used)",
+  "V6_min_pairs": "单靶标单次划分可判对数 < 30 则该次不计入;靶标有效划分数 < MIN_SPLITS_PER_TARGET 则该靶标不计入",
+  "V7_population_floor": "任一人群有效靶标 < H.MIN_TARGETS 则该人群作废并计数,不进分母"
+ },
+
+ "expected_runtime": "六人群 x 200 划分 x 17 臂,离线,预计 25-45 分钟,$0",
+ "cost_statement": "本次运行完全离线,不调用任何 API,花费 $0。"
+}
