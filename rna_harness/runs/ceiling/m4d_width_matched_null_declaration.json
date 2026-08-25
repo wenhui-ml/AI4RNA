@@ -1,0 +1,74 @@
+{
+ "id": "M4d",
+ "name": "the_control_that_was_not_a_control",
+ "date": "2026-08-25",
+ "status": "pre-registered, no data computed",
+ "cost_usd": 0,
+ "offline": true,
+ "spec_version": "rule 38-59 + 【绝不退缩】口径",
+
+ "one_line": "兑现 M4c 第八节的三笔:等宽纯噪声零模型、GC_only 自己的信度、用独立划分估信度。M4c 的 K2 触发了但我判它携带零信息 —— **一个被作废解读的闸门不许就这么留着当结论。**",
+
+ "what_went_wrong_in_M4c_verbatim": {
+  "the_line": "idx[f'N{j}'] = iA + [nB + 2 + j]",
+  "why": "iA 是完整的 22 列出厂面板。所谓『噪声模型』= 面板 + 一根废列。**它不是零模型,它就是 A。K2 是拿 A 和 A 比。**",
+  "what_M4c_therefore_did_not_test": "『面板的跨批次持续性会不会被一个没有信号的模型复制出来』—— 这句话在 M4c 的数据下一次都没有被检验过。",
+  "rule_59_applied_to_myself": "闸门触发时排除掉的替代解释是什么?M4c 的 K2 排除掉的是【主臂自己】。按第 59 条,那道闸门当时就没写完。"
+ },
+
+ "the_two_things_being_separated": {
+  "confound": "`A` 是 22 列、每批重新拟合;`GC_only` 是 2 列。**列数越多逐批拟合噪声越大 ⇒ 逐靶标 capture 越不稳 ⇒ 跨批次相关被衰减得越狠。** 所以 M4c 的『A 2/6 对 GC_only 6/6』至少一部分可能是复杂度差异,不是失败模式差异。",
+  "separation_1_width_matched_nulls": "**NG = 2 列纯噪声**(对 GC_only 等宽),**NA = 22 列纯噪声**(对 A 等宽),各 12 根。C1 的宽度匹配。纯噪声,不含基础面板。",
+  "separation_2_disattenuation": "对每个块单独估信度,报**去衰减后**的 rho = rho / sqrt(rel_a * rel_b),再比较 A 与 GC_only。"
+ },
+
+ "reliability_must_use_independent_splits": {
+  "what_M4c_did": "同一批 200 次划分下把设计对半 ⇒ 两半共享划分噪声 ⇒ **信度被高估 ⇒ 天花板抬高 ⇒ K3 更难触发 ⇒ 方向对我自己的主张有利**。",
+  "the_fix": "跑**两族互相独立的划分**(不同 RNG 族),各自算逐靶标 capture,rel = 两族之间的 Spearman。两族不共享任何划分。",
+  "direction_disclosure": "这个修正会让信度**下降**、天花板**降低**、K3 **更容易触发** —— **不利方向**。理由是纯逻辑的(共享噪声的两半不是两次独立测量),不因为它更危险就不做。"
+ },
+
+ "kill_conditions_each_with_what_its_firing_excludes": {
+  "K0": {
+   "fires": "12 根 NG 或 12 根 NA 里,按主臂同一条规则(六对里正向排除 0 >= 4)触发的 >= 2 ⇒ 整轮作废",
+   "rule_59_what_it_excludes": "排除【这套跨批次相关流程本身会从没有信号的列里造出持续性】"
+  },
+  "K1": {
+   "fires": "GC_only 的六对 rho 均值 <= NG 的十二根均值,或两者区间重叠 ⇒ 写 `gc_persistence_is_a_width_artefact`",
+   "rule_59_what_it_excludes": "排除【GC_only 的 6/6 只是因为它窄、拟合稳,任何两列都会这样】"
+  },
+  "K2": {
+   "fires": "**去衰减后** GC_only 与 A 的 rho 区间重叠 ⇒ 写 `contrast_is_complexity_not_failure_mode`",
+   "rule_59_what_it_excludes": "排除【M4c 的 2/6 对 6/6 是列数造成的衰减差,不是失败模式差】"
+  },
+  "K3": {
+   "fires": "**去衰减后** A 的六对里正向排除 0 的 >= 4 ⇒ 写 `panel_errors_persist_after_disattenuation`",
+   "rule_59_what_it_excludes": "排除【面板误差不持续】—— **这一条会推翻 M4c 的 K1,方向不利于我刚写下的机制陈述,必须照判**"
+  }
+ },
+
+ "must_fire_probes": {
+  "P0_reliability_positive": {"fires": "主人群 A 的独立划分信度区间【正向】排除 0", "sidedness_rule_56": "同一个量的两次独立测量必须正相关,**单侧**"},
+  "P1_global_permutation": {"fires": "全局置换后的 rho 区间含 0", "sidedness_rule_56": "置换后无已知方向,双侧"},
+  "P2_rule_58_settings": {"fires": "探针与主臂的划分数、靶标地板、bootstrap 次数、置换次数逐项相等(脚本内断言)"},
+  "P3_null_is_actually_null": {
+   "fires": "NA 与 NG 的**单批** capture 均值都在 0 附近(|均值| < 0.05)",
+   "why": "**第 59 条自用**:如果我的『纯噪声块』其实还在选出好设计,那它就又不是零模型了。这一条专门排除【我第二次把对照写成非对照】。"
+  },
+  "void_if_any_probe_does_not_fire": "第 54 条。替换探针只能进下一份声明。"
+ },
+
+ "void_gates": {
+  "V1_no_leak": "分子级与靶标级泄漏 0/200,逐人群报出",
+  "V2_shared_targets": "四人群共同靶标 < 20 则整轮作废",
+  "V3_degenerate": "capture 在退化格上无定义,按 M4 口径剔除(主对象就是比值,闸门与量匹配)",
+  "V4_rule_51": "每个区间裁定报 bootstrap 种子翻转率",
+  "V5_rule_55": "重抽共同靶标一次,重算全部六对;置换全局做一次",
+  "V6_rule_53": "只数与被宣称效应同侧(正)的触发",
+  "V7_rule_58": "探针设置与主臂逐项断言相等",
+  "V8_rule_59": "本声明每一道闸门都写明【触发时排除掉哪个替代解释】,写不出的不许进判据"
+ },
+
+ "expected_runtime": "四人群 x 26 个块 x 2 族独立划分,预计 40-70 分钟,$0",
+ "cost_statement": "本次运行完全离线,不调用任何 API,花费 $0。"
+}
