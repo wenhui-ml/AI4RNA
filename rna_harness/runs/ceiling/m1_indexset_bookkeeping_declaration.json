@@ -1,0 +1,103 @@
+{
+ "id": "M1",
+ "name": "indexset_bookkeeping_vs_collapsed_sum",
+ "date": "2026-08-25",
+ "status": "pre-registered; amended after a 70-split smoke that produced no verdict; deciding run not yet executed",
+ "cost_usd": 0,
+ "offline": true,
+ "spec_version": "rule 38-54 + 【绝不退缩】口径",
+ "one_line": "邓煜移动一:不要把分布压成标量,要在一个【可分类的离散指标集】上记账。这是四步里唯一一步我从来没用过 —— 我把 L×L 的 bpp 矩阵压成 7 个标量,而 `ensemble_defect` 本身就是一个求和,求和就是压缩。本实验在靶标的交叉配对集合上按类记账,问:分类买不买得到东西。",
+ "why_now": {
+  "two_independent_pointers": "(1) 天花板复核:出厂判据 5.7%、两根 GC 列 12.2%、整套面板 20.1%,**79.9% 没有任何东西碰到**;(2) M2 十个结构不变量全部 unresolved(且该跑按其自身闸门 1 作废)。两处指的是同一件事:**两个表示族都用完了**。",
+  "why_it_composes_with_move_three": "分类就是不变量,所以移动一天然接移动二;而全部评估仍然只在 **gc_cross 与 gc_frac 完全相等**的对上进行,GC 的两根列对预测差的贡献按构造恒为 0。**这一层不重新论证,直接继承 M3 的构造与它的内建对照。**"
+ },
+ "the_index_set_and_its_classification": {
+  "index_set": "靶标的交叉配对集合 {(i,j)} = pk_pairs(target) − pk_pairs(_round_only(target))",
+  "per_design_bookkeeping": "对每个设计,记下每个 (i,j) 的系综配对概率 p_ij = bpp[i+1][j+1](ViennaRNA 分配函数),**不求和**",
+  "classes__8_columns_each_a_sum_over_a_classifiable_subclass": [
+   "p_min      = min_{(i,j)} p_ij                      —— 最弱的一对",
+   "p_term     = mean p_ij over 茎端对(茎内链首/链尾)",
+   "p_int      = mean p_ij over 茎内对(非端)        —— 空则用 p_term 填补",
+   "p_span_lo  = mean p_ij over 跨度 < 该靶标中位跨度",
+   "p_span_hi  = mean p_ij over 跨度 >= 中位跨度",
+   "p_stem_sh  = mean p_ij over 长度<=2 的茎          —— 空则用 p_all 填补",
+   "p_stem_lo  = mean p_ij over 长度>=3 的茎          —— 空则用 p_all 填补",
+   "p_worststem= 平均 p 最低的那根茎的 mean p"
+  ],
+  "the_collapse_it_is_compared_against": "p_all = mean_{(i,j)} p_ij —— **同一个指标集上的求和**。这就是被压缩掉的那个标量。",
+  "imputation_disclosure": "每一类的填补比例必须报出;任一类填补比例 > 30% 则该列作废并计数。"
+ },
+ "arms__all_scored_on_EXACTLY_GC_matched_pairs": {
+  "A": "基础 22 列面板(F2)",
+  "A_s1pad": "A + [p_all] + 7 根噪声 —— **宽度配平的塌缩臂**(C1 的 T0pad 修法:不许拿 1 列去比 8 列)",
+  "A_C8": "A + 8 根分类列 —— **主臂**",
+  "A_ed": "A + ens_defect_skel —— M3 的真列,只为接得上,不参与主判据",
+  "A_skelC8": "A + 在**骨架(圆括号)配对集合**上用同一套分类算出的 8 根列 —— **指标集安慰剂**:同样的机器、同样的宽度,换一个不该起作用的指标集",
+  "A_G": "A + gc_cross + gc_frac —— **内建必须为零对照**(继承 M3)",
+  "A_nj": "A + 8 根 N(0,1),j = 0..11 —— **第 45/46 条:按实加列数 8 标定的零点,12 根**"
+ },
+ "population_note": "只用骨架可形成子集(与 M3 臂1 同一子集),这样 A_ed 可比。主人群 panel_f1_fresh(样本2),复现 panel_f1_designs / third / fourth。**没有盲人群**(H2/C1 读过全部六个),被测的量是新的,测试不是盲的。",
+ "kill_conditions": {
+  "K0": {
+   "tests": "GC 相消有没有失效",
+   "fires": "`A_G − A` 在配平对上区间**排除 0** ⇒ 本人群整个作废",
+   "the_decision_line_verbatim": "K0 = ex(P, 'A_G')",
+   "must_fire_input": "探针:完全不配平地跑一遍,K0 必须响(M3 测到 +0.0251)"
+  },
+  "K1": {
+   "tests": "分类记账相对基础面板有没有增量",
+   "fires": "`A_C8 − A` 区间含 0",
+   "the_decision_line_verbatim": "K1 = not ex(P, 'A_C8')",
+   "must_fire_input": "探针:把 8 根分类列换成 8 根噪声,K1 必须响"
+  },
+  "K2": {
+   "tests": "**这才是移动一的问题:分类比塌缩多买到了什么**",
+   "fires": "`A_C8 − A_s1pad` 区间含 0",
+   "the_decision_line_verbatim": "K2 = not ex_contrast(P, 'A_C8', 'A_s1pad')",
+   "must_fire_input": "探针:把 8 根分类列**全部设为 p_all**(退化分类),K2 必须响 —— 退化时分类确实什么也没多买"
+  },
+  "K3": {
+   "tests": "宽度混杂",
+   "fires": "`A_C8 − A` 的均值不超过 12 根 8 列噪声臂的零点中心 + 其 95 分位"
+  },
+  "K4": {
+   "tests": "指标集是不是特异的",
+   "fires": "`A_skelC8 − A` 也排除 0 且量级 >= `A_C8 − A` 的一半 ⇒ 同一套机器换个指标集也一样,交叉配对集合不特异"
+  },
+  "K5": {
+   "tests": "复现",
+   "fires": "主人群 K1 不触发,而三个复现人群里 `A_C8 − A` 排除 0 的少于 2 个。**按第 53 条:复现计数必须与每个人群的 12 根噪声触发根数一起报;某人群噪声触发 >= 2/12 则该人群的计数作废并明写。**"
+  }
+ },
+ "void_gates": {
+  "V1_leakage": "分子级 + 靶标级双查,全 200 次划分;非 0 则作废",
+  "V2_columns_are_wired_and_not_degenerate": "8 根分类列每根方差 > 0,且与 p_all 的 |相关| < 0.999;任一根不满足 -> 该列作废并计数。**并报每根与 p_all 的相关,分类若与塌缩相关到 0.99 以上,它就不是分类。**",
+  "V3_rule_48": "报每根分类列与 gc_cross 的相关。**但第 48 条在本次是按构造过的:全部评估只在 gc_cross 完全相等的对上,GC 对预测差的贡献恒为 0。**",
+  "V4_rule_51": "每一个『区间是否含 0』的裁定都报 50 个 bootstrap 种子下的翻转率;翻转率非 0 -> 该裁定记为仪器读数",
+  "V5_rule_53": "每个人群单独报 12 根噪声里区间排除 0 的根数(标称 5%)。假阳率与主人群不一致的人群,其复现计数作废",
+  "V6_rule_47_all_three_probes_must_be_run": "K0/K1/K2 的必响输入全部真的跑,并报响没响。**任一探针没响 -> 本次运行作废(第 54 条),不许事后换探针给这一跑背书。**",
+  "V7_imputation": "报每一类的填补比例;>30% 的类作废并计数",
+  "V8_bootstrap_unit": "n == 产生 g_t 的靶标数 且 != 格数 且 != 分子数"
+ },
+ "what_a_positive_result_would_mean": "在 GC 已按构造相消的对上,**保留指标集记账比把它求和掉多买到了排序力** —— 那就直接证明瓶颈是表示,而且给出第三个表示族。它同时把移动二接上:类就是不变量,主项可以按类切。",
+ "what_this_cannot_do": "不改 H2/M3/M2b 的任何冻结裁定。不判上线(要改出厂决定,先过那三张表的重新校准)。仍在 Turner 族内,不修判官独立性。",
+ "frozen": "看到任何数字之后:不许改类的定义、不许改填补规则、不许改配平条件、不许改块或宽度配平方式、不许改划分比例/次数、不许换区间构造、不许换主人群、不许动 K2 这条主判据。",
+ "amendments_before_any_deciding_population_ran": {
+  "found_in": "70 次划分的冒烟(不产生任何裁定;主人群一次决定性运行都没跑过)",
+  "A_V7_fires_on_p_stem_sh": {
+   "observed": "填补比例 p_stem_sh = 84.9%~85.4%(四个人群一致),其余七类 0%。",
+   "why": "绝大多数靶标没有长度<=2 的交叉茎,所以该列 85% 的时间等于 p_all —— 它不是一个类,是塌缩的副本。",
+   "action": "**这是执行 V7,不是修改声明**:V7 原文『任一类填补比例 > 30% 则该列作废并计数』。作废 p_stem_sh,类数 8 -> 7。",
+   "width_consequence": "宽度配平随之变:塌缩臂 = p_all + 6 根噪声,噪声臂 = 每根 7 列。**否则主判据 K2 会退化成宽度比较。**",
+   "direction_disclosure": "**方向披露:去掉一根 85% 等于 p_all 的列,对主臂略为有利**(少一列过拟合成本,而它几乎不带信息)。与任何结果无关,是 V7 的机械后果。",
+   "implementation_note": "填补比例在四个人群全部折叠完之后汇总计算,作废的列集对四个人群统一,避免各人群的臂不同。"
+  },
+  "B_V2_prose_vs_number": {
+   "observed": "与塌缩 p_all 的相关:p_term +0.992, p_int +0.993, p_stem_lo +0.994, p_span_hi +0.978, p_span_lo +0.974, p_worststem +0.878, p_min +0.846。",
+   "conflict": "V2 的**判决数**是 |相关| < 0.999(七根全过);V2 的**散文**写的是『相关到 0.99 以上就不是分类』(三根不过)。",
+   "resolution": "**按第 42 条,以那一行判决数为准(0.999),七根全部保留;冲突照实记录,不在看到数之后往对自己有利的方向解释。**",
+   "why_it_does_not_invalidate_K2": "高共线性不使 K2 失效 —— 回归用得到的是残差变异,K2 问的正是『分类相对塌缩多买到什么』。共线性高只意味着可多买的量小,不意味着测不了。"
+  },
+  "C_V3_gc_correlation_recorded": "分类列与 gc_cross 的相关 +0.22~+0.48。**第 48 条在本次按构造过关**(只在 gc_cross 完全相等的对上评估),该相关只作记录。"
+ }
+}
