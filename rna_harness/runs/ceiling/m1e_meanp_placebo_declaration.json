@@ -1,0 +1,87 @@
+{
+ "id": "M1e",
+ "name": "mean_p_vs_ed_with_placebo__probe_condition_fixed",
+ "date": "2026-08-25",
+ "status": "pre-registered; M1d was VOID by rule 54 (its K1 probe condition was two-sided); this run fixes that ONE line",
+ "cost_usd": 0,
+ "offline": true,
+ "spec_version": "rule 38-55 + 【绝不退缩】口径",
+ "one_line": "兑现 M1d 的作废。只改一处:K1 必响探针的条件从【区间含 0】改为【不在正向侧排除 0】(第 56 条)。其余全部原样。",
+ "what_M1c_left_owing": {
+  "the_claim": "`mean p_ij over 骨架配对` 在宽度 7 上是 **+0.0148 [+0.0034,+0.0263] 排除 0、种子 50/50**,与七根分类列打平;同宽度下 `ensemble_defect` 是 +0.0059 含 0。",
+  "what_was_never_measured": "**(a) 单列对单列的直接对比** —— M1c 里两者都被补到宽度 7,而 `ed` 与 `p_all` 的直接对比 S2 = −0.0089 **[−0.0201,+0.0011] 含 0**,是 unresolved。**(b) 安慰剂臂** —— 从来没跑过。",
+  "why_the_placebo_is_mandatory_here": "R6 与 M7 都测到:一般集合集中度类列(`ed_mfe`)能拿到真列约一半的效力。**一根『平均边际概率』天然就是集合集中度的度量,所以它比 `ed` 更需要这道对照,不是更不需要。**"
+ },
+ "columns__all_single_and_all_from_(seq,target)_only": {
+  "p_all_skel": "骨架(圆括号)配对的平均 p_ij —— **主臂**",
+  "ed_skel": "ensemble_defect(骨架) —— M3 的胜出列,**主比较对象**",
+  "p_all_mfe": "**该设计自己 MFE 结构的配对的平均 p_ij** —— 安慰剂:同一个泛函、同一种集合集中度,但指的不是靶标",
+  "p_all_cross": "交叉配对的平均 p_ij —— 指标集对照(M1 测过 −0.0042 含 0,本臂再测一次)",
+  "width": "**全部单列。M1c 的宽度惩罚问题按构造消失,主判据是单列对单列。**"
+ },
+ "evaluation": "全部只在 **gc_cross 与 gc_frac 完全相等**的对上打分(继承 M3 的构造与它的内建 `A_G` 对照)。第 48 条按构造过关。打分用 C1 修正版:共同对集、预测并列记 0.5。",
+ "kill_conditions": {
+  "K0": {
+   "tests": "GC 相消有没有失效",
+   "fires": "`A_G − A` 区间排除 0 ⇒ 本人群作废",
+   "the_decision_line_verbatim": "K0 = ex(P, 'A_G')",
+   "must_fire_input": "探针:完全不配平地跑一遍,K0 必须响(M1/M3b/M6 都测到 +0.029~+0.030)"
+  },
+  "K1": {
+   "tests": "主臂相对面板有没有增量",
+   "fires": "`A_ps − A` 区间含 0",
+   "the_decision_line_verbatim": "K1 = not ex(P, 'A_ps')",
+   "must_fire_input": "探针:把 p_all_skel 换成一根噪声,**该噪声主列必须不在【正向侧】排除 0**(第 56 条;M1d 实测 −0.0022,负向侧排除 0)"
+  },
+  "K2": {
+   "tests": "**主判据:单列对单列,平均边际概率打不打得过 ensemble_defect**",
+   "fires": "`A_ps − A_ed` 区间含 0",
+   "the_decision_line_verbatim": "K2 = not ex(P, 'ps_minus_ed')",
+   "must_fire_input": "探针:令 p_all_skel := ed_skel(两列完全相同),K2 必须响",
+   "MANDATORY_LABEL": "触发时写 `mean_p_indistinguishable_from_ensemble_defect`,**绝不写 `refuted`** —— 含 0 = 这台仪器分不开两根列"
+  },
+  "K3": {
+   "tests": "**归属(第 52 条)**",
+   "fires": "安慰剂 `A_pm − A` 也排除 0 **且** 其量级 >= `A_ps − A` 的一半",
+   "MANDATORY_LABEL": "触发时写 `explained_by_generic_concentration` —— 把主张的范围收到集合集中度类,不是证伪"
+  },
+  "K4": {
+   "tests": "指标集特异性",
+   "fires": "`A_pc − A`(交叉配对)也排除 0 且量级 >= `A_ps − A` 的一半"
+  },
+  "K5": {
+   "tests": "复现",
+   "fires": "主人群 K1 不触发,而三个复现人群里 `A_ps − A` 排除 0 的少于 2 个。**第 53 条改写版:逐人群报【同侧】噪声触发根数,>= 2/12 的人群其计数作废并明写。**"
+  }
+ },
+ "void_gates": {
+  "V1_leakage": "分子级 + 靶标级双查,全 200 次划分",
+  "V2_columns_wired": "四根列每根方差 > 0,且两两 |相关| < 0.999;照实报出全部两两相关与各自与 gc_cross 的相关",
+  "V3_rule_46": "12 根**单列**噪声臂,与主臂同批划分",
+  "V4_rule_51": "每个『区间是否含 0』的裁定报 50 个 bootstrap 种子下的翻转率",
+  "V5_rule_53": "逐人群只数**与被宣称效应同侧**的噪声触发根数",
+  "V6_rule_54": "K0/K1/K2 三个必响输入全部真的跑并报响没响。**任一没响 ⇒ 本次运行作废,不许事后换探针。**"
+ },
+ "populations": {
+  "primary": "panel_f1_fresh.json(样本2)",
+  "replication": [
+   "panel_f1_designs.json",
+   "panel_f1_third.json",
+   "panel_f1_fourth.json"
+  ],
+  "fifth_sixth": "**本构造做 GC 精确配平,M1c 已测出配平会把第五/六批剔到只剩 16 和 1 个靶标 ⇒ 本实验不用它们,并明写原因。而且它们本来也不是盲人群 —— H2 读过。**",
+  "subset": "只用骨架可形成子集",
+  "blindness": "**没有盲人群。**"
+ },
+ "what_a_positive_result_would_mean": "一根**更简单、更便宜**的列在同一个位置上打赢 `ensemble_defect`,而且不是一般集合集中度的产物 —— 那可以直接换掉出厂判据里的那一根。",
+ "what_this_cannot_do": "不改 M1c/M3/M7 的任何冻结裁定。**不判上线** —— 要改出厂决定,先过那三张表的重新校准。仍在 Turner 族内。",
+ "frozen": "看到任何数字之后:不许改四根列的定义、不许改配平条件、不许把任何臂补宽、不许换探针、不许改划分比例/次数、不许换主人群。",
+ "the_void_being_cashed": {
+  "m1d_verdict": "void_probe_did_not_fire",
+  "what_happened": "K1 探针把主列换成一根 N(0,1),测到 A_ps−A = −0.0022 [−0.0044,−0.0002] —— 在【负向侧】排除 0。一根废列可靠地伤害排序,区间正确地检出了这件事,而我给探针写的是双侧条件,于是它被记成『没响』。",
+  "the_one_line_changed": "K1 探针必响条件:`not excl` -> `not (excl and ci[0] > 0)`,即【不在正向侧排除 0】",
+  "why_this_is_not_post_hoc_rescue": "理由与任何观测结果无关:一根废列的期望效应是负的,要求它『含 0』等于要求它没有代价,那本来就不是检出力的证据。**这正是第 53 条已经写下的道理,我当时只把它用到噪声臂上,忘了用到探针上。**",
+  "direction_disclosure": "**这个修正让 K1 探针更容易通过 —— 危险方向,所以理由必须纯逻辑,并且不许再改第二处。**",
+  "everything_else_frozen_unchanged": "四根列的定义、GC 精确配平、单列对单列的主判据、安慰剂臂、指标集对照、12 根单列噪声臂、逐人群同侧假阳、种子翻转、K0/K2 探针 —— 一律原样。"
+ }
+}
