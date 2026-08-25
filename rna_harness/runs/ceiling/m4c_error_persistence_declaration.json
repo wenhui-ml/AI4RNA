@@ -1,0 +1,75 @@
+{
+ "id": "M4c",
+ "name": "does_the_criterion_fail_on_the_same_targets_every_round",
+ "date": "2026-08-25",
+ "status": "pre-registered, no data computed",
+ "cost_usd": 0,
+ "offline": true,
+ "spec_version": "rule 38-58 + 【绝不退缩】口径",
+
+ "one_line": "移动四的另一半。M4/M4b 只做了【单轮】选择价值;`m4_audit.md` 第六节把误差跨轮相关列为未测项,并写死『不许说本实验覆盖了移动四的全部』。本份把它做完。",
+
+ "the_move_four_statement_being_tested": {
+  "deng_form": "长程 = 短程 + 误差传播控制。短程结论(单轮选择价值)已经有了;长程要问的是【误差会不会在轮与轮之间被平均掉】。",
+  "product_form": "多轮设计里,同一靶标上判据的错误如果是**相关的**(同一失败模式),它们不会像独立噪声那样随轮数变小。**那么『多开几轮』这件事的价值,取决于一个我从没测过的量。**",
+  "why_it_matters_more_than_it_sounds": "M4b 已证明单轮增益在 n=10 见顶、n=50 归零。若误差还跨轮持续,那么【加大池子】与【多开轮次】两条路就同时被堵住,这条线剩下的只有【换判据】。"
+ },
+
+ "primary_object": {
+  "per_target_quantity": "capture_t = (E_model(10) − E_rand) / (E_oracle(10) − E_rand),逐靶标(先格内、再靶标级)",
+  "why_capture_not_regret": "**关键混淆:裸的 regret = E_oracle − E_model 里含有靶标自身的 wet 离散度**,那是纯粹的靶标性质,任何模型(包括随机)都会让它跨人群高度相关。除以可得增益之后,**随机模型的 capture 恒为 0、无方差**,靶标离散度按构造被约掉。",
+  "estimand": "rho = 跨人群 Spearman 相关(共同靶标上),四人群共 **6 对**",
+  "interval": "靶标 cluster bootstrap;第 55 条:重抽共同靶标并**重算全部 6 对**,置换**全局**做一次,不在每对内部独立打乱"
+ },
+
+ "arms": {
+  "arm_real": "A = 22 列出厂面板",
+  "arm_G": "GC_only(两根 GC 列)—— M4b 说它是唯一还在涨的曲线,问它的失败模式是不是也持续",
+  "arm_P_placebo": "12 个**噪声模型**:预测列换成一根 N(0,1)。第 46 条 + 第 52 条。随机模型的 capture 期望为 0,其跨人群 rho 应当在 0 附近 —— 这是本实验的零点,不是装饰。",
+  "reliability": "每个人群内做**设计对半**(格内随机分两半,各自算 capture_t),给出该人群的信度 rel_p;衰减天花板 = sqrt(rel_a * rel_b),逐对报出"
+ },
+
+ "must_fire_probes": {
+  "P0_self_consistency": {
+   "tests": "这套逐靶标量本身有没有可复现的结构",
+   "input": "同一人群的两个设计半 vs 彼此(即信度本身)",
+   "fires": "主人群 rel_p 区间【正向】排除 0",
+   "sidedness_rule_56": "已知方向:同一人群同一量的两半必须正相关。**单侧**。"
+  },
+  "P1_label_permutation": {
+   "tests": "跨人群 rho 会不会无中生有",
+   "input": "把一个人群的靶标标签全局置换",
+   "fires": "置换后的 rho 区间含 0",
+   "sidedness_rule_56": "置换后无已知非零方向,双侧正确"
+  },
+  "P2_settings_match_rule_58": {
+   "tests": "**第 58 条**:探针设置必须与主臂完全一致",
+   "fires": "探针的划分数、靶标地板、区间构造与主臂逐项相等(脚本内断言,不等则整轮作废)",
+   "why_this_is_a_probe_now": "同一天内我三次把必响探针跑在比主臂更省的设置上,其中一次方向对我有利。把它变成一道会作废整轮的断言,而不是一条我要记得遵守的规矩。"
+  },
+  "void_if_any_probe_does_not_fire": "第 54 条。替换探针只能进下一份声明。"
+ },
+
+ "kill_conditions": {
+  "K0": {"tests": "仪器无中生有", "fires": "12 个噪声模型里**同侧**(正)rho 排除 0 的 >= 2/12 ⇒ 整轮作废"},
+  "K1": {"tests": "误差到底持不持续", "fires": "arm_real 的 rho 在 **6 对里排除 0 的 < 4 对** ⇒ 写 `errors_do_not_persist_across_rounds`", "MANDATORY_LABEL": "**K1 触发是【好消息】**:误差不相关意味着多开轮次真的能把它平均掉。不许因为它触发就把本实验读成失败。"},
+  "K2": {"tests": "归属(第 52 条)", "fires": "噪声模型的 rho 六对均值 >= arm_real 的一半 ⇒ 这个相关不是判据的性质"},
+  "K3": {"tests": "测量假象", "fires": "arm_real 的 rho 点估计 >= 衰减天花板 sqrt(rel_a*rel_b) 且区间不含天花板 ⇒ 相关高于信度允许的上限,只可能是构造泄漏,整轮作废"},
+  "K4": {"tests": "GC 的失败模式", "fires": "arm_G 的 rho 六对里排除 0 的 >= 4 ⇒ **连那条唯一还在涨的曲线也在同一批靶标上反复失败**,必须写进裁定串"}
+ },
+
+ "void_gates": {
+  "V1_no_leak": "分子级与靶标级泄漏计数必须为 0/200,逐人群报出",
+  "V2_shared_targets": "每对人群的共同靶标数 < 20 则该对作废并计数,不进 6 对的分母",
+  "V3_degenerate": "capture 在 oracle == random 的格上无定义,**这些格按 M4 口径剔除**(与 M4b 修正案 A 相反 —— 因为这里主对象【就是】比值,闸门与量匹配)",
+  "V4_rule_51": "每个区间裁定报 50 个 bootstrap 种子下的翻转率",
+  "V5_rule_55": "重抽共同靶标后**重算全部 6 对**;置换全局一次",
+  "V6_rule_53": "噪声臂只数与被宣称效应同侧(正)的触发数",
+  "V7_rule_58": "探针与主臂设置逐项断言相等"
+ },
+
+ "the_boundary": "本实验用【不同批次】代理【不同轮次】。批次不是严格意义上的设计轮次(它们不是同一个流程的连续迭代)。**这一条必须写进审计的边界节,不许把结论说成『多轮设计里』,只能说『跨批次』。**",
+
+ "expected_runtime": "四人群 x 15 个块 x n=10 + 设计对半 + 2 组探针,预计 30-50 分钟,$0",
+ "cost_statement": "本次运行完全离线,不调用任何 API,花费 $0。"
+}
