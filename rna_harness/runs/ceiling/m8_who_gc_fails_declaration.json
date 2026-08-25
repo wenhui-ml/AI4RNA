@@ -1,0 +1,79 @@
+{
+ "id": "M8",
+ "name": "which_targets_does_the_gc_criterion_fail_on_every_batch",
+ "date": "2026-08-25",
+ "status": "pre-registered, no data computed",
+ "cost_usd": 0,
+ "offline": true,
+ "spec_version": "rule 38-59 + 【绝不退缩】口径",
+
+ "one_line": "M4c/M4d 证明两根 GC 列在【同一批靶标】上每批都失败(六对全中,等宽纯噪声 −0.01,去衰减不动)。**那么是哪些靶标?** 这是移动二在一个【已知非空】的指标集上的第一次应用。",
+
+ "why_this_is_positive_side_not_another_empty_family": {
+  "the_five_empty_families": "靶标结构 13 列、数据量 3 列、预测配对集两个指标集、测量几何 10 列、动力学 5 列 —— 全部在解释 `g_t` 上被测空,分辨力 |rho| ≳ 0.18。",
+  "why_this_is_different": "**被解释的量换了。** 那五族要解释的是 `g_t`(ensemble_defect 的增量),而 `g_t` 的跨人群可复现性本身被 R6 的安慰剂打掉过。**本次要解释的量是 `capture_t^GC`,它的跨批次复现是 M4d 刚刚在等宽纯噪声对照下确证的(6/6,信度 0.9997)。** 一个被确证稳定的量,比一个可复现性存疑的量更值得去解释。",
+  "and_the_hypothesis_is_mechanistic": "不是把 35 根列扔进模型看谁显著。主臂是**一句可以被一列证伪的机制话**。"
+ },
+
+ "the_mechanism_being_tested": {
+  "sentence": "**两根 GC 列只能靠【设计之间 GC 的差别】排序。如果一个靶标的设计们 gc_cross 几乎不变,GC 判据就没有信息可用 —— 失败必然发生,而且每批都发生。**",
+  "why_it_would_explain_persistence": "『设计之间 GC 差多少』是**靶标(与设计流程)的性质**,不是批次的性质,所以它在批与批之间保持 ⇒ 失败也保持。这正是 M4c 观测到的形状。",
+  "what_would_refute_it": "capture_t^GC 与格内 gc_cross 离散度无关(区间含 0),或者这个关系对面板 capture_t^A 一样强(那它就不是 GC 特有的)。"
+ },
+
+ "primary_object": {
+  "y": "capture_t^GC = 逐靶标 capture@10,块为 GC_only(两根 GC 列),四人群各自算",
+  "x_main": "spread_gc = 格内 gc_cross 的标准差,格→靶标取均值。**只用设计序列算,不碰 wet。**",
+  "statistic": "逐人群 Spearman rho(y, x),靶标 cluster bootstrap 区间 + 种子翻转(第 51 条)",
+  "replication_rule": "四人群里**同侧**(正)排除 0 的 >= 3 ⇒ 复现"
+ },
+
+ "secondary_invariants_bonferroni_0_05_over_5": [
+  "spread_gcfrac:格内 gc_frac 标准差",
+  "mean_gcfrac:格内 gc_frac 均值(**GC 含量本身**,与离散度分开)",
+  "n_designs:格内设计数(数据量族的代表,第 50 条)",
+  "target_len:靶标长度"
+ ],
+
+ "controls": {
+  "arm_A_specificity": "**同一分析原样跑在面板 capture_t^A 上。** M4c 已证明面板的失败【不】跨批次持续(2/6),所以若 spread_gc 对 A 一样强,本机制就不是 GC 特有的 —— 这是本实验的归属臂。",
+  "arm_placebo": "spread_noise:格内一根 N(0,1) 的标准差(纯设计级噪声的离散度),按同一条规则判",
+  "arm_noise_12": "12 根**靶标级** N(0,1) 不变量,按同一条规则判(第 46/52/53 条)"
+ },
+
+ "kill_conditions_each_with_what_its_firing_excludes": {
+  "K0": {"fires": "12 根噪声不变量里同侧复现(>=3/4 人群)的 >= 2/12 ⇒ 整轮作废",
+         "rule_59_excludes": "排除【这套逐靶标相关流程会从无信号的不变量里造出关系】"},
+  "K1": {"fires": "spread_gc 对 capture_t^GC 的复现 < 3/4 ⇒ 写 `spread_does_not_explain_the_failure_set`",
+         "rule_59_excludes": "排除【GC 判据的持续失败是因为设计之间 GC 没差别】—— 主假设本身"},
+  "K2": {"fires": "同一关系在面板 capture_t^A 上也复现 >=3/4 且量级 >= GC 的一半 ⇒ 写 `not_gc_specific`",
+         "rule_59_excludes": "排除【这只是一个『格内任何离散度低就难排序』的通用效应】"},
+  "K3": {"fires": "安慰剂 spread_noise 复现 >= 3/4 ⇒ 整轮归属作废",
+         "rule_59_excludes": "排除【任何格内离散度都会与 capture 相关,与它是不是 GC 无关】"},
+  "K4": {"fires": "mean_gcfrac(GC 含量本身)比 spread_gc 复现得更好 ⇒ 裁定串必须写 `level_not_spread`",
+         "rule_59_excludes": "排除【是离散度而不是含量】—— 这两个我事先分不清,所以两个都测"}
+ },
+
+ "void_gates": {
+  "V1_no_wet_in_x": "所有不变量只由设计序列与靶标结构算出,**断言计算路径不接触 wet**",
+  "V2_no_leak": "capture 的划分泄漏 0/200,逐人群报出",
+  "V3_degenerate": "capture 在退化格上无定义,按 M4 口径剔除(主对象是比值,闸门与量匹配)",
+  "V4_rule_51": "每个区间裁定报 50 个 bootstrap 种子翻转率",
+  "V5_rule_53": "噪声只数同侧",
+  "V6_rule_58": "对照臂与主臂用完全相同的划分数、靶标地板、区间构造",
+  "V7_rule_59": "每道闸门写明触发时排除掉哪个替代解释(见上),写不出的不许进判据",
+  "V8_bonferroni": "四根次要不变量按 0.05/5 判(主臂 spread_gc 占一份)"
+ },
+
+ "must_fire_probes": {
+  "P0_reconstruct_M4d": {"fires": "本次算出的 GC_only 六对跨批次 rho 均值与 M4d 的 +0.4951 相差 < 0.02",
+                          "why": "本实验的 y 必须与 M4d 是同一个量,否则解释的是别的东西"},
+  "P1_spread_is_real": {"fires": "spread_gc 在四人群上的标准差 > 0 且非常数(否则它没有分辨力)"},
+  "P2_no_wet_leak": {"fires": "V1 的断言通过(不变量计算路径不接触 wet)"},
+  "void_if_any_probe_does_not_fire": "第 54 条。"
+ },
+
+ "the_boundary": "**本实验判『失败集是不是由这个不变量刻画的』,不判『怎么修』。** 即使主假设成立,它给出的也只是一个可界的余项,不是一个更好的判据。**不许把它读成产品建议。**",
+ "expected_runtime": "四人群 x 14 个块,预计 15-25 分钟,$0",
+ "cost_statement": "本次运行完全离线,不调用任何 API,花费 $0。"
+}
