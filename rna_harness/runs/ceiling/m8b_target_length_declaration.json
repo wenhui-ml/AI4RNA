@@ -1,0 +1,73 @@
+{
+ "id": "M8b",
+ "name": "long_targets_starve_the_gc_criterion",
+ "date": "2026-08-25",
+ "status": "pre-registered, no data computed on the BLIND populations",
+ "cost_usd": 0,
+ "offline": true,
+ "spec_version": "rule 38-60 + 【绝不退缩】口径",
+
+ "one_line": "M8 表里最一致的一行是 `target_len`(四人群 −0.3139/−0.2781/−0.2810/−0.3531,全负),而它被我硬编码成只数正向的复现计数器记成 0/4(第 60 条)。本份把它单独拿出来,**方向预注册为负**,并且**第一次用第五/第六批做真盲测**。",
+
+ "DISCLOSURE_which_half_is_blind": {
+  "discovery_sample": "**四个核心人群(样本2/基准4560/样本3/第四批)是发现样本。** 那四个负号是我在 M8 跑完之后看见的。**在它们上面重测不是复现,是把发现样本换一把更细的尺子重算。** 本份声明的裁定串必须把它们标成 `discovery`。",
+  "the_genuinely_blind_test": "**第五批 `panel_f1_fifth.json` 与第六批 `panel_f1_sixth.json` 在 capture_t 这个量上一次都没算过**(M4b/M4c/M4d/M8 全部只跑四人群)。它们是本假设唯一的盲测。",
+  "why_they_may_survive_here_when_they_died_in_M3c": "M3c 的盲人群死于**精确 GC 配平构造付掉 86~93% 的对**(见 `m3c_audit.md` 第五节)。**capture@10 不做任何配平**,只要求格内设计数 >= 10。这条约束在本实验里不存在。**这不是保证,是理由。**",
+  "what_I_am_not_allowed_to_do": "跑完之后不许改方向、不许改人群、不许把发现样本的结果当复现引。第 42 条。"
+ },
+
+ "the_hypothesis_with_its_direction_frozen": {
+  "sentence": "**靶标越长,两根 GC 列拿到的可得增益份额越低。** rho(target_len, capture_t^GC) < 0。",
+  "direction_is_pre_registered_negative": "本份只数**负向**触发(第 53 条同侧,第 60 条:方向已声明,所以单侧计数在此是**有定义**的)。",
+  "why_it_is_not_circular": "方向来自 M8 的观测,所以四个核心人群不算复现(见上)。**盲人群上的方向是被预注册的,那才是检验。**",
+  "a_mechanism_I_am_NOT_claiming": "本实验**不解释**为什么长靶标会这样。可能是长靶标设计空间更大、可能是 GC 在长序列上信息密度更低、可能是长靶标的湿实验读数更噪。**三者本实验都分不开,审计里必须写明。**"
+ },
+
+ "primary_object": {
+  "y": "capture_t^GC = 逐靶标 capture@10,块为 GC_only(两根 GC 列)",
+  "x": "target_len = 靶标长度(只由靶标结构算出,不碰 wet)",
+  "statistic": "逐人群 Spearman rho,靶标 cluster bootstrap **95%** 区间(**单假设,不做 Bonferroni** —— 这正是 M8 把区间撑到 ±0.34 的原因)",
+  "replication_rule": "**盲人群里区间上界 < 0 的数量**。发现样本的计数单独报出并标 `discovery`。"
+ },
+
+ "controls": {
+  "arm_A": "同一分析跑在面板 capture_t^A 上。M8 已测得它 −0.458/+0.261/−0.152/−0.200 **不一致** —— 本份在盲人群上再问一次:这是不是一个『任何判据在长靶标上都变差』的通用效应。",
+  "arm_placebo": "一根**靶标级**打乱的 target_len(把长度在靶标间随机重排),按同一条规则判",
+  "arm_noise_12": "12 根靶标级 N(0,1),按同一条规则判(第 46/53 条,只数负向)",
+  "arm_confound_len": "**报出 rho(target_len, n_designs) 与 rho(target_len, 格内 wet 标准差)** —— 若长度与后两者强相关,本关系可能是它们的影子。**报出,不进判据。**"
+ },
+
+ "kill_conditions_each_with_what_its_firing_excludes": {
+  "K0": {"fires": "12 根噪声不变量里负向复现(>=2 个可用盲人群)的 >= 2/12 ⇒ 整轮作废",
+         "rule_59_excludes": "排除【这套流程会从无信号的列里造出负相关】"},
+  "K1": {"fires": "**盲人群里没有一个的区间上界 < 0** ⇒ 写 `blind_null`",
+         "rule_59_excludes": "排除【长度效应真实存在】—— 主假设本身"},
+  "K2": {"fires": "面板 capture_t^A 在盲人群上也负向复现且量级 >= GC 的一半 ⇒ 写 `not_gc_specific`",
+         "rule_59_excludes": "排除【这只是任何判据在长靶标上都变差】"},
+  "K3": {"fires": "安慰剂(打乱的长度)负向复现 >= 1 个盲人群 ⇒ 整轮归属作废",
+         "rule_59_excludes": "排除【靶标级任何列都会与 capture 负相关】"},
+  "K4": {"fires": "两个盲人群都因 V7 地板作废 ⇒ 裁定串必须带 `blind_unavailable`",
+         "rule_59_excludes": "**不排除任何东西 —— 它是一个记号,防止盲测从裁定串里静默消失**(M3c 那次的教训)"}
+ },
+
+ "void_gates": {
+  "V1_no_wet_in_x": "target_len 只由靶标结构算出,断言不接触 wet",
+  "V2_no_leak": "泄漏 0/200 逐人群报出",
+  "V3_degenerate": "退化格按 M4 口径剔除(主对象是比值)",
+  "V4_rule_51": "报 50 个 bootstrap 种子翻转率",
+  "V5_rule_53_60": "方向已预注册为负 ⇒ 只数负向触发,**且这一次计数器逐量指定,不全表共用**",
+  "V6_rule_58": "对照臂与主臂用完全相同的划分数、靶标地板、区间构造",
+  "V7_population_floor": "有效靶标 < 20 的人群作废并计数,不进任何分母"
+ },
+
+ "must_fire_probes": {
+  "P0_same_quantity": {"fires": "四个核心人群上本次 GC_only 的 capture 水平与 M8/M4d 一致(逐人群差 < 0.01)"},
+  "P1_length_varies": {"fires": "每个可用人群的 target_len 标准差 > 0"},
+  "P2_recover_M8": {"fires": "四个核心人群上本次 rho(target_len, capture^GC) 与 M8 的四个值逐一相差 < 0.02",
+                    "why": "**发现样本必须被逐字复现**,否则本份换的就不只是判据"},
+  "void_if_any_probe_does_not_fire": "第 54 条。"
+ },
+
+ "expected_runtime": "六人群 x 15 个块,预计 25-40 分钟,$0",
+ "cost_statement": "本次运行完全离线,不调用任何 API,花费 $0。"
+}
