@@ -1,0 +1,89 @@
+=== M9-pre start 2026-08-26T03:02:44+00:00 ===
+=== M9-pre:重尾 vs 效应集中 —— 扛效应的靶标换不换人 ===
+  声明 5fd49c1f(代码存在之前已推送)。离线 $0。共同靶标地板 20。
+
+=== 样本2(主) ===
+  泄漏 分子 0/200 靶标 0/200  ✓  产生 g_t 的靶标 56
+  形状 均值 +0.0140 截尾10% +0.0070 中位 +0.0076 HL +0.0066 正 30/56 符号p 0.689 峰度 8.3
+  信度天花板(设计对半) rho **+0.3911** [+0.0720,+0.6731] (n=41)
+=== 基准4560 ===
+  顺序连接断言(panel_f1_designs.json 无 seq 列):4560 条,不一致 0
+  泄漏 分子 0/200 靶标 0/200  ✓  产生 g_t 的靶标 46
+  形状 均值 +0.0027 截尾10% +0.0022 中位 +0.0038 HL +0.0033 正 25/46 符号p 0.659 峰度 2.74
+=== 样本3 ===
+  泄漏 分子 0/200 靶标 0/200  ✓  产生 g_t 的靶标 47
+  形状 均值 +0.0164 截尾10% +0.0148 中位 +0.0118 HL +0.0144 正 29/47 符号p 0.144 峰度 2.88
+=== 第四批 ===
+  泄漏 分子 0/200 靶标 0/200  ✓  产生 g_t 的靶标 35
+  形状 均值 +0.0207 截尾10% +0.0193 中位 +0.0149 HL +0.0189 正 24/35 符号p 0.041 峰度 3.9
+
+=== 必响探针 ===
+
+  --- P0 靶标难度 A 本身(必须 >= 5/6 正向排除 0) ---
+    样本2(主)     × 基准4560     n= 46  rho +0.1936 [-0.0781,+0.4398]  含 0
+    样本2(主)     × 样本3        n= 47  rho +0.1445 [-0.1656,+0.4242]  含 0
+    样本2(主)     × 第四批        n= 35  rho +0.0485 [-0.3389,+0.4098]  含 0
+    基准4560     × 样本3        n= 41  rho +0.1880 [-0.1434,+0.4813]  含 0
+    基准4560     × 第四批        n= 30  rho +0.2400 [-0.1192,+0.5305]  含 0
+    样本3        × 第四批        n= 31  rho +0.1274 [-0.2774,+0.5008]  含 0
+    ⇒ 正向排除 0 **0/6**,负向排除 0 **0/6**,作废 0
+
+  --- P1 等宽纯噪声(必须 <= 1/6 正向排除 0) ---
+    样本2(主)     × 基准4560     n= 46  rho +0.1272 [-0.1971,+0.4355]  含 0
+    样本2(主)     × 样本3        n= 47  rho -0.0505 [-0.3455,+0.2571]  含 0
+    样本2(主)     × 第四批        n= 35  rho -0.0420 [-0.3895,+0.3282]  含 0
+    基准4560     × 样本3        n= 41  rho +0.0422 [-0.3011,+0.3702]  含 0
+    基准4560     × 第四批        n= 30  rho -0.1724 [-0.5371,+0.2401]  含 0
+    样本3        × 第四批        n= 31  rho +0.0867 [-0.3111,+0.4429]  含 0
+    ⇒ 正向排除 0 **0/6**,负向排除 0 **0/6**,作废 0
+
+=== 主臂:g_t = A_ed − A 的跨人群持续性 ===
+
+  --- 主臂 ---
+    样本2(主)     × 基准4560     n= 46  rho +0.5100 [+0.2164,+0.7254]  **正向排除0**
+    样本2(主)     × 样本3        n= 47  rho +0.3365 [+0.0352,+0.6154]  **正向排除0**
+    样本2(主)     × 第四批        n= 35  rho +0.3899 [+0.0650,+0.6386]  **正向排除0**
+    基准4560     × 样本3        n= 41  rho +0.2044 [-0.1254,+0.5060]  含 0
+    基准4560     × 第四批        n= 30  rho -0.0198 [-0.4034,+0.3639]  含 0
+    样本3        × 第四批        n= 31  rho -0.2815 [-0.5682,+0.0951]  含 0
+    ⇒ 正向排除 0 **3/6**,负向排除 0 **0/6**,作废 0
+
+=== 判决条件 ===
+  K0: **触发**   探针未按预期 ⇒ 整轮作废
+  K1: 未触发   超过信度天花板 ⇒ 作废
+  K2: 未触发   正向排除 0 >= 4 ⇒ (b) 效应集中
+  K3: 未触发   正向排除 0 <= 1 ⇒ (a) 重尾
+  K4: 未触发   共同靶标不足的对 >= 3 ⇒ 无数据
+
+=== 裁定 ===
+  **void_probe_failed**
+  主臂六对均值 rho +0.1899,信度天花板均值 +0.3911(占 49%)
+  P0 靶标难度均值 rho +0.1570 ⇒ 主臂/P0 = 1.21(接近 1 则『持续的只是靶标难度』,第 64 条形状二)
+
+  **第 61 条照引:本臂共同靶标给出的半宽只能裁决 |rho| >~ 0.3 的持续性。M4c 的两个量级作参照:GC_only +0.4898 可检出,面板 +0.1523 检不出。K3 触发只等于『本臂看不见 0.15』,不等于 (a) 成立 —— 可检出性的实证上界由 P0 在同一批共同靶标上拿到的 +0.1570 给出。**
+
+=== 次要臂(只报出,不进判据):g_t 分布形状 ===
+  人群                 均值     截尾10%       中位       HL      正/n     符号p      峰度
+  样本2(主)        +0.0140   +0.0070  +0.0076  +0.0066    30/56   0.689    8.30
+  基准4560        +0.0027   +0.0022  +0.0038  +0.0033    25/46   0.659    2.74
+  样本3           +0.0164   +0.0148  +0.0118  +0.0144    29/47   0.144    2.88
+  第四批           +0.0207   +0.0193  +0.0149  +0.0189    24/35   0.041    3.90
+Traceback (most recent call last):
+  File "/data/wenhui/openclaude_rna/rna_harness/runs/ceiling/m9pre_heavytail_vs_concentration.py", line 260, in <module>
+    sys.exit(main())
+  File "/data/wenhui/openclaude_rna/rna_harness/runs/ceiling/m9pre_heavytail_vs_concentration.py", line 246, in main
+    json.dump({"verdict": verdict, "main": rows, "P0": p0rows, "P1": p1rows, "ceiling": Ghalf,
+  File "/home/ubuntu/miniconda3/envs/rna/lib/python3.10/json/__init__.py", line 179, in dump
+    for chunk in iterable:
+  File "/home/ubuntu/miniconda3/envs/rna/lib/python3.10/json/encoder.py", line 431, in _iterencode
+    yield from _iterencode_dict(o, _current_indent_level)
+  File "/home/ubuntu/miniconda3/envs/rna/lib/python3.10/json/encoder.py", line 405, in _iterencode_dict
+    yield from chunks
+  File "/home/ubuntu/miniconda3/envs/rna/lib/python3.10/json/encoder.py", line 405, in _iterencode_dict
+    yield from chunks
+  File "/home/ubuntu/miniconda3/envs/rna/lib/python3.10/json/encoder.py", line 438, in _iterencode
+    o = _default(o)
+  File "/home/ubuntu/miniconda3/envs/rna/lib/python3.10/json/encoder.py", line 179, in default
+    raise TypeError(f'Object of type {o.__class__.__name__} '
+TypeError: Object of type int64 is not JSON serializable
+=== M9-pre done 2026-08-26T03:05:58+00:00 rc=0 ===
