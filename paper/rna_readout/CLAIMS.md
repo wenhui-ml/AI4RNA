@@ -84,3 +84,22 @@
 > 而三根互相独立的探针排除了「这是探测化学的赝像」这一解释。**
 
 **这句话里没有验证器有效性主张,因此不落在兄弟论文族的领地里(见 [[project-paper-family-collision-map]])。**
+
+---
+
+# 附:Related work 实查状态(2026-08-26)
+
+**规则:novelty 措辞只能建立在【查过的】条目上。「没搜到」不等于「没有」,一律按「未见」写,不按「首次」写。**
+
+| 问题 | 查了什么 | 结果 | 对论文的影响 |
+|---|---|---|---|
+| GC 放置作为设计规则是否已有? | Eterna PNAS 2014「RNA design rules from a massive open laboratory」全文 | **已有。** 玩家提出 "G-C content"、"C-G vs G-C edge base pairs in different contexts"、"G-C closing pairs at multiloop junctions"。方法=稀疏线性回归;结构=**仅嵌套,无假结**;**未见配平全局 GC** | **F1。不许写 "first/novel/discovery"。差异化只能是:假结 + 配平对照 + 全局GC固定 + 面板配平** |
+| SHAPE 的碱基偏倚是否已量化? | Wilkinson 等,PMID 19458034 | **已量化。** 内在 2'-OH 反应性 G≈A,是 U 的 1.4 倍、C 的 1.7 倍 | **这是我们赝像假说的【来源】,要引,而且要说它让假说变得可证伪** |
+| 有没有人把「试管可复现上限」当分母? | 检索 RNA probing replicate reproducibility / explainable variance ceiling | **未见。** 命中的都是 QC 与重复一致性度量,不是把上限当可解释方差的分母 | A1 可写成「据我们所见未被如此使用」,**不写「首次」** |
+| 有没有人在 RNA 设计上做过配平成对对照? | 检索 propensity/cardinality matching × RNA design × chemical mapping | **未见。** 配平方法学本身成熟(PSM/cardinality/prognostic score),但**未见用于 RNA 设计对湿读数** | C 组的方法论定位:**借成熟方法进新领域**,不是发明方法 |
+| OpenKnot 设计论文自己有没有做过同类分析? | 「De novo design of RNA pseudoknots with deep learning」(bioRxiv 2026, Townley/Kladwang 等) | **部分已知**:该文用 M2/M2R 做**补偿突变验证结构存在**(mutate-map-rescue),不是用来做序列性质分析;主结论是**方法层面**(95% 的 57 个靶标被解决)。**全文精读待补(bioRxiv 429 限流)** | **⚠️ 未结清。定稿前必须精读,确认它没有报过「预测器符合度 vs OpenKnot score」的相关分析** |
+
+**未结清项(定稿前必须清掉):**
+1. bioRxiv 那篇的全文精读(限流,重试)。
+2. Ribonanza 系列论文有没有报过同类的「序列性质 → 化学作图分数」分析。
+3. `OpenKnotScoreMATLAB` 里 Crossed Pair Quality 的确切定义(我们目前只实现了 ECS 那一半,Y2 的口径要写准)。
