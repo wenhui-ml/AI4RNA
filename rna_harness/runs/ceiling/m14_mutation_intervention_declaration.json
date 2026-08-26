@@ -1,0 +1,61 @@
+{
+  "id": "m14_single_nucleotide_intervention",
+  "frozen_utc": "2026-08-26",
+  "cost": "offline, $0",
+  "THIS_ONE_IS_BLIND": "**两条主臂我从未看过任何结果。** 我只看过不含任何结果的结构性事实:文件列名、`i = mutA + sub_start - 2` 的索引映射(13976/13976 一致)、以及各类突变的**计数**。计数本身不含湿读数。",
+  "why_this_exists": "M13/M13b/M13c 全部是**冻结语料上的配平对照**,再干净也是观察性的。文献检索查到 `OK7a_M2_data.v4.5.2.csv` 就在本机 `/data/wenhui/openknot_data/Data/`(2026-08-07 下载):Round 3 的 20 个靶标 × 8 个设计方法,**有人把一个碱基改掉,然后把管子重新测了一遍**。这是这条线第一次拿到**干预**,而不是关联。",
+  "what_the_library_actually_is": "**不是随机扫描,是系统性互补碱基交换**,而且计数天然完全对称:G->C(伙伴 C) 3264、C->G(伙伴 G) 3264、A->U(伙伴 U) 1196、U->A(伙伴 A) 1196、未配对位 4472。**同一种碱基对被两个方向各拆一次,条数一模一样。**",
+  "the_discriminating_logic": {
+    "published_fact": "2'-OH 酰化的内在反应性:G ≈ A,比 U 高 1.4 倍、比 C 高 1.7 倍(Wilkinson 等,PMID 19458034)。Eterna Classic Score 判【目标配对位】正确的条件是**反应性 < 0.25**,判【目标未配对位】正确的条件是**反应性 > 0.125**。",
+    "chemistry_predicts": "拆同一个 G-C 对,**两个方向符号相反**:G->C 把该位从最高反应性换成最低 ⇒ 更容易判『对』⇒ 分数**上升**;C->G 反过来 ⇒ 分数**下降**。",
+    "biophysics_predicts": "两个方向**同号**:无论从哪边拆,G-C 对都变成非规范对(C-C 或 G-G),结构后果几乎相同 ⇒ 两边都**变差**。",
+    "the_cleanest_readout": "**在【伙伴位】上读。** 伙伴位的碱基**没有被改动**,所以那里的反应性变化里**一点碱基身份的成分都没有** —— 这是一个化学上零偏倚的结构读数。"
+  },
+  "population": "OK7a_M2_data.v4.5.2.csv。父本与突变体**都要求 SN_filter == 1**。只取与父本恰好相差一个碱基的行。分析限制在设计区 [sub_start-1, sub_end-1](0-based),索引映射 `i = mutA + sub_start - 2`(已逐行验证 13976/13976)。伙伴位必须有非空反应性。参考发夹(设计区外的 37 个括号)一律排除。",
+  "outcomes": {
+    "Y1_primary_chemistry_free": "**Δreactivity 在伙伴位 j** = reactivity_j(突变体) − reactivity_j(父本)。j 的碱基不变。**方向预先声明:拆对 ⇒ 伙伴位反应性上升(Δ > 0)。**",
+    "Y2_product_currency": "**ΔECS** = EternaClassicScore(突变体) − ECS(父本),按公开阈值实现(目标配对位 correct iff 反应性 < 0.25;目标未配对位 correct iff 反应性 > 0.125;分母为有反应性数据的位置数,×100)。**方向预先声明:拆对 ⇒ ECS 下降。**"
+  },
+  "arms": {
+    "GC_via_G_to_C": "拆 G-C,改 G 那一边(n=3264)",
+    "GC_via_C_to_G": "拆 G-C,改 C 那一边(n=3264)",
+    "AU_via_A_to_U": "拆 A-U,改 A 那一边(n=1196)",
+    "AU_via_U_to_A": "拆 A-U,改 U 那一边(n=1196)",
+    "unpaired_control": "未配对位上的突变(n=4472)。**没有对可拆 ⇒ 伙伴位不存在 ⇒ Y1 用随机取的伪伙伴位,预期 ≈ 0。**"
+  },
+  "primary_inference": "靶标(puzzle)层 cluster bootstrap,2000 次,95% 区间。**第 76 条:必须同时报出 bootstrap 半宽与 P1 远端安慰剂的 SD,两个数并排。** 只有 20 个 puzzle,cluster 数偏少,这一条不许省。",
+  "kill_conditions": {
+    "K0": "P0/P1/P2/P3 任一不合格 ⇒ 整轮作废",
+    "K1": "**拆 G-C 的两个方向在 Y1 上【同号】且都在拆对方向排除 0** ⇒ `pair_breaking_is_structural` —— 干预层面上排除探测化学赝像,M13 线的设计规则读法**站得住**。",
+    "K2": "**两个方向在 Y1 上【符号相反】** ⇒ `composition_artifact_dominates` ⇒ **M13/M13b/M13c 的设计规则读法必须撤回**,改写成关于 OpenKnot Score 的测量偏倚。",
+    "K3": "两个方向都不排除 0 ⇒ `no_effect_or_underpowered`,必须报出 P3 梯级的检出阈值来区分这两者。",
+    "K4": "梯级检出阈值(以实测 E[Y1] 为刻度)> 主臂报出的最大效应 ⇒ no_adjudicating_power",
+    "K5": "**Y1 上两方向同号,而 Y2(ECS)上两方向【符号相反】** ⇒ `structural_effect_real_but_the_score_is_composition_biased` —— **这是一个关于领域自己那把尺子的正向测量结果**:管子说对被拆了,而分数在响应碱基组成。必须按这个名字裁定并把偏倚量化报出,不许只报 Y1。"
+  },
+  "must_fire_probes": {
+    "P0_identity": "父本与自身比 ⇒ Y1 与 Y2 必须**恰好 0.000000**。",
+    "P1_distal_placebo_GATED": "在**距突变位 >= 15 nt、且在目标里未配对、且不在设计区外**的位置上读 Δreactivity。**这是对两次测量归一化漂移的检验,是本轮最关键的一根探针** —— 若两条分子的反应性整体标度不同,一切结论都是假的。**通过条件:|远端效应| < 主臂效应的 20%。**",
+    "P2_mismatched_parent": "把每个突变体与**另一个 (puzzle, method) 组**的父本配对,重跑同一流程。12 次,拆对方向排除 0 的必须 <= 1。",
+    "P3_ladder_rule71_74": "往伙伴位的 Δreactivity 上注入已知幅度 δ ∈ {0.01,0.02,0.05,0.10,0.20,0.40,0.80,1.50},**刻度实测**,每档 20 次,报逐档检出比例。**顶档下限取 1.50** —— 第 74 条:量程按【主臂可能报出的上界】设,不按预言设。归一化反应性里未配对位典型 > 0.6、配对位典型 < 0.1,故 +1.0 是物理上界附近,1.50 覆盖它。**本条已被连续违反四次(M10b/M11/M12/M13),本轮量程故意设到预言的四倍以上。**"
+  },
+  "rule_61_power_and_the_staked_prediction": "**跑前把预言写死:**(a) 拆 G-C 的两个方向在 Y1 上**同号为正**,效应 **+0.05 ~ +0.35** 归一化反应性单位;(b) **拆 G-C 的效应量大于拆 A-U 的**(G-C 更强);(c) 未配对位对照的伪伙伴 Y1 ≈ 0;(d) Y2 上 **G->C 与 C->G 符号相反**(因为 ECS 把被改动的那一位本身也计入,而那一位的碱基身份变了)—— **即我预期裁定落在 K1 且同时触发 K5**。**注意 (d) 与 (a) 并不矛盾:Y1 无碱基偏倚,Y2 有。** 若 (a) 与 (d) 同时成立,那正是这条线最有价值的一句话。",
+  "rule_64_unexpected_shapes": {
+    "shape_1": "Y1 效应为**负**(拆对之后伙伴位反应性下降)⇒ 与生物物理相反,双侧报出并单独成节,不许当 null 处理。",
+    "shape_2": "**P1 远端安慰剂不为 0** ⇒ 归一化漂移,整轮作废,不许用差分或标准化事后补救(那是改判据)。",
+    "shape_3": "效应由**单一 puzzle 或单一 method** 驱动 ⇒ 报 leave-one-puzzle-out 与 leave-one-method-out 极差。",
+    "shape_4": "未配对位对照的伪伙伴 Y1 **不为 0** ⇒ 说明『伙伴位』这个读数本身有系统性偏移,主臂读法必须改写。",
+    "shape_5": "拆 A-U 的效应**大于**拆 G-C ⇒ 与热力学相反,照报,并检查是否 A-U 多出现在更暴露的位置。"
+  },
+  "what_this_cannot_do": [
+    "**这是干预,但不是随机化到人群的干预** —— 突变位置由文库设计者选定,不是随机抽的。能说的是『在这些被选中的位置上,改这个碱基导致了什么』。",
+    "**Round 3 的 20 个靶标 × 8 方法,与 M13 的六个人群不是同一批分子** —— 这是独立切片,不是同一语料的复现。",
+    "反应性是 2A3 SHAPE 归一化值,不是『它折没折成』。",
+    "ECS 是 OpenKnot Score 的一半(另一半是 Crossed Pair Quality),**本轮不重建完整 OpenKnot Score**,Y2 只声明为 ECS。",
+    "不判上线。"
+  ],
+  "what_each_verdict_would_licence": {
+    "pair_breaking_is_structural": "M13 线的设计规则读法在**干预层面**站住:『把 GC 预算花在目标碱基对上』不是探测化学的赝像。",
+    "composition_artifact_dominates": "**撤回设计规则读法。** 改写成一句关于测量的话,并把 M13/M13b/M13c 的审计全部加注。",
+    "structural_effect_real_but_the_score_is_composition_biased": "两句话同时成立:规则是真的,**而且领域用来评判设计的那把尺子本身对碱基组成有可量化的偏倚** —— 后者是一个独立的、可被别人直接用上的正向结果。"
+  }
+}
