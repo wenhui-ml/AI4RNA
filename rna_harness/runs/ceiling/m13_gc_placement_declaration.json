@@ -1,0 +1,53 @@
+{
+  "id": "m13_gc_placement_matched_pairs",
+  "frozen_utc": "2026-08-26",
+  "cost": "offline, $0",
+  "why_this_exists": "M12 建立的是**相关性**:一族序列内在的列在【出厂面板 + 两根 GC 列】之上有留出增量,六人群(含两个对本族盲的批次)全部排除 0。但 M12 的两个可识别驱动列里,`gc_paired` 的贡献是一个**线性模型的 drop-one 系数** —— 它可能是函数形式设定错误的产物,而且它不是一条可以交给设计者执行的规则。本实验把同一件事改写成**配平之后的成对对照**:不拟合任何模型,只比较两条真实存在的分子。",
+  "the_claim_under_test": "**在同一靶标、同一设计方法、全局 GC 相同、且出厂面板给分相同的前提下,把 GC 更多地放在靶标配对位上的那一条分子,在试管里测得更好。** 这句话里没有验证器有效性主张、没有 A_theta、没有 discovery 阶梯 —— 它是一条关于 RNA 的、可执行的设计规则。",
+  "unit_of_analysis": "**一对分子**,不是一条分子。",
+  "matching_all_computed_without_the_outcome_except_a_crossfitted_score": {
+    "exact": "同一 (puzzle, method) 格 —— 靶标与设计方法逐字相同。同一 puzzle 意味着配对位集合相同,因此格内 #paired 是常数。",
+    "caliper_1_global_gc": "|gc_frac_i - gc_frac_j| <= 0.02(绝对,两个百分点)",
+    "caliper_2_panel_prognostic_score": "|pB_i - pB_j| <= 0.2 * SD(pB),其中 pB 是**只用 22 根出厂面板列**、按靶标分组 5 折**交叉拟合**得到的湿读数预测(prognostic score matching,Hansen 2008)。0.2*SD 是 Rosenbaum-Rubin 的标准 caliper,跑前定死。",
+    "treatment_contrast": "gc_paired_i - gc_paired_j >= 0.05(五个百分点),i 记为 treated。",
+    "mechanical_note": "格内 #paired 恒定,故在 gc_frac 被配平的条件下 gc_paired 上升必然伴随 gc_unpaired 按 npaired/nunpaired 的比例下降。**这不是混杂,这正是处理本身:GC 的【再分配】。**"
+  },
+  "primary_quantity": "**配对差的均值** mean(wet_treated - wet_control),按**靶标 cluster bootstrap** 取 95% 区间(2000 次)。所有配对(all-pairs)入主臂;靶标层重抽样吸收格内重复使用同一分子带来的依赖。",
+  "arms": {
+    "A_strict_primary": "gc_frac caliper + 面板 prognostic score caliper。**主臂。**",
+    "B_loose": "只配平 gc_frac(不配面板)。样本更大,主张更弱。",
+    "C_one_to_one": "贪心 1 对 1 不重叠配对,每条分子至多用一次。**稳健性臂,不作闸门,但必须与主臂同号,否则单独报出。**",
+    "D_dose_response": "按 Delta gc_paired 分层 [0.05,0.10) / [0.10,0.15) / [0.15,+inf),报逐层效应。**机制证据在这里:若效应不随剂量增长,机制读法减弱。**"
+  },
+  "populations": "全部六个人群(样本2 / 基准4560 / 样本3 / 第四批 / 第五批 / 第六批)。某人群配对数 < 100 或涉及靶标 < 15 则记为不可用并计数。",
+  "kill_conditions": {
+    "K0": "P0/P1/P2/P3 任一不合格 ⇒ 整轮作废",
+    "K1": "**主臂 A 在 >= 4 / 6 个人群上配对差区间排除 0 且为正** ⇒ gc_placement_rule_holds",
+    "K2": "**六个人群全部含 0 或点估计 <= 0** ⇒ no_placement_effect",
+    "K3": "可用人群 < 3 ⇒ no_data",
+    "K4": "梯级检出阈值(以**实测的 E[配对差]** 为刻度,wet 单位)> 主臂报出的最大配对差 ⇒ no_adjudicating_power"
+  },
+  "must_fire_probes": {
+    "P0_structural_identity": "把处理列换成 gc_frac 本身(它已被 caliper 0.02 配平),delta_min 仍取 0.05 ⇒ **存活配对数必须恰好 0**(|d|<=0.02 与 d>=0.05 不可同时成立)。这是对 matcher 是否真的执行了 caliper 的结构性自检。",
+    "P1_gaussian_noise_width_matched": "处理列换成 12 根 N(0, SD(gc_paired)) 的合成列。**delta_min 不照抄 0.05**,而是取【与真列的 0.05 在格内两两 |Delta| 分布上处于同一分位数】的那个值 —— 第 71 条的宽度配平:噪声臂必须拿到与主臂可比的配对数。12 根里正向排除 0 的必须 <= 1(方向已预先声明,单侧计数,第 60 条)。",
+    "P2_constructive_ladder_rule71": "注入一根与逐格去均值后的 wet 相关系数为 rho 的合成处理列,rho ∈ {0.02,0.05,0.10,0.15,0.25,0.35,0.45}。**(a) 刻度实测**:先量 rho -> E[配对差](wet 单位),梯级横轴一律用实测值;**(b) 顶档必须 >= 主臂报出的最大配对差**;**(c) 注入在全部六个人群上做**;**(d) 每档 20 次,报逐档达标比例。**",
+    "P3_permutation_rule72": "**第 72 条的直接执行。** 把 gc_paired 的值**在格内跨分子打乱**,wet / gc_frac / pB 一律不动 ⇒ 只破坏【GC 放在哪里】与湿读数的关联,配平协变量与结果都不受影响。12 次,正向排除 0 的必须 <= 1。**自检:该零模型下,配平用的两个 caliper 变量的边际分布必须逐位不变。**"
+  },
+  "rule_61_power_computed_BEFORE_running": "M12 实测:整块 S 的留出 capture@10 增益为 +0.15 ~ +0.73 wet 单位,而 gc_paired 的 drop-one 贡献(+0.005 ~ +0.014)约为 ed_full(+0.020 ~ +0.023)的三分之一到二分之一。本实验的剂量(Delta gc_paired >= 0.05)是一个温和剂量。**跑前把预言写死:主臂配对差落在 +0.10 ~ +0.50 wet 单位,>= 4/6 个人群排除 0,且 D 臂呈单调剂量-反应。** 若点估计 < +0.05,大概率 K4 触发。",
+  "rule_64_unexpected_shapes": {
+    "shape_1": "效应**为负** ⇒ 设计规则反向。双侧计数并单独成节。**这仍然是一条正向的规则,只是符号相反,不许当成 null 处理掉。**",
+    "shape_2": "效应由**单一靶标或单一方法**驱动 ⇒ 必须报 leave-one-target-out 与 leave-one-method-out 的极差。",
+    "shape_3": "**B 臂(只配 gc_frac)为正而 A 臂(加面板配平)为空** ⇒ `panel_already_contains_it` —— 这与 M12 的增量主张相冲突,必须照此写出,不许只报 B 臂。",
+    "shape_4": "**存活配对太少**(>= 4 个人群不足 100 对或不足 15 靶标) ⇒ 按冻结 caliper 记 `no_data`;**允许一次**将两个 caliper 同时放宽到二倍并重跑,该结果必须明确标注为事后。",
+    "shape_5": "效应存在但 **D 臂无单调剂量-反应** ⇒ 机制读法减弱,剂量表无论如何都要给出。"
+  },
+  "exploratory_not_gated_mechanism_moderation": "若机制是『配对位上的 GC 稳定了目标结构』,则效应应当在【靶标自身螺旋更弱】的靶标上更大。按靶标的**平均螺旋长度**分成两半,预先声明方向:**短螺旋那一半效应更大**。探索性,不进闸门,两个方向都照报。",
+  "what_this_cannot_do": [
+    "**这仍然是观察性数据的配平对照,不是随机化干预。** 未观测混杂无法排除;能说的是『在这两个协变量被配平之后关联仍然存在』,不能说『因果』。",
+    "单一语料(OpenKnotBench v4.5.1)。六人群是**语料内复现**。",
+    "wet 是化学探测读数,不是『它折没折成』。",
+    "**不主张 gc_paired 是唯一或最重要的放置规则**;本实验只判这一条。",
+    "不判上线。"
+  ],
+  "what_a_positive_result_would_licence": "一句关于 RNA 的话:**『在设计一条序列时,把给定的 GC 预算更多地花在目标结构的配对位上,在试管里测得更好 —— 效应量 X wet 单位,在六个人群中 k 个上排除 0,且随剂量单调增长。』** 这句话不引用任何验证器有效性主张,不使用 chomsky_climb 的任何词汇,并且它是**可执行的**:它告诉设计者做什么,而不是告诉审稿人不要相信什么。"
+}
