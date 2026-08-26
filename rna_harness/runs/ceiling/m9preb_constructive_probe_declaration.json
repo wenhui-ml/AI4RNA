@@ -1,0 +1,44 @@
+{
+  "id": "m9preb_constructive_probe",
+  "frozen_utc": "2026-08-26",
+  "cost": "offline, $0",
+  "supersedes": "m9pre_heavytail_vs_concentration (void_probe_failed, 见 m9pre_void_audit.md)",
+  "one_line": "兑现 M9-pre 的作废。问题不变:M3 的 g_t 效应是【重尾噪声】(a) 还是【集中在同一批靶标】(b)。只改一处 —— 必响探针从『我认为应该相关的现成量』改为【构造性探针】,并把它做成分级标尺,先量出本臂到底能看见多大的持续性,再决定主臂读不读。",
+  "what_changed_and_why": {
+    "the_void": "M9-pre 的 P0 用逐靶标准确率 A 当『靶标难度』代理,六对 +0.1936/+0.1445/+0.0485/+0.1880/+0.2400/+0.1274 全部含 0,与等宽纯噪声 P1 的区间几乎完全重合 ⇒ 证明不了任何检出力,K0 触发,主臂不读。",
+    "root_cause": "逐靶标成对排序准确率是 (靶标, 设计池) 的性质,不是靶标的性质:不同人群对同一靶标有不同设计,GC 精确配平又吃掉 86~93% 的对。在这个构造上连靶标难度都不跨人群稳定。",
+    "the_fix_was_already_in_the_record": "m2_audit.md 第 27-29 行,早一天:声明探针 mean(wet) 不响,审计原话『它本来就不保证与 g_t 相关 —— 我当初把它写成检出力证据是错的,它证明不了任何事』,补救是构造性探针(g_t+噪声,+0.5351 响)。本次执行第 65 条:必响探针必须注入已知量再取回。"
+  },
+  "constructive_probe_P0": {
+    "construction": "对每个目标真实相关 rho ∈ {0.2, 0.4, 0.6, 0.8},逐人群构造 g_synth_p[t] = sqrt(rho)*u[t] + sqrt(1-rho)*e_p[t],其中 u[t] ~ N(0,1) 为【全人群共享】的靶标级分量(固定种子,四人群同一份),e_p[t] ~ N(0,1) 为逐人群独立噪声。构造上 corr(g_synth_p, g_synth_q) = rho 精确成立。靶标集与共同靶标集与主臂逐项相同(第 58 条)。",
+    "why_the_amplitudes_are_calibrated_this_way": "rho=0.4 这一档是按 M9-pre 实测的信度天花板 +0.3911 标定的 —— 它代表【一个完全持续的靶标级效应,在本量实测的噪声水平下】能达到的跨人群相关上限。若本臂连这一档都看不见,那么主臂的任何空结果都不是关于 (a)/(b) 的证据。",
+    "reported_as": "每一档报出六对里正向排除 0 的个数,以及实测 Spearman 均值(与名义 rho 的偏离一并报出)。检出阈值 = 最小的、达到 >= 5/6 的那一档。"
+  },
+  "probe_P1_unchanged": "等宽纯噪声替换 ed 列,六对正向排除 0 必须 <= 1/6。响 ⇒ 流程无中生有,整轮作废。",
+  "primary_quantity_unchanged": "逐靶标 g_t = mean_splits(per['A_ed'][t]) − mean_splits(per['A'][t]),M3 臂1 构造(formable_only=True,GC 精确配平,留出,重抽单位=靶标),一行判据不改。",
+  "populations_unchanged": "四个核心人群。盲人群在精确配平构造下不可用(已知构造代价)。",
+  "kill_conditions": {
+    "K0": "构造性探针在 rho=0.8 这一档仍未达到 >= 5/6 ⇒ 流程本身坏了,整轮作废",
+    "K1": "主臂六对均值超过信度天花板均值 ⇒ 作废(测量假象)",
+    "K2": "主臂正向排除 0 >= 4",
+    "K3": "主臂正向排除 0 <= 1",
+    "K4": "共同靶标 < 20 的对 >= 3 ⇒ 无数据",
+    "K5_NEW": "检出阈值 > 0.4(即本臂看不见一个在实测噪声水平下完全持续的效应)⇒ 裁定 no_adjudicating_power,主臂照报但明确标注【不裁决 (a)/(b)】。这一条替代 M9-pre 里没写的第三种形状『天花板本身低到无裁决力』,把它从事后解释变成跑前闸门。"
+  },
+  "verdict_map": {
+    "K0 或 K1 或 K4": "void_*",
+    "K5 触发": "no_adjudicating_power__construction_cannot_answer_this —— 这是一个【答案】,不是作废:它说明这个构造上永远回答不了这个问题,并给出需要多大的持续性才看得见",
+    "非 K5 且 K2 且非 K3": "concentrated_effect__move_two_framework_stands",
+    "非 K5 且 K3 且非 K2": "heavy_tailed_noise__move_two_was_chasing_a_tail",
+    "非 K5 且 2~3/6": "unresolved_between_heavy_tail_and_concentration"
+  },
+  "rule_61_power_computed_BEFORE_running": "共同靶标 30~47(M9-pre 实测:46/47/35/41/30/31)。Spearman 95% 半宽约 1.96/sqrt(n−3):n=47 ⇒ 0.294,n=30 ⇒ 0.375。⇒ 预测:rho=0.4 这一档在大 n 的对上勉强排除 0、在小 n 的对上排除不了,很可能落在 3~4/6,即【K5 会触发】。这一条预测写在跑前:若结果确如此,本臂的正确结论是『这个构造回答不了这个问题』,而不是任何关于 (a)/(b) 的结论。若 rho=0.4 意外达到 >= 5/6,则主臂可读。",
+  "contamination_declared": "M9-pre 里我已经看过主臂的六对表并知道其结构。⇒ 这四个人群对本问题是【发现集】。本实验不主张任何确证性;它主张的只是『本臂有没有裁决力』这一件与主臂数值无关的事。主臂结果按原判据照报,但其地位是发现,不是确证。",
+  "rule_64_unexpected_shapes": {
+    "shape_1": "六对相关全部为负 ⇒ 负向排除 0 >= 3/6 时单独记为 anti_persistence,不并入 (a)。",
+    "shape_2": "主臂相关与靶标难度相关之比接近 1 ⇒ 记为 confounded_by_target_difficulty。注:M9-pre 实测该比值 1.21,而靶标难度本身不可检出,故本次该形状的判读需同时报出两者的绝对值。",
+    "shape_3_NEW": "检出阈值恰好落在 0.4 与 0.6 之间 ⇒ 本臂能看见『很强的持续性』但看不见『实测噪声水平下的完全持续性』。此时 K5 触发,且必须报出:要让本臂有裁决力,共同靶标需要多少个(按 1.96/sqrt(n−3) 反解)。"
+  },
+  "secondary_arm_report_only": "四人群 g_t 的均值/截尾10%/中位/HL/符号p/峰度,承 M9-pre(峰度 8.30/2.74/2.88/3.90)。不进判据。",
+  "what_this_cannot_do": "不判上线;不改任何出厂决定;不涉及盲人群;不主张确证。"
+}
