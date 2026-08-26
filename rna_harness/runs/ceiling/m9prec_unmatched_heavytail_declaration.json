@@ -1,0 +1,51 @@
+{
+  "id": "m9prec_unmatched_heavytail",
+  "frozen_utc": "2026-08-26",
+  "cost": "offline, $0",
+  "supersedes": "m9preb_constructive_probe (no_adjudicating_power) 的下一步,不是它的重跑",
+  "one_line": "M9-pre-b 判定:在 GC 精确配平构造上,逐靶标量的信度只有 0.39 而检出阈值要 0.8 ⇒ 这个构造回答不了『重尾 (a) 还是效应集中 (b)』。本实验承 m8b 的绕行路线,把同一个问题搬到【不配平】构造上重问 —— 那里保留全部设计对,并且把两个盲人群带回来。",
+  "the_honest_problem_this_declaration_must_face": {
+    "the_quantity_changes": "M3 的 +0.0140 是【GC 相消之后】的量。去掉配平,g_t 不再是同一个量:计入的设计对变了(配平只保留 gc_cross 与 gc_frac 完全相同的对,约 7~14%),对的难度构成随之改变。**因此不配平构造上的结论不能自动搬回 M3 那个发现。**",
+    "the_bridge_arm": "为此本实验设一条【桥臂】:在每个核心人群内,于共同靶标上计算 rho(g_t^配平, g_t^不配平)。桥臂高 ⇒ 两个量是同一件事的两种测法,不配平的结论说得上配平的那个问题;桥臂低 ⇒ 说不上,必须在裁定里明写『本实验回答的是另一个问题』。**桥臂结果不改主裁定,但决定主裁定能被搬多远。**"
+  },
+  "primary_quantity": "逐靶标 g_t = mean_splits(per['A_ed'][t]) − mean_splits(per['A'][t]),M3 臂1 的列与留出构造逐字不变,**唯一改动是 mode='none'(不配平)**。",
+  "populations": "六个:四个核心(样本2主/基准4560/样本3/第四批)+ 两个盲(第五批/第六批)。不配平保留全部对,盲人群预计可用(m8b 在不配平量上拿到 40 与 31 个靶标)。",
+  "discovery_confirmation_split": {
+    "core_x_core_6_pairs": "**发现集**。M9-pre 里我已看过这四个人群在配平构造上的主臂表,污染已登记。照报,但不作确证。",
+    "pairs_involving_blind_9_pairs": "**确证集**。两个盲人群对『重尾 vs 集中』这个问题从未被使用过。其中盲×盲 1 对完全干净,盲×核心 8 对经核心一侧部分污染 —— 两者分开计数、分开报出,不合并。",
+    "why_this_matters": "这是本条线第一次在这个问题上拥有一个未被看过的确证集,而它是【放弃精确相消】换来的。这笔交换必须写在裁定里。"
+  },
+  "must_fire_probes": {
+    "P0_constructive_ladder": "第 65/66 条:重新标定本构造的灵敏度,不许沿用 M9-pre-b 的阈值。注入 g_synth_p[t] = sqrt(rho)*u[t] + sqrt(1-rho)*e_p[t],rho ∈ {0.1, 0.2, 0.3, 0.4, 0.6},u 全人群共享。检出阈值 = 最小达到 >= 5/6(核心六对)与 >= 7/9(含盲对)的那一档,两者分开报。",
+    "P1_noise_must_not_fire": "等宽纯噪声替换 ed 列,正向排除 0 必须 <= 1/6(核心)。响 ⇒ 整轮作废。",
+    "P2_construction_assertion_must_fire": "**验证『不配平』真的生效**:在不配平构造上 A_G − A 必须【排除 0】(M3 测到 +0.0251 [+0.0124,+0.0391])。若它含 0,说明 mode 没起作用或列索引错了 ⇒ 整轮作废。这是本次唯一一条能证明构造真的换了的闸门。",
+    "P3_assert": "梯级、噪声臂、主臂的划分数/靶标地板/区间构造/共同靶标集逐项相等(第 58 条),脚本内断言。"
+  },
+  "kill_conditions": {
+    "K0": "P1 响,或 P2 不响 ⇒ 整轮作废",
+    "K1": "主臂均值超过本构造自己的信度天花板 ⇒ 作废",
+    "K2": "**确证集**(含盲对)正向排除 0 >= 7/9 ⇒ (b) 效应集中",
+    "K3": "**确证集**正向排除 0 <= 2/9 ⇒ (a) 重尾",
+    "K4": "共同靶标 < 20 的对 >= 5 ⇒ 无数据",
+    "K5": "检出阈值 > 0.3 ⇒ no_adjudicating_power(仍然答不了,但答不了的原因这次是别的)"
+  },
+  "verdict_map": {
+    "K0/K1/K4": "void_*",
+    "K5": "no_adjudicating_power__unmatched_construction_also_too_noisy",
+    "非 K5 且 K2 且非 K3": "concentrated_effect__persists_on_blind",
+    "非 K5 且 K3 且非 K2": "heavy_tailed_noise__no_persistence_on_blind",
+    "非 K5 且中间": "unresolved"
+  },
+  "rule_61_power_computed_BEFORE_running__with_a_falsifiable_prediction": {
+    "the_prediction": "精确配平只保留约 7~14% 的对;不配平保留 100% ⇒ 每靶标的对数增加约 7~14 倍 ⇒ 逐靶标量的噪声方差降到约 1/10。由配平构造实测信度 0.3911 反推噪声/信号方差比 = (1−0.3911)/0.3911 = 1.557,除以 10 得 0.156 ⇒ **预测不配平构造的信度天花板约 0.85(区间给宽:0.75~0.92)**。",
+    "what_falsifies_it": "若实测天花板 < 0.6,则『配平吃掉对数』不是逐靶标量噪声的主因,我对这条线噪声来源的理解是错的,必须在审计里写明并重新找原因。**这条预测冻结在此,事后不许改口。**",
+    "consequent_prediction": "若天花板确在 0.85 附近,则检出阈值应降到 0.2~0.3,K5 不触发,本臂第一次对这个问题有裁决力。"
+  },
+  "rule_64_unexpected_shapes": {
+    "shape_1": "确证集全部为负 ⇒ 负向排除 0 >= 5/9 时单记 anti_persistence,不并入 (a)。",
+    "shape_2": "核心集与确证集方向相反(核心正、盲负或反之)⇒ 单记 core_blind_disagreement,并按第 60 条同时报出两侧绝对值,不许只数一侧。",
+    "shape_3": "桥臂低(< 0.4)而主裁定为 K2 或 K3 ⇒ 裁定必须加后缀 __about_a_different_quantity,提醒它搬不回 M3。"
+  },
+  "secondary_arm_report_only": "六人群 g_t 的均值/截尾10%/中位/HL/符号p/峰度;以及桥臂的逐人群 rho。不进判据。",
+  "what_this_cannot_do": "不判上线;不改任何出厂决定;不主张 GC 归属(不配平构造上 GC 未被相消,任何『归属』解读都是错的);只量结构,不量因果。"
+}
