@@ -1,0 +1,42 @@
+{
+  "id": "m15_structure_filter_robustness",
+  "frozen_utc": "2026-08-26",
+  "cost": "offline, $0",
+  "why_this_exists": "OpenKnotBench 的 README(v4.2.0 起)自己写明:新增 `RNet_structure` / `RNet_F1` / `RNet_F1_crossed_pair` 是为了**筛掉那些「SHAPE 剖面与目标剖面相符、但二级结构其实是错的」设计** —— 按 mutate-map-rescue 实验判断,**round 3 的一些设计确实发生了这种情况**。⇒ **`target_openknot_score` 高不等于折对了:存在结构简并。** 这与 M13b/M13c/M14 处理的【碱基组成化学赝像】是**两件不同的事**,我们至今一根探针都没对准它。账本记为 **F8**。",
+  "the_claim_under_test": "**M13b 的核心结果(账本 C1:配平之后 +2.12 ~ +3.79 OpenKnot 点,六人群置换 p=0.0005)在【只保留 RNet_F1 >= 80 的设计】之后是否存活。**",
+  "the_tradeoff_that_must_be_stated_in_the_body": "**这个筛子是一个预测器。** 用它筛,等于把一个我们整条线都在质疑的东西请回来当门卫。**取舍必须写在正文里,不许当成中性的稳健性检查。** 缓解:筛子只作用于**入选资格**,不进入处理、不进入配平、不进入结果;并且**互补子集(RNet_F1 < 80)同样报出**,让读者自己看。",
+  "data_join": "面板人群的 JSON 不带 `RNet_F1`,源表 `OpenKnotBench_data.v4.5.1.csv` 带。按 **(puzzle, sequence)** 连接;面板数据已按 (puzzle, design_sequence) 去重且 wet 取均值,故该连接应当一对一。**必须逐行断言连接后的 wet 与面板的 wet 一致(容差 1e-6),不一致的计数并剔除,不许静默。**",
+  "arms": {
+    "A_filtered": "只保留 RNet_F1 >= 80 的分子,重跑 M13b 的主臂(同一 caliper、同一处理、同一置换零模型),六人群。",
+    "B_complement": "只保留 RNet_F1 < 80 的分子,同样重跑。**这一臂必须报出,它才是判别的关键。**",
+    "C_unfiltered_reference": "M13b 的原值,原样并排,作为参照。"
+  },
+  "primary_inference": "置换检验(格内打乱 gc_paired,wet/gc_frac/pB 不动),2000 次/人群/臂;靶标 cluster bootstrap 区间并排报出(第 76 条)。",
+  "kill_conditions": {
+    "K0": "P0/P1/P2 任一不合格 ⇒ 作废",
+    "K1": "**A 臂在 >= 4/6 人群上同号且 p < 0.005** ⇒ `survives_structure_filter` —— C1 不是由「剖面对而结构错」的设计撑起来的。",
+    "K2": "**A 臂多数人群含 0 而 B 臂显著** ⇒ `driven_by_structurally_wrong_designs` ⇒ **C1 必须重新界定范围**,正文标题式陈述要改写。",
+    "K3": "**A 臂配对数不足**(>= 4 个人群 < 100 对) ⇒ `underpowered_after_filter`,必须报梯级阈值,**不许把功率不足写成存活或写成失败**。",
+    "K4": "梯级检出阈值 > A 臂实测效应 ⇒ no_adjudicating_power",
+    "K5": "**A 臂与 B 臂效应量接近(比值 ∈ [0.8,1.25])** ⇒ `filter_is_irrelevant` —— 筛子既没帮忙也没坏事,照报。"
+  },
+  "must_fire_probes": {
+    "P0_identity": "处理列换成已配平的 gc_frac ⇒ 存活配对恰好 0。",
+    "P1_noise": "12 根等宽噪声,delta 分位数配平,以置换 p<0.005 计数,各人群 <= 1。",
+    "P2_ladder_rule71_74_79": "注入与格内去均值 wet 相关 rho 的合成列,rho 扫到 **0.80**,刻度实测;**顶档下限取 4.0**(M13b 主臂最大 3.79 的上方,第 74 条);**加 rho=0 自检,达标比例必须 <= 0.15**(第 79 条);**梯级在【筛后的样本量】上做**,不许用未筛的功率冒充。"
+  },
+  "rule_61_staked_prediction": "**跑前写死:A 臂存活,效应量 +1.5 ~ +4.0,>= 4/6 人群 p<0.005;A 臂与 B 臂的效应量比落在 [0.6, 1.4](即筛子基本不改变结论)。** 理由:配平已经把面板 prognostic score 锁住,而 RNet_F1 与面板高度相关,所以再筛一次预期增量有限。**主要风险是样本量**:若 RNet_F1 >= 80 的比例低于 50%,配对数按平方衰减,K3 很可能触发 —— **那将是功率不足,不是失败**,这一句跑前写死。",
+  "rule_64_unexpected_shapes": {
+    "shape_1": "A 臂效应**大于**未筛参照 ⇒ 说明「结构错」的设计在稀释效应,照报,这是对 C1 有利的方向但同样要有区间。",
+    "shape_2": "连接失败率 > 5% ⇒ 报出并停,不许用近似匹配补救。",
+    "shape_3": "B 臂**符号相反** ⇒ 单独成节,那意味着两类设计上机制不同。",
+    "shape_4": "某人群 RNet_F1 缺失比例 > 20% ⇒ 该人群标注为不可用并计数。"
+  },
+  "what_this_cannot_do": [
+    "**RNet 是一个预测器,不是真值。** 本臂只能说『按 RNet 判为结构正确的那部分设计上,结论是否一样』,不能说『在真的折对了的设计上』。",
+    "**结构简并本身没有被测量**,只是被一个代理筛子部分规避。真正测它需要 mutate-map-rescue,那是 M2R 文件的事,不在本轮。",
+    "单一语料;观察性配平对照。",
+    "不判上线。"
+  ],
+  "what_a_positive_result_would_licence": "C1 的措辞可以保持不变,并在限制节写:**『把数据集作者用于识别结构错误设计的筛子加上之后,效应仍然存在(A 臂数值),互补子集见 B 臂。』**"
+}
