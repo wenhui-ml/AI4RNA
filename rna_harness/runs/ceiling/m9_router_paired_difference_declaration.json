@@ -1,0 +1,49 @@
+{
+  "id": "m9_router_paired_difference",
+  "frozen_utc": "2026-08-26",
+  "cost": "offline, $0",
+  "one_line": "M8d 的对照臂 K4 发现:在两个盲人群上,靶标越长,22 列面板拿到的可得增益份额【上升】(+0.2696 [+0.0299,+0.4774] 排除 0),而两根 GC 列【下降】。方向相反。本实验把它做成一次【对撞】:直接测配对差 capture^A − capture^GC 对靶标长度的相关 —— 因为若两条判据的长度依赖真的反向,那么『哪个判据更好』这个问题本身就是错的,正确的产品是【按长度路由】。",
+  "why_paired_difference_and_not_two_marginals": {
+    "statistical": "两条 capture 在同一批格、同一批 wet 上算出,强正相关 ⇒ 差的区间比任何一条边际都窄。M4b 已经用血证过这一课:它的 K4 比较两条【边际区间】是否重叠 ⇒ 不触发;而配对差 GC_only − A 是 +1.9519 [+0.5570,+3.2905],排除 0。**M8d 又一次分开报了两条边际,没算配对差。本实验补上。**",
+    "confounding": "PLAN_after_calibration 校准出的头号混淆是【长靶标的湿实验读数更不可复现】(r1b:偏 rho +0.1196 [+0.0030,+0.2485],28 靶标聚类)。测量噪声随长度上升会把【任何】判据在长靶标上的 capture 压向 0 —— 这是**共模**效应。**配对差对共模免疫。这不是统计上的便利,这是本实验能成立的唯一理由。**"
+  },
+  "primary_quantity": "逐靶标 d_t = capture_t^A − capture_t^GC_only,两者由 m8b_target_length.run_pop 在同一次留出、同一批格上算出,构造逐字不改。主臂 = rho(靶标长度, d_t),按人群分别算。",
+  "direction_pre_registered": "**正向**。依据 M8d 的 K4(面板 +0.2696 排除 0)与 GC 侧(−0.1353)。第 60 条:方向必须预先声明,计数器才允许单侧。负向排除 0 单独计数,不并入。",
+  "discovery_confirmation_INVERTED": {
+    "the_situation": "假设诞生于【盲人群】(M8d 的 K4 是对照臂,在第五/第六批合并盲臂上排除 0)。**所以它的确证集只能是四个核心人群**,而核心人群目前看着是空的:M8d 实测四人群的面板−GC 偏相关差为 −0.2255 / +0.4956 / +0.0512 / +0.1329(均值 +0.114,一强负,不一致)。",
+    "what_this_run_is": "**不是『确证路由器』,是『把一个诞生在本该确证它的地方的假设,拿到最不利的地方去测』。** 盲人群只作复述,不进主判据。"
+  },
+  "must_fire_probes": {
+    "P0_ladder_rule67": "构造性梯级,注入 d_synth[t] = sqrt(rho)*u[t] + sqrt(1-rho)*e[t] 与长度挂钩的版本:令 x = 长度秩,构造 y = sqrt(rho)*x_norm + sqrt(1-rho)*noise,报每档 20 次抽样的达标比例。检出阈值 = 达标比例 >= 0.8 的最小档。**不许沿用任何前一实验的阈值。**",
+    "P1_noise_must_not_fire": "12 根等宽纯噪声不变量替换长度,正向排除 0 必须 <= 1/12。",
+    "P2_reproduce_marginals_must_fire": "**两条边际臂必须复现 M8b/M8d 的已发表值**:GC_only 对长度在四核心人群上为 −0.31~−0.35 量级(M8b 原始),面板在合并盲臂上 +0.2696(M8d 偏相关前的裸值需另行对齐,允许 0.05 偏差)。对不上 ⇒ 机器不是同一台 ⇒ 整轮作废。",
+    "P4_orthogonality": "凡计算偏相关处,残差与条件变量的 Pearson 相关必须 < 1e-12(承 m8c 教训与 m9pred 的实践)。",
+    "P5_assert_rule58": "梯级/噪声臂/主臂的划分数、靶标地板、bootstrap 次数、共同靶标集逐项相等,脚本内断言。"
+  },
+  "kill_conditions": {
+    "K0": "P1 响 或 P2 不响 或 P4 不响 ⇒ 整轮作废",
+    "K1": "主臂均值 > Spearman-Brown 全样本信度天花板(设计对半测得)⇒ 作废(第 68 条)",
+    "K2": "**确证集(四核心人群)正向排除 0 >= 3/4** ⇒ router_confirmed",
+    "K3": "确证集正向排除 0 <= 1/4 ⇒ router_not_confirmed_on_core",
+    "K4": "检出阈值 > 全样本天花板 ⇒ no_adjudicating_power(自校准,承 m9pred)",
+    "K5": "**两条边际臂在同一人群上同号**(都正或都负)>= 3/4 人群 ⇒ 共模未被消掉,配对差的前提失效 ⇒ 裁定加 __common_mode_not_cancelled 并不许主张路由"
+  },
+  "verdict_map": {
+    "K0/K1": "void_*",
+    "K4": "no_adjudicating_power",
+    "K2 且非 K3": "router_confirmed_on_core",
+    "K3 且非 K2": "router_not_confirmed_on_core",
+    "中间(2/4)": "unresolved"
+  },
+  "rule_61_power_computed_BEFORE_running__with_a_frozen_prediction": {
+    "the_arithmetic": "M8d 的两条边际半宽:面板 0.224、GC 0.249(合并盲臂 71 靶标)。配对差因两臂正相关而更窄,粗估半宽 0.15~0.20。核心人群靶标数 57/56/57/42,与合并盲臂同量级 ⇒ 半宽相近。M8d 实测核心四人群的差为 −0.2255/+0.4956/+0.0512/+0.1329。",
+    "the_prediction": "**预测:确证集大概率落在 1/4 或 2/4,即 K3 触发或 unresolved,而不是 K2。** 理由:四个差值里两个绝对值小于 0.15(远小于半宽),一个为负。**若结果确如此,正确结论是『这条线索在核心人群上没有得到确证』,而不是『路由器不存在』—— 两者的区别必须写在裁定里。**",
+    "what_would_falsify_my_pessimism": "若 K2 触发(>= 3/4 正向排除 0),说明配对差确实比 M8d 的两条边际窄得多,足以把 +0.05 与 +0.13 这样的效应推出 0 —— 那样本实验就是这条线上第一个【在最不利的集合上被确证】的正向结果。"
+  },
+  "rule_64_unexpected_shapes": {
+    "shape_1": "配对差与长度的相关来自两臂【方差】的长度依赖而非【均值】⇒ 加测 d_t 的绝对值对长度的相关,若它比 d_t 本身更强,记为 variance_not_mean 并不许主张路由。",
+    "shape_2": "确证集正向 2/4 且两个通过的都是同一批靶标占比高的人群 ⇒ 记为 driven_by_shared_targets,报出四人群两两共同靶标数。",
+    "shape_3": "盲人群复述与核心人群反向 ⇒ 记为 blind_core_reversal,并按第 60 条同时报出双侧。"
+  },
+  "what_this_cannot_do": "不判上线;不改出厂决定;不主张 capture 的【绝对】份额(分母是 max-of-n,本项目已撤回其绝对用法,见 2026-08-21 周报更正块);只测长度依赖的【差】,不测任一判据的好坏。"
+}
