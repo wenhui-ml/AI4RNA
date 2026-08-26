@@ -1,0 +1,43 @@
+{
+  "id": "m9pre_heavytail_vs_concentration",
+  "frozen_utc": "2026-08-26",
+  "cost": "offline, $0",
+  "one_line": "M3 留下的悬案:主人群 A_ed−A 均值区间排除 0(+0.0140)而符号检验 p=0.689(56 靶标 26 负)。m3_audit 第三节写明两种读法【本实验分不开】:(a) 重尾噪声,『排除 0』脆弱;(b) 效应真实但集中在少数靶标 —— 而 (b) 正是移动二说的主项/余项结构。移动二基于 (b) 往下跑了五个实验(M2/M2d/M5/M6/M8),(a) 一次也没测过。本实验分开它们。",
+  "why_now": {
+    "new_evidence_for_reading_a": "r1b_audit.md 从原始 release 的 557 组重复测量独立测到:配对 |差| 的均值/中位 = 1.35(正态理论 1.18),90 分位 10.72,最大 19.00 —— 湿实验噪声本身重尾。重尾的测量噪声正好会制造出重尾的靶标级效应估计。这是 (a) 的第一份直接证据,而 M3 当时没有这份数据。",
+    "what_is_at_stake": "若 (a) 赢,移动二那五个实验找的是一条重尾分布的尾巴,而不是一个该被切开的结构;这句话必须被写下来。若 (b) 赢,那个子集存在,移动二的框架站得住,M9 的靶标级异质性假设有地基。"
+  },
+  "the_key_design_point__why_robust_estimators_alone_cannot_decide": "截尾均值/中位数/Hodges-Lehmann 在 (a) 与 (b) 下【都】≈0 —— (a) 因为噪声对称,(b) 因为多数靶标本来就没效应。所以稳健估计量【分不开】这两种读法,只能作次要臂报出。真正的判别器是:扛着效应的那批靶标,在人群之间换不换人。(a) ⇒ 每个人群换一批(独立噪声抽样);(b) ⇒ 每个人群都是同一批。这台机器 M4c 用过(误差跨批次持续性)。",
+  "primary_quantity": "逐靶标 g_t = mean_splits(per['A_ed'][t]) − mean_splits(per['A'][t]),即 m3_gc_cancelled.py 中 contrast() 内那个 g 向量的逐元素值。构造、留出、GC 精确配平、重抽单位一律沿用 M3 臂1(formable_only=True),不改一行判据。",
+  "populations": "四个核心人群(样本2主/基准4560/样本3/第四批)。盲人群在 GC 精确配平构造下不可用(m3c 第五节:16 与 1 个靶标),这是已知的构造代价,不是本实验的选择。",
+  "main_arm": "六对人群两两之间,在共同靶标上算 g_t 向量的 Spearman rho。共同靶标 < 20 的对作废并计数。",
+  "reliability_ceiling": "每个人群内把设计对半随机划分,各自算 g_t,两半相关 = 该人群的信度天花板。主臂相关必须显著低于天花板才叫真信号;超过天花板则本轮作废(测量假象)。承 M4c 第 55/56 条做法。",
+  "must_fire_probes": {
+    "P0_must_fire": "把主量换成【逐靶标基础准确率 A 本身】(靶标难度)。它是公认的强靶标级性质,六对相关必须正向排除 0 >= 5/6。若不响 ⇒ 本仪器无法检出任何靶标级持续性,整轮作废,K 判据一律不读。",
+    "P1_must_not_fire": "把 ed 那一列换成【等宽纯噪声】(承 M4d 构造),六对正向排除 0 必须 <= 1/6。若响 ⇒ 流程无中生有,整轮作废。",
+    "P2_assert": "探针与主臂的划分数、靶标地板、区间构造、共同靶标集逐项相等(第 58 条),脚本内断言,不等则整轮作废。"
+  },
+  "kill_conditions": {
+    "K0": "P0 或 P1 未按预期行事 ⇒ 整轮作废",
+    "K1": "主臂相关超过信度天花板 ⇒ 作废(测量假象)",
+    "K2": "六对里正向排除 0 >= 4 ⇒ 判 (b) concentrated_effect_persists",
+    "K3": "六对里正向排除 0 <= 1 ⇒ 判 (a) heavy_tail_no_persistence",
+    "K4": "共同靶标 < 20 的对 >= 3 ⇒ 无数据"
+  },
+  "verdict_map": {
+    "K2 且非 K3": "concentrated_effect__move_two_framework_stands",
+    "K3 且非 K2": "heavy_tailed_noise__move_two_was_chasing_a_tail",
+    "既非 K2 也非 K3(2~3/6)": "unresolved_between_heavy_tail_and_concentration"
+  },
+  "rule_61_power_computed_BEFORE_running": "共同靶标预计 30~50。Spearman 的 95% 半宽约 1.96/sqrt(n−3):n=50 ⇒ 0.285,n=30 ⇒ 0.375。M4c 实测的两个量级作参照:GC_only 的持续性 +0.4898(可检出),面板 +0.1523(检不出)。⇒ 本臂只能裁决 |rho| >~ 0.3 的持续性。附注(必须在裁定里照引):若真实持续性在 +0.15 量级,本臂【无裁决力】,K3 触发不等于 (a) 成立,只等于『本臂看不见 0.15』。不许把 K3 读成 (a) 的证明,除非同时报出 P0 在同一批共同靶标上拿到的相关值作为可检出性的实证上界。",
+  "named_alternative_explanations": {
+    "for_K2": "排除:靶标难度本身跨人群持续(由 P0 量化,主臂相关必须在扣除意义上不被它解释——报出主臂 rho 与 P0 rho 的比值)",
+    "for_K3": "排除:共同靶标太少导致检不出(由 K4 与第 61 条附注管辖)"
+  },
+  "rule_64_unexpected_shapes_I_must_be_able_to_tell_apart": {
+    "shape_1": "六对相关【全部为负】—— 即扛效应的靶标在人群间系统性反转。本闸门只数正向排除 0,会把它读成 K3(=(a))。声明在此写明:若负向排除 0 >= 3/6,单独记为 anti_persistence 并作为独立发现报出,不并入 (a)。这是第 60 条那个错误的预防。",
+    "shape_2": "主臂相关高但 P0 更高且比值接近 1 —— 即『持续的只是靶标难度』。此时 K2 触发但结论不是 (b),记为 confounded_by_target_difficulty。"
+  },
+  "secondary_arm_report_only": "四个人群各自的 g_t 分布:均值、10% 截尾均值、中位数、Hodges-Lehmann、符号检验 p、峰度、均值/中位比。不进任何 K 判据,只用于描述形状。",
+  "what_this_cannot_do": "不判上线;不改任何出厂决定;不涉及盲人群;只用骨架可形成子集,仍在 Turner 族内。"
+}
