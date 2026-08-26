@@ -1,0 +1,48 @@
+{
+  "id": "m9pred_corrected_gates",
+  "frozen_utc": "2026-08-26",
+  "cost": "offline, $0",
+  "supersedes": "m9prec_unmatched_heavytail (void_above_ceiling__about_a_different_quantity —— 两处触发都是对象写错)",
+  "one_line": "M9-pre-c 的裁定作废于我自己的两处对象错误(K1 拿对半信度比全样本相关;桥臂拿裸值比 0.4),而且梯级自相矛盾(0.3 达标、0.4 不达标)。本实验只改三处:闸门放到同一尺度(第 68 条)、梯级每档多次抽样(第 67 条)、加靶标难度对照(第 64 条形状二)。其余逐字不动。",
+  "three_changes_and_nothing_else": {
+    "change_1_rule_68": "K1 改为:主臂均值 > **Spearman-Brown 折算到全样本的天花板** 2r/(1+r) 才触发。M9-pre-c 实测对半 0.2427 ⇒ 全样本 0.3906,而主臂 0.3656 —— 原 K1 触发是把两个不同尺度的量相比。桥臂门槛同理改为**衰减校正值** bridge / sqrt(r_matched_full * r_unmatched_full),阈值仍为 0.4(M9-pre-c 校正后为 0.732)。",
+    "change_2_rule_67": "构造性梯级每档抽 **20 次**独立噪声实现,报每档达标比例的均值与散布。检出阈值 = **档内达标比例 >= 0.8 的最小档**。M9-pre-c 每档只抽一次,结果 0.3 达标而 0.4 不达标 —— 单次实现的阈值不是阈值。",
+    "change_3_rule_64_shape_2": "新增靶标难度对照:在**不配平**构造上量逐靶标基础准确率 A 的跨人群持续性,并计算主臂**扣掉难度之后**的偏相关。M9-pre 在**配平**构造上测到难度只有 +0.157(不可检出),但不配平构造上它可能高得多 —— 那样主臂的 0.3656 就可能只是靶标难度。"
+  },
+  "partial_correlation_definition__the_m8c_lesson": "偏相关一律用标准定义:先把两列各自**秩变换**,再对条件变量做**线性残差化**,最后在残差上算 **Pearson**。**不许对残差重新取秩** —— m8c 正是死在这一步(重排残差破坏了最小二乘只保证的 Pearson 正交性,算出的量既不是偏 Spearman 也没有名字)。配套探针 P4 见下。",
+  "primary_quantity_unchanged": "逐靶标 g_t = mean_splits(per['A_ed'][t]) − mean_splits(per['A'][t]),M3 臂1 的列与留出构造,mode='none'(不配平)。",
+  "populations_unchanged": "六个(四核心 + 两盲)。发现集 = 核心×核心 6 对;确证集 = 含盲 9 对,其中盲×盲 1 对完全干净,分开计数不合并。",
+  "must_fire_probes": {
+    "P0_ladder": "构造性梯级,rho ∈ {0.1,0.2,0.3,0.4,0.6},每档 20 次抽样。",
+    "P1_noise": "等宽纯噪声替换 ed 列,发现集正向排除 0 必须 <= 1/6。",
+    "P2_construction": "不配平下 A_G − A 必须排除 0(M9-pre-c 六人群全部通过,主人群 +0.0297)。",
+    "P4_orthogonality_NEW": "偏相关的残差与条件变量的 **Pearson 相关必须 < 1e-12**(机器精度恒等式)。这是 m8c 那次作废的直接产物:若该值不是机器零,说明我又重排了残差 ⇒ **整轮作废**。",
+    "P5_assert": "梯级/噪声臂/主臂/难度臂的划分数、靶标地板、bootstrap 次数、共同靶标集逐项相等(第 58 条),脚本内断言。"
+  },
+  "kill_conditions": {
+    "K0": "P1 响,或 P2 不响,或 P4 不响 ⇒ 整轮作废",
+    "K1_CORRECTED": "主臂均值 > Spearman-Brown 全样本天花板 ⇒ 作废",
+    "K2": "确证集正向排除 0 >= 7/9 ⇒ (b) 效应集中",
+    "K3": "确证集正向排除 0 <= 2/9 ⇒ (a) 重尾",
+    "K4": "作废对 >= 5 ⇒ 无数据",
+    "K5_SELF_CALIBRATED": "检出阈值 > **实测的 Spearman-Brown 全样本天花板** ⇒ no_adjudicating_power。**这个门槛不再是我拍的 0.3,而是数据自己给的**:阈值高于天花板,意味着本臂连一个完全持续的效应都看不见。",
+    "K6_NEW": "**扣掉靶标难度后的偏相关均值 <= 主臂裸相关均值的一半** ⇒ 裁定加后缀 __mostly_target_difficulty,且不许主张 (b)。"
+  },
+  "verdict_map": {
+    "K0/K1/K4": "void_*",
+    "K5": "no_adjudicating_power__even_unmatched",
+    "非 K5 且 K2 且非 K3": "concentrated_effect__persists_on_blind",
+    "非 K5 且 K3 且非 K2": "heavy_tailed_noise__no_persistence_on_blind",
+    "非 K5 且中间": "unresolved"
+  },
+  "rule_61_power_computed_BEFORE_running": "M9-pre-c 实测:0.4 档 4/6 与 6/9,0.6 档 6/6 与 9/9,0.3 档 6/6 与 7/9(单次实现)。**预测:20 次抽样取平均后,0.3 档的达标比例会明显低于 0.8,真实阈值落在 0.4~0.6 之间。而全样本天花板是 0.3906。⇒ 阈值 > 天花板,K5 触发,裁定为 no_adjudicating_power。** 这条预测冻结在此。若 0.3 或 0.4 档的达标比例意外 >= 0.8,则本臂有裁决力,主臂可读。",
+  "what_a_K5_verdict_would_mean": "**它不是第三次失败,是一个收口**:配平构造答不了(M9-pre-b),不配平构造也答不了(本次),而两者的共同原因已经查明 —— 逐靶标量是【设计数受限】(M9-pre-c 第二节:天花板随人群大小走,2639 分子的人群天花板只有 0.0299)。**那样这条线上『重尾 vs 效应集中』就是一个需要【更多设计】而不是更多对、更多人群、或更好统计的问题,并且这个数可以被估出来。**",
+  "contamination": "核心四人群对本问题已是发现集(M9-pre 起)。两个盲人群在 M9-pre-c 里已被我看过主臂数值 ⇒ **本次起它们也降为发现集**。**本实验不主张任何确证。** 这一点必须写在裁定里:本条线在这个问题上已经没有干净的确证集了,除非拿到新批次。",
+  "rule_64_unexpected_shapes": {
+    "shape_1": "确证集全负 ⇒ 单记 anti_persistence。",
+    "shape_2": "由 K6 管辖(难度解释掉一半以上)。",
+    "shape_3": "梯级 20 次抽样的档内散布极大(达标比例在 0.3~0.7 之间)⇒ 记为 ladder_unstable_even_averaged,并报出需要多少次抽样才能定阈值。",
+    "shape_4_NEW": "主臂裸相关 > 全样本天花板但偏相关 <= 天花板 ⇒ 说明超出部分正是难度贡献的,记为 excess_is_difficulty,不作废。"
+  },
+  "what_this_cannot_do": "不判上线;不改出厂决定;不主张 GC 归属;不主张确证(无干净确证集)。"
+}
