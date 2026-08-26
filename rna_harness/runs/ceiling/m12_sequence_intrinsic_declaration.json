@@ -1,0 +1,45 @@
+{
+  "id": "m12_sequence_intrinsic_block",
+  "frozen_utc": "2026-08-26",
+  "cost": "offline, $0",
+  "not_the_m12_m11_foreshadowed": "M11 的声明里提到的 M12 是『从靶标特征预测方法』,那一个以 M11b 触发 K1 为条件,尚未发生。本实验是**另一个** M12,与 M11 无依赖。",
+  "why_this_exists": "revB(事后复核)测出:出厂 22 列的【任意函数】留出后只到可解释上限的 20.9%,非线性增量 +0.0029(四人群里为正的 1/4)。裁定 `features_exhausted__new_columns_required`。而复核 `base_block` 的定义发现:**那 22 列全部是『三个 oracle 的预测与靶标符合得多好』(k 哑元 / recall_product / 逐 oracle 的 recall,precision,f1,n_pred_cross,n_pred_total / f1c)—— 没有一列是序列本身的性质。** 两根 GC 列是纯序列性质,样本内 0.1001,与整套面板的 0.1651 同量级。**⇒ 面板量的是裁判的信念,序列本身那一族几乎没被碰过。**",
+  "the_claim_under_test": "**存在一族【序列内在】的列,在【出厂面板 + 两根 GC 列】之上仍有留出增量。** 其中 S1 子块完全不调用任何折叠 oracle,只用靶标与序列的组合结构 —— 若 S1 单独就有增量,那是本条线上第一个『不需要裁判就能预测湿实验』的结果。",
+  "blocks": {
+    "B": "出厂 22 列(base_block,e1_ensemble_marginals.py)",
+    "G": "两根 GC 列(gc_cross 整数 + 全局 GC 比例),与 M4/M4b 同一定义",
+    "S1_combinatorial_no_oracle": "spur_max(最长伪螺旋,revA 的实现)、spur_cnt(长度>=4 的伪螺旋条数)、spur_margin(spur_max 减去靶标自身最长螺旋)、loop_max(最长未配对连续段)、helix_min(靶标最短螺旋)、gc_paired、gc_unpaired(把 GC 按配对/未配对位置拆开)",
+    "S2_ensemble_vienna": "egap=(MFE-EFE)/n、ed_full(对完整靶标的系综缺陷)、dG_gap=dG(target)-dG(MFE)"
+  },
+  "primary_quantity": "**留出增量** dR2 = R2_heldout(B+G+S) - R2_heldout(B+G),逐格去均值后按**靶标分组的 K 折 CV**,K=5。四个核心人群各自算。**基线是 B+G,不是 B** —— 第 39/59 条:对照必须只差要检验的那一件东西,而 GC 已知很强,不许拿它冒充新发现。同时报出 S1 单独、S2 单独、S1+S2。",
+  "product_currency_arm": "**留出 capture@10**:用同一 CV 划分,在留出靶标上按 (B+G) 与 (B+G+S) 的预测各选 top-1-of-10,报绝对增益(wet 原单位),与 M4b 的 +1.25 同口径。**这是把 R2 翻译成一条【可以运行的选择规则】的那一步** —— 本实验的产出必须包含它,否则只是又一个 R2。",
+  "populations": "四个核心人群(样本2/基准4560/样本3/第四批)。分子数 < 500 或靶标 < 20 的人群跳过并计数。",
+  "kill_conditions": {
+    "K0": "P0/P1/P2/P3 任一不合格 ⇒ 整轮作废",
+    "K1": "**dR2(B+G+S) 在 >= 3 个人群上留出区间排除 0(正向)** ⇒ sequence_intrinsic_block_adds",
+    "K2": "**四个人群全部含 0 或点估计 <= 0** ⇒ no_increment_over_panel_plus_gc",
+    "K3": "可用人群 < 3 ⇒ no_data",
+    "K4": "梯级检出阈值(以**实测的 E[dR2]** 为刻度)> 主臂报出的最大 dR2 ⇒ no_adjudicating_power"
+  },
+  "must_fire_probes": {
+    "P0_identity": "S := B+G 中已有的一列的拷贝 ⇒ 留出增量必须**恰好 0.000000**(同一设计矩阵的列空间不变)。",
+    "P1_noise": "S := 与 S 等宽的纯 N(0,1) 噪声,12 根。方向已预先声明为正,**单侧计数**(第 60 条):12 根里正向排除 0 的必须 <= 1。",
+    "P2_constructive_ladder_rule71": "注入一根与逐格去均值后的 y 相关系数为 rho 的合成列,rho ∈ {0.02,0.05,0.10,0.15,0.25}。**(a) 刻度实测**:先量出 rho -> E[留出 dR2] 的映射,梯级横轴一律用实测 E[dR2];**(b) 顶档必须 >= 主臂报出的最大 dR2**;**(c) 注入在【全部四个人群】上做**,不是子集;**(d) 每档 20 次,报达标比例并与解析功率对表(第 66/67 条)。**",
+    "P3_permutation_rule72": "**第 72 条的直接执行。** 把 S 的行**在格内打乱**(B+G 与 y 一律不动)⇒ 只破坏 S 与 y 的关联,基线臂完全不受影响。12 次,正向排除 0 的必须 <= 1。**跑前自检:在这个零模型下,B+G 的留出 R2 必须逐位不变。**"
+  },
+  "rule_61_power_computed_BEFORE_running": "revB 实测:留出 OLS R2 在四人群为 0.1551/0.1407 左右,CV 的 fold 间散布给出 dR2 的量级。以主人群 8682 分子、57 靶标、5 折靶标分组计,**dR2 的靶标 cluster bootstrap 半宽粗估 0.010~0.020**。**我在跑前把预言写死:我预期 dR2(B+G+S) 落在 +0.01 ~ +0.05,在 >=2 个人群上排除 0;并且预期 S1(无 oracle 那一块)是最大的单一贡献者。** 若 dR2 < 0.01,本臂大概率 K4 触发。",
+  "rule_64_unexpected_shapes": {
+    "shape_1": "dR2 **为负**(S 在留出上有害)⇒ 单独报出并**双侧计数**;这是过拟合的签名,必须与样本内 dR2 并排给出。",
+    "shape_2": "增量全部由 **S 里的一根列**贡献(去掉它剩 0)⇒ `driven_by_one_column`,并报出去掉后的值。M10b/M11 形状三的同型预防。",
+    "shape_3": "**样本内 dR2 大而留出 dR2 为 0** ⇒ `insample_only`,两个数必须并排。",
+    "shape_4": "**S2 有增量而 S1 没有** ⇒ 那意味着增量来自 ViennaRNA 的系综量,与『不需要裁判』这一主张相反,必须改写标题式陈述。"
+  },
+  "what_this_cannot_do": [
+    "观察性数据,**不主张任何列是机制**;所有增量都是关联。",
+    "单一语料(OpenKnotBench v4.5.1),**不主张跨语料外推**。",
+    "wet 是化学探测读数,不是『它折没折成』;**不判上线**。",
+    "不与 M4/M4b 的 capture 口径混引(那些是样本内、未相消);本实验的 capture 是**留出**的。",
+    "不主张 S 比 B 好;主判据是**增量**,基线是 B+G。"
+  ],
+  "what_a_positive_result_would_licence": "**一条可运行的选择规则**(product_currency_arm),外加一个陈述:『湿读数里有一部分,是三个折叠 oracle 的一致性度量看不见、而序列本身的组合结构看得见的』。这句话若成立,它是正向的、可复核的、且不依赖任何验证器有效性主张 —— 因此不落在兄弟论文族的领地里。"
+}
