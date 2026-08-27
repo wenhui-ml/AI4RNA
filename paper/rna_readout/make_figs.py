@@ -129,9 +129,19 @@ def fig2():
 
 
 # ---------------------------------------------------------------- fig 3: matched pairs vs null
+# m18's json is keyed by population file in POPS order; reuse the same EN labels as everywhere else
+POPNAME = [EN[n] for n in ("样本2(主)", "基准4560", "样本3", "第四批", "第五批(盲)", "第六批(盲)")]
+
+
 def fig3():
-    d = J("m13b_gc_placement.json")["pops"]
-    rows = [(r["pop"], r["A"], r.get("usable", False)) for r in d.values() if r.get("A")]
+    """the null here is M18's repaired one -- design held fixed, y permuted. The pre-M18 null
+    shuffled the treatment, which rebuilt the matched set and ran 2.5-3.1x too narrow."""
+    d = J("m18_repaired_null.json")["pops"]
+    rows = []
+    for r in d.values():
+        b = r["arms"]["B_panel_matched"]
+        rows.append((POPNAME[len(rows)], {**b, "z_vs_null": b["z_vs_null_REPAIRED"],
+                                          "p_perm": b["p_perm_REPAIRED"]}, b["usable"]))
     fig, ax = plt.subplots(figsize=(3.4, 2.15))
     for k, (nm, a, us) in enumerate(rows):
         y = len(rows) - 1 - k
@@ -142,7 +152,9 @@ def fig3():
         ax.plot([a["boot_ci_secondary"][0], a["boot_ci_secondary"][1]], [y, y],
                 color=c, lw=1.2, alpha=.75, zorder=3)
         ax.plot([a["effect"]], [y], "o", ms=5, color=c, mec="white", mew=1.1, zorder=4)
-        ax.text(a["boot_ci_secondary"][1] + .15, y, f"{a['effect']:+.2f}  z={a['z_vs_null']:.0f}",
+        ax.text(a["boot_ci_secondary"][1] + .15, y,
+                f"{a['effect']:+.2f}  z={a['z_vs_null']:.1f}"
+                + ("" if a["p_perm"] <= .005 else "  p=%.3f" % a["p_perm"]),
                 va="center", color=INK2, fontsize=6.8)
     ax.axvline(0, color=INK3, lw=.8, zorder=1)
     ax.set_yticks(range(len(rows))[::-1])
