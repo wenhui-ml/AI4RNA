@@ -366,7 +366,110 @@ def fig7():
     return a1
 
 
+# ---------------------------------------------------------------- fig 0: architecture
+def fig0():
+    """Where each result sits and what it feeds. NO MAGNITUDE APPEARS IN THIS FIGURE.
+
+    Every other figure recomputes its coordinates from an artifact, so a printed number cannot
+    drift from its run; a structure diagram has no such artifact, so it carries quantity names
+    and section pointers only.
+    """
+    from matplotlib.patches import FancyBboxPatch, FancyArrowPatch
+    fig, ax = plt.subplots(figsize=(7.0, 3.35)); ax.set_axis_off()
+    ax.set_xlim(0, 100); ax.set_ylim(0, 66)
+    W, H = 26.0, 11.0
+    ROW = {"top": 49.0, "mid": 27.5, "bot": 6.0}
+    COL = [14.0, 50.0, 86.0]                      # centres
+
+    def box(cx, y, txt, fc, ec, bold=False, w=W):
+        ax.add_patch(FancyBboxPatch((cx - w / 2, y), w, H,
+                                    boxstyle="round,pad=0.0,rounding_size=1.6",
+                                    fc=fc, ec=ec, lw=1.0, zorder=3))
+        ax.text(cx, y + H / 2, txt, ha="center", va="center", fontsize=6.9, color=INK,
+                zorder=4, weight="bold" if bold else "normal", linespacing=1.45)
+
+    def down(cx1, cx2, ytop, ybot):
+        ax.add_patch(FancyArrowPatch((cx1, ytop), (cx2, ybot + H), arrowstyle="-|>",
+                                     mutation_scale=8, lw=0.9, color=INK2, zorder=2,
+                                     shrinkA=1, shrinkB=1,
+                                     connectionstyle="arc3,rad=0.0"))
+
+    for y, lab in ((ROW["top"], "corpus and readouts"),
+                   (ROW["mid"], "estimated quantities"),
+                   (ROW["bot"], "what they compose into")):
+        ax.text(50, y + H + 3.4, lab, ha="center", fontsize=6.3, color=INK3, style="italic")
+
+    box(COL[0], ROW["top"], "designed sequences\n$\\times$ target structures\n9 design methods",
+        "#ffffff", INK3)
+    box(COL[1], ROW["top"], "compensatory rescue\nan intervention on one pair\nno predictor involved",
+        "#eaf2fd", S1, bold=True)
+    box(COL[2], ROW["top"], "the design score\npredictor panel enters\nonly as a covariate",
+        "#ffffff", INK3)
+    down(COL[0] + W / 2 - 1, COL[1] - W / 2 + 1, ROW["top"] + H / 2, ROW["top"] - H / 2)
+    ax.add_patch(FancyArrowPatch((COL[0] + W / 2, ROW["top"] + H / 2),
+                                 (COL[1] - W / 2, ROW["top"] + H / 2), arrowstyle="-|>",
+                                 mutation_scale=8, lw=0.9, color=INK2, zorder=2))
+    ax.add_patch(FancyArrowPatch((COL[1] + W / 2, ROW["top"] + H / 2),
+                                 (COL[2] - W / 2, ROW["top"] + H / 2), arrowstyle="-",
+                                 mutation_scale=8, lw=0.9, color=INK3, zorder=2, ls=(0, (2, 2))))
+
+    box(COL[0], ROW["mid"], "pair-type effect\non rescue, matched\n(Sec. 4.1)", "#eaf2fd", S1, bold=True)
+    box(COL[1], ROW["mid"], "placement gap $g$\nand slope $\\beta_{\\rm depth}$\n(Sec. 4.2)",
+        "#eaf2fd", S1, bold=True)
+    box(COL[2], ROW["mid"], "matched-pair effect\non the design score\n(Sec. 4.3)", "#ffffff", INK3)
+    down(COL[1], COL[0], ROW["top"], ROW["mid"])
+    down(COL[1], COL[1], ROW["top"], ROW["mid"])
+    down(COL[2], COL[2], ROW["top"], ROW["mid"])
+
+    box(30, ROW["bot"], "the mediation identity\nattenuation $= g \\times \\beta_{\\rm depth}$\n(Sec. 5.1)",
+        "#fdf0e9", S2, bold=True, w=36)
+    box(72, ROW["bot"], "the gradient is a property\nof the design method\n(Sec. 4.4, 5.2)",
+        "#fdf0e9", S2, w=36)
+    down(COL[0], 24, ROW["mid"], ROW["bot"])
+    down(COL[1], 36, ROW["mid"], ROW["bot"])
+    down(COL[1], 66, ROW["mid"], ROW["bot"])
+    down(COL[2], 78, ROW["mid"], ROW["bot"])
+
+    ax.text(1, 1, "blue: nothing on this path calls a folding predictor", fontsize=6.3, color=S1)
+    _save(fig, f"{OUT}/fig0_arch.pdf"); plt.close(fig)
+
+
+# ---------------------------------------------------------------- fig 8: the permutation rule
+def fig8():
+    """Why the null must permute the outcome. Measured, from m17d_typeI_diag.json."""
+    d = J("m17d_typeI_diag.json")
+    fig, (ax, ax2) = plt.subplots(1, 2, figsize=(6.6, 2.4),
+                                  gridspec_kw={"width_ratios": [1, 1.25]})
+    tot = d["total"]
+    rates = [tot["A"][0] / tot["A"][1], tot["B"][0] / tot["B"][1]]
+    ax.bar([0, 1], rates, width=.5, color=[S2, S1], zorder=3)
+    ax.axhline(d["nominal"], color=INK2, lw=1.0, ls=(0, (3, 2)), zorder=4)
+    ax.text(1.52, d["nominal"], "  nominal 0.005", va="center", fontsize=6.6, color=INK2)
+    for i, (r, t) in enumerate(zip(rates, ("A", "B"))):
+        ax.text(i, r + .0026, f"{r:.4f}\n{tot[t][0]}/{tot[t][1]}", ha="center",
+                fontsize=6.6, color=INK2, linespacing=1.3)
+    ax.set_xticks([0, 1]); ax.set_xlim(-.6, 1.9)
+    ax.set_xticklabels(["permute the\ntreatment", "permute the\noutcome"], fontsize=7)
+    ax.set_ylabel("type-I error at the 0.005 gate", fontsize=7.4)
+    ax.set_ylim(0, max(rates) * 1.35)
+    bare(ax, xgrid=False); ax.grid(axis="y", color=GRID, lw=.5)
+
+    pops = list(d["A"]); y = np.arange(len(pops))[::-1]
+    sa = [float(np.std(d["A"][k]["eff"])) for k in pops]
+    sb = [float(np.std(d["B"][k]["eff"])) for k in pops]
+    ax2.barh(y + .19, sa, height=.34, color=S2, zorder=3, label="design rebuilt by the permutation")
+    ax2.barh(y - .19, sb, height=.34, color=S1, zorder=3, label="design held fixed")
+    ax2.set_yticks(y); ax2.set_yticklabels([en(d["A"][k]["pop"]) if "pop" in d["A"][k]
+                                            else k for k in pops], fontsize=6.6)
+    ax2.set_xlabel("SD of the statistic under each null", fontsize=7.4)
+    ax2.legend(frameon=False, fontsize=6.4, loc="lower right", labelcolor=INK2)
+    bare(ax2)
+    fig.tight_layout(w_pad=1.4)
+    _save(fig, f"{OUT}/fig8_null.pdf"); plt.close(fig)
+
+
 if __name__ == "__main__":
+    fig0(); fig8()
     b, a = fig1(); fig2(); fig3(); fig4(); fig5(); fig6(); fig7()
     print(f"fig1 baseline R2 {b:.4f} ({b/CEILING:.1%})  +seq {b+a:.4f} ({(b+a)/CEILING:.1%})")
     print("wrote", sorted(os.listdir(OUT)))

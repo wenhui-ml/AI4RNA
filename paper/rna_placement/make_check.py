@@ -22,7 +22,9 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 TEX = os.path.join(HERE, "R1_placement.tex")
 
 # thresholds and design constants the paper states as rules, not as measurements
-ALLOWED = {"0.005", "0.05", "0.2", "0.80", "0.6", "2.0", "1.0", "0.0", "0.5"}
+# design constants the paper states as rules: the two calipers, the treatment threshold,
+# the significance gate, the ladder self-check bar and the corpus authors' own filter cut
+ALLOWED = {"0.005", "0.05", "0.02", "0.2", "0.80", "0.6", "2.0", "1.0", "0.0", "0.5"}
 CTX = re.compile(r"(linewidth|textwidth|pt\b|em\b|in\}|HTML|\\setcounter|fraction|"
                  r"\\definecolor|width=|scale=|arc=|boxrule|margin=|\\usepackage|"
                  r"documentclass|xytext|figsize)")
