@@ -1,0 +1,21 @@
+=== M26b:四套参数(其中两套是机器学习拟合)在同一批 4317 次干预上 ===
+  声明 b99164c3。离线 $0。
+
+=== P2 同一批配对 ===
+  四套的纳入集合逐字相同: True  (n=4317)
+
+=== P1 参数确实换了 ===
+  Turner1999       与 Turner2004 相关 +0.8482  最大差 0.9950  均值 0.5463
+  Andronescu2007   与 Turner2004 相关 +0.8576  最大差 0.9866  均值 0.5440
+  Langdon2018      与 Turner2004 相关 +0.8639  最大差 0.9977  均值 0.5660
+  两两相关 {'Turner2004|Turner1999': 0.8482, 'Turner2004|Andronescu2007': 0.8576, 'Turner2004|Langdon2018': 0.8639, 'Turner1999|Andronescu2007': 0.9183, 'Turner1999|Langdon2018': 0.7514, 'Andronescu2007|Langdon2018': 0.7823}
+
+=== E1/E2 逐模型 ===
+  model                 技能斜率        p    单调       CDE      同群体基线       留存          安慰剂        中介    区间含0
+  Turner2004         +0.1206   0.0020     是   +0.0663    +0.0689    96.3%  103.5±6.6      +3.7%       是
+  Turner1999         +0.1258   0.0020     是   +0.0686    +0.0680   100.9%   98.4±7.2      -0.9%       是
+  Andronescu2007     +0.1311   0.0020     是   +0.0661    +0.0675    97.9%   98.4±7.5      +2.1%       是
+  Langdon2018        +0.1056   0.0020     否   +0.0626    +0.0647    96.8%  102.2±7.1      +3.2%       是
+
+=== 裁定: identity_survives_every_parameter_set ===
+押注逐条: {"1_all_have_skill": true, "2_all_retention_ge_80": true, "3_all_mediated_ci_contains_zero": true, "4_ml_params_skill_not_below_turner2004": false, "5_pairwise_corr_ge_07": true}

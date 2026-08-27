@@ -117,7 +117,10 @@ the flipped pair forms is calibrated against the measurement (rescue $\jdg{mCalL
 $\jdg{mCalHi}$ across bins of $P_{\mathrm{model}}$, slope $\jdg{mSkillSlope}$,
 $p=\jdg{mSkillP}$), and holding it fixed the identity contrast still retains \textbf{$\jdg{mRet}$}
 against a placebo mediator's $\jdg{mPlaceboMean}\pm\jdg{mPlaceboSd}$ ($z=\jdg{mZ}$, mediated
-fraction $\jdg{mMed}$, $\jdg{mMedCi}$). The three pair types do not lie on
+fraction $\jdg{mMed}$, $\jdg{mMedCi}$). Under $\jdg{pNModels}$ parameter sets --- two of them
+fitted rather than thermodynamic, and correlating only $\jdg{pCorrLo}$ to $\jdg{pCorrHi}$ with one
+another --- retention runs $\jdg{pRetLo}$ to $\jdg{pRetHi}$ and every mediated interval covers
+zero. The three pair types do not lie on
 one line in free energy, their implied slopes spanning $\jdg{eSlopeSpread}\times$, and the effect
 is positive in $\jdg{sNPos}$ of $\jdg{sNMeth}$ design methods (sign test $p=\jdg{sBinom}$), so it
 is not an artifact of which designs a given program can produce.
@@ -214,7 +217,8 @@ strict orientation flip of one pair, byte-identical to its own wild type otherwi
 can be \emph{scored} on $\jdg{mN}$ molecules it did not see rather than adjusted for. It scores
 well: its ensemble probability that the flipped pair forms is calibrated and monotone against the
 measurement ($\jdg{mSkillSlope}$, $p=\jdg{mSkillP}$). Held fixed, the identity contrast still
-retains $\jdg{mRet}$ (\S\ref{sec:scored}).
+retains $\jdg{mRet}$, and $\jdg{pRetLo}$ to $\jdg{pRetHi}$ across $\jdg{pNModels}$ parameter
+sets including two that are fitted rather than thermodynamic (\S\ref{sec:scored}).
 
 Whether a designed base pair forms therefore carries identity information that this thermodynamic
 model does not encode --- not merely its local term, but its ensemble prediction for the individual
@@ -270,7 +274,9 @@ and section pointers only.}
   own wild type at exactly the two mutated positions --- leaves it at $\jdg{mRet}$
   ($\jdg{mMed}$, $\jdg{mMedCi}$), against placebo mediators at
   $\jdg{ePlaceboMean}\pm\jdg{ePlaceboSd}$ and $\jdg{mPlaceboMean}\pm\jdg{mPlaceboSd}$. The model is
-  \emph{calibrated} on these molecules, which is what makes the second statement mean something.
+  \emph{calibrated} on these molecules, which is what makes the second statement mean something,
+  and the second statement holds under all $\jdg{pNModels}$ parameter sets ViennaRNA ships
+  ($\jdg{pRetLo}$ to $\jdg{pRetHi}$ retained).
 \item \textbf{Base-pair identity predicts formation, measured interventionally}
   (\S\ref{sec:pairtype}): matched within design on helix depth and crossing, a G--C target pair is
   rescued $\jdg{rescueAU}$ above a matched A--U pair and $\jdg{rescueGU}$ above a matched G--U
@@ -925,13 +931,35 @@ draws, so it has power. The measured within-design slope is $\jdg{mFlipSlope}$
 ($p=\jdg{mFlipP}$): the \emph{opposite} sign to the model's prediction, since a flip that costs
 local free energy should be rescued less. It is a null with power, not an underpowered arm.
 
+\paragraph{Four parameter sets, two of them not thermodynamic.} The obvious residual scope is
+that $P_{\mathrm{model}}$ came from one parameter set, so we ran the panel ViennaRNA ships:
+Turner\,2004, Turner\,1999 \citep{mathews1999expanded}, the constraint-generation set of
+\citet{andronescu2007efficient}, and a set derived from the CONTRAfold family
+\citep{do2006contrafold}. They are not versions of one prediction --- their pairwise correlations
+across the $\jdg{pNPairs}$ pairs run from $\jdg{pCorrLo}$ to $\jdg{pCorrHi}$ --- and all
+$\jdg{pNModels}$ have skill (slopes $\jdg{pSkillLo}$ to $\jdg{pSkillHi}$, every
+$p\le\jdg{pSkillP}$). \textbf{The identity contrast retains $\jdg{pRetLo}$ to $\jdg{pRetHi}$ under
+all four}, with every mediated fraction between $\jdg{pMedLo}$ and $\jdg{pMedHi}$ and every
+interval covering zero (Table~\ref{tab:panel}).
+
+\begin{table}[!htbp]
+\centering\small
+\caption{\textbf{The same test under four parameter sets.} \emph{Skill} is the within-design slope
+of rescue on that set's $P_{\mathrm{model}}$; \emph{retained} is the identity contrast after
+holding it fixed, against the \emph{placebo} mediator's retention. Two of the four sets are fitted
+rather than thermodynamic.}
+\label{tab:panel}
+\input{figs/panel.tex}
+\end{table}
+
 \paragraph{What this licenses, and what it does not.} \S\ref{sec:energy} could only say \emph{not
 the local nearest-neighbour term}. With $P_{\mathrm{model}}$ the statement becomes \emph{not this
 model's ensemble prediction for this exact molecule} --- and it is measured on molecules that were
 built, carrying a controlled intervention, against a prediction that is calibrated and monotone
-against the outcome. What it does not license: the intervention is not ours, the dataset's authors
-performed it on every testable pair, and $P_{\mathrm{model}}$ is one implementation with one
-parameter set. A second folding model could change the verdict and none was run.
+against the outcome. What it does not license: the intervention is not ours --- the dataset's authors
+performed it on every testable pair --- and all four parameter sets run inside one folding
+implementation, with one definition of the ensemble and one treatment of pseudoknots. A
+structurally different predictor, in particular a learned sequence model, remains untested.
 
 \subsection{The placement gap and the depth slope}
 \label{sec:mediation}
@@ -1235,12 +1263,13 @@ asked at all. \textbf{(iv) Good designs only.} The compensatory arm measured the
 design per (target,\,method) cell, so the corpus is pre-filtered by the design programs. The
 per-method decomposition bounds the objection on the axis it runs on --- $\jdg{sNPos}$ of
 $\jdg{sNMeth}$ methods positive, no ordering with placement strength --- but does not remove it,
-because no method submitted a poor design. \textbf{(v) One folding model.} \S\ref{sec:scored} widens the energy result from the local term
-of Definition~\ref{def:dg} to the ensemble prediction of \citet{lorenz2011vienna}'s implementation,
-which is the largest single step this paper takes; what remains is that it is \emph{one}
-implementation with one parameter set. A learned or differently parameterised model
-\citep{waymentsteele2022rna,sato2021rna} could absorb what this one does not, and running a second
-is the cheapest remaining test in the paper.
+because no method submitted a poor design. \textbf{(v) One folding implementation.} \S\ref{sec:scored} widens the energy result from the
+local term of Definition~\ref{def:dg} to a folding model's ensemble prediction, under
+$\jdg{pNModels}$ parameter sets including two fitted rather than thermodynamic ones. What remains
+is the implementation: one definition of the ensemble, one treatment of pseudoknots. A structurally
+different predictor --- a learned sequence model \citep{singh2019spotrna,sato2021rna,fu2022ufold}
+or an experiment-trained one \citep{waymentsteele2022rna} --- could absorb what these four do not,
+and that is now the cheapest remaining test in the paper.
 \textbf{(vi) Prior art.} GC placement as a design heuristic predates this work
 \citep{lee2014eterna}; what is measured here is its effect on pair formation and on the measurement
 itself.
@@ -1254,8 +1283,9 @@ optimising --- and the contrast does not move: $\jdg{eRet}$ retained, mediated f
 $\jdg{eMed}$, $\jdg{eMedCi}$. Hold fixed instead the model's full ensemble probability that this
 exact pair forms, on $\jdg{mN}$ molecules that were built to differ from their own wild type at two
 positions and nowhere else, and it still does not move: $\jdg{mRet}$ retained, $\jdg{mMed}$
-mediated, $\jdg{mMedCi}$ --- while that same prediction is calibrated against the measurement,
-which is what makes the statement worth making. It survives outside the terminal penalty's domain,
+mediated, $\jdg{mMedCi}$, and $\jdg{pRetLo}$ to $\jdg{pRetHi}$ across $\jdg{pNModels}$ parameter
+sets --- while those same predictions are calibrated against the measurement, which is what makes
+the statement worth making. It survives outside the terminal penalty's domain,
 it does not scale with the energy gaps between the three pair types, and it does not track which
 program built the sequence.
 What \emph{does} hide it is where the designer put the pair, and that is estimable from the corpus
@@ -1449,6 +1479,11 @@ the model's calibration is not monotone & --- & $\jdg{mCalMono}$ & \textbf{faile
 identity survives holding $P_{\mathrm{model}}$ fixed & $\ge50\%$ & $\jdg{mRet}$ & held \\
 that mediated fraction's interval covers zero & --- & $\jdg{mMedCi}$ & held \\
 the flip's local-energy arm is underpowered, not null & --- & has power & \textbf{failed} \\
+every parameter set has skill & $p\le0.005$ & $\jdg{pSkillP}$ & held \\
+identity retained under every parameter set & $\ge80\%$ & $\jdg{pRetLo}$--$\jdg{pRetHi}$ & held \\
+every mediated interval covers zero & --- & $\jdg{pMedLo}$--$\jdg{pMedHi}$ & held \\
+fitted parameters score no worse than Turner\,2004 & --- & one is lower & \textbf{failed} \\
+the four predictions are not collinear & $\rho\ge0.7$ & $\jdg{pCorrLo}$--$\jdg{pCorrHi}$ & held \\
 \midrule
 \multicolumn{4}{@{}l@{}}{\emph{frozen before \S\ref{sec:rounds} existed}}\\
 treatment-side randomisation over-rejects & $>0.010$ & $\jdg{m23nT}$ & held \\
