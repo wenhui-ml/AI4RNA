@@ -1,0 +1,32 @@
+=== M26v:用第二套独立实现复算新头条 ===
+
+纳入 4317
+
+=== 两套实现对拍(同一批记录、同一套分层)===
+  量              M26.matched   designaudit           差       权重
+  rescue(结果)        +0.05393      +0.05393    2.08e-17      902
+     designaudit 置换 p 0.0010  cluster CI [+0.0220, +0.0911]
+  P_vienna          -0.03039      -0.03039    0.00e+00      902
+     designaudit 置换 p 0.9790  cluster CI [-0.0628, +0.0105]
+  P_neural          +0.06055      +0.06055    1.39e-17      902
+     designaudit 置换 p 0.0010  cluster CI [+0.0329, +0.0956]
+  **两套实现一致(<1e-9)**
+
+=== 符号来自哪里:逐 depth / crossed 拆开 ===
+  层                          n    rescue   P_vienna   P_neural
+  depth=0 crossed=False    469   +0.1185    +0.0630    +0.1309
+  depth=0 crossed=True    1018   +0.0808    -0.0290    +0.2409
+  depth=1 crossed=False    419   +0.0627    +0.0048    +0.0497
+  depth=1 crossed=True     921   -0.0127    -0.0485    -0.0111
+  depth=2 crossed=False    227   +0.1105    -0.0679    -0.0269
+  depth=2 crossed=True     702   +0.0292    -0.0364    +0.0210
+  depth=3 crossed=False    172   +0.1917    -0.0050    -0.0241
+  depth=3 crossed=True     389   +0.0363    -0.0872    -0.0073
+  **P_vienna 为负的层: 6/8**  ⇒ 符号是普遍的
+
+=== 每个设计单元一票(避免大单元主导)===
+  可用设计单元 144   均值 -0.08026   中位 -0.08213
+  **为负的单元 91/144 = 63.2%**
+  符号检验 p = 0.00194
+
+写出 m26v_alpha_verify.json

@@ -161,7 +161,10 @@ def contrast(c: Corpus, levels, strata=None, extra=None, nperm=2000, nboot=500,
         v, _w, _s, _ok = _weighted(sid, tp, y)
         null.append(0.0 if v is None else v)
     null = np.sort(np.asarray(null))
-    p = (float((null >= eff).sum()) + 1) / (nperm + 1)
+    # two-sided. A one-sided (null >= eff) count reports ~0.98 for a real negative effect, which
+    # reads as "nothing here" when the effect is in the far negative tail. Found when the
+    # thermodynamic model's contrast came back at -0.0304 with p 0.979.
+    p = (float((np.abs(null) >= abs(eff)).sum()) + 1) / (nperm + 1)
     cl = c.cluster[m]
     units = np.unique(cl)
     boot = []

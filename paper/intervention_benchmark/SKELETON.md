@@ -51,12 +51,30 @@ Consequence: **the paper's second claim is a sign, not a ratio.**
 - c: leakage ladder — L1 exact 0/14416; design-window ≥0.8 identity 6.37%; ≥0.999 264;
   clean-subset slopes +0.2155 / +0.1288 essentially unchanged
 
-**Fig 4 — the result.** (M26v, pending verification at time of writing)
-- a: three matched contrasts on one axis — outcome **+0.0539**, ViennaRNA's own prediction
-  **−0.0304**, RibonanzaNet's **+0.0606**
-- b: per-design-cell sign of the ViennaRNA contrast, with the sign test
-- c: per depth × crossing breakdown — is the sign general or one stratum
-- d: product-route upper bounds, 6.8% and 23.2%, labelled as bounds under R4
+**Fig 4 — the result.** (M26v verified; two implementations agree to 2e-17)
+
+Three matched contrasts on one axis, same 4317 interventions, same 902 pair-weights:
+
+    outcome (rescue)          +0.0539   p 0.0010   [+0.0220, +0.0911]   excludes 0
+    RibonanzaNet's own        +0.0606   p 0.0010   [+0.0329, +0.0956]   excludes 0
+    ViennaRNA's own           -0.0304   p 0.979    [-0.0628, +0.0105]   COVERS 0
+
+The claim is the contrast between the two models, and only what the intervals support:
+
+> The neural model's prediction separates C-G from A-U targets in matched contexts by +0.0606,
+> the same direction and comparable magnitude to the measurement's +0.0539. The thermodynamic
+> model's prediction shows **no resolvable separation** — the measurement distinguishes something
+> the model does not.
+
+**The "thermodynamic model has the sign backwards" version is not written.** The point estimate is
+negative and the sign holds in 6 of 8 depth x crossing strata and 91 of 144 design cells (sign test
+p 0.00194), but the puzzle-clustered interval covers zero, and the design cell is not the
+independent unit — the puzzle is. A sign test over non-independent units is the same defect this
+project already recorded once. Reported as suggestive, in one place, with the interval.
+
+- b: per depth x crossing breakdown, including the one stratum that goes the other way
+     (depth=0 crossed=False, P_vienna +0.0630)
+- c: product-route upper bounds, 6.8% and 23.2%, labelled as bounds under R4
 
 **Fig 5 — it transfers (M28, pending).** natural coronavirus corpora; usable-flip counts after the
 SN cut; two probes as an internal replication.
