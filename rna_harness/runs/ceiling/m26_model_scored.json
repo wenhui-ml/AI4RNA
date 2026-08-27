@@ -1,0 +1,136 @@
+{
+ "n": 4317,
+ "n_dropped": 0,
+ "bin_edges": [
+  0.001,
+  0.3045,
+  0.934,
+  0.9974
+ ],
+ "D4": {
+  "bins": [
+   {
+    "bin": 0,
+    "n": 864,
+    "p_mean": 0.0001,
+    "rf_mean": 0.2994,
+    "rf_centred": -0.0709
+   },
+   {
+    "bin": 1,
+    "n": 863,
+    "p_mean": 0.0762,
+    "rf_mean": 0.4041,
+    "rf_centred": -0.0021
+   },
+   {
+    "bin": 2,
+    "n": 863,
+    "p_mean": 0.6915,
+    "rf_mean": 0.4375,
+    "rf_centred": 0.0157
+   },
+   {
+    "bin": 3,
+    "n": 863,
+    "p_mean": 0.9791,
+    "rf_mean": 0.4789,
+    "rf_centred": 0.0248
+   },
+   {
+    "bin": 4,
+    "n": 864,
+    "p_mean": 0.9993,
+    "rf_mean": 0.5038,
+    "rf_centred": 0.0326
+   }
+  ],
+  "monotone": true
+ },
+ "D1": {
+  "pmut": {
+   "slope": 0.12059,
+   "n": 4242,
+   "p_perm": 0.002
+  },
+  "pwt": {
+   "slope": 0.13245,
+   "n": 4242,
+   "p_perm": 0.002
+  },
+  "dp": {
+   "slope": -0.00635,
+   "n": 4242,
+   "p_perm": 0.71856
+  }
+ },
+ "K3_no_skill": false,
+ "D2": {
+  "cde": 0.0663,
+  "base_full": 0.0539,
+  "base_same_population": 0.0689,
+  "retention": 0.963,
+  "retention_wrong_denominator": 1.23,
+  "selection_component": 1.2772,
+  "p_perm": 0.0005,
+  "null_sd": 0.0129,
+  "boot_ci": [
+   0.0334,
+   0.1051
+  ],
+  "weight": 569.0,
+  "n_strata": 480,
+  "base_weight": 577.0,
+  "placebo_mean": 0.987,
+  "placebo_sd": 0.0276,
+  "z_vs_placebo": -0.871,
+  "mediated": 0.037,
+  "mediated_ci95": [
+   -0.017,
+   0.091
+  ]
+ },
+ "P3_ladder": {
+  "0.0": 0.0,
+  "0.005": 0.1,
+  "0.01": 0.0,
+  "0.02": 0.4,
+  "0.05": 0.85,
+  "0.1": 1.0,
+  "0.2": 1.0,
+  "0.4": 1.0,
+  "0.6": 1.0
+ },
+ "P3_delta0": 0.0,
+ "P3_threshold": 0.05,
+ "D3": {
+  "pwt": {
+   "cde": 0.0596,
+   "base_same_population": 0.0557,
+   "retention": 1.0689,
+   "weight": 678.0
+  },
+  "dp": {
+   "cde": 0.0531,
+   "base_same_population": 0.0494,
+   "retention": 1.0749,
+   "weight": 543.0
+  },
+  "ddg": {
+   "slope": 0.01273,
+   "p_perm": 0.07493,
+   "sd": 0.4906,
+   "frac_gt_03": 0.3882,
+   "detectable_slope": 0.01,
+   "verdict": "null"
+  }
+ },
+ "verdict": "identity_beyond_the_model_ensemble",
+ "staked": {
+  "1_model_has_skill": true,
+  "2_calibration_not_monotone": false,
+  "3_retention_ge_50": true,
+  "4_mediated_ci_contains_zero": true,
+  "5_flip_dG_arm_underpowered": false
+ }
+}
