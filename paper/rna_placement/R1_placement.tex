@@ -125,7 +125,9 @@ design score, in matched pairs of real molecules balanced on global GC and on th
 predictor panel, positive in all six populations, with three cuts against a probing-chemistry
 explanation. Placement itself varies with who designed: nine methods building for the same twenty
 targets span $\jdg{gSpread}$ depth units, with the human-designed arm at the pre-registered
-extreme.
+extreme. On three further rounds of the benchmark with disjoint targets, read for the first time
+here, the structure replicates --- all $\jdg{xrRounds}$ pooled depth gaps negative,
+$\jdg{xrSign}$ of the (round,\,method) cells negative, sign test $p=\jdg{xrSignP}$.
 
 The two mediators answer to different things. A corpus of designed molecules hides part of the
 effect through a covariate its designers chose, at a rate the corpus can be made to report. The
@@ -461,30 +463,72 @@ and the estimator is the pair-weighted mean of $y_u-y_v$ over $M$. No model prod
 \begin{proposition}[Design-fixed randomisation]
 \label{prop:null}
 Write $X=(t,\gamma,\pi)$, so that by \eqref{eq:matched} the matched set is $M=M(X)$ and the
-statistic is $T(y,X)$. Under the null $y\perp t$ within cell, permuting molecule identity within
-cell --- carrying every coordinate of $X$ together --- and permuting $y$ within cell induce the
-\emph{same} distribution of $T$. Permuting $t$ alone does not, whenever $t$ and $\gamma$ are
-dependent within cell.
+statistic is $T(y,X)$.
+\begin{enumerate}[leftmargin=1.6em,itemsep=1pt,topsep=2pt,label=(\roman*)]
+\item \emph{Identity.} For any dataset, permuting molecule identity within cell --- carrying every
+coordinate of $X$ together --- and permuting $y$ within cell induce the same distribution of $T$.
+No hypothesis is needed.
+\item \emph{Validity.} That distribution is an exact reference for $T$ under the hypothesis that
+$y$ is \emph{exchangeable within cell given the design}, i.e.\ $y\perp X$ within cell. It is not
+exact under the weaker $y\perp t$ alone, because $\gamma$ and $\pi$ predict $y$.
+\item \emph{Treatment-side randomisation is not a reference at all.} Permuting $t$ alone changes
+the matched set whenever $t$ and $\gamma$ are dependent within cell, so the observed statistic is
+compared against a null computed on a different design.
+\end{enumerate}
 \end{proposition}
 
 \begin{proof}
-For a within-cell permutation $\sigma$, the dataset $(y, X\circ\sigma)$ becomes
+(i) For a within-cell permutation $\sigma$, the dataset $(y, X\circ\sigma)$ becomes
 $(y\circ\sigma^{-1}, X)$ after relabelling molecules by $\sigma^{-1}$, and $T$ is invariant to
-relabelling; averaging over the symmetric group therefore gives one law, which is the first claim.
-For the second, let $X'$ replace $t$ by $t\circ\sigma$ and leave $\gamma,\pi$ in place. Then $X'$
-carries the product of the marginals of $t$ and $(\gamma,\pi)$ where $X$ carries their joint law,
-so whenever $t\not\perp\gamma$ within cell the two differ and $M(X')\ne M(X)$ in distribution. The
-observed statistic is then compared against a null computed on a different design.
+relabelling; averaging over the symmetric group gives one law. (ii) Exactness of a permutation
+reference requires the permuted quantity to be exchangeable under the hypothesis, which is the
+stated condition; $y\perp t$ does not imply it. (iii) Let $X'$ replace $t$ by $t\circ\sigma$ and
+leave $\gamma,\pi$ in place. Then $X'$ carries the product of the marginals of $t$ and
+$(\gamma,\pi)$ where $X$ carries their joint law, so whenever $t\not\perp\gamma$ within cell the
+two differ and $M(X')\neq M(X)$ in distribution.
 \end{proof}
 
-\noindent The direction of the error is not neutral. Once $t$ is decoupled from $\gamma$, the
-caliper on $\gamma$ admits pairs it would otherwise exclude, so $|M(X')|>|M(X)|$ typically, the
-null is computed on a larger and easier design, and its spread is too small
-(Fig.~\ref{fig:null}). Measured at a nominal $0.005$, the treatment-side randomisation rejects at
-$\jdg{nullRateOld}$ and the design-fixed one at $\jdg{nullRateNew}$. The equivalence asserted in
-the first half of Prop.~\ref{prop:null} was checked numerically as well: permuting all covariates
-jointly against permuting $y$ gives SD ratios of $\jdg{verSdLo}$ to $\jdg{verSdHi}$ and a largest
-two-sample KS statistic of $\jdg{verKsHi}$ against a $5\%$ critical value of $\jdg{verKsCrit}$.
+\noindent \textbf{(iii), measured.} Once $t$ is decoupled from $\gamma$, the caliper on $\gamma$
+admits pairs it would otherwise exclude, so $|M(X')|>|M(X)|$ typically, the null is computed on a
+larger and easier design, and its spread is too small (Fig.~\ref{fig:null}). Measured at a nominal
+$0.005$, the treatment-side randomisation rejects at $\jdg{nullRateOld}$ and the design-fixed one
+at $\jdg{nullRateNew}$. A four-way comparison under an exchangeable null agrees: permuting $t$
+rejects $\jdg{m23nTN}=\jdg{m23nT}$, permuting $y$ within cell $\jdg{m23nYN}=\jdg{m23nY}$, a
+Freedman--Lane residual permutation \citep{freedman1983nonstochastic,anderson2001permutation,winkler2014permutation}
+$\jdg{m23nFLN}$, and a permutation blocked on the calipers $\jdg{m23nBlN}$ --- though the last has
+almost no permutation freedom, its blocks having median size $\jdg{m23BlockMed}$. The equivalence
+in (i) was also checked numerically: permuting all covariates jointly against permuting $y$ gives
+SD ratios of $\jdg{verSdLo}$ to $\jdg{verSdHi}$ and a largest two-sample KS statistic of
+$\jdg{verKsHi}$ against a $5\%$ critical value of $\jdg{verKsCrit}$.
+
+\paragraph{(ii), and why it is bounded rather than simulated.} Under the weaker hypothesis the
+failure channel is specific: a matched pair contributes
+$h(\gamma_i,\pi_i)-h(\gamma_j,\pi_j)$ for $h=\mathbb E[y\mid\gamma,\pi]$, which vanishes only if
+the caliper closes exactly. Its size is therefore estimable from quantities the design already
+carries,
+\begin{equation}
+\mathrm{bias}\;=\;\beta_\gamma\,\overline{\Delta\gamma}\;+\;\beta_\pi\,\overline{\Delta\pi},
+\label{eq:imbalance}
+\end{equation}
+with the slopes fitted within cell and the mean gaps read off the matched set. On the panel-matched
+arm this is $\jdg{imbPanLo}$ to $\jdg{imbPanHi}$ of the effect across the six populations; without
+the panel caliper it is $\jdg{imbFreeLo}$ to $\jdg{imbFreeHi}$, essentially all of it through
+$\overline{\Delta\pi}$, which the caliper moves from $\jdg{imbDpiFreeLo}$--$\jdg{imbDpiFreeHi}$ to
+$\jdg{imbDpiPanLo}$--$\jdg{imbDpiPanHi}$ (Appendix~\ref{app:imbalance}). \emph{This is what the
+panel caliper is for}, and it is also why the panel-free arm is reported as an upper bound rather
+than as a cleaner measurement.
+
+We reached \eqref{eq:imbalance} analytically because on this design the question cannot be settled
+by simulation, for a reason worth stating. A synthetic dataset that is null in $t$ while retaining
+the real $y$--$\gamma$ relation does not exist here: $\gamma$ and $t$ are dependent, so part of
+that relation \emph{is} the effect. Two attempts leak it back. Permuting $t$ inside fixed
+$\gamma$ blocks retains $\jdg{m23LeakLo}$ to $\jdg{m23LeakHi}$ of the real effect --- the caliper
+is a moving window and the blocks a grid of the same width, so $\jdg{m23CrossBlock}$ of matched
+pairs straddle a boundary --- and the retained effect predicts the resulting rejection rates with
+correlation $\jdg{m23LeakCorr}$. Replacing the blocks with a non-parametric fit of
+$\mathbb E[y\mid\gamma,\pi]$ leaks $\jdg{m23Dgp3Leak}$. The robust content of
+Prop.~\ref{prop:null}, which does not depend on any of this, is that \emph{inference must preserve
+the joint covariate structure used to construct the matched set}.
 
 \begin{figure}[!htbp]
 \centering
@@ -927,6 +971,60 @@ would settle it.
 \end{claimbox}
 
 % =====================================================================
+\subsection{The placement structure on three held-out rounds}
+\label{sec:rounds}
+
+Everything above is estimated on one round of one benchmark. The release carries three further
+rounds, with \emph{disjoint} puzzle sets --- verified empty intersection in all three --- and
+different method mixes, none of which has been read at any earlier point in this work. The depth
+gap is computed from target structures and design sequences alone, so this arm is blind to every
+outcome by construction, and the loader asserts that no score or reactivity column is opened.
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=\linewidth]{fig12_rounds.pdf}
+\caption{\textbf{Four rounds.} \emph{Left}, each dot is one design method's G--C-minus-A--U helix
+depth within a round; the bar is the round's pooled gap. Green is the round every other section of
+this paper uses. \emph{Right}, the method component after removing target main effects, filled
+where $p\le0.005$.}
+\label{fig:rounds}
+\end{figure}
+
+\begin{claimbox}
+\textbf{The placement replicates, and the method component strengthens.} All $\jdg{xrRounds}$
+pooled gaps are negative, from $\jdg{xrGapLo}$ to $\jdg{xrGapHi}$ depth units over
+$\jdg{xrCells}$ (method,\,target) cells and $\jdg{xrTargets}$ target--round combinations.
+\textbf{$\jdg{xrSign}$ (round,\,method) cells are negative} (sign test $p=\jdg{xrSignP}$), and the
+human-designed arm ranks $\jdg{xrEterna}$ of its round in the four rounds respectively. The method
+component is positive in all four and clears $0.005$ in $\jdg{xrMcClears}$ of them
+(Table~\ref{tab:rounds}).
+\end{claimbox}
+
+\begin{table}[!htbp]
+\centering\small
+\caption{\textbf{The placement structure round by round.} Round 3 is the one used elsewhere in this
+paper; rounds 1, 2 and 4 have disjoint targets and were read for the first time here. The method
+component is computed on the benchmark's full target-pair set, which is larger than the
+compensatory arm's, so it is a replication of \S\ref{sec:gradient} rather than a restatement of it.}
+\label{tab:rounds}
+\input{figs/rounds.tex}
+\end{table}
+
+\paragraph{Round 1 is the exception and is reported as one.} Its pooled gap is the weakest by a
+factor of three and $\jdg{xrR1Pos}$ of its nine methods are positive --- $\jdg{xrR1Names}$ --- so
+the structure is a strong regularity rather than a law. Round 1 is also the round whose targets are
+drawn from a published pseudoknot set rather than composed for the benchmark, which is a difference
+we can name but not test.
+
+\paragraph{What this does and does not extend.} It extends the placement claim from one target set
+to four, and it raises the method component from an arm at its detection edge
+(\S\ref{sec:gradient}) to one that clears $0.005$ on two independent rounds. It does not extend the
+claim beyond \emph{designed} corpora: all four rounds come from one laboratory, one platform and one
+player community, and no natural-sequence corpus is present in this release. The prediction the
+mechanism makes about natural RNA --- that the placement structure should be weaker or absent where
+no designer chose --- is stated in \S\ref{sec:limits} as the test we did not run.
+
+% =====================================================================
 \section{Analysis}
 \label{sec:analysis}
 
@@ -1017,8 +1115,13 @@ none.
 \section{Limitations and conclusion}
 \label{sec:limits}
 
-\textbf{(i) One corpus.} Every mechanism is stated so as to be checkable elsewhere; none has been
-checked elsewhere by us. \textbf{(ii) Interventional at the mutation, observational at the
+\textbf{(i) One corpus, four rounds.} The placement structure is now measured on
+$\jdg{xrRounds}$ rounds with disjoint targets (\S\ref{sec:rounds}) and the formation results on
+one. All four rounds come from the same laboratory, platform and player community, so what
+replicates is the target set and the method mix, not the ecology. The sharpest untried test follows
+from the mechanism itself: \emph{a corpus nobody designed should not carry the placement
+structure.} Homologous natural sequences with a probing readout would decide it, and none is
+present in this release. \textbf{(ii) Interventional at the mutation, observational at the
 property.} The rescue readout is produced by an intervention --- a compensatory double substitution
 performed at the bench --- and that is what licenses a formation claim about an individual pair.
 We did not choose which pairs were mutated, and the exposure whose effect we estimate, the identity
@@ -1051,7 +1154,8 @@ $\jdg{eMedCi}$. It survives outside the terminal penalty's domain, it does not s
 energy gaps between the three pair types, and it does not track which program built the sequence.
 What \emph{does} hide it is where the designer put the pair, and that is estimable from the corpus
 itself: placement accounts for $\jdg{medFrac}$ of the gap between the marginal and matched
-contrasts, and the same property is worth $\jdg{cEffLo}$ to $\jdg{cEffHi}$ points on the
+contrasts, it recurs on $\jdg{xrRounds}$ rounds with disjoint targets ($\jdg{xrSign}$ of the
+(round,\,method) cells, $p=\jdg{xrSignP}$), and the same property is worth $\jdg{cEffLo}$ to $\jdg{cEffHi}$ points on the
 benchmark's own score between two real molecules matched on everything else we could match. A
 designed corpus, then, understates a property of its molecules through a covariate its authors
 chose, at a rate it can be made to report --- while the model those authors were optimising has
@@ -1194,14 +1298,18 @@ Each analysis was preceded by a declaration committed and pushed before the corr
 existed, stating the arms, the kill conditions, the must-fire probes, a staked numerical
 prediction, and the reading forced by each unexpected shape of the result. Verdicts are reported
 in the declaration's own wording, and Table~\ref{tab:prereg} carries the staked predictions with
-their outcomes, including the two that failed. Runs voided by their own probes are retained with
+their outcomes, including the four that failed and the one whose object turned out not to exist.
+Where a declaration left a band between its kill conditions undefined, or where a staked prediction
+was stricter than the kill condition it was written for, both thresholds are reported rather than
+reconciled after the fact. Runs voided by their own probes are retained with
 their logs rather than deleted; one of those voids is what produced Prop.~\ref{prop:null}.
 
 \begin{table}[!htbp]
 \centering\small
 \caption{Staked numerical predictions, frozen before the corresponding data existed.}
 \label{tab:prereg}
-\begin{tabular}{@{}p{0.40\linewidth}p{0.20\linewidth}p{0.16\linewidth}l@{}}
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}p{0.44\linewidth}p{0.16\linewidth}p{0.17\linewidth}l@{}}
 \toprule
 staked, before the run & bar & measured & outcome \\
 \midrule
@@ -1226,9 +1334,19 @@ overlap sufficient for the stratified estimate & $\ge200$ wts & $\jdg{eW}$ & hel
 \multicolumn{4}{@{}l@{}}{\emph{frozen before the two review arms existed}}\\
 effect positive in at least seven of nine methods & $\ge7/9$ &
   $\jdg{sNPos}/\jdg{sNMeth}$ & held \\
-effect size not monotone in the method's placement strength & $|\rho_s|<0.6$ & $\jdg{sSpear}$ &
-  held \\
+effect size not monotone in placement strength & $|\rho_s|<0.6$ & $\jdg{sSpear}$ & held \\
 the circular shift never indexes a sequence & assertion & source-checked & held \\
+\midrule
+\multicolumn{4}{@{}l@{}}{\emph{frozen before \S\ref{sec:rounds} existed}}\\
+treatment-side randomisation over-rejects & $>0.010$ & $\jdg{m23nT}$ & held \\
+$y$-permutation conservative when $y$ tracks the calipers & vs.\ bound &
+  --- & \textbf{void} \\
+all four rounds' pooled depth gaps negative & $<0$ & $\jdg{xrGapLo}$ \dots $\jdg{xrGapHi}$ & held \\
+at least two thirds of methods negative in every round & $\ge 2/3$ &
+  $\jdg{xrSign}$ pooled & \textbf{failed on round 1} \\
+human-designed arm in the most negative third of each round & --- &
+  ranks $\jdg{xrEterna}$ & held \\
+method component misses $0.005$ somewhere & --- & $\jdg{xrMcClears}$ of four clear & held \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1316,6 +1434,39 @@ means of the projection residual, which vanishes only when the conditional mean 
 mediator. Here it is not: across bins at $\jdg{eBinwiseDg}$\,kcal/mol the within-stratum centred
 rescue runs $\jdg{eBinwise}$. The product route consequently reports $\jdg{eLinearMed}$ mediated
 where the stratified route reports $\jdg{eMed}$.
+
+
+
+\section{Residual within-caliper imbalance}
+\label{app:imbalance}
+
+Proposition~\ref{prop:null}(ii) names the channel through which the within-cell permutation
+reference departs from exactness when $y$ depends on the matching covariates, and
+\eqref{eq:imbalance} bounds it with quantities the estimator already computes. Table~\ref{tab:imb}
+reports both factors and the resulting bias, with and without the panel caliper, for all six
+populations. The within-cell slope of the outcome on global GC is $\jdg{imbBetaLo}$ to
+$\jdg{imbBetaHi}$ points per unit; the panel caliper's effect is almost entirely on
+$\overline{\Delta\pi}$.
+
+\begin{table}[!htbp]
+\centering\small
+\caption{\textbf{The bias residual imbalance can produce}, as a share of the measured effect.
+Adding the panel caliper takes it from roughly a third of the effect to a few percent, and it is
+the reason \S\ref{sec:score}'s main arm is the panel-matched one.}
+\label{tab:imb}
+\input{figs/imbalance.tex}
+\end{table}
+
+\paragraph{Why this is a bound and not a simulation.} A synthetic dataset that is null in the
+treatment while retaining the real outcome--covariate relation does not exist on this design.
+$\gamma$ and $t$ are dependent, so part of the $y$--$\gamma$ relation is the effect itself, and any
+construction that preserves the relation preserves some of the effect. Permuting $t$ inside fixed
+$\gamma$ blocks retains $\jdg{m23LeakLo}$ to $\jdg{m23LeakHi}$ of it, because the caliper is a
+moving window while the blocks are a grid of the same width and $\jdg{m23CrossBlock}$ of matched
+pairs cross a boundary; the retained effect predicts the rejection rates that construction produces
+with correlation $\jdg{m23LeakCorr}$. Substituting a non-parametric fit of
+$\mathbb E[y\mid\gamma,\pi]$ makes it worse, at $\jdg{m23Dgp3Leak}$. We record this because the
+same trap is available to anyone calibrating a matched design by simulation.
 
 
 \end{document}

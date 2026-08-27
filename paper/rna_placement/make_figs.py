@@ -599,9 +599,52 @@ def fig11():
     _save(fig, f"{OUT}/fig11_collinear.pdf"); plt.close(fig)
 
 
+
+# ---------------------------------------------------------------- fig 12: four rounds
+def fig12():
+    """The placement structure on Round 3 and on three rounds with disjoint targets."""
+    d = J("m24_cross_round.json")["rounds"]
+    fig, (a1, a2) = plt.subplots(1, 2, figsize=(7.4, 2.7),
+                                 gridspec_kw={"width_ratios": [1.35, 1]})
+    order = sorted(d, key=lambda r: r["round"])
+    ymax = 0
+    for i, r in enumerate(order):
+        pm = r["per_method"]
+        xs = list(pm.values())
+        col = S1 if r["round"] != "3" else S3
+        a1.scatter(xs, [i] * len(xs), s=22, color=col, zorder=4,
+                   alpha=.85, edgecolor="none")
+        a1.scatter([r["pooled_gap"]], [i], s=70, marker="|", color=INK, zorder=5, lw=1.6)
+        ymax = i
+    a1.axvline(0, color=INK2, lw=.8)
+    a1.set_yticks(range(len(order)))
+    a1.set_yticklabels(["round %s%s\n%d targets, %d methods"
+                        % (r["round"], " (this paper)" if r["round"] == "3" else "",
+                           r["targets"], r["methods"]) for r in order], fontsize=6.3)
+    a1.set_xlabel("G--C minus A--U helix depth, per design method", fontsize=7.4)
+    a1.set_title("every round, and the methods inside it", fontsize=7.6, color=INK)
+    a1.invert_yaxis()
+    bare(a1)
+
+    y = np.arange(len(order))[::-1]
+    mc = [r["method_component"] for r in order]
+    cols = [S1 if r["method_p"] <= 0.005 else INK3 for r in order]
+    a2.barh(y, mc, height=.5, color=cols, zorder=3)
+    for i, r in zip(y, order):
+        a2.text(r["method_component"] + 0.008, i, "$p=%.4f$" % r["method_p"],
+                va="center", fontsize=6.2, color=INK2)
+    a2.set_yticks(y); a2.set_yticklabels(["round %s" % r["round"] for r in order], fontsize=6.6)
+    a2.set_xlabel("method component after target main effects", fontsize=7.4)
+    a2.set_xlim(0, max(mc) * 1.55)
+    a2.set_title("whose rule is it", fontsize=7.6, color=INK)
+    bare(a2)
+    fig.tight_layout(w_pad=1.3)
+    _save(fig, f"{OUT}/fig12_rounds.pdf"); plt.close(fig)
+
+
 if __name__ == "__main__":
     fig0(); fig8()
     b, a = fig1(); fig2(); fig3(); fig4(); fig5(); fig6(); fig7()
-    fig9(); fig10(); fig11()
+    fig9(); fig10(); fig11(); fig12()
     print(f"fig1 baseline R2 {b:.4f} ({b/CEILING:.1%})  +seq {b+a:.4f} ({(b+a)/CEILING:.1%})")
     print("wrote", sorted(os.listdir(OUT)))

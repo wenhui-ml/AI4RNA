@@ -1,0 +1,170 @@
+{
+ "nominal": 0.005,
+ "draws": 40,
+ "nperm": 400,
+ "N4_block_median": 1.0,
+ "N4_underpowered": true,
+ "DGP1": {
+  "total": {
+   "N1_permute_t": [
+    9,
+    240
+   ],
+   "N2_permute_y_cell": [
+    1,
+    240
+   ],
+   "N3_freedman_lane": [
+    0,
+    240
+   ],
+   "N4_blocked": [
+    0,
+    240
+   ]
+  },
+  "rate": {
+   "N1_permute_t": 0.0375,
+   "N2_permute_y_cell": 0.0042,
+   "N3_freedman_lane": 0.0,
+   "N4_blocked": 0.0
+  },
+  "null_sd_mean": {
+   "N1_permute_t": 0.43398,
+   "N2_permute_y_cell": 0.67455,
+   "N3_freedman_lane": 0.63936,
+   "N4_blocked": 0.29565
+  },
+  "per_pop": {
+   "panel_f1_fresh.json": {
+    "N1_permute_t": {
+     "n": 40,
+     "hits": 3
+    },
+    "N2_permute_y_cell": {
+     "n": 40,
+     "hits": 0
+    },
+    "N3_freedman_lane": {
+     "n": 40,
+     "hits": 0
+    },
+    "N4_blocked": {
+     "n": 40,
+     "hits": 0
+    }
+   },
+   "panel_f1_designs.json": {
+    "N1_permute_t": {
+     "n": 40,
+     "hits": 3
+    },
+    "N2_permute_y_cell": {
+     "n": 40,
+     "hits": 1
+    },
+    "N3_freedman_lane": {
+     "n": 40,
+     "hits": 0
+    },
+    "N4_blocked": {
+     "n": 40,
+     "hits": 0
+    }
+   },
+   "panel_f1_third.json": {
+    "N1_permute_t": {
+     "n": 40,
+     "hits": 1
+    },
+    "N2_permute_y_cell": {
+     "n": 40,
+     "hits": 0
+    },
+    "N3_freedman_lane": {
+     "n": 40,
+     "hits": 0
+    },
+    "N4_blocked": {
+     "n": 40,
+     "hits": 0
+    }
+   },
+   "panel_f1_fourth.json": {
+    "N1_permute_t": {
+     "n": 40,
+     "hits": 1
+    },
+    "N2_permute_y_cell": {
+     "n": 40,
+     "hits": 0
+    },
+    "N3_freedman_lane": {
+     "n": 40,
+     "hits": 0
+    },
+    "N4_blocked": {
+     "n": 40,
+     "hits": 0
+    }
+   },
+   "panel_f1_fifth.json": {
+    "N1_permute_t": {
+     "n": 40,
+     "hits": 0
+    },
+    "N2_permute_y_cell": {
+     "n": 40,
+     "hits": 0
+    },
+    "N3_freedman_lane": {
+     "n": 40,
+     "hits": 0
+    },
+    "N4_blocked": {
+     "n": 40,
+     "hits": 0
+    }
+   },
+   "panel_f1_sixth.json": {
+    "N1_permute_t": {
+     "n": 40,
+     "hits": 1
+    },
+    "N2_permute_y_cell": {
+     "n": 40,
+     "hits": 0
+    },
+    "N3_freedman_lane": {
+     "n": 40,
+     "hits": 0
+    },
+    "N4_blocked": {
+     "n": 40,
+     "hits": 0
+    }
+   }
+  }
+ },
+ "DGP2_VOID": {
+  "reason": "DGP2 不是零效应过程:caliper 是宽 CAL_GC 的移动窗而分块是同宽的固定网格,44.4% 的配对跨块并保留原始 t-y 关联。逐人群泄漏 4.7%~33.7%,与实测拒绝率相关 +0.857,预测拒绝率 0.254 高于实测 0.188。非参数替代(DGP3, kNN)泄漏 47.5%。结构性原因:γ 与 t 相依 ⇒ 真实 y-γ 关系里有一部分就是效应本身。",
+  "rates": {
+   "N1_permute_t": 0.6083,
+   "N2_permute_y_cell": 0.1875,
+   "N3_freedman_lane": 0.0667,
+   "N4_blocked": 0.0
+  },
+  "leak_per_pop": [
+   0.0467,
+   0.1638,
+   0.1094,
+   0.2217,
+   0.3368,
+   0.3144
+  ],
+  "leak_corr_with_rejection": 0.8565072461758629,
+  "dgp3_leak": 0.4751177294132621,
+  "cross_block_pair_frac": 0.4438
+ },
+ "verdict": "armA_stands__armB_void_no_null_process_exists__see_armC"
+}
