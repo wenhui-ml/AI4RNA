@@ -26,10 +26,12 @@ def main():
     recs = M21.build_with_dg()
     print("=== M22 A 臂:幸存者偏差的有界性 —— 效应是不是【方法能力】造出来的 ===")
     print("  声明 3e9496cc。离线 $0。**对象是 M2R 臂,每个 (靶标,方法) 只有最优设计。**\n")
-    # design-side depth gap per method, from M20's declaration (already committed, design-side only)
-    dep_gap = {"Eterna": -0.763, "Starting sequence": -0.567, "gRNAde-no3d": -0.522,
-               "Shujun_struct2seq": -0.451, "gRNAde": -0.393, "MPNN-fixbb": -0.361,
-               "Shujun_shape_struct2seq": -0.262, "MPNN-RFdiff": -0.119, "Rosetta": -0.092}
+    # design-side depth gap per method, read from M20's COMMITTED RESULT. The first version of
+    # this script hardcoded the figures from M20's declaration BLIND_STATUS instead, which were
+    # computed before the MIN_CELL filter and differ by up to 0.145; M24's reproduction probe
+    # caught it. Never transcribe a number that is already in an artifact.
+    dep_gap = {r["method"]: r["gap"] for r in
+               json.load(open(os.path.join(HERE, "m20_designer_confounding.json")))["A1"]["per_method"]}
     sfn = lambda r: (r["design"], min(r["depth"], 3), r["crossed"])
     rows = []
     for m in sorted({r["method"] for r in recs}):

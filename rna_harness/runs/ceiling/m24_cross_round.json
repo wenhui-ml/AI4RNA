@@ -1,0 +1,145 @@
+{
+ "P2": {
+  "max_cell_dev": 0.0,
+  "per_method_dev": {
+   "Shujun_struct2seq": -0.0,
+   "Shujun_shape_struct2seq": 0.0,
+   "Starting sequence": -0.0,
+   "MPNN-RFdiff": 0.0,
+   "gRNAde-no3d": 0.0,
+   "MPNN-fixbb": -0.0,
+   "gRNAde": -0.0,
+   "Rosetta": 0.0,
+   "Eterna": 0.0
+  },
+  "pass": true
+ },
+ "P3_overlap": {
+  "1": [],
+  "2": [],
+  "4": []
+ },
+ "rounds": [
+  {
+   "round": "1",
+   "cells": 141,
+   "targets": 17,
+   "methods": 9,
+   "pooled_gap": -0.0877,
+   "pooled_sd": 0.4457,
+   "frac_cells_negative": 0.5674,
+   "methods_negative": "5/9",
+   "per_method": {
+    "MPNN-fixbb": -0.4761,
+    "gRNAde": -0.3309,
+    "Eterna": -0.3146,
+    "Starting sequence": -0.2639,
+    "M2": -0.2628,
+    "3DRNA": 0.1221,
+    "MPNN-RFdiff": 0.143,
+    "Rosetta": 0.184,
+    "Rosetta-LoRes": 0.1959
+   },
+   "eterna_rank": 2,
+   "method_component": 0.31853,
+   "target_component": 0.7233,
+   "method_p": 0.0005
+  },
+  {
+   "round": "2",
+   "cells": 104,
+   "targets": 17,
+   "methods": 7,
+   "pooled_gap": -0.3404,
+   "pooled_sd": 0.4042,
+   "frac_cells_negative": 0.8173,
+   "methods_negative": "7/7",
+   "per_method": {
+    "Eterna": -0.5127,
+    "MPNN-fixbb": -0.4778,
+    "codesign-RFdiff": -0.3759,
+    "gRNAde": -0.2775,
+    "M2": -0.2628,
+    "Starting sequence": -0.262,
+    "MPNN-RFdiff": -0.2406
+   },
+   "eterna_rank": 0,
+   "method_component": 0.07964,
+   "target_component": 0.5013,
+   "method_p": 0.02749
+  },
+  {
+   "round": "3",
+   "cells": 200,
+   "targets": 20,
+   "methods": 10,
+   "pooled_gap": -0.2713,
+   "pooled_sd": 0.445,
+   "frac_cells_negative": 0.72,
+   "methods_negative": "9/10",
+   "per_method": {
+    "Eterna": -0.563,
+    "Starting sequence": -0.4628,
+    "M2": -0.4624,
+    "MPNN-fixbb": -0.3159,
+    "Struct2SeQ": -0.3144,
+    "gRNAde-no3d": -0.2108,
+    "MPNN-RFdiff": -0.2066,
+    "Struct2SeQ-SHAPE": -0.188,
+    "gRNAde": -0.0958,
+    "Rosetta": 0.1063
+   },
+   "eterna_rank": 0,
+   "method_component": 0.17783,
+   "target_component": 0.734,
+   "method_p": 0.0005
+  },
+  {
+   "round": "4",
+   "cells": 194,
+   "targets": 20,
+   "methods": 10,
+   "pooled_gap": -0.3508,
+   "pooled_sd": 0.4199,
+   "frac_cells_negative": 0.7938,
+   "methods_negative": "10/10",
+   "per_method": {
+    "codesign-RFdiff": -0.5074,
+    "gRNAde": -0.4845,
+    "Eterna": -0.4802,
+    "Struct2SeQ": -0.4436,
+    "Struct2SeQ-SHAPE": -0.3708,
+    "MPNN-fixbb": -0.3603,
+    "gRNAde-no3d": -0.2888,
+    "M2": -0.2522,
+    "Starting sequence": -0.2521,
+    "MPNN-RFdiff": -0.0752
+   },
+   "eterna_rank": 2,
+   "method_component": 0.08745,
+   "target_component": 0.7239,
+   "method_p": 0.01199
+  }
+ ],
+ "pooled_method_sign_test": {
+  "negative": 31,
+  "total": 36,
+  "binom_p": 6.456742994487286e-06
+ },
+ "round1_positive_methods": [
+  "3DRNA",
+  "MPNN-RFdiff",
+  "Rosetta",
+  "Rosetta-LoRes"
+ ],
+ "staked": {
+  "1_all_rounds_negative": true,
+  "2_two_thirds_methods_negative_each_round": false,
+  "3_eterna_in_most_negative_third_each_round": true,
+  "4_same_order_of_magnitude": true,
+  "5_method_component_misses_0005_somewhere": true
+ },
+ "K2_majority_each_round": true,
+ "verdict": "placement_replicates_across_rounds",
+ "declaration_band": "K1 \u53ea\u5728\u67d0\u8f6e\u5408\u5e76 g \u4e3a\u6b63\u65f6\u89e6\u53d1(\u672a\u89e6\u53d1);K2 \u8981\u6c42\u300e\u9010\u65b9\u6cd5\u591a\u6570\u4e3a\u8d1f\u300f(\u6ee1\u8db3:5/9, 7/7, 9/10, 10/10)\u3002\u62bc\u6ce8(2)\u8981\u6c42 >=2/3,round 1 \u7684 5/9 \u4e0d\u6ee1\u8db3\u3002**\u88c1\u5b9a\u6309\u58f0\u660e\u7684 K2,\u62bc\u6ce8(2)\u8bb0\u4e3a\u5931\u8d25\u3002**\u4e24\u8005\u4e0d\u662f\u540c\u4e00\u4e2a\u95e8\u69db,\u8fd9\u4e00\u53e5\u662f\u4e3a\u4e86\u9632\u6b62\u4e8b\u540e\u628a\u62bc\u6ce8\u5931\u8d25\u8bf4\u6210\u88c1\u5b9a\u5931\u8d25,\u6216\u53cd\u8fc7\u6765\u3002"
+}

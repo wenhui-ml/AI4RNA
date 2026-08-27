@@ -1,0 +1,29 @@
+=== M24:放置结构在三轮从未碰过的语料上是否重复 ===
+  声明 e8d4907f。离线 $0。**整条臂不读任何结果列(已断言)。**
+
+=== P2 代码路径自检:同一路径在 M2R 记录集上必须复现 M20 的九个数 ===
+  与 M20.cells_of 逐格最大差 0.00e+00
+  与已提交九个数的偏差 {'Shujun_struct2seq': -0.0, 'Shujun_shape_struct2seq': 0.0, 'Starting sequence': -0.0, 'MPNN-RFdiff': 0.0, 'gRNAde-no3d': 0.0, 'MPNN-fixbb': -0.0, 'gRNAde': -0.0, 'Rosetta': 0.0, 'Eterna': 0.0}
+  P2 通过
+
+=== P3 靶标集合互不相交 ===
+  round 1: 17 靶标,与 round 3 交集 空
+  round 2: 17 靶标,与 round 3 交集 空
+  round 4: 20 靶标,与 round 3 交集 空
+
+=== 主臂:逐轮的 CG−AU 深度差(不碰结果)===
+  round 1: 格  141  靶标 17  方法  9  合并 g -0.0877 ± 0.4457  为负的格 56.7%  方法为负 5/9  Eterna 排名 2  方法分量 +0.31853 (p=0.00050)
+  round 2: 格  104  靶标 17  方法  7  合并 g -0.3404 ± 0.4042  为负的格 81.7%  方法为负 7/7  Eterna 排名 0  方法分量 +0.07964 (p=0.02749)
+  round 3: 格  200  靶标 20  方法 10  合并 g -0.2713 ± 0.4450  为负的格 72.0%  方法为负 9/10  Eterna 排名 0  方法分量 +0.17783 (p=0.00050)
+  round 4: 格  194  靶标 20  方法 10  合并 g -0.3508 ± 0.4199  为负的格 79.4%  方法为负 10/10  Eterna 排名 2  方法分量 +0.08745 (p=0.01199)
+
+  round 1 逐方法: MPNN-fixbb:-0.476  gRNAde:-0.331  Eterna:-0.315  Starting sequence:-0.264  M2:-0.263  3DRNA:+0.122  MPNN-RFdiff:+0.143  Rosetta:+0.184  Rosetta-LoRes:+0.196
+  round 2 逐方法: Eterna:-0.513  MPNN-fixbb:-0.478  codesign-RFdiff:-0.376  gRNAde:-0.278  M2:-0.263  Starting sequence:-0.262  MPNN-RFdiff:-0.241
+  round 3 逐方法: Eterna:-0.563  Starting sequence:-0.463  M2:-0.462  MPNN-fixbb:-0.316  Struct2SeQ:-0.314  gRNAde-no3d:-0.211  MPNN-RFdiff:-0.207  Struct2SeQ-SHAPE:-0.188  gRNAde:-0.096  Rosetta:+0.106
+  round 4 逐方法: codesign-RFdiff:-0.507  gRNAde:-0.484  Eterna:-0.480  Struct2SeQ:-0.444  Struct2SeQ-SHAPE:-0.371  MPNN-fixbb:-0.360  gRNAde-no3d:-0.289  M2:-0.252  Starting sequence:-0.252  MPNN-RFdiff:-0.075
+
+  合并:31/36 个 (round, method) 方法为负,符号检验 p = 6.457e-06
+  **shape:round 1 有 4 个方法为正 —— ['3DRNA', 'MPNN-RFdiff', 'Rosetta', 'Rosetta-LoRes']**(PK50 靶标那一轮)
+
+=== 裁定: placement_replicates_across_rounds ===
+押注逐条: {"1_all_rounds_negative": true, "2_two_thirds_methods_negative_each_round": false, "3_eterna_in_most_negative_third_each_round": true, "4_same_order_of_magnitude": true, "5_method_component_misses_0005_somewhere": true}
