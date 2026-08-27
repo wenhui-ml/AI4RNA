@@ -375,62 +375,67 @@ def fig0():
     and section pointers only.
     """
     from matplotlib.patches import FancyBboxPatch, FancyArrowPatch
-    fig, ax = plt.subplots(figsize=(7.0, 3.35)); ax.set_axis_off()
-    ax.set_xlim(0, 100); ax.set_ylim(0, 66)
-    W, H = 26.0, 11.0
-    ROW = {"top": 49.0, "mid": 27.5, "bot": 6.0}
-    COL = [14.0, 50.0, 86.0]                      # centres
+    fig, ax = plt.subplots(figsize=(7.2, 3.7)); ax.set_axis_off()
+    ax.set_xlim(-2, 105); ax.set_ylim(-2, 68)
+    H = 12.0
+    ROW = {"top": 52.0, "mid": 28.0, "bot": 4.5}
+    C3 = [16.0, 50.0, 84.0]                       # top band centres
+    C4 = [15.0, 39.0, 63.5, 88.0]                 # middle band centres
+    CB = [24.0, 56.0, 88.0]                       # bottom band centres
 
-    def box(cx, y, txt, fc, ec, bold=False, w=W):
+    def box(cx, y, txt, fc, ec, bold=False, w=26.0, fs=6.7):
         ax.add_patch(FancyBboxPatch((cx - w / 2, y), w, H,
                                     boxstyle="round,pad=0.0,rounding_size=1.6",
                                     fc=fc, ec=ec, lw=1.0, zorder=3))
-        ax.text(cx, y + H / 2, txt, ha="center", va="center", fontsize=6.9, color=INK,
-                zorder=4, weight="bold" if bold else "normal", linespacing=1.45)
+        ax.text(cx, y + H / 2, txt, ha="center", va="center", fontsize=fs, color=INK,
+                zorder=4, weight="bold" if bold else "normal", linespacing=1.42)
 
     def down(cx1, cx2, ytop, ybot):
         ax.add_patch(FancyArrowPatch((cx1, ytop), (cx2, ybot + H), arrowstyle="-|>",
                                      mutation_scale=8, lw=0.9, color=INK2, zorder=2,
-                                     shrinkA=1, shrinkB=1,
-                                     connectionstyle="arc3,rad=0.0"))
+                                     shrinkA=1, shrinkB=1, connectionstyle="arc3,rad=0.0"))
 
-    for y, lab in ((ROW["top"], "corpus and readouts"),
-                   (ROW["mid"], "estimated quantities"),
-                   (ROW["bot"], "what they compose into")):
-        ax.text(50, y + H + 3.4, lab, ha="center", fontsize=6.3, color=INK3, style="italic")
+    # band labels live in the caption; on the canvas they collided with the arrows.
 
-    box(COL[0], ROW["top"], "designed sequences\n$\\times$ target structures\n9 design methods",
+    box(C3[0], ROW["top"], "designed sequences\n$\\times$ target structures\n9 design methods",
         "#ffffff", INK3)
-    box(COL[1], ROW["top"], "compensatory rescue\nan intervention on one pair\nno predictor involved",
-        "#eaf2fd", S1, bold=True)
-    box(COL[2], ROW["top"], "the design score\npredictor panel enters\nonly as a covariate",
+    box(C3[1], ROW["top"], "compensatory rescue\nan intervention on one pair\nno predictor involved",
+        "#eaf2fd", S1, bold=True, w=30)
+    box(C3[2], ROW["top"], "the design score\npredictor panel enters\nonly as a covariate",
         "#ffffff", INK3)
-    down(COL[0] + W / 2 - 1, COL[1] - W / 2 + 1, ROW["top"] + H / 2, ROW["top"] - H / 2)
-    ax.add_patch(FancyArrowPatch((COL[0] + W / 2, ROW["top"] + H / 2),
-                                 (COL[1] - W / 2, ROW["top"] + H / 2), arrowstyle="-|>",
-                                 mutation_scale=8, lw=0.9, color=INK2, zorder=2))
-    ax.add_patch(FancyArrowPatch((COL[1] + W / 2, ROW["top"] + H / 2),
-                                 (COL[2] - W / 2, ROW["top"] + H / 2), arrowstyle="-",
-                                 mutation_scale=8, lw=0.9, color=INK3, zorder=2, ls=(0, (2, 2))))
+    ax.add_patch(FancyArrowPatch((C3[0] + 13, ROW["top"] + H / 2), (C3[1] - 15, ROW["top"] + H / 2),
+                                 arrowstyle="-|>", mutation_scale=8, lw=0.9, color=INK2, zorder=2))
+    ax.add_patch(FancyArrowPatch((C3[1] + 15, ROW["top"] + H / 2), (C3[2] - 13, ROW["top"] + H / 2),
+                                 arrowstyle="-", mutation_scale=8, lw=0.9, color=INK3, zorder=2,
+                                 ls=(0, (2, 2))))
 
-    box(COL[0], ROW["mid"], "pair-type effect\non rescue, matched\n(Sec. 4.1)", "#eaf2fd", S1, bold=True)
-    box(COL[1], ROW["mid"], "placement gap $g$\nand slope $\\beta_{\\rm depth}$\n(Sec. 4.2)",
-        "#eaf2fd", S1, bold=True)
-    box(COL[2], ROW["mid"], "matched-pair effect\non the design score\n(Sec. 4.3)", "#ffffff", INK3)
-    down(COL[1], COL[0], ROW["top"], ROW["mid"])
-    down(COL[1], COL[1], ROW["top"], ROW["mid"])
-    down(COL[2], COL[2], ROW["top"], ROW["mid"])
+    box(C4[0], ROW["mid"], "pair-type effect\non rescue, matched\n(Sec. 4.2)",
+        "#eaf2fd", S1, bold=True, w=23)
+    box(C4[1], ROW["mid"], "mediator I\nthe model's own\n$\\Delta G_{\\rm loc}$  (Sec. 4.3)",
+        "#eaf2fd", S1, bold=True, w=23)
+    box(C4[2], ROW["mid"], "mediator II\nplacement $g$ and\n$\\beta_{\\rm depth}$  (Sec. 4.4)",
+        "#eaf2fd", S1, bold=True, w=23)
+    box(C4[3], ROW["mid"], "matched-pair effect\non the design score\n(Sec. 4.5)",
+        "#ffffff", INK3, w=23)
+    down(C3[1] - 8, C4[0], ROW["top"], ROW["mid"])
+    down(C3[1] - 2, C4[1], ROW["top"], ROW["mid"])
+    down(C3[1] + 4, C4[2], ROW["top"], ROW["mid"])
+    down(C3[2], C4[3], ROW["top"], ROW["mid"])
 
-    box(30, ROW["bot"], "the mediation identity\nattenuation $= g \\times \\beta_{\\rm depth}$\n(Sec. 5.1)",
-        "#fdf0e9", S2, bold=True, w=36)
-    box(72, ROW["bot"], "the gradient is a property\nof the design method\n(Sec. 4.4, 5.2)",
-        "#fdf0e9", S2, w=36)
-    down(COL[0], 24, ROW["mid"], ROW["bot"])
-    down(COL[1], 36, ROW["mid"], ROW["bot"])
-    down(COL[1], 66, ROW["mid"], ROW["bot"])
-    down(COL[2], 78, ROW["mid"], ROW["bot"])
+    box(CB[0], ROW["bot"], "mediates none of it\nformation is not a function\nof the local term  (Sec. 5.2)",
+        "#fdf0e9", S2, bold=True, w=32, fs=6.5)
+    box(CB[1], ROW["bot"], "the mediation identity\nattenuation $= g \\times \\beta_{\\rm depth}$\n(Sec. 5.1)",
+        "#fdf0e9", S2, bold=True, w=32, fs=6.5)
+    box(CB[2], ROW["bot"], "the gradient is a property\nof the design method\n(Sec. 4.6, 5.2)",
+        "#fdf0e9", S2, w=32, fs=6.5)
+    down(C4[0], CB[0] - 6, ROW["mid"], ROW["bot"])
+    down(C4[1], CB[0] + 6, ROW["mid"], ROW["bot"])
+    down(C4[0], CB[1] - 6, ROW["mid"], ROW["bot"])
+    down(C4[2], CB[1] + 6, ROW["mid"], ROW["bot"])
+    down(C4[2], CB[2] - 6, ROW["mid"], ROW["bot"])
+    down(C4[3], CB[2] + 6, ROW["mid"], ROW["bot"])
 
-    ax.text(1, 1, "blue: nothing on this path calls a folding predictor", fontsize=6.3, color=S1)
+    ax.text(-1, -1.5, "blue: nothing on this path calls a folding predictor", fontsize=6.3, color=S1)
     _save(fig, f"{OUT}/fig0_arch.pdf"); plt.close(fig)
 
 
@@ -468,8 +473,135 @@ def fig8():
     _save(fig, f"{OUT}/fig8_null.pdf"); plt.close(fig)
 
 
+
+# ---------------------------------------------------------------- fig 9: the energy test
+def fig9():
+    """M21. Left: where the two pair types can share an NN local free energy at all.
+    Centre: what conditioning on it does, against what conditioning on a placebo does.
+    Right: why the product-of-coefficients route disagrees."""
+    d = J("m21_thermo_mediator.json")
+    fig, (a1, a2, a3) = plt.subplots(1, 3, figsize=(7.4, 2.5))
+
+    edges = d["bin_edges"]
+    lab = ["$\\leq$%.1f" % edges[0]] + \
+          ["%.1f..%.1f" % (edges[i], edges[i + 1]) for i in range(len(edges) - 1)] + \
+          ["$>$%.1f" % edges[-1]]
+    x = np.arange(len(lab))
+    for k, (t, col) in enumerate((("CG", S1), ("AU", S2), ("GU", S3))):
+        h = d["dG_by_type"][t]["bin_hist"]
+        a1.bar(x + (k - 1) * .27, h, width=.26, color=col, zorder=3, label=t.replace("CG", "C--G")
+               .replace("AU", "A--U").replace("GU", "G--U"))
+    a1.set_xticks(x); a1.set_xticklabels(lab, fontsize=5.8, rotation=30, ha="right")
+    a1.set_xlabel("$\\Delta G_{\\mathrm{loc}}$ bin (kcal/mol)", fontsize=7.4)
+    a1.set_ylabel("target pairs", fontsize=7.4)
+    a1.legend(frameon=False, fontsize=6.4, labelcolor=INK2)
+    a1.set_title("where the types overlap", fontsize=7.6, color=INK)
+    bare(a1, xgrid=False)
+
+    pm = d["P3"]["placebo_retention_mean"] * 100
+    ps = d["P3"]["placebo_retention_sd"] * 100
+    re = d["B1"]["retention"] * 100
+    a2.axvspan(pm - 1.96 * ps, pm + 1.96 * ps, color="#f1f0ec", zorder=1)
+    a2.axvline(pm, color=INK3, lw=.8, ls=(0, (3, 2)), zorder=2)
+    a2.axvline(100, color=INK2, lw=.7, zorder=2)
+    ys = [3, 2, 1, 0]
+    vals = [re, d["sensitivity_bins"]["3"]["retention"] * 100,
+            d["sensitivity_bins"]["8"]["retention"] * 100, pm]
+    names = ["real, %d bins" % d["nbins"], "real, 3 bins", "real, 8 bins", "placebo mediator"]
+    cols = [S1, S1, S1, INK3]
+    a2.scatter(vals, ys, s=26, color=cols, zorder=4)
+    a2.errorbar([pm], [0], xerr=[1.96 * ps], color=INK3, lw=1.0, capsize=2, zorder=3)
+    a2.set_yticks(ys); a2.set_yticklabels(names, fontsize=6.6)
+    a2.set_xlabel("contrast retained after conditioning (%)", fontsize=7.4)
+    a2.set_title("conditioning on the model's own energy", fontsize=7.6, color=INK)
+    a2.set_ylim(-.7, 3.7)
+    bare(a2)
+
+    bw = d["B2"]["binwise"]
+    gx = [b["dG_mean"] for b in bw]; gy = [b["rf_centred"] for b in bw]
+    a3.axhline(0, color=INK3, lw=.7)
+    a3.plot(gx, gy, "-o", color=S1, ms=4, lw=1.1, zorder=3)
+    xs = np.linspace(min(gx), max(gx), 20)
+    a3.plot(xs, d["B2"]["beta_dG"] * (xs - np.mean(gx)), color=S2, lw=1.0,
+            ls=(0, (4, 2)), zorder=2, label="the linear fit $\\beta_{\\Delta G}$")
+    a3.set_xlabel("$\\Delta G_{\\mathrm{loc}}$ (kcal/mol)", fontsize=7.4)
+    a3.set_ylabel("rescue, centred in stratum", fontsize=7.4)
+    a3.legend(frameon=False, fontsize=6.4, labelcolor=INK2, loc="lower left")
+    a3.set_title("the assumption the linear route needs", fontsize=7.6, color=INK)
+    bare(a3, xgrid=False)
+
+    fig.tight_layout(w_pad=1.3)
+    _save(fig, f"{OUT}/fig9_energy.pdf"); plt.close(fig)
+
+
+# ---------------------------------------------------------------- fig 10: depth and method
+def fig10():
+    """Left: the contrast by helix depth -- the terminal-penalty domain is depth 0 only.
+    Right: the contrast method by method, which is the axis the survivorship objection runs on."""
+    d3 = J("m21_thermo_mediator.json")["B3"]
+    a22 = J("m22_review_arms.json")["A"]
+    fig, (a1, a2) = plt.subplots(1, 2, figsize=(7.4, 2.6),
+                                 gridspec_kw={"width_ratios": [1, 1.55]})
+    ks = ["depth0", "depth1", "depth2plus"]
+    nm = ["0\n(helix end)", "1", "$\\geq$2\n(interior)"]
+    v = [d3[k]["diff"] for k in ks]
+    a1.axhline(0, color=INK2, lw=.7)
+    bars = a1.bar(np.arange(3), v, width=.55,
+                  color=[S1 if d3[k]["p_perm"] <= .005 else INK3 for k in ks], zorder=3)
+    for i, k in enumerate(ks):
+        a1.text(i, v[i] + .004, "$p=%.4f$" % d3[k]["p_perm"], ha="center", fontsize=6.2,
+                color=INK2)
+    a1.set_xticks(np.arange(3)); a1.set_xticklabels(nm, fontsize=6.8)
+    a1.set_ylabel("C--G $-$ A--U rescue", fontsize=7.4)
+    a1.set_xlabel("helix depth", fontsize=7.4)
+    a1.set_title("not confined to the penalty's domain", fontsize=7.6, color=INK)
+    a1.set_ylim(-.005, max(v) * 1.28)
+    bare(a1, xgrid=False)
+
+    rows = a22["per_method"]
+    y = np.arange(len(rows))[::-1]
+    a2.axvline(0, color=INK2, lw=.7)
+    a2.scatter([r["diff"] for r in rows], y, s=[max(8, r["weight"] / 6) for r in rows],
+               color=[S1 if r["diff"] > 0 else S2 for r in rows], zorder=4)
+    a2.set_yticks(y)
+    a2.set_yticklabels([r["method"] for r in rows], fontsize=6.2)
+    a2.set_xlabel("C--G $-$ A--U rescue, matched within design", fontsize=7.4)
+    a2.set_title("%d of %d methods positive, sign test $p=%.4f$"
+                 % (a22["n_positive"], a22["n_methods"], a22["binom_p"]), fontsize=7.6, color=INK)
+    bare(a2)
+    fig.tight_layout(w_pad=1.4)
+    _save(fig, f"{OUT}/fig10_depth_method.pdf"); plt.close(fig)
+
+
+# ---------------------------------------------------------------- fig 11: not one line
+def fig11():
+    """If formation were a function of the local NN energy, the three pair-type contrasts would
+    lie on one line through the origin whose slope is the directly estimated beta."""
+    d = J("m21_thermo_mediator.json")
+    b4, col = d["B4"], d["B4_collinearity"]
+    fig, ax = plt.subplots(figsize=(3.5, 2.7))
+    ax.axhline(0, color=INK3, lw=.7); ax.axvline(0, color=INK3, lw=.7)
+    xs = np.linspace(-2.7, 0.15, 20)
+    ax.plot(xs, d["B2"]["beta_dG"] * xs, color=INK3, lw=1.0, ls=(0, (4, 2)), zorder=2,
+            label="$\\beta_{\\Delta G}$, estimated directly")
+    for (k, lab, c) in (("CG_vs_AU", "C--G $-$ A--U", S1), ("CG_vs_GU", "C--G $-$ G--U", S2),
+                        ("AU_vs_GU", "A--U $-$ G--U", S3)):
+        v = b4[k]
+        ax.scatter([v["dG_diff"]], [v["rescue_diff"]], s=34, color=c, zorder=4, label=lab)
+        ax.plot([0, v["dG_diff"]], [0, v["rescue_diff"]], color=c, lw=.8, alpha=.55, zorder=3)
+    ax.set_xlabel("$\\Delta\\Delta G_{\\mathrm{loc}}$ between the types (kcal/mol)", fontsize=7.4)
+    ax.set_ylabel("$\\Delta$ rescue, matched", fontsize=7.4)
+    ax.set_title("implied slopes spread $%.2f\\times$" % col["spread_ratio"],
+                 fontsize=7.6, color=INK)
+    ax.legend(frameon=False, fontsize=6.2, labelcolor=INK2, loc="lower left")
+    bare(ax, xgrid=False)
+    fig.tight_layout()
+    _save(fig, f"{OUT}/fig11_collinear.pdf"); plt.close(fig)
+
+
 if __name__ == "__main__":
     fig0(); fig8()
     b, a = fig1(); fig2(); fig3(); fig4(); fig5(); fig6(); fig7()
+    fig9(); fig10(); fig11()
     print(f"fig1 baseline R2 {b:.4f} ({b/CEILING:.1%})  +seq {b+a:.4f} ({(b+a)/CEILING:.1%})")
     print("wrote", sorted(os.listdir(OUT)))

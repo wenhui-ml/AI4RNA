@@ -25,7 +25,11 @@ TEX = os.path.join(HERE, "R1_placement.tex")
 # design constants the paper states as rules: the two calipers, the treatment threshold,
 # the significance gate, the ladder self-check bar and the corpus authors' own filter cut
 ALLOWED = {"0.005", "0.05", "0.02", "0.2", "0.80", "0.0", "0.5",
-           "0.4", "0.6", "0.8", "1.0", "2.0"}      # the four stringency rungs k
+           "0.4", "0.6", "0.8", "1.0", "2.0",   # the four stringency rungs k
+           "2.7",                               # ViennaRNA version 2.7.2, not a measurement
+           "1.96",                              # the normal quantile in a stated interval
+           "1.5",                               # the declared collinearity bar (M21 K-conditions)
+           "0.6"}                               # the declared |rho_s| bar (M22 A arm)      # the four stringency rungs k
 CTX = re.compile(r"(linewidth|textwidth|pt\b|em\b|in\}|HTML|\\setcounter|fraction|"
                  r"\\definecolor|width=|scale=|arc=|boxrule|margin=|\\usepackage|"
                  r"documentclass|xytext|figsize)")

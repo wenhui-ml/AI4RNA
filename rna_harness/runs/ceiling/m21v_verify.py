@@ -111,8 +111,13 @@ def main():
     print(f"  受影响记录(至少一侧堆叠伙伴非规范): {n_bad} / {len(raw)} = {100*n_bad/len(raw):.2f}%")
     dif = [abs(x["dG"] - y["dG"]) for x, y in zip(raw, grd)]
     print(f"  dG 最大改动 {max(dif):.3f} kcal/mol,均值 {np.mean(dif):.4f}")
+    # record the probe itself: what the library returns for a non-canonical partner
+    _fc = RNA.fold_compound("GAAGAAACAAC")
+    probe = _fc.eval_int_loop(2, 10, 3, 9) / 100.0
+    print(f"  探针:非规范 A-A 伙伴时 eval_int_loop 返回 {probe:+.2f} kcal/mol(有限但无意义)")
     R["V1"] = {"n_contaminated": n_bad, "frac": round(n_bad / len(raw), 4),
-               "max_dG_change": round(max(dif), 4)}
+               "max_dG_change": round(max(dif), 4), "n_total": len(raw),
+               "noncanonical_probe_kcal": round(probe, 2)}
 
     recs = grd
     edges = M21.bin_edges(recs, M21.NBINS)
