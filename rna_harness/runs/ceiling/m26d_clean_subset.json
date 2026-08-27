@@ -1,0 +1,91 @@
+{
+ "n_designs": 158,
+ "n_leaked_designs": 14,
+ "threshold": 0.8,
+ "n_clean": 3993,
+ "n_dirty": 324,
+ "P1": {
+  "n_no_candidate": 0,
+  "no_candidate_identity_mean": 0.0,
+  "no_candidate_identity_median": 0.0,
+  "no_candidate_identity_max": 0.0
+ },
+ "identity_hist": {
+  "0.0": 0,
+  "0.1": 0,
+  "0.2": 0,
+  "0.3": 0,
+  "0.4": 47,
+  "0.5": 91,
+  "0.6": 6,
+  "0.7": 0,
+  "0.8": 4,
+  "0.9": 2,
+  "1.0": 8
+ },
+ "arms": {
+  "RibonanzaNet_all": {
+   "n": 4317,
+   "slope": 0.20692,
+   "slope_p": 0.00249,
+   "weight": 493.0,
+   "cde": 0.0574,
+   "baseline": 0.057,
+   "retention": 1.0071,
+   "p_perm": 0.0005
+  },
+  "RibonanzaNet_clean": {
+   "n": 3993,
+   "slope": 0.21549,
+   "slope_p": 0.00249,
+   "weight": 462.0,
+   "cde": 0.0503,
+   "baseline": 0.0502,
+   "retention": 1.0016,
+   "p_perm": 0.0005
+  },
+  "RibonanzaNet_leaked": {
+   "n": 324,
+   "slope": 0.10022,
+   "slope_p": 0.01496,
+   "weight": 22.0,
+   "retention": null
+  },
+  "ViennaRNA_all": {
+   "n": 4317,
+   "slope": 0.12059,
+   "slope_p": 0.00249,
+   "weight": 569.0,
+   "cde": 0.0663,
+   "baseline": 0.0689,
+   "retention": 0.963,
+   "p_perm": 0.0005
+  },
+  "ViennaRNA_clean": {
+   "n": 3993,
+   "slope": 0.12881,
+   "slope_p": 0.00249,
+   "weight": 534.0,
+   "cde": 0.0575,
+   "baseline": 0.0604,
+   "retention": 0.9512,
+   "p_perm": 0.0005
+  },
+  "ViennaRNA_leaked": {
+   "n": 324,
+   "slope": -0.01761,
+   "slope_p": 0.62843,
+   "weight": 32.0,
+   "retention": null
+  }
+ },
+ "F3_RibonanzaNet_skill_gap": 0.11527,
+ "F3_ViennaRNA_skill_gap": 0.14642,
+ "verdict": "memorisation_explains_skill",
+ "stakes": {
+  "3_skill_gap_below_005": false,
+  "1_leaked_designs_le_10pct": true,
+  "2_clean_neural_retention_ge_50": true,
+  "4_clean_vienna_retention_ge_80": true
+ }
+}
