@@ -1,0 +1,134 @@
+=== M17:把三个折叠预测器从主臂里整个拆掉 ===
+  声明 a4d3b939(代码存在之前已推送)。离线 $0。
+  **主臂对我不盲** —— M13b 已量过面板配平版。本轮唯一改动:panel caliper 关掉。
+
+--- P5:L2(oracle 入选筛)掉行率,原地复算并断言 ---
+  样本2(主)        8787 ->  8787   掉行 0.0000%
+  顺序连接断言(panel_f1_designs.json 无 seq 列):4560 条,不一致 0
+  基准4560        4354 ->  4354   掉行 0.0000%
+  样本3           4384 ->  4384   掉行 0.0000%
+  第四批           2639 ->  2639   掉行 0.0000%
+  第五批(盲)        1435 ->  1435   掉行 0.0000%
+  第六批(盲)        1280 ->  1280   掉行 0.0000%
+  P5 通过:六人群全部 0.0000%,分子集合不是被 oracle 筛出来的
+
+--- 并行 54 个任务,24 进程(单线程 BLAS) ---
+/home/ubuntu/miniconda3/envs/rna/lib/python3.10/site-packages/numpy/lib/_function_base_impl.py:3045: RuntimeWarning: invalid value encountered in divide
+  c /= stddev[:, None]
+/home/ubuntu/miniconda3/envs/rna/lib/python3.10/site-packages/numpy/lib/_function_base_impl.py:3046: RuntimeWarning: invalid value encountered in divide
+  c /= stddev[None, :]
+/home/ubuntu/miniconda3/envs/rna/lib/python3.10/site-packages/numpy/lib/_function_base_impl.py:3045: RuntimeWarning: invalid value encountered in divide
+  c /= stddev[:, None]
+/home/ubuntu/miniconda3/envs/rna/lib/python3.10/site-packages/numpy/lib/_function_base_impl.py:3046: RuntimeWarning: invalid value encountered in divide
+  c /= stddev[None, :]
+/home/ubuntu/miniconda3/envs/rna/lib/python3.10/site-packages/numpy/lib/_function_base_impl.py:3045: RuntimeWarning: invalid value encountered in divide
+  c /= stddev[:, None]
+/home/ubuntu/miniconda3/envs/rna/lib/python3.10/site-packages/numpy/lib/_function_base_impl.py:3046: RuntimeWarning: invalid value encountered in divide
+  c /= stddev[None, :]
+/home/ubuntu/miniconda3/envs/rna/lib/python3.10/site-packages/numpy/lib/_function_base_impl.py:3045: RuntimeWarning: invalid value encountered in divide
+  c /= stddev[:, None]
+/home/ubuntu/miniconda3/envs/rna/lib/python3.10/site-packages/numpy/lib/_function_base_impl.py:3046: RuntimeWarning: invalid value encountered in divide
+  c /= stddev[None, :]
+/home/ubuntu/miniconda3/envs/rna/lib/python3.10/site-packages/numpy/lib/_function_base_impl.py:3045: RuntimeWarning: invalid value encountered in divide
+  c /= stddev[:, None]
+/home/ubuntu/miniconda3/envs/rna/lib/python3.10/site-packages/numpy/lib/_function_base_impl.py:3046: RuntimeWarning: invalid value encountered in divide
+  c /= stddev[None, :]
+/home/ubuntu/miniconda3/envs/rna/lib/python3.10/site-packages/numpy/lib/_function_base_impl.py:3045: RuntimeWarning: invalid value encountered in divide
+  c /= stddev[:, None]
+/home/ubuntu/miniconda3/envs/rna/lib/python3.10/site-packages/numpy/lib/_function_base_impl.py:3046: RuntimeWarning: invalid value encountered in divide
+  c /= stddev[None, :]
+  完成 panel_f1_fresh.json        arms
+  完成 panel_f1_designs.json      arms
+  完成 panel_f1_third.json        arms
+  完成 panel_f1_fourth.json       arms
+  完成 panel_f1_fifth.json        arms
+  完成 panel_f1_sixth.json        arms
+  完成 panel_f1_fresh.json        lad:0.0
+  完成 panel_f1_fresh.json        lad:0.25
+  完成 panel_f1_fresh.json        lad:0.5
+  完成 panel_f1_fresh.json        lad:1.0
+  完成 panel_f1_fresh.json        lad:2.0
+  完成 panel_f1_fresh.json        lad:4.0
+  完成 panel_f1_fresh.json        lad:6.0
+  完成 panel_f1_fresh.json        lad:8.0
+  完成 panel_f1_designs.json      lad:0.0
+  完成 panel_f1_designs.json      lad:0.25
+  完成 panel_f1_designs.json      lad:0.5
+  完成 panel_f1_designs.json      lad:1.0
+  完成 panel_f1_designs.json      lad:2.0
+  完成 panel_f1_designs.json      lad:4.0
+  完成 panel_f1_designs.json      lad:6.0
+  完成 panel_f1_designs.json      lad:8.0
+  完成 panel_f1_third.json        lad:0.0
+  完成 panel_f1_third.json        lad:0.25
+  完成 panel_f1_third.json        lad:0.5
+  完成 panel_f1_third.json        lad:1.0
+  完成 panel_f1_third.json        lad:2.0
+  完成 panel_f1_third.json        lad:4.0
+  完成 panel_f1_third.json        lad:6.0
+  完成 panel_f1_third.json        lad:8.0
+  完成 panel_f1_fourth.json       lad:0.0
+  完成 panel_f1_fourth.json       lad:0.25
+  完成 panel_f1_fourth.json       lad:0.5
+  完成 panel_f1_fourth.json       lad:1.0
+  完成 panel_f1_fourth.json       lad:2.0
+  完成 panel_f1_fourth.json       lad:4.0
+  完成 panel_f1_fourth.json       lad:6.0
+  完成 panel_f1_fourth.json       lad:8.0
+  完成 panel_f1_fifth.json        lad:0.0
+  完成 panel_f1_fifth.json        lad:0.25
+  完成 panel_f1_fifth.json        lad:0.5
+  完成 panel_f1_fifth.json        lad:1.0
+  完成 panel_f1_fifth.json        lad:2.0
+  完成 panel_f1_fifth.json        lad:4.0
+  完成 panel_f1_fifth.json        lad:6.0
+  完成 panel_f1_fifth.json        lad:8.0
+  完成 panel_f1_sixth.json        lad:0.0
+  完成 panel_f1_sixth.json        lad:0.25
+  完成 panel_f1_sixth.json        lad:0.5
+  完成 panel_f1_sixth.json        lad:1.0
+  完成 panel_f1_sixth.json        lad:2.0
+  完成 panel_f1_sixth.json        lad:4.0
+  完成 panel_f1_sixth.json        lad:6.0
+  完成 panel_f1_sixth.json        lad:8.0
+
+--- 主结果:两臂并排(声明禁止只报一个) ---
+  人群            oracle-free        p      z      配对 |       面板配平        p      配对 |     比值  SMD(pB)    corr
+  样本2(主)             +7.071  0.00050   32.0   12748 |     +3.682  0.00050    3308 |   1.92   0.9654    +nan
+  基准4560             +5.662  0.00050   18.7    2964 |     +3.794  0.00050     700 |   1.49   0.7712    +nan
+  样本3                +5.139  0.00050   17.8    3178 |     +3.232  0.00050     634 |   1.59   0.8259    +nan
+  第四批                +6.465  0.00050   16.1     984 |     +2.122  0.00050     222 |   3.05   0.6533    +nan
+  第五批(盲)             +7.077  0.00050   13.7     735 |     +3.708  0.00050     174 |   1.91   0.5637    +nan
+  第六批(盲)             +5.498  0.00050    9.4     199 |     +3.522  0.00050      45 |   1.56   0.4849    +nan
+
+--- 探针 ---
+  样本2(主)       P0 配对0 效应+0.00000000 | P1 命中 0/12 | P4 真实+7.07 vs 平移95分位+1.09 泄漏+0.0009(真臂+0.0968) 通过
+  基准4560       P0 配对0 效应+0.00000000 | P1 命中 0/12 | P4 真实+5.66 vs 平移95分位+1.35 泄漏+0.0024(真臂+0.0881) 通过
+  样本3          P0 配对0 效应+0.00000000 | P1 命中 0/12 | P4 真实+5.14 vs 平移95分位+0.90 泄漏+0.0003(真臂+0.0857) 通过
+  第四批          P0 配对0 效应+0.00000000 | P1 命中 0/12 | P4 真实+6.47 vs 平移95分位+1.20 泄漏+0.0060(真臂+0.0942) 通过
+  第五批(盲)       P0 配对0 效应+0.00000000 | P1 命中 0/12 | P4 真实+7.08 vs 平移95分位+2.19 泄漏+0.0064(真臂+0.0933) 通过
+  第六批(盲)       P0 配对0 效应+0.00000000 | P1 命中 0/12 | P4 真实+5.50 vs 平移95分位+2.53 泄漏+0.0001(真臂+0.0820) 通过
+
+--- P2 梯级(建在零上,第 79 条) ---
+  人群           δ=0     δ=0.25  δ=0.5   δ=1     δ=2     δ=4     δ=6     δ=8   
+  样本2(主)        0.12    0.00    0.25    0.25    0.88    1.00    1.00    1.00 
+               (-0.00)  (-0.15)  (+0.30)  (+0.57)  (+1.39)  (+2.24)  (+3.41)  (+4.33)   <- 括号是回收到的效应量
+  基准4560        0.25    0.12    0.38    0.12    0.75    1.00    1.00    1.00 
+               (+0.20)  (+0.15)  (+0.53)  (+0.51)  (+1.35)  (+1.98)  (+3.19)  (+4.23)   <- 括号是回收到的效应量
+  样本3           0.00    0.00    0.12    0.38    0.75    0.88    1.00    1.00 
+               (+0.12)  (+0.08)  (+0.48)  (+0.76)  (+1.52)  (+2.43)  (+3.70)  (+4.77)   <- 括号是回收到的效应量
+  第四批           0.00    0.12    0.25    0.25    0.38    1.00    1.00    1.00 
+               (-0.25)  (-0.08)  (+0.59)  (+0.57)  (+1.14)  (+2.98)  (+3.22)  (+4.08)   <- 括号是回收到的效应量
+  第五批(盲)        0.00    0.12    0.12    0.00    0.12    1.00    1.00    1.00 
+               (-0.03)  (+0.33)  (+0.31)  (+0.26)  (+0.66)  (+3.14)  (+3.90)  (+4.54)   <- 括号是回收到的效应量
+  第六批(盲)        0.00    0.12    0.00    0.12    0.12    0.62    0.88    1.00 
+               (+0.14)  (+0.13)  (-0.00)  (+0.56)  (+0.75)  (+2.11)  (+3.35)  (+4.42)   <- 括号是回收到的效应量
+
+=== 裁定 ===
+  P0 合格 | P1 合计命中 0/72 上限3 合格 | P4 6/6 | 梯级 δ=0 自检最大 0.25(上限0.15) 顶档最小 1.00 不合格
+  K4 顶档 8.0 vs 主臂最大 +7.077 -> 不触发
+  K1 显著人群 6/6 | K5 比值最大 3.05(阈 2.0) -> 触发
+  SMD(pB) 范围 [0.4849, 0.9654] -> 读法 (乙) 面板能看见一部分
+  **裁定:void_probe_failed**
+  **K5 触发:oracle-free 版必须写成【含面板可见成分的上界】,§4 仍以面板配平版为主臂。**
+wrote /data/wenhui/openclaude_rna/rna_harness/runs/ceiling/m17_oracle_free.json
