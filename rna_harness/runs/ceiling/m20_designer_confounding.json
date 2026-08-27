@@ -1,0 +1,213 @@
+{
+ "declaration": "m20_designer_confounding_declaration.json @ a9f2d776",
+ "A1": {
+  "method_component": 0.11995,
+  "target_component": 0.64769,
+  "n_cells": 117,
+  "p_perm": 0.01199,
+  "z": 2.78,
+  "null_mean": 0.0525,
+  "null_sd": 0.02426,
+  "per_method": [
+   {
+    "method": "Eterna",
+    "gap": -0.7118,
+    "n_targets": 14
+   },
+   {
+    "method": "gRNAde-no3d",
+    "gap": -0.5101,
+    "n_targets": 8
+   },
+   {
+    "method": "Shujun_struct2seq",
+    "gap": -0.4303,
+    "n_targets": 20
+   },
+   {
+    "method": "Starting sequence",
+    "gap": -0.4217,
+    "n_targets": 20
+   },
+   {
+    "method": "gRNAde",
+    "gap": -0.2982,
+    "n_targets": 5
+   },
+   {
+    "method": "Shujun_shape_struct2seq",
+    "gap": -0.25,
+    "n_targets": 19
+   },
+   {
+    "method": "MPNN-fixbb",
+    "gap": -0.2497,
+    "n_targets": 9
+   },
+   {
+    "method": "Rosetta",
+    "gap": -0.1922,
+    "n_targets": 7
+   },
+   {
+    "method": "MPNN-RFdiff",
+    "gap": -0.1271,
+    "n_targets": 15
+   }
+  ],
+  "human_rank": [
+   0,
+   3
+  ]
+ },
+ "A2": {
+  "marginal": 0.02497,
+  "matched": 0.05393,
+  "observed_attenuation": -0.02896,
+  "gap_g": -0.3815,
+  "beta_depth": 0.05406,
+  "predicted_attenuation": -0.02062,
+  "mediated_fraction": 0.7121,
+  "n_marg": 1086,
+  "n_matched": 902
+ },
+ "A3": {
+  "slope": 0.8357048998343611,
+  "p_perm": 0.0069965017491254375,
+  "n": 9,
+  "points": [
+   {
+    "method": "Eterna",
+    "pred": -0.039374,
+    "obs": -0.038804
+   },
+   {
+    "method": "MPNN-RFdiff",
+    "pred": -0.011015,
+    "obs": -0.013155
+   },
+   {
+    "method": "MPNN-fixbb",
+    "pred": -0.019843,
+    "obs": -0.034971
+   },
+   {
+    "method": "Rosetta",
+    "pred": -0.004224,
+    "obs": -0.010122
+   },
+   {
+    "method": "Shujun_shape_struct2seq",
+    "pred": -0.014593,
+    "obs": -0.035968
+   },
+   {
+    "method": "Shujun_struct2seq",
+    "pred": -0.021008,
+    "obs": -0.029851
+   },
+   {
+    "method": "Starting sequence",
+    "pred": -0.023431,
+    "obs": -0.028211
+   },
+   {
+    "method": "gRNAde",
+    "pred": -0.019717,
+    "obs": -0.027437
+   },
+   {
+    "method": "gRNAde-no3d",
+    "pred": -0.024956,
+    "obs": -0.040084
+   }
+  ]
+ },
+ "A4": {
+  "Eterna系": {
+   "marginal": 0.035,
+   "matched": 0.06778,
+   "attenuation": -0.03278,
+   "gap": -0.5579,
+   "n": 1056
+  },
+  "ML/物理": {
+   "marginal": 0.02078,
+   "matched": 0.04838,
+   "attenuation": -0.0276,
+   "gap": -0.3078,
+   "n": 3121
+  }
+ },
+ "P0": 0.0,
+ "P1": {
+  "draws": 12,
+  "hits": 0,
+  "p": [
+   0.9476,
+   0.7132,
+   0.3392,
+   0.5411,
+   0.1721,
+   0.409,
+   0.7132,
+   0.5287,
+   0.5611,
+   0.0873,
+   0.8304,
+   0.5636
+  ]
+ },
+ "P2_ladder": {
+  "0.0": {
+   "delta": 0.0,
+   "draws": 12,
+   "hit_rate": 0.0
+  },
+  "0.05": {
+   "delta": 0.05,
+   "draws": 12,
+   "hit_rate": 0.0
+  },
+  "0.1": {
+   "delta": 0.1,
+   "draws": 12,
+   "hit_rate": 0.083
+  },
+  "0.2": {
+   "delta": 0.2,
+   "draws": 12,
+   "hit_rate": 0.0
+  },
+  "0.4": {
+   "delta": 0.4,
+   "draws": 12,
+   "hit_rate": 0.083
+  },
+  "0.8": {
+   "delta": 0.8,
+   "draws": 12,
+   "hit_rate": 0.917
+  },
+  "1.2": {
+   "delta": 1.2,
+   "draws": 12,
+   "hit_rate": 1.0
+  }
+ },
+ "verdict": "unresolved_between_K1_and_K2__declaration_left_this_band_undefined",
+ "K3_mediation_failed": false,
+ "K4": false,
+ "declaration_gap": "K1 要求 p<=0.005,K2 要求含 0;实测 p=0.01199 两者皆非。声明未定义该band,照记,不许事后归入任一侧。",
+ "ladder_reading": {
+  "observed_method_spread": 0.5847,
+  "hit_at_0.4": 0.083,
+  "hit_at_0.8": 0.917
+ },
+ "staked_scorecard": {
+  "1_mediated_40_60pct": "错:71.2%",
+  "2_A1_p_le_0.005": "错:p=0.01199",
+  "3_Eterna_at_strongest_end": "对:名次 [0, 3] / 8",
+  "4_A3_slope_positive": "对:0.836, p=0.0070"
+ }
+}
