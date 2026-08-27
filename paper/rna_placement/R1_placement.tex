@@ -530,8 +530,11 @@ which they coincide is exactly the one that fails for the mediator of \S\ref{sec
 
 \begin{proposition}[Stratified and product-of-coefficients mediation]
 \label{prop:routes}
-Let $T\in\{A,B\}$ be the exposure, $M$ an observed mediator with conditional laws $P_{M\mid A}$ and
-$P_{M\mid B}$, and suppose that within a stratum
+Let $T\in\{A,B\}$ be the exposure and $M$ an observed mediator supported in a bounded set, with
+conditional laws $P_{M\mid A}$ and $P_{M\mid B}$ both absolutely continuous with respect to a fixed
+reference law $P_M$ --- in the application, the pooled within-stratum law, which is what the slope
+below is fitted on and which does not move when the exposure mix does. Suppose that within a
+stratum
 \begin{equation}
 \mathbb E\left[Y \mid T,M\right] \;=\; \alpha_T + h(M),
 \label{eq:nointeract}
@@ -539,8 +542,8 @@ $P_{M\mid B}$, and suppose that within a stratum
 with $h$ bounded and measurable and no $T\times M$ interaction. Let
 $\Delta^{\mathrm{tot}}=\mathbb E[Y\mid A]-\mathbb E[Y\mid B]$ be the total contrast,
 $\Delta^{\mathrm{cde}}=\alpha_A-\alpha_B$ the contrast at fixed $M$, and
-$\beta = \operatorname{Cov}(h(M),M)/\operatorname{Var}(M)$ the within-stratum least-squares slope
-of $Y$ on $M$, with $g=\mathbb E[M\mid A]-\mathbb E[M\mid B]$. Write $r(m)=h(m)-\beta m$ for the
+$\beta = \operatorname{Cov}_{P_M}(h(M),M)/\operatorname{Var}_{P_M}(M)$ the least-squares slope of
+$Y$ on $M$ under the reference law, and $g=\mathbb E[M\mid A]-\mathbb E[M\mid B]$. Write $r(m)=h(m)-\beta m$ for the
 residual of $h$ after its linear projection. Then
 \begin{equation}
 \underbrace{\Delta^{\mathrm{tot}}-\Delta^{\mathrm{cde}}}_{\text{stratified route}}
@@ -571,9 +574,11 @@ $|\mathbb E[r\mid A]-\mathbb E[r\mid B]| = |\int (r-c)\,\mathrm d(P_{M\mid A}-P_
 \le \|r-c\|_\infty\,\|P_{M\mid A}-P_{M\mid B}\|_1
 = \operatorname{osc}(r)\,d_{\mathrm{TV}}(P_{M\mid A},P_{M\mid B})$.
 If $h$ is affine then $r$ is constant, the right-hand side of \eqref{eq:routes} vanishes and the
-routes agree for all exposure laws. Conversely, if $h$ is not affine there is a point $m_0$ with
-$r(m_0)\neq \mathbb E[r(M)]$; choosing $P_{M\mid A}$ concentrated near $m_0$ and $P_{M\mid B}$ equal
-to the marginal makes the right-hand side non-zero.
+routes agree for all exposure laws. Conversely, if $h$ is not affine on $\operatorname{supp}P_M$ then $r$ is not $P_M$-a.s.\ constant,
+so there is $m_0\in\operatorname{supp}P_M$ with $r(m_0)\neq \mathbb E_{P_M}[r(M)]$; taking
+$P_{M\mid A}$ to be point mass at $m_0$ and $P_{M\mid B}=P_M$ makes the right-hand side of
+\eqref{eq:routes} equal to $r(m_0)-\mathbb E_{P_M}[r(M)]\neq0$. Boundedness of the support ensures
+$\operatorname{osc}(r)<\infty$ throughout.
 \end{proof}
 
 \noindent Two consequences are used below. First, $\beta$ is a projection, so under a non-affine
