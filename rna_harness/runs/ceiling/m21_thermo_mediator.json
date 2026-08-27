@@ -1,0 +1,236 @@
+{
+ "terminal_au_kcal": 0.5,
+ "n_pairs": 4453,
+ "nbins": 5,
+ "bin_edges": [
+  -5.7,
+  -4.5,
+  -3.3,
+  -2.4
+ ],
+ "dG_by_type": {
+  "CG": {
+   "n": 3061,
+   "mean": -4.5921,
+   "sd": 1.5778,
+   "bin_hist": [
+    776,
+    871,
+    392,
+    584,
+    438
+   ]
+  },
+  "AU": {
+   "n": 1116,
+   "mean": -3.002,
+   "sd": 1.3093,
+   "bin_hist": [
+    0,
+    73,
+    436,
+    258,
+    349
+   ]
+  },
+  "GU": {
+   "n": 140,
+   "mean": -1.8593,
+   "sd": 1.5515,
+   "bin_hist": [
+    0,
+    0,
+    33,
+    20,
+    87
+   ]
+  }
+ },
+ "B0": {
+  "base_weight": 902.0,
+  "base_strata": 553,
+  "dg_weight": 363.0,
+  "dg_strata": 285,
+  "overlap_ok": true
+ },
+ "K5_constant": true,
+ "B1": {
+  "cde": 0.082,
+  "base_full": 0.0539,
+  "base_same_population": 0.0805,
+  "retention": 1.0188,
+  "retention_wrong_denominator": 1.5207,
+  "selection_component": 1.4927,
+  "p_perm": 0.0005,
+  "null_sd": 0.0158,
+  "boot_ci": [
+   0.0488,
+   0.1201
+  ],
+  "weight": 363.0,
+  "n_strata": 285,
+  "base_weight": 367.0,
+  "base_strata": 269
+ },
+ "P3": {
+  "placebo_retention_mean": 1.0089,
+  "placebo_retention_sd": 0.0443,
+  "placebo_retention_range": [
+   0.9317,
+   1.0699
+  ],
+  "real_retention": 1.0188,
+  "z_vs_placebo": 0.224,
+  "mediated_fraction": -0.0188,
+  "mediated_fraction_ci95": [
+   -0.1056,
+   0.068
+  ]
+ },
+ "P1_pos": 0,
+ "P2_ladder": {
+  "0.0": 0.0,
+  "0.005": 0.0,
+  "0.01": 0.15,
+  "0.02": 0.1,
+  "0.05": 0.65,
+  "0.1": 1.0,
+  "0.2": 1.0,
+  "0.4": 1.0,
+  "0.6": 1.0
+ },
+ "P2_delta0": 0.0,
+ "P2_threshold": 0.1,
+ "probes_ok": true,
+ "B2": {
+  "beta_dG": -0.02286,
+  "n": 4381,
+  "dG_gap": -1.7245,
+  "mediated": 0.0394,
+  "total_matched": 0.0539,
+  "mediated_fraction": 0.7311,
+  "b1_implied_mediated_fraction": -0.0188,
+  "binwise": [
+   {
+    "bin": 0,
+    "n": 776,
+    "dG_mean": -6.449,
+    "rf_centred": -0.0085
+   },
+   {
+    "bin": 1,
+    "n": 944,
+    "dG_mean": -5.342,
+    "rf_centred": 0.0214
+   },
+   {
+    "bin": 2,
+    "n": 861,
+    "dG_mean": -3.945,
+    "rf_centred": 0.0122
+   },
+   {
+    "bin": 3,
+    "n": 862,
+    "dG_mean": -3.184,
+    "rf_centred": -0.0019
+   },
+   {
+    "bin": 4,
+    "n": 1010,
+    "dG_mean": -1.464,
+    "rf_centred": -0.0222
+   }
+  ],
+  "monotone": false
+ },
+ "B3": {
+  "depth0": {
+   "diff": 0.0922,
+   "p_perm": 0.0005,
+   "weight": 246.0,
+   "n_strata": 152,
+   "n": 1553
+  },
+  "depth1": {
+   "diff": 0.0124,
+   "p_perm": 0.22289,
+   "weight": 288.0,
+   "n_strata": 176,
+   "n": 1378
+  },
+  "depth2plus": {
+   "diff": 0.0608,
+   "p_perm": 0.0005,
+   "weight": 394.0,
+   "n_strata": 164,
+   "n": 1522
+  }
+ },
+ "B4": {
+  "CG_vs_AU": {
+   "rescue_diff": 0.0539,
+   "dG_diff": -1.7245,
+   "implied_slope": -0.03127,
+   "weight": 902.0
+  },
+  "CG_vs_GU": {
+   "rescue_diff": 0.1045,
+   "dG_diff": -2.3814,
+   "implied_slope": -0.04389,
+   "weight": 112.0
+  },
+  "AU_vs_GU": {
+   "rescue_diff": 0.0279,
+   "dG_diff": -0.5041,
+   "implied_slope": -0.05533,
+   "weight": 75.0
+  }
+ },
+ "B4_collinearity": {
+  "implied_slopes": [
+   -0.03127,
+   -0.04389,
+   -0.05533
+  ],
+  "spread_ratio": 1.769,
+  "beta_inside_range": false,
+  "collinear": false
+ },
+ "B5": {
+  "GU_adjacent": {
+   "diff": 0.1711,
+   "weight": 24.0,
+   "n_GU": 31
+  },
+  "GU_isolated": {
+   "diff": 0.0893,
+   "weight": 95.0,
+   "n_GU": 109
+  }
+ },
+ "sensitivity_bins": {
+  "3": {
+   "cde": 0.0774,
+   "base_same_population": 0.0773,
+   "retention": 1.0011,
+   "weight": 525.0,
+   "n_strata": 372
+  },
+  "8": {
+   "cde": 0.0812,
+   "base_same_population": 0.0805,
+   "retention": 1.0087,
+   "weight": 146.0,
+   "n_strata": 122
+  }
+ },
+ "verdict": "identity_beyond_NN_local_energy__mediated_fraction_indistinguishable_from_zero",
+ "staked": {
+  "1_retention_ge_50_and_p_le_0005": true,
+  "2_mediated_fraction_in_20_60": false,
+  "3_depth2plus_positive": true,
+  "4_not_collinear": true,
+  "5_overlap_ge_200": true
+ }
+}

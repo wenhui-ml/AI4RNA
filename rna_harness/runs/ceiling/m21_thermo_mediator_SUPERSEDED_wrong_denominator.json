@@ -1,0 +1,183 @@
+{
+ "terminal_au_kcal": 0.5,
+ "n_pairs": 4453,
+ "nbins": 5,
+ "bin_edges": [
+  -5.7,
+  -4.5,
+  -3.3,
+  -2.4
+ ],
+ "dG_by_type": {
+  "CG": {
+   "n": 3061,
+   "mean": -4.6264,
+   "sd": 1.5429,
+   "bin_hist": [
+    776,
+    905,
+    402,
+    565,
+    413
+   ]
+  },
+  "AU": {
+   "n": 1116,
+   "mean": -3.0228,
+   "sd": 1.2791,
+   "bin_hist": [
+    0,
+    73,
+    436,
+    267,
+    340
+   ]
+  },
+  "GU": {
+   "n": 140,
+   "mean": -1.8007,
+   "sd": 1.6476,
+   "bin_hist": [
+    0,
+    0,
+    33,
+    20,
+    87
+   ]
+  }
+ },
+ "B0": {
+  "base_weight": 902.0,
+  "base_strata": 553,
+  "dg_weight": 356.0,
+  "dg_strata": 279,
+  "overlap_ok": true
+ },
+ "K5_constant": true,
+ "B1": {
+  "cde": 0.0827,
+  "base": 0.0539,
+  "retention": 1.5334,
+  "p_perm": 0.0005,
+  "null_sd": 0.0171,
+  "boot_ci": [
+   0.0506,
+   0.1217
+  ],
+  "weight": 356.0,
+  "n_strata": 279
+ },
+ "P3": {
+  "placebo_retention_mean": 0.8587,
+  "placebo_retention_sd": 0.1811,
+  "placebo_retention_range": [
+   0.5793,
+   1.1423
+  ],
+  "placebo_weight_mean": 469.8,
+  "placebo_strata_mean": 438.2,
+  "real_retention": 1.5334,
+  "z_vs_placebo": 3.726
+ },
+ "P1_pos": 0,
+ "P2_ladder": {
+  "0.0": 0.0,
+  "0.005": 0.0,
+  "0.01": 0.05,
+  "0.02": 0.05,
+  "0.05": 0.8,
+  "0.1": 1.0,
+  "0.2": 1.0,
+  "0.4": 1.0,
+  "0.6": 1.0
+ },
+ "P2_delta0": 0.0,
+ "P2_threshold": 0.05,
+ "probes_ok": true,
+ "B2": {
+  "beta_dG": -0.0205,
+  "n": 4381,
+  "dG_gap": -1.7259,
+  "mediated": 0.0354,
+  "total_matched": 0.0539,
+  "mediated_fraction": 0.6562,
+  "b1_implied_mediated_fraction": -0.5334
+ },
+ "B3": {
+  "depth0": {
+   "diff": 0.0922,
+   "p_perm": 0.0005,
+   "weight": 246.0,
+   "n_strata": 152,
+   "n": 1553
+  },
+  "depth1": {
+   "diff": 0.0124,
+   "p_perm": 0.22289,
+   "weight": 288.0,
+   "n_strata": 176,
+   "n": 1378
+  },
+  "depth2plus": {
+   "diff": 0.0608,
+   "p_perm": 0.0005,
+   "weight": 394.0,
+   "n_strata": 164,
+   "n": 1522
+  }
+ },
+ "B4": {
+  "CG_vs_AU": {
+   "rescue_diff": 0.0539,
+   "dG_diff": -1.7259,
+   "implied_slope": -0.03125,
+   "weight": 902.0
+  },
+  "CG_vs_GU": {
+   "rescue_diff": 0.1045,
+   "dG_diff": -2.5092,
+   "implied_slope": -0.04166,
+   "weight": 112.0
+  },
+  "AU_vs_GU": {
+   "rescue_diff": 0.0279,
+   "dG_diff": -0.581,
+   "implied_slope": -0.04801,
+   "weight": 75.0
+  }
+ },
+ "B5": {
+  "GU_adjacent": {
+   "diff": 0.1711,
+   "weight": 24.0,
+   "n_GU": 31
+  },
+  "GU_isolated": {
+   "diff": 0.0893,
+   "weight": 95.0,
+   "n_GU": 109
+  }
+ },
+ "sensitivity_bins": {
+  "3": {
+   "cde": 0.0737,
+   "retention": 1.3658,
+   "weight": 521.0,
+   "n_strata": 368
+  },
+  "8": {
+   "cde": 0.0875,
+   "retention": 1.622,
+   "weight": 223.0,
+   "n_strata": 181
+  }
+ },
+ "verdict": "identity_beyond_NN_local_energy",
+ "staked": {
+  "1_retention_ge_50_and_p_le_0005": true,
+  "2_mediated_fraction_in_20_60": false,
+  "3_depth2plus_positive": true,
+  "4_not_collinear": null,
+  "5_overlap_ge_200": true
+ }
+}
