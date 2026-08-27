@@ -1,0 +1,31 @@
+=== M27 调查:OK7a 之外还有没有可挖的干预 ===
+  这是调查,不是实验。不算任何效应量。
+
+RMDB manifest 共 1024 条沉积
+  标题/名称含突变线索的 57 条 —— **但真正决定的是下面的距离谱,不是标题**
+
+    5/57  M2PK90_2A3_0000        designed  族  2000  突变数谱 {0: 1000, 1: 55170, 2: 34830}  双突变 34830  取向翻转     0
+    6/57  M2PK90_DMS_0000        designed  族  2000  突变数谱 {0: 1000, 1: 55170, 2: 34830}  双突变 34830  取向翻转     0
+    9/57  M2PK50_2A3_0000        designed  族  2000  突变数谱 {0: 1000, 2: 50000}  双突变 50000  取向翻转     0
+   10/57  M2PK50_DMS_0000        designed  族  2000  突变数谱 {0: 1000, 2: 50000}  双突变 50000  取向翻转     0
+   13/57  M2SL5_2A3_0000         unclear   族     6  突变数谱 {0: 3, 1: 1182, 2: 1314}  双突变  1314  取向翻转   160
+   14/57  M2SL5_DMS_0000         unclear   族     6  突变数谱 {0: 3, 1: 1182, 2: 1314}  双突变  1314  取向翻转   160
+   15/57  HC16M2R_1M7_0001       unclear   skip:既无构建体命名也无逐行序列注释
+   20/57  GLYCFN_SHP_0004        natural   skip:既无构建体命名也无逐行序列注释
+   25/57  16SFWJ_RSQ_0001        natural   skip:既无构建体命名也无逐行序列注释
+   30/57  16SFWJ_DMS_0001        natural   skip:既无构建体命名也无逐行序列注释
+   35/57  ZTPRSW_BZCN_0015       natural   skip:既无构建体命名也无逐行序列注释
+   40/57  ADDRSW_SHP_0003        natural   skip:既无构建体命名也无逐行序列注释
+   45/57  MDLOOP_NMD_0002        unclear   skip:既无构建体命名也无逐行序列注释
+   50/57  TBWND_1M7_0000         unclear   skip:既无构建体命名也无逐行序列注释
+   55/57  16SFWJ_STD_0001        natural   skip:既无构建体命名也无逐行序列注释
+
+=== 结果(10s)===
+  查了 57 条沉积,累计取向翻转干预 320 次
+  有可挖干预的沉积 2 条,其中**天然 RNA 0 条**
+Traceback (most recent call last):
+  File "/data/wenhui/openclaude_rna/rna_harness/runs/ceiling/m27_corpus_survey.py", line 205, in <module>
+    sys.exit(main())
+  File "/data/wenhui/openclaude_rna/rna_harness/runs/ceiling/m27_corpus_survey.py", line 193, in main
+    f"构建体 {r['n_constructs']:5d}  {r['name'][:44]}", flush=True)
+KeyError: 'n_constructs'
