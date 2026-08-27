@@ -1,0 +1,101 @@
+{
+ "A": {
+  "per_method": [
+   {
+    "method": "Starting sequence",
+    "diff": 0.0805,
+    "p_perm": 0.001,
+    "weight": 150.0,
+    "n_strata": 89,
+    "n_pairs": 578,
+    "design_side_depth_gap": -0.567
+   },
+   {
+    "method": "Shujun_struct2seq",
+    "diff": 0.07,
+    "p_perm": 0.0065,
+    "weight": 183.0,
+    "n_strata": 95,
+    "n_pairs": 584,
+    "design_side_depth_gap": -0.451
+   },
+   {
+    "method": "MPNN-RFdiff",
+    "diff": 0.0559,
+    "p_perm": 0.02199,
+    "weight": 103.0,
+    "n_strata": 67,
+    "n_pairs": 548,
+    "design_side_depth_gap": -0.119
+   },
+   {
+    "method": "Shujun_shape_struct2seq",
+    "diff": 0.0548,
+    "p_perm": 0.0065,
+    "weight": 130.0,
+    "n_strata": 79,
+    "n_pairs": 562,
+    "design_side_depth_gap": -0.262
+   },
+   {
+    "method": "Eterna",
+    "diff": 0.0502,
+    "p_perm": 0.01099,
+    "weight": 108.0,
+    "n_strata": 64,
+    "n_pairs": 541,
+    "design_side_depth_gap": -0.763
+   },
+   {
+    "method": "gRNAde-no3d",
+    "diff": 0.048,
+    "p_perm": 0.02049,
+    "weight": 66.0,
+    "n_strata": 44,
+    "n_pairs": 379,
+    "design_side_depth_gap": -0.522
+   },
+   {
+    "method": "gRNAde",
+    "diff": 0.0337,
+    "p_perm": 0.22739,
+    "weight": 25.0,
+    "n_strata": 18,
+    "n_pairs": 142,
+    "design_side_depth_gap": -0.393
+   },
+   {
+    "method": "MPNN-fixbb",
+    "diff": 0.0309,
+    "p_perm": 0.15392,
+    "weight": 76.0,
+    "n_strata": 49,
+    "n_pairs": 538,
+    "design_side_depth_gap": -0.361
+   },
+   {
+    "method": "Rosetta",
+    "diff": -0.0149,
+    "p_perm": 0.65967,
+    "weight": 61.0,
+    "n_strata": 48,
+    "n_pairs": 581,
+    "design_side_depth_gap": -0.092
+   }
+  ],
+  "n_positive": 8,
+  "n_methods": 9,
+  "binom_p": 0.01953,
+  "corr_with_design_gap": -0.5098,
+  "spearman_with_design_gap": -0.4
+ },
+ "B": {
+  "source_checks": {
+   "sequence_never_indexed": true,
+   "only_paired_index_rotated": true,
+   "ISGC_matrix_untouched": true
+  },
+  "all_pass": true,
+  "shifted_expression": "S = (c[\"paired\"] + s) % n"
+ }
+}
