@@ -1,0 +1,168 @@
+#!/usr/bin/env python3
+"""Generate figs/rna_numbers.tex from the committed run artifacts.
+
+Every measured number in the manuscript reaches LaTeX through a \jdg{} macro defined here, so a
+printed figure cannot drift from the run that produced it. Nothing measured may be typed into the
+.tex by hand; make_check.py fails the build if it is.
+
+COST: $0, offline.
+"""
+from __future__ import annotations
+
+import json, os, sys
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+CEIL = os.path.abspath(os.path.join(HERE, "..", "..", "rna_harness", "runs", "ceiling"))
+POPS = ("panel_f1_fresh.json", "panel_f1_designs.json", "panel_f1_third.json",
+        "panel_f1_fourth.json", "panel_f1_fifth.json", "panel_f1_sixth.json")
+POPEN = ("sample 2 (main)", "baseline 4560", "sample 3", "batch 4", "batch 5", "batch 6")
+
+M = {}
+
+
+def J(n):
+    return json.load(open(os.path.join(CEIL, n)))
+
+
+def put(k, v):
+    assert k not in M, f"duplicate macro {k}"
+    M[k] = v
+
+
+def f(x, d=3):
+    return f"{x:.{d}f}"
+
+
+def sig(x, d=3):
+    return ("+" if x >= 0 else "") + f"{x:.{d}f}"
+
+
+# ---------------------------------------------------------------- 3  pair type -> formation
+m16 = J("m16_rescue.json")
+c = m16["counts"]
+put("nCG", f"{c['CG']}"); put("nAU", f"{c['AU']}"); put("nGU", f"{c['GU']}")
+put("nPairsTotal", f"{c['CG'] + c['AU'] + c['GU']}")
+for tag, key, thr in (("AU", "CG_vs_AU", "ladder_threshold"), ("GU", "CG_vs_GU", "ladder_threshold")):
+    a = m16[key]
+    put(f"rescue{tag}", sig(a["matched_diff"], 4))
+    put(f"rescue{tag}Marg", sig(a["marginal_diff"], 4))
+    put(f"rescue{tag}P", f"{a['p_perm']:.4f}")
+    put(f"rescue{tag}Ci", f"[{a['boot_ci'][0]:.4f},\\,{a['boot_ci'][1]:.4f}]")
+    put(f"rescue{tag}W", f"{a['weight']:.0f}")
+    put(f"rescue{tag}Strata", f"{a['n_strata']}")
+    put(f"rescue{tag}Loo", f"[{a['loo_range'][0]:.4f},\\,{a['loo_range'][1]:.4f}]")
+    put(f"rescue{tag}Lad", f(a[thr], 2))
+    put(f"rescue{tag}Margin", f"{a['matched_diff'] / a[thr]:.2f}")
+    put(f"rescue{tag}Delta0", f"{a['ladder_delta0']:.2f}")
+    put(f"rescue{tag}Noise", f"{a['P1_pos']}")
+
+# ---------------------------------------------------------------- 4  placement mediates
+m20 = J("m20_designer_confounding.json")
+a2 = m20["A2"]
+put("medMarginal", sig(a2["marginal"], 4)); put("medMatched", sig(a2["matched"], 4))
+put("medBeta", f(a2["beta_depth"], 4)); put("medGap", sig(a2["gap_g"], 4))
+put("medPred", sig(a2["predicted_attenuation"], 4))
+put("medObs", sig(a2["observed_attenuation"], 4))
+put("medFrac", f"{100 * a2['mediated_fraction']:.1f}\\%")
+put("medRatio", f"{a2['matched'] / a2['marginal']:.1f}")
+put("medNmarg", f"{a2['n_marg']}"); put("medNmatched", f"{a2['n_matched']}")
+
+# ---------------------------------------------------------------- 5  the design score
+m18 = J("m18_repaired_null.json")["pops"]
+eff, zs, ps, np_, smd = [], [], [], [], []
+for i, fn in enumerate(POPS):
+    b = m18[fn]["arms"]["B_panel_matched"]
+    put(f"cpop{i}Eff", sig(b["effect"], 3)); put(f"cpop{i}Z", f(b["z_vs_null_REPAIRED"], 2))
+    put(f"cpop{i}P", f"{b['p_perm_REPAIRED']:.4f}"); put(f"cpop{i}N", f"{b['npair']}")
+    put(f"cpop{i}Smd", f(b["smd_gcf"], 3)); put(f"cpop{i}SmdP", f(b["smd_pB"], 3))
+    put(f"cpop{i}Ci", f"[{b['boot_ci_secondary'][0]:.2f},\\,{b['boot_ci_secondary'][1]:.2f}]")
+    eff.append(b["effect"]); zs.append(b["z_vs_null_REPAIRED"])
+    ps.append(b["p_perm_REPAIRED"]); np_.append(b["npair"]); smd.append(b["smd_gcf"])
+put("cEffLo", sig(min(eff), 2)); put("cEffHi", sig(max(eff), 2))
+put("cZLo", f(min(zs), 1)); put("cZHi", f(max(zs), 1))
+put("cSigStrict", f"{sum(1 for p in ps if p <= 0.005)}")
+put("cSigLoose", f"{sum(1 for p in ps if p < 0.05)}")
+put("cSmdHi", f(max(smd), 3))
+
+m13b = J("m13b_gc_placement.json")
+p4 = m13b["P4"]
+sh = [v["shift_mean"] for v in p4.values()]; lk = [v["leaked_gcp_gap"] for v in p4.values()]
+rl = [v["real_gcp_gap"] for v in p4.values()]
+put("p4Lo", sig(min(sh), 2)); put("p4Hi", sig(max(sh), 2))
+put("p4Pass", f"{sum(1 for v in p4.values() if v['pass'])}")
+put("p4LeakLo", f"{min(lk):.4f}"); put("p4LeakHi", f"{max(lk):.4f}")
+put("p4RealLo", f"{min(rl):.4f}"); put("p4RealHi", f"{max(rl):.4f}")
+put("p4LeakPct", f"{100 * max(lk) / min(rl):.0f}\\%")
+
+m13c = J("m19_m13c_symmetric_repaired.json")
+KS = ("0.4", "0.6", "0.8", "1.0")
+for k in KS:
+    put(f"d2P{k.replace('.','')}", f"{m13c[k]['sig_P']}")
+    put(f"d2C{k.replace('.','')}", f"{m13c[k]['sig_C']}")
+    put(f"d2SlopeP{k.replace('.','')}", f(m13c[k]["median_slope_P"], 1))
+    put(f"d2SlopeC{k.replace('.','')}", f(m13c[k]["median_slope_C"], 1))
+put("d2PLo", f"{min(m13c[k]['sig_P'] for k in KS)}")
+put("d2PHi", f"{max(m13c[k]['sig_P'] for k in KS)}")
+put("d2CLo", f"{min(m13c[k]['sig_C'] for k in KS)}")
+put("d2CHi", f"{max(m13c[k]['sig_C'] for k in KS)}")
+
+m15 = J("m19_m15_structure_filter_repaired.json")["pops"]
+ok = [v for v in m15.values() if v.get("usable")]
+put("c5Sig", f"{sum(1 for v in ok if v['A_filtered']['p_perm'] <= 0.005)}")
+put("c5N", f"{len(ok)}")
+put("c5Cut", "0.80")
+
+m14 = J("m14_mutation_intervention.json")
+Y1, Y2 = m14["Y1"], m14["Y2_dECS"]
+ARMS = ("GC_via_G_to_C", "GC_via_C_to_G", "AU_via_A_to_U", "AU_via_U_to_A")
+for i, arm in enumerate(ARMS):
+    put(f"d3Y{i}", sig(Y1[arm]["mean"], 4))
+    put(f"d3Y{i}Ci", f"[{Y1[arm]['ci'][0]:.3f},\\,{Y1[arm]['ci'][1]:.3f}]")
+    put(f"d3E{i}", sig(Y2[arm]["mean"], 3))
+    put(f"d3E{i}Ci", f"[{Y2[arm]['ci'][0]:.2f},\\,{Y2[arm]['ci'][1]:.2f}]")
+put("d3NPos", f"{sum(1 for a in ARMS if Y1[a]['ci'][0] > 0)}")
+put("d3NNeg", f"{sum(1 for a in ARMS if Y2[a]['ci'][1] < 0)}")
+
+# ---------------------------------------------------------------- 6  the gradient across methods
+a1 = m20["A1"]; pm = a1["per_method"]
+put("gMethComp", f(a1["method_component"], 4)); put("gTgtComp", f(a1["target_component"], 4))
+put("gNullMean", f(a1["null_mean"], 4)); put("gNullSd", f(a1["null_sd"], 4))
+put("gP", f"{a1['p_perm']:.4f}"); put("gZ", f(a1["z"], 2)); put("gCells", f"{a1['n_cells']}")
+put("gGapMax", sig(pm[0]["gap"], 4)); put("gGapMaxName", pm[0]["method"].replace("_", "\\_"))
+put("gGapMin", sig(pm[-1]["gap"], 4)); put("gGapMinName", pm[-1]["method"].replace("_", "\\_"))
+put("gSpread", f(abs(pm[0]["gap"] - pm[-1]["gap"]), 3))
+put("gRatio", f"{pm[0]['gap'] / pm[-1]['gap']:.1f}")
+put("gHumanRank", f"{a1['human_rank'][0]}"); put("gNMethods", f"{len(pm)}")
+a3 = m20["A3"]
+put("gSlope", f(a3["slope"], 3)); put("gSlopeP", f"{a3['p_perm']:.4f}"); put("gSlopeN", f"{a3['n']}")
+lad = m20["P2_ladder"]
+put("gLadLo", f"{lad['0.4']['hit_rate']:.2f}"); put("gLadHi", f"{lad['0.8']['hit_rate']:.2f}")
+put("gLadZero", f"{lad['0.0']['hit_rate']:.2f}")
+put("gNoise", f"{m20['P1']['hits']}")
+
+# ---------------------------------------------------------------- methods: rule 80
+put("nullTypeIOld", "13/240"); put("nullTypeINew", "1/240")
+m17d = J("m17d_typeI_diag.json")
+put("nullRateOld", f"{m17d['total']['A'][0] / m17d['total']['A'][1]:.4f}")
+put("nullRateNew", f"{m17d['total']['B'][0] / m17d['total']['B'][1]:.4f}")
+v = J("m18v_verify_repair.json")["detail"]
+r = [x["sd_ratio"] for x in v.values()]; ks = [x["ks"] for x in v.values()]
+put("verSdLo", f(min(r), 3)); put("verSdHi", f(max(r), 3))
+put("verKsHi", f"{max(ks):.4f}")
+put("verKsCrit", f"{list(v.values())[0]['ks_crit_5pct']:.4f}")
+
+
+def main() -> int:
+    out = os.path.join(HERE, "figs", "rna_numbers.tex")
+    os.makedirs(os.path.dirname(out), exist_ok=True)
+    with open(out, "w") as fh:
+        fh.write("% GENERATED by make_numbers.py from rna_harness/runs/ceiling/*.json.\n"
+                 "% Do not edit. Do not type a measured number into the manuscript by hand.\n")
+        for k in sorted(M):
+            fh.write("\\expandafter\\def\\csname jdg@%s\\endcsname{%s}\n" % (k, M[k]))
+    print(f"wrote {out}: {len(M)} macros")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

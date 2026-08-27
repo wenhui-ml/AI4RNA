@@ -287,7 +287,86 @@ def fig5():
     _save(fig, f"{OUT}/fig5_rescue.pdf"); plt.close(fig)
 
 
+# ---------------------------------------------------------------- fig 6: the mediation
+def fig6():
+    """Predicted attenuation against observed, one point per design method.
+
+    The predicted value is beta_depth times that method's own CG-minus-AU depth gap, computed
+    without reference to the observed attenuation; the two coordinates are therefore independent
+    calculations and the diagonal is the claim, not a fit.
+    """
+    m = J("m20_designer_confounding.json")
+    P = m["A3"]["points"]
+    fig, ax = plt.subplots(figsize=(3.4, 2.6))
+    lim = [min(min(p["pred"], p["obs"]) for p in P) * 1.12, 0.002]
+    ax.plot(lim, lim, color=INK3, lw=0.8, ls=(0, (3, 3)), zorder=1)
+    for p in P:
+        human = p["method"] in ("Eterna", "Starting sequence")
+        ax.plot([p["pred"]], [p["obs"]], "o", ms=6 if human else 4.5,
+                color=S2 if human else S1, mec="white", mew=1.0, zorder=3)
+    for p in P:
+        if p["method"] in ("Eterna", "Rosetta"):
+            ax.annotate(p["method"], (p["pred"], p["obs"]), textcoords="offset points",
+                        xytext=(7, -3), fontsize=6.6, color=INK2)
+    a2 = m["A2"]
+    ax.plot([a2["predicted_attenuation"]], [a2["observed_attenuation"]], "D", ms=6.5,
+            color=S3, mec="white", mew=1.1, zorder=4)
+    ax.annotate("pooled", (a2["predicted_attenuation"], a2["observed_attenuation"]),
+                textcoords="offset points", xytext=(6, 5), fontsize=6.8, color=INK2)
+    ax.set_xlim(lim); ax.set_ylim(lim)
+    ax.set_xlabel(r"predicted attenuation  $g_m \times \beta_{\rm depth}$")
+    ax.set_ylabel("observed attenuation")
+    ax.set_title(f"depth accounts for {100*a2['mediated_fraction']:.0f}% of the pooled gap",
+                 fontsize=7.6, color=INK2, pad=5)
+    bare(ax, xgrid=False); ax.grid(axis="x", color=GRID, lw=0.5)
+    _save(fig, f"{OUT}/fig6_mediation.pdf"); plt.close(fig)
+    return a2
+
+
+# ---------------------------------------------------------------- fig 7: the gradient
+def fig7():
+    """The CG-minus-AU depth gap by design method, with the permutation null for the method
+    component drawn beside it. Design-side only: no outcome variable enters this figure."""
+    m = J("m20_designer_confounding.json"); a1 = m["A1"]
+    pm = a1["per_method"]
+    fig, (ax, ax2) = plt.subplots(1, 2, figsize=(6.6, 2.5),
+                                  gridspec_kw={"width_ratios": [2.05, 1]})
+    y = np.arange(len(pm))[::-1]
+    for k, p in enumerate(pm):
+        human = p["method"] in ("Eterna", "Starting sequence")
+        ax.barh(y[k], p["gap"], height=.62, color=S2 if human else S1,
+                alpha=1.0 if human else .82, zorder=3)
+        ax.text(p["gap"] - .022, y[k], f"{p['gap']:+.3f}", va="center", ha="right",
+                fontsize=6.4, color=INK2)
+    ax.set_yticks(y)
+    ax.set_yticklabels([p["method"].replace("_", " ") + ("  (human)" if p["method"]
+                        in ("Eterna", "Starting sequence") else "") for p in pm], fontsize=6.8)
+    ax.set_xlabel("CG $-$ AU helix-depth gap    (more negative: G-C placed shallower)")
+    ax.set_xlim(min(p["gap"] for p in pm) * 1.22, 0)
+    bare(ax)
+    # The run stores the null's mean and SD, not its 2000 draws, so the null is drawn as an
+    # interval. A histogram here would be a shape we did not keep.
+    mu, sd = a1["null_mean"], a1["null_sd"]
+    ax2.add_patch(plt.Rectangle((mu - 1.96 * sd, -.3), 3.92 * sd, .6,
+                                color=INK3, alpha=.30, lw=0, zorder=2))
+    ax2.plot([mu], [0], "|", ms=11, color=INK2, mew=1.2, zorder=3)
+    ax2.plot([a1["method_component"]], [0], "o", ms=7, color=S2, mec="white", mew=1.1, zorder=4)
+    ax2.annotate(f"observed {a1['method_component']:.3f}\n$z={a1['z']:.2f}$, "
+                 f"$p={a1['p_perm']:.3f}$",
+                 (a1["method_component"], 0), textcoords="offset points", xytext=(0, 13),
+                 ha="center", fontsize=6.6, color=INK2)
+    ax2.annotate("permutation null\nmean $\\pm$ 1.96 SD", (mu, 0),
+                 textcoords="offset points", xytext=(0, -20), ha="center",
+                 fontsize=6.4, color=INK2)
+    ax2.set_xlabel("method component,\nafter removing target effects", fontsize=7.2)
+    ax2.set_ylim(-.85, .85); ax2.set_yticks([])
+    bare(ax2, xgrid=False); ax2.grid(axis="x", color=GRID, lw=0.5)
+    fig.tight_layout(w_pad=1.6)
+    _save(fig, f"{OUT}/fig7_gradient.pdf"); plt.close(fig)
+    return a1
+
+
 if __name__ == "__main__":
-    b, a = fig1(); fig2(); fig3(); fig4(); fig5()
+    b, a = fig1(); fig2(); fig3(); fig4(); fig5(); fig6(); fig7()
     print(f"fig1 baseline R2 {b:.4f} ({b/CEILING:.1%})  +seq {b+a:.4f} ({(b+a)/CEILING:.1%})")
     print("wrote", sorted(os.listdir(OUT)))

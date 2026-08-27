@@ -1,0 +1,506 @@
+\documentclass[11pt]{article}
+% ============================================================================
+% Single-file manuscript. Preamble and palette are inlined below rather than
+% \input from separate files, deliberately.
+%
+% figs/rna_numbers.tex is the ONE include, and it is generated: make_numbers.py
+% writes every \jdg{} macro from the committed run artifacts in
+% rna_harness/runs/ceiling/. It is data, not a chapter. No measured number is
+% typed into this file by hand, so a printed figure cannot drift from its run.
+%
+% Build:  python make_figs.py && python make_numbers.py && tectonic -X compile R1_placement.tex
+% ============================================================================
+
+% ------------------------------------------------ preamble
+% Shared preamble. Layout and environments follow the T6 judge manuscript so the two read as one
+% family; nothing here is specific to this paper's content.
+\usepackage[margin=1in]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{textcomp}
+\usepackage{amsmath,amssymb,amsthm,amsfonts}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{placeins}
+\usepackage{tabularx}
+\usepackage[hidelinks]{hyperref}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage{authblk}
+\usepackage{caption}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+\captionsetup{font=small,labelfont=bf,skip=4pt}
+\emergencystretch=1.5em
+\graphicspath{{figs/}}
+
+\renewcommand{\topfraction}{0.92}
+\renewcommand{\bottomfraction}{0.85}
+\renewcommand{\textfraction}{0.06}
+\renewcommand{\floatpagefraction}{0.72}
+\setcounter{topnumber}{4}\setcounter{bottomnumber}{3}\setcounter{totalnumber}{6}
+
+\newtheorem{proposition}{Proposition}
+\newtheorem{definition}{Definition}
+\newtheorem{assumption}{Assumption}
+
+% ---------------------------------------------------------------- generated numbers
+% \jdg{name} prints a number defined in figs/rna_numbers.tex, which make_numbers.py writes from
+% the committed run artifacts. An undefined name is a build error rather than a silent blank,
+% because a missing measurement must not print as nothing.
+\newcommand{\jdg}[1]{%
+  \ifcsname jdg@#1\endcsname\csname jdg@#1\endcsname
+  \else\textbf{??#1??}\PackageError{rna}{undefined measured quantity #1}{}\fi}
+
+% ---------------------------------------------------------------- boxes
+\newtcolorbox{claimbox}{breakable,enhanced,colback=cbBack,colframe=cbLine,
+  boxrule=0.6pt,left=6pt,right=6pt,top=5pt,bottom=5pt,arc=1pt}
+\newtcolorbox{scopebox}{breakable,enhanced,colback=sbBack,colframe=sbLine,
+  boxrule=0.6pt,left=6pt,right=6pt,top=5pt,bottom=5pt,arc=1pt,
+  borderline west={2pt}{0pt}{sbLine}}
+
+% ------------------------------------------------ palette
+% Palette. Series colours are the three dataviz reference slots used by every figure in this
+% family; the ink tokens are text only and are never used for a data series.
+\definecolor{S1}{HTML}{2A78D6}
+\definecolor{S2}{HTML}{EB6834}
+\definecolor{S3}{HTML}{1BAF7A}
+\definecolor{INK}{HTML}{0B0B0B}
+\definecolor{INKB}{HTML}{52514E}
+\definecolor{INKC}{HTML}{8A8984}
+\definecolor{cbBack}{HTML}{F4F8FD}
+\definecolor{cbLine}{HTML}{2A78D6}
+\definecolor{sbBack}{HTML}{FBF6F2}
+\definecolor{sbLine}{HTML}{EB6834}
+
+% ------------------------------------------------ generated numbers (the only include)
+\input{figs/rna_numbers}
+
+\title{\bf Where a Base Pair Sits Decides Whether It Forms\\[3pt]
+\large Compensatory Mutagenesis on a Designed RNA Corpus, and the Placement Rule\\
+That Accounts for Most of What a Naive Contrast Misses}
+
+\author{Wenhui Chen\thanks{\texttt{wenhui.chen@titanresearchlabs.ai}}}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent
+Which base pairs in a designed RNA actually form? We answer it with an interventional readout
+rather than a folding predictor. On the compensatory-mutagenesis arm of a chemical-probing
+benchmark, a target G--C pair is recovered by its double mutant $\jdg{rescueAU}$ more than a
+matched A--U pair and $\jdg{rescueGU}$ more than a matched G--U pair (permutation
+$p=\jdg{rescueAUP}$ on $\jdg{rescueAUW}$ matched pairs across $\jdg{rescueAUStrata}$ strata). The
+readout is the fraction of the wild-type SHAPE profile a double mutant restores: it is neither the
+benchmark's own design score nor sensitive to structural degeneracy, because it interrogates the
+one pair it mutates.
+
+How large that effect appears depends on how the comparison is stratified, and the difference is
+quantitatively explained rather than merely noted. Within design, the marginal contrast is
+$\jdg{medMarginal}$ and the depth-matched contrast is $\jdg{medMatched}$. Regressing rescue on
+helix depth inside design gives $\beta_{\mathrm{depth}} = \jdg{medBeta}$ per depth unit, and G--C
+pairs sit $\jdg{medGap}$ depth units shallower than A--U pairs, so placement predicts an
+attenuation of $\jdg{medPred}$ against an observed $\jdg{medObs}$: \textbf{depth accounts for
+$\jdg{medFrac}$ of the gap}. The two coordinates are computed independently and then compared, so
+this is a decomposition and not a correlation.
+
+The same property is worth something on the benchmark's own design score. In matched pairs of real
+molecules from one target and one design method, with global GC balanced to two percentage points
+and the shipped predictor panel's prognostic score balanced to $0.2$\,SD, the molecule that puts
+more of its GC on target-paired positions scores $\jdg{cEffLo}$ to $\jdg{cEffHi}$ OpenKnot points
+higher, positive in all six populations. Three cuts separate the effect from probing chemistry: a
+circular-shift placebo returns $\jdg{p4Lo}$ to $\jdg{p4Hi}$; a blind pairing-versus-composition
+contrast favours pairing at every stringency; and four single-nucleotide interventions move partner
+reactivity up and expected-correctness down with no sign reversal, which the chemistry hypothesis
+requires.
+
+Finally, the placement itself varies with who did the designing. Nine methods designed for the same
+twenty targets; their G--C-minus-A--U depth gaps run from $\jdg{gGapMin}$ to $\jdg{gGapMax}$, a
+spread of $\jdg{gSpread}$ depth units, with the human-designed arm at the extreme, exactly as
+registered. This arm is reported as suggestive: its method component is $\jdg{gMethComp}$ against a
+null of $\jdg{gNullMean} \pm \jdg{gNullSd}$ ($p=\jdg{gP}$), and the calibration ladder detects a
+spread of this size about half the time.
+
+The finding a corpus of this kind supports is therefore two-sided in a useful way: base-pair
+identity determines formation, and a corpus assembled by designers who already place G--C the same
+way will understate that determination unless the placement is held fixed.
+\end{abstract}
+
+% =====================================================================
+\section{Introduction}
+\label{sec:intro}
+
+Designing an RNA that folds into a target structure is scored, almost everywhere, by asking a
+folding predictor whether the designed sequence reaches the target. That measures the predictor's
+belief. A chemical-probing benchmark measures something else: what the molecule does in a tube. The
+question this paper asks of such a benchmark is the one a designer actually has: given a target
+structure and a sequence written against it, \emph{which of the intended base pairs actually
+form}, and what about the sequence decides it.
+
+The instrument that answers it is compensatory mutagenesis, and it is old. Mutate one side of a
+putative pair and the structure is disrupted; mutate both sides to the complementary partner and,
+if the pair is real, the structure is restored and the probing profile returns toward wild type.
+The fraction restored is a number per pair. It is not a design score, so it cannot be gamed by
+whatever a scoring rubric rewards, and it is not vulnerable to structural degeneracy, because a
+different structure is not rescued by this particular double mutation. A published benchmark ships
+that arm and, to our knowledge, it has not been analysed for what sequence properties predict
+rescue.
+
+\begin{claimbox}
+\textbf{What this paper contributes.}
+\begin{enumerate}[leftmargin=1.6em,itemsep=2pt,topsep=2pt,label=\textbf{\arabic*.}]
+\item \textbf{Base-pair identity predicts formation, measured interventionally}
+  (\S\ref{sec:rescue}). Matched within design on helix depth and on whether the pair is crossed,
+  a G--C target pair is rescued $\jdg{rescueAU}$ above a matched A--U pair and $\jdg{rescueGU}$
+  above a matched G--U pair, permutation $p=\jdg{rescueAUP}$, on a readout that is neither a
+  design score nor degeneracy-sensitive.
+\item \textbf{Placement quantitatively accounts for most of what the naive contrast misses}
+  (\S\ref{sec:mediation}). $\beta_{\mathrm{depth}} = \jdg{medBeta}$ per depth unit times a depth
+  gap of $\jdg{medGap}$ predicts $\jdg{medPred}$ of an observed $\jdg{medObs}$ attenuation,
+  \textbf{$\jdg{medFrac}$}, with predicted and observed computed independently.
+\item \textbf{The same property is worth $\jdg{cEffLo}$ to $\jdg{cEffHi}$ points on the design
+  score} (\S\ref{sec:score}), in matched pairs of real molecules, with three independent cuts
+  separating it from probing chemistry.
+\item \textbf{The placement gradient is a property of the design method}
+  (\S\ref{sec:gradient}), spanning $\jdg{gSpread}$ depth units across nine methods designing for
+  the same targets, with the human-designed arm at the registered extreme. Reported as
+  suggestive, at the stated strength.
+\item \textbf{A permutation rule with a measured type-I error} (\S\ref{sec:methods}). Where an
+  estimator matches under calipers structurally tied to the treatment, permuting the treatment
+  rebuilds the matched set instead of relabelling it; permuting the outcome holds the design
+  fixed. Measured: $\jdg{nullRateOld}$ against $\jdg{nullRateNew}$ at a nominal $0.005$.
+\end{enumerate}
+\end{claimbox}
+
+\paragraph{Scope, stated once.} Everything here is measured on one corpus, is observational in the
+sense that we did not choose which sequences exist, and \emph{no sequence was synthesised to any
+rule proposed here}. \S\ref{sec:limits} says what each of those costs.
+
+% =====================================================================
+\section{Related work}
+\label{sec:related}
+
+\paragraph{GC placement as a design heuristic is not new; what it does to the measurement is.}
+Eterna's player community arrived at placement rules for nested targets over a decade ago, and the
+rules were extracted and published as sparse linear predictors of design success
+\citep{lee2014eterna,andersonlee2016eterna100}. Those rules are
+prescriptive and were validated on design outcome. Two things separate this paper from them. First,
+the readout: rescue asks whether an individual pair forms, and a design-success score asks whether
+a molecule as a whole reached its target, so a placement rule validated on the second is not
+evidence about the first. Second, and the direction we did not expect, the heuristic acts on the
+\emph{measurement}: because designers already place G--C shallower, a contrast that does not hold
+depth fixed sees $\jdg{medRatio}\times$ less than the matched contrast, and
+\S\ref{sec:mediation} attributes most of that gap to placement quantitatively.
+
+% TODO(refs): the chemical-probing benchmark itself, the mutate-map-rescue methodology paper, and
+% the nine inverse-folding methods named in Section 6 still need a verified citation each. They are
+% deliberately absent rather than guessed; the open item is tracked in CLAIMS.md.
+\paragraph{Compensatory mutagenesis and chemical probing.} Mutate-map-rescue is a standard
+structural readout and the benchmark's arm implements it directly. Its use here is as an
+\emph{instrument for a sequence-property question} rather than for structure determination, which
+is what makes the pair-level stratification possible: every pair carries its own depth, its own
+crossing status and its own design.
+
+\paragraph{Designed corpora as data.} Inverse-folding models are increasingly trained and evaluated
+on corpora of designed sequences. \S\ref{sec:gradient} measures a property of such a corpus that
+matters for that use: the design methods that produced it do not place base pairs identically, so a
+property learned from the pooled corpus is learned from a mixture whose components differ on
+exactly the axis \S\ref{sec:mediation} shows to be confounding.
+
+% =====================================================================
+\section{Setup: an interventional, score-free readout}
+\label{sec:setup}
+
+\textbf{The unit is a base pair, not a molecule.} For every target base pair $(i,j)$ in a design
+for which the benchmark's compensatory arm measured both single mutants and the double mutant, the
+rescue factor is the fraction of the wild-type--to--single-mutant profile change that the double
+mutant restores, with $0$ meaning no restoration and $1$ meaning full restoration. We use it
+unaltered and untruncated.
+
+\textbf{Two covariates travel with each pair.} \emph{Helix depth} is the number of stacked pairs
+continuing on both sides, so a pair at the end of a helix has depth $0$; \emph{crossed} records
+whether the pair is crossed by another pair in the target. Both are properties of the target and
+the design and neither involves the readout. Ensemble quantities used only as balancing covariates in
+\S\ref{sec:score} are computed with ViennaRNA \citep{lorenz2011vienna}.
+
+\textbf{Pair-type counts.} The analysable set is $\jdg{nPairsTotal}$ pairs: $\jdg{nCG}$ G--C,
+$\jdg{nAU}$ A--U and $\jdg{nGU}$ G--U.
+
+% =====================================================================
+\section{Pair identity decides whether the pair forms}
+\label{sec:rescue}
+
+\textbf{The comparison is matched, not marginal.} Designers place pair types differently by
+position, so a marginal comparison of rescue by pair type is a comparison of positions as much as
+of identities. Within each (design, helix depth, crossed) stratum, we take the difference of mean
+rescue between pair types and weight strata by the smaller of the two counts.
+
+\begin{claimbox}
+\textbf{A target G--C pair is more likely to be really there.} Matched, $\jdg{rescueAU}$ above a
+matched A--U pair (permutation $p=\jdg{rescueAUP}$, cluster interval $\jdg{rescueAUCi}$,
+$\jdg{rescueAUW}$ pair-weights over $\jdg{rescueAUStrata}$ strata) and $\jdg{rescueGU}$ above a
+matched G--U pair ($p=\jdg{rescueGUP}$, $\jdg{rescueGUCi}$). Leaving out one target at a time moves
+the first to $\jdg{rescueAULoo}$ and the second to $\jdg{rescueGULoo}$. Width-matched pure noise
+fires $\jdg{rescueAUNoise}$ times.
+\end{claimbox}
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=0.86\linewidth]{fig5_rescue.pdf}
+\caption{\textbf{Rescue by pair type, marginal and matched.} The readout is the fraction of the
+wild-type profile a compensatory double mutant restores, so a higher value means the pair the
+mutation was designed to test is more likely to have been really there. Matching is within
+(design, helix depth, crossed); the marginal bars are the same pairs unstratified, and the gap
+between the two panels is what \S\ref{sec:mediation} decomposes.}
+\label{fig:rescue}
+\end{figure}
+
+\paragraph{Why this readout answers the question the design score cannot.} A design score is a
+property of a whole molecule under a scoring rule, so a sequence property that raises it might be
+raising the rule's opinion. Rescue is a property of one pair under an intervention on that pair. A
+different structure that happens to explain the wild-type profile is not restored by this
+particular double mutation, so structural degeneracy, which limits what a profile-matching score
+can conclude, does not reach this statistic. \emph{One number belongs in Methods rather than here}:
+the detection ladder for these two contrasts clears the observed effect by
+$\jdg{rescueAUMargin}\times$ and $\jdg{rescueGUMargin}\times$, so this is a real but not a
+comfortable margin, and the ladder returns $\jdg{rescueAUDelta0}$ at zero injected effect.
+
+% =====================================================================
+\section{Placement accounts for most of what the marginal contrast misses}
+\label{sec:mediation}
+
+The matched and marginal contrasts differ, and the mechanism is available in the same data. Two
+quantities are computed \emph{without reference to each other}. The first is the effect of depth on
+rescue: within (design, crossed), regressing rescue on depth gives $\beta_{\mathrm{depth}} =
+\jdg{medBeta}$ per depth unit. The second is where the pair types sit: G--C pairs are
+$\jdg{medGap}$ depth units shallower than A--U pairs, pooled over designs. Their product is what
+placement predicts the marginal contrast should lose.
+
+\begin{claimbox}
+\textbf{The decomposition closes to $\jdg{medFrac}$.} Marginal $\jdg{medMarginal}$ against matched
+$\jdg{medMatched}$ is an attenuation of $\jdg{medObs}$; $\beta_{\mathrm{depth}}$ times the depth
+gap predicts $\jdg{medPred}$. \emph{Predicted and observed are separate calculations that meet},
+which is what makes this a decomposition rather than the observation that two things correlate. The
+remaining $\approx 29\%$ is not attributed here.
+\end{claimbox}
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=0.52\linewidth]{fig6_mediation.pdf}
+\caption{\textbf{Predicted against observed attenuation, one point per design method.} The
+horizontal coordinate is that method's own depth gap times the pooled $\beta_{\mathrm{depth}}$, and
+the vertical coordinate is its measured marginal-minus-matched difference; neither enters the
+other's calculation. The diagonal is exact mediation. Every point sits below it, which is the
+$\approx 29\%$ the decomposition does not claim, and the pooled diamond is the number in the text.
+Orange marks the two human-designed arms.}
+\label{fig:mediation}
+\end{figure}
+
+\paragraph{What this means for anyone measuring a sequence property on a designed corpus.} The
+attenuation is not noise and it does not average away with more items, because it is produced by a
+systematic design choice that is present in every design. A property correlated with position will
+be measured at a fraction of its size, and the fraction is estimable exactly the way it is
+estimated here: measure the covariate gap, measure the covariate's slope on the outcome, multiply.
+
+% =====================================================================
+\section{The same property on the benchmark's design score}
+\label{sec:score}
+
+The two sections above use an arm most benchmarks do not ship. This one asks what the property is
+worth on the score every design in the corpus already has.
+
+\textbf{Matched pairs of real molecules.} Within one target and one design method, we form all
+ordered pairs of molecules whose global GC fraction differs by at most two percentage points and
+whose shipped-panel prognostic score differs by at most $0.2$\,SD, and whose fraction of GC sitting
+on target-paired positions differs by at least five percentage points. No model produces the
+estimate; it is the pair-weighted mean difference of the benchmark's own score. \emph{The predictor
+panel appears here for the first time in this paper, and only as a covariate}: no claim below
+depends on any predictor being right.
+
+\begin{table}[!htbp]
+\centering\small
+\caption{Matched-pair difference in OpenKnot points, six populations. Inference is by permutation
+holding the matched design fixed (\S\ref{sec:methods}); the bootstrap interval is reported beside
+it. Balance is the standardised mean difference on global GC. Two populations do not clear
+$p \le 0.005$ and their $p$ is printed.}
+\label{tab:score}
+\begin{tabular}{@{}lrrrrr@{}}
+\toprule
+population & effect & $z$ & $p$ & pairs & SMD \\
+\midrule
+sample 2 (main) & $\jdg{cpop0Eff}$ & $\jdg{cpop0Z}$ & $\jdg{cpop0P}$ & $\jdg{cpop0N}$ & $\jdg{cpop0Smd}$ \\
+baseline 4560   & $\jdg{cpop1Eff}$ & $\jdg{cpop1Z}$ & $\jdg{cpop1P}$ & $\jdg{cpop1N}$ & $\jdg{cpop1Smd}$ \\
+sample 3        & $\jdg{cpop2Eff}$ & $\jdg{cpop2Z}$ & $\jdg{cpop2P}$ & $\jdg{cpop2N}$ & $\jdg{cpop2Smd}$ \\
+batch 4         & $\jdg{cpop3Eff}$ & $\jdg{cpop3Z}$ & $\jdg{cpop3P}$ & $\jdg{cpop3N}$ & $\jdg{cpop3Smd}$ \\
+batch 5 (blind) & $\jdg{cpop4Eff}$ & $\jdg{cpop4Z}$ & $\jdg{cpop4P}$ & $\jdg{cpop4N}$ & $\jdg{cpop4Smd}$ \\
+batch 6 (blind) & $\jdg{cpop5Eff}$ & $\jdg{cpop5Z}$ & $\jdg{cpop5P}$ & $\jdg{cpop5N}$ & $\jdg{cpop5Smd}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=0.70\linewidth]{fig3_matched.pdf}
+\caption{\textbf{Matched-pair difference against the permutation null.} Effects are positive in
+all six populations and $\jdg{cSigStrict}$ of $\jdg{c5N}$ clear $p \le 0.005$; balance on global GC
+is at most $\jdg{cSmdHi}$ throughout.}
+\label{fig:matched}
+\end{figure}
+
+\subsection{Three cuts against probing chemistry}
+\label{sec:cuts}
+
+The score rewards low reactivity at paired positions, and 2A3 reactivity depends on base identity,
+so ``more GC at paired positions scores better'' has a chemistry explanation. Each cut below fails
+under that explanation in a different way.
+
+\textbf{Circular shift.} Rotating the target's paired-position set leaves the number of positions
+and the run structure intact and destroys the alignment. Shifted arms return $\jdg{p4Lo}$ to
+$\jdg{p4Hi}$ against a real effect of $\jdg{cEffLo}$ to $\jdg{cEffHi}$, passing on
+$\jdg{p4Pass}$ of $\jdg{c5N}$ populations. The leak diagnostic confirms the placebo is not a weak
+version of the treatment: shifted arms admit a true placement gap of $\jdg{p4LeakLo}$ to
+$\jdg{p4LeakHi}$ against the real arm's $\jdg{p4RealLo}$ to $\jdg{p4RealHi}$, about
+$\jdg{p4LeakPct}$.
+
+\textbf{Pairing against composition, blind.} Holding the GC \emph{base-pair} fraction fixed and
+varying placement beats holding placement fixed and varying composition, at every stringency: the
+pairing arm clears $p \le 0.005$ on $\jdg{d2PLo}$ to $\jdg{d2PHi}$ of $\jdg{c5N}$ populations and
+the composition arm on $\jdg{d2CLo}$ to $\jdg{d2CHi}$. The registered primary comparison is the
+slope, which is $\jdg{d2SlopeP04}$ against $\jdg{d2SlopeC04}$ at the loosest stringency.
+
+\textbf{A sign test on single-nucleotide interventions.} Breaking a target pair from either side
+raises partner reactivity and lowers expected correctness, on all four arms:
+$\jdg{d3Y0}$, $\jdg{d3Y1}$, $\jdg{d3Y2}$, $\jdg{d3Y3}$ upward and $\jdg{d3E0}$, $\jdg{d3E1}$,
+$\jdg{d3E2}$, $\jdg{d3E3}$ downward, with $\jdg{d3NPos}$ and $\jdg{d3NNeg}$ of four intervals
+excluding zero on the two readouts. \emph{Only the sign is used, and deliberately}: the partner
+base's own identity differs across the four arms, so their magnitudes are not comparable, whereas
+the chemistry hypothesis makes a prediction about direction --- breaking a G--C pair from the G
+side should look \emph{better} --- and no arm reverses.
+
+\textbf{Robustness to the corpus authors' own structure filter.} Restricting to designs the
+benchmark's own predictor scores above $\jdg{c5Cut}$ leaves the effects essentially unchanged and
+$\jdg{c5Sig}$ of $\jdg{c5N}$ populations clearing $p \le 0.005$.
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=0.92\linewidth]{fig4_three_cuts.pdf}
+\caption{\textbf{The three cuts.} Left, real against circularly shifted placement. Centre, the
+pairing arm against the composition arm at every stringency. Right, the four single-nucleotide
+arms on both readouts, where only the sign carries the argument.}
+\label{fig:cuts}
+\end{figure}
+
+% =====================================================================
+\section{The placement gradient is a property of the design method}
+\label{sec:gradient}
+
+The confound of \S\ref{sec:mediation} is a design choice, so it should vary with who designed. Nine
+methods produced designs for the same twenty targets, which makes the depth gap decomposable into a
+target component and a method component. \emph{This arm never touches the outcome variable}: it is
+computed from target structures and sequences alone.
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=0.94\linewidth]{fig7_gradient.pdf}
+\caption{\textbf{Left: the G--C-minus-A--U depth gap, by design method.} Every method places G--C
+shallower, and the spread across methods is $\jdg{gSpread}$ depth units, from $\jdg{gGapMin}$
+(\texttt{\jdg{gGapMinName}}) to $\jdg{gGapMax}$ (\texttt{\jdg{gGapMaxName}}). \textbf{Right: the
+method component after removing target main effects}, against the permutation null of method
+labels within target. Nothing in this figure involves rescue.}
+\label{fig:gradient}
+\end{figure}
+
+\begin{claimbox}
+\textbf{Reported as suggestive, at three strengths.} The method component is $\jdg{gMethComp}$
+against a null of $\jdg{gNullMean} \pm \jdg{gNullSd}$, $z = \jdg{gZ}$, $p = \jdg{gP}$ on
+$\jdg{gCells}$ (method, target) cells; the human-designed arm is at rank $\jdg{gHumanRank}$ of
+$\jdg{gNMethods}$ on the gradient, which was the registered prediction; and the cross-method slope
+of observed attenuation on predicted is $\jdg{gSlope}$ with permutation $p = \jdg{gSlopeP}$ at
+$n = \jdg{gSlopeN}$. \emph{None of the three clears a $0.005$ bar alone, and the reason is
+legible on the instrument}: the observed spread of $\jdg{gSpread}$ sits between the ladder rungs
+where detection is $\jdg{gLadLo}$ and $\jdg{gLadHi}$, so this arm is at its own detection edge for
+the effect present. A larger design pool, not a different analysis, is what would settle it.
+\end{claimbox}
+
+\paragraph{The competing explanation, and why the decomposition is the test for it.} Placing G--C
+at helix ends is also thermodynamics: a closing G--C avoids the terminal A--U penalty, so a method
+that optimises or learns stability would arrive at the same preference without any heuristic. That
+prediction is specific and it is the reason this arm is a decomposition: a thermodynamic preference
+is a property of the \emph{target} and would leave the method component at the null, while a design
+rule is a property of the \emph{method}. Both components are reported, and the target component is
+much the larger of the two at $\jdg{gTgtComp}$.
+
+% =====================================================================
+\section{Methods that carry a claim}
+\label{sec:methods}
+
+\textbf{Permutation must hold the design fixed.} Where an estimator is a matched-pair difference
+under calipers, and a caliper column is jointly structured with the treatment, permuting the
+treatment \emph{rebuilds} the matched set rather than relabelling it, and the resulting null is
+computed on a larger and easier design. Permuting the outcome within cell holds the matched set
+fixed and is the same null in the limit, since shuffling molecule identity while carrying every
+covariate is equivalent to shuffling the outcome. Measured type-I error at a nominal $0.005$:
+$\jdg{nullRateOld}$ for the treatment-side permutation against $\jdg{nullRateNew}$ for the
+outcome-side one. The equivalence was checked directly, with SD ratios of $\jdg{verSdLo}$ to
+$\jdg{verSdHi}$ and a largest two-sample KS statistic of $\jdg{verKsHi}$ against a $5\%$ critical
+value of $\jdg{verKsCrit}$.
+
+\textbf{Ladders are built on zero.} Every detection ladder in this paper scrambles labels first, so
+the true effect is zero, then injects a known effect. A ladder whose zero rung does not fall back
+to nominal is void and is not used.
+
+\textbf{Preregistration.} Every criterion graded here was frozen in a declaration file committed
+and pushed before the corresponding runner existed, and verdicts are reported in the declaration's
+own wording, including where a staked prediction failed.
+
+% =====================================================================
+\section{Limitations}
+\label{sec:limits}
+
+\textbf{(i) One corpus.} All measurements are on a single chemical-probing benchmark. Every
+mechanism is stated so that it is checkable elsewhere, and none has been checked elsewhere by us.
+
+\textbf{(ii) Observational.} We did not choose which sequences exist. \S\ref{sec:rescue} and
+\S\ref{sec:cuts} are interventional at the level of the \emph{mutation}, which is what licenses the
+formation claim; the placement claim is not, and \S\ref{sec:gradient}'s method comparison is not a
+randomised assignment of methods.
+
+\textbf{(iii) No sequence was synthesised.} Nothing here was tested by building a molecule to the
+rule and measuring it. That is the one experiment that would convert \S\ref{sec:score} from a
+selection result into a construction result, and it needs a tube.
+
+\textbf{(iv) The compensatory arm covers good designs only.} It measured the best-scoring design
+per (target, method), so the pair-level results are conservative with respect to poor designs and
+do not extrapolate to them.
+
+\textbf{(v) Prior art on the placement rule.} GC placement as a design heuristic predates this
+work. What is measured here is its effect on pair formation and on the measurement itself.
+
+% =====================================================================
+\section{Conclusion}
+\label{sec:conclusion}
+
+Whether a designed base pair forms depends on what the pair is, and the dependence is measurable
+with an intervention rather than inferred from a predictor: matched on placement, a G--C target
+pair is recovered $\jdg{rescueAU}$ more than an A--U pair and $\jdg{rescueGU}$ more than a G--U
+pair. How much of that a study sees depends on something the study did not choose, because the
+designers who built the corpus already put G--C shallower, and that placement accounts for
+$\jdg{medFrac}$ of the difference between the marginal and matched contrasts. On the benchmark's
+own design score the same property is worth $\jdg{cEffLo}$ to $\jdg{cEffHi}$ points between two
+real molecules matched on everything else we could match.
+
+The portable part is the second finding rather than the first. A corpus of designed molecules
+carries its designers' rules as covariates, and any sequence property correlated with position will
+be measured at a fraction of its true size on such a corpus. That fraction is estimable from the
+corpus itself, by measuring the covariate gap and the covariate's slope and multiplying, and here
+it recovers $\jdg{medFrac}$ of the discrepancy it was asked to explain.
+
+% =====================================================================
+\bibliographystyle{plainnat}
+\bibliography{refs}
+
+\end{document}
