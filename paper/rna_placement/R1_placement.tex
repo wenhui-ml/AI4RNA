@@ -389,6 +389,28 @@ six populations across three context sizes. The analysable pair set is $\jdg{nPa
 pairs: $\jdg{nCG}$ G--C, $\jdg{nAU}$ A--U and $\jdg{nGU}$ G--U. Ensemble quantities used only as
 balancing covariates in \S\ref{sec:score} are computed with ViennaRNA \citep{lorenz2011vienna}.
 
+\subsection{The measurement frame: what a point is worth}
+\label{sec:frame}
+
+Two facts about the corpus set the scale for everything below, and neither is a test.
+
+\textbf{Where the variance is.} Decomposing the design score gives $\jdg{varTarget}$ between
+targets, $\jdg{varMethod}$ between methods within target, and $\jdg{varCell}$ within cell, of
+which $\jdg{varNoise}$ is measurement noise. This is an identity, not a hypothesis, and it is why
+every estimator in this paper is computed after centring within $(\text{target},\text{method})$:
+the first two layers are removed by construction rather than adjusted for.
+
+\textbf{How much of the within-cell variance is reproducible at all.} The release contains
+$\jdg{ceilGroups}$ groups of repeated measurements covering $\jdg{ceilRows}$ rows. Pooling within
+groups gives a measurement SD of $\jdg{ceilSigB}$, $\jdg{ceilSigBCi}$ on $\jdg{ceilDf}$ degrees
+of freedom, so against a within-cell SD of $\jdg{ceilWithinSd}$ the reproducible fraction is
+\begin{equation}
+1-\sigma^{2}_{\mathrm{rep}}/\sigma^{2}_{\mathrm{cell}} \;=\; \jdg{ceilB}\;\;\jdg{ceilBCi}.
+\label{eq:ceiling}
+\end{equation}
+
+\noindent The pooled-variance route is the right one for \eqref{eq:ceiling}, which is a ratio of \emph{second} moments: the paired differences are heavy-tailed (mean-to-median $\jdg{ceilHeavyTail}$ against $\jdg{ceilNormalTail}$ under normality), so a median route on the same $\jdg{ceilPairs}$ groups reports $\jdg{ceilSigA}$ where the RMS is $\jdg{ceilRms454}$. \emph{A design-score point is therefore worth $1/\jdg{ceilWithinSd}$ of a within-cell SD, and $\jdg{ceilB}$ of that SD is reproducible signal} --- which is the scale against which \S\ref{sec:score}'s effect should be read.
+
 \subsection{Pair identity decides whether the pair forms}
 \label{sec:pairtype}
 
@@ -490,6 +512,14 @@ positive in all six populations and $\jdg{cSigStrict}$ of $\jdg{c5N}$ clear $p\l
 global GC is at most $\jdg{cSmdHi}$ throughout.}
 \label{fig:matched}
 \end{figure}
+
+\noindent \textbf{Dose--response, registered as monotone in advance.} Splitting the matched
+pairs by how large the placement gap is gives $\jdg{doseEff0}$ for gaps in
+$[\jdg{doseLo0},\jdg{doseLo1})$, $\jdg{doseEff1}$ in $[\jdg{doseLo1},\jdg{doseLo2})$ and
+$\jdg{doseEff2}$ above $\jdg{doseLo2}$ --- monotone, on $\jdg{doseN0}$, $\jdg{doseN1}$ and
+$\jdg{doseN2}$ pairs. Appendix~\ref{app:score} carries the remaining robustness arms: a
+one-to-one non-overlapping matching, leave-one-target-out, a free-energy caliper sweep, and the
+corpus authors' own structure filter.
 
 \noindent \textbf{Three cuts against a probing-chemistry explanation}, each failing differently
 under it; Appendix~\ref{app:cuts} carries them in full. A \emph{circular shift} of the target's
@@ -610,6 +640,57 @@ at a fraction of its size, and that fraction is estimable from the corpus itself
 
 \appendix
 
+\section{The design-score arm in full}
+\label{app:score}
+
+\S\ref{sec:score} reports the six-population headline. Four further arms were run and all are
+reported here; none of them is the primary and none was used to choose the primary.
+
+\begin{table}[!htbp]
+\centering\small
+\caption{\textbf{Dose--response.} Matched pairs split by the size of the placement gap, main
+population. Monotone increase was registered before the split was computed.}
+\label{tab:dose}
+\begin{tabular}{@{}lrr@{}}
+\toprule
+placement gap $t_u-t_v$ & pairs & effect \\
+\midrule
+$[\jdg{doseLo0},\,\jdg{doseLo1})$ & $\jdg{doseN0}$ & $\jdg{doseEff0}$ \\
+$[\jdg{doseLo1},\,\jdg{doseLo2})$ & $\jdg{doseN1}$ & $\jdg{doseEff1}$ \\
+$\ge \jdg{doseLo2}$               & $\jdg{doseN2}$ & $\jdg{doseEff2}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{A free-energy caliper, swept.} If the effect were entirely the extra stability that GC
+pairs buy, balancing the target's folding free energy would remove it. Sweeping that caliper from
+$\jdg{dgLooseCal}$ down to $\jdg{dgTightCal}$ kcal/mol moves the main population's effect from
+$\jdg{dgLooseEff}$ ($p=\jdg{dgLooseP}$) to $\jdg{dgTightEff}$ ($p=\jdg{dgTightP}$), retaining
+$\jdg{dgRetain}$ of the unbalanced $\jdg{dgBase}$. \emph{Free energy is a mediator here rather
+than a confounder} --- the treatment moves it by construction --- so attenuation under balancing
+is expected and the surviving majority is the quantity of interest.
+
+\begin{table}[!htbp]
+\centering\small
+\caption{\textbf{The corpus authors' own structure filter.} Restricting to designs their predictor
+scores above $\jdg{c5Cut}$, against the unfiltered reference on the same populations. Effects
+are essentially unchanged; $\jdg{c5Sig}$ of $\jdg{c5N}$ clear $p \le 0.005$ after the restriction
+costs pairs.}
+\label{tab:filter}
+\begin{tabular}{@{}lrrrrr@{}}
+\toprule
+population & designs kept & effect & unfiltered & $p$ & pairs \\
+\midrule
+sample 2 (main) & $\jdg{m15pop0Pass}$ & $\jdg{m15pop0Eff}$ & $\jdg{m15pop0Ref}$ & $\jdg{m15pop0P}$ & $\jdg{m15pop0N}$ \\
+baseline 4560   & $\jdg{m15pop1Pass}$ & $\jdg{m15pop1Eff}$ & $\jdg{m15pop1Ref}$ & $\jdg{m15pop1P}$ & $\jdg{m15pop1N}$ \\
+sample 3        & $\jdg{m15pop2Pass}$ & $\jdg{m15pop2Eff}$ & $\jdg{m15pop2Ref}$ & $\jdg{m15pop2P}$ & $\jdg{m15pop2N}$ \\
+batch 4         & $\jdg{m15pop3Pass}$ & $\jdg{m15pop3Eff}$ & $\jdg{m15pop3Ref}$ & $\jdg{m15pop3P}$ & $\jdg{m15pop3N}$ \\
+batch 5 (blind) & $\jdg{m15pop4Pass}$ & $\jdg{m15pop4Eff}$ & $\jdg{m15pop4Ref}$ & $\jdg{m15pop4P}$ & $\jdg{m15pop4N}$ \\
+batch 6 (blind) & $\jdg{m15pop5Pass}$ & $\jdg{m15pop5Eff}$ & $\jdg{m15pop5Ref}$ & $\jdg{m15pop5P}$ & $\jdg{m15pop5N}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \section{The three cuts in full}
 \label{app:cuts}
 
@@ -617,47 +698,99 @@ at a fraction of its size, and that fraction is estimable from the corpus itself
 \centering
 \includegraphics[width=0.92\linewidth]{fig4_three_cuts.pdf}
 \caption{\textbf{The three cuts of \S\ref{sec:score}.} \emph{Left}, real against circularly shifted
-placement, with the leak diagnostic: shifted arms admit a true placement gap of $\jdg{p4LeakLo}$ to
-$\jdg{p4LeakHi}$ against the real arm's $\jdg{p4RealLo}$ to $\jdg{p4RealHi}$, about
-$\jdg{p4LeakPct}$, so the placebo is not a weak copy of the treatment. \emph{Centre}, the pairing
-arm against the composition arm at every stringency. \emph{Right}, the four single-nucleotide arms
-on both readouts.}
+placement. \emph{Centre}, the pairing arm against the composition arm at every stringency.
+\emph{Right}, the four single-nucleotide arms on both readouts.}
 \label{fig:cuts}
 \end{figure}
 
-\noindent \textbf{Why the sign test uses only the sign.} The partner base's own identity differs
-across the four single-nucleotide arms, so their magnitudes are not comparable and the cross-arm
-magnitude comparison is not identified. The direction is: the chemistry hypothesis predicts that
-breaking a G--C pair from the G side should look \emph{better}, and no arm reverses. Partner
-reactivity moves $\jdg{d3Y0}$, $\jdg{d3Y1}$, $\jdg{d3Y2}$, $\jdg{d3Y3}$ and expected correctness
-$\jdg{d3E0}$, $\jdg{d3E1}$, $\jdg{d3E2}$, $\jdg{d3E3}$.
+\paragraph{Cut 1: the placebo is not a weak copy of the treatment.} A circular shift preserves the
+number of paired positions and their run structure and destroys the alignment, so a chemistry
+effect survives it and a placement effect does not. Shifted arms return $\jdg{p4Lo}$ to
+$\jdg{p4Hi}$. The leak diagnostic confirms the shifted arms are not weakly treated: they admit a
+true placement gap of $\jdg{p4LeakLo}$ to $\jdg{p4LeakHi}$ against the real arm's $\jdg{p4RealLo}$
+to $\jdg{p4RealHi}$, about $\jdg{p4LeakPct}$.
 
-\section{Panel occupancy: background this paper does not rest on}
-\label{app:occupancy}
+\begin{table}[!htbp]
+\centering\small
+\caption{\textbf{Cut 2: pairing against composition, blind, at four stringencies.} Each arm's
+treatment threshold is $k$ times that arm's own residual SD given the variable it holds fixed, so
+the two arms are equally stringent by construction rather than by a shared raw threshold. The
+registered primary comparison is the median slope; the counts are secondary.}
+\label{tab:pc}
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+$k$ & pairing arm, $p\le0.005$ & composition arm & pairing slope & composition slope \\
+\midrule
+$0.4$ & $\jdg{d2P04}/\jdg{c5N}$ & $\jdg{d2C04}/\jdg{c5N}$ & $\jdg{d2SlopeP04}$ & $\jdg{d2SlopeC04}$ \\
+$0.6$ & $\jdg{d2P06}/\jdg{c5N}$ & $\jdg{d2C06}/\jdg{c5N}$ & $\jdg{d2SlopeP06}$ & $\jdg{d2SlopeC06}$ \\
+$0.8$ & $\jdg{d2P08}/\jdg{c5N}$ & $\jdg{d2C08}/\jdg{c5N}$ & $\jdg{d2SlopeP08}$ & $\jdg{d2SlopeC08}$ \\
+$1.0$ & $\jdg{d2P10}/\jdg{c5N}$ & $\jdg{d2C10}/\jdg{c5N}$ & $\jdg{d2SlopeP10}$ & $\jdg{d2SlopeC10}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
 
-Before the pair-level readout was brought in we measured how much of the reproducible variance in
-the design score the shipped predictor panel occupies, and how much a block of sequence-intrinsic
-columns adds on top of it. Those results motivated the search that produced \S\ref{sec:score} and
-are reported here for completeness; no claim in the body depends on them.
+\begin{table}[!htbp]
+\centering\small
+\caption{\textbf{Cut 3: four single-nucleotide interventions, and the sign the chemistry hypothesis
+predicts.} Breaking a target pair from either side raises the \emph{partner} position's reactivity
+and lowers expected correctness. The chemistry hypothesis predicts that breaking a G--C pair from
+the G side should look better, i.e.\ a reversal in the first column; $\jdg{d3NPos}$ and
+$\jdg{d3NNeg}$ of four intervals exclude zero and none reverses. \emph{Only the sign is used}: the
+partner base's own identity differs across arms, so the magnitudes are not comparable.}
+\label{tab:sign}
+\begin{tabular}{@{}llrr@{}}
+\toprule
+pair broken & mutation & partner reactivity & expected correctness \\
+\midrule
+G--C & G$\to$C & $\jdg{d3Y0}$ $\jdg{d3Y0Ci}$ & $\jdg{d3E0}$ $\jdg{d3E0Ci}$ \\
+G--C & C$\to$G & $\jdg{d3Y1}$ $\jdg{d3Y1Ci}$ & $\jdg{d3E1}$ $\jdg{d3E1Ci}$ \\
+A--U & A$\to$U & $\jdg{d3Y2}$ $\jdg{d3Y2Ci}$ & $\jdg{d3E2}$ $\jdg{d3E2Ci}$ \\
+A--U & U$\to$A & $\jdg{d3Y3}$ $\jdg{d3Y3Ci}$ & $\jdg{d3E3}$ $\jdg{d3E3Ci}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
 
-\begin{figure}[!htbp]
-\centering
-\includegraphics[width=0.80\linewidth]{fig2_increment.pdf}
-\caption{Held-out increment of a sequence-intrinsic block over the shipped panel plus global GC,
-six populations. Background only.}
-\label{fig:occupancy}
-\end{figure}
+\section{The gradient, method by method}
+\label{app:gradient}
+
+\begin{table}[!htbp]
+\centering\small
+\caption{\textbf{Every method's placement gap and its predicted and observed attenuation.} The gap
+is design-side and involves no outcome; the predicted attenuation is that gap times the pooled
+$\beta_{\mathrm{depth}}$; the observed one is that method's own marginal-minus-matched difference.
+Neither of the last two columns enters the other's calculation, which is what
+Fig.~\ref{fig:mediation} plots.}
+\label{tab:permethod}
+\input{figs/permethod.tex}
+\end{table}
 
 \section{Preregistration record}
 \label{app:prereg}
 
-Each analysis was preceded by a declaration file committed and pushed to a repository before the
-corresponding runner existed, stating the arms, the kill conditions, the must-fire probes, a staked
-numerical prediction, and the reading forced by each unexpected shape of the result. Verdicts are
-reported in the declaration's own wording. Where a staked prediction failed it is recorded as
-failed rather than restated: the mediated fraction was staked at $40$--$60\%$ and measured at
-$\jdg{medFrac}$, and the method component of \S\ref{sec:gradient} was staked to clear $p\le0.005$
-and did not. Runs voided by their own probes --- including the one whose ladder's zero rung
-revealed the defect Prop.~\ref{prop:null} repairs --- are retained with their logs.
+Each analysis was preceded by a declaration committed and pushed before the corresponding runner
+existed, stating the arms, the kill conditions, the must-fire probes, a staked numerical
+prediction, and the reading forced by each unexpected shape of the result. Verdicts are reported
+in the declaration's own wording, and Table~\ref{tab:prereg} carries the staked predictions with
+their outcomes, including the two that failed. Runs voided by their own probes are retained with
+their logs rather than deleted; one of those voids is what produced Prop.~\ref{prop:null}.
+
+\begin{table}[!htbp]
+\centering\small
+\caption{Staked numerical predictions, frozen before the corresponding data existed.}
+\label{tab:prereg}
+\begin{tabular}{@{}p{0.40\linewidth}p{0.20\linewidth}p{0.16\linewidth}l@{}}
+\toprule
+staked, before the run & bar & measured & outcome \\
+\midrule
+pair type predicts rescue, G--C above A--U & $p\le0.005$ & $p=\jdg{rescueAUP}$ & held \\
+\quad and above G--U & $p\le0.005$ & $p=\jdg{rescueGUP}$ & held \\
+placement mediates the attenuation & $40$--$60\%$ & $\jdg{medFrac}$ & \textbf{failed, high} \\
+human-designed arm at the extreme of the gradient & rank $0$ & rank $\jdg{gHumanRank}$ & held \\
+method component of the gradient & $p\le0.005$ & $p=\jdg{gP}$ & \textbf{failed} \\
+cross-method slope positive & $>0$ & $\jdg{gSlope}$ & held \\
+dose--response monotone in the placement gap & monotone & Table~\ref{tab:dose} & held \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \end{document}
