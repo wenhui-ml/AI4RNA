@@ -37,7 +37,14 @@ NAT_RE = re.compile(r"riboswitch|ribozyme|tRNA|rRNA|ribosom|viral|HIV|IRES|intro
 DES_RE = re.compile(r"eterna|openknot|player|design|puzzle", re.I)
 
 
+NOCACHE = False
+
+
 def fetch(url, dest=None, timeout=180):
+    # /data sits at 96% on this host and the full-library sweep would add tens of GB of rdat that
+    # is read once and never again, so the sweep runs without writing them down.
+    if NOCACHE:
+        dest = None
     if dest and os.path.exists(dest) and os.path.getsize(dest) > 0:
         return open(dest, "rb").read()
     req = urllib.request.Request(url, headers={"User-Agent": "rna-harness/1.0"})
@@ -72,7 +79,10 @@ def by_name(text):
             for m in [re.search(r"sequence:([ACGUTN]+)", l)] if m]
     hist, fams, wt_of, doubles = collections.Counter(), collections.Counter(), {}, []
     for k, n in enumerate(names):
-        ms = MUT.findall(n)
+        # some deposits repeat "<id>_<pos><from>-<to>" twice in one name, and the id itself
+        # contains digits, so a raw findall reports a single mutant as a double. Deduplicate by
+        # position: two mutations at the same position are impossible, a repeat is a name quirk.
+        ms = sorted({m[0]: m for m in MUT.findall(n)}.values(), key=lambda m: int(m[0]))
         fam = MUT.split(n)[0]
         hist[min(len(ms), 4)] += 1
         fams[fam] += 1
@@ -139,8 +149,11 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--max", type=int, default=400)
     ap.add_argument("--all", action="store_true", help="scan every deposit, not just titled ones")
+    ap.add_argument("--nocache", action="store_true", help="do not write fetched rdat to disk")
     ap.add_argument("--out", default=os.path.join(HERE, "m27_corpus_survey.json"))
     a = ap.parse_args()
+    global NOCACHE
+    NOCACHE = a.nocache
     t0 = time.time()
     print("=== M27 调查:OK7a 之外还有没有可挖的干预 ===", flush=True)
     print("  这是调查,不是实验。不算任何效应量。\n", flush=True)
