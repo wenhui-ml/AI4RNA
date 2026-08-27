@@ -130,28 +130,67 @@ sequence property correlated with position is measured on such a corpus at a fra
 \label{sec:intro}
 
 Designing an RNA that folds to a target structure has been posed for three decades as a search
-problem against a thermodynamic model \citep{hofacker1994fast,andronescu2004new,busch2006info,
-zadeh2011nupack,kleinkauf2015antarna,runge2019learna}, and it is scored, almost everywhere, by
-asking a folding predictor whether the designed sequence reaches the target. That measures the
-predictor's belief. Chemical probing measures something else: what the molecule does in solution
-\citep{merino2005rna,wilkinson2006selective,marinus2021novel}. The question we ask of a probing
-benchmark is the one a designer actually has --- given a target structure and a sequence written
-against it, \emph{which of the intended base pairs form}, and what about the sequence decides it.
+problem against a thermodynamic model \citep{zuker1981optimal,mccaskill1990equilibrium,
+hofacker1994fast,andronescu2004new,busch2006info,zadeh2011nupack,kleinkauf2015antarna,
+runge2019learna}, and the convention that scores a design closes the loop: the objective is a
+folding model's verdict and so is the report card. The loop is not idle. When the packages are
+scored against experiment rather than against each other, they disagree with it by margins that
+depend on the structure class \citep{waymentsteele2022rna}, so a pipeline validated in-model
+carries an error term nothing inside the pipeline can see.
 
-The instrument that answers it is not new. Mutate one side of a putative pair and the structure is
-disrupted; mutate both sides to the complementary partner and, if the pair is real, the profile
-returns toward wild type \citep{kladwang2011mutate,kladwang2011two,tian2014high,cordero2015rna}.
-The fraction restored is a number per pair. It is not a design score, so no scoring rule's
-preferences enter it, and it is not vulnerable to structural degeneracy, because an alternative
-structure that also explains the wild-type profile is not restored by this particular compensatory
-mutation. A deployed probing benchmark ships that arm; to our knowledge it has not been analysed
-for which sequence properties predict rescue.
+Chemical probing is what breaks the loop, because it measures the molecule rather than a belief
+about it. Reagents that acylate flexible riboses or methylate unpaired Watson--Crick faces, read
+out by primer extension or by mutational profiling, give an accessibility value per nucleotide
+\citep{ehresmann1987probing,merino2005rna,wilkinson2006selective,weeks2010advances,
+siegfried2014rna,smola2015selective,cordero2012quantitative,marinus2021novel}, and the same
+chemistry now runs inside cells \citep{rouskin2014genome,spitale2015structural,zubradt2017dms}.
+But a profile is not a list of base pairs. It is used as a \emph{constraint} on a folding
+algorithm \citep{mathews2004incorporating,deigan2009accurate,hajdin2013accurate}, and that map is
+one-to-many: distinct structures can be consistent with one profile. Asking a probing profile
+whether a molecule folded as designed therefore still routes the answer through a model, and
+inherits the model's degeneracy.
 
-Doing so surfaces a second result we did not go looking for, and we think it is the more portable
-of the two. The pair types are not placed alike. Every design method in the corpus puts G--C pairs
-closer to helix ends than A--U pairs, and rescue depends on depth, so a contrast that does not hold
-depth fixed measures a mixture of identity and position. The resulting attenuation is not a caveat
-but a computable quantity, and \S\ref{sec:analysis} computes it.
+The instrument that avoids both problems is not new and is not ours. Covariation across
+homologues established the base pairs of large RNAs long before any of them was solved
+\citep{gutell1994lessons,michel1990modelling}, and compensatory mutagenesis is that argument run
+forward as an experiment: mutate one side of a putative pair and the local structure is disrupted;
+mutate both sides to the complementary partner and, if the pair is real, the profile returns
+toward wild type \citep{kladwang2011mutate,kladwang2011two,tian2014high,cordero2015rna,
+cheng2017rna}. Two properties of this readout are what this paper rests on. It is an
+\emph{intervention on the hypothesised pair itself}, so its verdict is per pair, not per molecule.
+And it is not degenerate in the way a profile is: an alternative structure that happens to explain
+the wild-type profile is in general not restored by the particular double substitution that
+restores the intended pair. The fraction restored is a scalar attached to a single base pair, it
+is not a design score, and no scoring rule's preferences enter it.
+
+A deployed probing benchmark ships such an arm, where it serves to certify structures. We use it
+to ask the question a designer actually has --- given a target structure and a sequence written
+against it, \emph{which of the intended base pairs form, and what about the sequence decides it}.
+To our knowledge the rescue arm has not previously been analysed as a dependent variable of
+sequence properties. The first answer is blunt. Holding the design fixed and matching on helix
+depth and on whether the pair is crossed, a G--C target pair is rescued $\jdg{rescueAU}$ above a
+matched A--U pair and $\jdg{rescueGU}$ above a matched G--U pair: identity decides formation, on a
+readout that is neither a design score nor degeneracy-sensitive.
+
+The second answer is the one we did not go looking for, and we think it is the more portable.
+\emph{The pair types are not placed alike.} Every design method in the corpus puts G--C pairs
+closer to helix ends than A--U pairs, and rescue depends on depth, so a contrast that does not
+hold depth fixed reports a mixture of identity and position rather than identity. This is
+non-collapsibility with an observed mediator \citep{simpson1951interpretation,
+greenland1999confounding}, and its interest here is that it is \emph{computable} rather than
+cautionary: the marginal contrast is attenuated by $\jdg{medObs}$, and the product of two
+quantities estimated on disjoint arms predicts $\jdg{medPred}$ of that attenuation,
+$\jdg{medFrac}$ of it. A corpus assembled by running design programs against targets therefore
+carries a built-in bias against detecting exactly the property it was assembled to study, its size
+follows from the method mix, and \S\ref{sec:gradient} measures that mix across nine methods.
+
+Everything below was preregistered: each criterion, threshold and predicted sign was frozen in a
+committed declaration before the code that would test it existed \citep{simmons2011falsepositive,
+nosek2018preregistration,gelman2014statistical}, evidential claims are held to a
+$0.005$ bar \citep{benjamin2018redefine}, and each arm carries a calibration ladder that reports
+what effect it could have detected. That discipline produced one methodological by-product we
+state as a proposition, because it invalidates the permutation test most naturally written for a
+matched design of this kind.
 
 \begin{figure}[!t]
 \centering
@@ -196,44 +235,79 @@ says what each costs.
 \section{Related work}
 \label{sec:related}
 
+\paragraph{Inverse folding and the convention that scores it.} Secondary-structure prediction by
+dynamic programming over nearest-neighbour energies \citep{zuker1981optimal,hofacker1994fast},
+and its partition-function form \citep{mccaskill1990equilibrium,lorenz2011vienna}, made the
+inverse problem well posed, and design programs have attacked it by adaptive walks, ensemble
+objectives, constraint propagation and learned policies \citep{andronescu2004new,busch2006info,
+zadeh2011nupack,kleinkauf2015antarna,runge2019learna}. Pseudoknot-capable
+\citep{rivas1999dynamic,reeder2004design,janssen2015pkiss,bellaousov2010probknot,hajdin2013accurate}
+and learned predictors \citep{singh2019spotrna,sato2021rna,fu2022ufold} widen the model class but
+not the convention: success is a round trip through a predictor. Where that convention has been
+audited against experiment, the packages' rankings move \citep{waymentsteele2022rna}. Our
+dependent variable never passes through a predictor at all; predictors appear here only inside a
+balancing covariate (\S\ref{sec:score}), and no claim depends on any of them being right.
+
+\paragraph{Probing readouts, and what a profile does and does not pin down.} Structure probing has
+a long instrument literature --- chemical and enzymatic reagents read by primer extension
+\citep{ehresmann1987probing}, 2\textsuperscript{$\prime$}-OH acylation at nucleotide resolution
+\citep{merino2005rna,wilkinson2006selective,weeks2010advances}, mutational profiling that turns
+adducts into sequencing reads \citep{siegfried2014rna,smola2015selective}, DMS variants
+\citep{cordero2012quantitative,zubradt2017dms}, in-cell protocols
+\citep{rouskin2014genome,spitale2015structural} and the 2A3 reagent \citep{marinus2021novel}. The
+downstream use is almost always as a soft constraint on folding
+\citep{mathews2004incorporating,deigan2009accurate,hajdin2013accurate}, precisely because a
+per-nucleotide profile underdetermines a pair list. That is the gap the present readout steps
+around, and it is why our estimand is per pair.
+
+\paragraph{Compensatory mutation as pair-level evidence.} Covariation across homologues is the
+classical argument that a pair exists \citep{gutell1994lessons,michel1990modelling}; mutate-and-map
+and its rescue extension run that argument as an experiment on a single molecule
+\citep{kladwang2011mutate,kladwang2011two,tian2014high,cordero2015rna}, and multiplexed variants
+scale it \citep{cheng2017rna}. In every one of those uses the target of inference is the
+\emph{structure}: rescue is evidence for a pair. We invert the direction and treat rescue as a
+measurement whose \emph{predictors} are the object of study. That inversion is what makes
+\S\ref{sec:method}'s stratification possible: each pair carries its own identity, depth, crossing
+status and design, so the comparison can be made inside a design rather than across designs.
+
 \paragraph{Design rules from designed corpora.} Eterna's player community produced placement rules
 for nested targets, extracted as sparse predictors of design success and validated on that outcome
-\citep{lee2014eterna,andersonlee2016eterna100,koodli2021eternabrain}. Those rules are prescriptive
-and their evidence is molecule-level. Two things separate this paper. First the readout: rescue
-asks whether one pair formed and design success asks whether a molecule reached its target, so a
-rule validated on the second is not evidence about the first. Second, and the direction we did not
-anticipate, the same placement acts on the \emph{measurement}: because designers already place
+\citep{lee2014eterna,andersonlee2016eterna100,koodli2021eternabrain}, and the same corpora have
+driven package evaluation and applied mRNA design
+\citep{waymentsteele2022rna,waymentsteele2021theoretical,leppek2022combinatorial,
+yesselman2019computational}. Two things separate this paper. First the readout: rescue asks
+whether one pair formed and design success asks whether a molecule reached its target, so a rule
+validated on the second is not evidence about the first. Second, and the direction we did not
+anticipate, the same placement acts on the \emph{measurement} --- because designers already place
 G--C shallower, a contrast that does not hold depth fixed sees $\jdg{medRatio}\times$ less than the
-matched contrast (\S\ref{sec:mediation}).
+matched contrast (\S\ref{sec:mediation}). A designed corpus is a non-random sample of sequence
+space, and here the non-randomness is in the covariate that mediates the effect.
 
-\paragraph{Chemical probing and compensatory mutagenesis.} SHAPE reports local flexibility at
-nucleotide resolution \citep{merino2005rna,wilkinson2006selective}, is used as a folding constraint
-\citep{deigan2009accurate,mathews2004incorporating}, and the 2A3 reagent extends it to living cells
-\citep{marinus2021novel}. Mutate-and-map and its rescue extension turn probing into a pair-level
-assay \citep{kladwang2011mutate,kladwang2011two,tian2014high,cordero2015rna}. Our use of it is as
-an instrument for a \emph{sequence-property} question rather than for structure determination,
-which is what makes the stratification of \S\ref{sec:method} possible: every pair carries its own
-depth, its own crossing status and its own design.
+\paragraph{The thermodynamic explanation this must be separated from.} Nearest-neighbour
+parameters \citep{freier1986improved,xia1998thermodynamic,mathews1999expanded,turner2010nndb} give
+a terminal A--U a penalty a terminal G--C does not carry, and helix ends are further modulated by
+dangling ends and coaxial stacking \citep{serra1995predicting,walter1994coaxial}. An identity
+effect that lives at helix ends is therefore exactly what stacking thermodynamics predicts, and it
+is also what a placement rule would produce. \S\ref{sec:qualitative} treats the two as rival
+explanations of the same coefficient and reports what separates them and what does not.
 
-\paragraph{Predictors as covariates, not as truth.} Thermodynamic folding
-\citep{zuker1981optimal,mccaskill1990equilibrium,hofacker1994fast,lorenz2011vienna} rests on
-nearest-neighbour parameters \citep{xia1998thermodynamic,turner2010nndb} in which a terminal A--U
-carries a penalty a terminal G--C does not --- which is the competing explanation
-\S\ref{sec:qualitative} must separate from a design rule. Pseudoknot-capable predictors
-\citep{rivas1999dynamic,reeder2004design,janssen2015pkiss,bellaousov2010probknot,hajdin2013accurate}
-and learned ones \citep{singh2019spotrna,sato2021rna,fu2022ufold} appear here only inside a
-balancing covariate (\S\ref{sec:score}); no claim depends on any of them being right.
-
-\paragraph{Matching, permutation and mediation.} The estimator is a caliper-matched pair difference
-\citep{rosenbaum1983central,rosenbaum1985constructing,stuart2010matching,imbens2015causal},
-balanced on a prognostic score \citep{hansen2008prognostic} and reported with standardised mean
-differences \citep{austin2011introduction}. Inference is by randomisation
-\citep{fisher1935design,ernst2004permutation,good2005permutation}; Prop.~\ref{prop:null} states a
-restriction on \emph{which} randomisation is valid for a calipered design, which we did not find
-stated in that literature. \S\ref{sec:mediation}'s decomposition is a product-of-coefficients
-mediation \citep{baron1986moderator,imai2010general,vanderweele2015explanation} in which the
-mediator is observed and the exposure is not manipulable. Every criterion below was frozen before
-its data existed \citep{simmons2011falsepositive,nosek2018preregistration}.
+\paragraph{Matched designs, randomisation, mediation.} The estimand is a potential-outcome contrast
+under a treatment nobody assigned \citep{rubin1974estimating,cochran1965planning,imbens2015causal},
+so the design does the work: caliper-matched pairs
+\citep{rosenbaum1983central,rosenbaum1985constructing,stuart2010matching,abadie2006large}, used as
+preprocessing rather than as a model \citep{ho2007matching}, balanced on a prognostic score
+\citep{hansen2008prognostic}, reported with standardised mean differences
+\citep{austin2011introduction}, defended with negative controls chosen to have no path to the
+outcome \citep{lipsitch2010negative} and read with an eye to how much hidden bias would overturn
+them \citep{rosenbaum1987sensitivity,rosenbaum2010design}. Inference is by randomisation
+\citep{fisher1935design,ernst2004permutation,good2005permutation}, with intervals by the bootstrap
+\citep{efron1993introduction}; Prop.~\ref{prop:null} states a restriction on \emph{which}
+randomisation is valid once the matched set is built under calipers, which we did not find stated
+in that literature. \S\ref{sec:mediation}'s decomposition is a product-of-coefficients mediation
+\citep{baron1986moderator,imai2010general,vanderweele2015explanation} with an observed mediator
+and a non-manipulable exposure, a setting whose identification conditions are stronger than the
+estimator's algebra suggests \citep{vanderweele2009conceptual}; we state them and say which one
+the corpus cannot support.
 
 % =====================================================================
 \section{Method}
