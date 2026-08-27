@@ -206,9 +206,14 @@ def main():
         print(f"    {r['rmdb_id']:22s} {r['kind']:9s} 翻转 {r['n_orientation_flip']:5d}  "
               f"族 {r.get('n_families', r.get('n_constructs', 0)):5d}  "
               f"双突变 {r['n_double']:5d}  {r['name'][:40]}", flush=True)
-    if not nat:
-        print("\n  **天然语料里一次可挖的干预都没有 ⇒ `mine` 不可迁移到天然 RNA,"
-              "论文必须照这么写,不许含糊。**", flush=True)
+    # NO automatic natural/designed verdict is printed here. The kind label comes from a regex
+    # over deposit titles and it is wrong: M2SL5 (three coronavirus stem-loops) and M3SARS (three
+    # coronavirus frameshift elements) are both labelled "unclear" because their titles are
+    # library names, not RNA names. This block printed "no natural corpus contains an
+    # intervention" three times while the survey was in fact holding two. Titles do not decide;
+    # the construct families do, and reading them is a human step.
+    print("\n  kind 标签来自标题正则,**不可信** —— 必须打开族名才知道是什么 RNA。"
+          "本调查不给天然/设计的自动裁定。", flush=True)
     json.dump({"n_deposits_scanned": len(rows), "total_flips": nf,
                "n_with_interventions": len(got), "n_natural_with_interventions": len(nat),
                "rows": rows}, open(a.out, "w"), ensure_ascii=False, indent=1)
