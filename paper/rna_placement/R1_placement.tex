@@ -123,6 +123,14 @@ the same $n=\jdg{legN}$ records reports \jdg{legRho} ($p=\jdg{legRhoP}$); the ou
 differs across the two arms being compared by a factor of \jdg{legSdRatio}. Same design, same
 data, opposite verdicts.
 
+The proposition itself is then put at risk outside its subject matter. On \jdg{xdN} designed
+protein binders --- no base pairs, no folding model, no chemical probing --- the premise transfers
+($\eta^2=\jdg{xdEta}$ of the mediator explained by design method within a target) and the two
+routes differ by only \jdg{xdGapPts} points, which was a \emph{failed} pre-registered prediction
+and is what the bound predicts, because those arms overlap. Across the two corpora the overlap
+differs by a factor of \jdg{xdDtvRatio} and the route gap by \jdg{xdGapRatio}: the bound does not
+merely hold, it tracks.
+
 What survives from the substantive question is stated as bounds rather than fractions. The local
 nearest-neighbour energy differs between the two pair types by \jdg{dDg}\,kcal/mol
 (\jdg{dDgCi}) while the same model's ensemble probability differs by \jdg{dPm} (\jdg{dPmCi}),
@@ -703,6 +711,24 @@ pairs: $\jdg{nCG}$ G--C, $\jdg{nAU}$ A--U and $\jdg{nGU}$ G--U. Ensemble quantit
 balancing covariates in \S\ref{sec:score} are computed with ViennaRNA \citep{lorenz2011vienna},
 which is also the source of the per-pair nearest-neighbour energies of Definition~\ref{def:dg};
 those enter as a \emph{mediator} in \S\ref{sec:energy}, never as an outcome.
+
+\paragraph{The covariate distribution has two producers, not one.} This paper's premise is that
+the covariates were arranged by a design algorithm rather than by nature. That is incomplete. The
+constructs were also \emph{selected}: the releasing repository states that one design per target
+per method was taken forward, the highest-scoring among those whose neural agreement with the
+target reached $\mathrm{F1}\ge\jdg{selCut}$. Replaying that rule against the public pool, it
+recovers \jdg{selRepro} of \jdg{selNCells} cells (\jdg{selAgree}); the same argmax with the filter
+\emph{not} applied recovers \jdg{selReproB} (\jdg{selAgreeB}), and in \jdg{selPassedOver} of the
+disagreements eligible designs existed and were passed over. The operative rule is the top
+\emph{prior experimental} score, and \jdg{selNFallback} of \jdg{selCells} tested designs fail the
+published cutoff outright. A companion study reports this in full; two consequences are load
+bearing here and are stated rather than deferred. First, selection acts on the design cell, which
+is a component of every stratum in this paper, so selection status is constant in \jdg{selNStrata}
+of \jdg{selNStrata} strata --- the same conditioning that removes placement removes it too.
+Second, it runs \emph{against} the effects reported below rather than with them: cell-level
+predictive skill and the score that did the selecting are rank-correlated at \jdg{selRhoRank}
+(\jdg{selRhoRankCi}). A corpus assembled by an algorithm and then filtered on a measurement is a
+harder case than the one this paper set out to analyse, not an easier one.
 
 \paragraph{Order of the arms.} \S\ref{sec:frame} fixes the scale a point is read on.
 \S\ref{sec:pairtype} estimates the effect. \S\ref{sec:energy} puts the folding model's own energy

@@ -431,6 +431,26 @@ put("xdRFailBins", ", ".join(str(r["nbins"]) for r in _rs if not r["bound_holds"
 put("xdROscLo", f"{min(r['osc_r'] for r in _rs):.5f}")
 put("xdROscHi", f"{max(r['osc_r'] for r in _rs):.5f}")
 
+# ---------------------------------------------------------------- how the corpus was selected
+# (M30). R1's premise is that the covariate distribution was produced by a design algorithm; it
+# was also produced by a selection rule, and the paper has to say so.
+m30 = J("m30_selection_audit.json")
+_s1, _s2 = m30["S1"], m30["S2"]
+put("selCells", f"{m30['n_cells']}")
+put("selNCells", f"{_s1['n_cells']}")
+put("selRepro", f"{_s1['n_reproduced']}")
+put("selAgree", f"{_s1['agreement']:.4f}")
+put("selReproB", f"{_s1['n_reproduced_no_filter']}")
+put("selAgreeB", f"{_s1['agreement_no_filter']:.4f}")
+put("selPassedOver", f"{_s1['n_eligible_passed_over']}")
+put("selCut", f"{m30['cutoff']:.2f}")
+put("selPoolPass", f"{100*_s2['pool_pass_rate_this_round']:.1f}\\%")
+put("selNFallback", f"{_s2['n_tested_fallback']}")
+put("selStrataMixed", f"{m30['strata_mixed_on_selection']}")
+put("selNStrata", f"{m30['S3']['strata_pass'] + m30['S3']['strata_fallback']}")
+put("selRhoRank", sig(m30["S4c_scale_free"]["openknot_score"]["spearman"]))
+put("selRhoRankCi", ci(m30["S4c_scale_free"]["openknot_score"]["ci"]))
+
 # ---------------------------------------------------------------- survivorship + shift (M22)
 m22 = J("m22_review_arms.json")
 a22 = m22["A"]
