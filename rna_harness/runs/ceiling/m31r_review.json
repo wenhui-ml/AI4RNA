@@ -1,0 +1,112 @@
+{
+ "R1_vs_free_baseline": {
+  "rho": {
+   "P_vienna": 0.2557,
+   "P_neural": 0.32947,
+   "depth": 0.32252
+  },
+  "ci": {
+   "P_vienna": [
+    0.19212,
+    0.32177
+   ],
+   "P_neural": [
+    0.27092,
+    0.39023
+   ],
+   "depth": [
+    0.26955,
+    0.3747
+   ],
+   "P_neural-depth": [
+    -0.07375,
+    0.08662
+   ],
+   "P_vienna-depth": [
+    -0.16457,
+    0.02919
+   ],
+   "P_neural-P_vienna": [
+    0.03746,
+    0.11322
+   ]
+  },
+  "K2_reissued": true
+ },
+ "R2_partial_given_depth": {
+  "rho": {
+   "P_vienna": 0.18198,
+   "P_neural": 0.23799
+  },
+  "ci": {
+   "P_vienna": [
+    0.10684,
+    0.27076
+   ],
+   "P_neural": [
+    0.17412,
+    0.30691
+   ]
+  },
+  "p_perm": {
+   "P_vienna": 0.0005,
+   "P_neural": 0.0005
+  },
+  "K5_nothing_beyond_depth": false
+ },
+ "R3_tiebreak": {
+  "recovery": {
+   "depth_only": 0.34854,
+   "depth_then_P_vienna": 0.35968,
+   "depth_then_P_neural": 0.36817
+  },
+  "ci_gain": {
+   "P_vienna": [
+    0.00098,
+    0.02454
+   ],
+   "P_neural": [
+    0.01116,
+    0.03064
+   ]
+  }
+ },
+ "R4_controls": {
+  "selection_fallback": {
+   "n_cells": 29,
+   "rho": {
+    "P_vienna": 0.35977,
+    "P_neural": 0.40747
+   },
+   "ci": {
+    "P_vienna": [
+     0.20174,
+     0.4696
+    ],
+    "P_neural": [
+     0.27026,
+     0.47865
+    ]
+   }
+  },
+  "leakage_clean": {
+   "n_cells": 144,
+   "n_leaked": 14,
+   "rho": {
+    "P_vienna": 0.19822,
+    "P_neural": 0.24684
+   },
+   "ci": {
+    "P_vienna": [
+     0.11824,
+     0.28253
+    ],
+    "P_neural": [
+     0.18138,
+     0.31298
+    ]
+   }
+  }
+ },
+ "verdict": "reframe_supported_as_increment_over_depth"
+}
