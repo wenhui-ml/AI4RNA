@@ -542,7 +542,8 @@
 
 @article{protdbench2026,
   title={{ProtDBench}: A unified benchmark of protein binder design and evaluation},
-  author={{ProtDBench authors}},
+  author={Liu, Cong and Ren, Milong and Guan, Jiaqi and Gong, Chengyue and Sun, Jinyuan and
+          Chen, Xinshi and Xiao, Wenzhi},
   journal={arXiv preprint arXiv:2605.04118},
   year={2026}
 }
@@ -580,9 +581,85 @@
 @article{chanrg2026,
   title={Fair splits flip the leaderboard: {CHANRG} reveals limited generalization in
          {RNA} secondary-structure prediction},
-  author={{CHANRG authors}},
+  author={Chen, Zhiyuan and Deng, Zhenfeng and Deng, Pan and Liao, Yue and Su, Xiu and
+          Ye, Peng and Liu, Xihui},
   journal={arXiv preprint arXiv:2603.22330},
   year={2026},
   note={29 predictors; foundation models lead in distribution and lose most of that lead out of
         it. Changes the split; this paper changes the question}
+}
+
+% ---------------------------------------------------------------------------
+% Added after a literature pass, 2026-08-28. Two lines the manuscript had to
+% confront: (i) scoring folding algorithms by their predicted response to a
+% sequence change is an established task -- the riboSNitch benchmark -- and
+% (ii) "the benchmark number is carried by something other than the property"
+% has a direct ancestry in this field that predates the 2026 restatement.
+% ---------------------------------------------------------------------------
+
+@article{corley2015ribosnitch,
+  title={Detecting {riboSNitches} with {RNA} folding algorithms: a genome-wide benchmark},
+  author={Corley, Meredith and Solem, Amanda and Qu, Kun and Chang, Howard Y. and
+          Laederach, Alain},
+  journal={Nucleic Acids Research},
+  volume={43}, number={3}, pages={1859--1868}, year={2015},
+  doi={10.1093/nar/gkv010},
+  note={Scores eleven folding algorithms by predicted structural response to a single variant;
+        the closest established paradigm to this paper's, and the reference against which the
+        differences of estimand are stated}
+}
+
+@article{kirven2025variantfold,
+  title={{VariantFoldRNA}: a flexible, containerized, and scalable pipeline for genome-wide
+         {riboSNitch} prediction},
+  author={Kirven, Kobie J. and Bevilacqua, Philip C. and Assmann, Sarah M.},
+  journal={NAR Genomics and Bioinformatics},
+  volume={7}, number={2}, pages={lqaf066}, year={2025},
+  doi={10.1093/nargab/lqaf066}
+}
+
+@article{szikszai2022generalize,
+  title={Deep learning models for {RNA} secondary structure prediction (probably) do not
+         generalize across families},
+  author={Szikszai, Marcell and Wise, Michael and Datta, Amitava and Ward, Max and
+          Mathews, David H.},
+  journal={Bioinformatics},
+  volume={38}, number={16}, pages={3892--3899}, year={2022},
+  doi={10.1093/bioinformatics/btac415}
+}
+
+@article{flamm2022caveats,
+  title={Caveats to deep learning approaches to {RNA} secondary structure prediction},
+  author={Flamm, Christoph and Wielach, Julia and Wolfinger, Michael T. and Badelt, Stefan and
+          Lorenz, Ronny and Hofacker, Ivo L.},
+  journal={Frontiers in Bioinformatics},
+  volume={2}, pages={835422}, year={2022},
+  doi={10.3389/fbinf.2022.835422}
+}
+
+@article{qiu2023sequence,
+  title={Sequence similarity governs generalizability of de novo deep learning models for
+         {RNA} secondary structure prediction},
+  author={Qiu, Xiangyun},
+  journal={PLOS Computational Biology},
+  volume={19}, number={4}, pages={e1011047}, year={2023},
+  doi={10.1371/journal.pcbi.1011047}
+}
+
+@article{mathews2019benchmark,
+  title={How to benchmark {RNA} secondary structure prediction accuracy},
+  author={Mathews, David H.},
+  journal={Methods},
+  volume={162--163}, pages={60--67}, year={2019},
+  doi={10.1016/j.ymeth.2019.04.003}
+}
+
+@article{szikszai2026gauging,
+  title={Deep learning for {RNA} secondary structure determination: gauging generalizability and
+         broadening the scope of traditional methods},
+  author={Szikszai, Marcell and Wang, Ting-Yuan and Krueger, Ryan and Mathews, David H. and
+          Ward, Max and Aviran, Sharon},
+  journal={RNA},
+  volume={32}, number={4}, pages={428--442}, year={2026},
+  doi={10.1261/rna.080846.125}
 }

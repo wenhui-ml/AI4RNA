@@ -275,6 +275,21 @@ def main(pdir: str) -> int:
         print(f"\n[I] {n} unfinished marker(s) in the manuscript body: {unfinished}")
         print("    NOT POSTABLE until each is replaced by the thing it stands for.")
 
+    # J -- a citation key that is not in refs.bib does not fail the build, it typesets "[?]".
+    # This check exists because two such keys reached a committed PDF and nothing saw them.
+    bibp = os.path.join(pdir, "refs.bib")
+    if os.path.exists(bibp):
+        bibsrc = open(bibp, encoding="utf-8", errors="replace").read()
+        bibkeys = set(re.findall(r"^@[a-zA-Z]+\{([^,]+),", bibsrc, re.M))
+        cited = set()
+        for grp in re.findall(r"\\[a-zA-Z]*cite[a-zA-Z]*\*?(?:\[[^\]]*\])*\{([^}]*)\}", body_nc):
+            cited |= {k.strip() for k in grp.split(",") if k.strip()}
+        undef = sorted(cited - bibkeys)
+        if undef:
+            fail += 1
+            print(f"\n[J] {len(undef)} citation key(s) cited and absent from refs.bib: {undef}")
+            print("    Each typesets as [?]. NOT POSTABLE.")
+
     print(f"\n--- {'FAIL' if fail else 'clean'} ({fail} blocking finding(s))")
     return 1 if fail else 0
 

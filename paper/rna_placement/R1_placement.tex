@@ -391,7 +391,13 @@ validated on the second is not evidence about the first. Second, and the directi
 anticipate, the same placement acts on the \emph{measurement} --- because designers already place
 G--C shallower, a contrast that does not hold depth fixed sees $\jdg{medRatio}\times$ less than the
 matched contrast (\S\ref{sec:mediation}). A designed corpus is a non-random sample of sequence
-space, and here the non-randomness is in the covariate that mediates the effect.
+space, and here the non-randomness is in the covariate that mediates the effect. That a benchmark number
+on such a corpus can be carried by a covariate rather than by the ability it is named after is
+already established in this field for one covariate --- similarity to what a model was trained on
+\citep{szikszai2022generalize,qiu2023sequence} --- and that channel is closed by changing the
+split. Pricing a \emph{second} channel is not a matter of splitting, and this paper supplies what
+it needs instead: the condition under which a share of the number is estimable at all, and the
+calibration showing that here it is not.
 
 \paragraph{The thermodynamic explanation this must be separated from.} Nearest-neighbour
 parameters \citep{freier1986improved,xia1998thermodynamic,mathews1999expanded,turner2010nndb} give
@@ -716,6 +722,19 @@ exposure arms overlap in the mediator, which is precisely when the stratified ro
 identified --- so the two routes are most likely to diverge exactly where the product route is the
 only one that can be computed. The practical rule we follow is to report $h$ bin by bin, and to
 use the product route only where it is affine to within the reported precision.
+
+\paragraph{What is and is not new here.} \textbf{We claim no priority for the non-equivalence
+itself.} That the two routes stop agreeing once the outcome model is not linear in the mediator is
+standard \citep{mackinnon2007mediation,vanderweele2015explanation}, and the two are routinely
+compared as competing estimators of a shared target \citep{cheng2023product}. Three things are
+added, and the third is the one the calibration below rests on. The gap is written in closed form
+as a contrast of a single function --- \eqref{eq:routes}, the exposure contrast of the residual of
+the conditional mean after its linear projection --- rather than as a discrepancy attributed to
+model form. It is bounded by an observable, \eqref{eq:routebound}, whose second factor is the same
+overlap the stratified route needs to be identified, which is what makes the disagreement
+predictable in advance instead of merely possible. And the characterisation is an \emph{iff} over
+exposure laws: affinity of $h$ is not a sufficient condition offered for convenience, it is the
+exact one, so no weaker regularity assumption can rescue interchangeability here.
 
 \subsection{Calibration and preregistration}
 \label{sec:cal2}

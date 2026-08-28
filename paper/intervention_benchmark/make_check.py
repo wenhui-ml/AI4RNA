@@ -69,6 +69,22 @@ def word_counts(code, defined):
     return out
 
 
+
+# ---------------------------------------------------------------------------
+# Citation integrity. Added after a key cited in the body but absent from refs.bib
+# printed as "[? ?]" on page 6 of a committed PDF and no check saw it: the build
+# does not fail on an undefined citation, it just typesets a question mark.
+# ---------------------------------------------------------------------------
+def undefined_citations() -> list:
+    tex = open(TEX).read()
+    bib = open(os.path.join(HERE, "refs.bib")).read()
+    keys = set(re.findall(r"^@[a-zA-Z]+\{([^,]+),", bib, re.M))
+    cited = set()
+    for grp in re.findall(r"\\[a-zA-Z]*cite[a-zA-Z]*\*?(?:\[[^\]]*\])*\{([^}]*)\}", tex):
+        cited |= {k.strip() for k in grp.split(",") if k.strip()}
+    return sorted(cited - keys)
+
+
 def main() -> int:
     bad, badw = [], []
     defined = set(re.findall(r"\\csname\s+jdg@\w+\\endcsname\{([^}]*)\}",
@@ -100,8 +116,14 @@ def main() -> int:
         print(f"\n**{len(bad)} hand-typed decimal(s) in the manuscript body:**")
         for ln, v, ctx in bad:
             print(f"  line {ln}: {v}   |  {ctx}")
-    if bad or badw:
-        print("\nEvery measured number must come from make_numbers.py via \\jdg{}.")
+    missing_keys = undefined_citations()
+    if missing_keys:
+        print(f"\n**{len(missing_keys)} citation key(s) cited in the body and absent from refs.bib:**")
+        for k in missing_keys:
+            print(f"  {k}   -> would typeset as [?]")
+    if bad or badw or missing_keys:
+        print("\nEvery measured number must come from make_numbers.py via \\jdg{}, "
+              "and every cited key must exist in refs.bib.")
         return 1
     print("clean: no hand-typed measured number in the manuscript body")
     return 0

@@ -168,7 +168,7 @@ the pairs being compared are already recovered nine times out of ten, the remain
 mostly noise about which structure a degenerate profile happened to select. The second is a
 degree of freedom that is rarely reported --- \emph{which} pairs enter the comparison. Restricting
 to the designed target pairs, or admitting every pair a predictor emits, are both defensible
-choices, and on the corpus below they move the same measurement by a factor of \jdg{cvSwing}.
+choices that benchmarking practice leaves open \citep{mathews2019benchmark}, and on the corpus below they move the same measurement by a factor of \jdg{cvSwing}.
 
 There is a different question available, and the data to ask it already exists. Chemical-probing
 campaigns that include mutant libraries have, for more than a decade, synthesised and measured
@@ -263,6 +263,7 @@ established before any of them is reported.}
 \label{sec:background}
 
 \subsection{What probing measures, and what it does not}
+\label{sec:probing}
 Reagents that acylate flexible riboses or methylate unpaired Watson--Crick faces report per
 nucleotide on accessibility \citep{ehresmann1987probing,merino2005rna,wilkinson2006selective,
 weeks2010advances,siegfried2014rna}, quantitative treatment of the resulting profiles is itself a
@@ -342,6 +343,23 @@ the experiment itself, including a public server that will predict a mutate-and-
 \citep{ribonanzanet2024}; what it does not do is treat the resulting predictions as a benchmark
 with a control for who chose the pairs.
 
+\paragraph{Scoring a folding algorithm by its response to a mutation, inside this field.}
+One established task does exactly that, and it is close enough that the separation has to be made
+in estimands rather than in ambitions. riboSNitch prediction asks whether a single-nucleotide
+variant reorganises a transcript's structure, and \citet{corley2015ribosnitch} turned it into a
+genome-wide benchmark of eleven folding algorithms --- including three built for that task,
+remuRNA, RNAsnp and SNPfold --- graded against structural change detected by parallel probing,
+a line that is still being built on \citep{kirven2025variantfold}. Three things differ here. The
+intervention is a compensatory \emph{pair} rather than a single substitution, so the unordered
+pair type is held fixed and the molecule's own wild type is the internal control. The estimand is
+one \emph{named} base pair rather than a whole-transcript ensemble distance. And the grading
+column contains no folding model: a riboSNitch label is a structural change inferred by comparing
+two probing profiles, which is exactly the one-to-many map of \S\ref{sec:probing}, whereas the
+outcome used here is arithmetic on reactivities (\S\ref{sec:outcome}). What that line and this one
+share is the premise --- that a prediction about a \emph{change} tests a folding model more
+sharply than a prediction about a state --- and we read the existence of that literature as
+corroboration of the premise, not as evidence for any number below.
+
 \paragraph{The closest prior analysis of this outcome.} The rescue factor has been related to a
 folding calculation once before, and the difference matters enough to state precisely.
 \citet{tian2018allosteric} validated the quantity as a readout by showing that rescue factors from
@@ -359,7 +377,15 @@ search \citep{andronescu2004new,busch2006info,zadeh2011nupack}, sampling and lea
 \citep{kleinkauf2015antarna,runge2019learna}, human players and the models trained on them
 \citep{lee2014eterna,andersonlee2016eterna100,koodli2021eternabrain}, and pipelines assembled from
 several of these \citep{yesselman2019computational} --- and a corpus assembled that way carries
-its producers' preferences as covariates. This hazard is recognised
+its producers' preferences as covariates. Inside this field the hazard has already been demonstrated once, in a
+form close enough that the present thesis should be read as its generalisation: a deep model's
+benchmark score is carried by family membership and by sequence similarity to its training set
+rather than by an ability to predict structure \citep{szikszai2022generalize,flamm2022caveats,
+qiu2023sequence}, a finding restated on rebuilt splits and on curated held-out structures four
+years later \citep{chanrg2026,szikszai2026gauging}. Those studies name \emph{one} channel ---
+homology --- and close it by changing the split. \S\ref{sec:ledger} asks the question after
+that one: on a corpus nobody sampled, how many such channels are there, who chose each, and how
+much does each carry. The hazard is also recognised
 qualitatively in several fields --- feedback in recommender systems \citep{chaney2018algorithmic},
 generator--judge contamination in language-model evaluation \citep{li2025preference}, characteristic
 biases of protein design programs \citep{protdbench2026} --- and the correction it demands here is
