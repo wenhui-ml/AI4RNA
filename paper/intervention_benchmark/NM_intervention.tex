@@ -926,11 +926,31 @@ companion study; nothing in this paper depends on reading it.
 \section{Preregistration record}
 \label{app:prereg}
 
-Every experiment in this paper was declared in a frozen JSON file committed and pushed before the
-code that produced it existed, naming the arms, the kill conditions, the probes that must fire,
-and a list of staked predictions written before the run. The table below records the outcome of
-each stake. Predictions that failed are marked as failed; the accompanying text does not
-re-describe them as successes.
+The manuscript reads \jdg{pvTotal} run artifacts, and they were not all licensed the same way.
+Of these, \jdg{pvPreReg} are \emph{experiments}: each was declared in a frozen JSON file committed
+and pushed before the code that produced it existed, naming the arms, the kill conditions, the
+probes that must fire, and a list of staked predictions written before the run. Every claim in
+Section~\ref{sec:results} rests on these. The table below records the outcome of each stake.
+Predictions that failed are marked as failed; the accompanying text does not re-describe them as
+successes.
+
+The remaining \jdg{pvSurveyReviewSupport} were not preregistered, and saying so is part of the
+record. A \emph{survey} accounts for \jdg{pvSurvey} of them: it establishes design-side facts
+before a declaration can be written at all, counting what each public deposit contains so that the
+second-corpus experiment could be declared against something. It estimates no effect and none may
+be read from it. \emph{Reviews} account for \jdg{pvReview}. Each was written after the run it
+checks, because that run needed checking, and a review cannot be preregistered without
+preregistering its own conclusion; two of this paper's results exist only because of them, the
+withdrawal in Section~\ref{sec:withdrawal} and the reissued kill condition recorded below.
+\emph{Supporting quantities} account for the last \jdg{pvSupport}: a rank agreement both earlier
+runs need and neither reports, and the curve behind a figure. Neither states a new claim.
+
+Which artifact falls in which class is recorded in \texttt{provenance.json} beside the manuscript
+rather than asserted here, and the build refuses to proceed if that file disagrees with what is on
+disk: if a run filed as preregistered has no frozen declaration, or a run filed as unplanned turns
+out to have one, or an artifact the manuscript reads is not classified at all, the audit fails.
+The sentence this paragraph replaced claimed the stronger thing --- that \emph{every} experiment
+here was preregistered --- and nothing checked it.
 
 \begin{center}
 \begin{tabular}{p{0.62\textwidth}c}

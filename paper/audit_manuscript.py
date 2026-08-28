@@ -136,6 +136,8 @@ def main(pdir: str) -> int:
         if not os.path.exists(p):
             continue
         for m in re.finditer(r"[\"']([\w.\-]+\.json)[\"']", open(p).read()):
+            if os.path.exists(os.path.join(pdir, m.group(1))):
+                continue                      # a paper-local file (provenance.json), not an artifact
             a = os.path.join(CEIL, m.group(1))
             if not os.path.exists(a):
                 missing.append(m.group(1))
@@ -158,6 +160,62 @@ def main(pdir: str) -> int:
     if noprov:
         fail += 1
         print(f"\n[E] {len(noprov)} figure fragment(s) without a provenance header: {noprov}")
+
+    # H -- the manuscript's claim about its own process, made checkable.
+    # The preregistration appendix says which artifacts were declared before their code existed.
+    # provenance.json is that statement in machine-readable form; this refuses it if it drifts.
+    prov_path = os.path.join(pdir, "provenance.json")
+    if os.path.exists(prov_path):
+        prov = json.load(open(prov_path))
+        classes = {k: v for k, v in prov.items() if not k.startswith("_")}
+        listed: dict[str, list[str]] = {}
+        for cls, items in classes.items():
+            for a in items:
+                if a.startswith("_"):
+                    continue
+                listed.setdefault(a, []).append(cls)
+        read = set()
+        for gen in ("make_numbers.py", "make_figs.py"):
+            gp = os.path.join(pdir, gen)
+            if os.path.exists(gp):
+                read |= set(re.findall(r"[\"']([\w.\-]+\.json)[\"']", open(gp).read()))
+        read.discard("provenance.json")
+
+        unclassified = sorted(read - set(listed))
+        if unclassified:
+            fail += 1
+            print(f"\n[H] {len(unclassified)} artifact(s) read by a generator but not classified "
+                  f"in provenance.json: {unclassified}")
+        stale = sorted(set(listed) - read)
+        if stale:
+            fail += 1
+            print(f"\n[H] {len(stale)} artifact(s) classified in provenance.json but no longer "
+                  f"read: {stale}")
+        twice = sorted(a for a, cs in listed.items() if len(cs) > 1)
+        if twice:
+            fail += 1
+            print(f"\n[H] {len(twice)} artifact(s) in more than one class: {twice}")
+
+        # the claim itself: preregistered means a frozen declaration really exists and is tracked
+        for a, cover in classes.get("preregistered", {}).items():
+            if a.startswith("_"):
+                continue
+            decl = cover or (a[:-5] + "_declaration.json")
+            dp = os.path.join(CEIL, decl)
+            if not os.path.exists(dp):
+                fail += 1
+                print(f"\n[H] {a} is claimed preregistered but {decl} does not exist")
+            elif not tracked(dp):
+                fail += 1
+                print(f"\n[H] {a} is claimed preregistered but {decl} is not tracked by git")
+        # and the converse: a run with a frozen declaration must not be filed as unplanned
+        for cls in ("survey", "review", "support"):
+            for a in classes.get(cls, {}):
+                if a.startswith("_"):
+                    continue
+                if os.path.exists(os.path.join(CEIL, a[:-5] + "_declaration.json")):
+                    fail += 1
+                    print(f"\n[H] {a} is filed as {cls} but a frozen declaration exists for it")
 
     # E2 -- a generated fragment the manuscript never inputs is a figure that was built,
     # compiled and then orphaned; it is the [B] defect in graphical form.
