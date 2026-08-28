@@ -32,6 +32,9 @@
 \usepackage{authblk}
 \usepackage{caption}
 \usepackage{tcolorbox}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepgfplotslibrary{groupplots}
 \tcbuselibrary{skins,breakable}
 \captionsetup{font=small,labelfont=bf,skip=4pt}
 \emergencystretch=1.5em
@@ -79,6 +82,13 @@
 \definecolor{sbLine}{HTML}{EB6834}
 \definecolor{wbBack}{HTML}{FDF3F3}
 \definecolor{wbLine}{HTML}{B3261E}
+% figure palette -- the generated TikZ in figs/*.tex refers to these by name
+\definecolor{nmneural}{HTML}{C0392B}
+\definecolor{nmthermo}{HTML}{2471A3}
+\definecolor{nmfree}{HTML}{117A3D}
+\definecolor{nmink}{HTML}{1A1A1A}
+\definecolor{nmgrey}{HTML}{8D8D8D}
+\definecolor{nmmid}{HTML}{D8B365}
 
 \input{figs/nm_numbers}
 
@@ -225,6 +235,17 @@ returns a contrast \jdg{cvPaired} (\jdg{cvPairedCi}) larger and admits no such c
 \end{claimbox}
 
 % =====================================================================
+\begin{figure}[t]
+\centering
+\input{figs/fig1_corpus}
+\caption{\textbf{What the criterion admitted, and the range the predictors use on it.}
+\textbf{a}, Helix depth of the flipped pair across the \jdg{nAdmitted} admitted interventions;
+\jdg{rkDepLeTwo} sit at depth two or less, which is why \jdg{rkTied} of within-design pairs are
+tied on depth. \textbf{b}, Where each predictor's own pair probability falls. A calibration
+reading is only worth having if the predictor varies, and neither is pinned to its ceiling.}
+\label{fig:corpus}
+\end{figure}
+
 \subsection{Recovering the interventions}
 \label{sec:mining-results}
 
@@ -335,6 +356,16 @@ than against the deposits, is the audit this design still owes.
 \end{scopebox}
 
 % =====================================================================
+\begin{figure}[t]
+\centering
+\input{figs/fig2_calibration}
+\caption{\textbf{Both predictors have skill on this instrument.} Mean measured rescue against
+bins of each predictor's own equilibrium or learned pair probability, with the bin's mean
+probability and size printed beneath each point. The relation is monotone for the thermodynamic
+model; the neural model's is steeper. Neither curve involves a reference structure.}
+\label{fig:calibration}
+\end{figure}
+
 \subsection{What the instrument reads out}
 \label{sec:result}
 
@@ -495,6 +526,19 @@ verdict was not read, and the interval that should have been there was computed 
 the one reported above. The declaration, the run, the fault and the repair are in
 Appendix~\ref{app:prereg}.
 
+\begin{figure}[t]
+\centering
+\input{figs/fig3_ranking}
+\caption{\textbf{A free integer ranks which flips rescue as well as either model.}
+\textbf{a}, Within-design rank agreement with measured rescue, point estimate and
+puzzle-clustered 95\% interval. Helix depth is read off the declared target structure and costs
+nothing. \textbf{b}, Within-cell AUROC as the rescue threshold defining a hit is swept; above
+\jdg{rkOverThr} the free baseline overtakes both models. \textbf{c}, Share of a design's rescuing
+flips recovered against the share of its flips built. Using a predictor only to break depth's
+ties --- no fitting, no weights --- is the whole of the practical gain.}
+\label{fig:ranking}
+\end{figure}
+
 \subsection{A metric we withdraw}
 \label{sec:withdrawal}
 
@@ -524,6 +568,17 @@ like. \textbf{None of that is needed here.} This instrument reports direct contr
 and never a ratio of two contrasts, which is a design decision taken because of the number above:
 the quantities in Section~\ref{sec:results} are differences of matched contrasts, each with its own
 interval, and none of them divides one small noisy quantity by another.
+
+\begin{figure}[t]
+\centering
+\input{figs/fig4_audits}
+\caption{\textbf{The two audits, in the main text.} \textbf{a}, Within-stratum skill slope before
+and after excising design cells whose windows resemble the neural model's source libraries. The
+thermodynamic row is the control that makes the comparison readable: it was trained on nothing and
+behaves the same way. \textbf{b}, The matched identity contrast on the whole corpus, on cells whose
+design passes the published selection cutoff, and on the cells where that filter did not bind.}
+\label{fig:audits}
+\end{figure}
 
 \section{Discussion}
 \label{sec:discussion}
