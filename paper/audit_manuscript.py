@@ -212,7 +212,11 @@ def main(pdir: str) -> int:
             elif not tracked(dp):
                 fail += 1
                 print(f"\n[H] {a} is claimed preregistered but {decl} is not tracked by git")
-        # and the converse: a run with a frozen declaration must not be filed as unplanned
+        # and the converse: a run with a frozen declaration must not be filed as unplanned.
+        # "corpus" is exempt: it names released or derived DATA the analysis reads, not a run, so
+        # there is nothing for it to have declared. It was added when R1's ledger turned up six
+        # population files that no experiment class fitted, and shoehorning data into "support"
+        # would have made the taxonomy lie about what those files are.
         for cls in ("survey", "review", "support"):
             for a in classes.get(cls, {}):
                 if a.startswith("_"):

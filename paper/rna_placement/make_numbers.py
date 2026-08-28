@@ -298,6 +298,21 @@ put("m23BlockMed", f(m23["N4_block_median"], 1))
 # The corpus's own counts were spelled out as words -- "twenty targets", "nine design methods",
 # "six populations", "four rounds" -- which make_check.py could not see because it only looks for
 # digits. They are counts over a released file and a different release is a different corpus.
+# ---- provenance counts. R1 had no provenance.json, so the audit's [H] check -- the one that
+# tests a manuscript's claim about its own process -- had never run on this paper. It had run on
+# the companion and found that paper's preregistration sentence false; R1's was false in the same
+# way. These counts come out of the classification so the sentence cannot drift from it.
+_pv = json.load(open(os.path.join(HERE, "provenance.json")))
+_cls = {k: len([x for x in v if not x.startswith("_")])
+        for k, v in _pv.items() if not k.startswith("_")}
+put("pvTotal", f"{sum(_cls.values())}")
+put("pvPreReg", f"{_cls['preregistered']}")
+put("pvReview", f"{_cls['review']}")
+put("pvSurvey", f"{_cls['survey']}")
+put("pvSupport", f"{_cls['support']}")
+put("pvCorpus", f"{_cls['corpus']}")
+put("pvUnplanned", f"{_cls['review'] + _cls['survey'] + _cls['support']}")
+
 _cc = J("m33_cluster_census.json")
 put("ccPuzzlesR", f"{_cc['n_puzzles']}")
 put("ccCellsR", f"{_cc['n_design_cells']}")

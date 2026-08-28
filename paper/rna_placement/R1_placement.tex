@@ -127,32 +127,32 @@ a design algorithm produced --- and the calibration that catches them}
 
 \begin{abstract}
 \noindent
-Pre-registration protects an analysis against choosing a statistic after seeing the data. It does
-not protect it against choosing a statistic that cannot be read. We report two such statistics from
-one pre-registered pipeline, on a corpus of \jdg{dN} controlled interventions whose covariates were
-arranged by a design algorithm rather than by nature, and give the calibration that catches both.
+On a corpus written by design programs, a benchmark number is carried by a covariate somebody
+chose, and the work is to price each choice. This paper supplies what pricing needs and cannot
+assume: the condition under which a \emph{share} of that number is estimable at all, and a
+calibration showing that here it is not --- so channels must be priced one at a time and
+never added up. Pre-registration protects against choosing a statistic after seeing the data, not
+against choosing one that cannot be read; we report two such, from one frozen pipeline of
+\jdg{dN} controlled interventions.
 
-The first is a mediated fraction. Its two standard estimators --- conditioning on the mediator, and
-multiplying two coefficients --- are treated as interchangeable. We prove they differ by exactly
-$\mathbb E[r(M)\mid A]-\mathbb E[r(M)\mid B]$, for $r$ the residual of the conditional mean after
-its linear projection, bounded by
-$\operatorname{osc}(r)\,d_{\mathrm{TV}}$, and that they agree for every pair of exposure laws
-\emph{if and only if} that conditional mean is affine
-(Proposition~\ref{prop:routes}). The corollary is uncomfortable: they disagree most where the
-product route is the only one computable. On our data they disagree by \jdg{eLinearGapPts} points,
-and our own pre-registered verdict had silently picked one of them.
+The first is a mediated fraction, whose two estimators are treated as interchangeable. They differ
+by exactly $\mathbb E[r(M)\mid A]-\mathbb E[r(M)\mid B]$, for $r$ the residual of
+the conditional mean after its linear projection, bounded by
+$\operatorname{osc}(r)\,d_{\mathrm{TV}}$, and agree for every pair of exposure laws \emph{iff} that
+conditional mean is affine (Prop.~\ref{prop:routes}) --- so they disagree most where the product
+route is the only one computable. Here they disagree by \jdg{eLinearGapPts} points and our frozen
+verdict had silently picked one. Which is readable is settled empirically: injecting a
+\emph{known} mediated fraction into the real mediator, the estimator's reading covers
+\jdg{calNSpanFrac} and \jdg{calVSpanFrac} of the range the truth covers and returns \jdg{calNFull}
+and \jdg{calVFull} at total mediation. Published guidance clears us on both its thresholds and the quantity that governs is not in it.
 
-Which route is readable is then settled empirically. Injecting a \emph{known} mediated fraction
-into the real mediator and leaving only the outcome synthetic, the truth moves \jdg{calSpanTrue}
-while the estimator's reading moves \jdg{calNSpan} and \jdg{calVSpan} --- \jdg{calNSpanFrac} and
-\jdg{calVSpanFrac} of the range --- returning \jdg{calNFull} and \jdg{calVFull} at total mediation.
-Published guidance clears us on both of its thresholds; the quantity that governs is not in it. A
-second declared statistic, on a second corpus, reverses against its own rank counterpart.
-
-Put at risk on \jdg{xdN} designed protein binders, the bound does not merely hold: across the two
-corpora the overlap differs by a factor of \jdg{xdDtvRatio} and the route gap by \jdg{xdGapRatio}.
-What survives of the substantive question is stated as bounds --- \jdg{dDgBound} and
-\jdg{dPmBound} --- and every mediated fraction this work previously reported is withdrawn.
+Put at risk on \jdg{xdN} designed protein binders the bound does not merely hold, it tracks:
+overlap differs across the two corpora by \jdg{xdDtvRatio} and the route gap by \jdg{xdGapRatio}.
+The two channels we can price directly go opposite ways --- the designers' placement
+carries the effect (\jdg{medMarginal} marginal against \jdg{medMatched} matched) and the free energy
+their programs optimised carries none (\jdg{eMed}, \jdg{eMedCi}) --- and what survives is stated as
+the bounds \jdg{dDgBound} and \jdg{dPmBound}. Every mediated fraction this work previously
+reported is withdrawn.
 \end{abstract}
 
 % =====================================================================
@@ -784,12 +784,27 @@ advance, declare each arm's predictions before its code exists, and rest no clai
 alone; where an arm does not clear the gate it is reported as not clearing it
 (\S\ref{sec:gradient}) rather than promoted on a weaker threshold.
 
-Every criterion graded in \S\ref{sec:results} was frozen before the analysis code that grades it
-existed, in the sense made operational in \S\ref{sec:cal2}: a JSON declaration naming the
-statistic, the gate, the ladder of Def.~\ref{def:ladder} and a staked numerical prediction, then
-committed and pushed. Nothing below reports a criterion whose declaration is not in that record,
-and where a stake failed the failure is reported in the declaration's own wording rather than
-rephrased. Appendix~\ref{app:prereg} lists every declaration, its commit and its verdict.
+This manuscript's generators read \jdg{pvTotal} artifacts, and they were not all licensed the same
+way; saying which is which is part of the record. \jdg{pvPreReg} are \emph{experiments}, each
+declared in a JSON file naming the statistic, the gate, the ladder of Def.~\ref{def:ladder} and a
+staked numerical prediction, committed and pushed before the code that produced it existed
+(\S\ref{sec:cal2}). Where a stake failed, the failure is reported in the declaration's own wording
+rather than rephrased. \jdg{pvCorpus} are the population data files the analysis runs on, which
+declare nothing because they are not runs. The remaining \jdg{pvUnplanned} were not preregistered:
+\jdg{pvSurvey} is a census of what the bootstrap resamples, \jdg{pvSupport} a supporting quantity
+for a claim made elsewhere, and \jdg{pvReview} are \emph{reviews} --- each written after the run it
+checks, because that run needed checking, and a review cannot be preregistered without
+preregistering its own conclusion.
+
+\textbf{Two of those reviews are load bearing and we say so here rather than let a reader find
+it.} The direct contrasts that replace the withdrawn mediated fraction, and which appear in this
+paper's abstract, were written after the calibration of \S\ref{sec:cal} showed the fraction
+unreadable --- so the quantity this paper now reports in its place was never staked in advance. So
+was the interval on the reproducibility ceiling of \S\ref{sec:frame}, which repairs a debt an
+earlier review had recorded and not paid. Which artifact falls in which class is recorded in
+\texttt{provenance.json} beside the manuscript rather than asserted here, and the build refuses to
+proceed if that file disagrees with what is on disk. Appendix~\ref{app:prereg} lists every
+declaration, its commit and its verdict.
 
 Three conventions run through the estimating arms and are stated once here rather than
 repeated, with their exceptions, because a convention stated without its exceptions is a claim

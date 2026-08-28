@@ -122,9 +122,9 @@
 \input{figs/nm_numbers}
 
 \title{\bf Scoring RNA Structure Prediction on Interventions\\That Have Already Been Performed\\[4pt]
-\large Compensatory mutagenesis in a chemical-probing corpus yields \jdg{nAdmitted} controlled
-two-nucleotide\\experiments; scoring models on them separates two model classes that\\
-agreement with a reference structure cannot}
+\large Compensatory mutagenesis in a chemical-probing corpus yields \jdg{nAdmitted} controlled\\
+two-nucleotide experiments, and pricing them channel by channel says which of a\\
+benchmark's numbers is carried by a covariate somebody chose}
 
 \author{Wenhui Chen\thanks{\texttt{wenhui.chen@titanresearchlabs.ai}}}
 \date{}
@@ -135,20 +135,23 @@ agreement with a reference structure cannot}
 \begin{abstract}
 \noindent
 Chemical-probing benchmarks score RNA structure predictors by how far a predicted structure agrees
-with a reference. Agreement saturates, and it cannot say whether a prediction responds correctly to
-an intervention. We recover \jdg{nAdmitted} two-nucleotide interventions already executed in a public benchmark --- compensatory orientation flips whose measured outcome
-contains no folding model --- and score three predictors by response instead. A transformer's own
-output separates G--C from A--U targets in matched contexts by \jdg{resNeural}
-(\jdg{resNeuralCi}); neither predictor built on the nearest-neighbour decomposition does so,
-including one whose parameters were fitted to the same kind of data the transformer was trained on
-(\jdg{resVienna}, \jdg{efContrast}). Paired on one resample, all three predictors differ from each
-other, so the effect decomposes rather than dichotomises: changing the decomposition is worth
-\jdg{axArch} (\jdg{axArchCi}) and changing the training data \jdg{axData} (\jdg{axDataCi}), a gap
-of \jdg{axGap} (\jdg{axGapCi}). Asked instead which flips rescue within one design, a free integer --- helix depth in the
-declared target --- is matched by all three (differences \jdg{rkDiffNCi}, \jdg{rkDiffVCi} and
-\jdg{efVsDepthCi}, all covering zero). What survives with depth held fixed is real but modest
-(\jdg{rkPartN}, \jdg{rkPartNCi}). We reproduce the rule
-that selected the corpus, audit leakage in the main text, and withdraw one of our own metrics.
+with a reference. Agreement saturates; and on a corpus written by design programs, chosen by a
+selection rule and scored against a model's own output, the number a benchmark reports is carried
+by a covariate somebody chose rather than by the property it is named after. We recover
+\jdg{nAdmitted} two-nucleotide interventions already executed in a public benchmark ---
+compensatory orientation flips whose measured outcome contains no folding model --- score three
+predictors by response, and price \jdg{chPriced} such channels. \jdg{chCarry} carry the number and
+\jdg{chEmpty} are empty. The reference channel carries most: the same molecules read
+interventionally give \jdg{cvIntvSd} standard deviations against \jdg{cvConvSd} read as agreement.
+The declared target carries as much as any model: helix depth, a free integer, is matched by all
+three predictors (\jdg{rkDiffNCi}, \jdg{rkDiffVCi}, \jdg{efVsDepthCi}, all covering zero), and what
+survives with depth held fixed is real but modest (\jdg{rkPartN}, \jdg{rkPartNCi}). The model's own
+authors carry it along two separable axes --- the decomposition \jdg{axArch} (\jdg{axArchCi}) and
+the training data \jdg{axData} (\jdg{axDataCi}), differing by \jdg{axGap} (\jdg{axGapCi}).
+\textbf{The empty channel is the folding model's own free energy}, the objective every one of these
+design programs was optimising. We report the prices as direct contrasts and never as shares,
+because the estimator for a share is uninformative here --- which we show, and withdraw a metric of
+our own for.
 \end{abstract}
 
 % =====================================================================
@@ -186,13 +189,27 @@ and did the measurement agree? No reference structure enters that comparison, so
 that makes profile-based scoring awkward does not arise, and the saturation does not either,
 because the quantity being predicted is a change rather than a state.
 
-Three things had to be true for this to be a method rather than an observation, and the paper is
-organised around establishing them. The interventions must be recoverable by a stated rule rather
-than by inspection, which is Section~\ref{sec:mining}. The instrument must be shown to have
-resolution before any conclusion is drawn from it, which is Section~\ref{sec:scoring} --- and the
-predictors we score are not innocent of the corpus, so the leakage audit lives there too, in the
-main text. And the readout must produce something the incumbent readout cannot, which is
+Three things had to be true for this to be a method rather than an observation, and the paper
+establishes them in order. The interventions must be recoverable by a stated rule rather than by
+inspection, which is Section~\ref{sec:mining}. The instrument must be shown to have resolution
+before any conclusion is drawn from it, which is Section~\ref{sec:scoring} --- and the predictors
+we score are not innocent of the corpus, so the leakage audit lives there too, in the main text.
+And the readout must produce something the incumbent readout cannot, which is
 Section~\ref{sec:result}.
+
+\paragraph{What the instrument turned out to be for.} We built it to ask whether a predictor
+responds correctly to a mutation, and every arm answered a narrower question than that: how much of
+the number is carried by one covariate that somebody chose. These molecules were written by design
+programs, filtered by a selection rule, mutated at pairs somebody picked, and scored against a
+reference column that is itself a model's output --- so a benchmark number on this corpus is a
+statement about a chosen covariate until it is shown otherwise. Section~\ref{sec:ledger} is the
+ledger that results: \jdg{chPriced} channels, each named by its chooser and priced by a direct
+contrast, of which \jdg{chCarry} carry the number and \jdg{chEmpty} are empty. The three empty ones
+are the ones a reader would demand --- leakage, probe chemistry, and \emph{the folding model's own
+free energy}, the objective every one of these design programs was optimising. That last row is the
+paper's sharpest result and it is a null: the explanation everyone reaches for first is the one
+channel that is not carrying anything. \textbf{The prices are not shares and cannot be added up},
+for a reason that is itself a result (\S\ref{sec:withdrawal}).
 
 It also has to be possible to be wrong in public. Section~\ref{sec:withdrawal} retracts a
 quantity this work previously reported --- the fraction of the identity contrast surviving after a
@@ -208,15 +225,21 @@ probing corpus, with named and counted exclusions, ambiguity refused rather than
 threshold that can be tuned to raise the yield. It admits \jdg{nAdmitted} interventions here and
 refuses \jdg{nExclTwoPos}, \jdg{nExclNonCanon} and \jdg{nExclNoOutcome} constructs for three
 stated reasons.
-\item A demonstration that the incumbent readout is exhausted on this corpus and carries a
-researcher degree of freedom worth \jdg{cvSwing}$\times$, measured against the interventional
-readout on the same molecules, the same pairs and the same strata.
+\item \textbf{A ledger of \jdg{chPriced} covariate-choice channels} (\S\ref{sec:ledger}), each
+named by who chose it and priced by a direct contrast with an interval, \jdg{chCarry} carrying the
+number and \jdg{chEmpty} empty --- together with the \jdg{chUnpriced} choosers we can name and
+cannot price. The incumbent readout is one row of it: exhausted on this corpus, carrying a
+researcher degree of freedom worth \jdg{cvSwing}$\times$, and read against the interventional
+readout on the same molecules, pairs and strata it is worth \jdg{cvConvSd} against \jdg{cvIntvSd}
+standard deviations.
 \item Three instrument readouts --- sensitivity, calibration and residual --- with the first two
 established before the third is reported, and a four-level leakage audit of the one predictor that
 could plausibly have memorised these molecules.
-\item The result: a separation between a thermodynamic and a neural predictor on the identity axis
-that the conventional readout cannot express, recomputed by two independently written estimators
-agreeing to \jdg{resAgree}.
+\item The result the ledger's C5 row carries: on the identity axis the three predictors differ
+pairwise, and the separation splits into a decomposition axis worth \jdg{axArch} (\jdg{axArchCi})
+and a training-data axis worth \jdg{axData} (\jdg{axDataCi}), differing by \jdg{axGap}
+(\jdg{axGapCi}) --- a separation the conventional readout cannot express, recomputed by two
+independently written estimators agreeing to \jdg{resAgree}.
 \item \texttt{designaudit}, which performs all of the above on a corpus file and whose selftest
 reproduces this paper's headline numbers from the public data.
 \end{enumerate}
@@ -1289,6 +1312,65 @@ design passes the published selection cutoff, and on the cells where that filter
 \label{fig:audits}
 \end{figure}
 
+
+% =====================================================================
+\subsection{The ledger: who chose the covariate that carries each number}
+\label{sec:ledger}
+
+Every result above is an answer to the same question asked of a different covariate. The corpus was
+not sampled: design programs wrote the molecules, a rule chose which of them were made, experimenters
+chose which pairs to mutate, and the reference against which agreement is scored is itself a model's
+output. In that setting a benchmark number is carried by a covariate \emph{somebody chose}, and the
+work of an instrument is to name each chooser and put a price on the channel. Table~\ref{tab:channels}
+is this paper's ledger. It introduces no new estimate: every price in it is reported and defended in
+the section named beside it, and each was read back from its own run artifact and checked against the
+value this manuscript prints (\jdg{chDrift} disagreements).
+
+\begin{table}[!htbp]
+\centering\small
+\caption{\textbf{The eight channels this instrument priced.} A channel is a covariate somebody
+chose; its price is what the identity readout is worth with that covariate free against held, on
+this corpus. \jdg{chCarry} carry and \jdg{chEmpty} are empty. Prices are in each channel's own
+units and are \emph{not} commensurable --- see the text --- so the table is read down the last
+column, never across it.}
+\label{tab:channels}
+\input{figs/tab_channels}
+\end{table}
+
+\paragraph{What the ledger says.} \jdg{chCarry} of \jdg{chPriced} channels carry the number, and
+one of those (C4) carries it \emph{against} the effect we report rather than with it. Only one row
+is a decomposition and so only one has a residual: C2's attenuation is predicted to within
+\jdg{chEps} by the product of a depth slope and a depth gap estimated on disjoint arms, and the
+rest of it is not accounted for. The three
+empty channels are worth as much as the five that carry, because of which they are. C7 is the
+leakage every reader demands first and it is empty. C8 is the probe chemistry, and it is empty on
+the rank statistic after we retracted a slope comparison that said otherwise. \textbf{And C6 is the
+folding model's own free energy --- the covariate every one of these design programs was
+optimising, the first explanation anyone would offer for the identity effect, and the one channel
+that is empty} (\jdg{resVienna}, \jdg{resViennaCi}; a bound of \jdg{bdVienna} on what could run
+through it). The companion study measures that channel in full and reaches the same place.
+
+\paragraph{Why the last column cannot be added up.} The natural way to present a ledger like this is
+as shares of one total, and that is the one presentation this corpus forbids. A share is a mediated
+fraction, and \S\ref{sec:withdrawal} shows the estimator for it is uninformative here: swept against
+a known truth it moves \jdg{mcNeuralSpanFrac} and \jdg{mcViennaSpanFrac} of the range it is supposed
+to report. \textbf{The prohibition and the thesis are the same fact seen from two heights.} Because
+no common scale survives, each channel is priced by a direct contrast in its own units with an
+interval on the difference that matters, and the ledger is read one row at a time. That is a weaker
+presentation than a decomposition and it is the one the data supports; a table of shares would have
+been more quotable and would have been measuring nothing.
+
+\paragraph{Two choosers this paper names and does not price.} A ledger that claims to name every
+chooser is refused by one it cannot. \emph{First}, the experimenters chose which pairs received a
+compensatory mutant, and nothing in the corpus records why those pairs. Mining them faithfully does
+not make them representative, and no arm here prices that choice; the exhaustive natural-RNA scan of
+\S\ref{sec:second} is attractive for exactly this reason and is too small to carry it.
+\emph{Second}, this model's final pre-training stage consumed pseudo-labels covering its own test
+sequences, so a sequence can have been seen without its experimental label having been seen, and
+C7's audit --- built from deposited measurements --- cannot separate that case from the unseen one.
+Both are stated here, once, and not repeated in \S\ref{sec:limitations}.
+
+% =====================================================================
 \section{Discussion}
 \label{sec:discussion}
 
@@ -1306,13 +1388,12 @@ completed experiment yield an answer it was not designed to give, at no experime
 corresponding limitation is exact and stated in Section~\ref{sec:mining}: the corpus decides what
 can be asked. A field that stops depositing mutant libraries stops supplying this instrument.
 
-\paragraph{Which pairs were probed was somebody's choice.}
-Mining precision is not representativeness. The experimenters chose which pairs to give a
-compensatory mutant, and a criterion that admits those pairs faithfully still inherits their
-selection. This is why every estimate here conditions on the design and why
-Assumption~\ref{ass:placement} is stated rather than assumed silently; it is also why the
-exhaustive scan noted in Section~\ref{sec:second} is scientifically more attractive than its size
-suggests.
+\paragraph{Mining precision is not representativeness.}
+The one chooser this instrument cannot price is the one who decided which pairs would receive a
+compensatory mutant (\S\ref{sec:ledger}), and that is why every estimate here conditions on the
+design rather than assuming Assumption~\ref{ass:placement} silently. It is also why the exhaustive
+scan of \S\ref{sec:second} is scientifically more attractive than its size suggests: a scan that
+enumerates every pair has no such chooser.
 
 \paragraph{Three predictors are three predictors.}
 We evaluated a nearest-neighbour implementation under \jdg{panN} parameter sets, a second model
@@ -1374,12 +1455,13 @@ public depositions surveyed, \jdg{scSkipped} (\jdg{scSkippedPct}) cannot be eval
 because they publish neither construct naming nor per-row sequence annotation
 (\S\ref{sec:mining}). Compensatory flips are not rare; the annotation needed to find them is.
 
-\paragraph{The leakage audit bounds what it can reach.} \jdg{lkTrain} sequences from
-\jdg{lkDeposits} of the neural model's own source libraries were assembled and graded, and the
-licensed statement is \emph{no overlap with the training sources we could obtain}, never \emph{no
-leakage} (\S\ref{sec:leakage}). One tier is outside it and named there. EternaFold is not a clean
-control either: its parameters were fitted to Eterna cloud-lab data and this corpus is an Eterna
-round, so it is innocent of these molecules but not of the design population that produced them.
+\paragraph{The leakage audit bounds what it can reach.} The licensed statement from
+the \jdg{lkTrain} sequences graded in \S\ref{sec:leakage} is \emph{no overlap with the training sources we could obtain},
+never \emph{no leakage}; the tier outside it is priced as unpriceable in \S\ref{sec:ledger} and not
+restated here. What that section does not cover belongs here instead: EternaFold is not a clean
+control either. Its parameters were fitted to Eterna cloud-lab data and this corpus is an Eterna
+round, so it is innocent of these molecules but not of the design population that produced them ---
+which weakens C5's training-data arm specifically, and in the direction of understating it.
 
 \paragraph{An orientation flip cannot deliver every causal quantity.} It preserves the unordered
 pair type, so it does not measure the effect of \emph{being} a C--G rather than an A--U; it
@@ -1437,9 +1519,18 @@ target that costs nothing, is not reported as a baseline anywhere we have found,
 the differences are \jdg{rkDiffNCi}, \jdg{rkDiffVCi} and \jdg{efVsDepthCi}, all covering zero.
 What survives with depth held fixed is real and modest, \jdg{rkPartN} (\jdg{rkPartNCi}).
 
-The instrument is the contribution, and the result that matters most for how it will be used is
-Claim~\ref{claim:depth}: a benchmark that does not report the free baseline will credit a model for
-knowing where a pair sits in its helix. We report ours, and it is not beaten.
+What organises those results is not the instrument but the axis they all lie on. On a corpus this
+one's shape --- written by design programs, filtered by a rule, mutated at pairs somebody picked,
+and scored against a column that is a model's own output --- a benchmark number is carried by a
+covariate somebody chose until it is shown otherwise, and an instrument's job is to name each
+chooser and price the channel. Section~\ref{sec:ledger} does that for \jdg{chPriced} of them.
+\jdg{chCarry} carry the number; \jdg{chEmpty} are empty; \jdg{chUnpriced} choosers we can name and
+cannot price, and we say which. The three empty channels are the ones a reader demands first, and
+the emptiest is the free energy every one of these programs was written to minimise.
+
+The result that matters most for how the instrument will be used is Claim~\ref{claim:depth}, which
+is one row of that ledger: a benchmark that does not report the free baseline will credit a model
+for knowing where a pair sits in its helix. We report ours, and it is not beaten.
 
 
 \bibliographystyle{unsrtnat}

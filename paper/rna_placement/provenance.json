@@ -1,0 +1,63 @@
+{
+  "_why": [
+    "R1 had no provenance.json at all, so audit_manuscript.py's [H] check -- the one that tests a",
+    "manuscript's claim about its own process -- had never run on this paper. It ran on NM and",
+    "found that paper's preregistration sentence to be false. R1's was false in the same way:",
+    "'Nothing below reports a criterion whose declaration is not in that record', while the direct",
+    "contrasts that REPLACED the withdrawn mediated fraction (m21b) and the reproducibility ceiling's",
+    "interval (r1b) are reported in the abstract and in Section 5 and have no frozen declaration.",
+    "Both are legitimate -- they are repairs written after the runs they repair, and a repair cannot",
+    "be preregistered without preregistering its own conclusion -- but the paper has to say so.",
+    "Every artifact either generator reads appears here exactly once, and the audit fails the build",
+    "if this file disagrees with what is on disk."
+  ],
+  "preregistered": {
+    "_rule": "a declaration frozen, committed and pushed before the code that produced it existed",
+    "m13b_gc_placement.json": null,
+    "m13c_symmetric.json": "m13c_pairing_vs_composition_declaration.json",
+    "m14_mutation_intervention.json": null,
+    "m16_rescue.json": null,
+    "m18_repaired_null.json": null,
+    "m20_designer_confounding.json": null,
+    "m21_thermo_mediator.json": null,
+    "m22_review_arms.json": null,
+    "m23_exact_null.json": null,
+    "m24_cross_round.json": null,
+    "m28_second_corpus.json": null,
+    "m29_binder_crossdomain.json": null,
+    "m30_selection_audit.json": null
+  },
+  "survey": {
+    "_rule": "establishes design-side facts BEFORE a declaration can be written, and estimates nothing",
+    "m33_cluster_census.json": "counts what the cluster bootstrap resamples -- targets, design cells and their balance -- so the intervals can be read; no effect is estimated"
+  },
+  "review": {
+    "_rule": "written after the run it checks, because that run needed checking; a review cannot be preregistered without preregistering its own conclusion",
+    "m17d_typeI_diag.json": "the type-I diagnostic that found the permutation null to be too narrow, which is why Prop. 1 exists",
+    "m18v_verify_repair.json": "verifies the repaired randomisation against the joint-covariate permutation it should equal",
+    "m19_m13c_symmetric_repaired.json": "re-runs Cut 2 under the repaired null",
+    "m19_m13d_stability_repaired.json": "re-runs the free-energy caliper sweep under the repaired null",
+    "m19_m15_structure_filter_repaired.json": "re-runs the corpus authors' structure filter under the repaired null",
+    "m21b_direct_contrast.json": "the direct contrasts that REPLACE M21's withdrawn retention figure, written after m26r3 showed the retention estimator uninformative here; reported in the abstract",
+    "m21v_verify.json": "recomputes M21's arm with an independently written estimator",
+    "m26r2_positive_control.json": "the first calibration attempt, kept because its failure mode has a name",
+    "m26r3_realistic_calibration.json": "recalibrates retention at the arm separation this corpus actually has",
+    "m26r4_calibration_symmetry.json": "re-reads m26r3's sweep after the audit found one arm's correlation reported and the other's omitted inside the same withdrawal",
+    "m28r_review.json": "reviews M28's two boundary results before either is written down",
+    "m29r_review.json": "reviews the cross-domain arm's bin sweep before its bound is read",
+    "r1b_ceiling_interval.json": "puts an interval on the reproducibility ceiling, a debt recorded in an earlier review and never paid; written after the ceiling was already in use"
+  },
+  "support": {
+    "_rule": "a supporting or display quantity for a claim already made elsewhere; states no new claim",
+    "m23c_imbalance_bound.json": "the within-caliper residual imbalance behind Eq. (7), which Prop. 1's part (ii) needs and which states no new claim"
+  },
+  "corpus": {
+    "_rule": "released or derived DATA the analysis reads. Not a run: it states no claim, estimates nothing, and there is nothing for it to have declared.",
+    "panel_f1_fresh.json": "population 'sample 2 (main)': the designs, their scores and the shipped predictor panel",
+    "panel_f1_designs.json": "population 'baseline 4560'",
+    "panel_f1_third.json": "population 'sample 3'",
+    "panel_f1_fourth.json": "population 'batch 4'",
+    "panel_f1_fifth.json": "population 'batch 5 (blind)'",
+    "panel_f1_sixth.json": "population 'batch 6 (blind)'"
+  }
+}

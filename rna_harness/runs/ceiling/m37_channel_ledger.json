@@ -1,0 +1,120 @@
+{
+  "_what_this_is": "a ledger of priced covariate-choice channels; estimates nothing",
+  "check1_macro_vs_artifact_drift": [],
+  "check2_identity": {
+    "attenuation_closes": true,
+    "fraction_closes": true,
+    "residual_epsilon": -0.00834
+  },
+  "check3": {
+    "empty_channel_is_empty": true,
+    "n_priced": 8,
+    "n_carrying": 5,
+    "n_unpriced_named": 2
+  },
+  "channels": [
+    {
+      "id": "C1",
+      "who": "the model being scored (its structure IS the reference column)",
+      "paper": "NM",
+      "carries": true,
+      "price": "+0.2400 SD measured against +0.0848 SD read as agreement"
+    },
+    {
+      "id": "C2",
+      "who": "the design programs, through where they put the pair",
+      "paper": "R1",
+      "carries": true,
+      "price": "marginal +0.0250 against matched +0.0539; 71.2% of the gap predicted by beta*g"
+    },
+    {
+      "id": "C3",
+      "who": "whoever wrote the declared target, through helix depth",
+      "paper": "NM",
+      "carries": true,
+      "price": "depth alone +0.3225 against the transformer's +0.3295"
+    },
+    {
+      "id": "C4",
+      "who": "the corpus builder, through the rule that selected the designs",
+      "paper": "NM",
+      "carries": true,
+      "direction": "against",
+      "price": "skill against the selecting score, Spearman -0.2455 [-0.37726, -0.09286]"
+    },
+    {
+      "id": "C5",
+      "who": "the model's authors, through decomposition and through training data",
+      "paper": "NM",
+      "carries": true,
+      "price": "decomposition +0.06624, training data +0.02470"
+    },
+    {
+      "id": "C6",
+      "who": "the objective the design loop was told to optimise (the model's own energy)",
+      "paper": "R1",
+      "carries": false,
+      "price": "retention 101.9%, mediated -1.9% [-10.6, 6.8], placebo z +0.22"
+    },
+    {
+      "id": "C7",
+      "who": "the model's training set, through window overlap",
+      "paper": "NM",
+      "carries": false,
+      "price": "skill slope +0.20692 against +0.21549 on the excised subset"
+    },
+    {
+      "id": "C8",
+      "who": "the probe chemistry the depositors chose",
+      "paper": "NM",
+      "carries": false,
+      "price": "paired rank difference across the two chemistries [-0.0761, 0.2305], covering zero"
+    }
+  ],
+  "unpriced": [
+    {
+      "id": "U1",
+      "who": "the experimenters, through WHICH pairs were given a compensatory mutant",
+      "why": "the corpus supplies the mutants; nothing in it says why those pairs and not others, and no arm of either paper prices it. Named in NM's Discussion and unpriced there."
+    },
+    {
+      "id": "U2",
+      "who": "the released checkpoint's pseudo-label stage",
+      "why": "a sequence can have been seen without its experimental label having been seen; an audit built from deposited measurements cannot separate that case. Named in NM's leakage scopebox and outside C7's reach."
+    }
+  ],
+  "verdict": "ledger_verified_the_unification_is_supported",
+  "log": [
+    "=== M37:通道账本 —— 每个数是被谁选的协变量扛着的 ===\n",
+    "--- 检查 1:账本上的价格 vs 论文实际印出来的宏(对拍)---",
+    "  16 个价格全部与论文印出来的宏一致",
+    "\n--- 检查 2:placement 通道是分解,必须作为恒等式闭合 ---",
+    "  marginal - matched = -0.02896;记录的 observed_attenuation = -0.02896;差 0.00e+00",
+    "  predicted / observed = 0.71202;记录的 mediated_fraction = 0.71210;差 8.34e-05",
+    "  恒等式闭合:True / True;未闭合的残差 eps = -0.00834",
+    "\n--- 检查 3:穷尽性,以及那条空通道是不是真的空 ---",
+    "  C6(模型自己的能量):中介区间含 0 且安慰剂 z 不显著 = True",
+    "  已定价通道 8,其中承载 5,不承载 3",
+    "  **未定价的选择者 2**,必须在论文里点名:",
+    "    U1  the experimenters, through WHICH pairs were given a compensatory mutant",
+    "    U2  the released checkpoint's pseudo-label stage",
+    "\n=== 账本 ===",
+    "  C1  [NM] 承载     the model being scored (its structure IS the reference column)",
+    "        +0.2400 SD measured against +0.0848 SD read as agreement",
+    "  C2  [R1] 承载     the design programs, through where they put the pair",
+    "        marginal +0.0250 against matched +0.0539; 71.2% of the gap predicted by beta*g",
+    "  C3  [NM] 承载     whoever wrote the declared target, through helix depth",
+    "        depth alone +0.3225 against the transformer's +0.3295",
+    "  C4  [NM] 反向承载   the corpus builder, through the rule that selected the designs",
+    "        skill against the selecting score, Spearman -0.2455 [-0.37726, -0.09286]",
+    "  C5  [NM] 承载     the model's authors, through decomposition and through training data",
+    "        decomposition +0.06624, training data +0.02470",
+    "  C6  [R1] 不承载    the objective the design loop was told to optimise (the model's own energy)",
+    "        retention 101.9%, mediated -1.9% [-10.6, 6.8], placebo z +0.22",
+    "  C7  [NM] 不承载    the model's training set, through window overlap",
+    "        skill slope +0.20692 against +0.21549 on the excised subset",
+    "  C8  [NM] 不承载    the probe chemistry the depositors chose",
+    "        paired rank difference across the two chemistries [-0.0761, 0.2305], covering zero",
+    "\n  ledger_verified_the_unification_is_supported"
+  ]
+}
