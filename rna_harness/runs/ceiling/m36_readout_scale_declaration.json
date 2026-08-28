@@ -1,0 +1,44 @@
+{
+  "id": "M36",
+  "title": "What the conventional readout actually is, and whether the two readouts can be subtracted",
+  "frozen_before_code": true,
+  "why": [
+    "Two defects found by reading m25_estimator_benchmark.py against the manuscript.",
+    "",
+    "(1) PROVENANCE. Section 5.1 says three times that the comparator is 'the structure inferred",
+    "from the wild-type profile'. It is not. load_rnet() reads the RNet_structure column of",
+    "OpenKnotBench_data.v4.5.1.csv, which is RibonanzaNet's sequence-to-structure prediction; the",
+    "benchmark file ships no probing-derived structure column at all. So Claim 1 does not show what",
+    "the Introduction sets up (the degeneracy of a profile-constrained fold), and the comparator is",
+    "produced by the SAME model whose contrast is Claim 2's headline. Neither fact is disclosed.",
+    "",
+    "(2) SCALE. paired_diff = R1 - R2 subtracts a contrast in rescue-factor units from a contrast",
+    "in structure-ensemble-frequency units. Its interval is [+0.0024, +0.0638] and barely excludes",
+    "zero. Subtracting two differently-scaled quantities is the exact fault this manuscript retracts",
+    "in its second withdrawbox ('the two slopes were never on one scale')."
+  ],
+  "design": {
+    "records": "m25's arm B: the pairs on which both readouts are defined, rebuilt through m25's own loader and strat()",
+    "estimator": "m25.E4_matched, unchanged",
+    "standardisation": "each contrast divided by the POOLED WITHIN-STRATUM SD of its own column, because the estimator is a within-stratum difference; the marginal SD is reported beside it",
+    "bootstrap": "m25's own design-clustered resample, 2000 draws, both columns on the same draw"
+  },
+  "staked_predictions": [
+    {"id": "P1", "quantity": "raw contrasts reproduced", "predicted": "R1 = +0.0527 and R2 = +0.0198 to < 1e-3"},
+    {"id": "P2", "quantity": "rescue column within-stratum SD", "predicted": "0.20 to 0.35"},
+    {"id": "P3", "quantity": "RNet-frequency column within-stratum SD", "predicted": "0.15 to 0.35"},
+    {"id": "P4", "quantity": "standardised paired difference", "predicted": "positive, and its interval EXCLUDES zero"}
+  ],
+  "probes_that_must_fire": [
+    {"id": "S1", "check": "the column the conventional readout is read from is named in the output, verbatim from the CSV header"},
+    {"id": "S2", "check": "both readouts are defined on identical keys and identical stratum weights (m25's own P4 assertion)"}
+  ],
+  "kill_conditions": [
+    {"id": "K1", "if": "P4 fails -- the standardised paired difference covers zero", "then": "Claim 1's comparison of the two readouts is WITHDRAWN. The manuscript keeps only the saturation statement and the knob statement, both of which are properties of one readout and need no cross-scale subtraction."},
+    {"id": "K2", "if": "either SD falls outside its staked range", "then": "the standardisation is reported with the measured SD and the staked range is recorded as failed; no number is adjusted to fit."}
+  ],
+  "not_at_issue": [
+    "The provenance defect (1) is a factual correction to the prose and needs no experiment. It is repaired whatever this run returns."
+  ],
+  "cost": "offline, $0. Two CSV reads, no model call, no GPU."
+}
