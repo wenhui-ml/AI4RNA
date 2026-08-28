@@ -499,7 +499,7 @@ $t$ within it,
 Depth is capped at three because deeper pairs are sparse (Fig.~\ref{fig:corpus}a) and an uncapped
 stratification would empty most strata of one arm.
 
-\paragraph{The estimator.} Replacing each conditional mean by its sample mean gives
+\paragraph{The estimator.} Replacing each conditional mean in \eqref{eq:estimand} by its sample mean gives
 \begin{equation}
 \hat\alpha \;=\; \frac{\sum_{s\in\mathcal{S}} w_s\,\bigl(\bar R_A(s)-\bar R_B(s)\bigr)}
                         {\sum_{s\in\mathcal{S}} w_s}\,,
@@ -710,11 +710,14 @@ and the design cell is a component of the stratum, so selection status is consta
 Assumption~\ref{ass:placement} it is conditioned out by construction, not by argument.
 
 \emph{Second, the effect is present where the published filter would not have bound.} The cutoff
-is loose --- \jdg{selPoolPass} of the round's \jdg{selNPoolRound} designs clear it --- and
+is loose --- \jdg{selPoolPass} of the round's \jdg{selNPoolRound} designs clear it, and
+\jdg{selPoolPassAll} pooled over all rounds --- and
 \jdg{selNFallback} of the \jdg{selCells} tested designs fail it, carrying \jdg{selNCgauFb} of the
 \jdg{selNCgau} interventions the identity contrast uses. Inside those cells the contrast is
 \jdg{selFbArm} (\jdg{selFbCi}), the same sign as the full-corpus \jdg{selFull}, and the
-passing-minus-failing difference is \jdg{selDiff} (\jdg{selDiffCi}).
+passing-minus-failing difference is \jdg{selDiff} (\jdg{selDiffCi}). The tested designs are
+not concentrated at the cutoff either: their agreement scores have median \jdg{selF1Med} and tenth
+percentile \jdg{selF1PTen}, so the filter is not what makes this corpus what it is.
 
 \emph{Third, measured skill runs against the selection variable rather than with it.} Splitting
 cells at the median tested OpenKnot score \jdg{selMedScore}, the identity contrast is
@@ -846,7 +849,9 @@ nothing could not be shown to be missing anything.
 is a linear map on symmetrised pairwise features of a transformer trained on roughly two million
 chemical-mapping profiles; it contains no nearest-neighbour parameter table, no partition function
 and no ensemble in the thermodynamic sense. Its within-stratum slope is \jdg{skNeural}
-($p=\jdg{skNeuralP}$), higher than the thermodynamic model's, and the two predictors agree with
+($p=\jdg{skNeuralP}$) when scored on the mutant sequence and \jdg{skNeuralWt} when scored on the
+wild type the mutant was derived from --- so most of what it knows about a flip it already knows
+before the flip is made. The mutant-sequence slope is higher than the thermodynamic model's, and the two predictors agree with
 each other only at Pearson \jdg{nnCorrP} and Spearman \jdg{nnCorrS} --- they are not two versions
 of one prediction. Its head scores the target pairs \jdg{nnRatio}$\times$ above randomly chosen
 position pairs (\jdg{nnOnTarget} against \jdg{nnOffTarget}) and its output matrix is symmetric to
@@ -857,7 +862,9 @@ predictor actually varies over the corpus, so the distributions are reported rat
 The thermodynamic probability has median \jdg{dynVMed} and runs \jdg{dynVPTen} to
 \jdg{dynVPNinety} between its tenth and ninetieth percentiles, with \jdg{dynVHi} of interventions
 above $\jdg{dynThrHi}$, \jdg{dynVLo} below $\jdg{dynThrLo}$ and \jdg{dynVMid} in between; the neural score has median
-\jdg{dynNMed}, with \jdg{dynNHi} above $\jdg{dynThrHi}$ and \jdg{dynNLo} below $\jdg{dynThrLo}$. Both predictors spend
+\jdg{dynNMed}, with \jdg{dynNHi} above $\jdg{dynThrHi}$ and \jdg{dynNLo} below $\jdg{dynThrLo}$;
+its tenth and ninetieth percentiles are \jdg{dynNPTen} and \jdg{dynNPNinety}, so eight in ten of
+its outputs lie in the interval the two thresholds bracket only at the extremes. Both predictors spend
 most of the corpus away from their ceilings.
 
 \paragraph{Parameter sets are not the axis that matters.} Repeating the thermodynamic arm under
@@ -880,7 +887,7 @@ Exact whole-construct overlap with our \jdg{lkOurs} sequences is \jdg{lkExact}. 
 window, \jdg{lkGt08} of our sequences reach $\ge0.8$ identity to some training window,
 \jdg{lkGt09} reach $\ge0.9$, and \jdg{lkVerbatim} appear verbatim --- players reuse their own
 designs across rounds, which is neither surprising nor benign. Excising every design cell above
-the \jdg{clThr} threshold removes \jdg{clLeaked} of \jdg{clDesigns} cells and \jdg{clDirty} of
+the \jdg{clThr} threshold removes \jdg{clLeaked} of \jdg{clDesigns} cells (\jdg{clLeakedPct}) and \jdg{clDirty} of
 \jdg{nAdmitted} interventions. On the remaining \jdg{clClean}:
 
 \begin{center}
@@ -957,7 +964,10 @@ from a saturated predictor would say nothing, so the dynamic ranges of \S\ref{se
 the first thing to check against this table. EternaFold is the least saturated of the three ---
 \jdg{efHi} of its values above \jdg{dynThrHi} and \jdg{efLo} below \jdg{dynThrLo}, median
 \jdg{efMed}, against \jdg{dynNHi}/\jdg{dynNLo} for the transformer --- and it returns the
-smallest contrast of the three. Its posterior floor censors \jdg{efCoverage} coverage at the
+smallest contrast of the three. The comparison is licensed rather than assumed: the thermodynamic predictor's identity
+contrast, recomputed end to end through the third model's scoring path, differs from the value
+obtained through the original path by \jdg{efEquiv}, so the three columns are one estimator applied
+to three predictors and not three estimators that resemble one another. Its posterior floor censors \jdg{efCoverage} coverage at the
 mutant, near enough balanced across pair types (\jdg{efCensCg} of C--G against \jdg{efCensAu} of
 A--U) that it cannot manufacture a difference, and dropping every censored record moves the
 estimate to \jdg{efClean} (\jdg{efCleanCi}).
@@ -1000,7 +1010,8 @@ The criterion transfers. It admits \jdg{xnAdmitDms} interventions under one chem
 \jdg{xnAdmitTwoA} under the other, \jdg{xnShared} of them the same molecular events seen twice,
 and it refuses everything it should: a frameshift-element deposit contributes \jdg{xnFseFlips}
 candidate flips and \jdg{xnFseAdmit} usable ones, because its reference profiles carry
-signal-to-noise \jdg{xnFseSnLo} to \jdg{xnFseSnHi} against a cutoff of \jdg{xnSnCut}. A corpus
+signal-to-noise \jdg{xnFseSnLo} to \jdg{xnFseSnHi} against a cutoff of \jdg{xnSnCut}. The
+deposit we do use clears it: its lowest reference signal-to-noise is \jdg{xnSl5SnLo}. A corpus
 whose wild types are poorly measured yields nothing, which is the correct behaviour and not a
 failure of transfer.
 
@@ -1014,9 +1025,10 @@ resolving.
 \begin{withdrawbox}
 \textbf{Retraction, second.} An earlier version of this section reported that the scoring step
 transferred on one probe chemistry and not the other, from raw slopes: \jdg{xnSlopeVDms} against
-\jdg{xnSlopeVTwoA} for the thermodynamic predictor, and \jdg{xnSlopeNDms} against
+\jdg{xnSlopeVTwoA} ($p=\jdg{xnSlopeVTwoAP}$) for the thermodynamic predictor, and \jdg{xnSlopeNDms} against
 \jdg{xnSlopeNTwoA} for the neural one. \textbf{Both comparisons are withdrawn.} The
-outcome's dispersion differs between the two chemistries by a factor of \jdg{xnSdRatio}
+outcome's dispersion differs between the two chemistries by a factor of \jdg{xnSdRatio}, which
+\jdg{xnOutliersDms} extreme DMS records below $-1$ are enough to produce on a column of this size,
 (\jdg{xnSdDms} against \jdg{xnSdTwoA}), so the two slopes were never on one scale. On the rank
 statistic, which no rescaling of either column can move, the probes are indistinguishable: the
 paired difference is \jdg{xnDiffV} for the thermodynamic predictor and \jdg{xnDiffN} for the
@@ -1051,6 +1063,7 @@ within-design rank agreement with rescue & $\rho$ & 95\% CI & cells positive \\
 RibonanzaNet                       & \jdg{rkRhoN} & \jdg{rkRhoNCi} & \jdg{rkPosN} \\
 \textbf{helix depth, free}         & \jdg{rkRhoD} & \jdg{rkRhoDCi} & \jdg{rkPosD} \\
 EternaFold                         & \jdg{efRho}  & \jdg{efRhoCi}  & \jdg{efPos}  \\
+\multicolumn{4}{l}{\footnotesize EternaFold's rank agreement resolves from zero at $p=\jdg{efRhoP}$.} \\
 ViennaRNA                          & \jdg{rkRhoV} & \jdg{rkRhoVCi} & \jdg{rkPosV} \\
 \bottomrule
 \end{tabular}
@@ -1090,7 +1103,10 @@ neural predictor's rank agreement with depth is \jdg{rkDepN} against \jdg{rkRhoN
 outcome, the thermodynamic predictor's is \jdg{rkDepV} against \jdg{rkRhoV}, and EternaFold's is
 \jdg{efDepthRho} against \jdg{efRho} --- differences of \jdg{rkDepGapN}, \jdg{rkDepGapV} and
 \jdg{efDepthGap}. To three decimals, what each predictor knows about which
-flips rescue is what it knows about how deep the pair sits.
+flips rescue is what it knows about how deep the pair sits. The same holds on a decision framing
+rather than a ranking one: at a rescue threshold of \jdg{rkThresh}, with a base rate of
+\jdg{rkBase}, depth alone separates rescued from unrescued flips within cell at AUROC
+\jdg{rkAucD} against the neural predictor's \jdg{rkAucN} (Fig.~\ref{fig:ranking}b).
 
 \paragraph{What survives when depth is held fixed.} Partial rank correlation given depth, with
 nothing fitted and the permutation performed inside (cell, depth) blocks, is \jdg{rkPartN}
@@ -1155,16 +1171,29 @@ measuring on this corpus, and no claim in this paper uses them.
 would report a low value when mediation is genuinely present, and that is testable: hold the
 estimator's machinery fixed, make the mediator the \emph{real} predictor with its real
 distribution and its real binning, synthesise only the outcome so that a known fraction $f$ of the
-contrast runs through the mediator, and read back what the estimator says. Swept over $f$, the
-measured retention correlates with the truth at \jdg{mcNeuralCorr} --- the wrong sign --- and the
-thermodynamic arm returns \jdg{mcViennaFull} when the truth is total mediation. The neural arm
-fails the same way without ever leaving a range that looks reasonable: at $f=0$, no mediation at
-all, it reads \jdg{mcNeuralZero}, and at $f=1$, where every bit of the contrast has been routed
-through the mediator and the answer is zero, it reads \jdg{mcNeuralFull}. A reader given only the
-second number would have read it as we did. The governing
+contrast runs through the mediator, and read back what the estimator says. Swept over $f$ up to \jdg{mcSpanTop}, the truth
+moves \jdg{mcSpanTrue} while the measured retention moves \jdg{mcNeuralSpan} on the neural arm and
+\jdg{mcViennaSpan} on the thermodynamic one --- \jdg{mcNeuralSpanFrac} and \jdg{mcViennaSpanFrac}
+of the range it is supposed to report. The neural arm fails without ever leaving a range that looks
+reasonable: at $f=0$, no mediation at all, it reads \jdg{mcNeuralZero}, and at $f=1$, where every
+bit of the contrast has been routed through the mediator and the answer is zero, it reads
+\jdg{mcNeuralFull}. The thermodynamic arm reads \jdg{mcViennaZero} and \jdg{mcViennaFull} at the
+same two points, so it announces its own failure at one end and is silently wrong at the other. A
+reader given only the first number would have read it as we did. The governing
 quantity is the mediator's separation between the arms, and here it is \jdg{mcSep} pooled standard
 deviations: there was never much for the conditioning to remove, so a value near $100\%$ was close
 to being forced by the design.
+
+The summary we do \emph{not} rest this on is the correlation between truth and measurement across
+the sweep, and the reason is worth stating because the correlation is the summary a reader would
+expect. It is \jdg{mcNeuralCorr} for the neural arm and \jdg{mcViennaCorr} for the thermodynamic
+one, so on that statistic alone the two arms appear to disagree about whether the estimator works,
+with mean absolute errors \jdg{mcNeuralMae} and \jdg{mcViennaMae}. Both correlations are artefacts
+of the single $f=1$ point: dropping it moves them to \jdg{mcNeuralLoo} and \jdg{mcViennaLoo}, and
+the rank correlations, which one point cannot dominate the same way, are \jdg{mcNeuralRho} and
+\jdg{mcViennaRho}. A six-point correlation carried by one point is evidence in neither direction,
+which is why the retraction above is stated on the span --- a statistic that never touches the
+degenerate endpoint.
 
 The quantity being withdrawn is a mediated fraction, and the literature that defines such
 quantities is explicit that they require assumptions this design cannot supply
@@ -1410,6 +1439,7 @@ The contrast keeps its sign where the filter did not bind \quad(\jdg{selFbArm}) 
 The passing-minus-failing difference covers zero \quad(\jdg{selDiffCi}) & correct \\
 Fewer than half of interventions exceed $\jdg{dynThrHi}$ \quad(\jdg{dynVHi}) & correct \\
 Skill does not rise with the neural agreement score \quad(\jdg{selRhoFOneCi}) & correct \\
+\multicolumn{2}{@{}l@{}}{\emph{emitted verdict:} \texttt{\jdg{selVerdict}}}\\
 \midrule
 \multicolumn{2}{@{}l@{}}{\emph{frozen before the ranking arm existed (\S\ref{sec:ranking})}}\\
 Some predictor ranks flips within a design, interval excluding zero & correct \\
@@ -1424,8 +1454,8 @@ Ranking survives the selection and leakage control populations & correct \\
 \end{longtable}}
 
 \noindent The fifth row of the last block is the one worth reading. Its run returned every staked
-prediction satisfied and a verdict supporting the reframe; the verdict was not read, because the
-condition that was supposed to be able to refuse it could not have. The repair --- the paired
+prediction satisfied and emitted the verdict \texttt{\jdg{rkVerdict}}; the verdict was not read,
+because the condition that was supposed to be able to refuse it could not have. The repair --- the paired
 interval, the partial rank correlation given depth, and a tie-breaking ranker that fits nothing
 --- is a separate review artifact, and \S\ref{sec:ranking} reports its numbers rather than the
 original run's verdict.

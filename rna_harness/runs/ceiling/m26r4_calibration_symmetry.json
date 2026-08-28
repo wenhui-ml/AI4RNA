@@ -1,0 +1,109 @@
+{
+  "source": "m26r3_realistic_calibration.json",
+  "arms": {
+    "RibonanzaNet": {
+      "corr": -0.7019,
+      "mae": 0.4743,
+      "spearman": -0.3143,
+      "sign_is_correct": false,
+      "loo": [
+        {
+          "dropped_f": 0.0,
+          "corr": -0.8157
+        },
+        {
+          "dropped_f": 0.1,
+          "corr": -0.6712
+        },
+        {
+          "dropped_f": 0.25,
+          "corr": -0.6823
+        },
+        {
+          "dropped_f": 0.5,
+          "corr": -0.7215
+        },
+        {
+          "dropped_f": 0.75,
+          "corr": -0.84
+        },
+        {
+          "dropped_f": 1.0,
+          "corr": -0.0628
+        }
+      ],
+      "loo_corr_min": -0.84,
+      "loo_corr_max": -0.0628,
+      "loo_sign_flips": false,
+      "corr_without_endpoint": -0.0628,
+      "retention_at_f0": 1.0315,
+      "retention_at_f1": 1.3141,
+      "span_measured_f_le_075": 0.0967,
+      "span_true_f_le_075": 0.75,
+      "span_ratio": 0.1289
+    },
+    "ViennaRNA": {
+      "corr": 0.7026,
+      "mae": 1.7358,
+      "spearman": 0.0286,
+      "sign_is_correct": true,
+      "loo": [
+        {
+          "dropped_f": 0.0,
+          "corr": 0.7295
+        },
+        {
+          "dropped_f": 0.1,
+          "corr": 0.6941
+        },
+        {
+          "dropped_f": 0.25,
+          "corr": 0.6892
+        },
+        {
+          "dropped_f": 0.5,
+          "corr": 0.7368
+        },
+        {
+          "dropped_f": 0.75,
+          "corr": 0.8794
+        },
+        {
+          "dropped_f": 1.0,
+          "corr": -0.7613
+        }
+      ],
+      "loo_corr_min": -0.7613,
+      "loo_corr_max": 0.8794,
+      "loo_sign_flips": true,
+      "corr_without_endpoint": -0.7613,
+      "retention_at_f0": 0.9571,
+      "retention_at_f1": -8.425,
+      "span_measured_f_le_075": 0.2154,
+      "span_true_f_le_075": 0.75,
+      "span_ratio": 0.2872
+    }
+  },
+  "V_correlation_is_produced_by_the_endpoint": true,
+  "both_arms_span_less_than_half_the_truth": true,
+  "verdict": "report_both_arms_the_positive_correlation_is_an_endpoint_artefact",
+  "log": [
+    "=== M26r4:校准汇报的对称性复核 ===",
+    "\n--- RibonanzaNet(宏前缀 calN)",
+    "  corr(真值留存, 实测留存) = -0.7019   符号正确:False",
+    "  秩相关 = -0.3143    平均绝对误差 = 0.4743",
+    "  f=0 实测 +103.2%    f=1 实测 +131.4%",
+    "  留一:-0.8400 .. -0.0628   去掉 f=1 那一点后 -0.0628   留一会翻号:False",
+    "  f<=0.75 段:实测跨度 0.0967 对应真值跨度 0.7500(比 0.129)",
+    "\n--- ViennaRNA(宏前缀 calV)",
+    "  corr(真值留存, 实测留存) = +0.7026   符号正确:True",
+    "  秩相关 = +0.0286    平均绝对误差 = 1.7358",
+    "  f=0 实测 +95.7%    f=1 实测 -842.5%",
+    "  留一:-0.7613 .. +0.8794   去掉 f=1 那一点后 -0.7613   留一会翻号:True",
+    "  f<=0.75 段:实测跨度 0.2154 对应真值跨度 0.7500(比 0.287)",
+    "\n=== 复核裁定 ===",
+    "  ViennaRNA 那个 +0.7026 是不是由 f=1 单点造出来的:True",
+    "  两条臂在 f<=0.75 段的实测跨度都不到真值跨度的一半:True",
+    "  report_both_arms_the_positive_correlation_is_an_endpoint_artefact"
+  ]
+}

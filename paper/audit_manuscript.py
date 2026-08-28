@@ -70,7 +70,11 @@ def main(pdir: str) -> int:
             defs[m.group(1)] = m.group(2)
 
     body = src[src.index("\\begin{document}"):]
-    body_nc = "\n".join(ln.split("%")[0] if not ln.lstrip().startswith("%") else ""
+    # Strip comments, but an ESCAPED percent is text, not a comment. Splitting on a bare "%"
+    # truncated every line containing "5\%" -- and a paper of percentages has many, so macros that
+    # WERE reported were being listed under [B] as never shown. Erring toward keeping text is the
+    # safe direction for [B]; it can only hide a defect in [C]/[F], never invent one.
+    body_nc = "\n".join(re.split(r"(?<!\\)%", ln)[0] if not ln.lstrip().startswith("%") else ""
                         for ln in body.splitlines())
     used = set(re.findall(r"\\jdg\{(\w+)\}", body_nc))
 

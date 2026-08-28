@@ -147,9 +147,10 @@ bin by bin and non-affine, and our own pre-registered verdict had silently picke
 Which one is readable is then settled empirically, not by argument. We inject a \emph{known}
 mediated fraction into the real mediator --- real distribution, real correlation with the design
 cells, real binning --- leaving only the outcome synthetic, and read back what the estimator
-reports. Across \jdg{calSweep} the conditioning estimator correlates with the truth at
-\jdg{calNCorr} for one predictor, the wrong sign, and returns \jdg{calVFull} for the other when
-the truth is total mediation. The published guidance would not have stopped us: our standardised
+reports. Across \jdg{calSweep} the truth moves \jdg{calSpanTrue} while the
+conditioning estimator's reading moves \jdg{calNSpan} and \jdg{calVSpan} --- \jdg{calNSpanFrac} and
+\jdg{calVSpanFrac} of the range --- and at total mediation it returns \jdg{calNFull} and
+\jdg{calVFull}. The published guidance would not have stopped us: our standardised
 total effect is \jdg{calStdC} against a recommended floor of \jdg{calStdCThr}, on
 $n=\jdg{dN}\gg\jdg{calNThr}$. What actually governs is a quantity that guidance does not mention
 --- the mediator separates the arms by \jdg{posSepReal} pooled standard deviations.
@@ -274,8 +275,8 @@ mean of the outcome in the mediator is affine. We measure it bin by bin
 Knowing which route is wrong is not the same as knowing whether either is readable, and that is
 settled by calibration rather than by argument (\S\ref{sec:cal}). Injecting a \emph{known}
 mediated fraction into the real mediator, leaving only the outcome synthetic, the conditioning
-estimator tracks the truth at $\jdg{calNCorr}$ --- the wrong sign --- and returns $\jdg{calVFull}$
-for the second predictor when the truth is total mediation. Every retention figure and mediated
+estimator's reading spans $\jdg{calNSpanFrac}$ and $\jdg{calVSpanFrac}$ of the range the truth
+spans, and at total mediation returns $\jdg{calNFull}$ and $\jdg{calVFull}$. Every retention figure and mediated
 fraction in earlier versions of this work is withdrawn. What replaces them is a pair of bounds:
 the local energy differs between the pair types by $\jdg{dDg}$\,kcal/mol ($\jdg{dDgCi}$) and the
 ensemble probability by $\jdg{dPm}$ ($\jdg{dPmCi}$, covering zero), bounding their contributions
@@ -305,7 +306,7 @@ design of this kind.
 \centering
 \input{figs/fig0_arch}
 \caption{\textbf{Where each result sits and what it feeds.} The top band is the corpus and its two
-readouts; the middle band is what \S\ref{sec:exp} estimates --- the pair-type effect and the two
+readouts; the middle band is what \S\ref{sec:results} estimates --- the pair-type effect and the two
 mediators put to it, one taken from the folding model and one from the designers; the bottom band
 is what \S\ref{sec:analysis} composes those estimates into. Blue marks the path on which no folding
 predictor is ever called: the benchmark's own design score enters only in \S\ref{sec:score}, and
@@ -329,8 +330,9 @@ and section pointers only.}
   ($\jdg{eBinwise}$).
 \item \textbf{A constructive calibration for an estimator, and the demonstration that published
   guidance does not substitute for it} (\S\ref{sec:cal}). Inject a known mediated fraction into
-  the real mediator and read back what the estimator says: across $\jdg{calSweep}$ it correlates
-  with the truth at $\jdg{calNCorr}$, and returns $\jdg{calVFull}$ at total mediation. Our
+  the real mediator and read back what the estimator says: across $\jdg{calSweep}$ its reading
+  covers $\jdg{calNSpanFrac}$ and $\jdg{calVSpanFrac}$ of the range the truth covers, and at total
+  mediation it returns $\jdg{calNFull}$ and $\jdg{calVFull}$. Our
   standardised total effect is $\jdg{calStdC}$ against a recommended floor of $\jdg{calStdCThr}$
   and $n=\jdg{dN}$ against $\jdg{calNThr}$, so the guidance passes us. The quantity that governs
   is not in the guidance: the mediator separates the arms by $\jdg{posSepReal}$ pooled SD.
@@ -419,7 +421,12 @@ a terminal A--U a penalty a terminal G--C does not carry, and helix ends are fur
 dangling ends and coaxial stacking \citep{serra1995predicting,walter1994coaxial}. An identity
 effect that lives at helix ends is therefore exactly what stacking thermodynamics predicts, and it
 is also what a placement rule would produce. \S\ref{sec:qualitative} treats the two as rival
-explanations of the same coefficient and reports what separates them and what does not.
+explanations of the same coefficient and reports what separates them and what does not. The
+decomposition itself is not tied to measured thermodynamics: the same nearest-neighbour form can be
+fitted to data instead, by discriminative training \citep{do2006contrafold} or by constrained
+optimisation against known structures \citep{andronescu2007efficient}, which is why
+\S\ref{sec:energy} treats $\Delta G_{\mathrm{loc}}$ as \emph{this model's} energy rather than as
+the energy.
 
 \paragraph{Matched designs, randomisation, mediation.} The estimand is a potential-outcome contrast
 under a treatment nobody assigned \citep{rubin1974estimating,cochran1965planning,imbens2015causal},
@@ -450,6 +457,7 @@ the corpus cannot support.
 \label{sec:method}
 
 \subsection{Quantities}
+\label{sec:quantities}
 
 \begin{definition}[Rescue factor]
 \label{def:rf}
@@ -547,6 +555,7 @@ and the estimator is the pair-weighted mean of $y_u-y_v$ over $M$. No model prod
 \end{definition}
 
 \subsection{Inference: the randomisation must hold the design fixed}
+\label{sec:inference}
 
 \begin{proposition}[Design-fixed randomisation]
 \label{prop:null}
@@ -631,6 +640,7 @@ a coincidence.}
 \end{figure}
 
 \subsection{The decomposition}
+\label{sec:decomp}
 
 \begin{proposition}[Placement accounts for the attenuation]
 \label{prop:med}
@@ -723,6 +733,7 @@ only one that can be computed. The practical rule we follow is to report $h$ bin
 use the product route only where it is affine to within the reported precision.
 
 \subsection{Calibration and preregistration}
+\label{sec:cal2}
 
 \begin{definition}[Ladder]
 \label{def:ladder}
@@ -738,10 +749,12 @@ in the declaration's own wording including where the prediction failed
 \citep{simmons2011falsepositive,nosek2018preregistration}. Appendix~\ref{app:prereg} is the record.
 
 % =====================================================================
-\section{Experiments}
-\label{sec:exp}
+\section{Experimental setup}
+\label{sec:setup}
 
-\paragraph{Corpus.} A deployed chemical-probing benchmark of designed RNAs, with a compensatory
+\subsection{Corpus}
+\label{sec:corpus}
+ A deployed chemical-probing benchmark of designed RNAs, with a compensatory
 mutagenesis arm covering twenty targets and nine design methods, and a design-score arm covering
 six populations across three context sizes. The analysable pair set is $\jdg{nPairsTotal}$ target
 pairs: $\jdg{nCG}$ G--C, $\jdg{nAU}$ A--U and $\jdg{nGU}$ G--U. Ensemble quantities used only as
@@ -749,7 +762,10 @@ balancing covariates in \S\ref{sec:score} are computed with ViennaRNA \citep{lor
 which is also the source of the per-pair nearest-neighbour energies of Definition~\ref{def:dg};
 those enter as a \emph{mediator} in \S\ref{sec:energy}, never as an outcome.
 
-\paragraph{The covariate distribution has two producers, not one.} This paper's premise is that
+\subsection{The covariate distribution has two producers, not one}
+\label{sec:twoproducers}
+
+This paper's premise is that
 the covariates were arranged by a design algorithm rather than by nature. That is incomplete. The
 constructs were also \emph{selected}: the releasing repository states that one design per target
 per method was taken forward, the highest-scoring among those whose neural agreement with the
@@ -761,11 +777,32 @@ disagreements eligible designs existed and were passed over. The operative rule 
 published cutoff outright. A companion study reports this in full; two consequences are load
 bearing here and are stated rather than deferred. First, selection acts on the design cell, which
 is a component of every stratum in this paper, so selection status is constant in \jdg{selNStrata}
-of \jdg{selNStrata} strata --- the same conditioning that removes placement removes it too.
+of \jdg{selNStrata} strata: \jdg{selStrataMixed} strata are mixed on it. The same conditioning that
+removes placement removes it too.
 Second, it runs \emph{against} the effects reported below rather than with them: cell-level
 predictive skill and the score that did the selecting are rank-correlated at \jdg{selRhoRank}
 (\jdg{selRhoRankCi}). A corpus assembled by an algorithm and then filtered on a measurement is a
 harder case than the one this paper set out to analyse, not an easier one.
+
+\subsection{Preregistration protocol}
+\label{sec:preregprotocol}
+
+Every criterion graded in \S\ref{sec:results} was frozen before the analysis code that grades it
+existed, in the sense made operational in \S\ref{sec:cal2}: a JSON declaration naming the
+statistic, the gate, the ladder of Def.~\ref{def:ladder} and a staked numerical prediction, then
+committed and pushed. Nothing below reports a criterion whose declaration is not in that record,
+and where a stake failed the failure is reported in the declaration's own wording rather than
+rephrased. Appendix~\ref{app:prereg} lists every declaration, its commit and its verdict.
+
+Three conventions run through every arm and are stated once here rather than repeated. All
+estimators are computed after centring within $(\text{target},\text{method})$, so the two
+between-cell variance layers of \S\ref{sec:frame} are removed by construction rather than adjusted
+for. All permutation tests shuffle \emph{within} stratum, never across, for the reason given in
+\S\ref{sec:inference}. All intervals resample targets rather than pairs, so every interval below
+rests on the target count and not on the pair count.
+
+\section{Results}
+\label{sec:results}
 
 \paragraph{Order of the arms.} \S\ref{sec:frame} fixes the scale a point is read on.
 \S\ref{sec:pairtype} estimates the effect. \S\ref{sec:energy} puts the folding model's own energy
@@ -807,10 +844,13 @@ outside them. \emph{A design-score point is therefore worth $1/\jdg{ceilWithinSd
 \label{sec:pairtype}
 
 \begin{claimbox}
-Matched by Def.~\ref{def:contrast}, a target G--C pair is rescued $\jdg{rescueAU}$ above a matched
+Matched by Def.~\ref{def:contrast} on the strata of Def.~\ref{def:depth}, with the outcome of
+Def.~\ref{def:rf} and the weighting of \eqref{eq:contrast}, a target G--C pair is rescued $\jdg{rescueAU}$ above a matched
 A--U pair (permutation $p=\jdg{rescueAUP}$, cluster interval $\jdg{rescueAUCi}$, $\jdg{rescueAUW}$
 pair-weights over $\jdg{rescueAUStrata}$ strata) and $\jdg{rescueGU}$ above a matched G--U pair
-($p=\jdg{rescueGUP}$, $\jdg{rescueGUCi}$). Leave-one-target-out moves the first to
+($p=\jdg{rescueGUP}$, $\jdg{rescueGUCi}$, $\jdg{rescueGUW}$ pair-weights over
+$\jdg{rescueGUStrata}$ strata, width-matched noise firing $\jdg{rescueGUNoise}$ times).
+Leave-one-target-out moves the first to
 $\jdg{rescueAULoo}$ and the second to $\jdg{rescueGULoo}$; width-matched pure noise fires
 $\jdg{rescueAUNoise}$ times. The ladder returns $\jdg{rescueAUDelta0}$ at $\delta=0$ and clears the
 observed effects by $\jdg{rescueAUMargin}\times$ and $\jdg{rescueGUMargin}\times$.
@@ -843,7 +883,8 @@ what Prop.~\ref{prop:null} requires. Overlap is real but not free
 (Fig.~\ref{fig:energy}, left): G--C pairs average $\jdg{eDgCG}$\,kcal/mol against $\jdg{eDgAU}$ for
 A--U and $\jdg{eDgGU}$ for G--U, and the most stable bin holds $\jdg{eBinsCG}$ G--C pairs against
 $\jdg{eBinsAU}$ A--U ones by bin. The estimate therefore lives where a G--C pair with an unusually
-weak stacking context meets an A--U pair with an unusually strong one, on $\jdg{eW}$ pair-weights
+weak stacking context meets an A--U pair with an unusually strong one, on $\jdg{eW}$ of
+$\jdg{eWBase}$ pair-weights
 over $\jdg{eStrata}$ strata --- and the price is visible in the calibration ladder, whose detection
 threshold moves from $\jdg{rescueAULad}$ to $\jdg{eLad}$.
 
@@ -882,11 +923,15 @@ separates them by $\jdg{dDg}$\,kcal/mol (\jdg{dDgCi}, $p=\jdg{dDgP}$), a tight i
 zero; and the same model's ensemble probability that the pair forms separates them by $\jdg{dPm}$
 (\jdg{dPmCi}, $p=\jdg{dPmP}$), which does not resolve from zero. \textbf{The model's pipeline
 absorbs a $|\jdg{dDg}|$\,kcal/mol local energy difference into a probability difference too small
-to detect.} Their product-route bounds are $\jdg{dDgBound}$ and $\jdg{dPmBound}$ --- upper limits
-only, for the reason in the box above --- a factor of $\jdg{dBoundRatio}$ apart.
+to detect.} Each bound is that arm's contrast times its own within-stratum slope of the outcome on the
+mediator, divided by the total: those slopes are $\jdg{dDgSlope}$ per kcal/mol and
+$\jdg{dPmSlope}$ per unit probability, giving bounds of $\jdg{dDgBound}$ and $\jdg{dPmBound}$ ---
+upper limits only, for the reason in the box above --- a factor of $\jdg{dBoundRatio}$ apart.
 \end{claimbox}
 
-\paragraph{Why the placebo is the whole experiment.} Adding any stratifying dimension shrinks a
+\paragraph{Why the placebo is the whole experiment.} Appendix~\ref{app:traps} states the two
+traps of this subsection as rules that apply to any stratified mediation analysis. Adding any
+stratifying dimension shrinks a
 matched contrast, because it drops records that no longer have a counterpart. The placebo shrinks
 it by exactly that mechanical amount and by nothing else, so the only interpretable quantity here
 is the difference between the two shrinkages. It is $\jdg{eZ}$ standard deviations, which is to
@@ -1007,19 +1052,37 @@ outcome is synthetic,
 Y \;=\; \gamma\,M_{\text{real}} \;+\; \delta\,\mathbf 1[\text{G--C}] \;+\;
 \mathcal N(0,\sigma^2),\qquad \sigma=\jdg{calOutSd},
 \]
-with $\gamma$ and $\delta$ set so the total stratified contrast equals the corpus's own
-$\jdg{calTotal}$ and a known fraction $f$ of it runs through the mediator. Sweeping $f$ over
+with $\gamma=f\,\text{total}/\alpha$ and $\delta=(1-f)\,\text{total}$ set so the total
+stratified contrast equals the corpus's own $\jdg{calTotal}$ and a known fraction $f$ of it runs
+through the mediator. Here $\alpha$ is the mediator's \emph{own} stratified contrast between the
+arms --- $\jdg{calNAlpha}$ for the first predictor and $\jdg{calVAlpha}$ for the second --- and its
+smallness is the design's ceiling rather than an artefact of the sweep: with $\alpha$ this small,
+$\gamma$ has to become implausibly large before $f$ approaches one. Sweeping $f$ over
 $\jdg{calSweep}$ says what a measured retention means here.
 
 \begin{claimbox}
-\textbf{The conditioning estimator does not track the truth on this corpus.} Across the sweep it
-correlates with the true mediated fraction at $\jdg{calNCorr}$ for the first mediator --- the
-wrong sign --- with mean absolute error $\jdg{calNMae}$; for the second the error is
-$\jdg{calVMae}$ and at $f=100\%$ it returns $\jdg{calVFull}$. At $f=0$ it returns
-$\jdg{calNZero}$ and $\jdg{calVZero}$, so it is not that the estimator is biased by a constant:
+\textbf{The conditioning estimator does not track the truth on this corpus.} Over
+$f\in[0,\jdg{calSpanTop}]$ the truth moves $\jdg{calSpanTrue}$ while the measured retention moves
+$\jdg{calNSpan}$ for the first mediator and $\jdg{calVSpan}$ for the second --- $\jdg{calNSpanFrac}$
+and $\jdg{calVSpanFrac}$ of the range it is supposed to cover. Mean absolute error is
+$\jdg{calNMae}$ and $\jdg{calVMae}$. At $f=0$ it returns $\jdg{calNZero}$ and $\jdg{calVZero}$ and
+at $f=100\%$ it returns $\jdg{calNFull}$ and $\jdg{calVFull}$, so it is not biased by a constant:
 it is uninformative about $f$ over the whole range. \textbf{Every retention figure and mediated
 fraction in earlier versions of this work is withdrawn.}
 \end{claimbox}
+
+\paragraph{Why that is stated as a range and not as a correlation.} The natural summary of a
+calibration sweep is the correlation between truth and measurement, and we report it, but it
+cannot carry the claim and we say so rather than quoting whichever arm is convenient. The two
+mediators give $\jdg{calNCorr}$ and $\jdg{calVCorr}$: the first has the wrong sign, the second the
+right one. Both are artefacts of a single sweep point. Dropping $f=100\%$ --- the one place where
+the estimator degenerates, returning $\jdg{calVFull}$ --- moves them to $\jdg{calNLoo}$ and
+$\jdg{calVLoo}$, so the second changes sign; across all six leave-one-out fits the first ranges
+over $[\jdg{calNLooLo},\,\jdg{calNLooHi}]$ and the second over
+$[\jdg{calVLooLo},\,\jdg{calVLooHi}]$. Rank correlations, which one point cannot dominate the same
+way, are $\jdg{calNRho}$ and $\jdg{calVRho}$. A six-point correlation produced by one point is not
+evidence in either direction, which is why the claim above is made on the span --- a statement that
+does not use the degenerate endpoint at all.
 
 \paragraph{Two reasons this was invisible from inside the analysis.} First, the placebo mediator
 --- which the method requires and which we ran --- controls the mechanical shrinkage that any
@@ -1033,7 +1096,9 @@ the data.
 \paragraph{The published guidance would not have stopped us.} The instability of ratio-form
 mediation measures when the total effect is small is documented, with the operational advice to
 compute them only when the standardised total effect reaches about $\jdg{calStdCThr}$ and the
-sample exceeds $\jdg{calNThr}$ \citep{preacher2011effect,mackinnon2007mediation}. Our standardised
+sample exceeds $\jdg{calNThr}$ \citep{preacher2011effect,mackinnon2007mediation}; simulation studies
+of the competing ratio-form measures reach the same place from the other direction, finding all of
+them poorly behaved once the total effect is small \citep{miocevic2018statistical}. Our standardised
 total effect is $\jdg{calStdC}$ and $n=\jdg{dN}$. \textbf{We clear both thresholds and the
 estimator is still unreadable}, because the quantity that governs is not the standardised total
 effect but the mediator's separation between arms, which the guidance does not mention and which
@@ -1075,7 +1140,8 @@ The premise transfers first, which is why the rest is readable: the method a bin
 explains $\eta^2=\jdg{xdEta}$ of the mediator within a target (\jdg{xdEtaLo} to \jdg{xdEtaHi}
 across the three), the same producer-preference structure this paper documents for RNA. On that
 corpus the marginal contrast is \jdg{xdMarg} ($p=\jdg{xdMargP}$) and the matched one
-\jdg{xdMatched}, and the two mediation routes give \jdg{xdStrat} and \jdg{xdProd}.
+\jdg{xdMatched}, and the two mediation routes give \jdg{xdStrat} and \jdg{xdProd}. The bound of Prop.~\ref{prop:routes}
+\jdg{xdBound} here.
 
 \paragraph{We staked that the routes would differ by at least five points, and they differ by
 \jdg{xdGapPts}.} Read alone that is a failed prediction, and Table~\ref{tab:prereg} records it
@@ -1089,12 +1155,12 @@ correspondingly larger $d_{\mathrm{TV}}$ --- computed by the same function, in t
 the same estimator. It does.
 
 \begin{center}
-\begin{tabular}{lccccc}
+\begin{tabular}{lcccccc}
 \toprule
-corpus & $n$ & $d_{\mathrm{TV}}$ & $\mathrm{osc}(r)$ & route gap (pts) & $|$gap$|/$bound \\
+corpus & $n$ & $d_{\mathrm{TV}}$ & $\mathrm{osc}(r)$ & bound $\mathrm{osc}(r)\,d_{\mathrm{TV}}$ & route gap (pts) & $|$gap$|/$bound \\
 \midrule
-protein binders & \jdg{xdBN} & \jdg{xdBDtv} & \jdg{xdBOsc} & \jdg{xdBGap} & \jdg{xdBTight} \\
-RNA designs     & \jdg{xdRN} & \jdg{xdRDtv} & \jdg{xdROsc} & \jdg{xdRGap} & \jdg{xdRTight} \\
+protein binders & \jdg{xdBN} & \jdg{xdBDtv} & \jdg{xdBOsc} & \jdg{xdBRhs} & \jdg{xdBGap} & \jdg{xdBTight} \\
+RNA designs     & \jdg{xdRN} & \jdg{xdRDtv} & \jdg{xdROsc} & \jdg{xdRRhs} & \jdg{xdRGap} & \jdg{xdRTight} \\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -1190,16 +1256,16 @@ Prop.~\ref{prop:null}; the cluster bootstrap interval is beside it. Balance is t
 mean difference on global GC \citep{austin2011introduction}. Two populations do not clear
 $p\le0.005$ and their $p$ is printed.}
 \label{tab:score}
-\begin{tabular}{@{}lrrrrrr@{}}
+\begin{tabular}{@{}lrrrrrrr@{}}
 \toprule
-population & effect & 95\% CI & $z$ & $p$ & pairs & SMD \\
+population & effect & 95\% CI & $z$ & $p$ & pairs & SMD & SMD $p$ \\
 \midrule
-sample 2 (main) & $\jdg{cpop0Eff}$ & $\jdg{cpop0Ci}$ & $\jdg{cpop0Z}$ & $\jdg{cpop0P}$ & $\jdg{cpop0N}$ & $\jdg{cpop0Smd}$ \\
-baseline 4560   & $\jdg{cpop1Eff}$ & $\jdg{cpop1Ci}$ & $\jdg{cpop1Z}$ & $\jdg{cpop1P}$ & $\jdg{cpop1N}$ & $\jdg{cpop1Smd}$ \\
-sample 3        & $\jdg{cpop2Eff}$ & $\jdg{cpop2Ci}$ & $\jdg{cpop2Z}$ & $\jdg{cpop2P}$ & $\jdg{cpop2N}$ & $\jdg{cpop2Smd}$ \\
-batch 4         & $\jdg{cpop3Eff}$ & $\jdg{cpop3Ci}$ & $\jdg{cpop3Z}$ & $\jdg{cpop3P}$ & $\jdg{cpop3N}$ & $\jdg{cpop3Smd}$ \\
-batch 5 (blind) & $\jdg{cpop4Eff}$ & $\jdg{cpop4Ci}$ & $\jdg{cpop4Z}$ & $\jdg{cpop4P}$ & $\jdg{cpop4N}$ & $\jdg{cpop4Smd}$ \\
-batch 6 (blind) & $\jdg{cpop5Eff}$ & $\jdg{cpop5Ci}$ & $\jdg{cpop5Z}$ & $\jdg{cpop5P}$ & $\jdg{cpop5N}$ & $\jdg{cpop5Smd}$ \\
+sample 2 (main) & $\jdg{cpop0Eff}$ & $\jdg{cpop0Ci}$ & $\jdg{cpop0Z}$ & $\jdg{cpop0P}$ & $\jdg{cpop0N}$ & $\jdg{cpop0Smd}$ & $\jdg{cpop0SmdP}$ \\
+baseline 4560   & $\jdg{cpop1Eff}$ & $\jdg{cpop1Ci}$ & $\jdg{cpop1Z}$ & $\jdg{cpop1P}$ & $\jdg{cpop1N}$ & $\jdg{cpop1Smd}$ & $\jdg{cpop1SmdP}$ \\
+sample 3        & $\jdg{cpop2Eff}$ & $\jdg{cpop2Ci}$ & $\jdg{cpop2Z}$ & $\jdg{cpop2P}$ & $\jdg{cpop2N}$ & $\jdg{cpop2Smd}$ & $\jdg{cpop2SmdP}$ \\
+batch 4         & $\jdg{cpop3Eff}$ & $\jdg{cpop3Ci}$ & $\jdg{cpop3Z}$ & $\jdg{cpop3P}$ & $\jdg{cpop3N}$ & $\jdg{cpop3Smd}$ & $\jdg{cpop3SmdP}$ \\
+batch 5 (blind) & $\jdg{cpop4Eff}$ & $\jdg{cpop4Ci}$ & $\jdg{cpop4Z}$ & $\jdg{cpop4P}$ & $\jdg{cpop4N}$ & $\jdg{cpop4Smd}$ & $\jdg{cpop4SmdP}$ \\
+batch 6 (blind) & $\jdg{cpop5Eff}$ & $\jdg{cpop5Ci}$ & $\jdg{cpop5Z}$ & $\jdg{cpop5P}$ & $\jdg{cpop5N}$ & $\jdg{cpop5Smd}$ & $\jdg{cpop5SmdP}$ \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1224,7 +1290,7 @@ corpus authors' own structure filter.
 
 \noindent \textbf{Three cuts against a probing-chemistry explanation}, each failing differently
 under it; Appendix~\ref{app:cuts} carries them in full. A \emph{circular shift} of the target's
-paired-position set, preserving size and run structure and destroying alignment, returns
+paired-position set, \jdg{sShiftExpr}, preserving size and run structure and destroying alignment, returns
 $\jdg{p4Lo}$ to $\jdg{p4Hi}$ and passes on $\jdg{p4Pass}$ of $\jdg{c5N}$ populations. A blind
 \emph{pairing-against-composition} contrast favours pairing at every stringency, $\jdg{d2PLo}$ to
 $\jdg{d2PHi}$ populations against $\jdg{d2CLo}$ to $\jdg{d2CHi}$, with registered primary slopes of
@@ -1255,11 +1321,12 @@ the null of permuting method labels within target. Nothing in this figure involv
 \textbf{Reported at the strength it has.} The method component is $\jdg{gMethComp}$ against a null
 of $\jdg{gNullMean}\pm\jdg{gNullSd}$, $z=\jdg{gZ}$, $p=\jdg{gP}$ on $\jdg{gCells}$
 (method,\,target) cells; the human-designed arm is at rank $\jdg{gHumanRank}$ of $\jdg{gNMethods}$,
-which was the registered prediction; and the cross-method slope of observed attenuation on
-predicted is $\jdg{gSlope}$, permutation $p=\jdg{gSlopeP}$ at $n=\jdg{gSlopeN}$. \emph{None clears
+which was the registered prediction (Appendix~\ref{app:gradient} gives every method's row); and
+the cross-method slope of observed attenuation on predicted is $\jdg{gSlope}$, permutation $p=\jdg{gSlopeP}$ at $n=\jdg{gSlopeN}$. \emph{None clears
 a $0.005$ bar alone, and the instrument says why}: the observed spread $\jdg{gSpread}$ falls
-between ladder rungs where detection is $\jdg{gLadLo}$ and $\jdg{gLadHi}$, so this arm sits at its
-own detection edge for the effect present. A larger design pool, not a different analysis, is what
+between ladder rungs where detection is $\jdg{gLadLo}$ and $\jdg{gLadHi}$ --- the $\delta=0$ rung
+returns $\jdg{gLadZero}$ and width-matched noise fires $\jdg{gNoise}$ times, so the edge is one of
+power and not of calibration --- so this arm sits at its own detection edge for the effect present. A larger design pool, not a different analysis, is what
 would settle it.
 \end{claimbox}
 
@@ -1418,40 +1485,48 @@ and an objective can and cannot carry; neither is a claim about any particular m
 none.
 
 % =====================================================================
-\section{Limitations and conclusion}
+\section{Limitations}
 \label{sec:limits}
 
-\textbf{(i) One corpus, four rounds.} The placement structure is now measured on
+
+\paragraph{(i) One corpus, four rounds.} The placement structure is now measured on
 $\jdg{xrRounds}$ rounds with disjoint targets (\S\ref{sec:rounds}) and the formation results on
 one. All four rounds come from the same laboratory, platform and player community, so what
 replicates is the target set and the method mix, not the ecology. The sharpest untried test follows
 from the mechanism itself: \emph{a corpus nobody designed should not carry the placement
 structure.} Homologous natural sequences with a probing readout would decide it, and none is
-present in this release. \textbf{(ii) Interventional at the mutation, observational at the
-property.} The rescue readout is produced by an intervention --- a compensatory double substitution
+present in this release. 
+\paragraph{(ii) Interventional at the mutation, observational at the property.} The rescue readout is produced by an intervention --- a compensatory double substitution
 performed at the bench --- and that is what licenses a formation claim about an individual pair.
 We did not choose which pairs were mutated, and the exposure whose effect we estimate, the identity
 of the target pair, was assigned by a designer. \S\ref{sec:gradient} does not randomise methods.
-\textbf{(iii) No sequence was synthesised to any rule proposed here.} The experiment that would
+
+\paragraph{(iii) No sequence was synthesised to any rule proposed here.} The experiment that would
 close the loop is specific and we state it rather than gesture at it: build matched sequence pairs
 that hold $\Delta G_{\mathrm{loc}}$ fixed while swapping pair identity --- Fig.~\ref{fig:energy}
 (left) shows the overlap region where such pairs exist --- and measure rescue on them. That
 converts \S\ref{sec:energy} from a stratified estimate on an existing corpus into a construction,
 and it is the one addition that would let the mechanism question of \S\ref{sec:qualitative} be
-asked at all. \textbf{(iv) Good designs only.} The compensatory arm measured the best-scoring
+asked at all. 
+\paragraph{(iv) Good designs only.} The compensatory arm measured the best-scoring
 design per (target,\,method) cell, so the corpus is pre-filtered by the design programs. The
 per-method decomposition bounds the objection on the axis it runs on --- $\jdg{sNPos}$ of
 $\jdg{sNMeth}$ methods positive, no ordering with placement strength --- but does not remove it,
-because no method submitted a poor design. \textbf{(v) The bounds are bounds.} $\jdg{dDgBound}$ and $\jdg{dPmBound}$ come from the product
+because no method submitted a poor design. 
+\paragraph{(v) The bounds are bounds.} $\jdg{dDgBound}$ and $\jdg{dPmBound}$ come from the product
 route, which Proposition~\ref{prop:routes} licenses only where the conditional mean is affine.
 It is not, as measured. They are therefore upper limits on what each quantity could carry, not
 estimates of what it does, and the statement that survives is the comparison between them rather
 than either number alone.
-\textbf{(vi) Prior art.} GC placement as a design heuristic predates this work
+
+\paragraph{(vi) Prior art.} GC placement as a design heuristic predates this work
 \citep{lee2014eterna}; what is measured here is its effect on pair formation and on the measurement
 itself.
 
-\paragraph{Conclusion.} Whether a designed base pair forms depends on what the pair is, measurably
+\section{Conclusion}
+\label{sec:conclusion}
+
+Whether a designed base pair forms depends on what the pair is, measurably
 and by intervention rather than by a predictor's opinion: matched on placement, a G--C target pair
 is recovered $\jdg{rescueAU}$ more than an A--U pair and $\jdg{rescueGU}$ more than a G--U pair.
 How much of that runs through the free energy the designs were optimised for is a question we can
@@ -1503,7 +1578,8 @@ $\ge \jdg{doseLo2}$               & $\jdg{doseN2}$ & $\jdg{doseEff2}$ \\
 pairs buy, balancing the target's folding free energy would remove it. Sweeping that caliper from
 $\jdg{dgLooseCal}$ down to $\jdg{dgTightCal}$ kcal/mol moves the main population's effect from
 $\jdg{dgLooseEff}$ ($p=\jdg{dgLooseP}$) to $\jdg{dgTightEff}$ ($p=\jdg{dgTightP}$), retaining
-$\jdg{dgRetain}$ of the unbalanced $\jdg{dgBase}$. \emph{Free energy is a mediator here rather
+$\jdg{dgRetain}$ of the unbalanced $\jdg{dgBase}$, against a within-cell spread of
+$\jdg{dgSd}$\,kcal/mol in the balancing variable itself. \emph{Free energy is a mediator here rather
 than a confounder} --- the treatment moves it by construction --- so attenuation under balancing
 is expected and the surviving majority is the quantity of interest.
 
@@ -1514,16 +1590,16 @@ scores above $\jdg{c5Cut}$, against the unfiltered reference on the same populat
 are essentially unchanged; $\jdg{c5Sig}$ of $\jdg{c5N}$ clear $p \le 0.005$ after the restriction
 costs pairs.}
 \label{tab:filter}
-\begin{tabular}{@{}lrrrrr@{}}
+\begin{tabular}{@{}lrrrrrr@{}}
 \toprule
-population & designs kept & effect & unfiltered & $p$ & pairs \\
+population & designs kept & effect & unfiltered & $p$ & pairs & pairs (unfilt.) \\
 \midrule
-sample 2 (main) & $\jdg{m15pop0Pass}$ & $\jdg{m15pop0Eff}$ & $\jdg{m15pop0Ref}$ & $\jdg{m15pop0P}$ & $\jdg{m15pop0N}$ \\
-baseline 4560   & $\jdg{m15pop1Pass}$ & $\jdg{m15pop1Eff}$ & $\jdg{m15pop1Ref}$ & $\jdg{m15pop1P}$ & $\jdg{m15pop1N}$ \\
-sample 3        & $\jdg{m15pop2Pass}$ & $\jdg{m15pop2Eff}$ & $\jdg{m15pop2Ref}$ & $\jdg{m15pop2P}$ & $\jdg{m15pop2N}$ \\
-batch 4         & $\jdg{m15pop3Pass}$ & $\jdg{m15pop3Eff}$ & $\jdg{m15pop3Ref}$ & $\jdg{m15pop3P}$ & $\jdg{m15pop3N}$ \\
-batch 5 (blind) & $\jdg{m15pop4Pass}$ & $\jdg{m15pop4Eff}$ & $\jdg{m15pop4Ref}$ & $\jdg{m15pop4P}$ & $\jdg{m15pop4N}$ \\
-batch 6 (blind) & $\jdg{m15pop5Pass}$ & $\jdg{m15pop5Eff}$ & $\jdg{m15pop5Ref}$ & $\jdg{m15pop5P}$ & $\jdg{m15pop5N}$ \\
+sample 2 (main) & $\jdg{m15pop0Pass}$ & $\jdg{m15pop0Eff}$ & $\jdg{m15pop0Ref}$ & $\jdg{m15pop0P}$ & $\jdg{m15pop0N}$ & $\jdg{m15pop0Comp}$ \\
+baseline 4560   & $\jdg{m15pop1Pass}$ & $\jdg{m15pop1Eff}$ & $\jdg{m15pop1Ref}$ & $\jdg{m15pop1P}$ & $\jdg{m15pop1N}$ & $\jdg{m15pop1Comp}$ \\
+sample 3        & $\jdg{m15pop2Pass}$ & $\jdg{m15pop2Eff}$ & $\jdg{m15pop2Ref}$ & $\jdg{m15pop2P}$ & $\jdg{m15pop2N}$ & $\jdg{m15pop2Comp}$ \\
+batch 4         & $\jdg{m15pop3Pass}$ & $\jdg{m15pop3Eff}$ & $\jdg{m15pop3Ref}$ & $\jdg{m15pop3P}$ & $\jdg{m15pop3N}$ & $\jdg{m15pop3Comp}$ \\
+batch 5 (blind) & $\jdg{m15pop4Pass}$ & $\jdg{m15pop4Eff}$ & $\jdg{m15pop4Ref}$ & $\jdg{m15pop4P}$ & $\jdg{m15pop4N}$ & $\jdg{m15pop4Comp}$ \\
+batch 6 (blind) & $\jdg{m15pop5Pass}$ & $\jdg{m15pop5Eff}$ & $\jdg{m15pop5Ref}$ & $\jdg{m15pop5P}$ & $\jdg{m15pop5N}$ & $\jdg{m15pop5Comp}$ \\
 \bottomrule
 \end{tabular}
 \end{table}

@@ -365,6 +365,22 @@ for nm, tag in (("RibonanzaNet", "N"), ("ViennaRNA", "V")):
 put("calSweep", ", ".join(f"{100*x['f']:.0f}\\%" for x in r3["RibonanzaNet"]["sweep"]))
 put("calTotal", sig(r3["RibonanzaNet"]["total"], 5))
 
+# ---- m26r4: the audit found calVCorr and calNFull computed and never shown -- both live in the
+# SAME claimbox as the numbers that ARE shown, so quoting one arm's correlation and the other
+# arm's error is selective reporting inside a withdrawal. This block reports both arms on the
+# same footing, and the leave-one-out that shows why neither correlation may be leaned on.
+r4 = J("m26r4_calibration_symmetry.json")["arms"]
+for nm, tag in (("RibonanzaNet", "N"), ("ViennaRNA", "V")):
+    a4 = r4[nm]
+    put(f"cal{tag}Rho", sig(a4["spearman"], 4))
+    put(f"cal{tag}Loo", sig(a4["corr_without_endpoint"], 4))
+    put(f"cal{tag}LooLo", sig(a4["loo_corr_min"], 4))
+    put(f"cal{tag}LooHi", sig(a4["loo_corr_max"], 4))
+    put(f"cal{tag}Span", f(a4["span_measured_f_le_075"], 4))
+    put(f"cal{tag}SpanFrac", f"{100 * a4['span_ratio']:.1f}\\%")
+put("calSpanTrue", f(r4["ViennaRNA"]["span_true_f_le_075"], 2))
+put("calSpanTop", "75\\%")
+
 # the guidance that passed us: standardised total effect and n, against the published thresholds
 _OUTCOME_SD = 0.2501            # m26r3_audit.md, the outcome SD the synthetic noise was matched to
 put("calOutSd", f(_OUTCOME_SD, 4))

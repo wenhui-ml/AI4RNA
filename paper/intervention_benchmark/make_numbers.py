@@ -204,6 +204,21 @@ put("mcNeuralFull", pct(sw[-1]["measured_retention"], 1))
 sv = r3["ViennaRNA"]["sweep"]
 put("mcViennaFull", pct(sv[-1]["measured_retention"], 1))
 put("mcSep", f(0.053, 3))
+put("mcViennaZero", pct(sv[0]["measured_retention"], 1))
+
+# ---- m26r4: the correlations above are each produced by ONE sweep point, and quoting the
+# wrong-sign arm's correlation while omitting the other arm's is selective reporting inside a
+# retraction. The claim is therefore carried by the SPAN, which does not use the degenerate
+# endpoint at all; the correlations are reported for both arms with their leave-one-out.
+r4 = J("m26r4_calibration_symmetry.json")["arms"]
+for nm, tag in (("RibonanzaNet", "Neural"), ("ViennaRNA", "Vienna")):
+    a4 = r4[nm]
+    put(f"mc{tag}Loo", sig(a4["corr_without_endpoint"], 4))
+    put(f"mc{tag}Rho", sig(a4["spearman"], 4))
+    put(f"mc{tag}Span", f(a4["span_measured_f_le_075"], 4))
+    put(f"mc{tag}SpanFrac", pct(a4["span_ratio"], 1))
+put("mcSpanTrue", f(r4["ViennaRNA"]["span_true_f_le_075"], 2))
+put("mcSpanTop", "75\\%")
 
 # ---- the outcome contains no model
 w = J("m26w_rescue_provenance.json")
