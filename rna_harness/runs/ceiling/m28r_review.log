@@ -1,0 +1,40 @@
+=== M28r:两个边界结果的复查 ===
+  不产生任何新主张。只决定 M28 已有的数能不能读。
+
+【R1】M3SARS 的零,是【参考测量】不合格,不是【干预】太吵
+  M3SARS_DMS_0000      fse__NC_004718.3_13400-13499_libraryread   翻转  1310  参考 SN  0.241  自身 SN 过线    14   <= 整族被参考卡掉
+  M3SARS_DMS_0000      fse__NC_019843.3_13440-13539_libraryread   翻转  1325  参考 SN  0.029  自身 SN 过线    25   <= 整族被参考卡掉
+  M3SARS_DMS_0000      fse__NC_045512.2_13470-13569_libraryread   翻转  1319  参考 SN  0.779  自身 SN 过线     8   <= 整族被参考卡掉
+  M3SARS_2A3_0000      fse__NC_004718.3_13400-13499_libraryread   翻转  1310  参考 SN  0.705  自身 SN 过线    70   <= 整族被参考卡掉
+  M3SARS_2A3_0000      fse__NC_019843.3_13440-13539_libraryread   翻转  1325  参考 SN  0.021  自身 SN 过线    48   <= 整族被参考卡掉
+  M3SARS_2A3_0000      fse__NC_045512.2_13470-13569_libraryread   翻转  1319  参考 SN  1.951  自身 SN 过线    75
+  M2SL5_DMS_0000       SL5_BtCoV_HKU5_GCadded                     翻转    53  参考 SN  4.391  自身 SN 过线    41
+  M2SL5_DMS_0000       SL5_MERS_GCadded                           翻转    58  参考 SN 11.754  自身 SN 过线    55
+  M2SL5_DMS_0000       SL5_SARS_CoV_2                             翻转    49  参考 SN  4.324  自身 SN 过线    47
+  M2SL5_2A3_0000       SL5_BtCoV_HKU5_GCadded                     翻转    53  参考 SN 11.664  自身 SN 过线    52
+  M2SL5_2A3_0000       SL5_MERS_GCadded                           翻转    58  参考 SN 12.759  自身 SN 过线    56
+  M2SL5_2A3_0000       SL5_SARS_CoV_2                             翻转    49  参考 SN  3.801  自身 SN 过线    44
+
+  读法:野生型的剖面在 d_i、d_j、d_ij 三个差向量里都要被减掉,所以参考不合格 ⇒ 整族不可用。
+  **这不是过滤器的缺陷,是 rescue 公式的依赖结构。阈值不动。**
+
+【R2】两个探针的差,放到同一尺度上还剩多少
+  M2SL5_DMS_0000 重挖 n=143
+  M2SL5_2A3_0000 重挖 n=152
+  共享干预 139  层 3
+  预测量跨探针一致性(必须恰好 0):ViennaRNA 0.00e+00  RibonanzaNet 0.00e+00
+  结果量 SD  DMS 0.4120  2A3 0.2021  比 2.04x   (DMS 有 2 条 < -1,2A3 有 0 条)
+
+  ViennaRNA
+    层内 Pearson    DMS +0.2009 (p 0.0135)   2A3 +0.1242 (p 0.1394)
+    层内 Spearman   DMS +0.3024 (p 0.0015)   2A3 +0.2283 (p 0.0060)
+    配对 bootstrap 的【差】 +0.0774  95% [-0.0761, +0.2305]  **含 0**
+    DMS 去掉 2 条离群后 Pearson +0.1994 (p 0.0220)
+
+  RibonanzaNet
+    层内 Pearson    DMS +0.2483 (p 0.0020)   2A3 +0.1731 (p 0.0485)
+    层内 Spearman   DMS +0.2387 (p 0.0065)   2A3 +0.1905 (p 0.0315)
+    配对 bootstrap 的【差】 +0.0767  95% [-0.0829, +0.2262]  **含 0**
+    DMS 去掉 2 条离群后 Pearson +0.2611 (p 0.0020)
+
+写出 /data/wenhui/openclaude_rna/rna_harness/runs/ceiling/m28r_review.json

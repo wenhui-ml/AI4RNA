@@ -1,0 +1,172 @@
+{
+ "R1_reference_gating": {
+  "M3SARS_DMS_0000": [
+   {
+    "family": "fse__NC_004718.3_13400-13499_libraryready",
+    "n_flips": 1310,
+    "wt_sn": 0.241,
+    "flips_passing_own_sn": 14,
+    "family_gated_out_by_its_reference": true
+   },
+   {
+    "family": "fse__NC_019843.3_13440-13539_libraryready",
+    "n_flips": 1325,
+    "wt_sn": 0.029,
+    "flips_passing_own_sn": 25,
+    "family_gated_out_by_its_reference": true
+   },
+   {
+    "family": "fse__NC_045512.2_13470-13569_libraryready",
+    "n_flips": 1319,
+    "wt_sn": 0.779,
+    "flips_passing_own_sn": 8,
+    "family_gated_out_by_its_reference": true
+   }
+  ],
+  "M3SARS_2A3_0000": [
+   {
+    "family": "fse__NC_004718.3_13400-13499_libraryready",
+    "n_flips": 1310,
+    "wt_sn": 0.705,
+    "flips_passing_own_sn": 70,
+    "family_gated_out_by_its_reference": true
+   },
+   {
+    "family": "fse__NC_019843.3_13440-13539_libraryready",
+    "n_flips": 1325,
+    "wt_sn": 0.021,
+    "flips_passing_own_sn": 48,
+    "family_gated_out_by_its_reference": true
+   },
+   {
+    "family": "fse__NC_045512.2_13470-13569_libraryready",
+    "n_flips": 1319,
+    "wt_sn": 1.951,
+    "flips_passing_own_sn": 75,
+    "family_gated_out_by_its_reference": false
+   }
+  ],
+  "M2SL5_DMS_0000": [
+   {
+    "family": "SL5_BtCoV_HKU5_GCadded",
+    "n_flips": 53,
+    "wt_sn": 4.391,
+    "flips_passing_own_sn": 41,
+    "family_gated_out_by_its_reference": false
+   },
+   {
+    "family": "SL5_MERS_GCadded",
+    "n_flips": 58,
+    "wt_sn": 11.754,
+    "flips_passing_own_sn": 55,
+    "family_gated_out_by_its_reference": false
+   },
+   {
+    "family": "SL5_SARS_CoV_2",
+    "n_flips": 49,
+    "wt_sn": 4.324,
+    "flips_passing_own_sn": 47,
+    "family_gated_out_by_its_reference": false
+   }
+  ],
+  "M2SL5_2A3_0000": [
+   {
+    "family": "SL5_BtCoV_HKU5_GCadded",
+    "n_flips": 53,
+    "wt_sn": 11.664,
+    "flips_passing_own_sn": 52,
+    "family_gated_out_by_its_reference": false
+   },
+   {
+    "family": "SL5_MERS_GCadded",
+    "n_flips": 58,
+    "wt_sn": 12.759,
+    "flips_passing_own_sn": 56,
+    "family_gated_out_by_its_reference": false
+   },
+   {
+    "family": "SL5_SARS_CoV_2",
+    "n_flips": 49,
+    "wt_sn": 3.801,
+    "flips_passing_own_sn": 44,
+    "family_gated_out_by_its_reference": false
+   }
+  ]
+ },
+ "R2_predictors_identical": {
+  "vienna_max_abs_diff": 0.0,
+  "neural_max_abs_diff": 0.0,
+  "ok": true
+ },
+ "R2_outcome_scale": {
+  "DMS_sd": 0.412,
+  "2A3_sd": 0.2021,
+  "ratio": 2.038,
+  "DMS_below_minus1": 2,
+  "2A3_below_minus1": 0
+ },
+ "R2_arms": {
+  "ViennaRNA": {
+   "within_corr": {
+    "DMS": 0.2009,
+    "2A3": 0.1242
+   },
+   "within_corr_p": {
+    "DMS": 0.01349,
+    "2A3": 0.13943
+   },
+   "within_spearman": {
+    "DMS": 0.3024,
+    "2A3": 0.2283
+   },
+   "within_spearman_p": {
+    "DMS": 0.0015,
+    "2A3": 0.006
+   },
+   "paired_boot_corr_diff": {
+    "mean": 0.0774,
+    "ci95": [
+     -0.0761,
+     0.2305
+    ],
+    "excludes_zero": false
+   },
+   "DMS_without_outliers": {
+    "n": 137,
+    "within_corr": 0.1994,
+    "p": 0.02199
+   }
+  },
+  "RibonanzaNet": {
+   "within_corr": {
+    "DMS": 0.2483,
+    "2A3": 0.1731
+   },
+   "within_corr_p": {
+    "DMS": 0.002,
+    "2A3": 0.04848
+   },
+   "within_spearman": {
+    "DMS": 0.2387,
+    "2A3": 0.1905
+   },
+   "within_spearman_p": {
+    "DMS": 0.0065,
+    "2A3": 0.03148
+   },
+   "paired_boot_corr_diff": {
+    "mean": 0.0767,
+    "ci95": [
+     -0.0829,
+     0.2262
+    ],
+    "excludes_zero": false
+   },
+   "DMS_without_outliers": {
+    "n": 137,
+    "within_corr": 0.2611,
+    "p": 0.002
+   }
+  }
+ }
+}
