@@ -1,0 +1,53 @@
+{
+  "id": "M35",
+  "title": "Paired differences between the three predictors' identity contrasts",
+  "frozen_before_code": true,
+  "why": [
+    "The NM manuscript's headline is a comparison of THREE point estimates, each with its own",
+    "interval, and no interval on any difference between them: RibonanzaNet +0.06055 (CI excludes",
+    "zero), ViennaRNA -0.03039 (covers zero), EternaFold -0.00569 (covers zero). From that the",
+    "abstract, Claim 2 and the Conclusion all assert 'the split follows the decomposition and not",
+    "the training data'.",
+    "",
+    "That is the error this paper retracts TWICE. The depth-baseline kill condition was written as",
+    "a comparison of two point estimates with no interval and is recorded as failed for exactly",
+    "that reason; the second withdrawbox retracts a two-chemistry comparison for the same fault.",
+    "A failure to resolve is not evidence of no effect, and three separate intervals do not license",
+    "a statement about the difference between them.",
+    "",
+    "The existing artifacts CANNOT supply the missing interval: m32 computes EternaFold's and",
+    "ViennaRNA's contrasts in its own bootstrap and imports RibonanzaNet's point estimate from",
+    "m26v, a different run with a different resample. A paired difference needs all four columns",
+    "resampled together over the SAME puzzles."
+  ],
+  "design": {
+    "records": "M26.build() -- 4317 admitted interventions, carrying rf and pmut",
+    "join": "emut from m32_eterna_cache.npz, nmut from m26c_pneural_cache.npz, by exact sequence",
+    "estimator": "M26.matched over (design, min(depth,3), crossed), unchanged, one column at a time",
+    "bootstrap": "ONE resample of the 20 puzzles per draw; all four contrasts recomputed on that",
+    "same resample, so every difference is paired. 4000 draws, seed 3501.",
+    "permutation": "within stratum, on the paired difference, 4000 draws"
+  },
+  "staked_predictions": [
+    {"id": "P1", "quantity": "neural - vienna paired difference", "predicted": "+0.090 +- 0.02, interval EXCLUDES zero"},
+    {"id": "P2", "quantity": "neural - eterna paired difference", "predicted": "+0.066 +- 0.02, interval EXCLUDES zero"},
+    {"id": "P3", "quantity": "vienna - eterna paired difference", "predicted": "-0.025 +- 0.02, interval COVERS zero"},
+    {"id": "P4", "quantity": "measured - neural paired difference", "predicted": "-0.007 +- 0.03, interval COVERS zero"}
+  ],
+  "probes_that_must_fire": [
+    {"id": "S1", "check": "all four columns present on all 4317 records; any join miss VOIDS the run"},
+    {"id": "S2", "check": "each single-column contrast recomputed here reproduces its published value to < 1e-4: rf +0.05393, pmut -0.03039, emut -0.00569, nmut +0.06055"},
+    {"id": "S3", "check": "the bootstrap resamples 20 puzzles, and the same index vector is used for all four columns within a draw"}
+  ],
+  "kill_conditions": [
+    {"id": "K1", "if": "P2 covers zero", "then": "the sentence 'the split follows the decomposition and not the training data' is NOT licensed and is removed from the abstract, from Claim 2 and from the Conclusion. What replaces it is a bounded statement naming the interval."},
+    {"id": "K2", "if": "P1 covers zero", "then": "Claim 2's separation between the transformer and the thermodynamic model is withdrawn; only the single-arm statements survive."},
+    {"id": "K3", "if": "S2 fails on any column", "then": "the run is VOID and no number from it may be reported."},
+    {"id": "K4", "if": "P4 excludes zero", "then": "the word 'tracking' is removed wherever the manuscript says the transformer's contrast tracks the measurement, and replaced by the measured difference and its interval."}
+  ],
+  "forbidden": [
+    "reporting any difference without its interval",
+    "reading a covering interval as evidence that two predictors agree"
+  ],
+  "cost": "offline, $0. Both prediction caches are on disk; no GPU pass and no API call."
+}
