@@ -1,0 +1,64 @@
+{
+  "id": "m32_third_model_class",
+  "frozen_utc": "2026-08-28T00:00:00Z",
+  "cost": "offline, $0 -- locally built EternaFold binary, CPU only, no API",
+
+  "why_this_exists": [
+    "A networked review of the NM manuscript found its heaviest defect: the benchmark scores TWO",
+    "predictors on its main axis, and the paper draws a conclusion about two model CLASSES from",
+    "one member each. Contemporaneous benchmarks score many more (CHANRG, arXiv 2603.22330,",
+    "scores 29). The 4-parameter-set panel already in the paper varies parameters within ONE",
+    "implementation and cannot answer the class question.",
+    "EternaFold is the right third model because it is neither of the two: a CONTRAfold-architecture",
+    "model whose feature family resembles the nearest-neighbour frame but whose parameters are",
+    "FIT TO Eterna chemical-mapping data rather than to optical melting. If the identity separation",
+    "is a property of being neural, EternaFold should behave like ViennaRNA. If it is a property of",
+    "being fit to probing data, EternaFold should behave like RibonanzaNet. The manuscript's",
+    "'neural versus thermodynamic' framing is falsifiable by this run and that is the point."
+  ],
+
+  "arms": {
+    "A_identity_contrast": "the matched G-C versus A-U contrast of the manuscript's Claim 1, computed on EternaFold's posterior pairing probability, in the SAME strata with the SAME estimator as m26/m26c",
+    "B_within_design_ranking": "the within-design rank agreement with measured rescue of the manuscript's Claim 3, EternaFold's P against the same 158 cells",
+    "C_vs_depth": "EternaFold minus the free helix-depth baseline, resampled together, with an interval on the DIFFERENCE (rule 68: never two point estimates)",
+    "D_depth_share": "EternaFold's within-cell rank agreement with depth itself, the m31s quantity"
+  },
+
+  "rule_61_staked_predictions_written_BEFORE_running": {
+    "S1": "coverage: EternaFold returns a usable posterior for >= 95% of the 4317 interventions' wild-type and mutant sequences",
+    "S2": "IDENTITY AXIS: EternaFold's identity contrast has the SAME SIGN as ViennaRNA's (-0.0304), i.e. it does NOT reproduce the measured direction. Reason for the stake: its feature family is the nearest-neighbour frame, and the manuscript's reading is that the frame, not the fitting, is what fails.",
+    "S3": "RANKING AXIS: EternaFold's rho with rescue lies between ViennaRNA's +0.2557 and RibonanzaNet's +0.3295",
+    "S4": "EternaFold does NOT beat the free depth baseline: the interval on (EternaFold - depth) contains zero",
+    "S5": "EternaFold's rank agreement WITH DEPTH is within 0.06 of its rank agreement with the outcome, as it is for both models already scored",
+    "S6": "the equivalence probe P1 reproduces m26's ViennaRNA identity contrast through the new code path to 4 decimal places"
+  },
+
+  "kill_conditions": {
+    "K1": "coverage < 95% => the run is VOID and no arm may be read. A model that cannot score the corpus is not evidence about the corpus.",
+    "K2": "S2 FAILS and EternaFold separates in the MEASURED direction with an interval excluding zero => the manuscript's 'neural versus thermodynamic' framing is REFUSED. Claim 1 must be restated as learned-from-probing-data versus fit-to-optical-melting, throughout, including the abstract. This is the outcome that costs the most to write and it is written down here first.",
+    "K3": "S4 FAILS and EternaFold beats depth with an interval excluding zero => the depth-baseline claim must be restated as specific to the two predictors already scored, not as a property of the task",
+    "K4": "P1 disagrees with m26 beyond 4 decimals => the new code path is not the old estimator and NOTHING from this run may be reported until that is resolved"
+  },
+
+  "must_fire_probes": {
+    "P0_binary_sanity": "the built binary reproduces a designed hairpin's pairing on a known toy sequence before any corpus sequence is scored",
+    "P1_estimator_equivalence": "ViennaRNA's identity contrast recomputed through THIS script's estimator must equal m26_model_scored.json's value to 4 decimals",
+    "P2_leakage_is_stated_not_claimed_away": "EternaFold was trained on Eterna cloud-lab chemical mapping and this corpus is an Eterna OpenKnot round. The weights predate the round, but EternaFold is NOT innocent of the design population and the manuscript must say so rather than treat it as a clean control.",
+    "P3_same_admissions": "the intervention set, strata and weights are read from m26_model_scored.json and never recomputed"
+  },
+
+  "what_this_cannot_do": [
+    "It cannot make the benchmark comprehensive. Three predictors is not 29, and the manuscript",
+    "must state the number it scores rather than imply a field-wide sweep.",
+    "It cannot separate architecture from training data: EternaFold differs from ViennaRNA in BOTH.",
+    "A clean separation of those two would need a nearest-neighbour model refit to probing data and",
+    "a transformer trained on optical melting, and neither exists."
+  ],
+
+  "what_a_positive_result_would_licence": [
+    "If S2 holds: the sentence 'a thermodynamic predictor's output does not separate them' may be",
+    "widened to 'two predictors in the nearest-neighbour feature family do not, including one fit to",
+    "probing data', which is a materially stronger claim than the manuscript currently makes.",
+    "If S2 fails: nothing is licenced and K2 is executed."
+  ]
+}
