@@ -128,53 +128,31 @@ a design algorithm produced --- and the calibration that catches them}
 \begin{abstract}
 \noindent
 Pre-registration protects an analysis against choosing a statistic after seeing the data. It does
-not protect it against choosing a statistic that cannot be read. We report two instances from one
-pipeline, on a corpus of \jdg{dN} controlled interventions whose covariate distribution was
-produced not by nature but by a design algorithm, and we give the calibration that catches both.
+not protect it against choosing a statistic that cannot be read. We report two such statistics from
+one pre-registered pipeline, on a corpus of \jdg{dN} controlled interventions whose covariates were
+arranged by a design algorithm rather than by nature, and give the calibration that catches both.
 
-The first is a mediated fraction. Its two standard estimators --- conditioning on the mediator and
-multiplying two coefficients --- are routinely treated as interchangeable. We prove they differ by
-exactly $\mathbb E[r(M)\mid A]-\mathbb E[r(M)\mid B]$, where $r$ is the residual of the
-conditional mean after its linear projection, bounded by
-$\operatorname{osc}(r)\,d_{\mathrm{TV}}(P_{M\mid A},P_{M\mid B})$, and that they agree for every
-pair of exposure laws \emph{if and only if} that conditional mean is affine
-(Proposition~\ref{prop:routes}). The bound has an uncomfortable corollary: the routes diverge
-least when the arms overlap in the mediator, which is exactly when the conditioning route is
-identified --- so they disagree most where the product route is the only one computable. On our
-data they disagree by \jdg{eLinearGapPts} percentage points, with the conditional mean measured
-bin by bin and non-affine, and our own pre-registered verdict had silently picked one of them.
+The first is a mediated fraction. Its two standard estimators --- conditioning on the mediator, and
+multiplying two coefficients --- are treated as interchangeable. We prove they differ by exactly
+$\mathbb E[r(M)\mid A]-\mathbb E[r(M)\mid B]$, for $r$ the residual of the conditional mean after
+its linear projection, bounded by
+$\operatorname{osc}(r)\,d_{\mathrm{TV}}$, and that they agree for every pair of exposure laws
+\emph{if and only if} that conditional mean is affine
+(Proposition~\ref{prop:routes}). The corollary is uncomfortable: they disagree most where the
+product route is the only one computable. On our data they disagree by \jdg{eLinearGapPts} points,
+and our own pre-registered verdict had silently picked one of them.
 
-Which one is readable is then settled empirically, not by argument. We inject a \emph{known}
-mediated fraction into the real mediator --- real distribution, real correlation with the design
-cells, real binning --- leaving only the outcome synthetic, and read back what the estimator
-reports. Across \jdg{calSweep} the truth moves \jdg{calSpanTrue} while the
-conditioning estimator's reading moves \jdg{calNSpan} and \jdg{calVSpan} --- \jdg{calNSpanFrac} and
-\jdg{calVSpanFrac} of the range --- and at total mediation it returns \jdg{calNFull} and
-\jdg{calVFull}. The published guidance would not have stopped us: our standardised
-total effect is \jdg{calStdC} against a recommended floor of \jdg{calStdCThr}, on
-$n=\jdg{dN}\gg\jdg{calNThr}$. What actually governs is a quantity that guidance does not mention
---- the mediator separates the arms by \jdg{posSepReal} pooled standard deviations.
+Which route is readable is then settled empirically. Injecting a \emph{known} mediated fraction
+into the real mediator and leaving only the outcome synthetic, the truth moves \jdg{calSpanTrue}
+while the estimator's reading moves \jdg{calNSpan} and \jdg{calVSpan} --- \jdg{calNSpanFrac} and
+\jdg{calVSpanFrac} of the range --- returning \jdg{calNFull} and \jdg{calVFull} at total mediation.
+Published guidance clears us on both of its thresholds; the quantity that governs is not in it. A
+second declared statistic, on a second corpus, reverses against its own rank counterpart.
 
-The second instance is a different estimator on a different corpus. A within-stratum skill slope,
-also declared in advance, reports \jdg{legSlope} ($p=\jdg{legSlopeP}$) where the rank statistic on
-the same $n=\jdg{legN}$ records reports \jdg{legRho} ($p=\jdg{legRhoP}$); the outcome's dispersion
-differs across the two arms being compared by a factor of \jdg{legSdRatio}. Same design, same
-data, opposite verdicts.
-
-The proposition itself is then put at risk outside its subject matter. On \jdg{xdN} designed
-protein binders --- no base pairs, no folding model, no chemical probing --- the premise transfers
-($\eta^2=\jdg{xdEta}$ of the mediator explained by design method within a target) and the two
-routes differ by only \jdg{xdGapPts} points, which was a \emph{failed} pre-registered prediction
-and is what the bound predicts, because those arms overlap. Across the two corpora the overlap
-differs by a factor of \jdg{xdDtvRatio} and the route gap by \jdg{xdGapRatio}: the bound does not
-merely hold, it tracks.
-
-What survives from the substantive question is stated as bounds rather than fractions. The local
-nearest-neighbour energy differs between the two pair types by \jdg{dDg}\,kcal/mol
-(\jdg{dDgCi}) while the same model's ensemble probability differs by \jdg{dPm} (\jdg{dPmCi}),
-which does not resolve from zero; the two structural bounds are \jdg{dDgBound} and \jdg{dPmBound},
-a factor of \jdg{dBoundRatio} apart. We withdraw every retention figure and mediated fraction this
-work previously reported.
+Put at risk on \jdg{xdN} designed protein binders, the bound does not merely hold: across the two
+corpora the overlap differs by a factor of \jdg{xdDtvRatio} and the route gap by \jdg{xdGapRatio}.
+What survives of the substantive question is stated as bounds --- \jdg{dDgBound} and
+\jdg{dPmBound} --- and every mediated fraction this work previously reported is withdrawn.
 \end{abstract}
 
 % =====================================================================
