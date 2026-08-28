@@ -1,0 +1,163 @@
+{
+ "arms": [
+  {
+   "label": "MAIN: IL7Ra+InsulinR+TrkA (Cao x Watson), n=416",
+   "n": 416,
+   "n_cells": 6,
+   "n_dead_cells": 0,
+   "n_live_cells": 6,
+   "A_premise": {
+    "eta2_by_target": [
+     {
+      "target": "IL7Ra",
+      "eta2": 0.4203,
+      "n": 171
+     },
+     {
+      "target": "InsulinR",
+      "eta2": 0.187,
+      "n": 117
+     },
+     {
+      "target": "TrkA",
+      "eta2": 0.171,
+      "n": 128
+     }
+    ],
+    "eta2_mean": 0.2594
+   },
+   "B": {
+    "marginal": 0.03011,
+    "marginal_w": 182.0,
+    "marginal_p": 0.4053,
+    "marginal_p_treatment_side": 0.4003,
+    "null_sd": 0.03556,
+    "matched": 0.02216,
+    "matched_w": 152.0,
+    "z_edges": [
+     62.0,
+     65.0,
+     71.0,
+     88.0
+    ]
+   },
+   "C": {
+    "beta_z": 0.001042,
+    "g": -4.7987,
+    "route_stratified": 0.00795,
+    "route_product": -0.005,
+    "gap": 0.01295,
+    "gap_points": 1.29,
+    "osc_r": 0.12709,
+    "d_TV": 0.2253,
+    "bound_lhs": 0.012946,
+    "bound_rhs": 0.02863,
+    "bound_holds": true
+   },
+   "D": {
+    "bins": [
+     {
+      "bin": 0,
+      "n": 77,
+      "h": 0.005865640009995085,
+      "z": 56.351
+     },
+     {
+      "bin": 1,
+      "n": 86,
+      "h": -0.01038734436739594,
+      "z": 62.919
+     },
+     {
+      "bin": 2,
+      "n": 86,
+      "h": 0.003763118831219563,
+      "z": 65.267
+     },
+     {
+      "bin": 3,
+      "n": 80,
+      "h": -0.07243980963045911,
+      "z": 80.35
+     },
+     {
+      "bin": 4,
+      "n": 87,
+      "h": 0.06796797569860087,
+      "z": 93.138
+     }
+    ],
+    "residual_after_linear": [
+     -0.05283,
+     -0.07593,
+     -0.06422,
+     -0.15613,
+     -0.02905
+    ],
+    "osc_r": 0.12709,
+    "mean_abs_dev": 0.03232,
+    "monotone": false,
+    "affine_to_within": 0.12709
+   },
+   "E": {
+    "sweep": [
+     {
+      "f": 0.0,
+      "true_retention": 1.0,
+      "measured_retention": 1.0244
+     },
+     {
+      "f": 0.25,
+      "true_retention": 0.75,
+      "measured_retention": 1.0824
+     },
+     {
+      "f": 0.5,
+      "true_retention": 0.5,
+      "measured_retention": 1.0916
+     },
+     {
+      "f": 0.75,
+      "true_retention": 0.25,
+      "measured_retention": -0.3236
+     },
+     {
+      "f": 1.0,
+      "true_retention": 0.0,
+      "measured_retention": 0.0715
+     }
+    ],
+    "corr": 0.7836,
+    "mae": 0.3187
+   },
+   "ladder": {
+    "rungs": {
+     "0.0": 0.05,
+     "0.02": 0.1,
+     "0.05": 0.25,
+     "0.1": 0.85,
+     "0.2": 1.0,
+     "0.4": 1.0
+    },
+    "delta0": 0.05,
+    "threshold": 0.1
+   }
+  },
+  {
+   "label": "SENSITIVITY: EGFR, n=434",
+   "n": 434,
+   "n_cells": 3,
+   "n_dead_cells": 0,
+   "n_live_cells": 3,
+   "void": "K0_too_few_live_cells"
+  }
+ ],
+ "targets": [
+  "IL7Ra",
+  "InsulinR",
+  "TrkA"
+ ],
+ "tau": "input_rosetta_interface_binder_hydrophobicity_percent",
+ "z": "A_length",
+ "y": "binder"
+}
