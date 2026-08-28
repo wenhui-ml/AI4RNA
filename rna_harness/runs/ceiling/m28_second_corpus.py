@@ -144,15 +144,30 @@ def tags(name):
     return sorted({m[0]: m for m in MUT.findall(name)}.values(), key=lambda m: int(m[0]))
 
 
-def wt_name(name):
-    """the wild type's name is the mutant's name with every mutation tag deleted.
+def family_key(name):
+    """everything before the first mutation tag -- the family this construct mutates.
 
-    Verified on M2SL5: `SL5_SARS_CoV_2_0G-A_5pad6_w53barcode` minus `_0G-A` is exactly
-    `SL5_SARS_CoV_2_5pad6_w53barcode`, which is the wild-type row. Family-prefix matching (what
-    m27 used for counting) would NOT work here: the padding suffix survives on the wild type and
-    is stripped from nothing, so wild type and mutant would land in different families.
+    Both deposits name a mutant `<family>_<tag>[_<tag>]_<pad>_<suffix>`, so the family is the
+    prefix. Deleting the tags instead (which works on M2SL5) does NOT work on M3SARS, whose wild
+    type is `fse__NC_019843.3_13440-13539_libraryready;sublibrary:...` while its mutants carry an
+    extra `_0pad27_libraryready` segment the wild type does not have. Tag-deletion voided both
+    M3SARS deposits for "no constant offset" when the real cause was that no wild type was ever
+    found. The prefix rule covers both.
     """
-    return MUT.sub("", name)
+    m = MUT.search(name)
+    return name[:m.start()] if m else None
+
+
+def find_wt(key, wts):
+    """the wild type is the UNIQUE zero-tag construct whose name starts with the family key.
+
+    More than one match is refused as ambiguous rather than resolved by a rule -- resolving it
+    would let the corpus choose which wild type it supplies. This is the OK7a discipline, kept.
+    """
+    hits = [w for w in wts if w.name.startswith(key)]
+    if len(hits) == 1:
+        return hits[0]
+    return "AMBIGUOUS" if hits else None
 
 
 def single_name(name, keep):
@@ -162,7 +177,7 @@ def single_name(name, keep):
     return name.replace(f"_{drop[0]}{drop[1]}-{drop[2]}", "", 1)
 
 
-def find_offset(cons, by_name, window):
+def find_offset(cons, window):
     """position tags are 0-based inside the designed region; sequences carry padding.
 
     The offset is PER FAMILY, not per deposit. M2SL5's construct names say so out loud --
@@ -182,14 +197,15 @@ def find_offset(cons, by_name, window):
     within `AGREE` is left out and reported, never fitted per construct.
     """
     lo, hi = window
+    wts = [c for c in cons if not tags(c.name)]
     per = collections.defaultdict(collections.Counter)
     for c in cons:
         ts = tags(c.name)
         if len(ts) != 1:
             continue
-        fam = wt_name(c.name)
-        wt = by_name.get(fam)
-        if wt is None or len(wt.seq) != len(c.seq):
+        fam = family_key(c.name)
+        wt = find_wt(fam, wts) if fam else None
+        if wt is None or wt == "AMBIGUOUS" or len(wt.seq) != len(c.seq):
             continue
         d = [k for k in range(lo, hi) if c.seq[k] != wt.seq[k]]
         if len(d) == 1:
@@ -202,9 +218,9 @@ def find_offset(cons, by_name, window):
 
 
 # ----------------------------------------------------------------------------- arm A: mining
-EXCLUSIONS = ("no_wild_type", "length_mismatch", "not_two_positions", "not_orientation_flip",
-              "pair_not_canonical", "tag_position_mismatch", "singles_missing", "low_sn",
-              "no_outcome")
+EXCLUSIONS = ("no_wild_type", "ambiguous", "length_mismatch", "not_two_positions",
+              "not_orientation_flip", "pair_not_canonical", "tag_position_mismatch",
+              "singles_missing", "low_sn", "no_outcome")
 
 
 def mine(cons, by_name, offsets, sn_min, window):
@@ -215,6 +231,7 @@ def mine(cons, by_name, offsets, sn_min, window):
     work here -- every position pair was mutated.
     """
     ex = {k: 0 for k in EXCLUSIONS}
+    wts = [c for c in cons if not tags(c.name)]
     out = []
     for c in cons:
         ts = tags(c.name)
@@ -230,8 +247,11 @@ def mine(cons, by_name, offsets, sn_min, window):
         if pt not in CANON:
             ex["pair_not_canonical"] += 1
             continue
-        fam = wt_name(c.name)
-        wt = by_name.get(fam)
+        fam = family_key(c.name)
+        wt = find_wt(fam, wts) if fam else None
+        if wt == "AMBIGUOUS":
+            ex["ambiguous"] += 1
+            continue
         if wt is None or fam not in offsets:
             ex["no_wild_type"] += 1
             continue
@@ -465,7 +485,7 @@ def run_deposit(rid, args):
 
     by_name = {c.name: c for c in cons}
     window = (seqpos[0] - 1, seqpos[-1])          # 0-based, half-open: the reactivity columns
-    allo = find_offset(cons, by_name, window)
+    allo = find_offset(cons, window)
     log(f"  设计窗(0基,半开)= {window};窗外每条构建体带自己的条码,比对一律不出窗")
     offs, dropped = {}, {}
     for fam, (off, n, tot) in sorted(allo.items()):
