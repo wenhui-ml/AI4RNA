@@ -230,7 +230,8 @@ performed rather than observed: disrupt a putative pair with one mutation, disru
 the partner mutation, and ask whether the pair of mutations together restores what either alone
 destroyed. Mutate-and-map applied this systematically \citep{kladwang2011two,cordero2015rich}, and
 mutate-map-rescue added the compensatory arm that this paper mines
-\citep{tian2014correcting,cheng2017rna}. In every one of those studies the target of inference is
+\citep{tian2014correcting,cheng2017rna}, later extended to a fourth dimension by locking one
+helix before probing the rest \citep{tian2018allosteric}. In every one of those studies the target of inference is
 the molecule. We keep the experiment and change the target of inference to the model.
 
 \paragraph{Benchmarks in the neighbourhood.}
@@ -245,6 +246,17 @@ its structural prediction responds correctly to a mutation. And the mutate-and-m
 the experiment itself, including a public server that will predict a mutate-and-map profile
 \citep{ribonanzanet2024}; what it does not do is treat the resulting predictions as a benchmark
 with a control for who chose the pairs.
+
+\paragraph{The closest prior analysis of this outcome.} The rescue factor has been related to a
+folding calculation once before, and the difference matters enough to state precisely.
+\citet{tian2018allosteric} validated the quantity as a readout by showing that rescue factors from
+\emph{simulated} mutate-map-rescue experiments track helix frequencies across 325 Rfam families,
+for helices of at least three base pairs, with the rescue factors averaged over the helix. That
+result is why the quantity is worth measuring at all, and we cite it as the provenance of our
+outcome rather than as a competitor. It compares a simulation against itself, at the resolution of
+a helix, on natural sequences. It is not a test of whether a predictor anticipates \emph{measured}
+rescue at a \emph{single} pair on sequences a design program wrote --- which is the question a
+benchmark has to answer, and the one this paper is built to ask.
 
 \paragraph{Corpora made by design programs.}
 The molecules here were produced by design methods competing on shared targets, and a corpus
@@ -306,8 +318,9 @@ about the second quantity. This limit belongs beside the numbers and not in a cl
 \subsection{The outcome contains no model}
 \label{sec:outcome}
 
-The outcome is the corpus's rescue factor, and because everything in this paper is a statement
-about it we verified how it is produced rather than trusting the column. Writing $d_i$, $d_j$ and
+The outcome is the corpus's rescue factor \citep{tian2014correcting,tian2018allosteric}, and
+because everything in this paper is a statement about it we verified how it is produced rather
+than trusting the column. Writing $d_i$, $d_j$ and
 $d_{ij}$ for the reactivity profiles of the two single mutants and the double mutant, each minus
 the wild-type profile and restricted to the design window,
 \begin{equation}
