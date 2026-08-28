@@ -257,6 +257,15 @@ def main(pdir: str) -> int:
     if orphan:
         print(f"\n[G] {len(orphan)} \\label never referenced: {orphan}")
 
+    # I -- nothing unfinished may reach a reader. A manuscript is postable when this is empty;
+    # until then the audit says so out loud rather than leaving it to whoever remembers.
+    unfinished = sorted(set(re.findall(r"PLACEHOLDER[-\w]*|\bTODO\b|\bFIXME\b|\bXXX\b", body_nc)))
+    if unfinished:
+        fail += 1
+        n = sum(body_nc.count(u) for u in unfinished)
+        print(f"\n[I] {n} unfinished marker(s) in the manuscript body: {unfinished}")
+        print("    NOT POSTABLE until each is replaced by the thing it stands for.")
+
     print(f"\n--- {'FAIL' if fail else 'clean'} ({fail} blocking finding(s))")
     return 1 if fail else 0
 

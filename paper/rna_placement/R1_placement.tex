@@ -1546,6 +1546,19 @@ designed corpus, then, understates a property of its molecules through a covaria
 chose, at a rate it can be made to report --- while the model those authors were optimising has
 nothing to say about the property at all.
 
+\paragraph{Code and data availability.} Every number in this manuscript is generated from a
+committed run artifact by a single script; no measured value is typed into the source, and a check
+run at build time fails the build if one is. Each experiment's criteria were frozen in a JSON
+declaration committed before the code that grades them existed, and Appendix~\ref{app:prereg}
+lists every declaration with its verdict, including the ones that failed. \textsc{[Public release:
+the analysis pipeline and every run artifact will be released as a public repository at
+\url{https://github.com/PLACEHOLDER/designaudit}, with the tagged release archived under a Zenodo
+DOI, \texttt{PLACEHOLDER-DOI}.]} The corpora are already public: the OpenKnot benchmark release
+\texttt{OK7a\_M2R\_data.v4.5.1.csv} and the design-score tables it ships with, the RMDB deposits
+named in Appendix~\ref{app:prereg}, and the protein-binder corpus of \S\ref{sec:crossdomain}.
+Every count in this paper is a count over those versioned files, and a different version of one of
+them is a different corpus.
+
 % =====================================================================
 \bibliographystyle{plainnat}
 \bibliography{refs}
