@@ -1,0 +1,60 @@
+{
+ "id": "M30",
+ "title": "The selection rule that produced our corpus, and the dynamic range of the score",
+ "frozen_before_code": true,
+ "cost": "offline, $0 -- public CSVs on disk plus the cached ViennaRNA and RibonanzaNet scores from M26/M26c. No API, no GPU.",
+
+ "why": [
+  "The OpenKnotAIDesignData repository states, of the mutate-and-map-rescue experiments specifically:",
+  "  'The top OpenKnot score design for each method for each target were selected amongst those with",
+  "   RNet_F1 greater than equal to 80. (If no designs passed this secondary structure accuracy cutoff,",
+  "   the top score design was still tested.)'",
+  "RNet_F1 is RibonanzaNet's own agreement with the target structure. Our corpus is therefore conditioned",
+  "on a neural model's own prediction, and no sentence of the manuscript says so. That is a defect in the",
+  "manuscript whether or not it changes a number, and it was found by an outside reading, not by us.",
+  "M30 does not argue about it. It reproduces the rule from the public pool, measures how tightly it binds,",
+  "and runs the one control that can decide the question: the cells where the filter did NOT bind."
+ ],
+
+ "sources": {
+  "pool": "/data/wenhui/openknot_data/Data/OpenKnotBench_data.v4.5.1.csv",
+  "corpus": "/data/wenhui/openknot_data/Data/OK7a_M2R_data.v4.5.1.csv",
+  "scores": "m26_model_scored.py build() (ViennaRNA pf) + m26c_pneural_cache.npz (RibonanzaNet-SS)"
+ },
+
+ "linkage": {
+  "rule": "each M2R cell's wild type is linked to the public pool by EXACT design-sequence match: sequence[sub_start-1:sub_end]",
+  "why_not_labels": "the two files disagree on method labels (Shujun_struct2seq vs Struct2SeQ, and the M2R 'Starting sequence' cells carry bench-Eterna design sequences). Linking by sequence makes the label map unnecessary for every arm except S1, where the candidate pool must be named.",
+  "controls_excluded_from_S1": "the 20 'Starting sequence' cells are the unmutated starting sequence, not a designed sequence, and are not subject to the selection rule."
+ },
+
+ "arms": {
+  "S1": "reproduce the stated rule. For each non-control cell, predict the tested design as argmax(target_openknot_score) among pool rows with RNet_F1 >= 0.80, falling back to argmax over the whole pool when none pass. Compare against the design actually tested. Report agreement.",
+  "S2": "measure how tightly the filter binds: pass rate of the round-3 pool at the cutoff; how many tested designs pass their own cutoff; how many cells are fallback cells; how many interventions sit in them.",
+  "S3": "THE CONTROL THAT DECIDES. Re-estimate the headline identity contrast (rescue, CG vs AU, the same strata, the same weighted matched estimator, the same permutation) separately on interventions in passing cells and in fallback cells. Fallback cells are the arm in which the filter did not bind. Puzzle-clustered bootstrap of each arm and of their difference.",
+  "S4": "does measured skill depend on having been selected. Re-estimate the within-stratum P_model -> rescue slope separately in passing and fallback cells, and rank-correlate cell-level skill against the tested design's own RNet_F1.",
+  "D": "dynamic range. Quantiles of P_model (ViennaRNA) and P_neural (RibonanzaNet-SS) over the corpus, with the fraction above 0.99, the fraction below 0.08, and the fraction between."
+ },
+
+ "staked": {
+  "1": "S1 agreement >= 0.90 of non-control cells: the stated rule is the rule that was applied",
+  "2": "pool pass rate at the cutoff >= 0.70: the filter is loose, not strict",
+  "3": ">= 20 fallback cells and >= 300 interventions in them: the control arm is powered",
+  "4": "the identity contrast inside fallback cells is positive, the same sign as the full-corpus estimate",
+  "5": "the passing-minus-fallback difference in the identity contrast has a bootstrap CI containing zero",
+  "6": "fewer than half of the interventions have P_model > 0.99",
+  "7": "cell-level skill does not rise with the tested design's RNet_F1: the Spearman CI contains zero"
+ },
+
+ "kill": {
+  "K0": "S1 agreement < 0.70 -> the stated rule is not the rule that was applied. The audit is uninterpretable, nothing downstream is read, and the manuscript says only that the selection rule could not be reproduced.",
+  "K1": "fewer than 300 interventions in fallback cells -> S3 and S4 are underpowered. They are reported as underpowered, and no robustness-to-selection claim is made.",
+  "K2": "the fallback-cell contrast has the opposite sign, or the difference CI excludes zero on the side that says selection creates the effect -> selection is a live explanation of the headline. It goes in the main text and the headline is qualified there, not in an appendix.",
+  "K3": "P_model > 0.99 for a majority of interventions -> the score is saturated and the calibration reading of M26 is withdrawn.",
+  "K4": "no claim is made here about design methods, and no design method is ranked or re-ranked from this run. The selection rule is a property of how the corpus was built, not a result about generative models."
+ },
+
+ "not_covered": [
+  "The exposure-graded leakage audit against the public 2,150,401-sequence Ribonanza library, whose final pre-training stage pseudo-labelled all training AND test sequences. That needs a download we do not yet have, and the manuscript's leakage section will say so explicitly rather than imply the 14-deposit audit settles it."
+ ]
+}
