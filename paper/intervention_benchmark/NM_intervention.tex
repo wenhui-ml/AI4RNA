@@ -209,7 +209,7 @@ reproduces this paper's headline numbers from the public data.
 \end{enumerate}
 
 % =====================================================================
-\section{Background}
+\subsection{Background and related work}
 \label{sec:background}
 
 \paragraph{What probing measures, and what it does not.}
@@ -350,7 +350,15 @@ and on this design it is not. A vectorised and a readable implementation of all 
 agree to \jdg{biasCrosscheck}.
 
 % =====================================================================
-\section{The conventional readout on this corpus}
+\section{Results}
+\label{sec:results}
+
+\noindent The order below is the order the instrument is meant to be read in. What the conventional
+readout can still resolve on this corpus comes first, because it sets what an alternative has to
+beat. Then the interventions the corpus already contains, then the predictors scored on them, then
+what that scoring separates, and last whether the two steps run on molecules nobody designed.
+
+\subsection{The conventional readout on this corpus}
 \label{sec:conventional}
 
 Before proposing a readout it is worth showing what the incumbent one does here, on the same
@@ -389,7 +397,7 @@ returns a contrast \jdg{cvPaired} (\jdg{cvPairedCi}) larger and admits no such c
 \end{claimbox}
 
 % =====================================================================
-\section{Recovering the interventions}
+\subsection{Recovering the interventions}
 \label{sec:mining-results}
 
 Applying Definition~\ref{def:flip} to the corpus's \jdg{nConstructs} constructs admits
@@ -414,7 +422,7 @@ permutation under a fixed design, same-population denominators, a placebo mediat
 runs, and a linearity test before any product-of-coefficients quantity is reported.
 
 % =====================================================================
-\section{Scoring predictors}
+\subsection{Scoring predictors}
 \label{sec:scoring}
 
 A predictor enters as a callable that returns, for a sequence and a position pair, a number it
@@ -422,7 +430,7 @@ believes about that pair forming. It need not be a probability, and it need not 
 it must only be comparable across the sequences of one corpus. Three readouts come back, and the
 order matters.
 
-\subsection{Sensitivity, then calibration}
+\subsubsection{Sensitivity, then calibration}
 
 \paragraph{The thermodynamic model has skill here.} Taking the equilibrium probability that the
 flipped pair forms in the mutant's own ensemble, measured rescue rises monotonically across bins of
@@ -448,7 +456,7 @@ optical melting, and correlating with one another only \jdg{panCorrLo} to \jdg{p
 skill slopes from \jdg{panLo} to \jdg{panHi}. Changing parameters within one implementation moves
 the instrument's reading much less than changing model class does.
 
-\subsection{The leakage audit, in the main text}
+\subsubsection{The leakage audit, in the main text}
 \label{sec:leakage}
 
 RibonanzaNet was trained on Eterna's OpenKnot campaigns and this corpus is an OpenKnot round, so
@@ -486,7 +494,7 @@ with the training sources we could obtain}, never \emph{no leakage}.
 \end{scopebox}
 
 % =====================================================================
-\section{What the instrument reads out}
+\subsection{What the instrument reads out}
 \label{sec:result}
 
 Three contrasts, on the same \jdg{nAdmitted} interventions, the same stratification and the same
@@ -548,139 +556,24 @@ read values near $100\%$ as evidence that the model explains almost none of the 
 measuring on this corpus, and no claim in this paper uses them.
 \end{withdrawbox}
 
-The reason is a calibration that had not been run. A retention figure is informative only if the
-estimator would report a low value when mediation is genuinely present, and testing that requires
-a case where the mediated fraction is known. Our first attempt at such a control was itself wrong
-and is worth recording: it built a synthetic mediator depending on the treatment but not
-predicting the outcome. Such a variable lies on no causal path, so conditioning on it destroys
-overlap between the arms without shrinking the within-stratum contrast; the weight fell to zero
-and the run reported that as detection. It had detected overlap collapse.
+\noindent The reason is one number. A retention figure carries information only if the estimator
+would report a low value when mediation is genuinely present, and that is testable: hold the
+estimator's machinery fixed, make the mediator the \emph{real} predictor with its real
+distribution and its real binning, synthesise only the outcome so that a known fraction $f$ of the
+contrast runs through the mediator, and read back what the estimator says. Swept over $f$, the
+measured retention correlates with the truth at \jdg{mcNeuralCorr} --- the wrong sign --- and the
+thermodynamic arm returns \jdg{mcViennaFull} when the truth is total mediation. The governing
+quantity is the mediator's separation between the arms, and here it is \jdg{mcSep} pooled standard
+deviations: there was never much for the conditioning to remove, so a value near $100\%$ was close
+to being forced by the design.
 
-The second attempt changes one thing and keeps the rest real. The mediator \emph{is} the real
-predictor, with its real distribution, its real correlation with design cells and its real binning
-behaviour; only the outcome is synthetic,
-\[
-Y \;=\; \gamma\,M_{\text{real}} \;+\; \delta\,\mathbf{1}[\text{G--C}] \;+\; \varepsilon,
-\]
-with $\gamma$ and $\delta$ chosen so the total stratified contrast equals the corpus's own
-\jdg{resOut} and a known fraction $f$ of it runs through the mediator. Sweeping $f$ says what a
-measured retention means here.
-
-\begin{center}
-\begin{tabular}{lcccccc}
-\toprule
-true mediated fraction $f$ & $0\%$ & $10\%$ & $25\%$ & $50\%$ & $75\%$ & $100\%$ \\
-\midrule
-measured retention, RibonanzaNet & \jdg{mcNeuralZero} & --- & --- & --- & --- & \jdg{mcNeuralFull} \\
-measured retention, ViennaRNA    & --- & --- & --- & --- & --- & \jdg{mcViennaFull} \\
-\bottomrule
-\end{tabular}
-\end{center}
-
-Across the sweep the neural arm's correlation with the truth is \jdg{mcNeuralCorr} --- the wrong
-sign --- with mean absolute error \jdg{mcNeuralMae}; the thermodynamic arm's mean absolute error is
-\jdg{mcViennaMae}, and at $f=100\%$ it returns \jdg{mcViennaFull}. At this corpus's
-signal-to-noise the retention ratio is a small noisy number divided by another small noisy number,
-and it carries no information about the mediated fraction.
-
-Two things made this hard to see from the inside. The placebo mediator, which the method requires
-and which we ran, controls for the mechanical shrinkage that any extra stratifying dimension
-produces --- but a placebo has no relation to the outcome, so it cannot calibrate the bias that
-arises precisely \emph{because} the mediator does predict the outcome. And the real predictor
-separates the two arms by only \jdg{mcSep} pooled standard deviations, so there was never much for
-the conditioning to remove; a value near $100\%$ was close to being forced by the design.
-
-The quantity that replaces it is in Section~\ref{sec:result}, and it is a difference of two
-matched contrasts rather than a ratio of them.
-
-% =====================================================================
-\section{Does the instrument transfer?}
-\label{sec:second}
-
-The mining criterion is stated for any probing corpus, and whether real corpora other than this
-one supply interventions is a question about the world rather than about the method. We swept
-\jdg{scDeposits} deposits of a public probing database under the criterion. Eleven contain
-compensatory doubles, \jdg{scFlips} orientation flips in total; the rest are single-mutant
-libraries, which supply none by construction.
-
-Two of the eleven are natural RNA, and we take both forward. The first is a mutate-and-map library
-of \jdg{xnFamilies} coronavirus 5$'$UTR stem-loops, measured under \jdg{xnProbes} independent
-chemical probes --- dimethyl sulfate, which acylates the Watson--Crick face of adenine and
-cytosine, and 2A3, which reports backbone flexibility. Neither deposit declares a target
-structure, so the admission clause requiring the two positions to pair in a declared structure
-cannot run and is dropped. Dropping it makes the test stricter rather than weaker: the scan is
-exhaustive, so the predictor must say \emph{which} flips are rescued rather than score pairs
-already known to exist. No reference structure, and no predicted structure, enters anywhere in
-this section.
-
-Under a signal-to-noise cut fixed at \jdg{xnSnCut} before the data were touched, the criterion
-admits \jdg{xnAdmitDms} interventions on the first probe and \jdg{xnAdmitTwoA} on the second,
-\jdg{xnShared} of them shared. Stratification here is by molecule family alone, since neither
-helix depth nor crossing is defined without a structure.
-
-\begin{claimbox}
-\textbf{Both model classes retain measurable skill on natural RNA, under both probes.} On the
-within-stratum rank correlation between prediction and measured rescue, the thermodynamic model
-scores \jdg{xnRhoVDms} ($p=\jdg{xnRhoVDmsP}$) and \jdg{xnRhoVTwoA} ($p=\jdg{xnRhoVTwoAP}$) on the
-two probes, and the neural model \jdg{xnRhoNDms} ($p=\jdg{xnRhoNDmsP}$) and \jdg{xnRhoNTwoA}
-($p=\jdg{xnRhoNTwoAP}$). \textbf{The two probes are not distinguishable}: a paired cluster
-bootstrap on the \emph{difference} of the two correlations returns \jdg{xnDiffV} for the
-thermodynamic model and \jdg{xnDiffN} for the neural one, both covering zero. The predictors
-depend only on sequence and are bit-identical across the two probes, so this is a paired
-comparison in which only the measurement changes.
-\end{claimbox}
-
-\begin{table}[!htbp]
-\centering\small
-\caption{\textbf{The instrument on natural RNA.} Both probes measure the same interventions on the
-same molecules. \emph{Rank} is the within-family rank correlation, which does not depend on the
-outcome's scale; \emph{slope} is the pre-registered linear statistic, reported unchanged.}
-\label{tab:transfer}
-\begin{tabular}{llcccc}
-\toprule
-& & \multicolumn{2}{c}{rank correlation} & \multicolumn{2}{c}{slope (pre-registered)} \\
-\cmidrule(lr){3-4}\cmidrule(lr){5-6}
-predictor & probe & estimate & $p$ & estimate & \\
-\midrule
-thermodynamic & DMS & \jdg{xnRhoVDms} & \jdg{xnRhoVDmsP} & \jdg{xnSlopeVDms} & \\
-              & 2A3 & \jdg{xnRhoVTwoA} & \jdg{xnRhoVTwoAP} & \jdg{xnSlopeVTwoA} & ($p=\jdg{xnSlopeVTwoAP}$) \\
-neural        & DMS & \jdg{xnRhoNDms} & \jdg{xnRhoNDmsP} & \jdg{xnSlopeNDms} & \\
-              & 2A3 & \jdg{xnRhoNTwoA} & \jdg{xnRhoNTwoAP} & \jdg{xnSlopeNTwoA} & \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\paragraph{Why the cross-probe comparison is not made on the slope.} The statistic declared in
-advance was a linear within-stratum slope, and on that statistic one of the four arms --- the
-thermodynamic model on 2A3 --- does not reach the threshold ($\jdg{xnSlopeVTwoA}$,
-$p=\jdg{xnSlopeVTwoAP}$). That line is reported as declared. It is not, however, the statistic a
-comparison \emph{between} probes may use: the two outcomes differ in dispersion by a factor of
-\jdg{xnSdRatio} (\jdg{xnSdDms} against \jdg{xnSdTwoA}, with \jdg{xnOutliersDms} points below
-$-1$ on the first probe and none on the second), so raw slopes are not on a common scale. The
-rank statistic is, and Table~\ref{tab:transfer} reports both. That a pre-registered statistic can
-be the wrong one to read is a general point about this kind of design and we take it up in a
-companion paper rather than here.
-
-\paragraph{One corpus the instrument cannot use, and why.} The second natural deposit is an
-exhaustive two-dimensional double-mutant scan of three coronavirus frameshift elements ---
-\jdg{xnFseFlips} orientation flips, twenty-five times what the stem-loop library supplies. It
-yields \jdg{xnFseAdmit} usable interventions. The reason is not the interventions but the
-references: the three wild-type profiles carry signal-to-noise between \jdg{xnFseSnLo} and
-\jdg{xnFseSnHi}, against \jdg{xnSl5SnLo} and above for the stem-loop library, and the wild-type
-profile is subtracted in all three difference vectors that define the outcome, so a family whose
-reference fails takes every intervention in that family with it. \textbf{Whether a corpus can
-carry this instrument is decided by its reference measurements, not by how many interventions it
-holds} --- a constraint on corpus design that we state here and do not pursue further.
-
-\begin{scopebox}
-\textbf{Scope of this section.} It establishes that the mining step and the scoring step run on
-natural molecules, under two independent probe chemistries, with no reference structure. It does
-not establish an effect size transferable to OK7a: three families and one stratifying variable
-give this arm far less resolution, the identity contrast here is underpowered by design, and its
-interval is reported in the declaration's terms as a measurement of power rather than as evidence
-about identity. Extending the transfer test to corpora with well-measured references, and to
-non-viral natural RNA, is left to future work.
-\end{scopebox}
+That failure is general rather than particular to this corpus, and a companion study develops it
+--- the exact condition under which the two routes to a mediated fraction may be interchanged, why
+a placebo mediator cannot detect this bias, and what a calibration of an estimator should look
+like. \textbf{None of that is needed here.} This instrument reports direct contrasts and bounds
+and never a ratio of two contrasts, which is a design decision taken because of the number above:
+the quantities in Section~\ref{sec:results} are differences of matched contrasts, each with its own
+interval, and none of them divides one small noisy quantity by another.
 
 \section{Discussion}
 \label{sec:discussion}
@@ -720,8 +613,7 @@ corpora produced by design programs are becoming common in other fields. We have
 elsewhere and make no claim about it; the estimator theory required for the conditioning step is
 developed in a companion study, which this paper cites but does not depend on.
 
-% =====================================================================
-\section{Limitations}
+\subsection{Limitations}
 \label{sec:limitations}
 
 \begin{enumerate}[leftmargin=1.4em,itemsep=3pt]

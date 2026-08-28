@@ -135,14 +135,34 @@ work previously reported.
 \section{Introduction}
 \label{sec:intro}
 
-Designing an RNA that folds to a target structure has been posed for three decades as a search
-problem against a thermodynamic model \citep{zuker1981optimal,mccaskill1990equilibrium,
-hofacker1994fast,andronescu2004new,busch2006info,zadeh2011nupack,kleinkauf2015antarna,
-runge2019learna}, and the convention that scores a design closes the loop: the objective is a
-folding model's verdict and so is the report card. The loop is not idle. When the packages are
-scored against experiment rather than against each other, they disagree with it by margins that
-depend on the structure class \citep{waymentsteele2022rna}, so a pipeline validated in-model
-carries an error term nothing inside the pipeline can see.
+Pre-registration answers one question about an analysis: was the statistic chosen before the data
+were seen \citep{simmons2011falsepositive,nosek2018preregistration}. It does not answer a second
+one, which is whether that statistic, on that data, reports anything at all. The two are usually
+conflated because in the settings where pre-registration became standard they coincide --- a
+well-powered randomised trial with a large standardised effect --- and they come apart in exactly
+the setting this paper is about: an observational corpus that some algorithm generated for a
+different purpose, carrying effects an order of magnitude smaller than the ones the estimator's
+guidance was written for.
+
+We report two instances from one pipeline. Both statistics were frozen in a declaration and pushed
+before the analysis code existed, both came with permutation tests and constructive power ladders,
+and both were unreadable in ways none of that machinery could detect. The first is a mediated
+fraction whose two estimators disagree by $\jdg{eLinearGapPts}$ percentage points on the same
+records; the second is a skill slope that returns the opposite verdict from a rank statistic on
+the same records. In each case the pre-registration did its job and the number still could not be
+read.
+
+The corpus that makes this concrete is one of designed RNA, and the setting matters because it is
+what puts the effect sizes where they are. Designing an RNA that folds to a target structure has
+been posed for three decades as a search problem against a thermodynamic model
+\citep{zuker1981optimal,mccaskill1990equilibrium,hofacker1994fast,andronescu2004new,
+busch2006info,zadeh2011nupack,kleinkauf2015antarna,runge2019learna}, and the convention that
+scores a design closes the loop: the objective is a folding model's verdict and so is the report
+card. When the packages are scored against experiment rather than against each other they disagree
+with it by margins that depend on the structure class \citep{waymentsteele2022rna}. More to the
+point here, the molecules in such a corpus were not sampled --- they were \emph{built}, by
+programs with preferences, so the covariate distribution an analyst inherits is the generator's
+\citep{chaney2018algorithmic}.
 
 Chemical probing is what breaks the loop, because it measures the molecule rather than a belief
 about it. Reagents that acylate flexible riboses or methylate unpaired Watson--Crick faces, read
@@ -1155,12 +1175,16 @@ no designer chose --- is stated in \S\ref{sec:limits} as the test we did not run
 \section{Analysis}
 \label{sec:analysis}
 
-\subsection{Quantitative: the decomposition closes to $\jdg{medFrac}$}
+\subsection{Quantitative: the decomposition bounds placement at $\jdg{medFrac}$}
 \label{sec:quant}
 
 Substituting \S\ref{sec:mediation}'s two estimates into \eqref{eq:med} gives a predicted
 attenuation of $\jdg{medPred}$ against an observed $\jdg{medObs}$ (Table~\ref{tab:med}), so
-placement accounts for $\jdg{medFrac}$ and $\varepsilon$ carries the rest. The residual has a
+placement accounts for at most $\jdg{medFrac}$ and $\varepsilon$ carries the rest.
+\textbf{At most}, and not exactly: \eqref{eq:med} is the product route, which
+Proposition~\ref{prop:routes} licenses as an equality only where the conditional mean is affine,
+and \S\ref{sec:cal} is the reason we no longer report the conditioning route beside it as though
+the two were estimates of one thing. The residual has a
 visible sign: every method in Fig.~\ref{fig:mediation} lies below the diagonal, so the attenuation
 exceeds what a linear depth term predicts, consistently rather than randomly. That is what a
 mediator measured with error, or a second mediator correlated with depth, would produce; we do not
