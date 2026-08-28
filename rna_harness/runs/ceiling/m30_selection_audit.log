@@ -1,0 +1,99 @@
+=== M30:产生这份语料的筛选规则,以及分数的动态范围 ===
+  声明已冻结并推送于本文件存在之前。离线 $0。
+  仓库原文(只作用在 mutate-and-map-rescue 上):
+    "The top OpenKnot score design for each method for each target were selected amongst
+     those with RNet_F1 greater than equal to 80. (If no designs passed this secondary
+     structure accuracy cutoff, the top score design was still tested.)"
+  RNet_F1 是 RibonanzaNet 自己与靶标结构的一致度。语料被神经模型自己的预测筛过。
+
+  公开池 36761 条设计;M2R 语料 160 个格(靶标 x 方法)
+
+=== 连接:按设计序列逐字节匹配(不依赖两个文件互相冲突的方法标签)===
+  160/160 个被测设计在公开池中找到逐字节相同的序列
+  它们所在的轮次 {3: 360}
+  被测设计自身的 RNet_F1:130/160 过线,30 个是 fallback 格
+  由连接反推的方法映射 {'MPNN-RFdiff': 'MPNN-RFdiff', 'MPNN-fixbb': 'MPNN-fixbb', 'gRNAde-no3d': 'gRNAde-no3d', 'Rosetta': 'Rosetta', 'Shujun_struct2seq': 'Struct2SeQ', 'Shujun_shape_struct2seq': 'Struct2SeQ-SHAPE', 'Eterna': 'Eterna', 'Starting sequence': 'Starting sequence', 'gRNAde': 'gRNAde'}
+
+=== S1 用公开池重现仓库写下的那条规则 ===
+  对每个非对照格:在同一轮、同一靶标、同一方法的候选里,取 RNet_F1 >= 0.8 中
+  OpenKnot 分最高者;若无一过线,取全池分最高者。与实际被测的设计比对。
+  非对照格 140;规则重现 121 个,一致率 0.8643
+  其中规则自身走了 fallback 分支的格 14 个
+  同一取最大值、但【不施加】已发表的 RNet_F1 筛子:重现 135 个,一致率 0.9643
+  其中 14 个格:过线的候选存在,却仍然测了不过线的最高分设计
+  ⇒ 已发表的那句规则,在这些格里【没有】起作用。筛选变量是实验 OpenKnot 分,不是 F1。
+  被测设计在本格 OpenKnot 分上的名次分布 {1: 135, 2: 3, 3: 1, 17: 1}
+  『取最高分』也解释不了的 5 个格:
+    ['P03', 'Rosetta']  名次 2  顶端并列 1  顶端 分=79.6661 F1=0.0  被测 F1=0.439
+    ['P06', 'Eterna']  名次 17  顶端并列 15  顶端 分=100.0 F1=0.8261  被测 F1=0.8261
+    ['P06', 'MPNN-fixbb']  名次 3  顶端并列 2  顶端 分=98.6667 F1=0.8696  被测 F1=0.8511
+    ['P10', 'Rosetta']  名次 2  顶端并列 1  顶端 分=70.6579 F1=0.0  被测 F1=0.3243
+    ['P15', 'Rosetta']  名次 2  顶端并列 1  顶端 分=85.7692 F1=0.0  被测 F1=0.4
+  不一致的 19 个格,前五个:
+    ['P03', 'Rosetta']  候选 40(过线 0)  规则选中 F1=0.0 分=79.6661  实测 F1=0.439 分=78.2106
+    ['P04', 'Shujun_struct2seq']  候选 20(过线 18)  规则选中 F1=1.0 分=89.8858  实测 F1=0.7547 分=90.8602
+    ['P06', 'Eterna']  候选 204(过线 204)  规则选中 F1=0.8261 分=100.0  实测 F1=0.8261 分=99.3333
+    ['P06', 'MPNN-fixbb']  候选 20(过线 19)  规则选中 F1=0.8696 分=98.6667  实测 F1=0.8511 分=98.0
+    ['P06', 'Rosetta']  候选 40(过线 9)  规则选中 F1=0.8261 分=97.3333  实测 F1=0.5333 分=98.0
+  **K0(<0.70 则整份审计不可读)= False**
+
+=== S2 这道筛子有多紧 ===
+  全池 36761 条中过线 0.7629;本轮 9118 条中过线 0.8303
+  被测设计 130/160 过线,fallback 格 30 个
+  被测设计 RNet_F1 的分位 min 0.1000 p10 0.5379 中位 0.9714 p90 1.0000 max 1.0000
+
+=== 把每一次干预标上它所在格的筛选状态 ===
+  M26 纳入集合 4317;其中格未连上而弃 0
+  身份对照用的 CG/AU 干预 4177:过线格 3450,fallback 格 727
+  **K1(fallback 干预 <300 则 S3/S4 判为功效不足)= False**
+  分层 970 个,其中筛选状态不恒定的 0 个 <- 0 表示筛选状态已被分层完全吸收
+
+=== S3 判定性对照:在筛子没有起作用的那些格里,身份效应还在吗 ===
+  全语料   +0.05393  权重 902 层 553
+  过线格   +0.06003  权重 754 层 468
+  fallback +0.02284  权重 148 层 85
+  过线格 CI [0.02566, 0.09624];fallback 格 CI [-0.01554, 0.08892]
+  差(过线 - fallback)= +0.03719  CI [-0.02808, 0.0887]
+  fallback 格的置换 p = 0.36382(置换结果列,处理列不动 —— 第 80 条)
+  同号 True;差的 CI 含 0 True
+  **K2(筛选是头条的活解释)= False**
+
+=== S4 被测出来的『技能』会不会只是被选中的那些设计好预测 ===
+  层内 P_model -> rescue 斜率:全语料 +0.11942(n=4099)  过线 +0.09020(n=3390)  fallback +0.24761(n=709)
+  fallback 格斜率的置换 p = 0.00050
+  可算斜率的格 158 个;格内斜率 vs 该格被测设计的 RNet_F1,Spearman -0.06370491618734968
+  Spearman 的按题聚类自助 CI [-0.27863, 0.11835]
+
+=== D 分数的动态范围(外部读法给的判死条件:多数 > 0.99 即饱和)===
+  P_model_ViennaRNA        min 0.0000 p10 0.0000 中位 0.7451 p90 0.9996 max 1.0000
+                           >0.99 占 0.2810   <0.08 占 0.3310   中间 0.3880
+  P_neural_RibonanzaNet    min 0.0000 p10 0.0136 中位 0.9839 p90 0.9994 max 1.0000
+                           >0.99 占 0.4408   <0.08 占 0.1339   中间 0.4253
+  **K3(热力学分数饱和,M26 的标定读法作废)= False**
+
+=== S3b/S4b(事后追加,由 S1 逼出来)真正做筛选的是实验 OpenKnot 分 ===
+  按格中位 OpenKnot 分 94.3515 一分为二:高 2050 条,低 2127 条
+  高分格 +0.07635(权重 400 层 285);低分格 +0.03606(权重 502 层 268)
+  高分格 CI [0.04485, 0.12607];低分格 CI [-0.01117, 0.08196];差 +0.04029 CI [-0.01813, 0.10755]
+  层内 P_model -> rescue 斜率:高分格 +0.04948(n=2011)  低分格 +0.17393(n=2088)
+  格内斜率 vs 该格被测设计的 OpenKnot 分,Spearman -0.2683267438340389  CI [-0.40575, -0.09303]
+  身份效应两臂差含 0 True;技能与筛选分的相关含 0 False
+
+=== S4c 同一个问题,换成不随尺度变化的统计量(第 68 条)===
+  P_model 的离散度:高分格 SD 0.4377,低分格 SD 0.4395,比 1.004
+  可算秩技能的格 158 个
+  格内【秩】技能 vs openknot_score:Spearman -0.24553250202705068  CI [-0.37726, -0.09286]  含 0 False
+  格内【秩】技能 vs RNet_F1:Spearman -0.02412836821280305  CI [-0.23073, 0.13723]  含 0 True
+  两臂的格内秩技能中位数:高分格 +0.1018,低分格 +0.2324
+
+=== 对照声明里预先押下的七条 ===
+  1_rule_reproduces_ge_0.90            False
+  1b_no_filter_rule_reproduces_ge_0.90_POSTHOC True
+  2_pool_pass_rate_ge_0.70             True
+  3_control_arm_powered                True
+  4_fallback_contrast_same_sign        True
+  5_diff_ci_contains_zero              True
+  6_not_saturated                      True
+  7_skill_does_not_rise_with_f1        True
+
+  裁定 selection_real_disclosed_and_conditioned_out
