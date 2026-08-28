@@ -12,12 +12,23 @@
     "n_carrying": 5,
     "n_unpriced_named": 2
   },
+  "check4_split": {
+    "unclassified": [],
+    "split_closable": [
+      "C7"
+    ],
+    "split_closable_and_carrying": [],
+    "n_split_closable": 1,
+    "n_not_split_closable": 7
+  },
   "channels": [
     {
       "id": "C1",
       "who": "the model being scored (its structure IS the reference column)",
       "paper": "NM",
       "carries": true,
+      "split_closable": false,
+      "split_why": "the reference column is the scored model's own output on whichever side of a split the molecule lands",
       "price": "+0.2400 SD measured against +0.0848 SD read as agreement"
     },
     {
@@ -25,6 +36,8 @@
       "who": "the design programs, through where they put the pair",
       "paper": "R1",
       "carries": true,
+      "split_closable": false,
+      "split_why": "placement is a property of how the molecule was written, and it travels with the molecule into either side",
       "price": "marginal +0.0250 against matched +0.0539; 71.2% of the gap predicted by beta*g"
     },
     {
@@ -32,6 +45,8 @@
       "who": "whoever wrote the declared target, through helix depth",
       "paper": "NM",
       "carries": true,
+      "split_closable": false,
+      "split_why": "depth is read off a target somebody declared and travels with the molecule",
       "price": "depth alone +0.3225 against the transformer's +0.3295"
     },
     {
@@ -40,6 +55,8 @@
       "paper": "NM",
       "carries": true,
       "direction": "against",
+      "split_closable": false,
+      "split_why": "the selection rule decided which molecules exist to be split at all",
       "price": "skill against the selecting score, Spearman -0.2455 [-0.37726, -0.09286]"
     },
     {
@@ -47,6 +64,8 @@
       "who": "the model's authors, through decomposition and through training data",
       "paper": "NM",
       "carries": true,
+      "split_closable": false,
+      "split_why": "the contrast is between models, not between molecules; a split reassigns molecules and leaves it untouched",
       "price": "decomposition +0.06624, training data +0.02470"
     },
     {
@@ -54,6 +73,8 @@
       "who": "the objective the design loop was told to optimise (the model's own energy)",
       "paper": "R1",
       "carries": false,
+      "split_closable": false,
+      "split_why": "a free energy is a property of the sequence, not of its relatedness to a training set",
       "price": "retention 101.9%, mediated -1.9% [-10.6, 6.8], placebo z +0.22"
     },
     {
@@ -61,6 +82,8 @@
       "who": "the model's training set, through window overlap",
       "paper": "NM",
       "carries": false,
+      "split_closable": true,
+      "split_why": "THE one channel a split is built to close: it is defined by similarity between a test molecule and what the model was trained on",
       "price": "skill slope +0.20692 against +0.21549 on the excised subset"
     },
     {
@@ -68,6 +91,8 @@
       "who": "the probe chemistry the depositors chose",
       "paper": "NM",
       "carries": false,
+      "split_closable": false,
+      "split_why": "the chemistry is a property of the assay, not of any partition of molecules",
       "price": "paired rank difference across the two chemistries [-0.0761, 0.2305], covering zero"
     }
   ],
@@ -98,6 +123,16 @@
     "  **未定价的选择者 2**,必须在论文里点名:",
     "    U1  the experimenters, through WHICH pairs were given a compensatory mutant",
     "    U2  the released checkpoint's pseudo-label stage",
+    "\n--- 检查 4:换一个更公平的划分,能关掉哪几条 ---",
+    "    C1  划分关不掉  —— the reference column is the scored model's own output on whichever side of a split the molecule lands",
+    "    C2  划分关不掉  —— placement is a property of how the molecule was written, and it travels with the molecule into either side",
+    "    C3  划分关不掉  —— depth is read off a target somebody declared and travels with the molecule",
+    "    C4  划分关不掉  —— the selection rule decided which molecules exist to be split at all",
+    "    C5  划分关不掉  —— the contrast is between models, not between molecules; a split reassigns molecules and leaves it untouched",
+    "    C6  划分关不掉  —— a free energy is a property of the sequence, not of its relatedness to a training set",
+    "    C7  划分能关  —— THE one channel a split is built to close: it is defined by similarity between a test molecule and what the model was trained on",
+    "    C8  划分关不掉  —— the chemistry is a property of the assay, not of any partition of molecules",
+    "  八条里划分能关的:['C7'];其中承载的:无",
     "\n=== 账本 ===",
     "  C1  [NM] 承载     the model being scored (its structure IS the reference column)",
     "        +0.2400 SD measured against +0.0848 SD read as agreement",

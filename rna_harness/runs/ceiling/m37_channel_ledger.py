@@ -75,7 +75,9 @@ def main() -> int:
     # macro the manuscript prints so the two can be compared.
     CH = [
         dict(id="C1", who="the model being scored (its structure IS the reference column)",
-             paper="NM", carries=True,
+             paper="NM", carries=True, split_closable=False,
+             split_why="the reference column is the scored model's own output on whichever "
+                       "side of a split the molecule lands",
              price=f"{m36['standardised']['rescue_contrast_in_sd']:+.4f} SD measured against "
                    f"{m36['standardised']['rnet_contrast_in_sd']:+.4f} SD read as agreement",
              checks=[("cvIntvSd", m36["standardised"]["rescue_contrast_in_sd"]),
@@ -83,44 +85,55 @@ def main() -> int:
                      ("cvSwing", abs(m25["R2_all_target_pairs_NOT_P4"]["diff"]
                                      / m25["R2_inferred"]["diff"]))]),
         dict(id="C2", who="the design programs, through where they put the pair",
-             paper="R1", carries=True,
+             paper="R1", carries=True, split_closable=False,
+             split_why="placement is a property of how the molecule was written, and it travels "
+                       "with the molecule into either side",
              price=f"marginal {m20['marginal']:+.4f} against matched {m20['matched']:+.4f}; "
                    f"{100 * m20['mediated_fraction']:.1f}% of the gap predicted by beta*g",
              checks=[("medMarginal", m20["marginal"]), ("medMatched", m20["matched"]),
                      ("medObs", m20["observed_attenuation"]),
                      ("medPred", m20["predicted_attenuation"])]),
         dict(id="C3", who="whoever wrote the declared target, through helix depth",
-             paper="NM", carries=True,
+             paper="NM", carries=True, split_closable=False,
+             split_why="depth is read off a target somebody declared and travels with the molecule",
              price=f"depth alone {m31['depth_baseline']['rho']:+.4f} against the transformer's "
                    f"{m31['P_neural']['rho']:+.4f}",
              checks=[("rkRhoD", m31["depth_baseline"]["rho"]),
                      ("rkRhoN", m31["P_neural"]["rho"])]),
         dict(id="C4", who="the corpus builder, through the rule that selected the designs",
-             paper="NM", carries=True, direction="against",
+             paper="NM", carries=True, direction="against", split_closable=False,
+             split_why="the selection rule decided which molecules exist to be split at all",
              price=f"skill against the selecting score, Spearman {m30['spearman']:+.4f} "
                    f"{m30['ci']}",
              checks=[("selRhoRank", m30["spearman"])]),
         dict(id="C5", who="the model's authors, through decomposition and through training data",
-             paper="NM", carries=True,
+             paper="NM", carries=True, split_closable=False,
+             split_why="the contrast is between models, not between molecules; a split reassigns "
+                       "molecules and leaves it untouched",
              price=f"decomposition {m35['post_hoc_axes']['architecture_axis_neural_minus_eterna']['effect']:+.5f}, "
                    f"training data {m35['post_hoc_axes']['training_data_axis_eterna_minus_vienna']['effect']:+.5f}",
              checks=[("axArch", m35["post_hoc_axes"]["architecture_axis_neural_minus_eterna"]["effect"]),
                      ("axData", m35["post_hoc_axes"]["training_data_axis_eterna_minus_vienna"]["effect"])]),
         dict(id="C6", who="the objective the design loop was told to optimise (the model's own energy)",
-             paper="R1", carries=False,
+             paper="R1", carries=False, split_closable=False,
+             split_why="a free energy is a property of the sequence, not of its relatedness to a "
+                       "training set",
              price=f"retention {100 * m21['retention']:.1f}%, mediated "
                    f"{100 * m21p['mediated_fraction']:+.1f}% "
                    f"{[round(100 * x, 1) for x in m21p['mediated_fraction_ci95']]}, "
                    f"placebo z {m21p['z_vs_placebo']:+.2f}",
              checks=[("eRet", 100 * m21["retention"]), ("eZ", m21p["z_vs_placebo"])]),
         dict(id="C7", who="the model's training set, through window overlap",
-             paper="NM", carries=False,
+             paper="NM", carries=False, split_closable=True,
+             split_why="THE one channel a split is built to close: it is defined by similarity "
+                       "between a test molecule and what the model was trained on",
              price=f"skill slope {m26d['RibonanzaNet_all']['slope']:+.5f} against "
                    f"{m26d['RibonanzaNet_clean']['slope']:+.5f} on the excised subset",
              checks=[("clNeuralAll", m26d["RibonanzaNet_all"]["slope"]),
                      ("clNeuralClean", m26d["RibonanzaNet_clean"]["slope"])]),
         dict(id="C8", who="the probe chemistry the depositors chose",
-             paper="NM", carries=False,
+             paper="NM", carries=False, split_closable=False,
+             split_why="the chemistry is a property of the assay, not of any partition of molecules",
              price=f"paired rank difference across the two chemistries "
                    f"{m28r['paired_boot_corr_diff']['ci95']}, covering zero",
              checks=[]),
@@ -188,6 +201,27 @@ def main() -> int:
                      "n_priced": len(CH), "n_carrying": sum(c["carries"] for c in CH),
                      "n_unpriced_named": len(UNPRICED)}
 
+    # ---- check (4): what a fairer split would close. The field's standard remedy for a number
+    # carried by something other than the ability it names is to change the split. A split
+    # reassigns MOLECULES, so it can only close a channel whose covariate is a property of how
+    # molecules resemble one another. Classify every channel and refuse the claim if any row is
+    # unclassified -- an unclassified row would make the count below a guess.
+    log("\n--- 检查 4:换一个更公平的划分,能关掉哪几条 ---")
+    unclassified = [c["id"] for c in CH if "split_closable" not in c]
+    if unclassified:
+        log(f"  !! 未分类的通道 {unclassified} ⇒ 这条论点不许写")
+    closable = [c["id"] for c in CH if c.get("split_closable")]
+    carry_closable = [c["id"] for c in CH if c.get("split_closable") and c["carries"]]
+    for c in CH:
+        if "split_closable" in c:
+            log(f"    {c['id']}  {'划分能关' if c['split_closable'] else '划分关不掉'}"
+                f"  —— {c['split_why']}")
+    log(f"  八条里划分能关的:{closable or '无'};其中承载的:{carry_closable or '无'}")
+    OUT["check4_split"] = {"unclassified": unclassified, "split_closable": closable,
+                           "split_closable_and_carrying": carry_closable,
+                           "n_split_closable": len(closable),
+                           "n_not_split_closable": len(CH) - len(closable)}
+
     log("\n=== 账本 ===")
     for c in CH:
         mark = "承载" if c["carries"] else "不承载"
@@ -198,7 +232,8 @@ def main() -> int:
     OUT["channels"] = [{k: v for k, v in c.items() if k != "checks"} for c in CH]
     OUT["unpriced"] = UNPRICED
 
-    ok = not drift and OUT["check2_identity"]["attenuation_closes"] and empty_ok
+    ok = (not drift and OUT["check2_identity"]["attenuation_closes"] and empty_ok
+          and not unclassified)
     OUT["verdict"] = ("ledger_verified_the_unification_is_supported"
                       if ok else "LEDGER_FAILED_do_not_restructure_on_it")
     log(f"\n  {OUT['verdict']}")

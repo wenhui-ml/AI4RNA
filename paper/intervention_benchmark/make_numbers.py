@@ -572,6 +572,12 @@ put("chEmpty", f"{_led['check3']['n_priced'] - _led['check3']['n_carrying']}")
 put("chUnpriced", f"{_led['check3']['n_unpriced_named']}")
 put("chEps", sig(_led["check2_identity"]["residual_epsilon"], 4))
 put("chDrift", f"{len(_led['check1_macro_vs_artifact_drift'])}")
+# check 4: what the field's standard remedy -- a fairer split -- would and would not close.
+# The counts come from the ledger artifact's own classification, never from prose.
+put("chSplit", f"{_led['check4_split']['n_split_closable']}")
+put("chNoSplit", f"{_led['check4_split']['n_not_split_closable']}")
+put("chSplitCarry", f"{len(_led['check4_split']['split_closable_and_carrying'])}")
+put("chSplitId", ", ".join(_led["check4_split"]["split_closable"]) or "none")
 
 _ROWS = [
     ("C1", "the model being scored", "its own predicted structure, used as the reference",
