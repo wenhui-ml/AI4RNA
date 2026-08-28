@@ -212,12 +212,52 @@ put("scDeposits", f"{sv2['n_deposits_scanned']}")
 put("scFlips", f"{sv2['total_flips']:,}".replace(",", "{,}"))
 put("scHits", f"{sv2['n_with_interventions']}")
 
-# ---------------- expected: M28 has not run
-exp("xNatFlips", "3954")
-exp("xNatUsable", "160")
-exp("xNatFamilies", "3")
-exp("xNatProbes", "2")
-exp("xNatSkill", "positive")
+# ================================================================ F  M28, the second corpus
+# The transfer test. Two natural-RNA deposits; the criterion runs with its declared-pair clause
+# dropped, because these deposits declare no structure and the scan is exhaustive.
+m28 = J("m28_second_corpus.json")
+m28r = J("m28r_review.json")
+d28 = {x["rmdb_id"]: x for x in m28["deposits"]}
+sl5d, sl5a = d28["M2SL5_DMS_0000"], d28["M2SL5_2A3_0000"]
+
+put("xnFamilies", f"{sl5d['A']['n_families']}")
+put("xnProbes", "two")
+put("xnAdmitDms", f"{sl5d['A']['n_admitted']}")
+put("xnAdmitTwoA", f"{sl5a['A']['n_admitted']}")
+put("xnShared", f"{m28['D_two_probes']['M2SL5']['n_shared']}")
+put("xnSnCut", f"{m28['sn_threshold']:.1f}")
+
+# the cross-probe comparison is made on a scale-free statistic: the two outcomes differ in
+# dispersion by xnSdRatio, so raw slopes are not comparable across probes.
+sc = m28r["R2_outcome_scale"]
+put("xnSdRatio", f"{sc['ratio']:.2f}")
+put("xnSdDms", f"{sc['DMS_sd']:.4f}")
+put("xnSdTwoA", f"{sc['2A3_sd']:.4f}")
+put("xnOutliersDms", f"{sc['DMS_below_minus1']}")
+
+for nm, tag in (("ViennaRNA", "V"), ("RibonanzaNet", "N")):
+    a = m28r["R2_arms"][nm]
+    put(f"xnRho{tag}Dms", sig(a["within_spearman"]["DMS"]))
+    put(f"xnRho{tag}TwoA", sig(a["within_spearman"]["2A3"]))
+    put(f"xnRho{tag}DmsP", pv(a["within_spearman_p"]["DMS"]))
+    put(f"xnRho{tag}TwoAP", pv(a["within_spearman_p"]["2A3"]))
+    put(f"xnDiff{tag}", ci(a["paired_boot_corr_diff"]["ci95"]))
+
+# the pre-registered statistic, reported unchanged next to it
+put("xnSlopeVDms", sig(sl5d["C"]["ViennaRNA"]["slope"], 5))
+put("xnSlopeVTwoA", sig(sl5a["C"]["ViennaRNA"]["slope"], 5))
+put("xnSlopeVTwoAP", pv(sl5a["C"]["ViennaRNA"]["p_perm"]))
+put("xnSlopeNDms", sig(sl5d["C"]["RibonanzaNet"]["slope"], 5))
+put("xnSlopeNTwoA", sig(sl5a["C"]["RibonanzaNet"]["slope"], 5))
+
+# the frameshift deposit: exhaustive, and unusable for a reason worth one sentence
+fse = d28["M3SARS_DMS_0000"]
+gate = m28r["R1_reference_gating"]["M3SARS_DMS_0000"]
+put("xnFseFlips", f"{sum(g['n_flips'] for g in gate)}")
+put("xnFseAdmit", f"{fse['A']['n_admitted']}")
+put("xnFseSnLo", f"{min(g['wt_sn'] for g in gate):.3f}")
+put("xnFseSnHi", f"{max(g['wt_sn'] for g in gate):.3f}")
+put("xnSl5SnLo", f"{min(g['wt_sn'] for g in m28r['R1_reference_gating']['M2SL5_DMS_0000']):.3f}")
 
 # ================================================================ write
 out = [

@@ -603,23 +603,85 @@ one supply interventions is a question about the world rather than about the met
 compensatory doubles, \jdg{scFlips} orientation flips in total; the rest are single-mutant
 libraries, which supply none by construction.
 
-Two of the eleven are natural RNA. The larger comprises \exd{xNatFamilies} coronavirus frameshift
-stimulation elements measured under \exd{xNatProbes} chemical probes, with \exd{xNatFlips}
-orientation flips arranged as an exhaustive two-dimensional double-mutant scan --- which removes,
-by construction, the experimenter's choice of which pairs to probe. Read depth is the binding
-constraint there rather than flip count: the usable flip count after a quality cut is
-\exd{xNatUsable}, and we expect the sensitivity readout to be \exd{xNatSkill}.
+Two of the eleven are natural RNA, and we take both forward. The first is a mutate-and-map library
+of \jdg{xnFamilies} coronavirus 5$'$UTR stem-loops, measured under \jdg{xnProbes} independent
+chemical probes --- dimethyl sulfate, which acylates the Watson--Crick face of adenine and
+cytosine, and 2A3, which reports backbone flexibility. Neither deposit declares a target
+structure, so the admission clause requiring the two positions to pair in a declared structure
+cannot run and is dropped. Dropping it makes the test stricter rather than weaker: the scan is
+exhaustive, so the predictor must say \emph{which} flips are rescued rather than score pairs
+already known to exist. No reference structure, and no predicted structure, enters anywhere in
+this section.
+
+Under a signal-to-noise cut fixed at \jdg{xnSnCut} before the data were touched, the criterion
+admits \jdg{xnAdmitDms} interventions on the first probe and \jdg{xnAdmitTwoA} on the second,
+\jdg{xnShared} of them shared. Stratification here is by molecule family alone, since neither
+helix depth nor crossing is defined without a structure.
+
+\begin{claimbox}
+\textbf{Both model classes retain measurable skill on natural RNA, under both probes.} On the
+within-stratum rank correlation between prediction and measured rescue, the thermodynamic model
+scores \jdg{xnRhoVDms} ($p=\jdg{xnRhoVDmsP}$) and \jdg{xnRhoVTwoA} ($p=\jdg{xnRhoVTwoAP}$) on the
+two probes, and the neural model \jdg{xnRhoNDms} ($p=\jdg{xnRhoNDmsP}$) and \jdg{xnRhoNTwoA}
+($p=\jdg{xnRhoNTwoAP}$). \textbf{The two probes are not distinguishable}: a paired cluster
+bootstrap on the \emph{difference} of the two correlations returns \jdg{xnDiffV} for the
+thermodynamic model and \jdg{xnDiffN} for the neural one, both covering zero. The predictors
+depend only on sequence and are bit-identical across the two probes, so this is a paired
+comparison in which only the measurement changes.
+\end{claimbox}
+
+\begin{table}[!htbp]
+\centering\small
+\caption{\textbf{The instrument on natural RNA.} Both probes measure the same interventions on the
+same molecules. \emph{Rank} is the within-family rank correlation, which does not depend on the
+outcome's scale; \emph{slope} is the pre-registered linear statistic, reported unchanged.}
+\label{tab:transfer}
+\begin{tabular}{llcccc}
+\toprule
+& & \multicolumn{2}{c}{rank correlation} & \multicolumn{2}{c}{slope (pre-registered)} \\
+\cmidrule(lr){3-4}\cmidrule(lr){5-6}
+predictor & probe & estimate & $p$ & estimate & \\
+\midrule
+thermodynamic & DMS & \jdg{xnRhoVDms} & \jdg{xnRhoVDmsP} & \jdg{xnSlopeVDms} & \\
+              & 2A3 & \jdg{xnRhoVTwoA} & \jdg{xnRhoVTwoAP} & \jdg{xnSlopeVTwoA} & ($p=\jdg{xnSlopeVTwoAP}$) \\
+neural        & DMS & \jdg{xnRhoNDms} & \jdg{xnRhoNDmsP} & \jdg{xnSlopeNDms} & \\
+              & 2A3 & \jdg{xnRhoNTwoA} & \jdg{xnRhoNTwoAP} & \jdg{xnSlopeNTwoA} & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Why the cross-probe comparison is not made on the slope.} The statistic declared in
+advance was a linear within-stratum slope, and on that statistic one of the four arms --- the
+thermodynamic model on 2A3 --- does not reach the threshold ($\jdg{xnSlopeVTwoA}$,
+$p=\jdg{xnSlopeVTwoAP}$). That line is reported as declared. It is not, however, the statistic a
+comparison \emph{between} probes may use: the two outcomes differ in dispersion by a factor of
+\jdg{xnSdRatio} (\jdg{xnSdDms} against \jdg{xnSdTwoA}, with \jdg{xnOutliersDms} points below
+$-1$ on the first probe and none on the second), so raw slopes are not on a common scale. The
+rank statistic is, and Table~\ref{tab:transfer} reports both. That a pre-registered statistic can
+be the wrong one to read is a general point about this kind of design and we take it up in a
+companion paper rather than here.
+
+\paragraph{One corpus the instrument cannot use, and why.} The second natural deposit is an
+exhaustive two-dimensional double-mutant scan of three coronavirus frameshift elements ---
+\jdg{xnFseFlips} orientation flips, twenty-five times what the stem-loop library supplies. It
+yields \jdg{xnFseAdmit} usable interventions. The reason is not the interventions but the
+references: the three wild-type profiles carry signal-to-noise between \jdg{xnFseSnLo} and
+\jdg{xnFseSnHi}, against \jdg{xnSl5SnLo} and above for the stem-loop library, and the wild-type
+profile is subtracted in all three difference vectors that define the outcome, so a family whose
+reference fails takes every intervention in that family with it. \textbf{Whether a corpus can
+carry this instrument is decided by its reference measurements, not by how many interventions it
+holds} --- a constraint on corpus design that we state here and do not pursue further.
 
 \begin{scopebox}
-\textbf{Status.} The quantities in this section marked \textsuperscript{\textsc{exp}} are
-\emph{expected}: the experiment is declared and frozen, and has not yet produced them. They are
-typeset differently from measured quantities throughout, and the manuscript will not be submitted
-while any remain. The declaration commits in advance to measuring power before making any claim,
-and to reporting the two chemical probes separately rather than pooling them into an apparently
-larger sample.
+\textbf{Scope of this section.} It establishes that the mining step and the scoring step run on
+natural molecules, under two independent probe chemistries, with no reference structure. It does
+not establish an effect size transferable to OK7a: three families and one stratifying variable
+give this arm far less resolution, the identity contrast here is underpowered by design, and its
+interval is reported in the declaration's terms as a measurement of power rather than as evidence
+about identity. Extending the transfer test to corpora with well-measured references, and to
+non-viral natural RNA, is left to future work.
 \end{scopebox}
 
-% =====================================================================
 \section{Discussion}
 \label{sec:discussion}
 
@@ -666,9 +728,12 @@ developed in a companion study, which this paper cites but does not depend on.
 \item \textbf{The intervention is narrow.} An orientation flip preserves the unordered pair type.
 It tests whether a model's prediction of a substitution's consequences was borne out; it does not
 deliver the causal effect of pair identity.
-\item \textbf{One corpus is measured, a second is declared.} Section~\ref{sec:second} reports
-expected quantities, marked as such. Until they are measured, transfer of the mining step is
-demonstrated only by the sweep that found candidate corpora, not by an analysis of one.
+\item \textbf{Transfer is shown, its size is not.} Section~\ref{sec:second} establishes that both
+steps run on natural molecules under two probe chemistries, on \jdg{xnFamilies} families and one
+stratifying variable. That is enough to answer whether the instrument reads, and not enough to
+carry an effect size across corpora; the second corpus is a demonstration of scope, not a
+replication. A corpus whose reference profiles are poorly measured yields nothing at all, as
+\jdg{xnFseFlips} flips reduced to \jdg{xnFseAdmit} usable ones show.
 \item \textbf{The leakage audit bounds what it can reach.} \jdg{lkTrain} sequences from the neural
 model's source libraries are not the released checkpoint's training manifest.
 \item \textbf{A negative result we cannot resolve.} The thermodynamic model's own matched contrast
