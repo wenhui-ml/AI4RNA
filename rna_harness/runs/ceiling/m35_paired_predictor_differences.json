@@ -1,0 +1,177 @@
+{
+  "nboot": 2000,
+  "nperm": 2000,
+  "seed": 3501,
+  "S1_join_missing": 0,
+  "S2_equivalence": {
+    "measured": {
+      "here": 0.05393,
+      "published": 0.05393,
+      "abs_diff": 1.570701251188411e-06,
+      "passed": true
+    },
+    "neural": {
+      "here": 0.06055,
+      "published": 0.06055,
+      "abs_diff": 2.733586797601384e-06,
+      "passed": true
+    },
+    "vienna": {
+      "here": -0.03039,
+      "published": -0.03039,
+      "abs_diff": 2.9222493442351838e-06,
+      "passed": true
+    },
+    "eterna": {
+      "here": -0.00569,
+      "published": -0.00569,
+      "abs_diff": 3.85762455251161e-07,
+      "passed": true
+    }
+  },
+  "S3_boot_usable": 2000,
+  "paired_differences": {
+    "neural_minus_vienna": {
+      "effect": 0.09094,
+      "ci": [
+        0.05277,
+        0.13176
+      ],
+      "p_perm": 0.0005,
+      "covers_zero": false
+    },
+    "neural_minus_eterna": {
+      "effect": 0.06624,
+      "ci": [
+        0.03472,
+        0.10124
+      ],
+      "p_perm": 0.0005,
+      "covers_zero": false
+    },
+    "vienna_minus_eterna": {
+      "effect": -0.0247,
+      "ci": [
+        -0.04278,
+        -0.00422
+      ],
+      "p_perm": 0.0025,
+      "covers_zero": false
+    },
+    "measured_minus_neural": {
+      "effect": -0.00662,
+      "ci": [
+        -0.04164,
+        0.032
+      ],
+      "p_perm": 0.61319,
+      "covers_zero": true
+    },
+    "measured_minus_vienna": {
+      "effect": 0.08432,
+      "ci": [
+        0.03388,
+        0.13206
+      ],
+      "p_perm": 0.0005,
+      "covers_zero": false
+    },
+    "measured_minus_eterna": {
+      "effect": 0.05962,
+      "ci": [
+        0.02203,
+        0.09946
+      ],
+      "p_perm": 0.001,
+      "covers_zero": false
+    }
+  },
+  "post_hoc_axes": {
+    "_why": "forced by P3 failing; not staked in the declaration",
+    "architecture_axis_neural_minus_eterna": {
+      "effect": 0.06624,
+      "ci": [
+        0.03472,
+        0.10124
+      ]
+    },
+    "training_data_axis_eterna_minus_vienna": {
+      "effect": 0.0247,
+      "ci": [
+        0.00436,
+        0.0428
+      ]
+    },
+    "architecture_minus_training_data": {
+      "effect": 0.04155,
+      "ci": [
+        0.00583,
+        0.08095
+      ],
+      "covers_zero": false
+    },
+    "both_axes_move_in_the_measured_direction": true
+  },
+  "staked": {
+    "P1": {
+      "quantity": "neural_minus_vienna",
+      "predicted": "EXCLUDES",
+      "held": true
+    },
+    "P2": {
+      "quantity": "neural_minus_eterna",
+      "predicted": "EXCLUDES",
+      "held": true
+    },
+    "P3": {
+      "quantity": "vienna_minus_eterna",
+      "predicted": "COVERS",
+      "held": false
+    },
+    "P4": {
+      "quantity": "measured_minus_neural",
+      "predicted": "COVERS",
+      "held": true
+    }
+  },
+  "kill_conditions": {
+    "K1_decomposition_sentence_unlicensed": false,
+    "K2_separation_withdrawn": false,
+    "K4_tracking_must_go": false
+  },
+  "verdict": "difference_intervals_support_the_headline",
+  "log": [
+    "=== M35:三个预测器之间【差值】的区间 ===\n",
+    "纳入 4317 次干预",
+    "--- S1 连接 ---\n  四列齐备 4317/4317,缺 0",
+    "\n--- S2 单列等价(必须对上已发表的数)---",
+    "  measured  本脚本 +0.05393   已发表 +0.05393   差 1.57e-06   OK",
+    "  neural    本脚本 +0.06055   已发表 +0.06055   差 2.73e-06   OK",
+    "  vienna    本脚本 -0.03039   已发表 -0.03039   差 2.92e-06   OK",
+    "  eterna    本脚本 -0.00569   已发表 -0.00569   差 3.86e-07   OK",
+    "\n--- S3 自助 ---\n  20 个 puzzle,每次抽样同一组下标喂给四列",
+    "  2000/2000 次抽样四列都可估",
+    "\n=== 配对差(同一次抽样内的两列相减)===",
+    "  neural    - vienna     +0.09094   CI [0.05277, 0.13176]   置换 p 0.00050   不含 0",
+    "  neural    - eterna     +0.06624   CI [0.03472, 0.10124]   置换 p 0.00050   不含 0",
+    "  vienna    - eterna     -0.02470   CI [-0.04278, -0.00422]   置换 p 0.00250   不含 0",
+    "  measured  - neural     -0.00662   CI [-0.04164, 0.032]   置换 p 0.61319   含 0",
+    "  measured  - vienna     +0.08432   CI [0.03388, 0.13206]   置换 p 0.00050   不含 0",
+    "  measured  - eterna     +0.05962   CI [0.02203, 0.09946]   置换 p 0.00100   不含 0",
+    "\n=== 事后(P3 押输逼出来的):两条轴各自移动了多少 ===",
+    "  架构轴   neural - eterna  +0.06624  CI [0.03472, 0.10124]",
+    "  训练数据轴 eterna - vienna +0.02470  CI [0.00436, 0.0428]",
+    "  两轴之差                  +0.04155  CI [0.00583, 0.08095]  不含 0",
+    "  两条轴都朝实测方向移动:True",
+    "\n=== 押注 ===",
+    "  P1  neural_minus_vienna      押 EXCLUDES  成立",
+    "  P2  neural_minus_eterna      押 EXCLUDES  成立",
+    "  P3  vienna_minus_eterna      押 COVERS    **未成立**",
+    "  P4  measured_minus_neural    押 COVERS    成立",
+    "\n=== 杀条件 ===",
+    "  K1_decomposition_sentence_unlicensed: False",
+    "  K2_separation_withdrawn: False",
+    "  K4_tracking_must_go: False",
+    "\n  difference_intervals_support_the_headline"
+  ]
+}

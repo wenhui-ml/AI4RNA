@@ -86,6 +86,10 @@
   \ifcsname exd@#1\endcsname\textcolor{S2}{\csname exd@#1\endcsname\,\textsuperscript{\textsc{exp}}}%
   \else\textbf{??#1??}\PackageError{nm}{undefined expected quantity #1}{}\fi}
 
+% Claims were numbered by hand -- three literals that a reordering would silently break, and
+% nothing in the text could \ref one. \claimhead steps a counter and plants the label.
+\newcounter{claimno}
+\newcommand{\claimhead}[1]{\refstepcounter{claimno}\label{#1}\textbf{Claim \theclaimno.}}
 \newtcolorbox{claimbox}{breakable,enhanced,colback=cbBack,colframe=cbLine,
   boxrule=0.6pt,left=6pt,right=6pt,top=5pt,bottom=5pt,arc=1pt}
 \newtcolorbox{scopebox}{breakable,enhanced,colback=sbBack,colframe=sbLine,
@@ -137,8 +141,10 @@ contains no folding model --- and score three predictors by response instead. A 
 output separates G--C from A--U targets in matched contexts by \jdg{resNeural}
 (\jdg{resNeuralCi}); neither predictor built on the nearest-neighbour decomposition does so,
 including one whose parameters were fitted to the same kind of data the transformer was trained on
-(\jdg{resVienna}, \jdg{efContrast}), so the split follows the decomposition and not the training
-data. Asked instead which flips rescue within one design, a free integer --- helix depth in the
+(\jdg{resVienna}, \jdg{efContrast}). Paired on one resample, all three predictors differ from each
+other, so the effect decomposes rather than dichotomises: changing the decomposition is worth
+\jdg{axArch} (\jdg{axArchCi}) and changing the training data \jdg{axData} (\jdg{axDataCi}), a gap
+of \jdg{axGap} (\jdg{axGapCi}). Asked instead which flips rescue within one design, a free integer --- helix depth in the
 declared target --- is matched by all three (differences \jdg{rkDiffNCi}, \jdg{rkDiffVCi} and
 \jdg{efVsDepthCi}, all covering zero). What survives with depth held fixed is real but modest
 (\jdg{rkPartN}, \jdg{rkPartNCi}). We reproduce the rule
@@ -581,6 +587,19 @@ its length, and whatever the design programs found easy about it, so interventio
 within a target and not across. Section~\ref{sec:estimation} reports how many independent clusters
 this leaves, because that number, and not the intervention count, is what the intervals rest on.
 
+\paragraph{Two things the intervals cannot fix, stated here rather than left to a referee.}
+The cluster bootstrap resamples \jdg{ccPuzzles} units. A percentile interval built on that few
+clusters is known to be optimistic, and no correction is applied: we report the cluster count
+beside every interval instead, and every interval in this paper should be read as at least as wide
+as printed rather than as exact. The second is multiplicity. This paper reports of order thirty
+contrasts and rank statistics across its arms, and applies no family-wise or false-discovery
+correction. What it does instead is fix the gate at $0.005$ in advance, declare each arm's
+predictions before the run, and rest no claim on a $p$-value alone --- every claim carries an
+interval, and the ones that matter carry an interval \emph{on a difference}. A reader who prefers
+a corrected threshold can apply one: the claims that would survive a Bonferroni correction at
+thirty tests are exactly those reported with $p=\jdg{resOutP}$, which is the smallest attainable
+value at the permutation count used.
+
 \paragraph{What is not done.}
 No model is fitted to the outcome, so there is no regression to be misspecified and no coefficient
 whose standard error depends on a variance assumption \citep{freedman1983nonstochastic}. The price
@@ -761,21 +780,43 @@ readouts are defined, intersect to the \jdg{cvPairs} pairs both can score, and v
 the two analyses receive byte-identical stratum weights (\jdg{cvWeight} pair-weights over
 \jdg{cvStrata} strata) before either is computed.
 
-\paragraph{It is saturated.} The structure inferred from the wild-type profile already contains
-the target pair for \jdg{cvHitCG} of G--C targets, \jdg{cvHitAU} of A--U targets and
-\jdg{cvHitGU} of G--U targets. Whatever a benchmark built on that agreement can still resolve, it
+\paragraph{What the incumbent readout is here, exactly.} It is the agreement readout the benchmark
+itself ships, and naming its source changes how the comparison should be read. The released file
+\jdg{cvSourceFile} carries two structure columns and no others: the declared target, and
+\jdg{cvSourceCol} --- \emph{RibonanzaNet's own sequence-to-structure prediction}. It carries no
+probing-derived structure column at all. So the comparison below is not against a
+profile-constrained fold, and two consequences follow that we state rather than leave to a reader
+who opens the code. First, the degeneracy of profile-constrained folding described in
+\S\ref{sec:background} is a property of that literature and \emph{is not what this subsection
+measures}; what this subsection measures is the readout this benchmark actually distributes.
+Second, that readout is produced by the same model whose contrast is Claim~\ref{claim:identity}'s
+subject, so the two are not independent, and the comparison here should be read as one model's
+output examined two ways --- collapsed into a structure, and left as a probability --- rather than
+as a neutral incumbent against a challenger.
+
+\paragraph{It is saturated.} Averaged over that model's sampled structures, the target pair is
+present with frequency \jdg{cvHitCG} for G--C targets, \jdg{cvHitAU} for A--U targets and
+\jdg{cvHitGU} for G--U targets. Whatever a benchmark built on that agreement can still resolve, it
 is resolving in the last tenth of the range.
 
-\paragraph{It gives a smaller answer on the same data.} The identity contrast read
-interventionally is \jdg{cvIntv} ($p=\jdg{cvIntvP}$); read conventionally, from whether the
-inferred structure contains the pair, it is \jdg{cvConv} ($p=\jdg{cvConvP}$), a ratio of
-\jdg{cvRatio}. Because the two readouts are defined on the same molecules and the same pairs, the
-difference can be tested directly: a design-clustered bootstrap of the paired difference gives
-\jdg{cvPaired} (\jdg{cvPairedCi}), which excludes zero. The two readouts are measuring different
-things, and it is not a matter of one being noisier.
+\paragraph{It gives a smaller answer on the same data, and the comparison has to be made in
+standard deviations.} The identity contrast read interventionally is \jdg{cvIntv}
+($p=\jdg{cvIntvP}$); read as agreement, from how often the predicted structure contains the pair,
+it is \jdg{cvConv} ($p=\jdg{cvConvP}$). Those two numbers are not on one scale and may not simply
+be subtracted --- that is the fault this paper retracts in \S\ref{sec:second}, and it applies to
+its own Claim~\ref{claim:readout} unless the scales are made explicit. The two columns' pooled
+within-stratum standard deviations are \jdg{cvSdRescue} and \jdg{cvSdRnet}, so in units of each
+column's own dispersion the contrasts are \jdg{cvIntvSd} and \jdg{cvConvSd} standard deviations.
+Because both readouts are defined on the same molecules and the same pairs, the difference can be
+tested directly on one design-clustered resample: \jdg{cvPairedSd} standard deviations
+(\jdg{cvPairedSdCi}), which excludes zero --- a factor of \jdg{cvRatioSd} between the two
+readouts on their own scales. In raw units the same difference is \jdg{cvPaired}
+(\jdg{cvPairedCi}), reported here only so the two can be compared, and not relied on. The two
+readouts are measuring different things, and it is not a matter of one being noisier.
 
-\paragraph{It has a knob.} Scoring instead every target pair of the same designs --- a choice no
-less defensible, and one that no longer satisfies the matched-pair-set constraint --- returns
+\paragraph{It has a knob.} Scoring instead every target pair of the same designs --- a choice
+routinely made, and one we would not make here because it breaks the matched-pair-set constraint
+this comparison is built on --- returns
 \jdg{cvAlt} on \jdg{cvAltWeight} pair-weights, a factor of \jdg{cvSwing} away from
 \jdg{cvConv}. The hit rates on that larger set are \jdg{cvAltHitCG} and \jdg{cvAltHitAU}, so the
 enlargement is not benign: it adds pairs the inferred structure mostly does not contain. The
@@ -784,7 +825,7 @@ compensatory mutant was made, and which mutants were made is a fact about the co
 choice by the analyst.
 
 \begin{claimbox}
-\textbf{Claim 1.} On this corpus the conventional structure-agreement readout is near saturation
+\claimhead{claim:readout} On this corpus the conventional structure-agreement readout is near saturation
 for the pairs under comparison, and its answer moves by \jdg{cvSwing}$\times$ with a defensible
 change in which pairs are admitted. The interventional readout, on the same molecules and strata,
 returns a contrast \jdg{cvPaired} (\jdg{cvPairedCi}) larger and admits no such choice.
@@ -810,9 +851,10 @@ Applying Definition~\ref{def:flip} to the corpus's \jdg{nConstructs} constructs 
 refuses the rest for three reasons: \jdg{nExclTwoPos} constructs do not differ from their wild
 type at exactly two in-window positions, \jdg{nExclNonCanon} carry a non-canonical wild-type pair,
 and \jdg{nExclNoOutcome} have no measured outcome. Clause (ii) of Definition~\ref{def:flip} is
-asserted in code on every admitted record, and \jdg{nDropped} records are dropped by that
-assertion, which is the check working rather than a coincidence: the corpus's own annotation and
-the sequences agree.
+re-asserted in code on every admitted record, against the sequences rather than against the
+corpus's own mutation annotation. \jdg{nDropped} records fail it, which is the two sources
+agreeing; had the annotation disagreed with the sequences anywhere, the count would be non-zero and
+those records would be refused rather than reconciled.
 
 The \jdg{nAdmitted} interventions span \jdg{nUniqueSeq} distinct sequences once wild types are
 counted. Every one of them is a molecule that was synthesised and probed.
@@ -953,8 +995,33 @@ The transformer's prediction separates the two pair types by \jdg{resNeural}, in
 direction as the measurement's \jdg{resOut} and of comparable magnitude. Neither predictor built
 on the nearest-neighbour decomposition resolves such a separation, and the two of them differ in
 where their parameters came from: ViennaRNA's from optical melting, EternaFold's from the same
-kind of chemical-mapping data the transformer was trained on. \textbf{The split therefore falls
-along the decomposition and not along the training data.} The measurement figures are computed
+kind of chemical-mapping data the transformer was trained on.
+
+\paragraph{The differences, with intervals, because the point estimates do not license the claim.}
+Three contrasts with three intervals say nothing about the differences between them, and a
+covering interval is not evidence of no effect --- the fault this paper records as a failed kill
+condition in Appendix~\ref{app:prereg} and retracts again in \S\ref{sec:second}. Every difference
+below is therefore computed on \emph{one} resample of the \jdg{ccPuzzles} puzzles per draw, with
+all four columns evaluated on that same draw, so the differences are paired. All three resolve:
+the transformer exceeds the thermodynamic model by \jdg{pdNV} (\jdg{pdNVCi}, $p=\jdg{pdNVP}$) and
+the learned-parameter model by \jdg{pdNE} (\jdg{pdNECi}, $p=\jdg{pdNEP}$), and the two
+nearest-neighbour models differ from \emph{each other} by \jdg{pdVE} (\jdg{pdVECi},
+$p=\jdg{pdVEP}$). The measurement is indistinguishable from the transformer (\jdg{pdMN},
+\jdg{pdMNCi}, $p=\jdg{pdMNP}$) and separated from both others (\jdg{pdMV}, \jdg{pdMVCi}, $p=\jdg{pdMVP}$;
+\jdg{pdME}, \jdg{pdMECi}, $p=\jdg{pdMEP}$).
+
+\textbf{That last difference is what we predicted would cover zero, and it does not.} We staked
+before the run that the two nearest-neighbour models would be indistinguishable, which is what the
+earlier phrasing of this result --- \emph{the split follows the decomposition and not the training
+data} --- asserted. They are not indistinguishable, so that phrasing is withdrawn. What replaces
+it is a decomposition rather than a dichotomy, since the three predictors differ pairwise along one
+axis each. Holding the training data at chemical mapping and changing the decomposition is worth
+\jdg{axArch} (\jdg{axArchCi}); holding the decomposition and changing the parameters from optical
+melting to chemical mapping is worth \jdg{axData} (\jdg{axDataCi}). \textbf{Both axes move the
+contrast toward the measurement, and the decomposition moves it \jdg{axRatio}$\times$ further ---
+a gap of \jdg{axGap} (\jdg{axGapCi}) that itself excludes zero.} The training data is not
+irrelevant; it is the smaller of two effects that point the same way. This quantity was not staked
+and is reported as post hoc. The measurement figures are computed
 twice, by \texttt{designaudit}'s bincount estimator and by an independently written dictionary
 implementation, agreeing to \jdg{resAgree}; the EternaFold row is computed through a third script
 whose reproduction of the ViennaRNA row agrees with the published value exactly.
@@ -973,14 +1040,17 @@ A--U) that it cannot manufacture a difference, and dropping every censored recor
 estimate to \jdg{efClean} (\jdg{efCleanCi}).
 
 \begin{claimbox}
-\textbf{Claim 2.} On \jdg{nAdmitted} executed two-nucleotide interventions, a neural predictor's
+\claimhead{claim:identity} On \jdg{nAdmitted} executed two-nucleotide interventions, a neural predictor's
 own output distinguishes G--C from A--U targets in matched contexts by \jdg{resNeural}
 (\jdg{resNeuralCi}), tracking the measurement's \jdg{resOut} (\jdg{resOutCi}); a thermodynamic
 predictor's output does not resolve such a separation, and neither does a second predictor on that
 same decomposition whose parameters were fitted to chemical mapping (\jdg{resVienna},
 \jdg{resViennaCi}; \jdg{efContrast}, \jdg{efContrastCi}). The instrument distinguishes something
 one structural decomposition represents and the other does not, without a reference structure
-entering the comparison, and the separation does not follow the training data.
+entering the comparison. Paired over the same resample, the transformer exceeds the two of them
+by \jdg{pdNVCi} and \jdg{pdNECi} and they differ from each other by \jdg{pdVECi}, so the effect
+decomposes rather than dichotomises: the decomposition is worth \jdg{axArch} (\jdg{axArchCi}) and
+the training data \jdg{axData} (\jdg{axDataCi}), a gap of \jdg{axGap} (\jdg{axGapCi}).
 \end{claimbox}
 
 \paragraph{What we are not claiming.} The thermodynamic point estimate is negative, and that
@@ -1127,7 +1197,7 @@ of the within-cell pairs are tied on it, and that is the room a tie-break has to
 the whole of the practical claim, and it is small.
 
 \begin{claimbox}
-\textbf{Claim 3.} On this task a free integer matches a transformer trained on roughly two million
+\claimhead{claim:depth} On this task a free integer matches a transformer trained on roughly two million
 chemical-mapping profiles (\jdg{rkRhoD} against \jdg{rkRhoN}, difference \jdg{rkDiffNCi}). Holding
 it fixed, both predictors retain a real but modest ordering ability (\jdg{rkPartN} and
 \jdg{rkPartV}, both $p\le\jdg{rkPartNP}$), worth \jdg{rkGainN} points of recovery when used to
@@ -1251,7 +1321,11 @@ mapping. The licensed statement concerns those predictors and those parameterisa
 here supports a claim about all existing models, and the declaration governing these runs forbade
 that phrase in advance. What the third predictor buys is narrower and worth stating exactly: it
 breaks the tie between \emph{architecture} and \emph{training data} that the first two leave
-joined, and it comes down on the side of the decomposition.
+joined. It does not resolve that tie into a dichotomy: both axes move the contrast in the
+measured direction, and what is measurable is which moves it further --- \jdg{axArch}
+(\jdg{axArchCi}) for the decomposition against \jdg{axData} (\jdg{axDataCi}) for the training
+data. We had written this result as the decomposition mattering and the training data not, and the
+interval on the difference between the two nearest-neighbour models refused it.
 
 \paragraph{Beyond RNA.}
 The primitive --- recover interventions a corpus already contains, score a model on its predicted
@@ -1354,14 +1428,17 @@ separates the predictors: a transformer's own pairing probability distinguishes 
 targets in matched contexts by \jdg{resNeural} (\jdg{resNeuralCi}) where the measurement puts them
 \jdg{resOut} (\jdg{resOutCi}) apart, and neither predictor built on the nearest-neighbour
 decomposition does so --- \jdg{resVienna} (\jdg{resViennaCi}) and \jdg{efContrast}
-(\jdg{efContrastCi}). On the axis an experimenter would actually use, which flips to build inside
+(\jdg{efContrastCi}). Paired on one resample the three differ pairwise, and the separation
+decomposes into a decomposition axis worth \jdg{axArch} (\jdg{axArchCi}) and a training-data axis
+worth \jdg{axData} (\jdg{axDataCi}); we had written that the second was absent, and the interval
+said otherwise. On the axis an experimenter would actually use, which flips to build inside
 one design, all three are matched or beaten by helix depth: an integer read off the declared
 target that costs nothing, is not reported as a baseline anywhere we have found, and against which
 the differences are \jdg{rkDiffNCi}, \jdg{rkDiffVCi} and \jdg{efVsDepthCi}, all covering zero.
 What survives with depth held fixed is real and modest, \jdg{rkPartN} (\jdg{rkPartNCi}).
 
 The instrument is the contribution, and the result that matters most for how it will be used is
-the third one: a benchmark that does not report the free baseline will credit a model for
+Claim~\ref{claim:depth}: a benchmark that does not report the free baseline will credit a model for
 knowing where a pair sits in its helix. We report ours, and it is not beaten.
 
 
@@ -1451,6 +1528,25 @@ Top-quartile recovery beats random by $\ge5$ points & correct \\
   interval. Reissued against the paired interval \jdg{rkDiffNCi}} & \textbf{failed} \\
 The base rate of rescue lies in $[0.2,0.8]$ \quad(\jdg{rkBase}) & correct \\
 Ranking survives the selection and leakage control populations & correct \\
+\midrule
+\multicolumn{2}{@{}l@{}}{\emph{frozen before the paired-difference arm existed (\S\ref{sec:result})}}\\
+Each predictor's contrast, recomputed on the joined columns, reproduces its published value to
+  $<10^{-4}$ & correct \\
+The transformer exceeds the thermodynamic model, interval on the difference excluding zero
+  \quad(\jdg{pdNVCi}) & correct \\
+The transformer exceeds the learned-parameter model, interval excluding zero
+  \quad(\jdg{pdNECi}) & correct \\
+\textbf{The two nearest-neighbour models are indistinguishable from each other, interval covering
+  zero} --- \emph{it does not: \jdg{pdVE} (\jdg{pdVECi}). This is the prediction whose failure
+  removed \emph{and not the training data} from the abstract, Claim~\ref{claim:identity} and the
+  Conclusion} & \textbf{failed} \\
+The measurement and the transformer are indistinguishable \quad(\jdg{pdMNCi}) & correct \\
+\midrule
+\multicolumn{2}{@{}l@{}}{\emph{frozen before the readout-scale arm existed (\S\ref{sec:conventional})}}\\
+Both readouts reproduce their published contrasts on identical weights and strata & correct \\
+The rescue column's within-stratum SD lies in $[\jdg{cvSdRescueLo},\jdg{cvSdRescueHi}]$ \quad(\jdg{cvSdRescue}) & correct \\
+The agreement column's within-stratum SD lies in $[\jdg{cvSdRnetLo},\jdg{cvSdRnetHi}]$ \quad(\jdg{cvSdRnet}) & correct \\
+The standardised paired difference excludes zero \quad(\jdg{cvPairedSdCi}) & correct \\
 \end{longtable}}
 
 \noindent The fifth row of the last block is the one worth reading. Its run returned every staked

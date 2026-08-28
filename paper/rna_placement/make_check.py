@@ -37,27 +37,70 @@ CTX = re.compile(r"(linewidth|textwidth|pt\b|em\b|in\}|HTML|\\setcounter|fractio
 NUM = re.compile(r"(?<![\w.])(\d+\.\d+)(?![\w])")
 
 
+
+WORDS = {"four": 4, "five": 5, "six": 6, "seven": 7, "eight": 8, "nine": 9, "ten": 10,
+         "eleven": 11, "twelve": 12, "twenty": 20, "thirty": 30, "forty": 40, "fifty": 50}
+# Spelled-out counts are invisible to the decimal scan above, and two kinds were wrong here: R1
+# said "a sevenfold inflation" where the measured ratio is 8.9, and "twenty targets" / "nine design
+# methods" / "six populations" / "four rounds" were counts over a released file typed as words.
+# A different release is a different corpus, so these must come through \jdg{} like any other
+# measurement.
+#
+# The first version of this check flagged any spelled-out cardinal matching a macro's value and
+# was useless: "four rules are enforced as code", "eight in ten", "all five of the following" are
+# structural and it caught ten of them for every real one. It now fires only on nouns that name a
+# quantity OF THE CORPUS -- the things that change when the release changes -- plus "-fold", which
+# is always a ratio of two measured numbers.
+CORPUS_NOUNS = r"""targets? puzzles? methods? populations? rounds? designs? cells? predictors?
+    libraries library deposits? families family interventions? constructs? flips? mutants?
+    sequences? pairs? strata stratum bins? parameter""".split()
+WORD_RE = re.compile(r"\b(" + "|".join(WORDS) + r")(?:(fold)\b|[- ](" +
+                     "|".join(CORPUS_NOUNS) + r")\b)", re.I)
+
+
+def word_counts(code, defined):
+    """A corpus count, or a ratio, spelled out as a word instead of coming through \jdg{}."""
+    out = []
+    for m in WORD_RE.finditer(code):
+        w = m.group(1).lower()
+        noun = "fold" if m.group(2) else m.group(3).lower()
+        if noun == "fold" or str(WORDS[w]) in defined:
+            out.append(f"{m.group(1)} {noun}")
+    return out
+
+
 def main() -> int:
-    bad = []
+    bad, badw = [], []
+    defined = set(re.findall(r"\\csname\s+jdg@\w+\\endcsname\{([^}]*)\}",
+                             open(os.path.join(os.path.dirname(TEX), "figs", "rna_numbers.tex")).read()))
     started = False
     for i, line in enumerate(open(TEX), 1):
         if "\\begin{document}" in line:
             started = True
         if not started:
             continue
-        code = line.split("%")[0] if not line.lstrip().startswith("%") else ""
+        # an ESCAPED percent is text, not a comment; splitting on a bare "%"
+        # truncated every line containing "5\\%" and hid what came after it
+        code = re.split(r"(?<!\\\\)%", line)[0] if not line.lstrip().startswith("%") else ""
         if not code.strip() or CTX.search(code):
             continue
         for m in NUM.finditer(code):
             if m.group(1) in ALLOWED:
                 continue
             bad.append((i, m.group(1), code.strip()[:96]))
+        for w in word_counts(code, defined):
+            badw.append((i, w, code.strip()[:96]))
     n_jdg = len(re.findall(r"\\jdg\{", open(TEX).read()))
     print(f"\\jdg{{}} uses in the manuscript: {n_jdg}")
+    if badw:
+        print(f"\n**{len(badw)} corpus count spelled out as a word:**")
+        for ln, w, ctx in badw:
+            print(f"  line {ln}: {w}   |  {ctx}")
     if bad:
         print(f"\n**{len(bad)} hand-typed decimal(s) in the manuscript body:**")
         for ln, v, ctx in bad:
             print(f"  line {ln}: {v}   |  {ctx}")
+    if bad or badw:
         print("\nEvery measured number must come from make_numbers.py via \\jdg{}.")
         return 1
     print("clean: no hand-typed measured number in the manuscript body")

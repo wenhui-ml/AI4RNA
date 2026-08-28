@@ -293,6 +293,16 @@ for k, tag in (("N1_permute_t", "nT"), ("N2_permute_y_cell", "nY"),
     tt = m23["DGP1"]["total"][k]
     put(f"m23{tag}N", f"{tt[0]}/{tt[1]}")
 put("m23BlockMed", f(m23["N4_block_median"], 1))
+# "a sevenfold inflation" was typed into Related work as a word, which make_check.py cannot see
+# because it only looks for digits. The measured ratio is not seven.
+# The corpus's own counts were spelled out as words -- "twenty targets", "nine design methods",
+# "six populations", "four rounds" -- which make_check.py could not see because it only looks for
+# digits. They are counts over a released file and a different release is a different corpus.
+_cc = J("m33_cluster_census.json")
+put("ccPuzzlesR", f"{_cc['n_puzzles']}")
+put("ccCellsR", f"{_cc['n_design_cells']}")
+put("m23Ratio", f"{r23['N1_permute_t'] / r23['N2_permute_y_cell']:.1f}")
+put("nullRatio", f"{J('m17d_typeI_diag.json')['total']['A'][0] / J('m17d_typeI_diag.json')['total']['B'][0]:.1f}")
 _lk = m23["DGP2_VOID"]["leak_per_pop"]
 put("m23LeakLo", f"{100 * min(_lk):.1f}\\%"); put("m23LeakHi", f"{100 * max(_lk):.1f}\\%")
 put("m23LeakCorr", sig(m23["DGP2_VOID"]["leak_corr_with_rejection"], 3))

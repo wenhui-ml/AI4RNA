@@ -1,0 +1,87 @@
+{
+  "S1_source": {
+    "file": "OpenKnotBench_data.v4.5.1.csv",
+    "column": "RNet_structure",
+    "column_present": true,
+    "structure_columns_in_file": [
+      "target_structure",
+      "RNet_structure"
+    ],
+    "profile_derived_structure_column_present": false
+  },
+  "S2_identical_design": {
+    "weights": [
+      892,
+      892
+    ],
+    "strata": [
+      549,
+      549
+    ],
+    "identical": true
+  },
+  "P1_raw": {
+    "R1_rescue": 0.05267,
+    "R2_rnet": 0.01981,
+    "matches_published": true
+  },
+  "scales": {
+    "rescue_within_sd": 0.2195,
+    "rnet_within_sd": 0.2335,
+    "rescue_marginal_sd": 0.2506,
+    "rnet_marginal_sd": 0.3079,
+    "sd_ratio_within": 0.9399
+  },
+  "standardised": {
+    "rescue_contrast_in_sd": 0.24,
+    "rnet_contrast_in_sd": 0.0848,
+    "paired_diff_in_sd": 0.1552,
+    "ci": [
+      0.01533,
+      0.30193
+    ],
+    "covers_zero": false,
+    "raw_paired_diff": 0.03287,
+    "raw_ci": [
+      0.0005,
+      0.06442
+    ],
+    "n_boot": 2000
+  },
+  "staked": {
+    "P1": true,
+    "P2": true,
+    "P3": true,
+    "P4": true
+  },
+  "K1_claim1_comparison_withdrawn": false,
+  "K2_sd_outside_staked_range": false,
+  "verdict": "comparison_survives_standardisation_but_must_be_reported_in_sd_units",
+  "log": [
+    "=== M36:常规读数究竟是什么,以及两个读数能不能相减 ===\n",
+    "--- S1 常规读数的来源 ---",
+    "  文件 OpenKnotBench_data.v4.5.1.csv",
+    "  这一列 RNet_structure:在表头里 True",
+    "  全表所有含 structure 的列:['target_structure', 'RNet_structure']",
+    "  => 常规读数是 RibonanzaNet 自己的序列到结构预测,不是任何由 profile 推出的结构;本文件里根本没有那样一列",
+    "\n两个读数都定义的配对 4293",
+    "--- S2/P1 ---\n  权重/层数 R1 892/549  R2 892/549  逐字相同 True",
+    "  R1 rescue +0.05267(已发表 +0.0527)  R2 RNet +0.01981(已发表 +0.0198)  对得上 True",
+    "\n--- P2/P3 两列各自的尺度 ---",
+    "  rescue      层内 SD 0.2195   边际 SD 0.2506",
+    "  RNet 频率   层内 SD 0.2335   边际 SD 0.3079",
+    "  层内 SD 之比 0.9399 —— 相减之前它们不在一个尺度上",
+    "\n--- P4 标准化之后 ---",
+    "  rescue 对比 +0.2400 个层内 SD;RNet 对比 +0.0848 个层内 SD",
+    "  配对差 +0.1552 SD  CI [0.01533, 0.30193]  不含 0(2000 次抽样)",
+    "  原口径(未标准化,论文现在报的那个)+0.03287  CI [0.0005, 0.06442]",
+    "\n=== 押注 ===",
+    "  P1: 成立",
+    "  P2: 成立",
+    "  P3: 成立",
+    "  P4: 成立",
+    "\n=== 杀条件 ===\n  K1 撤回 Claim 1 的跨读数比较:False",
+    "  K2 SD 落在押注区间外:False",
+    "  comparison_survives_standardisation_but_must_be_reported_in_sd_units"
+  ]
+}

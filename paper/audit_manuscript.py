@@ -247,6 +247,11 @@ def main(pdir: str) -> int:
 
     # G -- label/ref reachability
     labels = set(re.findall(r"\\label\{([^}]*)\}", body_nc))
+    # A paper may define its own label-planting macro. NM's \claimhead{} does \refstepcounter
+    # plus \label, so its labels never appear as a literal \label{} in the body and every \ref
+    # to one read as dangling. Collect them too rather than making the manuscript work around
+    # the auditor.
+    labels |= set(re.findall(r"\\claimhead\{([^}]*)\}", body_nc))
     # \eqref must be in this alternation or every labelled equation reads as an orphan
     refs = set(re.findall(r"\\(?:eq|auto|c|C|page|name)?ref\{([^}]*)\}", body_nc))
     dangling = sorted(refs - labels)

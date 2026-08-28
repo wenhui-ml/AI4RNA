@@ -327,7 +327,7 @@ and section pointers only.}
   (\S\ref{sec:score}), in matched pairs of real molecules, with three cuts against a
   probing-chemistry explanation.
 \item \textbf{The placement gradient is a property of the design method} (\S\ref{sec:gradient}),
-  spanning $\jdg{gSpread}$ depth units across nine methods designing for the same targets, with
+  spanning $\jdg{gSpread}$ depth units across \jdg{gNMethods} methods designing for the same targets, with
   the human-designed arm at the pre-registered extreme, reported at the strength it has.
 \item \textbf{Two inference rules for this class of design.} A permutation must hold a calipered
   matched set fixed (Prop.~\ref{prop:null}; measured type-I error $\jdg{nullRateOld}$ against
@@ -424,7 +424,7 @@ configuration, and that doing so inflates Type~I error
 \citep{hansen2008covariate,rosenbaum2010design}. What we add is the magnitude on a design of this
 kind. Against a nominal $0.005$, the treatment-side randomisation rejects at $\jdg{m23nT}$
 ($\jdg{m23nTN}$ draws) while the outcome-side one rejects at $\jdg{m23nY}$ ($\jdg{m23nYN}$) --- a
-sevenfold inflation, measured rather than argued. \S\ref{sec:mediation}'s decomposition is a product-of-coefficients mediation
+\jdg{m23Ratio}-fold inflation, measured rather than argued. \S\ref{sec:mediation}'s decomposition is a product-of-coefficients mediation
 \citep{baron1986moderator,imai2010general,vanderweele2015explanation} with an observed mediator
 and a non-manipulable exposure, a setting whose identification conditions are stronger than the
 estimator's algebra suggests \citep{vanderweele2009conceptual}; we state them and say which one
@@ -442,8 +442,8 @@ the corpus cannot support.
 Let $P$ be the target secondary structure of a design $d$ and $(i,j)\in P$ a target base pair.
 Write $r^{\mathrm{wt}}$ for the wild-type reactivity profile, $r^{i}$ and $r^{j}$ for the profiles
 of the two single mutants, and $r^{ij}$ for the compensatory double mutant that replaces $(i,j)$
-by the complementary pair. With $\rho_x=\mathrm{RMSD}(r^{\mathrm{wt}},r^{x})$, the benchmark
-defines
+by the complementary pair. With $\rho_x=\mathrm{RMSD}(r^{\mathrm{wt}},r^{x})$, the released column is
+reproduced by
 \begin{equation}
 R(i,j) \;=\; 1 \;-\; \frac{\rho_{ij}}{\sqrt{\rho_i^{2}+\rho_j^{2}}},
 \label{eq:rf}
@@ -453,7 +453,14 @@ compensatory pair restores: $R=0$ is no restoration, $R=1$ is full. We use $R$ u
 untruncated, negative values included.
 \end{definition}
 
-\noindent Two properties of \eqref{eq:rf} carry the paper. It contains no design score, so no
+\noindent Equation~\eqref{eq:rf} is stated as the reproduction of a released column and not as
+a formula quoted from a paper, and the distinction is load bearing rather than pedantic. The
+technique's own literature \citep{tian2014correcting,tian2018allosteric} is the provenance of the
+quantity; we do not assert that it normalises the two single-mutant perturbations the same way,
+and every claim below is a statement about the column this corpus released. A companion study
+records the recomputation from the raw per-nucleotide reactivities.
+
+Two properties of \eqref{eq:rf} carry the paper. It contains no design score, so no
 scoring rule's preferences enter it; and it interrogates the pair it mutates, so an alternative
 structure consistent with $r^{\mathrm{wt}}$ is not rescued by this particular double mutation.
 
@@ -586,7 +593,7 @@ carries,
 \label{eq:imbalance}
 \end{equation}
 with the slopes fitted within cell and the mean gaps read off the matched set. On the panel-matched
-arm this is $\jdg{imbPanLo}$ to $\jdg{imbPanHi}$ of the effect across the six populations; without
+arm this is $\jdg{imbPanLo}$ to $\jdg{imbPanHi}$ of the effect across the \jdg{c5N} populations; without
 the panel caliper it is $\jdg{imbFreeLo}$ to $\jdg{imbFreeHi}$, essentially all of it through
 $\overline{\Delta\pi}$, which the caliper moves from $\jdg{imbDpiFreeLo}$--$\jdg{imbDpiFreeHi}$ to
 $\jdg{imbDpiPanLo}$--$\jdg{imbDpiPanHi}$ (Appendix~\ref{app:imbalance}). \emph{This is what the
@@ -609,7 +616,7 @@ the joint covariate structure used to construct the matched set}.
 \centering
 \input{figs/fig8_null}
 \caption{\textbf{Prop.~\ref{prop:null} measured.} \emph{Left}: rejection rate at the $0.005$ gate
-under each randomisation, $40$ draws in each of six populations. Permuting the treatment rebuilds
+under each randomisation, $40$ draws in each of \jdg{c5N} populations. Permuting the treatment rebuilds
 the matched set and rejects an order of magnitude too often; permuting the outcome holds the design
 fixed and returns the nominal rate. \emph{Right}: the SD of the statistic under each null, per
 population. The treatment-side null is uniformly the narrower, which is the mechanism rather than
@@ -733,8 +740,10 @@ in the declaration's own wording including where the prediction failed
 \subsection{Corpus}
 \label{sec:corpus}
  A deployed chemical-probing benchmark of designed RNAs, with a compensatory
-mutagenesis arm covering twenty targets and nine design methods, and a design-score arm covering
-six populations across three context sizes. The analysable pair set is $\jdg{nPairsTotal}$ target
+mutagenesis arm covering \jdg{ccPuzzlesR} targets and \jdg{gNMethods} design methods, and a
+design-score arm covering \jdg{c5N} populations across three context sizes. The compensatory arm's
+\jdg{nPairsTotal} pairs sit in \jdg{ccCellsR} (target,\,method) design cells over the
+\jdg{ccPuzzlesR} targets that every interval below resamples. The analysable pair set is $\jdg{nPairsTotal}$ target
 pairs: $\jdg{nCG}$ G--C, $\jdg{nAU}$ A--U and $\jdg{nGU}$ G--U. Ensemble quantities used only as
 balancing covariates in \S\ref{sec:score} are computed with ViennaRNA \citep{lorenz2011vienna},
 which is also the source of the per-pair nearest-neighbour energies of Definition~\ref{def:dg};
@@ -765,6 +774,16 @@ harder case than the one this paper set out to analyse, not an easier one.
 \subsection{Preregistration protocol}
 \label{sec:preregprotocol}
 
+Two limits of the inference are stated here rather than left to a referee. Every interval on a
+contrast rests on $\jdg{ccPuzzlesR}$ resampled targets, and a percentile bootstrap on that few
+clusters is known to be optimistic; no correction is applied, the cluster count is reported beside
+each estimate instead, and every interval should be read as at least as wide as printed. And this
+paper reports of order fifty contrasts, slopes and rank statistics across its arms with no
+family-wise or false-discovery correction. What it does instead is fix the gate at $0.005$ in
+advance, declare each arm's predictions before its code exists, and rest no claim on a $p$-value
+alone; where an arm does not clear the gate it is reported as not clearing it
+(\S\ref{sec:gradient}) rather than promoted on a weaker threshold.
+
 Every criterion graded in \S\ref{sec:results} was frozen before the analysis code that grades it
 existed, in the sense made operational in \S\ref{sec:cal2}: a JSON declaration naming the
 statistic, the gate, the ladder of Def.~\ref{def:ladder} and a staked numerical prediction, then
@@ -772,12 +791,20 @@ committed and pushed. Nothing below reports a criterion whose declaration is not
 and where a stake failed the failure is reported in the declaration's own wording rather than
 rephrased. Appendix~\ref{app:prereg} lists every declaration, its commit and its verdict.
 
-Three conventions run through every arm and are stated once here rather than repeated. All
-estimators are computed after centring within $(\text{target},\text{method})$, so the two
-between-cell variance layers of \S\ref{sec:frame} are removed by construction rather than adjusted
-for. All permutation tests shuffle \emph{within} stratum, never across, for the reason given in
-\S\ref{sec:inference}. All intervals resample targets rather than pairs, so every interval below
-rests on the target count and not on the pair count.
+Three conventions run through the estimating arms and are stated once here rather than
+repeated, with their exceptions, because a convention stated without its exceptions is a claim
+about the paper that the paper does not meet. \emph{First}, every arm that estimates a contrast
+works inside $(\text{target},\text{method})$ --- the design-score arm by centring, the rescue
+arms by carrying the cell as a component of the stratum --- so the two between-cell variance layers
+of \S\ref{sec:frame} are removed by construction rather than adjusted for. The measurement-frame
+quantities of \S\ref{sec:frame} are not contrasts and are not centred; they are variance
+components of the raw score. \emph{Second}, every permutation test shuffles \emph{within} the
+stratification its own statistic is defined on and never across it, for the reason given in
+\S\ref{sec:inference}; which stratification that is differs by arm and is named at each. \emph{Third}, every
+interval on a contrast is a cluster bootstrap over targets, so it rests on the target count and not
+on the pair count. The one interval in this paper that is not is the reproducibility ceiling of
+\S\ref{sec:frame}, which resamples repeated measurement groups because targets are not its unit of
+replication; it is the only such interval and it is marked where it appears.
 
 \section{Results}
 \label{sec:results}
@@ -800,7 +827,9 @@ every estimator in this paper is computed after centring within $(\text{target},
 the first two layers are removed by construction rather than adjusted for.
 
 \textbf{How much of the within-cell variance is reproducible at all.} The release contains
-$\jdg{ceilGroups}$ groups of repeated measurements covering $\jdg{ceilRows}$ rows. Pooling within
+$\jdg{ceilGroups}$ groups of repeated measurements covering $\jdg{ceilRows}$ rows. \emph{This
+is the one interval in the paper that resamples something other than targets}: its unit of
+replication is the repeated measurement group, as \S\ref{sec:preregprotocol} notes. Pooling within
 groups gives a measurement SD of $\jdg{ceilSigB}$, $\jdg{ceilSigBCi}$ on $\jdg{ceilDf}$ degrees
 of freedom, so against a within-cell SD of $\jdg{ceilWithinSd}$ the reproducible fraction is
 \begin{equation}
@@ -969,12 +998,12 @@ check would have concluded that the model's energy explains most of the effect.
 \paragraph{Not an artifact of which designs a program can build.} The compensatory arm holds, for
 each (target, method) cell, the design that scored best --- so the corpus is pre-filtered by the
 design programs themselves, and one could ask whether the effect lives only in the subspace current
-algorithms can reach. The nine methods differ widely in capability, so if the effect were
+algorithms can reach. The \jdg{gNMethods} methods differ widely in capability, so if the effect were
 manufactured that way it should track capability. It is positive in $\jdg{sNPos}$ of
 $\jdg{sNMeth}$ methods (sign test $p=\jdg{sBinom}$; Fig.~\ref{fig:depthmethod}, right and
 Table~\ref{tab:permethodrescue}), the exception being \texttt{\jdg{sNegName}} at $\jdg{sNegDiff}$
 ($p=\jdg{sNegP}$ on $\jdg{sNegW}$ pair-weights), and its size does not order with the method's own
-placement strength (Spearman $\jdg{sSpear}$ across nine). This bounds the objection on the axis it
+placement strength (Spearman $\jdg{sSpear}$ across \jdg{gNMethods}). This bounds the objection on the axis it
 runs on; it does not remove it, because every method submitted only its best design.
 
 \begin{figure}[!htbp]
@@ -1229,7 +1258,7 @@ for the first time, and only inside $\pi$}: no claim depends on any predictor be
 
 \begin{table}[!htbp]
 \centering\small
-\caption{Matched-pair difference in design-score points, six populations. Inference by
+\caption{Matched-pair difference in design-score points, \jdg{c5N} populations. Inference by
 Prop.~\ref{prop:null}; the cluster bootstrap interval is beside it. Balance is the standardised
 mean difference on global GC \citep{austin2011introduction}. Two populations do not clear
 $p\le0.005$ and their $p$ is printed.}
@@ -1252,7 +1281,7 @@ batch 6 (blind) & $\jdg{cpop5Eff}$ & $\jdg{cpop5Ci}$ & $\jdg{cpop5Z}$ & $\jdg{cp
 \centering
 \input{figs/fig3_matched}
 \caption{\textbf{Matched-pair difference against the design-fixed permutation null.} Effects are
-positive in all six populations, $\jdg{cSigStrict}$ of $\jdg{c5N}$ clear $p\le0.005$ and
+positive in all \jdg{c5N} populations, $\jdg{cSigStrict}$ of $\jdg{c5N}$ clear $p\le0.005$ and
 $\jdg{cSigLoose}$ of $\jdg{c5N}$ clear $p<0.05$; balance on global GC is at most
 $\jdg{cSmdHi}$ throughout.}
 \label{fig:matched}
@@ -1281,7 +1310,7 @@ $\jdg{c5Cut}$ leaves $\jdg{c5Sig}$ of $\jdg{c5N}$ populations clearing $p\le0.00
 \subsection{The placement gradient across design methods}
 \label{sec:gradient}
 
-Nine methods produced designs for the same twenty targets, so the depth gap decomposes into a
+\jdg{gNMethods} methods produced designs for the same \jdg{ccPuzzlesR} targets, so the depth gap decomposes into a
 target component and a method component. \emph{This arm never touches $R$}: it is computed from
 target structures and sequences alone.
 
@@ -1321,7 +1350,7 @@ outcome by construction, and the loader asserts that no score or reactivity colu
 \begin{figure}[!htbp]
 \centering
 \input{figs/fig12_rounds}
-\caption{\textbf{Four rounds.} \emph{Left}, each dot is one design method's G--C-minus-A--U helix
+\caption{\textbf{\jdg{xrRounds} rounds.} \emph{Left}, each dot is one design method's G--C-minus-A--U helix
 depth within a round; the bar is the round's pooled gap. Green is the round every other section of
 this paper uses. \emph{Right}, the method component after removing target main effects, filled
 where $p\le0.005$.}
@@ -1333,7 +1362,7 @@ where $p\le0.005$.}
 pooled gaps are negative, from $\jdg{xrGapLo}$ to $\jdg{xrGapHi}$ depth units over
 $\jdg{xrCells}$ (method,\,target) cells and $\jdg{xrTargets}$ target--round combinations.
 \textbf{$\jdg{xrSign}$ (round,\,method) cells are negative} (sign test $p=\jdg{xrSignP}$), and the
-human-designed arm ranks $\jdg{xrEterna}$ of its round in the four rounds respectively. The method
+human-designed arm ranks $\jdg{xrEterna}$ of its round in the \jdg{xrRounds} rounds respectively. The method
 component is positive in all four and clears $0.005$ in $\jdg{xrMcClears}$ of them
 (Table~\ref{tab:rounds}).
 \end{claimbox}
@@ -1349,7 +1378,7 @@ compensatory arm's, so it is a replication of \S\ref{sec:gradient} rather than a
 \end{table}
 
 \paragraph{Round 1 is the exception and is reported as one.} Its pooled gap is the weakest by a
-factor of three and $\jdg{xrR1Pos}$ of its nine methods are positive --- $\jdg{xrR1Names}$ --- so
+factor of three and $\jdg{xrR1Pos}$ of its \jdg{gNMethods} methods are positive --- $\jdg{xrR1Names}$ --- so
 the structure is a strong regularity rather than a law. Round 1 is also the round whose targets are
 drawn from a published pseudoknot set rather than composed for the benchmark, which is a difference
 we can name but not test.
@@ -1357,7 +1386,7 @@ we can name but not test.
 \paragraph{What this does and does not extend.} It extends the placement claim from one target set
 to four, and it raises the method component from an arm at its detection edge
 (\S\ref{sec:gradient}) to one that clears $0.005$ on two independent rounds. It does not extend the
-claim beyond \emph{designed} corpora: all four rounds come from one laboratory, one platform and one
+claim beyond \emph{designed} corpora: all \jdg{xrRounds} rounds come from one laboratory, one platform and one
 player community, and no natural-sequence corpus is present in this release. The prediction the
 mechanism makes about natural RNA --- that the placement structure should be weaker or absent where
 no designer chose --- is stated in \S\ref{sec:limits} as the test we did not run.
@@ -1467,9 +1496,9 @@ none.
 \label{sec:limits}
 
 
-\paragraph{(i) One corpus, four rounds.} The placement structure is now measured on
+\paragraph{(i) One corpus, \jdg{xrRounds} rounds.} The placement structure is now measured on
 $\jdg{xrRounds}$ rounds with disjoint targets (\S\ref{sec:rounds}) and the formation results on
-one. All four rounds come from the same laboratory, platform and player community, so what
+one. All \jdg{xrRounds} rounds come from the same laboratory, platform and player community, so what
 replicates is the target set and the method mix, not the ecology. The sharpest untried test follows
 from the mechanism itself: \emph{a corpus nobody designed should not carry the placement
 structure.} Homologous natural sequences with a probing readout would decide it, and none is
@@ -1546,7 +1575,7 @@ them is a different corpus.
 \section{The design-score arm in full}
 \label{app:score}
 
-\S\ref{sec:score} reports the six-population headline. Four further arms were run and all are
+\S\ref{sec:score} reports the \jdg{c5N}-population headline. Four further arms were run and all are
 reported here; none of them is the primary and none was used to choose the primary.
 
 \begin{table}[!htbp]
@@ -1724,7 +1753,7 @@ the three pair types are not collinear in $\Delta G$ & spread $>1.5\times$ &
 overlap sufficient for the stratified estimate & $\ge200$ wts & $\jdg{eW}$ & held \\
 \midrule
 \multicolumn{4}{@{}l@{}}{\emph{frozen before the two review arms existed}}\\
-effect positive in at least seven of nine methods & $\ge7/9$ &
+effect positive in at least seven of \jdg{gNMethods} methods & $\ge7/9$ &
   $\jdg{sNPos}/\jdg{sNMeth}$ & held \\
 effect size not monotone in placement strength & $|\rho_s|<0.6$ & $\jdg{sSpear}$ & held \\
 the circular shift never indexes a sequence & assertion & source-checked & held \\
@@ -1736,7 +1765,7 @@ the circular shift never indexes a sequence & assertion & source-checked & held 
 treatment-side randomisation over-rejects & $>0.010$ & $\jdg{m23nT}$ & held \\
 $y$-permutation conservative when $y$ tracks the calipers & vs.\ bound &
   --- & \textbf{void} \\
-all four rounds' pooled depth gaps negative & $<0$ & $\jdg{xrGapLo}$ \dots $\jdg{xrGapHi}$ & held \\
+all \jdg{xrRounds} rounds' pooled depth gaps negative & $<0$ & $\jdg{xrGapLo}$ \dots $\jdg{xrGapHi}$ & held \\
 at least two thirds of methods negative in every round & $\ge 2/3$ &
   $\jdg{xrSign}$ pooled & \textbf{failed on round 1} \\
 human-designed arm in the most negative third of each round & --- &

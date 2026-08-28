@@ -88,13 +88,41 @@ put("cvIntv", sig(b["R1_rescue"]["diff"]))
 put("cvIntvP", pv(b["R1_rescue"]["p"]))
 put("cvConv", sig(b["R2_inferred"]["diff"]))
 put("cvConvP", pv(b["R2_inferred"]["p"]))
-put("cvRatio", f"{b['ratio']:.2f}")
+# cvRatio used to be R2/R1 on the RAW columns -- a ratio of two differently scaled contrasts,
+# which is the fault this paper retracts elsewhere. It is now formed in each column's own
+# within-stratum SD units, from m36, and the raw ratio is not printed at all.
 put("cvPaired", sig(b["paired_diff"]))
 put("cvPairedCi", ci(b["paired_ci"]))
 alt = b["R2_all_target_pairs_NOT_P4"]
 put("cvAlt", sig(alt["diff"]))
 put("cvAltWeight", f"{alt['weight']:.0f}")
 put("cvSwing", f"{abs(alt['diff'] / b['R2_inferred']['diff']):.2f}")
+
+# ---- m36: what the "conventional" readout is read from, and the two columns' own scales. The
+# manuscript said three times that it was a structure inferred from the wild-type profile. The
+# benchmark file has no such column; the readout is the shipped RibonanzaNet prediction.
+m36 = J("m36_readout_scale.json")
+put("cvSourceCol", "\\texttt{" + m36["S1_source"]["column"].replace("_", "\\_") + "}")
+put("cvSourceFile", "\\texttt{" + m36["S1_source"]["file"].replace("_", "\\_") + "}")
+put("cvSdRescue", f(m36["scales"]["rescue_within_sd"], 4))
+put("cvSdRnet", f(m36["scales"]["rnet_within_sd"], 4))
+_st = m36["standardised"]
+put("cvIntvSd", sig(_st["rescue_contrast_in_sd"], 4))
+put("cvConvSd", sig(_st["rnet_contrast_in_sd"], 4))
+put("cvPairedSd", sig(_st["paired_diff_in_sd"], 4))
+put("cvPairedSdCi", ci(_st["ci"]))
+put("cvRatioSd", f"{_st['rescue_contrast_in_sd'] / _st['rnet_contrast_in_sd']:.2f}")
+
+# The preregistration table must quote the DECLARATION, not a threshold retyped beside it. These
+# come out of the frozen file, so the table cannot drift from what was actually staked.
+import re as _re
+_d36 = J("m36_readout_scale_declaration.json")
+for _sp in _d36["staked_predictions"]:
+    _m = _re.search(r"([\d.]+) to ([\d.]+)", _sp["predicted"])
+    if _m and "rescue" in _sp["quantity"]:
+        put("cvSdRescueLo", _m.group(1)); put("cvSdRescueHi", _m.group(2))
+    elif _m:
+        put("cvSdRnetLo", _m.group(1)); put("cvSdRnetHi", _m.group(2))
 for k in ("CG", "AU"):
     put(f"cvAltHit{k}", f(alt["hit_rate"][k], 3))
 
@@ -495,6 +523,25 @@ put("efDepthRho", sig(m32["D_depth_share"]["rho_with_depth"]))
 put("efDepthGap", sig(m32["D_depth_share"]["gap"], 5))
 put("efCoverage", pct(m32["S1_coverage"], 1))
 put("efEquiv", f"{m32['P1_equivalence']['abs_diff']:.0e}".replace("e+00", ""))
+
+# ---- m35: the manuscript compared three point estimates and never their differences, which is
+# the fault it retracts twice. All four columns resampled over the SAME 20 puzzles per draw.
+m35 = J("m35_paired_predictor_differences.json")
+_pd = m35["paired_differences"]
+for k, tag in (("neural_minus_vienna", "NV"), ("neural_minus_eterna", "NE"),
+               ("vienna_minus_eterna", "VE"), ("measured_minus_neural", "MN"),
+               ("measured_minus_vienna", "MV"), ("measured_minus_eterna", "ME")):
+    d = _pd[k]
+    put(f"pd{tag}", sig(d["effect"], 5)); put(f"pd{tag}Ci", ci(d["ci"]))
+    put(f"pd{tag}P", pv(d["p_perm"]))
+_ax = m35["post_hoc_axes"]
+put("axArch", sig(_ax["architecture_axis_neural_minus_eterna"]["effect"], 5))
+put("axArchCi", ci(_ax["architecture_axis_neural_minus_eterna"]["ci"]))
+put("axData", sig(_ax["training_data_axis_eterna_minus_vienna"]["effect"], 5))
+put("axDataCi", ci(_ax["training_data_axis_eterna_minus_vienna"]["ci"]))
+put("axGap", sig(_ax["architecture_minus_training_data"]["effect"], 5))
+put("axGapCi", ci(_ax["architecture_minus_training_data"]["ci"]))
+put("axRatio", f"{_ax['architecture_axis_neural_minus_eterna']['effect'] / _ax['training_data_axis_eterna_minus_vienna']['effect']:.1f}")
 _dr = m32r["R1_dynamic_range"]
 put("efHi", pct(_dr["frac_hi"], 1))
 put("efLo", pct(_dr["frac_lo"], 1))
