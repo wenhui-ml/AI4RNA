@@ -1,0 +1,68 @@
+{
+ "id": "M38",
+ "title": "The purpose-built comparator the literature already has: does a riboSNitch-style mutation-effect score beat the free depth integer?",
+ "frozen_before_code": true,
+ "cost": "offline, $0. ViennaRNA 2.7.2 locally on the 4317 admitted interventions already built by M26. No API, no GPU, no new data, no network.",
+
+ "why": [
+  "A literature pass found that scoring a folding algorithm by its predicted response to a",
+  "sequence change is an established task in this field: riboSNitch prediction, benchmarked",
+  "across eleven folding algorithms by Corley et al. (NAR 2015) and still being built on",
+  "(VariantFoldRNA, NARGAB 2025). The manuscript now separates itself from that line in",
+  "Related work. A separation stated in prose is not the same as a separation measured.",
+  "",
+  "The paper's sharpest sentence is that no predictor beats a free integer -- helix depth --",
+  "at ranking which compensatory flips rescue. The obvious referee reply is that none of the",
+  "three scored predictors was BUILT to answer a question about a mutation. A riboSNitch-style",
+  "score was. If a purpose-built mutation-effect score also fails to beat the free integer,",
+  "that sentence gets much harder to dismiss. If it succeeds, the paper has a positive result",
+  "it did not have, and the depth claim must be scoped to predictors that were not built for",
+  "the task. Both outcomes are publishable and we do not know which one this is.",
+  "",
+  "The direction is declared here because it is not obvious and must not be chosen later. A",
+  "compensatory flip that RESCUES preserves the global structure, so a global structural-change",
+  "score should be SMALL where rescue is LARGE. The declared sign is NEGATIVE. Every score below",
+  "is negated before ranking so that, if the declaration is right, higher means more rescue and",
+  "the number is directly comparable with the predictors already in the table."
+ ],
+
+ "scores": {
+  "d_bppm": "Euclidean distance between the base-pair probability matrices of the wild type and the mutant, over the upper triangle. The substitution preserves length, so the index sets coincide and no alignment is needed. This is the MFE-class riboSNitch score in its standard form.",
+  "d_mfe": "base-pair distance between the two MFE structures (symmetric difference of the pair sets).",
+  "d_ens": "absolute change in ensemble free energy, |G_ens(mut) - G_ens(wt)|.",
+  "d_bppm_local": "the SAME Euclidean distance restricted to rows and columns within WINDOW nucleotides of the mutated pair. This is an internal control, not a fourth predictor: a null on the global score must not be attributable to dilution by the rest of the molecule."
+ },
+
+ "task": {
+  "unit": "one admissible orientation flip inside one design cell -- M31's unit, unchanged",
+  "conditioning": "the design cell alone, NOT depth, NOT crossing -- M31's conditioning set, unchanged",
+  "outcome": "the corpus rescue factor R, unchanged and untruncated",
+  "comparator": "helix depth, the free integer, scored on the identical cells in the identical way"
+ },
+
+ "arms": {
+  "A": "within-design ranking. Per cell with at least NMIN flips, Spearman(-score, R); weighted mean across cells, puzzle-clustered bootstrap CI, and a within-cell permutation p (rule 80: R is shuffled INSIDE the cell, never across).",
+  "B": "head to head against the free baseline. Per-cell paired difference Spearman(-score, R) - Spearman(depth, R), puzzle-clustered bootstrap of the difference. This is the arm the claim depends on.",
+  "C": "the local control. Arm A repeated with d_bppm_local, so the global score's result cannot be explained by dilution.",
+  "D": "verification, run and printed before any verdict is read: (i) IDENTITY -- every score must be exactly 0 when the mutant sequence equals the wild type, checked on a synthetic self-pair per unique wild type; (ii) OBWEIGHT -- d_bppm recomputed by a second, independently written accumulation (dict of pairs vs dense array) agreeing to 1e-10; (iii) SYMMETRY -- d(wt, mut) == d(mut, wt) to 1e-12."
+ },
+
+ "constants": {"NMIN": 8, "WINDOW": 15, "NBOOT": 2000, "NPERM": 2000, "SEED": 20260828},
+
+ "staked": {
+  "1": "at least one of d_bppm, d_mfe, d_ens has a within-design Spearman whose puzzle-clustered CI excludes zero IN THE DECLARED NEGATIVE DIRECTION (positive after negation)",
+  "2": "NONE of the three beats the free depth baseline: every paired difference CI in arm B covers zero or lies below it",
+  "3": "the local variant ranks at least as well as the global one, point estimate for point estimate",
+  "4": "d_bppm and d_mfe agree in sign"
+ },
+
+ "kill": {
+  "K0": "fewer than 8 cells survive NMIN -> the arm is void and nothing is read from it.",
+  "K1": "arm D fails any of its three checks -> the run is void, the code is wrong, and no number from it may be quoted. This is checked and printed FIRST.",
+  "K2": "a score's CI excludes zero on the WRONG side of the declared direction -> reported in the declaration's own wording as a direction failure, printed with the wrong-side note. The story is NOT flipped to match; a post-hoc sign is not a finding.",
+  "K3": "a riboSNitch-style score BEATS depth in arm B -> staked prediction 2 has failed. This is a positive result and the manuscript must report it as one: the depth sentence is scoped to predictors not built for the task, and the purpose-built score becomes the first thing in this paper to beat the free integer.",
+  "K4": "the manuscript may not claim that a riboSNitch-style method 'was tested and failed' as a statement about the published TOOLS. What is scored here is the standard score computed from the same folding model the paper already scores, not remuRNA, RNAsnp or SNPfold themselves. The wording must say so."
+ },
+
+ "decision_this_run_gates": "whether the paper's depth-baseline sentence survives contact with a score built to answer a question about a mutation. It changes the ranking table and the ledger's C1 row wording. It does not touch the eligibility criterion, the identity contrast, the leakage audit, the withdrawal, or R1."
+}
