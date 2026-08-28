@@ -33,6 +33,14 @@ def f(x, d=3):
     return f"{x:.{d}f}"
 
 
+def ci(v, d=4):
+    return f"[{sig(v[0], d)},\\,{sig(v[1], d)}]"
+
+
+def pv(x):
+    return "<0.001" if x < 0.001 else f"{x:.4f}".rstrip("0").rstrip(".")
+
+
 def sig(x, d=3):
     return ("+" if x >= 0 else "") + f"{x:.{d}f}"
 
@@ -323,54 +331,67 @@ put("xrEterna", "/".join(str(r["eterna_rank"] + 1) for r in m24["rounds"]))
 
 
 # ---------------------------------------------------------------- the model, scored (M26)
-m26 = J("m26_model_scored.json")
-put("mN", f"{m26['n']}"); put("mDrop", f"{m26['n_dropped']}")
-d4 = m26["D4"]
-put("mCalLo", f(d4["bins"][0]["rf_mean"], 4)); put("mCalHi", f(d4["bins"][-1]["rf_mean"], 4))
-put("mCalPLo", f(d4["bins"][0]["p_mean"], 4)); put("mCalPHi", f(d4["bins"][-1]["p_mean"], 4))
-put("mCalMono", "monotone" if d4["monotone"] else "not monotone")
-put("mCalCent", ",\\;".join(sig(b["rf_centred"], 4) for b in d4["bins"]))
-d1m = m26["D1"]
-put("mSkillSlope", sig(d1m["pmut"]["slope"], 4)); put("mSkillP", f"{d1m['pmut']['p_perm']:.4f}")
-put("mSkillWtSlope", sig(d1m["pwt"]["slope"], 4))
-put("mSkillDp", sig(d1m["dp"]["slope"], 4)); put("mSkillDpP", f"{d1m['dp']['p_perm']:.4f}")
-d2m = m26["D2"]
-put("mCde", sig(d2m["cde"], 4)); put("mBaseSame", sig(d2m["base_same_population"], 4))
-put("mBaseFull", sig(d2m["base_full"], 4))
-put("mRet", f"{100 * d2m['retention']:.1f}\\%")
-put("mP", f"{d2m['p_perm']:.4f}"); put("mNullSd", f(d2m["null_sd"], 4))
-put("mCi", f"[{d2m['boot_ci'][0]:.4f},\\,{d2m['boot_ci'][1]:.4f}]")
-put("mW", f"{d2m['weight']:.0f}"); put("mWBase", f"{d2m['base_weight']:.0f}")
-put("mStrata", f"{d2m['n_strata']}")
-put("mPlaceboMean", f"{100 * d2m['placebo_mean']:.1f}\\%")
-put("mPlaceboSd", f"{100 * d2m['placebo_sd']:.1f}")
-put("mZ", sig(d2m["z_vs_placebo"], 2))
-put("mMed", f"{100 * d2m['mediated']:+.1f}\\%")
-put("mMedCi", f"[{100 * d2m['mediated_ci95'][0]:+.1f}\\%,\\,"
-              f"{100 * d2m['mediated_ci95'][1]:+.1f}\\%]")
-put("mLad", f(m26["P3_threshold"], 2)); put("mDeltaZero", f"{m26['P3_delta0']:.2f}")
-d3m = m26["D3"]
-put("mRetWt", f"{100 * d3m['pwt']['retention']:.1f}\\%")
-put("mRetDp", f"{100 * d3m['dp']['retention']:.1f}\\%")
-dd = d3m["ddg"]
-put("mFlipSlope", sig(dd["slope"], 4)); put("mFlipP", f"{dd['p_perm']:.4f}")
-put("mFlipSd", f(dd["sd"], 3)); put("mFlipFrac", f"{100 * dd['frac_gt_03']:.1f}\\%")
-put("mFlipDetect", f(dd["detectable_slope"], 2))
-put("mFlipThr", "0.3")
+# ================================================================ THE NEW CORE
+# Three blocks that did not exist when this paper was about placement. They are the paper now.
 
-m26b = J("m26b_model_panel.json")
-_m = m26b["models"]
-put("pNModels", f"{len(_m)}")
-put("pRetLo", f"{100 * min(r['retention'] for r in _m):.1f}\\%")
-put("pRetHi", f"{100 * max(r['retention'] for r in _m):.1f}\\%")
-put("pSkillLo", sig(min(r["skill_slope"] for r in _m), 4))
-put("pSkillHi", sig(max(r["skill_slope"] for r in _m), 4))
-put("pSkillP", f"{max(r['skill_p'] for r in _m):.4f}")
-_c = list(m26b["pairwise_corr"].values())
-put("pCorrLo", f(min(_c), 2)); put("pCorrHi", f(max(_c), 2))
-put("pMedLo", f"{100 * min(r['mediated'] for r in _m):+.1f}\\%")
-put("pMedHi", f"{100 * max(r['mediated'] for r in _m):+.1f}\\%")
-put("pNPairs", f"{m26b['n']}")
+# ---- M21b: the direct quantities that replace the withdrawn retention figures.
+# Same records, same stratification, no ratio of contrasts anywhere.
+m21b = J("m21b_direct_contrast.json")
+put("dN", f"{m21b['n']}")
+for key, tag in (("rf", "Out"), ("dg", "Dg"), ("pmut", "Pm")):
+    r = m21b[key]
+    put(f"d{tag}", sig(r["effect"], 4))
+    put(f"d{tag}Ci", ci(r["ci"]))
+    put(f"d{tag}P", pv(r["p"]))
+put("dW", f"{m21b['rf']['weight']:.0f}")
+put("dStrata", f"{m21b['rf']['strata']}")
+put("dDgSlope", sig(m21b["dg"]["within_slope"], 5))
+put("dPmSlope", sig(m21b["pmut"]["within_slope"], 5))
+put("dDgBound", f"{100 * m21b['dg']['structural_bound']:.1f}\\%")
+put("dPmBound", f"{100 * m21b['pmut']['structural_bound']:.1f}\\%")
+put("dBoundRatio", f"{m21b['dg']['structural_bound'] / m21b['pmut']['structural_bound']:.1f}")
+
+# ---- m26r3: the constructive calibration. Inject a KNOWN mediated fraction into the real
+# mediator, keep only the outcome synthetic, and read back what the estimator reports.
+r3 = J("m26r3_realistic_calibration.json")
+for nm, tag in (("RibonanzaNet", "N"), ("ViennaRNA", "V")):
+    a = r3[nm]
+    put(f"cal{tag}Corr", sig(a["corr"], 4))
+    put(f"cal{tag}Mae", f(a["mae"], 4))
+    put(f"cal{tag}Full", f"{100 * a['sweep'][-1]['measured_retention']:+.1f}\\%")
+    put(f"cal{tag}Zero", f"{100 * a['sweep'][0]['measured_retention']:.1f}\\%")
+    put(f"cal{tag}Alpha", sig(a["alpha"], 5))
+    put(f"cal{tag}Bound", f"{100 * a['structural_bound']:.1f}\\%")
+put("calSweep", ", ".join(f"{100*x['f']:.0f}\\%" for x in r3["RibonanzaNet"]["sweep"]))
+put("calTotal", sig(r3["RibonanzaNet"]["total"], 5))
+
+# the guidance that passed us: standardised total effect and n, against the published thresholds
+_OUTCOME_SD = 0.2501            # m26r3_audit.md, the outcome SD the synthetic noise was matched to
+put("calOutSd", f(_OUTCOME_SD, 4))
+put("calStdC", f(abs(r3["RibonanzaNet"]["total"]) / _OUTCOME_SD, 3))
+put("calStdCThr", "0.2")
+put("calNThr", "500")
+
+# the failed first attempt, kept because its failure mode has a name
+r2 = J("m26r2_positive_control.json")
+put("posCorr", sig(r2["corr_true_vs_measured"], 3))
+put("posMae", f(r2["mean_abs_error"], 4))
+put("posFull", f"{100 * r2['sweep'][0]['measured_retention']:.1f}\\%")
+put("posSepSyn", "1.67")        # m26r3_audit.md
+put("posSepReal", "0.053")
+put("posSepRatio", "31")
+
+# ---- m28r: the second leg. A different estimator, a different corpus, the same disease.
+m28 = J("m28_second_corpus.json")
+m28r = J("m28r_review.json")
+_d28 = {x["rmdb_id"]: x for x in m28["deposits"]}
+_a = m28r["R2_arms"]["ViennaRNA"]
+put("legSlope", sig(_d28["M2SL5_2A3_0000"]["C"]["ViennaRNA"]["slope"], 5))
+put("legSlopeP", pv(_d28["M2SL5_2A3_0000"]["C"]["ViennaRNA"]["p_perm"]))
+put("legRho", sig(_a["within_spearman"]["2A3"]))
+put("legRhoP", pv(_a["within_spearman_p"]["2A3"]))
+put("legSdRatio", f"{m28r['R2_outcome_scale']['ratio']:.2f}")
+put("legN", f"{_d28['M2SL5_2A3_0000']['A']['n_admitted']}")
 
 # ---------------------------------------------------------------- survivorship + shift (M22)
 m22 = J("m22_review_arms.json")
@@ -497,45 +518,9 @@ def m23c_table():
 
 
 
-def m26_calibration_table():
-    b = J("m26_model_scored.json")["D4"]["bins"]
-    rows = ["%d & %d & $%.4f$ & $%+.4f$ & $%+.4f$ \\\\" %
-            (r["bin"], r["n"], r["p_mean"], r["rf_mean"], r["rf_centred"]) for r in b]
-    txt = ("%% GENERATED by make_numbers.py. Do not edit.\n"
-           "\\begin{tabular}{@{}rrrrr@{}}\n\\toprule\n"
-           "bin & pairs & $P_{\\mathrm{model}}$ & rescue & rescue, centred in design \\\\\n"
-           "\\midrule\n" + "\n".join(rows) + "\n\\bottomrule\n\\end{tabular}\n")
-    out = os.path.join(HERE, "figs", "calib.tex")
-    open(out, "w").write(txt)
-    return out, len(rows)
-
-
-
-
-def m26b_panel_table():
-    m = J("m26b_model_panel.json")["models"]
-    rows = []
-    for r in m:
-        rows.append("\\texttt{%s} & $%+.4f$ & $%.4f$ & %s & $%+.4f$ & $%+.4f$ & $%.1f\\%%$ & "
-                    "$%.1f \\pm %.1f$ & $%+.1f\\%%$ \\\\" %
-                    (r["model"], r["skill_slope"], r["skill_p"],
-                     "yes" if r["monotone"] else "no", r["cde"], r["base_same_population"],
-                     100 * r["retention"], 100 * r["placebo_mean"], 100 * r["placebo_sd"],
-                     100 * r["mediated"]))
-    txt = ("%% GENERATED by make_numbers.py. Do not edit.\n"
-           "\\begin{tabular}{@{}lrrcrrrrr@{}}\n\\toprule\n"
-           "parameter set & skill & $p$ & mono. & CDE & baseline & retained & placebo & "
-           "mediated \\\\\n\\midrule\n" + "\n".join(rows) +
-           "\n\\bottomrule\n\\end{tabular}\n")
-    out = os.path.join(HERE, "figs", "panel.tex")
-    open(out, "w").write(txt)
-    return out, len(rows)
-
-
 def main() -> int:
     for fn in (permethod_table, m21_depth_table, m22_method_table,
-               m24_round_table, m23c_table, m26_calibration_table,
-               m26b_panel_table):
+               m24_round_table, m23c_table):
         o, n = fn()
         print(f"wrote {o}: {n} rows")
     out = os.path.join(HERE, "figs", "rna_numbers.tex")

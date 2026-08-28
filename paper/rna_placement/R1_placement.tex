@@ -78,9 +78,9 @@
 % ------------------------------------------------ generated numbers (the only include)
 \input{figs/rna_numbers}
 
-\title{\bf Whether a Designed Base Pair Forms Is Not a Function\\of the Free Energy It Was Designed With\\[4pt]
-\large Compensatory mutagenesis on a probing benchmark separates pair identity from the\\
-nearest-neighbour model, and from where the designer put it}
+\title{\bf Pre-Registration Does Not Confer Readability\\[4pt]
+\large Two estimators, declared in advance and both unreadable, on a corpus\\
+a design algorithm produced --- and the calibration that catches them}
 
 \author{Wenhui Chen\thanks{\texttt{wenhui.chen@titanresearchlabs.ai}}}
 \date{}
@@ -90,59 +90,45 @@ nearest-neighbour model, and from where the designer put it}
 
 \begin{abstract}
 \noindent
-Which of the base pairs written into a designed RNA actually form? We answer it with an
-intervention rather than a folding predictor. On the compensatory-mutagenesis arm of a
-chemical-probing benchmark, a target G--C pair is recovered by its own double mutant
-$\jdg{rescueAU}$ more than a matched A--U pair and $\jdg{rescueGU}$ more than a matched G--U pair
-(permutation $p=\jdg{rescueAUP}$; $\jdg{rescueAUW}$ matched pair-weights over
-$\jdg{rescueAUStrata}$ strata). The readout is the fraction of the wild-type SHAPE profile that
-the compensatory double mutant restores, so it is neither the benchmark's design score nor
-sensitive to structural degeneracy: an alternative structure is not rescued by this particular
-double mutation.
+Pre-registration protects an analysis against choosing a statistic after seeing the data. It does
+not protect it against choosing a statistic that cannot be read. We report two instances from one
+pipeline, on a corpus of \jdg{dN} controlled interventions whose covariate distribution was
+produced not by nature but by a design algorithm, and we give the calibration that catches both.
 
-That ordering is what nearest-neighbour thermodynamics predicts, so we tested it against the
-model directly. For every target pair we take what the model itself assigns to it --- its inner
-stack, its outer stack and the terminal penalty on whichever side is a helix end, read from
-ViennaRNA's parameter tables --- and hold that quantity fixed by stratification.
-\textbf{It mediates none of the effect.} The contrast is $\jdg{eCde}$ against a same-population
-baseline of $\jdg{eBaseSame}$, a retained fraction of $\jdg{eRet}$ ($p=\jdg{eP}$,
-$\jdg{eCi}$), while a placebo mediator drawn from the same distribution retains
-$\jdg{ePlaceboMean}\pm\jdg{ePlaceboSd}$ --- $z=\jdg{eZ}$, mediated fraction $\jdg{eMed}$,
-$\jdg{eMedCi}$. Nor is it the terminal penalty acting alone: outside that term's domain, at helix
-depth $\ge 2$, the contrast is $\jdg{eDTwo}$ ($p=\jdg{eDTwoP}$). Nor is it anything the model can
-express. The compensatory mutants are a controlled two-nucleotide intervention --- a strict
-orientation flip, each mutant byte-identical to its own wild type but for the two mutated positions
---- so the model can be scored on them rather than adjusted for. Its equilibrium probability that
-the flipped pair forms is calibrated against the measurement (rescue $\jdg{mCalLo}$ to
-$\jdg{mCalHi}$ across bins of $P_{\mathrm{model}}$, slope $\jdg{mSkillSlope}$,
-$p=\jdg{mSkillP}$), and holding it fixed the identity contrast still retains \textbf{$\jdg{mRet}$}
-against a placebo mediator's $\jdg{mPlaceboMean}\pm\jdg{mPlaceboSd}$ ($z=\jdg{mZ}$, mediated
-fraction $\jdg{mMed}$, $\jdg{mMedCi}$). Under $\jdg{pNModels}$ parameter sets --- two of them
-fitted rather than thermodynamic, and correlating only $\jdg{pCorrLo}$ to $\jdg{pCorrHi}$ with one
-another --- retention runs $\jdg{pRetLo}$ to $\jdg{pRetHi}$ and every mediated interval covers
-zero. The three pair types do not lie on
-one line in free energy, their implied slopes spanning $\jdg{eSlopeSpread}\times$, and the effect
-is positive in $\jdg{sNPos}$ of $\jdg{sNMeth}$ design methods (sign test $p=\jdg{sBinom}$), so it
-is not an artifact of which designs a given program can produce.
+The first is a mediated fraction. Its two standard estimators --- conditioning on the mediator and
+multiplying two coefficients --- are routinely treated as interchangeable. We prove they differ by
+exactly $\mathbb E[r(M)\mid A]-\mathbb E[r(M)\mid B]$, where $r$ is the residual of the
+conditional mean after its linear projection, bounded by
+$\operatorname{osc}(r)\,d_{\mathrm{TV}}(P_{M\mid A},P_{M\mid B})$, and that they agree for every
+pair of exposure laws \emph{if and only if} that conditional mean is affine
+(Proposition~\ref{prop:routes}). The bound has an uncomfortable corollary: the routes diverge
+least when the arms overlap in the mediator, which is exactly when the conditioning route is
+identified --- so they disagree most where the product route is the only one computable. On our
+data they disagree by \jdg{eLinearGapPts} percentage points, with the conditional mean measured
+bin by bin and non-affine, and our own pre-registered verdict had silently picked one of them.
 
-What \emph{does} mediate the effect is where the designer put the pair. Within design, the
-marginal contrast is $\jdg{medMarginal}$ and the depth-matched contrast is $\jdg{medMatched}$;
-regressing rescue on helix depth inside design gives $\beta_{\mathrm{depth}}=\jdg{medBeta}$ per
-depth unit, and G--C pairs sit $\jdg{medGap}$ depth units shallower than A--U pairs, so placement
-predicts an attenuation of $\jdg{medPred}$ against an observed $\jdg{medObs}$ ---
-\textbf{$\jdg{medFrac}$}, from two factors estimated without reference to the quantity they
-predict. The same property is worth $\jdg{cEffLo}$ to $\jdg{cEffHi}$ points on the benchmark's own
-design score, in matched pairs of real molecules balanced on global GC and on the shipped
-predictor panel, positive in all six populations, with three cuts against a probing-chemistry
-explanation. Placement itself varies with who designed: nine methods building for the same twenty
-targets span $\jdg{gSpread}$ depth units, with the human-designed arm at the pre-registered
-extreme. On three further rounds of the benchmark with disjoint targets, read for the first time
-here, the structure replicates --- all $\jdg{xrRounds}$ pooled depth gaps negative,
-$\jdg{xrSign}$ of the (round,\,method) cells negative, sign test $p=\jdg{xrSignP}$.
+Which one is readable is then settled empirically, not by argument. We inject a \emph{known}
+mediated fraction into the real mediator --- real distribution, real correlation with the design
+cells, real binning --- leaving only the outcome synthetic, and read back what the estimator
+reports. Across \jdg{calSweep} the conditioning estimator correlates with the truth at
+\jdg{calNCorr} for one predictor, the wrong sign, and returns \jdg{calVFull} for the other when
+the truth is total mediation. The published guidance would not have stopped us: our standardised
+total effect is \jdg{calStdC} against a recommended floor of \jdg{calStdCThr}, on
+$n=\jdg{dN}\gg\jdg{calNThr}$. What actually governs is a quantity that guidance does not mention
+--- the mediator separates the arms by \jdg{posSepReal} pooled standard deviations.
 
-The two mediators answer to different things. A corpus of designed molecules hides part of the
-effect through a covariate its designers chose, at a rate the corpus can be made to report. The
-model those designers were optimising does not account for the effect at all.
+The second instance is a different estimator on a different corpus. A within-stratum skill slope,
+also declared in advance, reports \jdg{legSlope} ($p=\jdg{legSlopeP}$) where the rank statistic on
+the same $n=\jdg{legN}$ records reports \jdg{legRho} ($p=\jdg{legRhoP}$); the outcome's dispersion
+differs across the two arms being compared by a factor of \jdg{legSdRatio}. Same design, same
+data, opposite verdicts.
+
+What survives from the substantive question is stated as bounds rather than fractions. The local
+nearest-neighbour energy differs between the two pair types by \jdg{dDg}\,kcal/mol
+(\jdg{dDgCi}) while the same model's ensemble probability differs by \jdg{dPm} (\jdg{dPmCi}),
+which does not resolve from zero; the two structural bounds are \jdg{dDgBound} and \jdg{dPmBound},
+a factor of \jdg{dBoundRatio} apart. We withdraw every retention figure and mediated fraction this
+work previously reported.
 \end{abstract}
 
 % =====================================================================
@@ -204,29 +190,31 @@ identity contrast should collapse. \textbf{It does not move.} The contrast among
 local free energy is $\jdg{eCde}$ against a same-population baseline of $\jdg{eBaseSame}$: a
 retained fraction of $\jdg{eRet}$, against $\jdg{ePlaceboMean}\pm\jdg{ePlaceboSd}$ for a placebo
 mediator built from the same numbers, and a mediated fraction of $\jdg{eMed}$, $\jdg{eMedCi}$.
+\textbf{Those figures are the subject of this paper, not its result.}
 Three further readings agree. Outside the terminal penalty's domain entirely, at helix depth
 $\ge2$, the contrast is $\jdg{eDTwo}$ ($p=\jdg{eDTwoP}$). The three pair types do not fall on one
 line in free energy, their implied slopes spanning $\jdg{eSlopeSpread}\times$. And the effect is
 positive in $\jdg{sNPos}$ of $\jdg{sNMeth}$ design methods, so it is not a property of what one
 program can build.
 
-The obvious objection to that is scope: $\Delta G_{\mathrm{loc}}$ is two stacks and a terminal
-penalty, and a folding model is much more. The corpus answers it, because it already contains the
-experiment. Every compensatory double mutant is a controlled two-nucleotide intervention --- a
-strict orientation flip of one pair, byte-identical to its own wild type otherwise --- so the model
-can be \emph{scored} on $\jdg{mN}$ molecules it did not see rather than adjusted for. It scores
-well: its ensemble probability that the flipped pair forms is calibrated and monotone against the
-measurement ($\jdg{mSkillSlope}$, $p=\jdg{mSkillP}$). Held fixed, the identity contrast still
-retains $\jdg{mRet}$, and $\jdg{pRetLo}$ to $\jdg{pRetHi}$ across $\jdg{pNModels}$ parameter
-sets including two that are fitted rather than thermodynamic (\S\ref{sec:scored}).
+That was our reading, and it was wrong in a way worth reporting. The reading rested on a mediated
+fraction, and a mediated fraction on this corpus has two estimators that disagree by
+$\jdg{eLinearGapPts}$ percentage points --- the product route gives $\jdg{eLinearMed}$, the
+conditioning route the opposite sign --- with both numbers written side by side in our own frozen
+output and the verdict field silently taking one of them. Proposition~\ref{prop:routes} says when
+they may be treated as interchangeable, and the condition is testable: it is that the conditional
+mean of the outcome in the mediator is affine. We measure it bin by bin
+($\jdg{eBinwise}$) and it is not.
 
-Whether a designed base pair forms therefore carries identity information that this thermodynamic
-model does not encode --- not merely its local term, but its ensemble prediction for the individual
-molecule. \S\ref{sec:qualitative} says what that does and does not licence. It is also a statement the corpus was in a position to hide, because a mediation analysis
-that assumed the outcome to be linear in the free energy would have reported the opposite: the
-product-of-coefficients route gives $\jdg{eLinearMed}$ mediated, $\jdg{eLinearGapPts}$ points away
-from the stratified estimate, and the linearity it needs is testable and fails
-(\S\ref{sec:energy}).
+Knowing which route is wrong is not the same as knowing whether either is readable, and that is
+settled by calibration rather than by argument (\S\ref{sec:cal}). Injecting a \emph{known}
+mediated fraction into the real mediator, leaving only the outcome synthetic, the conditioning
+estimator tracks the truth at $\jdg{calNCorr}$ --- the wrong sign --- and returns $\jdg{calVFull}$
+for the second predictor when the truth is total mediation. Every retention figure and mediated
+fraction in earlier versions of this work is withdrawn. What replaces them is a pair of bounds:
+the local energy differs between the pair types by $\jdg{dDg}$\,kcal/mol ($\jdg{dDgCi}$) and the
+ensemble probability by $\jdg{dPm}$ ($\jdg{dPmCi}$, covering zero), bounding their contributions
+at $\jdg{dDgBound}$ and $\jdg{dPmBound}$.
 
 Something else does hide the effect, and it is not physics. \emph{The pair types are not placed
 alike.} Every design method in the corpus puts G--C pairs closer to helix ends than A--U pairs, and
@@ -266,17 +254,21 @@ and section pointers only.}
 \begin{claimbox}
 \textbf{Contributions.}
 \begin{enumerate}[leftmargin=1.6em,itemsep=2pt,topsep=2pt,label=\textbf{\arabic*.}]
-\item \textbf{Formation is not a function of what the folding model predicts about the
-  molecule} (\S\ref{sec:energy}, \S\ref{sec:scored}). Holding the model's per-pair local energy
-  fixed leaves the identity contrast at $\jdg{eRet}$ of its same-population baseline
-  ($\jdg{eMed}$, $\jdg{eMedCi}$ mediated), and holding fixed its \emph{full ensemble probability
-  that this exact pair forms} --- on $\jdg{mN}$ molecules that were built, each differing from its
-  own wild type at exactly the two mutated positions --- leaves it at $\jdg{mRet}$
-  ($\jdg{mMed}$, $\jdg{mMedCi}$), against placebo mediators at
-  $\jdg{ePlaceboMean}\pm\jdg{ePlaceboSd}$ and $\jdg{mPlaceboMean}\pm\jdg{mPlaceboSd}$. The model is
-  \emph{calibrated} on these molecules, which is what makes the second statement mean something,
-  and the second statement holds under all $\jdg{pNModels}$ parameter sets ViennaRNA ships
-  ($\jdg{pRetLo}$ to $\jdg{pRetHi}$ retained).
+\item \textbf{An exact account of when the two mediation routes may be interchanged, and a bound
+  that says where they will not be} (Proposition~\ref{prop:routes}). They differ by
+  $\mathbb E[r(M)\mid A]-\mathbb E[r(M)\mid B]$ and agree for all exposure laws iff the
+  conditional mean is affine; the disagreement is bounded by
+  $\operatorname{osc}(r)\,d_{\mathrm{TV}}$, which is small exactly when the arms overlap --- that
+  is, exactly when the conditioning route is identified. On this corpus they disagree by
+  $\jdg{eLinearGapPts}$ points and the affinity condition fails as measured
+  ($\jdg{eBinwise}$).
+\item \textbf{A constructive calibration for an estimator, and the demonstration that published
+  guidance does not substitute for it} (\S\ref{sec:cal}). Inject a known mediated fraction into
+  the real mediator and read back what the estimator says: across $\jdg{calSweep}$ it correlates
+  with the truth at $\jdg{calNCorr}$, and returns $\jdg{calVFull}$ at total mediation. Our
+  standardised total effect is $\jdg{calStdC}$ against a recommended floor of $\jdg{calStdCThr}$
+  and $n=\jdg{dN}$ against $\jdg{calNThr}$, so the guidance passes us. The quantity that governs
+  is not in the guidance: the mediator separates the arms by $\jdg{posSepReal}$ pooled SD.
 \item \textbf{Base-pair identity predicts formation, measured interventionally}
   (\S\ref{sec:pairtype}): matched within design on helix depth and crossing, a G--C target pair is
   rescued $\jdg{rescueAU}$ above a matched A--U pair and $\jdg{rescueGU}$ above a matched G--U
@@ -375,8 +367,14 @@ outcome \citep{lipsitch2010negative} and read with an eye to how much hidden bia
 them \citep{rosenbaum1987sensitivity,rosenbaum2010design}. Inference is by randomisation
 \citep{fisher1935design,ernst2004permutation,good2005permutation}, with intervals by the bootstrap
 \citep{efron1993introduction}; Prop.~\ref{prop:null} states a restriction on \emph{which}
-randomisation is valid once the matched set is built under calipers, which we did not find stated
-in that literature. \S\ref{sec:mediation}'s decomposition is a product-of-coefficients mediation
+randomisation is valid once the matched set is built under calipers. \textbf{We claim no priority
+for that restriction.} The matching literature already records that permuting the treatment after
+matching is invalid, because the permuted assignment would not have produced the same matched
+configuration, and that doing so inflates Type~I error
+\citep{hansen2008covariate,rosenbaum2010design}. What we add is the magnitude on a design of this
+kind. Against a nominal $0.005$, the treatment-side randomisation rejects at $\jdg{m23nT}$
+($\jdg{m23nTN}$ draws) while the outcome-side one rejects at $\jdg{m23nY}$ ($\jdg{m23nYN}$) --- a
+sevenfold inflation, measured rather than argued. \S\ref{sec:mediation}'s decomposition is a product-of-coefficients mediation
 \citep{baron1986moderator,imai2010general,vanderweele2015explanation} with an observed mediator
 and a non-manipulable exposure, a setting whose identification conditions are stronger than the
 estimator's algebra suggests \citep{vanderweele2009conceptual}; we state them and say which one
@@ -772,15 +770,29 @@ Prop.~\ref{prop:routes} drawn against the function it approximates.}
 \end{figure}
 
 \begin{claimbox}
-\textbf{The mediated fraction is indistinguishable from zero.} Among pairs sharing a bin of
+\textbf{The two routes disagree by $\jdg{eLinearGapPts}$ points, and the affinity that would
+reconcile them fails.} The conditioning route: among pairs sharing a bin of
 $\Delta G_{\mathrm{loc}}$ the contrast is $\jdg{eCde}$ (permutation $p=\jdg{eP}$, null SD
 $\jdg{eNullSd}$, cluster interval $\jdg{eCi}$) against a baseline of $\jdg{eBaseSame}$ computed on
-\emph{the same records} with the energy dimension removed: a retained fraction of $\jdg{eRet}$,
-so the fraction mediated through the model's own energy is $\jdg{eMed}$, $\jdg{eMedCi}$. A placebo
-mediator --- the same $\Delta G_{\mathrm{loc}}$ values permuted within target and cut at the same
-edges --- retains $\jdg{ePlaceboMean}\pm\jdg{ePlaceboSd}$ over the range
-$\jdg{ePlaceboLo}$ to $\jdg{ePlaceboHi}$, putting the real mediator at $z=\jdg{eZ}$. Bin count is
-not doing the work: $\jdg{eSens3}$ at three bins and $\jdg{eSens8}$ at eight.
+\emph{the same records} with the energy dimension removed --- a retained fraction of $\jdg{eRet}$,
+a mediated fraction of $\jdg{eMed}$, $\jdg{eMedCi}$. The product route, on the same records:
+$\beta=\jdg{eBeta}$ against a gap of $\jdg{eGap}$, giving $\jdg{eLinearMed}$. Both numbers were
+written to the same frozen output file and the verdict field took the first without argument.
+Proposition~\ref{prop:routes} says the choice is legitimate only where the conditional mean is
+affine; measured bin by bin it runs $\jdg{eBinwise}$ over $\Delta G_{\mathrm{loc}}$ means
+$\jdg{eBinwiseDg}$, and it is not.
+\end{claimbox}
+
+\begin{claimbox}
+\textbf{What is left after the fraction is withdrawn is a pair of direct contrasts.} On
+$\jdg{dW}$ matched pair-weights over $\jdg{dStrata}$ strata ($n=\jdg{dN}$), the outcome separates
+the two pair types by $\jdg{dOut}$ (\jdg{dOutCi}, $p=\jdg{dOutP}$); $\Delta G_{\mathrm{loc}}$
+separates them by $\jdg{dDg}$\,kcal/mol (\jdg{dDgCi}, $p=\jdg{dDgP}$), a tight interval far from
+zero; and the same model's ensemble probability that the pair forms separates them by $\jdg{dPm}$
+(\jdg{dPmCi}, $p=\jdg{dPmP}$), which does not resolve from zero. \textbf{The model's pipeline
+absorbs a $|\jdg{dDg}|$\,kcal/mol local energy difference into a probability difference too small
+to detect.} Their product-route bounds are $\jdg{dDgBound}$ and $\jdg{dPmBound}$ --- upper limits
+only, for the reason in the box above --- a factor of $\jdg{dBoundRatio}$ apart.
 \end{claimbox}
 
 \paragraph{Why the placebo is the whole experiment.} Adding any stratifying dimension shrinks a
@@ -867,99 +879,95 @@ and $\jdg{eGuIso}$ against isolated G--U ($n=\jdg{eGuIsoN}$). The direction is t
 literature would suggest and the counts are too small to carry weight; it is reported as a
 description and no claim rests on it.
 
-\subsection{The model, scored on an intervention that was performed}
-\label{sec:scored}
+% [REMOVED] The subsection that scored ViennaRNA's ensemble prediction on the compensatory
+% mutants, and the four-parameter-set panel that followed it, are not in this paper. They
+% belong to the companion instrument paper, which owns the scoring step. What is left here is
+% the estimator question, which is what this paper is about.
 
-\S\ref{sec:energy} holds fixed the \emph{local} nearest-neighbour term, and that is a narrow object:
-coaxial stacking, dangling ends and non-local competition are outside it. This subsection removes
-the narrowness, because the corpus turns out to contain the experiment that removes it.
+\subsection{Which route is readable is a question for calibration, not for argument}
+\label{sec:cal}
 
-\paragraph{The compensatory mutants are a controlled two-nucleotide intervention.} Every
-compensatory double mutant in the arm is a strict \emph{orientation flip} of one target pair ---
-G--C becomes C--G, A--U becomes U--A, G--U becomes U--G, with no exception and never a change of
-the unordered pair type --- and each mutant differs from its own wild type at exactly the two
-mutated positions inside the design window and is byte-identical everywhere else. That assertion is
-in the code and it admits $\jdg{mN}$ pairs and drops $\jdg{mDrop}$. Each of these is a real
-synthesised molecule carrying a known perturbation, with its own wild type as control.
+Proposition~\ref{prop:routes} says the two routes may disagree and says when. It does not say
+whether either is reporting anything. That is an empirical question about this corpus at this
+signal-to-noise, and it has an experiment: hold the estimator's machinery fixed and vary a truth
+it is supposed to recover.
 
-\paragraph{So the model can be scored rather than conditioned on.} For each mutant, the partition
-function of \citet{mccaskill1990equilibrium} as implemented in ViennaRNA gives the equilibrium
-probability $P_{\mathrm{model}}$ that the flipped target pair forms. This is the model's direct
-prediction of the quantity rescue measures, and it is computed over the \emph{whole ensemble}, so
-everything $\Delta G_{\mathrm{loc}}$ omits is inside it.
+\paragraph{The first attempt failed, and its failure has a name.} We built a synthetic mediator
+$M=\phi\,\mathbf 1[\text{G--C}]+\varepsilon$ and conditioned on it. That variable depends on the
+treatment but does not predict the outcome, so it lies on no causal path; conditioning on it
+destroys overlap between the arms without shrinking the within-stratum contrast. At $\phi$ large
+the matched weight fell to zero and the run recorded a detection. \textbf{It had detected overlap
+collapse.} A positive control for a mediation estimator must depend on the treatment
+\emph{and} predict the outcome; only the first is easy to arrange, and arranging only the first
+produces a result that looks like success.
 
-\begin{figure}[!htbp]
-\centering
-\includegraphics[width=\linewidth]{fig13_model.pdf}
-\caption{\textbf{Left}: measured rescue against the model's own probability that the flipped pair
-forms, in five bins of $P_{\mathrm{model}}$. The model is calibrated on these molecules.
-\textbf{Right}: the identity contrast retained after holding that prediction fixed, against the
-band a placebo mediator produces (grey, mean $\pm1.96$\,SD).}
-\label{fig:scored}
-\end{figure}
+\paragraph{The second attempt calibrated in the wrong regime, by a measurable amount.} Repaired,
+the control recovers a truth of total mediation as $\jdg{posFull}$ retention, correlating with the
+truth at $\jdg{posCorr}$ with mean absolute error $\jdg{posMae}$ --- directionally right and
+compressed hard. But its synthetic mediator separated the arms by $\jdg{posSepSyn}$ pooled
+standard deviations where the real one separates them by $\jdg{posSepReal}$, a factor of
+$\jdg{posSepRatio}$. A calibration an order of magnitude away from the regime it is calibrating
+is not a calibration.
+
+\paragraph{The third changes one thing.} The mediator \emph{is} the real predictor --- real
+distribution, real correlation with the design cells, real binning behaviour --- and only the
+outcome is synthetic,
+\[
+Y \;=\; \gamma\,M_{\text{real}} \;+\; \delta\,\mathbf 1[\text{G--C}] \;+\;
+\mathcal N(0,\sigma^2),\qquad \sigma=\jdg{calOutSd},
+\]
+with $\gamma$ and $\delta$ set so the total stratified contrast equals the corpus's own
+$\jdg{calTotal}$ and a known fraction $f$ of it runs through the mediator. Sweeping $f$ over
+$\jdg{calSweep}$ says what a measured retention means here.
 
 \begin{claimbox}
-\textbf{The model has real skill here, and identity survives it anyway.} Rescue rises
-$\jdg{mCalLo}$ to $\jdg{mCalHi}$ across bins running from $P_{\mathrm{model}}=\jdg{mCalPLo}$ to
-$\jdg{mCalPHi}$ (Table~\ref{tab:calib}); the relationship is $\jdg{mCalMono}$ and the within-design
-slope of rescue on $P_{\mathrm{model}}$ is $\jdg{mSkillSlope}$, $p=\jdg{mSkillP}$. Holding
-$P_{\mathrm{model}}$ fixed by stratification, the C--G-minus-A--U contrast is $\jdg{mCde}$ against
-a same-population baseline of $\jdg{mBaseSame}$ --- \textbf{$\jdg{mRet}$ retained}
-($p=\jdg{mP}$, $\jdg{mCi}$, $\jdg{mW}$ pair-weights over $\jdg{mStrata}$ strata) --- while the
-placebo mediator retains $\jdg{mPlaceboMean}\pm\jdg{mPlaceboSd}$, putting the real one at
-$z=\jdg{mZ}$. The fraction mediated through the model's ensemble prediction is $\jdg{mMed}$,
-$\jdg{mMedCi}$. The ladder's $\delta=0$ self-check returns $\jdg{mDeltaZero}$ and its detection
-threshold is $\jdg{mLad}$ against the observed $\jdg{mCde}$.
+\textbf{The conditioning estimator does not track the truth on this corpus.} Across the sweep it
+correlates with the true mediated fraction at $\jdg{calNCorr}$ for the first mediator --- the
+wrong sign --- with mean absolute error $\jdg{calNMae}$; for the second the error is
+$\jdg{calVMae}$ and at $f=100\%$ it returns $\jdg{calVFull}$. At $f=0$ it returns
+$\jdg{calNZero}$ and $\jdg{calVZero}$, so it is not that the estimator is biased by a constant:
+it is uninformative about $f$ over the whole range. \textbf{Every retention figure and mediated
+fraction in earlier versions of this work is withdrawn.}
 \end{claimbox}
 
-\begin{table}[!htbp]
-\centering\small
-\caption{\textbf{The model's calibration on molecules it did not see.} $P_{\mathrm{model}}$ is the
-equilibrium probability that the flipped target pair forms in the mutant's own ensemble; the last
-column removes each design's mean, which is the form the estimators of \S\ref{sec:method} use.}
-\label{tab:calib}
-\input{figs/calib.tex}
-\end{table}
+\paragraph{Two reasons this was invisible from inside the analysis.} First, the placebo mediator
+--- which the method requires and which we ran --- controls the mechanical shrinkage that any
+extra stratifying dimension produces, but a placebo has no relation to the outcome, so it cannot
+calibrate the bias that arises precisely \emph{because} the mediator does predict the outcome.
+Having a placebo is not having a calibration. Second, the real mediator separates the arms by
+$\jdg{posSepReal}$ pooled standard deviations, so there was never much for the conditioning to
+remove, and a retention near $100\%$ was close to being forced by the design rather than found in
+the data.
 
-\paragraph{Three variants, and one that fails informatively.} Holding fixed the wild type's
-$P_{\mathrm{model}}$ retains $\jdg{mRetWt}$ and holding the change $\Delta P$ retains
-$\jdg{mRetDp}$; $\Delta P$ has no predictive slope of its own ($\jdg{mSkillDp}$,
-$p=\jdg{mSkillDpP}$). The local cost of the flip is the informative failure. Its spread is real ---
-$\mathrm{SD}=\jdg{mFlipSd}$\,kcal/mol, with $\jdg{mFlipFrac}$ of flips moving the local energy by
-more than $\jdg{mFlipThr}$\,kcal/mol --- and the arm recovers an injected slope of $\jdg{mFlipDetect}$ in most
-draws, so it has power. The measured within-design slope is $\jdg{mFlipSlope}$
-($p=\jdg{mFlipP}$): the \emph{opposite} sign to the model's prediction, since a flip that costs
-local free energy should be rescued less. It is a null with power, not an underpowered arm.
+\paragraph{The published guidance would not have stopped us.} The instability of ratio-form
+mediation measures when the total effect is small is documented, with the operational advice to
+compute them only when the standardised total effect reaches about $\jdg{calStdCThr}$ and the
+sample exceeds $\jdg{calNThr}$ \citep{preacher2011effect,mackinnon2007mediation}. Our standardised
+total effect is $\jdg{calStdC}$ and $n=\jdg{dN}$. \textbf{We clear both thresholds and the
+estimator is still unreadable}, because the quantity that governs is not the standardised total
+effect but the mediator's separation between arms, which the guidance does not mention and which
+is $\jdg{posSepReal}$ here.
 
-\paragraph{Four parameter sets, two of them not thermodynamic.} The obvious residual scope is
-that $P_{\mathrm{model}}$ came from one parameter set, so we ran the panel ViennaRNA ships:
-Turner\,2004, Turner\,1999 \citep{mathews1999expanded}, the constraint-generation set of
-\citet{andronescu2007efficient}, and a set derived from the CONTRAfold family
-\citep{do2006contrafold}. They are not versions of one prediction --- their pairwise correlations
-across the $\jdg{pNPairs}$ pairs run from $\jdg{pCorrLo}$ to $\jdg{pCorrHi}$ --- and all
-$\jdg{pNModels}$ have skill (slopes $\jdg{pSkillLo}$ to $\jdg{pSkillHi}$, every
-$p\le\jdg{pSkillP}$). \textbf{The identity contrast retains $\jdg{pRetLo}$ to $\jdg{pRetHi}$ under
-all four}, with every mediated fraction between $\jdg{pMedLo}$ and $\jdg{pMedHi}$ and every
-interval covering zero (Table~\ref{tab:panel}).
+\paragraph{The same disease, a different estimator, a different corpus.} The failure is not
+specific to mediation. On a second corpus of natural RNA, a within-stratum \emph{skill slope} of
+the outcome on a predictor --- also declared in advance, also with a permutation test and a
+constructive ladder --- reports $\jdg{legSlope}$ ($p=\jdg{legSlopeP}$) on $n=\jdg{legN}$ records,
+while the rank statistic on the same records reports $\jdg{legRho}$ ($p=\jdg{legRhoP}$). The two
+arms being compared differ in outcome dispersion by a factor of $\jdg{legSdRatio}$, and the
+predictor is near-binary, so the linear slope is carried by a few intermediate points and by the
+outcome's tail. Same data, same design, opposite verdicts, and nothing in the pre-registration
+distinguishes them.
 
-\begin{table}[!htbp]
-\centering\small
-\caption{\textbf{The same test under four parameter sets.} \emph{Skill} is the within-design slope
-of rescue on that set's $P_{\mathrm{model}}$; \emph{retained} is the identity contrast after
-holding it fixed, against the \emph{placebo} mediator's retention. Two of the four sets are fitted
-rather than thermodynamic.}
-\label{tab:panel}
-\input{figs/panel.tex}
-\end{table}
-
-\paragraph{What this licenses, and what it does not.} \S\ref{sec:energy} could only say \emph{not
-the local nearest-neighbour term}. With $P_{\mathrm{model}}$ the statement becomes \emph{not this
-model's ensemble prediction for this exact molecule} --- and it is measured on molecules that were
-built, carrying a controlled intervention, against a prediction that is calibrated and monotone
-against the outcome. What it does not license: the intervention is not ours --- the dataset's authors
-performed it on every testable pair --- and all four parameter sets run inside one folding
-implementation, with one definition of the ensemble and one treatment of pseudoknots. A
-structurally different predictor, in particular a learned sequence model, remains untested.
+\begin{scopebox}
+\textbf{What we are and are not claiming.} That ratio-form mediation measures are unstable at
+small total effects is known, and that the difference and product methods disagree under
+non-linearity is known. What this section adds is that the published operational thresholds for
+the first are not sufficient on a corpus of this kind, that the governing quantity is a different
+one, and that a constructive calibration --- inject a known target into the real machinery, read
+back what the estimator reports --- decides the question on the analyst's own data rather than by
+reference to a rule of thumb. Proposition~\ref{prop:routes} supplies the exact identity and bound
+for the second. We do not claim the failure modes themselves are new.
+\end{scopebox}
 
 \subsection{The placement gap and the depth slope}
 \label{sec:mediation}
@@ -1180,14 +1188,14 @@ is that the narrow term is the one the design programs consume: a sum over exact
 penalties is the objective, so a property of formation orthogonal to it is a property the design
 loop cannot be optimising towards.
 
-\S\ref{sec:scored} widens it, and the widening is what the corpus was carrying all along. The
-compensatory mutants are a controlled two-nucleotide intervention on real molecules, so the model's
-\emph{ensemble} probability that the flipped pair forms --- which contains coaxial stacking,
-dangling ends and non-local competition --- can be put to the same test. It is calibrated against
-the measurement, and the identity contrast retains $\jdg{mRet}$ when it is held fixed, against a
-placebo mediator's $\jdg{mPlaceboMean}\pm\jdg{mPlaceboSd}$. The licensed reading is therefore
-\emph{not this model's prediction for this molecule}, and the residual scope is one implementation
-and one parameter set rather than one energy term.
+What replaces the retention reading is a comparison of two bounds, and it needs no mediation
+estimator at all. Between the two pair types the local nearest-neighbour energy differs by
+$\jdg{dDg}$\,kcal/mol ($\jdg{dDgCi}$, $p=\jdg{dDgP}$) --- a tight interval far from zero --- while
+the same model's ensemble probability that the pair forms differs by $\jdg{dPm}$
+($\jdg{dPmCi}$), which does not resolve from zero. Their structural bounds are $\jdg{dDgBound}$
+and $\jdg{dPmBound}$, a factor of $\jdg{dBoundRatio}$ apart. The model's pipeline absorbs a large
+local energy difference into a probability difference too small to detect; both quantities are
+direct contrasts on $\jdg{dW}$ matched pair-weights over $\jdg{dStrata}$ strata.
 
 Three readings point the same way and fail differently, which is the reason to have all three.
 The terminal-penalty account makes a positional prediction and the contrast survives outside the
@@ -1195,9 +1203,10 @@ penalty's domain ($\jdg{eDTwo}$ at depth $\ge2$, $p=\jdg{eDTwoP}$). A pure $\Del
 account makes a proportionality prediction and the three pair types are not collinear
 ($\jdg{eSlopeSpread}\times$ spread in implied slope). A survivorship account makes a prediction
 about design methods and the effect is positive in $\jdg{sNPos}$ of $\jdg{sNMeth}$ of them without
-ordering by their placement strength. And a whole-model account predicts that the model's own
-probability for the individual molecule should absorb the effect; it absorbs $\jdg{mMed}$ of it.
-None of the four is decisive on its own; they fail as a set, and they fail in four different ways.
+ordering by their placement strength. None of the three is decisive on its own; they fail as a
+set, and they fail in three different ways. A fourth reading --- that the model's own ensemble
+probability absorbs the effect --- is bounded at $\jdg{dPmBound}$ and not estimated, because the
+estimator that would have estimated it is the one \S\ref{sec:cal} withdraws.
 
 \paragraph{Placement accounts for most of it, and placement is a choice somebody made.} The
 attenuation between the marginal and matched contrasts closes to $\jdg{medFrac}$ on two factors
@@ -1263,13 +1272,11 @@ asked at all. \textbf{(iv) Good designs only.} The compensatory arm measured the
 design per (target,\,method) cell, so the corpus is pre-filtered by the design programs. The
 per-method decomposition bounds the objection on the axis it runs on --- $\jdg{sNPos}$ of
 $\jdg{sNMeth}$ methods positive, no ordering with placement strength --- but does not remove it,
-because no method submitted a poor design. \textbf{(v) One folding implementation.} \S\ref{sec:scored} widens the energy result from the
-local term of Definition~\ref{def:dg} to a folding model's ensemble prediction, under
-$\jdg{pNModels}$ parameter sets including two fitted rather than thermodynamic ones. What remains
-is the implementation: one definition of the ensemble, one treatment of pseudoknots. A structurally
-different predictor --- a learned sequence model \citep{singh2019spotrna,sato2021rna,fu2022ufold}
-or an experiment-trained one \citep{waymentsteele2022rna} --- could absorb what these four do not,
-and that is now the cheapest remaining test in the paper.
+because no method submitted a poor design. \textbf{(v) The bounds are bounds.} $\jdg{dDgBound}$ and $\jdg{dPmBound}$ come from the product
+route, which Proposition~\ref{prop:routes} licenses only where the conditional mean is affine.
+It is not, as measured. They are therefore upper limits on what each quantity could carry, not
+estimates of what it does, and the statement that survives is the comparison between them rather
+than either number alone.
 \textbf{(vi) Prior art.} GC placement as a design heuristic predates this work
 \citep{lee2014eterna}; what is measured here is its effect on pair formation and on the measurement
 itself.
@@ -1277,17 +1284,14 @@ itself.
 \paragraph{Conclusion.} Whether a designed base pair forms depends on what the pair is, measurably
 and by intervention rather than by a predictor's opinion: matched on placement, a G--C target pair
 is recovered $\jdg{rescueAU}$ more than an A--U pair and $\jdg{rescueGU}$ more than a G--U pair.
-The interesting part is what that dependence is not. Hold fixed the free energy the
-nearest-neighbour model assigns to the pair --- the quantity every program in this corpus was
-optimising --- and the contrast does not move: $\jdg{eRet}$ retained, mediated fraction
-$\jdg{eMed}$, $\jdg{eMedCi}$. Hold fixed instead the model's full ensemble probability that this
-exact pair forms, on $\jdg{mN}$ molecules that were built to differ from their own wild type at two
-positions and nowhere else, and it still does not move: $\jdg{mRet}$ retained, $\jdg{mMed}$
-mediated, $\jdg{mMedCi}$, and $\jdg{pRetLo}$ to $\jdg{pRetHi}$ across $\jdg{pNModels}$ parameter
-sets --- while those same predictions are calibrated against the measurement, which is what makes
-the statement worth making. It survives outside the terminal penalty's domain,
-it does not scale with the energy gaps between the three pair types, and it does not track which
-program built the sequence.
+How much of that runs through the free energy the designs were optimised for is a question we can
+bound and cannot answer. The energy differs between the pair types by $\jdg{dDg}$\,kcal/mol
+($\jdg{dDgCi}$) and the model's ensemble probability by $\jdg{dPm}$ ($\jdg{dPmCi}$, covering
+zero); the bounds are $\jdg{dDgBound}$ and $\jdg{dPmBound}$. Earlier versions of this work
+reported a mediated fraction instead, and that number is withdrawn: on this corpus, at these
+effect sizes, the estimator that produced it tracks a known truth at $\jdg{calNCorr}$. The
+contrast survives outside the terminal penalty's domain, it does not scale with the energy gaps
+between the three pair types, and it does not track which program built the sequence.
 What \emph{does} hide it is where the designer put the pair, and that is estimable from the corpus
 itself: placement accounts for $\jdg{medFrac}$ of the gap between the marginal and matched
 contrasts, it recurs on $\jdg{xrRounds}$ rounds with disjoint targets ($\jdg{xrSign}$ of the
@@ -1458,6 +1462,7 @@ cross-method slope positive & $>0$ & $\jdg{gSlope}$ & held \\
 dose--response monotone in the placement gap & monotone & Table~\ref{tab:dose} & held \\
 \midrule
 \multicolumn{4}{@{}l@{}}{\emph{frozen before \S\ref{sec:energy} existed}}\\
+\multicolumn{4}{@{}l@{}}{\emph{\small (the two ratio entries are the record; as measurements they are withdrawn, \S\ref{sec:cal})}}\\
 identity contrast survives conditioning on $\Delta G_{\mathrm{loc}}$
   & $\ge50\%$, $p\le0.005$ & $\jdg{eRet}$, $p=\jdg{eP}$ & held \\
 fraction mediated through $\Delta G_{\mathrm{loc}}$ & $20$--$60\%$ & $\jdg{eMed}$ &
@@ -1473,17 +1478,8 @@ effect positive in at least seven of nine methods & $\ge7/9$ &
 effect size not monotone in placement strength & $|\rho_s|<0.6$ & $\jdg{sSpear}$ & held \\
 the circular shift never indexes a sequence & assertion & source-checked & held \\
 \midrule
-\multicolumn{4}{@{}l@{}}{\emph{frozen before \S\ref{sec:scored} existed}}\\
-the folding model has skill on the flipped mutants & $p\le0.005$ & $\jdg{mSkillP}$ & held \\
-the model's calibration is not monotone & --- & $\jdg{mCalMono}$ & \textbf{failed} \\
-identity survives holding $P_{\mathrm{model}}$ fixed & $\ge50\%$ & $\jdg{mRet}$ & held \\
-that mediated fraction's interval covers zero & --- & $\jdg{mMedCi}$ & held \\
-the flip's local-energy arm is underpowered, not null & --- & has power & \textbf{failed} \\
-every parameter set has skill & $p\le0.005$ & $\jdg{pSkillP}$ & held \\
-identity retained under every parameter set & $\ge80\%$ & $\jdg{pRetLo}$--$\jdg{pRetHi}$ & held \\
-every mediated interval covers zero & --- & $\jdg{pMedLo}$--$\jdg{pMedHi}$ & held \\
-fitted parameters score no worse than Turner\,2004 & --- & one is lower & \textbf{failed} \\
-the four predictions are not collinear & $\rho\ge0.7$ & $\jdg{pCorrLo}$--$\jdg{pCorrHi}$ & held \\
+\multicolumn{4}{@{}l@{}}{\emph{frozen before the scoring experiment, which is reported in the companion paper}}\\
+\multicolumn{4}{@{}l@{}}{\emph{\small (nine predictions there; not restated here)}}\\
 \midrule
 \multicolumn{4}{@{}l@{}}{\emph{frozen before \S\ref{sec:rounds} existed}}\\
 treatment-side randomisation over-rejects & $>0.010$ & $\jdg{m23nT}$ & held \\

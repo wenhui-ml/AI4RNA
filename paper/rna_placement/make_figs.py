@@ -644,49 +644,10 @@ def fig12():
 
 
 # ---------------------------------------------------------------- fig 13: the model, scored
-def fig13():
-    """M26. Left: the model is calibrated against the wet readout on molecules it never saw.
-    Right: what holding that calibrated prediction fixed does to the identity contrast."""
-    d = J("m26_model_scored.json")
-    fig, (a1, a2) = plt.subplots(1, 2, figsize=(7.4, 2.6),
-                                 gridspec_kw={"width_ratios": [1.15, 1]})
-    b = d["D4"]["bins"]
-    x = [r["p_mean"] for r in b]; y = [r["rf_mean"] for r in b]
-    n = [r["n"] for r in b]
-    a1.plot(x, y, "-o", color=S1, lw=1.2, ms=5, zorder=4)
-    for xi, yi, ni in zip(x, y, n):
-        a1.annotate(f"n={ni}", (xi, yi), textcoords="offset points", xytext=(0, -11),
-                    ha="center", fontsize=5.8, color=INK2)
-    a1.set_xlabel("$P_{\\mathrm{model}}$: the model's probability that the flipped pair forms",
-                  fontsize=7.2)
-    a1.set_ylabel("measured rescue", fontsize=7.4)
-    a1.set_title("the model is calibrated here", fontsize=7.6, color=INK)
-    bare(a1, xgrid=False)
-
-    D = d["D2"]
-    pm = D["placebo_mean"] * 100; ps = D["placebo_sd"] * 100; re = D["retention"] * 100
-    a2.axvspan(pm - 1.96 * ps, pm + 1.96 * ps, color="#f1f0ec", zorder=1)
-    a2.axvline(pm, color=INK3, lw=.8, ls=(0, (3, 2)), zorder=2)
-    a2.axvline(100, color=INK2, lw=.7, zorder=2)
-    d3 = d["D3"]
-    ys = [3, 2, 1, 0]
-    vals = [re, d3["pwt"]["retention"] * 100, d3["dp"]["retention"] * 100, pm]
-    names = ["hold $P_{\\rm model}$ fixed", "hold $P_{\\rm model}$(wild type)",
-             "hold $\\Delta P$", "placebo mediator"]
-    a2.scatter(vals, ys, s=26, color=[S1, S1, S1, INK3], zorder=4)
-    a2.errorbar([pm], [0], xerr=[1.96 * ps], color=INK3, lw=1.0, capsize=2, zorder=3)
-    a2.set_yticks(ys); a2.set_yticklabels(names, fontsize=6.6)
-    a2.set_xlabel("identity contrast retained (%)", fontsize=7.4)
-    a2.set_title("and identity survives it", fontsize=7.6, color=INK)
-    a2.set_ylim(-.7, 3.7)
-    bare(a2)
-    fig.tight_layout(w_pad=1.3)
-    _save(fig, f"{OUT}/fig13_model.pdf"); plt.close(fig)
-
-
+# [REMOVED] fig13 drew the model-scoring arm, which is now in the companion paper.
 if __name__ == "__main__":
     fig0(); fig8()
     b, a = fig1(); fig2(); fig3(); fig4(); fig5(); fig6(); fig7()
-    fig9(); fig10(); fig11(); fig12(); fig13()
+    fig9(); fig10(); fig11(); fig12()
     print(f"fig1 baseline R2 {b:.4f} ({b/CEILING:.1%})  +seq {b+a:.4f} ({(b+a)/CEILING:.1%})")
     print("wrote", sorted(os.listdir(OUT)))
