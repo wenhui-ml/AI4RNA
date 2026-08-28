@@ -989,6 +989,70 @@ reference to a rule of thumb. Proposition~\ref{prop:routes} supplies the exact i
 for the second. We do not claim the failure modes themselves are new.
 \end{scopebox}
 
+\subsection{The proposition, tested where none of this paper's machinery applies}
+\label{sec:crossdomain}
+
+A proposition proved on a page and exercised on the corpus that motivated it has been checked
+against itself. Proposition~\ref{prop:routes} makes a claim with no RNA in it --- it is about a
+treatment, a mediator and a stratification --- so it can be put at risk somewhere this paper's
+apparatus has no purchase. We ran it on a corpus of designed \emph{protein} binders: \jdg{xdN}
+records over \jdg{xdCells} target-by-method cells for \jdg{xdTargets}, with binder hydrophobicity
+as the treatment, chain length as the mediator, and measured binding as the outcome. Nothing about
+base pairs, helices, folding models or chemical probing survives the transfer.
+
+The premise transfers first, which is why the rest is readable: the method a binder came from
+explains $\eta^2=\jdg{xdEta}$ of the mediator within a target (\jdg{xdEtaLo} to \jdg{xdEtaHi}
+across the three), the same producer-preference structure this paper documents for RNA. On that
+corpus the marginal contrast is \jdg{xdMarg} ($p=\jdg{xdMargP}$) and the matched one
+\jdg{xdMatched}, and the two mediation routes give \jdg{xdStrat} and \jdg{xdProd}.
+
+\paragraph{We staked that the routes would differ by at least five points, and they differ by
+\jdg{xdGapPts}.} Read alone that is a failed prediction, and it is recorded as one in the
+preregistration table. Read through Proposition~\ref{prop:routes} it is the prediction the
+proposition makes: the gap is bounded by $\mathrm{osc}(r)\cdot d_{\mathrm{TV}}$, and the binder
+corpus's two arms overlap heavily in the mediator, so the bound leaves little room for the routes
+to separate. A theory that only ever predicts large effects is not being tested by them.
+
+That reading is only admissible if the RNA corpus, where the routes differ by far more, carries a
+correspondingly larger $d_{\mathrm{TV}}$ --- computed by the same function, in the same file, on
+the same estimator. It does.
+
+\begin{center}
+\begin{tabular}{lccccc}
+\toprule
+corpus & $n$ & $d_{\mathrm{TV}}$ & $\mathrm{osc}(r)$ & route gap (pts) & $|$gap$|/$bound \\
+\midrule
+protein binders & \jdg{xdBN} & \jdg{xdBDtv} & \jdg{xdBOsc} & \jdg{xdBGap} & \jdg{xdBTight} \\
+RNA designs     & \jdg{xdRN} & \jdg{xdRDtv} & \jdg{xdROsc} & \jdg{xdRGap} & \jdg{xdRTight} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{claimbox}
+\textbf{The bound does not merely hold; it tracks.} The two corpora differ in overlap by a factor
+of \jdg{xdDtvRatio} and in route gap by a factor of \jdg{xdGapRatio}. Proposition~\ref{prop:routes}
+bounds the second by the first, and across two domains sharing no measurement, no model and no
+units, the ratio it bounds and the ratio it is bounded by agree to within the second decimal.
+\end{claimbox}
+
+\paragraph{The one thing this comparison had to survive.} $\mathrm{osc}(r)$ is a supremum over the
+support, and estimating it from binned means shrinks it --- which shrinks the bound's right-hand
+side, the direction that manufactures false violations. Swept over \jdg{xdSweepN} bin counts from
+\jdg{xdSweepLo} to \jdg{xdSweepHi}, the bound holds on the binder corpus at \jdg{xdBHold} of
+\jdg{xdSweepN} and on the RNA corpus at \jdg{xdRHold}, failing only at the coarsest settings
+(\jdg{xdRFailBins} bins) where $\mathrm{osc}(r)$ is estimated at \jdg{xdROscLo} against
+\jdg{xdROscHi} at the finest. \textbf{The apparent violations are a resolution artifact of the
+estimator, not a counterexample}, and the comparison above is therefore made at a binning both
+corpora resolve. We report this rather than the coarse setting because we found it by looking, not
+because it is the setting that flatters the result.
+
+\begin{scopebox}
+\textbf{What the cross-domain arm claims.} That the proposition's premise and its bound behave as
+stated on a corpus outside this paper's subject matter, and that the quantity it names governs how
+far the two routes separate. It makes no claim about protein binders, about binder design methods,
+or about the biology of any of the three targets. The corpus is a test bed for an inequality.
+\end{scopebox}
+
 \subsection{The placement gap and the depth slope}
 \label{sec:mediation}
 

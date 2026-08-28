@@ -393,6 +393,44 @@ put("legRhoP", pv(_a["within_spearman_p"]["2A3"]))
 put("legSdRatio", f"{m28r['R2_outcome_scale']['ratio']:.2f}")
 put("legN", f"{_d28['M2SL5_2A3_0000']['A']['n_admitted']}")
 
+# ---------------------------------------------------------------- cross-domain test of the
+# proposition itself (M29 + M29r). The binder corpus is not RNA and shares no machinery with it.
+m29 = J("m29_binder_crossdomain.json")
+m29r = J("m29r_review.json")
+_main = m29["arms"][0]
+put("xdN", f"{_main['n']}")
+put("xdCells", f"{_main['n_cells']}")
+put("xdEta", f"{_main['A_premise']['eta2_mean']:.4f}")
+put("xdEtaLo", f"{min(x['eta2'] for x in _main['A_premise']['eta2_by_target']):.4f}")
+put("xdEtaHi", f"{max(x['eta2'] for x in _main['A_premise']['eta2_by_target']):.4f}")
+put("xdTargets", ", ".join(x["target"] for x in _main["A_premise"]["eta2_by_target"]))
+put("xdMarg", sig(_main["B"]["marginal"], 5))
+put("xdMargP", pv(_main["B"]["marginal_p"]))
+put("xdMatched", sig(_main["B"]["matched"], 5))
+put("xdStrat", sig(_main["C"]["route_stratified"], 5))
+put("xdProd", sig(_main["C"]["route_product"], 5))
+put("xdGapPts", f"{_main['C']['gap_points']:.2f}")
+_cmp = m29r["comparison"]
+for tag, k in (("B", "binder"), ("R", "rna")):
+    v = _cmp[k]
+    put(f"xd{tag}N", f"{v['n']}")
+    put(f"xd{tag}Dtv", f"{v['d_TV']:.4f}")
+    put(f"xd{tag}Osc", f"{v['osc_r']:.5f}")
+    put(f"xd{tag}Gap", f"{v['gap_points']:+.2f}")
+    put(f"xd{tag}Rhs", f"{v['rhs']:.5f}")
+    put(f"xd{tag}Tight", f"{v['tightness']:.3f}")
+put("xdDtvRatio", f"{_cmp['dtv_ratio']:.2f}")
+put("xdGapRatio", f"{_cmp['gap_ratio']:.2f}")
+_bs, _rs = m29r["R1_binder_binsweep"], m29r["R2_rna_binsweep"]
+put("xdSweepN", f"{len(_bs)}")
+put("xdSweepLo", f"{min(r['nbins'] for r in _bs)}")
+put("xdSweepHi", f"{max(r['nbins'] for r in _bs)}")
+put("xdBHold", f"{sum(r['bound_holds'] for r in _bs)}")
+put("xdRHold", f"{sum(r['bound_holds'] for r in _rs)}")
+put("xdRFailBins", ", ".join(str(r["nbins"]) for r in _rs if not r["bound_holds"]))
+put("xdROscLo", f"{min(r['osc_r'] for r in _rs):.5f}")
+put("xdROscHi", f"{max(r['osc_r'] for r in _rs):.5f}")
+
 # ---------------------------------------------------------------- survivorship + shift (M22)
 m22 = J("m22_review_arms.json")
 a22 = m22["A"]
