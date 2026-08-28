@@ -1,0 +1,44 @@
+{
+  "R1_dynamic_range": {
+    "frac_hi": 0.0702,
+    "frac_lo": 0.2618,
+    "frac_mid": 0.6681,
+    "median": 0.5489,
+    "p10": 0.0021,
+    "p90": 0.9837
+  },
+  "R1_range_could_explain_null": false,
+  "R2_censor_rate_by_pairtype": {
+    "CG": 0.0389,
+    "AU": 0.0412,
+    "GU": 0.0786
+  },
+  "R2_contrast_all": {
+    "effect": -0.00569,
+    "ci": [
+      -0.02989,
+      0.02174
+    ],
+    "p_perm": 0.6701649175412294,
+    "weight": 902.0,
+    "n_strata": 553
+  },
+  "R2_contrast_uncensored": {
+    "effect": -0.00597,
+    "ci": [
+      -0.03263,
+      0.02332
+    ],
+    "p_perm": 0.6271864067966016,
+    "weight": 859.0,
+    "n_strata": 542
+  },
+  "R2_sign_flips_when_censoring_removed": false,
+  "R2_separates_without_censoring": false,
+  "R3": {
+    "eterna_ci_contains_zero": true,
+    "licensed_sentence": "EternaFold does not separate the two pair types in the measured direction; its interval contains zero",
+    "refused_sentence": "EternaFold behaves like ViennaRNA -- both point estimates are negative but EternaFold's is five times smaller and both intervals cover zero, so a shared sign is not a shared behaviour"
+  },
+  "verdict": "S2_stands_but_only_as_a_non_separation"
+}

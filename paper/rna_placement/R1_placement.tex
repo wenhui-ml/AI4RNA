@@ -20,6 +20,7 @@
 \usepackage{textcomp}
 \usepackage{amsmath,amssymb,amsthm,amsfonts}
 \usepackage{booktabs}
+\usepackage{longtable}
 \usepackage{graphicx}
 \usepackage{xcolor}
 \usepackage{array}
@@ -41,6 +42,29 @@
 \renewcommand{\textfraction}{0.06}
 \renewcommand{\floatpagefraction}{0.72}
 \setcounter{topnumber}{4}\setcounter{bottomnumber}{3}\setcounter{totalnumber}{6}
+
+% ---------------------------------------------------------------- adaptive pagination
+% Pages were breaking early and dumping the slack at the foot. The cause is not the float
+% parameters above -- it is that a page of solid paragraphs offers TeX no stretchable glue,
+% so when the next line will not fit there is nothing to absorb and the page ends short.
+% Give it a little flexibility everywhere and require it to be used.
+% NOT \flushbottom. Tried it: on a page whose next block is an unbreakable table, TeX breaks
+% after two paragraphs and then stretches those two across the whole page -- a 700pt chasm in
+% the middle, which is far worse than slack at the foot. The cure for a short page is to make
+% the block that would not fit BREAKABLE (see the longtable below), not to inflate the page.
+\raggedbottom
+\setlength{\abovedisplayskip}{9pt plus 3pt minus 3pt}
+\setlength{\belowdisplayskip}{9pt plus 3pt minus 3pt}
+\setlength{\abovedisplayshortskip}{4pt plus 2pt minus 2pt}
+\setlength{\belowdisplayshortskip}{5pt plus 2pt minus 2pt}
+\setlength{\textfloatsep}{16pt plus 5pt minus 4pt}
+\setlength{\floatsep}{12pt plus 4pt minus 3pt}
+\setlength{\intextsep}{12pt plus 4pt minus 3pt}
+% Breaking mid-paragraph is allowed but discouraged; a lone line at either edge costs more than
+% a slightly looser page, and 150 is low enough that TeX will still take one to avoid a gap.
+\widowpenalty=150
+\clubpenalty=150
+\brokenpenalty=100
 
 \newtheorem{proposition}{Proposition}
 \newtheorem{definition}{Definition}
@@ -1590,15 +1614,29 @@ was stricter than the kill condition it was written for, both thresholds are rep
 reconciled after the fact. Runs voided by their own probes are retained with
 their logs rather than deleted; one of those voids is what produced Prop.~\ref{prop:null}.
 
-\begin{table}[!htbp]
-\centering\small
-\caption{Staked numerical predictions, frozen before the corresponding data existed.}
-\label{tab:prereg}
+\begingroup\small
 \setlength{\tabcolsep}{3pt}
-\begin{tabular}{@{}p{0.44\linewidth}p{0.16\linewidth}p{0.17\linewidth}l@{}}
+\setlength{\LTcapwidth}{\linewidth}
+% longtable, not table+tabular: at 55 rows this block is within a few lines of the text height,
+% so as a float it can only be placed on a page of its own, and the page before it ends short.
+% Breakable, it flows and the surrounding pages fill.
+\begin{longtable}{@{}p{0.44\linewidth}p{0.16\linewidth}p{0.17\linewidth}l@{}}
+\caption{Staked numerical predictions, frozen before the corresponding data existed.}
+\label{tab:prereg}\\
 \toprule
 staked, before the run & bar & measured & outcome \\
 \midrule
+\endfirsthead
+\multicolumn{4}{@{}l@{}}{\emph{Table~\ref{tab:prereg}, continued}}\\[2pt]
+\toprule
+staked, before the run & bar & measured & outcome \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r@{}}{\emph{continued on the next page}}\\
+\endfoot
+\bottomrule
+\endlastfoot
 pair type predicts rescue, G--C above A--U & $p\le0.005$ & $p=\jdg{rescueAUP}$ & held \\
 \quad and above G--U & $p\le0.005$ & $p=\jdg{rescueGUP}$ & held \\
 placement mediates the attenuation & $40$--$60\%$ & $\jdg{medFrac}$ & \textbf{failed, high} \\
@@ -1649,9 +1687,8 @@ the retention estimator is unreadable here too & $|\rho|\le0.5$ & $\jdg{xdECorr}
   \textbf{failed, high} \\
 matched contrast below marginal & smaller & \jdg{xdMatched} vs \jdg{xdMarg} & held \\
 ladder detection threshold & $\ge0.10$ & \jdg{xdLadderThr} & held \\
-\bottomrule
-\end{tabular}
-\end{table}
+\end{longtable}
+\endgroup
 
 
 \section{The energy arm in full}

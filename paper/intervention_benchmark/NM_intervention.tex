@@ -21,6 +21,7 @@
 \usepackage{textcomp}
 \usepackage{amsmath,amssymb,amsthm,amsfonts}
 \usepackage{booktabs}
+\usepackage{longtable}
 \usepackage{graphicx}
 \usepackage{xcolor}
 \usepackage{array}
@@ -45,6 +46,29 @@
 \renewcommand{\textfraction}{0.06}
 \renewcommand{\floatpagefraction}{0.72}
 \setcounter{topnumber}{4}\setcounter{bottomnumber}{3}\setcounter{totalnumber}{6}
+
+% ---------------------------------------------------------------- adaptive pagination
+% Pages were breaking early and dumping the slack at the foot. The cause is not the float
+% parameters above -- it is that a page of solid paragraphs offers TeX no stretchable glue,
+% so when the next line will not fit there is nothing to absorb and the page ends short.
+% Give it a little flexibility everywhere and require it to be used.
+% NOT \flushbottom. Tried it: on a page whose next block is an unbreakable table, TeX breaks
+% after two paragraphs and then stretches those two across the whole page -- a 700pt chasm in
+% the middle, which is far worse than slack at the foot. The cure for a short page is to make
+% the block that would not fit BREAKABLE (see the longtable below), not to inflate the page.
+\raggedbottom
+\setlength{\abovedisplayskip}{9pt plus 3pt minus 3pt}
+\setlength{\belowdisplayskip}{9pt plus 3pt minus 3pt}
+\setlength{\abovedisplayshortskip}{4pt plus 2pt minus 2pt}
+\setlength{\belowdisplayshortskip}{5pt plus 2pt minus 2pt}
+\setlength{\textfloatsep}{16pt plus 5pt minus 4pt}
+\setlength{\floatsep}{12pt plus 4pt minus 3pt}
+\setlength{\intextsep}{12pt plus 4pt minus 3pt}
+% Breaking mid-paragraph is allowed but discouraged; a lone line at either edge costs more than
+% a slightly looser page, and 150 is low enough that TeX will still take one to avoid a gap.
+\widowpenalty=150
+\clubpenalty=150
+\brokenpenalty=100
 
 \newtheorem{proposition}{Proposition}
 \newtheorem{definition}{Definition}
@@ -992,11 +1016,22 @@ out to have one, or an artifact the manuscript reads is not classified at all, t
 The sentence this paragraph replaced claimed the stronger thing --- that \emph{every} experiment
 here was preregistered --- and nothing checked it.
 
-\begin{center}
-\begin{tabular}{p{0.62\textwidth}c}
+{\setlength{\LTcapwidth}{\textwidth}
+\begin{longtable}{p{0.62\textwidth}c}
 \toprule
 staked before the run & outcome \\
 \midrule
+\endfirsthead
+\multicolumn{2}{@{}l@{}}{\emph{preregistration record, continued}}\\[2pt]
+\toprule
+staked before the run & outcome \\
+\midrule
+\endhead
+\midrule
+\multicolumn{2}{r@{}}{\emph{continued on the next page}}\\
+\endfoot
+\bottomrule
+\endlastfoot
 Neural model has positive skill on this instrument, $p\le0.005$ & correct \\
 Neural skill exceeds the thermodynamic model's & correct \\
 Neural calibration is monotone & \textbf{failed} \\
@@ -1028,9 +1063,7 @@ Top-quartile recovery beats random by $\ge5$ points & correct \\
   interval. Reissued against the paired interval \jdg{rkDiffNCi}} & \textbf{failed} \\
 The base rate of rescue lies in $[0.2,0.8]$ \quad(\jdg{rkBase}) & correct \\
 Ranking survives the selection and leakage control populations & correct \\
-\bottomrule
-\end{tabular}
-\end{center}
+\end{longtable}}
 
 \noindent The fifth row of the last block is the one worth reading. Its run returned every staked
 prediction satisfied and a verdict supporting the reframe; the verdict was not read, because the
