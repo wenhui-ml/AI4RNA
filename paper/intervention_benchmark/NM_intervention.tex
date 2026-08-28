@@ -483,7 +483,13 @@ ViennaRNA                          & \jdg{rkRhoV} & \jdg{rkRhoVCi} & \jdg{rkPosV
 \end{center}
 
 \noindent Helix depth is an integer read off the declared target structure. It requires no model,
-no computation and no training data, and we have not found it reported as a baseline. Resampled
+no computation and no training data, and we have not found it reported as a baseline. That it
+should carry information is not a surprise and is not claimed as one: helix-end and terminal
+terms are part of the nearest-neighbour model itself \citep{mathews1999expanded,turner2010nndb},
+so where a pair sits in its helix is among the things a thermodynamic predictor is built to know,
+and fraying at helix ends is older than any of these models. The observation is narrower than
+that, and for a benchmark it is more awkward: written down as one integer and used as a baseline,
+it is not beaten here by either predictor. Resampled
 together, the neural predictor exceeds it by \jdg{rkDiffN} (\jdg{rkDiffNCi}) and the thermodynamic
 one by \jdg{rkDiffV} (\jdg{rkDiffVCi}); both intervals contain zero. At a rescue threshold of
 \jdg{rkOverThr} the free baseline overtakes both outright (\jdg{rkOverD} against \jdg{rkOverN}).
@@ -761,6 +767,13 @@ the wild-type profile and restricted to the design window,
 R \;=\; 1 \;-\; \frac{\lVert d_{ij}\rVert}{\sqrt{\lVert d_i\rVert^2 + \lVert d_j\rVert^2}}\,.
 \label{eq:rescue}
 \end{equation}
+Equation~\eqref{eq:rescue} is the corpus's implementation, recovered by recomputing the released
+column rather than quoted from a paper; the citations above are to the origin of the technique,
+and we do not assert that they normalise the two single-mutant perturbations the same way. The
+distinction is not pedantic. Every claim in this paper is a statement about the column the corpus
+released, so what has to be established is that \emph{that} column contains no folding model ---
+not that it matches a formula printed elsewhere.
+
 Recomputing \eqref{eq:rescue} from the raw per-nucleotide reactivity columns for all \jdg{rpN}
 double mutants whose two single mutants and wild type are all present reproduces the corpus's own
 value at Pearson $\jdg{rpPearson}$ and Spearman $\jdg{rpSpearman}$ --- same mean
@@ -777,6 +790,14 @@ depth capped at three, and whether the pair is crossed by another --- and compar
 within it, weighting each stratum by $\min(n_A(s), n_B(s))$ and pooling. Inference permutes the
 \emph{outcome} inside the fixed stratification; intervals resample the puzzle, which is the
 independent unit here because design cells that share a target are not independent of one another.
+
+That makes the number of puzzles, and not the number of interventions, the quantity a reader needs
+in order to know what the intervals can carry. There are \jdg{ccPuzzles} of them behind the
+\jdg{nAdmitted} interventions and \jdg{ccCells} design cells, and they are not lopsided: the
+smallest carries \jdg{ccPerMin} interventions, the median \jdg{ccPerMed}, the largest
+\jdg{ccPerMax}, so no single target contributes more than \jdg{ccLargest} of the corpus. That is
+not many, and every interval in this paper should be read as resting on that number rather than on
+the intervention count.
 
 \begin{assumption}[Placement is the confounder that matters]
 \label{ass:placement}
@@ -890,7 +911,23 @@ RNAGym assembles deep mutational scanning assays and reactivity profiles into a 
 \citep{rnagym2025}, and keeps variant-effect prediction and structure prediction as \emph{separate}
 tasks --- the fitness axis scores sequence models on a functional readout, the structure axis
 scores predictors on agreement. Our primitive joins them: a structure model is scored by whether
-its structural prediction responds correctly to a mutation. And the mutate-and-map literature owns
+its structural prediction responds correctly to a mutation.
+
+Scoring a model by the effect of a mutation is, in itself, an established paradigm outside this
+field, and the separation from it is a separation of quantities rather than of ambition.
+ProteinGym is the reference point for what such a benchmark looks like, scoring predictors against
+deep mutational scans across hundreds of assays \citep{proteingym2023}, and NABench does the same
+for nucleotide foundation models over 162 assays \citep{nabench2025}. In both, a model's
+sequence-level likelihood or fitness score is compared with a \emph{functional} measurement. Here
+a model's \emph{structural} prediction --- the probability it assigns to one named base pair --- is
+compared with a \emph{structural} measurement of that same pair, on a mutant whose own wild type
+is the internal control. The mutation is the same kind of object in both cases. What sits on
+either side of the comparison is not, and that is why a structure predictor can be scored here at
+all. A third line makes the incumbent readout harder instead of replacing it: CHANRG rebuilds the
+splits so that homology cannot leak across them and finds that foundation models keep their lead
+within distribution and lose most of it outside \citep{chanrg2026}. It changes the split where we
+change the question, and where the two agree we read that as corroboration and not as evidence
+from either. And the mutate-and-map literature owns
 the experiment itself, including a public server that will predict a mutate-and-map profile
 \citep{ribonanzanet2024}; what it does not do is treat the resulting predictions as a benchmark
 with a control for who chose the pairs.

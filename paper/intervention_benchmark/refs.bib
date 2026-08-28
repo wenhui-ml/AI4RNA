@@ -508,7 +508,8 @@
 
 @article{rnagym2025,
   title={{RNAGym}: Large-scale benchmarks for {RNA} fitness and structure prediction},
-  author={Marks, Debora S. and Das, Rhiju and others},
+  author={Arora, Rohit and Angelo, Murphy and Choe, Christian Andrew and others and
+          Das, Rhiju and Marks, Debora S.},
   journal={bioRxiv},
   year={2025},
   doi={10.1101/2025.06.16.660049},
@@ -552,3 +553,36 @@
   author={Tian, Siqi and Kladwang, Wipapat and Das, Rhiju},
   journal={eLife}, volume={7}, pages={e29602}, year={2018},
   doi={10.7554/eLife.29602}}
+
+@inproceedings{proteingym2023,
+  title={{ProteinGym}: Large-scale benchmarks for protein fitness prediction and design},
+  author={Notin, Pascal and Kollasch, Aaron and Ritter, Daniel and van Niekerk, Lood and
+          Paul, Steffanie and Spinner, Han and Rollins, Nathan and Shaw, Ada and
+          Orenbuch, Rose and Weitzman, Ruben and Frazer, Jonathan and Dias, Mafalda and
+          Franceschi, Dinko and Gal, Yarin and Marks, Debora S.},
+  booktitle={Advances in Neural Information Processing Systems},
+  volume={36},
+  pages={64331--64379},
+  year={2023},
+  note={Scores models by predicted mutation effect against deep mutational scans; the paradigm
+        this paper imports to RNA structure, with a different outcome}
+}
+
+@article{nabench2025,
+  title={{NABench}: Large-scale benchmarks of nucleotide foundation models for fitness prediction},
+  author={Li, Zhongmin and Ma, Runze and Tan, Jiahao and Tan, Chengzi and Zheng, Shuangjia},
+  journal={arXiv preprint arXiv:2511.02888},
+  year={2025},
+  note={162 assays, 2.6M mutated sequences, 29 models; fitness from sequence, not structural
+        response to an intervention}
+}
+
+@article{chanrg2026,
+  title={Fair splits flip the leaderboard: {CHANRG} reveals limited generalization in
+         {RNA} secondary-structure prediction},
+  author={{CHANRG authors}},
+  journal={arXiv preprint arXiv:2603.22330},
+  year={2026},
+  note={29 predictors; foundation models lead in distribution and lose most of that lead out of
+        it. Changes the split; this paper changes the question}
+}

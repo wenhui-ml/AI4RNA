@@ -206,6 +206,15 @@ put("rpMedDiff", f"{w['median_abs_diff']:.6f}".rstrip("0"))
 put("rpCorpusMean", f(w["corpus_mean"], 4))
 put("rpCorpusSd", f(w["corpus_sd"], 4))
 
+# ---- what the cluster bootstrap actually resamples (M33 census, filed as a survey)
+cc = J("m33_cluster_census.json")
+put("ccPuzzles", f"{cc['n_puzzles']}")
+put("ccCells", f"{cc['n_design_cells']}")
+put("ccPerMin", f"{cc['per_puzzle']['min']}")
+put("ccPerMed", f"{cc['per_puzzle']['median']}")
+put("ccPerMax", f"{cc['per_puzzle']['max']}")
+put("ccLargest", pct(cc["per_puzzle"]["largest_share"], 1))
+
 # ================================================================ H  the second corpus
 sv2 = J("m27_corpus_survey_all.json")
 # The survey's own summary fields count DEPOSITION RECORDS, and RMDB deposits the same
