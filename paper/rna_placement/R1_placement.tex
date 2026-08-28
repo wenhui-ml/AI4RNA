@@ -64,6 +64,19 @@
 % ------------------------------------------------ palette
 % Palette. Series colours are the three dataviz reference slots used by every figure in this
 % family; the ink tokens are text only and are never used for a data series.
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepgfplotslibrary{groupplots}
+\usetikzlibrary{arrows.meta}
+% figure palette -- the generated TikZ in figs/*.tex refers to these by name
+\definecolor{rpBlue}{HTML}{2A78D6}
+\definecolor{rpOrange}{HTML}{EB6834}
+\definecolor{rpAqua}{HTML}{1BAF7A}
+\definecolor{rpInk}{HTML}{0B0B0B}
+\definecolor{rpInkB}{HTML}{52514E}
+\definecolor{rpInkC}{HTML}{8A8984}
+\definecolor{rpBlueBg}{HTML}{EAF2FD}
+\definecolor{rpOrangeBg}{HTML}{FDF0E9}
 \definecolor{S1}{HTML}{2A78D6}
 \definecolor{S2}{HTML}{EB6834}
 \definecolor{S3}{HTML}{1BAF7A}
@@ -266,7 +279,7 @@ design of this kind.
 
 \begin{figure}[!t]
 \centering
-\includegraphics[width=\linewidth]{fig0_arch.pdf}
+\input{figs/fig0_arch}
 \caption{\textbf{Where each result sits and what it feeds.} The top band is the corpus and its two
 readouts; the middle band is what \S\ref{sec:exp} estimates --- the pair-type effect and the two
 mediators put to it, one taken from the folding model and one from the designers; the bottom band
@@ -583,7 +596,7 @@ the joint covariate structure used to construct the matched set}.
 
 \begin{figure}[!htbp]
 \centering
-\includegraphics[width=0.94\linewidth]{fig8_null.pdf}
+\input{figs/fig8_null}
 \caption{\textbf{Prop.~\ref{prop:null} measured.} \emph{Left}: rejection rate at the $0.005$ gate
 under each randomisation, $40$ draws in each of six populations. Permuting the treatment rebuilds
 the matched set and rejects an order of magnitude too often; permuting the outcome holds the design
@@ -773,7 +786,7 @@ observed effects by $\jdg{rescueAUMargin}\times$ and $\jdg{rescueGUMargin}\times
 
 \begin{figure}[!htbp]
 \centering
-\includegraphics[width=0.86\linewidth]{fig5_rescue.pdf}
+\input{figs/fig5_rescue}
 \caption{\textbf{Rescue by pair type, marginal and matched.} A higher value means the pair the
 compensatory mutation was designed to test is more likely to have been really there. Matching is
 $\mathcal{S}_{\mathrm m}$ of Def.~\ref{def:contrast}; the marginal bars are the same pairs under
@@ -804,7 +817,7 @@ threshold moves from $\jdg{rescueAULad}$ to $\jdg{eLad}$.
 
 \begin{figure}[!htbp]
 \centering
-\includegraphics[width=\linewidth]{fig9_energy.pdf}
+\input{figs/fig9_energy}
 \caption{\textbf{Conditioning on the model's own energy.} \emph{Left}, the overlap the estimate
 needs: the bin occupancies of the three pair types. \emph{Centre}, the contrast retained after
 conditioning, at three bin counts, against the band a placebo mediator produces (grey,
@@ -880,7 +893,7 @@ correspondingly small but in the wrong proportion.
 
 \begin{figure}[!htbp]
 \centering
-\includegraphics[width=0.52\linewidth]{fig11_collinear.pdf}
+\input{figs/fig11_collinear}
 \caption{\textbf{Not one line.} Each point is a pair-type contrast: its horizontal coordinate is
 the free-energy gap the nearest-neighbour model assigns between the two types, its vertical
 coordinate the measured rescue gap. Collinearity through the origin is what a pure
@@ -911,7 +924,7 @@ runs on; it does not remove it, because every method submitted only its best des
 
 \begin{figure}[!htbp]
 \centering
-\includegraphics[width=\linewidth]{fig10_depth_method.pdf}
+\input{figs/fig10_depth_method}
 \caption{\textbf{Left}, the identity contrast by helix depth; filled where $p\le0.005$. The
 terminal A--U penalty is charged at depth $0$ only. \textbf{Right}, the same contrast method by
 method, marker area proportional to pair-weight.}
@@ -1121,7 +1134,7 @@ predicted & depth slope $\beta_{\mathrm{depth}}$ & $\jdg{medBeta}$ \\
 
 \begin{figure}[!htbp]
 \centering
-\includegraphics[width=0.52\linewidth]{fig6_mediation.pdf}
+\input{figs/fig6_mediation}
 \caption{\textbf{Predicted against observed attenuation, one point per design method.} The
 horizontal coordinate is that method's own depth gap times the pooled $\beta_{\mathrm{depth}}$ and
 the vertical coordinate is its measured attenuation; neither enters the other's calculation, so
@@ -1161,7 +1174,7 @@ batch 6 (blind) & $\jdg{cpop5Eff}$ & $\jdg{cpop5Ci}$ & $\jdg{cpop5Z}$ & $\jdg{cp
 
 \begin{figure}[!htbp]
 \centering
-\includegraphics[width=0.70\linewidth]{fig3_matched.pdf}
+\input{figs/fig3_matched}
 \caption{\textbf{Matched-pair difference against the design-fixed permutation null.} Effects are
 positive in all six populations and $\jdg{cSigStrict}$ of $\jdg{c5N}$ clear $p\le0.005$; balance on
 global GC is at most $\jdg{cSmdHi}$ throughout.}
@@ -1197,7 +1210,7 @@ target structures and sequences alone.
 
 \begin{figure}[!htbp]
 \centering
-\includegraphics[width=0.94\linewidth]{fig7_gradient.pdf}
+\input{figs/fig7_gradient}
 \caption{\textbf{Left}: the G--C-minus-A--U depth gap by design method, from $\jdg{gGapMin}$
 (\texttt{\jdg{gGapMinName}}) to $\jdg{gGapMax}$ (\texttt{\jdg{gGapMaxName}}). Every method places
 G--C shallower. \textbf{Right}: the method component after removing target main effects, against
@@ -1229,7 +1242,7 @@ outcome by construction, and the loader asserts that no score or reactivity colu
 
 \begin{figure}[!htbp]
 \centering
-\includegraphics[width=\linewidth]{fig12_rounds.pdf}
+\input{figs/fig12_rounds}
 \caption{\textbf{Four rounds.} \emph{Left}, each dot is one design method's G--C-minus-A--U helix
 depth within a round; the bar is the round's pooled gap. Green is the round every other section of
 this paper uses. \emph{Right}, the method component after removing target main effects, filled
@@ -1487,7 +1500,7 @@ batch 6 (blind) & $\jdg{m15pop5Pass}$ & $\jdg{m15pop5Eff}$ & $\jdg{m15pop5Ref}$ 
 
 \begin{figure}[!htbp]
 \centering
-\includegraphics[width=0.92\linewidth]{fig4_three_cuts.pdf}
+\input{figs/fig4_three_cuts}
 \caption{\textbf{The three cuts of \S\ref{sec:score}.} \emph{Left}, real against circularly shifted
 placement. \emph{Centre}, the pairing arm against the composition arm at every stringency.
 \emph{Right}, the four single-nucleotide arms on both readouts.}
