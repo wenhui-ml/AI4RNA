@@ -349,6 +349,64 @@ estimator. We say this explicitly because the natural overstatement is that matc
 and on this design it is not. A vectorised and a readable implementation of all four estimators
 agree to \jdg{biasCrosscheck}.
 
+\subsection{How the corpus was selected}
+\label{sec:selection}
+
+A corpus of executed interventions is not a random sample of designs, and the rule that chose the
+designs is part of the instrument. The repository that released these experiments states one, for
+the mutate-and-map-rescue libraries specifically: the top OpenKnot score design for each method
+and each target, selected among those whose RibonanzaNet agreement with the target reached
+$\mathrm{F1}\ge\jdg{selCut}$, with the top-scoring design tested anyway when none passed. That
+rule conditions the corpus on a neural model's own prediction. We did not check it until an
+outside reading of the repository pointed at it, and the manuscript said nothing about it.
+
+Every one of the \jdg{selCells} tested designs matches a design in the public pool of
+\jdg{selPool} byte for byte, all in round \jdg{selRound}, so the rule can be replayed rather than
+assumed. \textbf{It does not reproduce.} Over the \jdg{selNCells} non-control cells the published
+rule recovers the tested design \jdg{selRepro} times (\jdg{selAgree}). The same argmax with the
+F1 filter simply not applied recovers \jdg{selReproB} (\jdg{selAgreeB}), and \jdg{selRankOne} of
+the tested designs are rank one on OpenKnot score in their own cell. In \jdg{selPassedOver} of the
+disagreements eligible designs existed --- as many as \jdg{selMaxElig} of the candidates passed
+the cutoff --- and the top-scoring design was tested regardless. \textbf{The variable that
+selected this corpus is the experimental OpenKnot score, not the neural model's prediction.} We
+fit no third rule to close the residual \jdg{selResid} cells; that would be fitting the audit.
+
+This changes what has to be controlled. Three things are then measurable.
+
+\emph{First, the selection is absorbed by the stratification.} Selection acts on the design cell,
+and the design cell is a component of the stratum, so selection status is constant inside
+\jdg{selNStrata} of \jdg{selNStrata} strata --- \jdg{selStrataMixed} strata are mixed. Under
+Assumption~\ref{ass:placement} it is conditioned out by construction, not by argument.
+
+\emph{Second, the effect is present where the published filter would not have bound.} The cutoff
+is loose --- \jdg{selPoolPass} of the round's \jdg{selNPoolRound} designs clear it --- and
+\jdg{selNFallback} of the \jdg{selCells} tested designs fail it, carrying \jdg{selNCgauFb} of the
+\jdg{selNCgau} interventions the identity contrast uses. Inside those cells the contrast is
+\jdg{selFbArm} (\jdg{selFbCi}), the same sign as the full-corpus \jdg{selFull}, and the
+passing-minus-failing difference is \jdg{selDiff} (\jdg{selDiffCi}).
+
+\emph{Third, measured skill runs against the selection variable rather than with it.} Splitting
+cells at the median tested OpenKnot score \jdg{selMedScore}, the identity contrast is
+\jdg{selHiArm} above and \jdg{selLoArm} below, differing by \jdg{selScDiffCi}; but the model's
+skill slope is \jdg{selSlopeHi} in the favoured cells against \jdg{selSlopeLo} in the rest, and
+across \jdg{selNCellSkill} cells the rank correlation between a cell's skill and the score that
+selected it is \jdg{selRhoRank} (\jdg{selRhoRankCi}), excluding zero. Selection ran against what
+we report. Against the neural model's F1 --- the quantity the published rule names --- skill shows
+nothing: \jdg{selRhoFOne} (\jdg{selRhoFOneCi}).
+
+The third result compares magnitudes across two populations, which is the comparison this paper
+withdraws elsewhere; it is therefore given on a rank statistic, which no rescaling of either
+column can move, and the slope version (\jdg{selRhoSlope}, \jdg{selRhoSlopeCi}) is reported beside
+it only because the two arms' predictor dispersion differs by a factor of \jdg{selSdRatio}.
+
+\begin{scopebox}
+\textbf{What the selection audit does and does not license.} It licenses the statement that the
+corpus was selected on a prior experimental measurement of the same designs, that the published
+description of that selection is not what the released data shows, and that the identity readout
+survives conditioning on it. It licenses no claim about design methods, and nothing here ranks or
+re-ranks a generative model. It is a property of how this corpus was built.
+\end{scopebox}
+
 % =====================================================================
 \section{Results}
 \label{sec:results}
@@ -450,6 +508,14 @@ of one prediction. Its head scores the target pairs \jdg{nnRatio}$\times$ above 
 position pairs (\jdg{nnOnTarget} against \jdg{nnOffTarget}) and its output matrix is symmetric to
 \jdg{nnAsym}, both checked before any contrast was computed.
 
+\paragraph{Neither score is saturated.} A calibration reading is only worth having if the
+predictor actually varies over the corpus, so the distributions are reported rather than assumed.
+The thermodynamic probability has median \jdg{dynVMed} and runs \jdg{dynVPTen} to
+\jdg{dynVPNinety} between its tenth and ninetieth percentiles, with \jdg{dynVHi} of interventions
+above $\jdg{dynThrHi}$, \jdg{dynVLo} below $\jdg{dynThrLo}$ and \jdg{dynVMid} in between; the neural score has median
+\jdg{dynNMed}, with \jdg{dynNHi} above $\jdg{dynThrHi}$ and \jdg{dynNLo} below $\jdg{dynThrLo}$. Both predictors spend
+most of the corpus away from their ceilings.
+
 \paragraph{Parameter sets are not the axis that matters.} Repeating the thermodynamic arm under
 \jdg{panN} parameter sets --- \jdg{panNames}, two of them fitted to data rather than derived from
 optical melting, and correlating with one another only \jdg{panCorrLo} to \jdg{panCorrHi} --- gives
@@ -490,7 +556,12 @@ readable: it was trained on nothing, and it behaves the same way.
 \begin{scopebox}
 \textbf{What the audit bounds.} These deposits are the neural model's source libraries, not a
 manifest of the released checkpoint's training set. The licensed statement is \emph{no overlap
-with the training sources we could obtain}, never \emph{no leakage}.
+with the training sources we could obtain}, never \emph{no leakage}. One tier in particular is
+outside it: this model's final pre-training stage consumed pseudo-labels covering its own test
+sequences as well as its training sequences, so a sequence can have been seen without its
+experimental label having been seen, and an audit built from deposited measurements cannot
+separate that case from the unseen one. Grading exposure against the full released library, rather
+than against the deposits, is the audit this design still owes.
 \end{scopebox}
 
 % =====================================================================
