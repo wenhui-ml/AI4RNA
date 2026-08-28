@@ -1,0 +1,158 @@
+{
+  "binary": "/tmp/claude-1000/-data-wenhui-openclaude-rna/6e34da6a-b0bb-4401-a731-1ad021750f1c/scratchpad/EternaFold/src/contrafold",
+  "params": "EternaFoldParams.v1",
+  "cutoff": 0.0001,
+  "P0_hairpin_close": 0.8096,
+  "S1_coverage": 0.9592,
+  "censored_mut": 176,
+  "censored_wt": 202,
+  "P1_equivalence": {
+    "m26v": -0.03039,
+    "here": -0.03039,
+    "abs_diff": 0.0,
+    "passed": true
+  },
+  "A_identity_contrast": {
+    "measured_rescue": {
+      "effect": 0.05393,
+      "ci": [
+        0.02314,
+        0.08719
+      ],
+      "p_perm": 0.0004997501249375312,
+      "weight": 902.0,
+      "n_strata": 553
+    },
+    "P_vienna": {
+      "effect": -0.03039,
+      "ci": [
+        -0.06491,
+        0.00994
+      ],
+      "p_perm": 0.0559720139930035,
+      "weight": 902.0,
+      "n_strata": 553
+    },
+    "P_eterna": {
+      "effect": -0.00569,
+      "ci": [
+        -0.03063,
+        0.02316
+      ],
+      "p_perm": 0.6761619190404797,
+      "weight": 902.0,
+      "n_strata": 553
+    },
+    "P_neural_from_m26v": {
+      "effect": 0.06055,
+      "ci": [
+        0.0329,
+        0.0956
+      ]
+    }
+  },
+  "S2": {
+    "same_sign_as_vienna": true,
+    "separates_in_measured_direction": false,
+    "held": true
+  },
+  "K2_fires": false,
+  "B_within_design": {
+    "P_vienna": {
+      "rho": 0.2557,
+      "ci": [
+        0.18991,
+        0.32188
+      ],
+      "p_perm": 0.0004997501249375312,
+      "n_cells": 158,
+      "n_records": 4317,
+      "median_cell_rho": 0.25945,
+      "frac_cells_positive": 0.8101
+    },
+    "P_neural": {
+      "rho": 0.32947,
+      "ci": [
+        0.26903,
+        0.39134
+      ],
+      "p_perm": 0.0004997501249375312,
+      "n_cells": 158,
+      "n_records": 4317,
+      "median_cell_rho": 0.32123,
+      "frac_cells_positive": 0.8797
+    },
+    "depth_baseline": {
+      "rho": 0.32252,
+      "ci": [
+        0.2692,
+        0.37311
+      ],
+      "p_perm": 0.0004997501249375312,
+      "n_cells": 158,
+      "n_records": 4317,
+      "median_cell_rho": 0.35336,
+      "frac_cells_positive": 0.8671
+    },
+    "P_eterna": {
+      "rho": 0.27649,
+      "ci": [
+        0.21218,
+        0.34362
+      ],
+      "p_perm": 0.0004997501249375312,
+      "n_cells": 158,
+      "n_records": 4317,
+      "median_cell_rho": 0.28892,
+      "frac_cells_positive": 0.8101
+    },
+    "dP_eterna": {
+      "rho": -0.04576,
+      "ci": [
+        -0.07894,
+        -0.01485
+      ],
+      "p_perm": 0.0034982508745627187,
+      "n_cells": 158,
+      "n_records": 4317,
+      "median_cell_rho": -0.06118,
+      "frac_cells_positive": 0.4051
+    }
+  },
+  "C_vs_depth": {
+    "diff": -0.04603,
+    "ci_diff": [
+      -0.13827,
+      0.0477
+    ],
+    "contains_zero": true
+  },
+  "S4": {
+    "held": true
+  },
+  "K3_fires": false,
+  "D_depth_share": {
+    "rho_with_depth": 0.2989,
+    "rho_with_outcome": 0.27649,
+    "gap": 0.02241
+  },
+  "S5": {
+    "held": true
+  },
+  "S3": {
+    "held": true,
+    "vienna": 0.2557,
+    "eterna": 0.27649,
+    "neural": 0.32947
+  },
+  "P2_leakage_note": "EternaFold's parameters were fit to Eterna cloud-lab chemical mapping. This corpus is an Eterna OpenKnot round. The published EternaFold parameters predate this round, so these molecules were not in its training data, but the DESIGN POPULATION is the same one and EternaFold must not be described as innocent of it. It is a third model class, not a clean-room control.",
+  "verdict": "third_class_behaves_like_the_nearest_neighbour_frame",
+  "eternafold_provenance": {
+    "repo": "https://github.com/eternagame/EternaFold.git",
+    "commit": "87b9aac55cee14fd562049d08f7b92d3131f10ce",
+    "commit_date": "2026-06-16",
+    "params_md5": "febc7352ae048d9edd1ba541a3d0b9cc",
+    "binary_md5": "5e1306e54be09835a383c1d3c41573dc",
+    "build": "cd src && make"
+  }
+}
