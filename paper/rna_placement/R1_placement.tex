@@ -1033,8 +1033,8 @@ corpus the marginal contrast is \jdg{xdMarg} ($p=\jdg{xdMargP}$) and the matched
 \jdg{xdMatched}, and the two mediation routes give \jdg{xdStrat} and \jdg{xdProd}.
 
 \paragraph{We staked that the routes would differ by at least five points, and they differ by
-\jdg{xdGapPts}.} Read alone that is a failed prediction, and it is recorded as one in the
-preregistration table. Read through Proposition~\ref{prop:routes} it is the prediction the
+\jdg{xdGapPts}.} Read alone that is a failed prediction, and Table~\ref{tab:prereg} records it
+as one, beside the other two of this arm's seven that also failed. Read through Proposition~\ref{prop:routes} it is the prediction the
 proposition makes: the gap is bounded by $\mathrm{osc}(r)\cdot d_{\mathrm{TV}}$, and the binder
 corpus's two arms overlap heavily in the mediator, so the bound leaves little room for the routes
 to separate. A theory that only ever predicts large effects is not being tested by them.
@@ -1071,6 +1071,16 @@ side, the direction that manufactures false violations. Swept over \jdg{xdSweepN
 estimator, not a counterexample}, and the comparison above is therefore made at a binning both
 corpora resolve. We report this rather than the coarse setting because we found it by looking, not
 because it is the setting that flatters the result.
+
+\paragraph{The failure that reinforces the thesis rather than the arm.} Three of this arm's seven
+staked predictions failed, and the third is the informative one. We predicted the retention
+estimator would be as unreadable here as on RNA, staking $|\rho|\le0.5$ against the injected
+truth; it correlates at \jdg{xdECorr}, and the prediction failed. It is not readable. Injecting a
+truth of \jdg{xdEHalfTrue} mediation, the estimator reports \jdg{xdEHalfMeas}; injecting
+\jdg{xdEQuarterTrue} it reports \jdg{xdEQuarterMeas}, with a mean absolute error of \jdg{xdEMae}
+across the sweep. The correlation is carried by the endpoints. \textbf{Correlation with a known
+truth is not calibration}, and staking a correlation was the wrong bar to have written --- which
+is the same lesson \S\ref{sec:cal} draws on RNA, arrived at here from the opposite side.
 
 \begin{scopebox}
 \textbf{What the cross-domain arm claims.} That the proposition's premise and its bound behave as
@@ -1552,7 +1562,7 @@ Each analysis was preceded by a declaration committed and pushed before the corr
 existed, stating the arms, the kill conditions, the must-fire probes, a staked numerical
 prediction, and the reading forced by each unexpected shape of the result. Verdicts are reported
 in the declaration's own wording, and Table~\ref{tab:prereg} carries the staked predictions with
-their outcomes, including the four that failed and the one whose object turned out not to exist.
+their outcomes, including the seven that failed and the one whose object turned out not to exist.
 Where a declaration left a band between its kill conditions undefined, or where a staked prediction
 was stricter than the kill condition it was written for, both thresholds are reported rather than
 reconciled after the fact. Runs voided by their own probes are retained with
@@ -1605,6 +1615,18 @@ at least two thirds of methods negative in every round & $\ge 2/3$ &
 human-designed arm in the most negative third of each round & --- &
   ranks $\jdg{xrEterna}$ & held \\
 method component misses $0.005$ somewhere & --- & $\jdg{xrMcClears}$ of four clear & held \\
+\midrule
+\multicolumn{4}{@{}l@{}}{\emph{frozen before the cross-domain arm existed
+  (\S\ref{sec:crossdomain}; protein binders, $n=\jdg{xdN}$)}}\\
+design method explains the mediator's variance & $\ge0.30$ & $\eta^2=\jdg{xdEta}$ &
+  \textbf{failed, low} \\
+the bound of Prop.~\ref{prop:routes} holds & holds, else refuted & \jdg{xdBound} & held \\
+the two routes differ & $\ge5$ pts & \jdg{xdGapPts} pts & \textbf{failed} \\
+the conditional mean is not affine & non-affine & spread \jdg{xdDSpread} & held \\
+the retention estimator is unreadable here too & $|\rho|\le0.5$ & $\jdg{xdECorr}$ &
+  \textbf{failed, high} \\
+matched contrast below marginal & smaller & \jdg{xdMatched} vs \jdg{xdMarg} & held \\
+ladder detection threshold & $\ge0.10$ & \jdg{xdLadderThr} & held \\
 \bottomrule
 \end{tabular}
 \end{table}

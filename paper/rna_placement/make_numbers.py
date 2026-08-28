@@ -430,6 +430,17 @@ put("xdRHold", f"{sum(r['bound_holds'] for r in _rs)}")
 put("xdRFailBins", ", ".join(str(r["nbins"]) for r in _rs if not r["bound_holds"]))
 put("xdROscLo", f"{min(r['osc_r'] for r in _rs):.5f}")
 put("xdROscHi", f"{max(r['osc_r'] for r in _rs):.5f}")
+put("xdBound", "holds" if _main["C"]["bound_holds"] else "FAILS")
+put("xdECorr", f"{_main['E']['corr']:.4f}")
+put("xdEMae", f"{_main['E']['mae']:.4f}")
+put("xdLadderThr", f"{_main['ladder']['threshold']:.2f}")
+_hs = [b["h"] for b in _main["D"]["bins"]]
+put("xdDSpread", f"{max(_hs)-min(_hs):.4f}")
+_sw = {round(r["true_retention"], 2): r["measured_retention"] for r in _main["E"]["sweep"]}
+put("xdEHalfTrue", "50\\%")
+put("xdEHalfMeas", f"{100*_sw[0.5]:.1f}\\%")
+put("xdEQuarterTrue", "25\\%")
+put("xdEQuarterMeas", f"{100*_sw[0.25]:.1f}\\%")
 
 # ---------------------------------------------------------------- how the corpus was selected
 # (M30). R1's premise is that the covariate distribution was produced by a design algorithm; it
