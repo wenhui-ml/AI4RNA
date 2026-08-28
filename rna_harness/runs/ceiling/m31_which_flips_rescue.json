@@ -1,0 +1,407 @@
+{
+ "NMIN": 8,
+ "THRESH_MAIN": 0.5,
+ "TOPK_FRAC": 0.25,
+ "n_records": 4317,
+ "n_cells_used": 158,
+ "n_records_in_cells": 4317,
+ "A_within_design": {
+  "P_vienna": {
+   "rho": 0.2557,
+   "ci": [
+    0.19127,
+    0.3251
+   ],
+   "p_perm": 0.0004997501249375312,
+   "n_cells": 158,
+   "n_records": 4317,
+   "median_cell_rho": 0.25945,
+   "frac_cells_positive": 0.8101
+  },
+  "dP_vienna": {
+   "rho": -0.01842,
+   "ci": [
+    -0.04313,
+    0.0056
+   ],
+   "p_perm": 0.24537731134432783,
+   "n_cells": 158,
+   "n_records": 4317,
+   "median_cell_rho": -0.00411,
+   "frac_cells_positive": 0.4937
+  },
+  "P_neural": {
+   "rho": 0.32947,
+   "ci": [
+    0.27123,
+    0.39112
+   ],
+   "p_perm": 0.0004997501249375312,
+   "n_cells": 158,
+   "n_records": 4317,
+   "median_cell_rho": 0.32123,
+   "frac_cells_positive": 0.8797
+  },
+  "dP_neural": {
+   "rho": 0.04913,
+   "ci": [
+    0.0033,
+    0.09338
+   ],
+   "p_perm": 0.0029985007496251873,
+   "n_cells": 158,
+   "n_records": 4317,
+   "median_cell_rho": 0.05135,
+   "frac_cells_positive": 0.6076
+  },
+  "depth_baseline": {
+   "rho": 0.32252,
+   "ci": [
+    0.26593,
+    0.37432
+   ],
+   "p_perm": 0.0004997501249375312,
+   "n_cells": 158,
+   "n_records": 4317,
+   "median_cell_rho": 0.35336,
+   "frac_cells_positive": 0.8671
+  }
+ },
+ "Aprime_causal_conditioning": {
+  "P_vienna": {
+   "rho": 0.31754,
+   "ci": [
+    0.16598,
+    0.44443
+   ],
+   "p_perm": 0.0004997501249375312,
+   "n_cells": 126,
+   "n_records": 1301,
+   "median_cell_rho": 0.38182,
+   "frac_cells_positive": 0.7857
+  },
+  "dP_vienna": {
+   "rho": 0.00483,
+   "ci": [
+    -0.04549,
+    0.08557
+   ],
+   "p_perm": 0.872063968015992,
+   "n_cells": 126,
+   "n_records": 1301,
+   "median_cell_rho": 0.02914,
+   "frac_cells_positive": 0.5238
+  },
+  "P_neural": {
+   "rho": 0.30034,
+   "ci": [
+    0.18341,
+    0.39214
+   ],
+   "p_perm": 0.0004997501249375312,
+   "n_cells": 126,
+   "n_records": 1301,
+   "median_cell_rho": 0.34755,
+   "frac_cells_positive": 0.7778
+  },
+  "dP_neural": {
+   "rho": 0.002,
+   "ci": [
+    -0.06323,
+    0.08241
+   ],
+   "p_perm": 0.9435282358820589,
+   "n_cells": 126,
+   "n_records": 1301,
+   "median_cell_rho": 0.04762,
+   "frac_cells_positive": 0.5317
+  },
+  "depth_baseline": {
+   "rho": 0.14858,
+   "ci": [
+    0.12391,
+    0.20069
+   ],
+   "p_perm": 0.04547726136931534,
+   "n_cells": 17,
+   "n_records": 197,
+   "median_cell_rho": 0.12214,
+   "frac_cells_positive": 0.7647
+  }
+ },
+ "B_auroc_sweep": [
+  {
+   "threshold": 0.2,
+   "base_rate": 0.8237,
+   "P_vienna": 0.6635,
+   "dP_vienna": 0.47556,
+   "P_neural": 0.68439,
+   "dP_neural": 0.49058,
+   "depth_baseline": 0.61099
+  },
+  {
+   "threshold": 0.3,
+   "base_rate": 0.7218,
+   "P_vienna": 0.6741,
+   "dP_vienna": 0.49041,
+   "P_neural": 0.70325,
+   "dP_neural": 0.52043,
+   "depth_baseline": 0.62781
+  },
+  {
+   "threshold": 0.4,
+   "base_rate": 0.5886,
+   "P_vienna": 0.66407,
+   "dP_vienna": 0.49882,
+   "P_neural": 0.69589,
+   "dP_neural": 0.52505,
+   "depth_baseline": 0.65695
+  },
+  {
+   "threshold": 0.5,
+   "base_rate": 0.4366,
+   "P_vienna": 0.65491,
+   "dP_vienna": 0.51053,
+   "P_neural": 0.69314,
+   "dP_neural": 0.53886,
+   "depth_baseline": 0.67426
+  },
+  {
+   "threshold": 0.6,
+   "base_rate": 0.2627,
+   "P_vienna": 0.64352,
+   "dP_vienna": 0.50721,
+   "P_neural": 0.67873,
+   "dP_neural": 0.54564,
+   "depth_baseline": 0.6864
+  },
+  {
+   "threshold": 0.7,
+   "base_rate": 0.1147,
+   "P_vienna": 0.63656,
+   "dP_vienna": 0.50527,
+   "P_neural": 0.67854,
+   "dP_neural": 0.55043,
+   "depth_baseline": 0.72671
+  },
+  {
+   "threshold": 0.8,
+   "base_rate": 0.022,
+   "P_vienna": 0.62122,
+   "dP_vienna": 0.56259,
+   "P_neural": 0.64388,
+   "dP_neural": 0.53022,
+   "depth_baseline": 0.74748
+  }
+ ],
+ "C_decision": {
+  "P_vienna": {
+   "recovery_topk": 0.34695,
+   "recovery_random": 0.26264,
+   "gain_points": 8.43,
+   "k_to_half": 10.832,
+   "k_to_half_random": 13.777,
+   "constructs_saved_ratio": 1.272,
+   "n_cells_scored": 155,
+   "mean_cell_size": 27.55
+  },
+  "dP_vienna": {
+   "recovery_topk": 0.26207,
+   "recovery_random": 0.26264,
+   "gain_points": -0.06,
+   "k_to_half": 13.923,
+   "k_to_half_random": 13.777,
+   "constructs_saved_ratio": 0.99,
+   "n_cells_scored": 155,
+   "mean_cell_size": 27.55
+  },
+  "P_neural": {
+   "recovery_topk": 0.35703,
+   "recovery_random": 0.26264,
+   "gain_points": 9.44,
+   "k_to_half": 10.426,
+   "k_to_half_random": 13.777,
+   "constructs_saved_ratio": 1.321,
+   "n_cells_scored": 155,
+   "mean_cell_size": 27.55
+  },
+  "dP_neural": {
+   "recovery_topk": 0.24297,
+   "recovery_random": 0.26264,
+   "gain_points": -1.97,
+   "k_to_half": 13.419,
+   "k_to_half_random": 13.777,
+   "constructs_saved_ratio": 1.027,
+   "n_cells_scored": 155,
+   "mean_cell_size": 27.55
+  },
+  "depth_baseline": {
+   "recovery_topk": 0.34854,
+   "recovery_random": 0.26264,
+   "gain_points": 8.59,
+   "k_to_half": 10.832,
+   "k_to_half_random": 13.777,
+   "constructs_saved_ratio": 1.272,
+   "n_cells_scored": 155,
+   "mean_cell_size": 27.55
+  }
+ },
+ "D_model_class": {
+  "neural": 0.32947,
+  "vienna": 0.2557,
+  "diff": 0.07377,
+  "ci_diff": [
+   0.03711,
+   0.11318
+  ],
+  "ci_contains_zero": false
+ },
+ "E_controls": {
+  "E1_selection_fallback": {
+   "P_vienna": {
+    "rho": 0.37507,
+    "ci": [
+     0.21616,
+     0.48045
+    ],
+    "p_perm": null,
+    "n_cells": 29,
+    "n_records": 775,
+    "median_cell_rho": 0.48571,
+    "frac_cells_positive": 0.8621
+   },
+   "dP_vienna": {
+    "rho": -0.05316,
+    "ci": [
+     -0.13937,
+     0.01169
+    ],
+    "p_perm": null,
+    "n_cells": 29,
+    "n_records": 775,
+    "median_cell_rho": -0.06498,
+    "frac_cells_positive": 0.4138
+   },
+   "P_neural": {
+    "rho": 0.4216,
+    "ci": [
+     0.29134,
+     0.49782
+    ],
+    "p_perm": null,
+    "n_cells": 29,
+    "n_records": 775,
+    "median_cell_rho": 0.31656,
+    "frac_cells_positive": 0.9655
+   },
+   "dP_neural": {
+    "rho": -0.05694,
+    "ci": [
+     -0.13711,
+     0.0062
+    ],
+    "p_perm": null,
+    "n_cells": 29,
+    "n_records": 775,
+    "median_cell_rho": -0.03755,
+    "frac_cells_positive": 0.4828
+   },
+   "depth_baseline": {
+    "rho": 0.12724,
+    "ci": [
+     0.02381,
+     0.24539
+    ],
+    "p_perm": null,
+    "n_cells": 29,
+    "n_records": 775,
+    "median_cell_rho": 0.06653,
+    "frac_cells_positive": 0.6207
+   }
+  },
+  "E2_leakage_clean": {
+   "P_vienna": {
+    "rho": 0.27178,
+    "ci": [
+     0.20791,
+     0.33988
+    ],
+    "p_perm": null,
+    "n_cells": 144,
+    "n_records": 3993,
+    "median_cell_rho": 0.27722,
+    "frac_cells_positive": 0.8333
+   },
+   "dP_vienna": {
+    "rho": -0.01768,
+    "ci": [
+     -0.04578,
+     0.00825
+    ],
+    "p_perm": null,
+    "n_cells": 144,
+    "n_records": 3993,
+    "median_cell_rho": -0.0002,
+    "frac_cells_positive": 0.5
+   },
+   "P_neural": {
+    "rho": 0.34024,
+    "ci": [
+     0.28387,
+     0.4013
+    ],
+    "p_perm": null,
+    "n_cells": 144,
+    "n_records": 3993,
+    "median_cell_rho": 0.32755,
+    "frac_cells_positive": 0.8958
+   },
+   "dP_neural": {
+    "rho": 0.05337,
+    "ci": [
+     0.00621,
+     0.09569
+    ],
+    "p_perm": null,
+    "n_cells": 144,
+    "n_records": 3993,
+    "median_cell_rho": 0.05135,
+    "frac_cells_positive": 0.6181
+   },
+   "depth_baseline": {
+    "rho": 0.32408,
+    "ci": [
+     0.26584,
+     0.38169
+    ],
+    "p_perm": null,
+    "n_cells": 144,
+    "n_records": 3993,
+    "median_cell_rho": 0.35104,
+    "frac_cells_positive": 0.8681
+   }
+  },
+  "E2_n_leaked_cells": 14
+ },
+ "staked": {
+  "1_some_predictor_ranks": true,
+  "2_within_design_exceeds_causal_conditioning": true,
+  "3_neural_at_least_vienna": true,
+  "4_topk_beats_random_by_5pts": true,
+  "5_beats_depth_baseline": true,
+  "6_base_rate_in_band": true,
+  "7_survives_controls": true
+ },
+ "kill": {
+  "K0_degenerate_base_rate": false,
+  "K1_no_ranking": false,
+  "K2_no_gain_over_depth": false,
+  "K3_ordering_flips": false
+ },
+ "ci_excluding_zero": [
+  "P_vienna",
+  "P_neural",
+  "dP_neural"
+ ],
+ "verdict": "reframe_supported"
+}
