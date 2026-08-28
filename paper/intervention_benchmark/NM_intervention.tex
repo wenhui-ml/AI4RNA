@@ -463,7 +463,11 @@ The contrast above is a causal one and conditions on helix depth, because design
 both what a pair is and where it goes. An experimenter asks a different question --- given this
 design and a budget, which flips should be built? --- and it needs a different conditioning set.
 Depth must \emph{not} be removed there: it is information the experimenter already holds. Same
-corpus, two questions, two conditioning sets. On \jdg{rkN} interventions in \jdg{rkCells} design
+corpus, two questions, two conditioning sets. Scored instead under the causal set --- design
+cell, depth and crossing all held, on the \jdg{rkCausalCells} cells and \jdg{rkCausalRecs}
+interventions where holding them still leaves flips to rank --- the same two predictors agree
+with rescue at \jdg{rkCausalN} (\jdg{rkCausalNCi}) and \jdg{rkCausalV} (\jdg{rkCausalVCi}).
+The table below reports the other set, because the question it answers is the experimenter's. On \jdg{rkN} interventions in \jdg{rkCells} design
 cells of at least \jdg{rkNmin} flips, ranking within the cell against measured rescue:
 
 \begin{center}
@@ -484,6 +488,16 @@ together, the neural predictor exceeds it by \jdg{rkDiffN} (\jdg{rkDiffNCi}) and
 one by \jdg{rkDiffV} (\jdg{rkDiffVCi}); both intervals contain zero. At a rescue threshold of
 \jdg{rkOverThr} the free baseline overtakes both outright (\jdg{rkOverD} against \jdg{rkOverN}).
 \textbf{We therefore do not claim that either predictor beats a depth baseline at this task.}
+
+\paragraph{The predicted change, not only the predicted level.} A mutation experiment suggests a
+different quantity from the one in the table: not the predicted reactivity of the mutant but the
+predicted \emph{change}, $\Delta P$, between mutant and wild type. We scored it on the same cells.
+For the neural predictor $\Delta P$ agrees with rescue at \jdg{rkRhoDp} (\jdg{rkRhoDpCi},
+$p=\jdg{rkRhoDpP}$, \jdg{rkPosDp} of cells positive); for the thermodynamic one at
+\jdg{rkRhoDpV} (\jdg{rkRhoDpVCi}, $p=\jdg{rkRhoDpVP}$). The neural interval excludes zero and
+does not reach that predictor's own level arm above; the thermodynamic one contains zero. We
+report the level arm in the table because it is the larger of the two, and we put no interval on
+the difference between them.
 
 \paragraph{What each predictor knows is close to what depth knows.} Within the same cells, the
 neural predictor's rank agreement with depth is \jdg{rkDepN} against \jdg{rkRhoN} with the
@@ -556,7 +570,11 @@ estimator's machinery fixed, make the mediator the \emph{real} predictor with it
 distribution and its real binning, synthesise only the outcome so that a known fraction $f$ of the
 contrast runs through the mediator, and read back what the estimator says. Swept over $f$, the
 measured retention correlates with the truth at \jdg{mcNeuralCorr} --- the wrong sign --- and the
-thermodynamic arm returns \jdg{mcViennaFull} when the truth is total mediation. The governing
+thermodynamic arm returns \jdg{mcViennaFull} when the truth is total mediation. The neural arm
+fails the same way without ever leaving a range that looks reasonable: at $f=0$, no mediation at
+all, it reads \jdg{mcNeuralZero}, and at $f=1$, where every bit of the contrast has been routed
+through the mediator and the answer is zero, it reads \jdg{mcNeuralFull}. A reader given only the
+second number would have read it as we did. The governing
 quantity is the mediator's separation between the arms, and here it is \jdg{mcSep} pooled standard
 deviations: there was never much for the conditioning to remove, so a value near $100\%$ was close
 to being forced by the design.
@@ -706,6 +724,24 @@ excluded as \emph{ambiguous} rather than resolved by a rule --- resolving it wou
 choose which intervention it supplies. Corpus quality fields (signal-to-noise, read depth) are
 carried on each admitted intervention and reported, and they never enter the criterion.
 
+\paragraph{How much public data the criterion admits.} We ran the criterion over every
+deposition we could enumerate in the RMDB: \jdg{scDeposits} records. \jdg{scSkipped} of them
+(\jdg{scSkippedPct}) could not be evaluated at all, because they publish neither construct naming
+nor per-row sequence annotation, and without one of the two there is no way to decide which
+constructs belong to the same design cell --- the criterion never gets as far as clause (ii). On
+the \jdg{scEval} that could be evaluated, \jdg{scHits} deposition records carry at least one
+admissible orientation flip. Those \jdg{scHits} records are \jdg{scLibs} distinct libraries,
+because the RMDB deposits a library once per chemical probe: \jdg{scFlips} flips counted once per
+library, \jdg{scFlipsRec} counted per deposited record. We report the first number. The binding
+constraint on applying this instrument to public data is therefore not that compensatory flips are
+rare in libraries --- they are not --- but that most depositions do not publish enough annotation
+to tell whether they contain any.
+
+We identify these libraries by name and do not use the survey's own designed-versus-natural
+label, which is too coarse to carry a claim at this granularity: the two libraries analysed as
+natural RNA in Section~\ref{sec:second} are among the \jdg{scHits}, and that label calls both of
+them unclear.
+
 \begin{scopebox}
 \textbf{What an orientation flip cannot say.} It preserves the unordered pair type. It therefore
 does not deliver the causal effect of \emph{being} a G--C rather than an A--U; it delivers whether
@@ -803,7 +839,9 @@ skill slope is \jdg{selSlopeHi} in the favoured cells against \jdg{selSlopeLo} i
 across \jdg{selNCellSkill} cells the rank correlation between a cell's skill and the score that
 selected it is \jdg{selRhoRank} (\jdg{selRhoRankCi}), excluding zero. Selection ran against what
 we report. Against the neural model's F1 --- the quantity the published rule names --- skill shows
-nothing: \jdg{selRhoFOne} (\jdg{selRhoFOneCi}).
+nothing: \jdg{selRhoFOne} (\jdg{selRhoFOneCi}) on ranks, and \jdg{selRhoFOneSlope}
+(\jdg{selRhoFOneSlopeCi}) on slopes. Both intervals contain zero. The corpus was selected along
+an axis our skill runs against, and not along the axis the published rule names.
 
 The third result compares magnitudes across two populations, which is the comparison this paper
 withdraws elsewhere; it is therefore given on a rank statistic, which no rescaling of either

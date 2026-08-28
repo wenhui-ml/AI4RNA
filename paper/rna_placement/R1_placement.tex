@@ -769,7 +769,15 @@ of freedom, so against a within-cell SD of $\jdg{ceilWithinSd}$ the reproducible
 \label{eq:ceiling}
 \end{equation}
 
-\noindent The pooled-variance route is the right one for \eqref{eq:ceiling}, which is a ratio of \emph{second} moments: the paired differences are heavy-tailed (mean-to-median $\jdg{ceilHeavyTail}$ against $\jdg{ceilNormalTail}$ under normality), so a median route on the same $\jdg{ceilPairs}$ groups reports $\jdg{ceilSigA}$ where the RMS is $\jdg{ceilRms454}$. \emph{A design-score point is therefore worth $1/\jdg{ceilWithinSd}$ of a within-cell SD, and $\jdg{ceilB}$ of that SD is reproducible signal} --- which is the scale against which \S\ref{sec:score}'s effect should be read.
+\noindent The pooled-variance route is the right one for \eqref{eq:ceiling}, which is a ratio of \emph{second} moments: the paired differences are heavy-tailed (mean-to-median $\jdg{ceilHeavyTail}$ against $\jdg{ceilNormalTail}$ under normality), so a median route on the same $\jdg{ceilPairs}$ groups reports $\jdg{ceilSigA}$
+($\jdg{ceilSigACi}$) where the RMS is $\jdg{ceilRms454}$. That choice is worth stating with its
+consequence rather than only its justification: carried through \eqref{eq:ceiling}, the median
+route would report a reproducible fraction of $\jdg{ceilA}$ $\jdg{ceilACi}$ against the
+$\jdg{ceilB}$ $\jdg{ceilBCi}$ we use, and the two intervals do not meet. We report the pooled-variance
+route for the reason above. Which of the two flatters a given claim depends on what the ceiling is
+being used to normalise, and that is not the basis on which we chose. The value declared
+before this measurement, $\jdg{ceilDeclared}$, falls between the two routes' SDs rather than
+outside them. \emph{A design-score point is therefore worth $1/\jdg{ceilWithinSd}$ of a within-cell SD, and $\jdg{ceilB}$ of that SD is reproducible signal} --- which is the scale against which \S\ref{sec:score}'s effect should be read.
 
 \subsection{Pair identity decides whether the pair forms}
 \label{sec:pairtype}
@@ -1176,8 +1184,9 @@ batch 6 (blind) & $\jdg{cpop5Eff}$ & $\jdg{cpop5Ci}$ & $\jdg{cpop5Z}$ & $\jdg{cp
 \centering
 \input{figs/fig3_matched}
 \caption{\textbf{Matched-pair difference against the design-fixed permutation null.} Effects are
-positive in all six populations and $\jdg{cSigStrict}$ of $\jdg{c5N}$ clear $p\le0.005$; balance on
-global GC is at most $\jdg{cSmdHi}$ throughout.}
+positive in all six populations, $\jdg{cSigStrict}$ of $\jdg{c5N}$ clear $p\le0.005$ and
+$\jdg{cSigLoose}$ of $\jdg{c5N}$ clear $p<0.05$; balance on global GC is at most
+$\jdg{cSmdHi}$ throughout.}
 \label{fig:matched}
 \end{figure}
 

@@ -208,9 +208,28 @@ put("rpCorpusSd", f(w["corpus_sd"], 4))
 
 # ================================================================ H  the second corpus
 sv2 = J("m27_corpus_survey_all.json")
-put("scDeposits", f"{sv2['n_deposits_scanned']}")
-put("scFlips", f"{sv2['total_flips']:,}".replace(",", "{,}"))
-put("scHits", f"{sv2['n_with_interventions']}")
+# The survey's own summary fields count DEPOSITION RECORDS, and RMDB deposits the same
+# library once per chemical probe (2A3 and DMS), so total_flips double-counts molecules.
+# Everything below is recomputed from rows so the manuscript can say which unit it means.
+_rows = sv2["rows"]
+_ev = [r for r in _rows if "n_orientation_flip" in r]      # the rest carry a `skipped` reason
+_hit = [r for r in _ev if r["n_orientation_flip"] > 0]
+_bylib: dict[str, int] = {}
+for r in _hit:                                              # one entry per library, not per probe
+    _bylib[r["name"]] = max(_bylib.get(r["name"], 0), r["n_orientation_flip"])
+put("scDeposits", f"{sv2['n_deposits_scanned']:,}".replace(",", "{,}"))
+put("scEval", f"{len(_ev)}")
+put("scSkipped", f"{len(_rows) - len(_ev)}")
+put("scSkippedPct", pct((len(_rows) - len(_ev)) / len(_rows), 0))
+put("scHits", f"{len(_hit)}")
+put("scLibs", f"{len(_bylib)}")
+put("scFlipsRec", f"{sv2['total_flips']:,}".replace(",", "{,}"))   # deposition-probe records
+put("scFlips", f"{sum(_bylib.values()):,}".replace(",", "{,}"))    # counted once per library
+# The survey's designed/natural label is NOT reported. It is too coarse to carry a claim:
+# the two libraries this paper analyses as natural RNA (M2SL5, M3SARS) are labelled
+# "unclear" by it, so its n_natural_with_interventions = 0 would contradict our own
+# second corpus. Libraries are identified by name instead.
+assert all(r.get("kind") == "unclear" for r in _hit), "the label changed; recheck the prose"
 
 # ================================================================ F  M28, the second corpus
 # The transfer test. Two natural-RNA deposits; the criterion runs with its declared-pair clause
@@ -343,6 +362,11 @@ for nm, tag in (("P_vienna", "V"), ("P_neural", "N"), ("depth_baseline", "D")):
     put(f"rkPos{tag}", pct(A31[nm]["frac_cells_positive"], 0))
 put("rkRhoDp", sig(A31["dP_neural"]["rho"]))
 put("rkRhoDpCi", ci(A31["dP_neural"]["ci"]))
+put("rkRhoDpV", sig(A31["dP_vienna"]["rho"]))
+put("rkRhoDpVCi", ci(A31["dP_vienna"]["ci"]))
+put("rkRhoDpP", f"{A31['dP_neural']['p_perm']:.4f}")
+put("rkRhoDpVP", f"{A31['dP_vienna']['p_perm']:.2f}")
+put("rkPosDp", pct(A31["dP_neural"]["frac_cells_positive"], 0))
 # the interval K2 was missing
 R1_, R2_, R3_ = m31r["R1_vs_free_baseline"], m31r["R2_partial_given_depth"], m31r["R3_tiebreak"]
 put("rkDiffN", sig(R1_["rho"]["P_neural"] - R1_["rho"]["depth"], 5))
@@ -394,7 +418,11 @@ put("rkVerdict", m31r["verdict"].replace("_", " "))
 # the causal conditioning set, for the contrast between the two questions
 Ap = m31["Aprime_causal_conditioning"]
 put("rkCausalN", sig(Ap["P_neural"]["rho"]))
+put("rkCausalNCi", ci(Ap["P_neural"]["ci"]))
 put("rkCausalV", sig(Ap["P_vienna"]["rho"]))
+put("rkCausalVCi", ci(Ap["P_vienna"]["ci"]))
+put("rkCausalCells", f"{Ap['P_neural']['n_cells']}")
+put("rkCausalRecs", f"{Ap['P_neural']['n_records']:,}".replace(",", "{,}"))
 
 # what the exposure-graded leakage audit will report, once the library is in hand
 exp("lkTierN", "four exposure tiers")
