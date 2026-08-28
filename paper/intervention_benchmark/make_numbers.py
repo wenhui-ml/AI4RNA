@@ -58,13 +58,22 @@ def pv(x):
 m26 = J("m26_model_scored.json")
 put("nAdmitted", f"{m26['n']}")
 put("nDropped", f"{m26['n_dropped']}")
-tc = m26.get("type_counts") or {"CG": 3061, "AU": 1116, "GU": 140}
+# The admission ledger. These were typed by hand until m34 existed -- laundered through put(),
+# where make_check.py (which only reads the .tex) could not see them. They come from the PACKAGED
+# criterion, designaudit.mining.mine, which is a different ledger from m26.build's; both admit
+# 4317 and m34 asserts that agreement before either is reported.
+adm = J("m34_admission_census.json")
+_da = adm["designaudit"]
+assert adm["implementations_agree_on_admission"], "the two criteria admit different sets"
 for k in ("CG", "AU", "GU"):
-    put(f"n{k}", f"{tc[k]}")
-put("nConstructs", "13702")
-put("nExclTwoPos", "9125")
-put("nExclNonCanon", "73")
-put("nExclNoOutcome", "27")
+    put(f"n{k}", f"{_da['by_pair_type'][k]}")
+put("nConstructs", f"{_da['n_constructs']:,}".replace(",", "{,}"))
+put("nExclTwoPos", f"{_da['excluded']['not_two_positions']:,}".replace(",", "{,}"))
+put("nExclNonCanon", f"{_da['excluded']['pair_not_canonical']}")
+put("nExclNoOutcome", f"{_da['excluded']['no_outcome']}")
+put("nWildTypes", f"{_da['unaccounted']}")
+put("nExclTotal", f"{_da['excluded_total']:,}".replace(",", "{,}"))
+put("nRowsRaw", f"{adm['m26_build']['n_rows']:,}".replace(",", "{,}"))
 put("nUniqueSeq", f"{J('m26c_neural_scored.json')['n_unique_seq']}")
 
 # ================================================================ B  the conventional readout
@@ -449,6 +458,38 @@ put("pvSupport", f"{len(_cls['support'])}")
 put("pvTotal", f"{sum(len(v) for v in _cls.values())}")
 put("pvSurveyReviewSupport",
     f"{len(_cls['survey']) + len(_cls['review']) + len(_cls['support'])}")
+
+# ================================================================ I  the third predictor
+m32 = J("m32_third_model_class.json")
+m32r = J("m32r_review.json")
+_A = m32["A_identity_contrast"]
+put("efContrast", sig(_A["P_eterna"]["effect"], 5))
+put("efContrastCi", ci(_A["P_eterna"]["ci"]))
+put("efContrastP", pv(_A["P_eterna"]["p_perm"]))
+_B = m32["B_within_design"]
+put("efRho", sig(_B["P_eterna"]["rho"]))
+put("efRhoCi", ci(_B["P_eterna"]["ci"]))
+put("efRhoP", pv(_B["P_eterna"]["p_perm"]))
+put("efPos", pct(_B["P_eterna"]["frac_cells_positive"], 0))
+put("efDp", sig(_B["dP_eterna"]["rho"]))
+put("efDpCi", ci(_B["dP_eterna"]["ci"]))
+put("efDpP", pv(_B["dP_eterna"]["p_perm"]))
+put("efVsDepth", sig(m32["C_vs_depth"]["diff"], 5))
+put("efVsDepthCi", ci(m32["C_vs_depth"]["ci_diff"]))
+put("efDepthRho", sig(m32["D_depth_share"]["rho_with_depth"]))
+put("efDepthGap", sig(m32["D_depth_share"]["gap"], 5))
+put("efCoverage", pct(m32["S1_coverage"], 1))
+put("efEquiv", f"{m32['P1_equivalence']['abs_diff']:.0e}".replace("e+00", ""))
+_dr = m32r["R1_dynamic_range"]
+put("efHi", pct(_dr["frac_hi"], 1))
+put("efLo", pct(_dr["frac_lo"], 1))
+put("efMed", f(_dr["median"], 4))
+_cz = m32r["R2_censor_rate_by_pairtype"]
+put("efCensCg", pct(_cz["CG"], 2))
+put("efCensAu", pct(_cz["AU"], 2))
+put("efClean", sig(m32r["R2_contrast_uncensored"]["effect"], 5))
+put("efCleanCi", ci(m32r["R2_contrast_uncensored"]["ci"]))
+put("efCommit", m32["eternafold_provenance"]["commit"][:8])
 
 # ================================================================ write
 out = [

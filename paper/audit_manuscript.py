@@ -243,7 +243,8 @@ def main(pdir: str) -> int:
 
     # G -- label/ref reachability
     labels = set(re.findall(r"\\label\{([^}]*)\}", body_nc))
-    refs = set(re.findall(r"\\(?:auto|c|C|page)?ref\{([^}]*)\}", body_nc))
+    # \eqref must be in this alternation or every labelled equation reads as an orphan
+    refs = set(re.findall(r"\\(?:eq|auto|c|C|page|name)?ref\{([^}]*)\}", body_nc))
     dangling = sorted(refs - labels)
     orphan = sorted(l for l in labels - refs if not l.startswith(("fig:", "tab:")))
     if dangling:

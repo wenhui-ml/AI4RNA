@@ -222,10 +222,137 @@ def fig_audits():
     emit("fig4_audits.tex", group(2, body, hsep="2.0cm"))
 
 
+
+# ---------------------------------------------------------------- 0  what the paper does
+def fig_arch():
+    """The pipeline, with section numbers resolved by LaTeX rather than typed.
+
+    Structural, not measured -- but it carries the two counts that decide whether the reader
+    should believe the rest, so those are read from artifacts like every other number.
+    """
+    n = J("m26_model_scored.json")["n"]
+    cc = J("m33_cluster_census.json")
+    nc = J("m34_admission_census.json")["designaudit"]["n_constructs"]
+    body = r"""\begin{tikzpicture}[
+  font=\scriptsize,
+  box/.style={draw, rounded corners=2pt, line width=0.7pt, align=center,
+              inner sep=3pt, minimum height=10mm, text width=34mm},
+  data/.style={box, draw=nmgrey, fill=white},
+  core/.style={box, draw=nmfree, fill=nmfree!6},
+  resbox/.style={box, draw=nmneural, fill=nmneural!5},
+  ar/.style={-{Latex[length=1.6mm, width=1.2mm]}, line width=0.6pt, color=nmink},
+  cut/.style={line width=0.6pt, color=nmgrey, densely dashed}]
+\hyphenpenalty=10000 \exhyphenpenalty=10000 \tolerance=9999
+
+\node[data] (corp) at (0,0)
+  {public probing corpus\\@N@ constructs, @C@ cells\\@P@ targets};
+\node[core, text width=38mm] (crit) at (5.4,0)
+  {\textbf{eligibility criterion}\\five clauses, exclusions counted\\(\S\ref{sec:mining})};
+\node[data, text width=36mm] (iv) at (10.8,0)
+  {@A@ executed\\two-nucleotide interventions\\outcome contains no model};
+\draw[ar] (corp) -- (crit);
+\draw[ar] (crit) -- (iv);
+
+\node[core, text width=34mm] (est) at (10.8,-2.4)
+  {\textbf{matched contrast}\\Eq.~\eqref{eq:est}, one assumption\\(\S\ref{sec:estimation})};
+\draw[ar] (iv) -- (est);
+
+\node[data, text width=34mm] (pred) at (5.4,-2.4)
+  {three predictors\\two decompositions\\(\S\ref{sec:predictors})};
+\draw[ar] (pred) -- (est);
+
+\node[core, text width=34mm] (res) at (0,-2.4)
+  {\textbf{resolution first}\\sensitivity, calibration,\\leakage (\S\ref{sec:scoring})};
+\draw[ar] (res) -- (pred);
+
+\node[resbox, text width=37mm] (r1) at (0,-5.0)
+  {\textbf{identity axis}\\the decomposition splits the\\predictors (\S\ref{sec:result})};
+\node[resbox, text width=37mm] (r2) at (5.4,-5.0)
+  {\textbf{ranking axis}\\a free integer is not beaten\\(\S\ref{sec:ranking})};
+\node[resbox, text width=37mm] (r3) at (10.8,-5.0)
+  {\textbf{a metric withdrawn}\\calibration against a known\\truth (\S\ref{sec:withdrawal})};
+\draw[ar] (est.south) -- ++(0,-0.5) -| (r1.north);
+\draw[ar] (est.south) -- ++(0,-0.5) -| (r2.north);
+\draw[ar] (est.south) -- ++(0,-0.5) -| (r3.north);
+
+\node[align=left, text=nmgrey, font=\tiny] at (5.4,-6.4)
+  {no reference structure enters any arrow above; the outcome is measured and the
+   predictors are read as probabilities};
+\end{tikzpicture}"""
+    # NB: literal % is legal LaTeX and illegal in %-formatting, so substitute explicitly.
+    for k, v in (("@N@", "13{,}702"), ("@C@", str(cc["n_design_cells"])),
+                 ("@P@", str(cc["n_puzzles"])), ("@A@", f"{n:,}".replace(",", "{,}"))):
+        body = body.replace(k, v)
+    emit("fig0_arch.tex", body)
+
+
+# ---------------------------------------------------------------- what an intervention is
+def fig_flip():
+    """The criterion and the two conditioning sets, drawn. No measured quantity."""
+    body = r"""\begin{tikzpicture}[font=\scriptsize,
+  nt/.style={draw=nmgrey, line width=0.5pt, minimum size=4.2mm, inner sep=0pt,
+             font=\scriptsize\ttfamily},
+  hit/.style={nt, draw=nmneural, line width=0.9pt, fill=nmneural!8},
+  ar/.style={-{Latex[length=1.4mm, width=1mm]}, line width=0.55pt, color=nmink}]
+\hyphenpenalty=10000 \exhyphenpenalty=10000
+
+% flanks OUTSIDE the design window are drawn too, because clause (ii) is about them: a wild
+% type and its compensatory mutant differ at a dozen positions out here, and none of those
+% differences are the intervention.
+\node[font=\scriptsize\bfseries, anchor=east] at (-0.35,0) {wild type};
+\node[font=\scriptsize\bfseries, anchor=east] at (-0.35,-0.75) {mutant};
+\foreach \c [count=\i from 0] in {A,C,G,G,C,A,U,G,C,A,U,G,C,A,U,U,G,A}
+  \node[nt] at (\i*0.48,0) {\c};
+\foreach \c [count=\i from 0] in {U,G,A,G,C,A,U,G,C,A,U,G,C,A,U,C,A,C}
+  \node[nt] at (\i*0.48,-0.75) {\c};
+\foreach \i in {0,1,2,15,16,17} {
+  \node[nt, draw=nmgrey!55, text=nmgrey] at (\i*0.48,0) {\phantom{X}};
+  \node[nt, draw=nmgrey!55, text=nmgrey] at (\i*0.48,-0.75) {\phantom{X}};}
+\foreach \c [count=\i from 0] in {A,C,G}
+  \node[font=\scriptsize\ttfamily, text=nmgrey] at (\i*0.48,0) {\c};
+\foreach \c [count=\i from 15] in {U,G,A}
+  \node[font=\scriptsize\ttfamily, text=nmgrey] at (\i*0.48,0) {\c};
+\foreach \c [count=\i from 0] in {U,G,A}
+  \node[font=\scriptsize\ttfamily, text=nmgrey] at (\i*0.48,-0.75) {\c};
+\foreach \c [count=\i from 15] in {C,A,C}
+  \node[font=\scriptsize\ttfamily, text=nmgrey] at (\i*0.48,-0.75) {\c};
+\node[hit] at (5*0.48,0) {A}; \node[hit] at (10*0.48,0) {U};
+\node[hit] at (5*0.48,-0.75) {U}; \node[hit] at (10*0.48,-0.75) {A};
+\draw[ar] (5*0.48,-0.30) -- (5*0.48,-0.46);
+\draw[ar] (10*0.48,-0.30) -- (10*0.48,-0.46);
+\draw[decorate, decoration={brace, amplitude=3pt, mirror}, color=nmgrey]
+  (3*0.48-0.24,-1.10) -- (14*0.48+0.24,-1.10)
+  node[midway, below=3pt, font=\tiny, color=nmink] {design window $[\ell,u)$};
+\node[font=\tiny, color=nmgrey, anchor=north] at (1*0.48,-1.14) {adapter};
+\node[font=\tiny, color=nmgrey, anchor=north] at (16*0.48,-1.14) {barcode};
+\draw[color=nmthermo, line width=0.7pt]
+  (5*0.48,0.24) .. controls (6.5*0.48,0.80) and (8.5*0.48,0.80) .. (10*0.48,0.24);
+\node[font=\tiny, color=nmthermo, anchor=south] at (7.5*0.48,0.72) {declared pair $(i,j)$};
+\node[align=left, font=\tiny, color=nmink, anchor=north west] at (0,-2.05)
+  {inside the window exactly two positions change, and they exchange: the unordered pair type is
+   preserved (A--U stays A--U).\\Outside it the two constructs differ freely, and none of those
+   differences is part of the intervention.};
+
+\begin{scope}[shift={(0,-3.5)}]
+\node[draw=nmthermo, fill=nmthermo!6, rounded corners=2pt, line width=0.7pt,
+      text width=44mm, align=center, inner sep=4pt, font=\scriptsize] (c1) at (1.5,0)
+  {\textbf{causal question}\\which pair type helps?\\condition on cell, depth, crossing};
+\node[draw=nmfree, fill=nmfree!6, rounded corners=2pt, line width=0.7pt,
+      text width=44mm, align=center, inner sep=4pt, font=\scriptsize] (c2) at (6.9,0)
+  {\textbf{experimenter's question}\\which flip should I build?\\condition on the cell alone};
+\node[font=\tiny, color=nmink, text width=50mm, align=center, anchor=north] at (1.5,-0.9)
+  {depth is a confounder, and is removed};
+\node[font=\tiny, color=nmink, text width=50mm, align=center, anchor=north] at (6.9,-0.9)
+  {depth is information already held, and is kept};
+\end{scope}
+\end{tikzpicture}"""
+    emit("fig_flip.tex", body)
+
+
 if __name__ == "__main__":
     print("emitting TikZ display items")
     ok = True
-    for fn in (fig_corpus, fig_calibration, fig_ranking, fig_audits):
+    for fn in (fig_arch, fig_flip, fig_corpus, fig_calibration, fig_ranking, fig_audits):
         try:
             fn()
         except FileNotFoundError as e:

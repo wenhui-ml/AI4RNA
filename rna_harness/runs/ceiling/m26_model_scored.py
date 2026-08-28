@@ -44,9 +44,19 @@ def pair_prob(seq, a, b, cache):
         return 0.0
 
 
+# Every reason a construct is refused, tallied. The manuscript prints these counts, and until
+# this existed they were typed into make_numbers.py by hand -- laundered through put() where the
+# hand-typed-number check could not see them. build() is unchanged otherwise: same recs, same
+# order, same artifacts.
+EXCL = {}
+
+
 def build():
     """one record per compensatory double mutant whose intervention is exactly two positions."""
     csv.field_size_limit(10 ** 9)
+    EXCL.clear()
+    EXCL.update({"n_rows": 0, "no_outcome_or_sn": 0, "no_wild_type": 0, "not_a_declared_pair": 0,
+                 "unparsable_positions": 0, "non_canonical_pair": 0, "not_exactly_two": 0})
     rows, wt = [], {}
     with open(SRC) as f:
         for d in csv.DictReader(f):
@@ -56,28 +66,35 @@ def build():
     cache = {}
     recs, dropped = [], []
     for d in rows:
+        EXCL["n_rows"] += 1
         if d["rescue_factor"] in ("", "NA", "nan") or d["SN_filter"] not in ("1", "1.0"):
+            EXCL["no_outcome_or_sn"] += 1
             continue
         k = (d["puzzle"], d["method"]); p = wt.get(k)
         if p is None:
+            EXCL["no_wild_type"] += 1
             continue
         ss = int(float(d["sub_start"])); se = int(float(d["sub_end"]))
         P = M16.parse_pairs(d["target_structure"])
         try:
             ma, mb = int(float(d["mutA"])), int(float(d["mutB"]))
         except ValueError:
+            EXCL["unparsable_positions"] += 1
             continue
         a, b = ma + ss - 2, mb + ss - 2
         if P.get(a) != b:
+            EXCL["not_a_declared_pair"] += 1
             continue
         w, m = p["sequence"], d["sequence"]
         pt = "".join(sorted({w[a], w[b]}))
         if pt not in ("CG", "AU", "GU"):
+            EXCL["non_canonical_pair"] += 1
             continue
         diff = tuple(sorted(i for i in range(ss - 1, se) if w[i] != m[i]))
         rf = float(d["rescue_factor"])
         if diff != tuple(sorted({a, b})):                      # P1: the intervention must be clean
             dropped.append({"pt": pt, "rf": rf, "ndiff": len(diff)})
+            EXCL["not_exactly_two"] += 1
             continue
         dep = 0
         while P.get(a - dep - 1) == b + dep + 1:
