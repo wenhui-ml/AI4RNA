@@ -1,0 +1,68 @@
+{
+ "id": "M31",
+ "title": "Can a predictor tell you which compensatory flips will rescue, inside one design?",
+ "frozen_before_code": true,
+ "cost": "offline, $0 -- the same 4317 admitted interventions and the ViennaRNA / RibonanzaNet scores already cached by M26 and M26c. No API, no GPU, no new data.",
+
+ "why": [
+  "The manuscript's present headline is that a predictor's own output separates G-C from A-U targets",
+  "in matched contexts. Two published results sit close to it: EternaBench (Nature Methods 2022)",
+  "already scores structure packages on Eterna chemical mapping, and an eLife 2018 study already",
+  "relates rescue factor to thermodynamic pairing probability across 325 Rfam families. Neither is",
+  "the same claim, but the ACTION -- score a predictor on chemical-probing data -- is occupied.",
+  "",
+  "The eLife direction is the inverse of the useful one: it used pairing probability to CHOOSE which",
+  "pairs to test, with the predictor as a selector. The question an experimenter actually faces is",
+  "the other way round. Given one design and a budget, which compensatory flips should be built?",
+  "That makes the predictor the object under test, and it converts into wet-lab units.",
+  "",
+  "It also needs a different conditioning set, and saying so is part of the point. The causal",
+  "contrast conditions on design cell, helix depth and crossing, because depth confounds pair type.",
+  "The prediction question must NOT condition on depth: depth is information the experimenter",
+  "already holds and would use. Same corpus, two questions, two conditioning sets, stated."
+ ],
+
+ "task": {
+  "unit": "one admissible orientation flip inside one design cell",
+  "conditioning": "the design cell alone -- NOT depth, NOT crossing",
+  "outcome": "the corpus rescue factor R, unchanged",
+  "predictors": [
+   "P_vienna: ViennaRNA equilibrium probability that the flipped pair forms in the mutant ensemble",
+   "P_neural: RibonanzaNet-SS pair score for the same pair in the same sequence",
+   "dP_vienna and dP_neural: the same, minus the wild type's value",
+   "BASELINE depth: helix depth, which the experimenter has for free and which must be beaten",
+   "BASELINE random"
+  ]
+ },
+
+ "arms": {
+  "A": "within-design ranking. Per cell with at least NMIN flips, Spearman(score, R). Report the weighted mean across cells, the puzzle-clustered CI, and a permutation p from shuffling R inside the cell (rule 80). Report the same statistic under the causal conditioning set beside it, to show the two questions are not the same question.",
+  "B": "detection. Rescued := R >= THRESH_MAIN, with a declared sweep. Within-cell AUROC and the base rate. Continuous is primary; binary is secondary and threshold-swept.",
+  "C": "THE DECISION CLAIM. Per cell, test only the top-k flips by each score, k = ceil(TOPK_FRAC * n_cell) with a floor of 2. Recovery = the share of the cell's rescuing flips captured. Compared against random-k and against the depth-only baseline. Reported in wet-lab units: constructs built to reach a given recovery.",
+  "D": "model class. A and C computed for both predictors, paired by cell, with a puzzle-clustered bootstrap of the difference.",
+  "E": "the controls already built. Arm A repeated on the cells that fail M30's published selection cutoff, and on the leakage-excised cells of the M26d cut."
+ },
+
+ "constants": {"NMIN": 8, "THRESH_MAIN": 0.5, "THRESH_SWEEP": [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8],
+               "TOPK_FRAC": 0.25, "NBOOT": 2000, "NPERM": 2000},
+
+ "staked": {
+  "1": "at least one predictor's within-design Spearman has a puzzle-clustered CI excluding zero",
+  "2": "the within-design Spearman EXCEEDS the same statistic computed under the causal conditioning set, because depth is informative and is no longer removed",
+  "3": "RibonanzaNet ranks at least as well as ViennaRNA on arm A",
+  "4": "top-k recovery at TOPK_FRAC beats random-k by at least 5 percentage points",
+  "5": "at least one predictor beats the depth-only baseline on arm C",
+  "6": "the base rate of rescued at THRESH_MAIN lies in [0.2, 0.8]",
+  "7": "arm A stays positive on the selection-fallback cells and on the leakage-excised cells"
+ },
+
+ "kill": {
+  "K0": "base rate outside [0.05, 0.95] at THRESH_MAIN -> the binary framing is degenerate; arm B is void and only continuous statistics are read.",
+  "K1": "BOTH predictors' within-design Spearman CIs contain zero -> there is no ranking capability. The reframe is REFUSED, the manuscript keeps its present headline, and the prior-art collision is handled in Related work instead.",
+  "K2": "neither predictor beats the depth-only baseline on arm C -> the capability claim is refused. Ranking flips would then be a restatement of helix depth, which is free, and the reframe is REFUSED.",
+  "K3": "the ordering of the two predictors flips across the threshold sweep -> the binary framing is withdrawn and only the continuous statistic is reported.",
+  "K4": "arm A is a prediction statistic and is never reported as causal. The causal contrast keeps its own conditioning set, unchanged, and neither number is presented as a version of the other."
+ },
+
+ "decision_this_run_gates": "whether the manuscript's Results headline changes from 'a predictor's output separates G-C from A-U in matched contexts' to 'a predictor ranks which compensatory flips rescue inside a design, well enough to change what gets built'. K1 or K2 refuses the change. Nothing in Method, in the selection audit, in the leakage audit or in the withdrawal depends on the outcome."
+}
