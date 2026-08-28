@@ -6,12 +6,13 @@
     label style={font=\scriptsize, color=rpInkB},
     tick label style={font=\tiny, color=rpInkB},
     legend style={font=\tiny, draw=none, fill=none, text=rpInkB},
+    clip=false, scaled x ticks=false, scaled y ticks=false,
+    /pgf/number format/fixed, /pgf/number format/precision=3,
+    /pgf/number format/1000 sep={},
     title style={font=\scriptsize, color=rpInk, at={(0,1.03)}, anchor=south west},
     xlabel={matched-pair difference (OpenKnot points)},
     xmin=-1.2, xmax=9.6, ymin=0.4, ymax=6.6,
-    ytick={6,5,4,3,2,1}, yticklabels={{sample 2 (main)},{baseline 4560},{sample 3},{batch 4},{batch 5},{batch 6 (n.u.)}},
-    extra x ticks={0}, extra x tick style={grid=major,
-      grid style={densely dotted, color=rpInkC}, xticklabel=\empty}]
+    ytick={6,5,4,3,2,1}, yticklabels={{sample 2 (main)},{baseline 4560},{sample 3},{batch 4},{batch 5},{batch 6 (n.u.)}},]
 \fill[rpInkC, opacity=0.28] (axis cs:-0.935312,5.7) rectangle (axis cs:0.935312,6.3);
 \addplot[color=rpBlue, line width=1.0pt, forget plot] coordinates {(2.4347,6) (4.9623,6)};
 \addplot[color=rpBlue, mark=*, mark size=2.4pt, only marks, forget plot] coordinates {(3.6816,6)};

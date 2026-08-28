@@ -19,6 +19,8 @@ os.makedirs(FIGS, exist_ok=True)
 NEU, THM, FREE, INK, GREY, MID = ("nmneural", "nmthermo", "nmfree", "nmink", "nmgrey", "nmmid")
 
 COMMON = r"""axis lines=left, axis line style={line width=0.4pt},
+    clip=false, scaled x ticks=false, scaled y ticks=false,
+    /pgf/number format/fixed, /pgf/number format/precision=3,
     tick style={line width=0.4pt, color=nmgrey}, tick align=outside,
     label style={font=\footnotesize}, tick label style={font=\scriptsize},
     legend style={font=\scriptsize, draw=none, fill=none},
@@ -68,23 +70,23 @@ def fig_corpus():
     xlabel={{helix depth of the flipped pair}}, ylabel={{interventions}},
     xtick={{{",".join(map(str, ks))}}}, ymin=0, ymax={max(vs)*1.24:.0f},
     enlarge x limits=0.10, nodes near coords, every node near coord/.append style={{font=\tiny,
-    color=nmink}}, title={{a\quad what the criterion admitted}}]
+    color=nmink}}, title={{a}}]
 \addplot[fill={FREE}, draw=none] coordinates {{{co(ks, vs)}}};
 
 \nextgroupplot[width=4.9cm, height=3.6cm, xbar stacked, bar width=13pt,
     xmin=0, xmax=100, xlabel={{share of interventions (\%)}},
     ytick={{0,1}}, yticklabels={{ViennaRNA, RibonanzaNet}}, y dir=reverse,
     enlarge y limits=0.55, legend columns=3,
-    legend style={{at={{(0.5,-0.34)}}, anchor=north, font=\scriptsize, draw=none,
+    legend style={{at={{(0.5,-0.52)}}, anchor=north, font=\scriptsize, draw=none,
       /tikz/every even column/.append style={{column sep=4pt}}}},
-    title={{b\quad neither score is saturated}}]
+    title={{b}}]
 \addplot[fill={GREY}, draw=none] coordinates {{({seg['lo'][0]:.1f},0) ({seg['lo'][1]:.1f},1)}};
 \addlegendentry{{$<0.08$}}
 \addplot[fill={MID}, draw=none] coordinates {{({seg['mid'][0]:.1f},0) ({seg['mid'][1]:.1f},1)}};
 \addlegendentry{{between}}
 \addplot[fill={INK}, draw=none] coordinates {{({seg['hi'][0]:.1f},0) ({seg['hi'][1]:.1f},1)}};
 \addlegendentry{{$>0.99$}}"""
-    emit("fig1_corpus.tex", group(2, body))
+    emit("fig1_corpus.tex", group(2, body, hsep="1.9cm"))
 
 
 # ---------------------------------------------------------------- Fig 2: calibration
@@ -103,10 +105,10 @@ def fig_calibration():
     xtick={{{",".join(map(str, xs))}}}, enlarge x limits=0.14, enlarge y limits=0.42,
     nodes near coords, point meta=explicit symbolic,
     every node near coord/.append style={{font=\tiny, color=nmink, below=4pt}},
-    title={{{letter}\quad {name}}}]
+    title={{{letter}}}]
 \addplot[color={col}, mark=*, mark size=1.7pt, line width=1.0pt]
   coordinates {{{co(xs, ys, meta)}}};""")
-    emit("fig2_calibration.tex", group(2, "\n\n".join(parts)))
+    emit("fig2_calibration.tex", group(2, "\n\n".join(parts), hsep="2.3cm"))
 
 
 # ---------------------------------------------------------------- Fig 3: Claim 3
@@ -136,13 +138,14 @@ def fig_ranking():
     yticklabel style={{font=\tiny}}, ymin=0.4, ymax={len(rows)+0.6},
     extra x ticks={{0}}, extra x tick style={{grid=major,
       grid style={{densely dotted, color={GREY}}}, xticklabel=\empty}},
-    title={{a\quad a free integer ties the best model}}]
+    title={{a}}]
 {chr(10).join(lines)}
 
 \nextgroupplot[width=4.15cm, height=3.4cm,
     xlabel={{rescue threshold defining a hit}}, ylabel={{within-cell AUROC}},
-    legend pos=south west, enlarge y limits=0.20,
-    title={{b\quad and overtakes them}}]
+    legend style={{at={{(0.5,1.02)}}, anchor=south, font=\tiny}},
+    legend columns=3, enlarge y limits=0.22,
+    title={{b}}]
 \addplot[color={NEU}, mark=*, mark size=1.3pt, line width=0.9pt]
   coordinates {{{co(th, [r["P_neural"] for r in sw])}}};
 \addlegendentry{{RibonanzaNet}}
@@ -155,29 +158,33 @@ def fig_ranking():
 
 \nextgroupplot[width=4.15cm, height=3.4cm,
     xlabel={{share of a design's flips built (\%)}},
-    ylabel={{rescuing flips recovered (\%)}}, legend pos=south east,
-    title={{c\quad what it is worth in constructs}}]
+    ylabel={{rescuing flips recovered (\%)}},
+    legend style={{at={{(0.97,0.03)}}, anchor=south east, font=\tiny}}, legend columns=1,
+    title={{c}}]
 \addplot[color={NEU}, line width=1.1pt]
   coordinates {{{co(f, [f"{100*y:.3f}" for y in c["depth_then_P_neural"]])}}};
-\addlegendentry{{depth, ties broken by model}}
+\addlegendentry{{depth$+$model}}
 \addplot[color={FREE}, line width=1.1pt]
   coordinates {{{co(f, [f"{100*y:.3f}" for y in c["depth_only"]])}}};
-\addlegendentry{{depth alone}}
+\addlegendentry{{depth}}
 \addplot[color={GREY}, dashed, line width=0.9pt]
   coordinates {{{co(f, [f"{100*y:.3f}" for y in c["random"]])}}};
 \addlegendentry{{random}}"""
-    emit("fig3_ranking.tex", group(3, body, hsep="1.15cm"))
+    emit("fig3_ranking.tex", group(3, body, hsep="2.05cm"))
 
 
 # ---------------------------------------------------------------- Fig 4: the two audits
 def fig_audits():
     d, s = J("m26d_clean_subset.json"), J("m30_selection_audit.json")
     arms, xs = ["all", "clean", "leaked"], [1, 2, 3]
-    bars = []
+    bars, allys = [], []
     for mdl, col in (("RibonanzaNet", NEU), ("ViennaRNA", THM)):
-        ys = [f"{d['arms'][f'{mdl}_{a}']['slope']:.5f}" for a in arms]
+        ys = [float(d["arms"][f"{mdl}_{a}"]["slope"]) for a in arms]
+        allys += ys
         bars.append(rf"\addplot[fill={col}, draw=none] coordinates {{{co(xs, ys)}}};"
                     "\n" rf"\addlegendentry{{{mdl}}}")
+    # ViennaRNA's leaked-subset slope is NEGATIVE; a floor of zero silently deletes that bar
+    ymin_a = min(0.0, min(allys)) * 1.3
     tl = ",".join("{" + t + "}" for t in
                   (rf"all\\$n${{=}}{d['arms']['ViennaRNA_all']['n']}",
                    rf"excised\\$n${{=}}{d['n_clean']}",
@@ -198,8 +205,10 @@ def fig_audits():
     body = rf"""\nextgroupplot[width=5.4cm, height=3.5cm, ybar, bar width=10pt,
     xtick={{1,2,3}}, xticklabels={{{tl}}},
     xticklabel style={{align=center, font=\tiny}},
-    ylabel={{within-stratum skill slope}}, enlarge x limits=0.24, ymin=0,
-    legend pos=north east, title={{a\quad leakage audit}}]
+    ylabel={{within-stratum skill slope}}, enlarge x limits=0.24,
+    ymin={ymin_a:.4f},
+    legend style={{at={{(0.5,1.03)}}, anchor=south}}, legend columns=2,
+    title={{a}}]
 {chr(10).join(bars)}
 
 \nextgroupplot[width=4.9cm, height=3.5cm,
@@ -208,10 +217,9 @@ def fig_audits():
     yticklabels={{{",".join("{" + e[0] + "}" for e in est)}}},
     yticklabel style={{font=\tiny}}, ymin=0.4, ymax={len(est)+0.6},
     extra x ticks={{0}}, extra x tick style={{grid=major,
-      grid style={{densely dotted, color={GREY}}}, xticklabel=\empty}},
-    title={{b\quad selection audit}}]
+      grid style={{densely dotted, color={GREY}}}, xticklabel=\empty}}, title={{b}}]
 {chr(10).join(lines)}"""
-    emit("fig4_audits.tex", group(2, body))
+    emit("fig4_audits.tex", group(2, body, hsep="2.0cm"))
 
 
 if __name__ == "__main__":

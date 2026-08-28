@@ -33,11 +33,19 @@ BASE = (r"axis lines=left, axis line style={line width=0.5pt, color=" + INK3 + r
         "\n    label style={font=\\scriptsize, color=" + INK2 + r"},"
         "\n    tick label style={font=\\tiny, color=" + INK2 + r"},"
         "\n    legend style={font=\\tiny, draw=none, fill=none, text=" + INK2 + r"},"
+        "\n    clip=false, scaled x ticks=false, scaled y ticks=false,"
+        "\n    /pgf/number format/fixed, /pgf/number format/precision=3,"
+        "\n    /pgf/number format/1000 sep={},"
         "\n    title style={font=\\scriptsize, color=" + INK + r", at={(0,1.03)}, anchor=south west}")
 
 
 def en(n):
     return EN.get(n, n)
+
+
+def pv(x):
+    """a permutation p of 0 is the floor of the null, not a measured zero."""
+    return r"<10^{-3}" if float(x) < 1e-4 else f"{float(x):.4f}"
 
 
 def esc(t):
@@ -87,6 +95,16 @@ def pt(x, y, col, ms="2.2pt", mark="*"):
             rf"coordinates {{({x},{y})}};")
 
 
+def zeroline(y0, y1):
+    """a vertical rule at zero, drawn with \\draw rather than \\addplot.
+
+    An extra tick's grid inherits the current plot cycle's colour; and inside an xbar axis every
+    \\addplot is rendered as a bar, so a two-point "line" comes out as a pair of stubs in the next
+    cycle colour. Both mistakes were made and both are visible only by looking at the figure."""
+    return (rf"\draw[color={INK3}, densely dotted, line width=0.6pt] "
+            rf"(axis cs:0,{y0}) -- (axis cs:0,{y1});")
+
+
 def band(x0, x1, y0, y1, col=INK3, op="0.28"):
     return (rf"\fill[{col}, opacity={op}] (axis cs:{x0},{y0}) rectangle (axis cs:{x1},{y1});")
 
@@ -121,9 +139,7 @@ def fig3():
     body = rf"""\begin{{axis}}[width=7.2cm, height=4.4cm, {BASE},
     xlabel={{matched-pair difference (OpenKnot points)}},
     xmin=-1.2, xmax=9.6, ymin=0.4, ymax={len(rows)+0.6},
-    ytick={{{ticks}}}, yticklabels={{{labs}}},
-    extra x ticks={{0}}, extra x tick style={{grid=major,
-      grid style={{densely dotted, color={INK3}}}, xticklabel=\empty}}]
+    ytick={{{ticks}}}, yticklabels={{{labs}}},]
 {chr(10).join(L)}
 \end{{axis}}
 \node[font=\tiny, color={INK2}, anchor=north] at (current bounding box.south)
@@ -159,10 +175,8 @@ def fig4():
     body = rf"""\nextgroupplot[width=4.5cm, height=3.5cm, xbar, bar width=4.5pt,
     ytick={{{t1}}}, yticklabels={{{l1}}}, yticklabel style={{font=\tiny}},
     xlabel={{effect (OpenKnot points)}}, ymin=0.4, ymax={len(nms)+0.6},
-    legend columns=2, legend style={{at={{(0.5,-0.30)}}, anchor=north}},
-    extra x ticks={{0}}, extra x tick style={{grid=major,
-      grid style={{densely dotted, color={INK3}}}, xticklabel=\empty}},
-    title={{a\quad true vs.\ shifted position set}}]
+    legend columns=2, legend style={{at={{(0.5,1.02)}}, anchor=south}},]
+{zeroline(0.4, len(nms)+0.6)}
 \addplot[fill={S1}, draw=none] coordinates {{{co([f"{v:.4f}" for v in real], ys)}}};
 \addlegendentry{{true paired set}}
 \addplot[fill={S2}, draw=none] coordinates {{{co([f"{v:.4f}" for v in sh], ys)}}};
@@ -173,8 +187,7 @@ def fig4():
     xticklabels={{{",".join("{{" + f"{float(k):.1f}" + "}}" for k in ks)}}},
     xlabel={{matching stringency $k$ (residual SD)}}, ylabel={{median slope}},
     ymin=-14, ymax=68, legend columns=2,
-    legend style={{at={{(0.5,-0.30)}}, anchor=north}},
-    title={{b\quad pairing vs.\ composition}}]
+    legend style={{at={{(0.5,1.02)}}, anchor=south}}]
 \addplot[color={S1}, mark=*, mark size=1.8pt, line width=1.1pt]
   coordinates {{{co(x2, [f"{v:.3f}" for v in sp])}}};
 \addlegendentry{{contrast pairing}}
@@ -187,11 +200,10 @@ def fig4():
     xticklabels={{{",".join("{{" + lab[k] + "}}" for k in ks2)}}},
     ylabel={{partner reactivity change}}, ymin=0, ymax=0.70,
     nodes near coords, point meta=explicit symbolic,
-    every node near coord/.append style={{font=\tiny, color={INK2}}},
-    title={{c\quad single-base intervention}}]
+    every node near coord/.append style={{font=\tiny, color={INK2}}}]
 \addplot[fill={S1}, draw=none] coordinates {{{
     " ".join(f"({a},{b:.4f}) [{b:+.2f}]" for a, b in zip(x3, v1))}}};"""
-    emit("fig4_three_cuts.tex", grp(3, body, hsep="1.25cm"))
+    emit("fig4_three_cuts.tex", grp(3, body, hsep="1.6cm"))
 
 
 # ---------------------------------------------------------------- fig 5: rescue
@@ -218,8 +230,8 @@ def fig5():
     body = rf"""\nextgroupplot[width=4.6cm, height=3.2cm, xbar, bar width=5pt,
     ytick={{{t1}}}, yticklabels={{{l1}}}, yticklabel style={{font=\tiny}},
     xlabel={{difference in rescue factor}}, xmin=0, xmax=0.155,
-    ymin=0.4, ymax={len(keys)+0.6}, legend pos=south east,
-    title={{a\quad compensatory rescue}}]
+    ymin=0.4, ymax={len(keys)+0.6},
+    legend style={{at={{(0.5,1.02)}}, anchor=south}}, legend columns=2]
 \addplot[fill={S3}, draw=none] coordinates {{{co([f"{v:.4f}" for v in marg], ys)}}};
 \addlegendentry{{marginal}}
 \addplot[fill={S1}, draw=none] coordinates {{{co([f"{v:.4f}" for v in matc], ys)}}};
@@ -229,15 +241,14 @@ def fig5():
     xtick={{0,1,2,3}}, xticklabels={{{{0\\(end)}},{{1}},{{2}},{{3+}}}},
     xticklabel style={{align=center}},
     xlabel={{helix depth}}, ylabel={{rescue factor}}, xmin=-0.2, xmax=3.6,
-    legend pos=south west,
-    title={{b\quad G--C sits shallower ({md['CG']:.2f} vs {md['AU']:.2f})}}]
+    legend style={{at={{(0.5,1.02)}}, anchor=south}}, legend columns=2]
 \addplot[color={S1}, mark=*, mark size=1.8pt, line width=1.1pt]
   coordinates {{{co(range(4), [f"{v:.4f}" for v in curves['CG']])}}};
 \addlegendentry{{G--C}}
 \addplot[color={S2}, mark=*, mark size=1.8pt, line width=1.1pt]
   coordinates {{{co(range(4), [f"{v:.4f}" for v in curves['AU']])}}};
 \addlegendentry{{A--U}}"""
-    emit("fig5_rescue.tex", grp(2, body, hsep="1.35cm"))
+    emit("fig5_rescue.tex", grp(2, body, hsep="1.7cm"))
 
 
 # ---------------------------------------------------------------- fig 6: the mediation identity
@@ -257,7 +268,8 @@ def fig6():
     xlabel={{predicted attenuation\quad $g_m \times \beta_{{\rm depth}}$}},
     ylabel={{observed attenuation}},
     xmin={lo:.5f}, xmax=0.002, ymin={lo:.5f}, ymax=0.002,
-    title={{depth accounts for {100*a2['mediated_fraction']:.0f}\% of the pooled gap}}]
+    title={{depth accounts for {100*a2['mediated_fraction']:.0f}\% of the pooled gap}},
+    xmax=0.006, enlarge y limits=0.08]
 \addplot[color={INK3}, dashed, line width=0.7pt, forget plot]
   coordinates {{({lo:.5f},{lo:.5f}) (0.002,0.002)}};
 {chr(10).join(pts)}
@@ -292,14 +304,13 @@ def fig7():
     ytick={{{t1}}}, yticklabels={{{l1}}}, yticklabel style={{font=\tiny}},
     xlabel={{CG $-$ AU helix-depth gap\quad(more negative: G--C placed shallower)}},
     xmin={lo:.4f}, xmax=0, ymin=0.4, ymax={len(pm)+0.6}]
-\addplot[fill={S1}, draw=none] coordinates {{{co([f"{g:.4f}" for g, _ in oth], [y for _, y in oth])}}};
-\addplot[fill={S2}, draw=none] coordinates {{{co([f"{g:.4f}" for g, _ in hum], [y for _, y in hum])}}};
+\addplot[fill={S1}, draw=none, bar shift=0pt] coordinates {{{co([f"{g:.4f}" for g, _ in oth], [y for _, y in oth])}}};
+\addplot[fill={S2}, draw=none, bar shift=0pt] coordinates {{{co([f"{g:.4f}" for g, _ in hum], [y for _, y in hum])}}};
 {labels}
 
 \nextgroupplot[width=3.4cm, height=4.3cm, ytick=\empty, ymin=-0.9, ymax=0.9,
     xlabel={{method component,\\after removing target effects}},
-    xlabel style={{align=center}},
-    title={{}}]
+    xlabel style={{align=center}}]
 {band(mu - 1.96*sd, mu + 1.96*sd, -0.32, 0.32, INK3, "0.30")}
 {pt(f"{mu:.4f}", 0, INK2, "3pt", "|")}
 {pt(f"{a1['method_component']:.4f}", 0, S2, "2.8pt")}
@@ -308,7 +319,7 @@ def fig7():
   {{observed {a1['method_component']:.3f}\\$z={a1['z']:.2f}$, $p={a1['p_perm']:.3f}$}};
 \node[font=\tiny, color={INK2}, align=center, below=8pt] at (axis cs:{mu:.4f},0)
   {{permutation null\\mean $\pm$ 1.96\,SD}};"""
-    emit("fig7_gradient.tex", grp(2, body, hsep="1.5cm"))
+    emit("fig7_gradient.tex", grp(2, body, hsep="2.5cm"))
 
 
 # ---------------------------------------------------------------- fig 8: the permutation rule
@@ -327,28 +338,27 @@ def fig8():
         rf"{{{r:.4f}\\{tot[t][0]}/{tot[t][1]}}};"
         for i, (r, t) in enumerate(zip(rates, ("A", "B"))))
 
-    body = rf"""\nextgroupplot[width=3.9cm, height=3.6cm, ybar, bar width=13pt,
+    body = rf"""\nextgroupplot[width=4.9cm, height=3.6cm, ybar, bar width=14pt,
     xtick={{1,2}}, xticklabels={{{{permute the\\treatment}},{{permute the\\outcome}}}},
-    xticklabel style={{align=center}}, xmin=0.35, xmax=2.9,
-    ylabel={{type-I error at the 0.005 gate}}, ymin=0, ymax={max(rates)*1.42:.5f},
-    title={{a\quad which column is permuted}}]
+    xticklabel style={{align=center}}, xmin=0.4, xmax=2.75,
+    ylabel={{type-I error at the 0.005 gate}}, ymin=0, ymax={max(rates)*1.42:.5f}]
 \addplot[fill={S2}, draw=none] coordinates {{(1,{rates[0]:.5f})}};
 \addplot[fill={S1}, draw=none] coordinates {{(2,{rates[1]:.5f})}};
-\addplot[color={INK2}, dashed, line width=0.8pt, forget plot]
-  coordinates {{(0.35,{d['nominal']}) (2.9,{d['nominal']})}};
-\node[font=\tiny, color={INK2}, right] at (axis cs:2.15,{d['nominal']})
-  {{nominal {d['nominal']}}};
+\draw[color={INK2}, dashed, line width=0.8pt]
+  (axis cs:0.4,{d['nominal']}) -- (axis cs:2.75,{d['nominal']});
+\node[font=\tiny, color={INK2}, anchor=north east] at
+  (axis cs:2.75,{d['nominal']}) {{nominal {d['nominal']}}};
 {ann}
 
 \nextgroupplot[width=5.4cm, height=3.6cm, xbar, bar width=4.5pt,
     ytick={{{t1}}}, yticklabels={{{l1}}}, yticklabel style={{font=\tiny}},
     xlabel={{SD of the statistic under each null}}, ymin=0.4, ymax={len(pops)+0.6},
-    legend pos=south east, title={{b\quad and what it does to the null}}]
+    legend style={{at={{(0.5,1.02)}}, anchor=south}}, legend columns=2]
 \addplot[fill={S2}, draw=none] coordinates {{{co([f"{v:.4f}" for v in sa], ys)}}};
 \addlegendentry{{design rebuilt by the permutation}}
 \addplot[fill={S1}, draw=none] coordinates {{{co([f"{v:.4f}" for v in sb], ys)}}};
 \addlegendentry{{design held fixed}}"""
-    emit("fig8_null.tex", grp(2, body, hsep="1.5cm"))
+    emit("fig8_null.tex", grp(2, body, hsep="2.5cm"))
 
 
 # ---------------------------------------------------------------- fig 9: the energy test
@@ -387,13 +397,12 @@ def fig9():
     xtick={{{",".join(map(str, x))}}}, xticklabels={{{",".join("{" + s + "}" for s in lab)}}},
     xticklabel style={{rotate=32, anchor=east, font=\tiny}},
     xlabel={{$\Delta G_{{\mathrm{{loc}}}}$ bin (kcal/mol)}}, ylabel={{target pairs}},
-    legend pos=north east, title={{a\quad where the types overlap}}]
+    legend style={{at={{(0.5,1.02)}}, anchor=south}}, legend columns=3]
 {chr(10).join(series)}
 
 \nextgroupplot[width=4.2cm, height=3.5cm,
     ytick={{{t2}}}, yticklabels={{{l2}}}, yticklabel style={{font=\tiny}},
-    xlabel={{contrast retained after conditioning (\%)}}, ymin=0.4, ymax={len(vals)+0.6},
-    title={{b\quad conditioning on the model's own energy}}]
+    xlabel={{contrast retained after conditioning (\%)}}, ymin=0.4, ymax={len(vals)+0.6}]
 {band(pm - 1.96*ps, pm + 1.96*ps, 0.4, len(vals)+0.6, INK3, "0.16")}
 \addplot[color={INK3}, dashed, line width=0.7pt, forget plot]
   coordinates {{({pm:.3f},0.4) ({pm:.3f},{len(vals)+0.6})}};
@@ -404,8 +413,7 @@ def fig9():
 
 \nextgroupplot[width=4.2cm, height=3.5cm,
     xlabel={{$\Delta G_{{\mathrm{{loc}}}}$ (kcal/mol)}},
-    ylabel={{rescue, centred in stratum}}, legend pos=south east,
-    title={{c\quad the assumption the linear route needs}}]
+    ylabel={{rescue, centred in stratum}}, legend pos=south east]
 \addplot[color={INK3}, line width=0.6pt, forget plot]
   coordinates {{({min(gx):.4f},0) ({max(gx):.4f},0)}};
 \addplot[color={S1}, mark=*, mark size=1.5pt, line width=0.9pt, forget plot]
@@ -413,7 +421,7 @@ def fig9():
 \addplot[color={S2}, dashed, line width=0.8pt]
   coordinates {{{co([f"{v:.4f}" for v in fx], [f"{v:.5f}" for v in fy])}}};
 \addlegendentry{{the linear fit $\beta_{{\Delta G}}$}}"""
-    emit("fig9_energy.tex", grp(3, body, hsep="1.3cm"))
+    emit("fig9_energy.tex", grp(3, body, hsep="2.4cm"))
 
 
 # ---------------------------------------------------------------- fig 10: depth and method
@@ -425,11 +433,10 @@ def fig10():
     v = [d3[k]["diff"] for k in ks]
     sig = [d3[k]["p_perm"] <= .005 for k in ks]
     bars = "\n".join(
-        rf"\addplot[fill={S1 if s else INK3}, draw=none, forget plot] "
-        rf"coordinates {{({i+1},{val:.5f})}};" for i, (val, s) in enumerate(zip(v, sig)))
-    ann = "\n".join(
-        rf"\node[font=\tiny, color={INK2}, above=1pt] at (axis cs:{i+1},{val:.5f}) "
-        rf"{{$p={d3[k]['p_perm']:.4f}$}};" for i, (k, val) in enumerate(zip(ks, v)))
+        rf"\addplot[fill={S1 if s else INK3}, draw=none, forget plot, bar shift=0pt] "
+        rf"coordinates {{({i+1},{val:.5f}) [$p={pv(d3[k]['p_perm'])}$]}};"
+        for i, (k, val, s) in enumerate(zip(ks, v, sig)))
+    ann = ""
 
     rows = a22["per_method"]
     ys = list(range(len(rows), 0, -1))
@@ -443,20 +450,18 @@ def fig10():
     xtick={{1,2,3}}, xticklabels={{{",".join(nm)}}},
     xticklabel style={{align=center}}, xmin=0.35, xmax=3.65,
     ylabel={{C--G $-$ A--U rescue}}, xlabel={{helix depth}},
-    ymin=-0.005, ymax={max(v)*1.34:.5f},
-    title={{a\quad not confined to the penalty's domain}}]
+    ymin=-0.005, ymax={max(v)*1.58:.5f},
+    nodes near coords, point meta=explicit symbolic,
+    every node near coord/.append style={{font=\tiny, color={INK2}}}]
 {bars}
 {ann}
 
 \nextgroupplot[width=5.4cm, height=3.6cm,
     ytick={{{t2}}}, yticklabels={{{l2}}}, yticklabel style={{font=\tiny}},
-    xlabel={{C--G $-$ A--U rescue, matched within design}}, ymin=0.4, ymax={len(rows)+0.6},
-    extra x ticks={{0}}, extra x tick style={{grid=major,
-      grid style={{densely dotted, color={INK3}}}, xticklabel=\empty}},
-    title={{b\quad {a22['n_positive']} of {a22['n_methods']} methods positive,
-      sign test $p={a22['binom_p']:.4f}$}}]
+    xlabel={{C--G $-$ A--U rescue, matched within design}}, ymin=0.4, ymax={len(rows)+0.6},]
+{zeroline(0.4, len(rows)+0.6)}
 {marks}"""
-    emit("fig10_depth_method.tex", grp(2, body, hsep="1.5cm"))
+    emit("fig10_depth_method.tex", grp(2, body, hsep="2.5cm"))
 
 
 # ---------------------------------------------------------------- fig 11: not one line
@@ -476,7 +481,7 @@ def fig11():
     body = rf"""\begin{{axis}}[width=6.2cm, height=4.8cm, {BASE},
     xlabel={{$\Delta\Delta G_{{\mathrm{{loc}}}}$ between the types (kcal/mol)}},
     ylabel={{$\Delta$ rescue, matched}}, xmin=-2.7, xmax=0.2,
-    legend pos=south east,
+    legend style={{at={{(0.5,-0.26)}}, anchor=north}}, legend columns=2,
     title={{implied slopes spread ${col['spread_ratio']:.2f}\times$}}]
 \addplot[color={INK3}, line width=0.6pt, forget plot] coordinates {{(-2.7,0) (0.2,0)}};
 \addplot[color={INK3}, dashed, line width=0.8pt]
@@ -505,30 +510,27 @@ def fig12():
     ys = list(range(len(order), 0, -1))
     mc = [r["method_component"] for r in order]
     cols = [S1 if r["method_p"] <= 0.005 else INK3 for r in order]
-    bars = "\n".join(rf"\addplot[fill={c}, draw=none, forget plot] coordinates {{({m:.4f},{y})}};"
+    bars = "\n".join(rf"\addplot[fill={c}, draw=none, forget plot, bar shift=0pt] "
+                     rf"coordinates {{({m:.4f},{y})}};"
                      for m, y, c in zip(mc, ys, cols))
     ann = "\n".join(rf"\node[font=\tiny, color={INK2}, right=1pt] at "
-                    rf"(axis cs:{r['method_component']:.4f},{y}) {{$p={r['method_p']:.4f}$}};"
+                    rf"(axis cs:{r['method_component']:.4f},{y}) {{$p={pv(r['method_p'])}$}};"
                     for r, y in zip(order, ys))
 
     body = rf"""\nextgroupplot[width=5.6cm, height=3.8cm,
     ytick={{{ticks}}}, yticklabels={{{",".join(names)}}},
     yticklabel style={{align=right, font=\tiny}}, ymin=0.4, ymax={len(order)+0.6},
-    xlabel={{G--C minus A--U helix depth, per design method}},
-    extra x ticks={{0}}, extra x tick style={{grid=major,
-      grid style={{densely dotted, color={INK3}}}, xticklabel=\empty}},
-    title={{a\quad every round, and the methods inside it}}]
+    xlabel={{G--C minus A--U helix depth, per design method}},]
 {chr(10).join(L)}
 
 \nextgroupplot[width=4.0cm, height=3.8cm, xbar, bar width=8pt,
     ytick={{{ticks}}}, yticklabels={{{",".join("{{round " + r["round"] + "}}" for r in order)}}},
     yticklabel style={{font=\tiny}}, ymin=0.4, ymax={len(order)+0.6},
     xlabel={{method component after target main effects}},
-    xmin=0, xmax={max(mc)*1.62:.4f},
-    title={{b\quad whose rule is it}}]
+    xmin=0, xmax={max(mc)*1.62:.4f}]
 {bars}
 {ann}"""
-    emit("fig12_rounds.tex", grp(2, body, hsep="1.9cm"))
+    emit("fig12_rounds.tex", grp(2, body, hsep="2.1cm"))
 
 
 # ---------------------------------------------------------------- fig 0: architecture
@@ -542,7 +544,7 @@ def fig0():
     body = r"""\begin{tikzpicture}[
   font=\scriptsize,
   box/.style={draw, rounded corners=2pt, line width=0.7pt, align=center,
-              inner sep=3pt, minimum height=11mm, text width=30mm},
+              inner sep=3pt, minimum height=11mm, text width=32mm},
   plain/.style={box, draw=rpInkC, fill=white},
   core/.style={box, draw=rpBlue, fill=rpBlueBg},
   outbox/.style={box, draw=rpOrange, fill=rpOrangeBg},
@@ -551,7 +553,7 @@ def fig0():
 
 \node[plain] (seq) at (0,0)
   {designed sequences\\$\times$ target structures\\9 design methods};
-\node[core] (resc) at (5.1,0)
+\node[core, text width=36mm] (resc) at (5.1,0)
   {\textbf{compensatory rescue}\\an intervention on one pair\\no predictor involved};
 \node[plain] (score) at (10.2,0)
   {the design score\\predictor panel enters\\only as a covariate};

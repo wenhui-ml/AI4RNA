@@ -6,10 +6,13 @@
     label style={font=\scriptsize, color=rpInkB},
     tick label style={font=\tiny, color=rpInkB},
     legend style={font=\tiny, draw=none, fill=none, text=rpInkB},
+    clip=false, scaled x ticks=false, scaled y ticks=false,
+    /pgf/number format/fixed, /pgf/number format/precision=3,
+    /pgf/number format/1000 sep={},
     title style={font=\scriptsize, color=rpInk, at={(0,1.03)}, anchor=south west},
     xlabel={$\Delta\Delta G_{\mathrm{loc}}$ between the types (kcal/mol)},
     ylabel={$\Delta$ rescue, matched}, xmin=-2.7, xmax=0.2,
-    legend pos=south east,
+    legend style={at={(0.5,-0.26)}, anchor=north}, legend columns=2,
     title={implied slopes spread $1.77\times$}]
 \addplot[color=rpInkC, line width=0.6pt, forget plot] coordinates {(-2.7,0) (0.2,0)};
 \addplot[color=rpInkC, dashed, line width=0.8pt]
