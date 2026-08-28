@@ -1,51 +1,52 @@
 {
-  "_why": [
-    "The preregistration appendix used to open with 'Every experiment in this paper was declared",
-    "in a frozen JSON file committed and pushed before the code that produced it existed.' That",
-    "sentence was false: seven of the seventeen artifacts the manuscript reads have no declaration.",
-    "It is the same defect caught earlier in R1 -- a claim about process that nobody checked.",
-    "This file is the classification the appendix now states, and audit_manuscript.py enforces it:",
-    "every artifact a generator reads must appear here exactly once, everything under",
-    "'preregistered' must really have a frozen declaration, and nothing in the other three classes",
-    "may quietly have one. A number in the manuscript can now be traced to how it was licensed."
-  ],
-  "preregistered": {
-    "_rule": "a declaration frozen, committed and pushed before the code that produced it existed",
-    "m25_estimator_benchmark.json": null,
-    "m26_model_scored.json": null,
-    "m26b_model_panel.json": null,
-    "m26c_neural_scored.json": null,
-    "m26c_leakage.json": "m26c_neural_scored_declaration.json",
-    "m26d_clean_subset.json": null,
-    "m28_second_corpus.json": null,
-    "m30_selection_audit.json": null,
-    "m31_which_flips_rescue.json": null,
-    "m32_third_model_class.json": null,
-    "m35_paired_predictor_differences.json": "m35_paired_predictor_differences_declaration.json",
-    "m36_readout_scale.json": "m36_readout_scale_declaration.json",
-    "m20_designer_confounding.json": "m20_designer_confounding_declaration.json"
-  },
-  "survey": {
-    "_rule": "establishes design-side facts BEFORE a declaration can be written, and estimates nothing",
-    "m27_corpus_survey_all.json": "counts what each RMDB deposit contains so the second-corpus experiment could be declared at all; no effect is computed and none may be",
-    "m33_cluster_census.json": "counts what the cluster bootstrap resamples -- puzzles, design cells and their balance -- so the intervals can be read; no effect is estimated",
-    "m34_admission_census.json": "the admission ledger from both implementations of the criterion, so the counts the manuscript prints are read rather than typed; estimates nothing"
-  },
-  "review": {
-    "_rule": "written after the run it checks, because the run needed checking; cannot be preregistered without preregistering its own conclusion",
-    "m26r3_realistic_calibration.json": "recalibrates retention at the separation this corpus actually has, after m26r2 was found to calibrate in a regime the data never visits",
-    "m26v_alpha_verify.json": "recomputes the headline with a second, independently written estimator",
-    "m26w_rescue_provenance.json": "reproduces the outcome column from raw reactivity, to show it contains no model",
-    "m28r_review.json": "reviews M28's two boundary results before either is written down",
-    "m31r_review.json": "reviews M31 before its verdict is read, and supplies the interval K2 was written without",
-    "m32r_review.json": "re-checks M32's dynamic range and its 1e-4 censoring floor, neither of which M32's own declaration contained",
-    "m26r4_calibration_symmetry.json": "re-reads M26r3's committed sweep after the manuscript audit found one arm's correlation reported and the other arm's omitted inside the same retraction; shows both correlations are produced by a single sweep point and supplies the span the retraction now rests on"
-  },
-  "support": {
-    "_rule": "a supporting or display quantity for a claim already made elsewhere; states no new claim",
-    "m31s_depth_share.json": "the within-cell rank agreement between each predictor and depth itself, which M31 and M31r both need and neither reports",
-    "m31t_recovery_curve.json": "the recovery-versus-budget curve behind Claim 3's figure, so the figure is drawn from a committed artifact",
-    "m37_channel_ledger.json": "the channel ledger of Section 5.8: it collects prices already published in the sections named beside them, cross-checks each against the macro this manuscript prints, closes the one identity among them and names the choosers it cannot price. It estimates nothing.",
-    "m36_readout_scale_declaration.json": "read so the preregistration table quotes the staked thresholds from the frozen declaration rather than having them retyped beside the measured values; not a result"
-  }
+ "_why": [
+  "The preregistration appendix used to open with 'Every experiment in this paper was declared",
+  "in a frozen JSON file committed and pushed before the code that produced it existed.' That",
+  "sentence was false: seven of the seventeen artifacts the manuscript reads have no declaration.",
+  "It is the same defect caught earlier in R1 -- a claim about process that nobody checked.",
+  "This file is the classification the appendix now states, and audit_manuscript.py enforces it:",
+  "every artifact a generator reads must appear here exactly once, everything under",
+  "'preregistered' must really have a frozen declaration, and nothing in the other three classes",
+  "may quietly have one. A number in the manuscript can now be traced to how it was licensed."
+ ],
+ "preregistered": {
+  "_rule": "a declaration frozen, committed and pushed before the code that produced it existed",
+  "m25_estimator_benchmark.json": null,
+  "m26_model_scored.json": null,
+  "m26b_model_panel.json": null,
+  "m26c_neural_scored.json": null,
+  "m26c_leakage.json": "m26c_neural_scored_declaration.json",
+  "m26d_clean_subset.json": null,
+  "m28_second_corpus.json": null,
+  "m30_selection_audit.json": null,
+  "m31_which_flips_rescue.json": null,
+  "m32_third_model_class.json": null,
+  "m35_paired_predictor_differences.json": "m35_paired_predictor_differences_declaration.json",
+  "m36_readout_scale.json": "m36_readout_scale_declaration.json",
+  "m20_designer_confounding.json": "m20_designer_confounding_declaration.json",
+  "m38_ribosnitch_baseline.json": null
+ },
+ "survey": {
+  "_rule": "establishes design-side facts BEFORE a declaration can be written, and estimates nothing",
+  "m27_corpus_survey_all.json": "counts what each RMDB deposit contains so the second-corpus experiment could be declared at all; no effect is computed and none may be",
+  "m33_cluster_census.json": "counts what the cluster bootstrap resamples -- puzzles, design cells and their balance -- so the intervals can be read; no effect is estimated",
+  "m34_admission_census.json": "the admission ledger from both implementations of the criterion, so the counts the manuscript prints are read rather than typed; estimates nothing"
+ },
+ "review": {
+  "_rule": "written after the run it checks, because the run needed checking; cannot be preregistered without preregistering its own conclusion",
+  "m26r3_realistic_calibration.json": "recalibrates retention at the separation this corpus actually has, after m26r2 was found to calibrate in a regime the data never visits",
+  "m26v_alpha_verify.json": "recomputes the headline with a second, independently written estimator",
+  "m26w_rescue_provenance.json": "reproduces the outcome column from raw reactivity, to show it contains no model",
+  "m28r_review.json": "reviews M28's two boundary results before either is written down",
+  "m31r_review.json": "reviews M31 before its verdict is read, and supplies the interval K2 was written without",
+  "m32r_review.json": "re-checks M32's dynamic range and its 1e-4 censoring floor, neither of which M32's own declaration contained",
+  "m26r4_calibration_symmetry.json": "re-reads M26r3's committed sweep after the manuscript audit found one arm's correlation reported and the other arm's omitted inside the same retraction; shows both correlations are produced by a single sweep point and supplies the span the retraction now rests on"
+ },
+ "support": {
+  "_rule": "a supporting or display quantity for a claim already made elsewhere; states no new claim",
+  "m31s_depth_share.json": "the within-cell rank agreement between each predictor and depth itself, which M31 and M31r both need and neither reports",
+  "m31t_recovery_curve.json": "the recovery-versus-budget curve behind Claim 3's figure, so the figure is drawn from a committed artifact",
+  "m37_channel_ledger.json": "the channel ledger of Section 5.8: it collects prices already published in the sections named beside them, cross-checks each against the macro this manuscript prints, closes the one identity among them and names the choosers it cannot price. It estimates nothing.",
+  "m36_readout_scale_declaration.json": "read so the preregistration table quotes the staked thresholds from the frozen declaration rather than having them retyped beside the measured values; not a result"
+ }
 }

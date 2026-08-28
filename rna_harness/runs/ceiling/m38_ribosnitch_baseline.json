@@ -1,0 +1,142 @@
+{
+ "declaration": "m38_ribosnitch_baseline_declaration.json",
+ "constants": {
+  "NMIN": 8,
+  "WINDOW": 15,
+  "NBOOT": 2000,
+  "NPERM": 2000,
+  "SEED": 20260828
+ },
+ "D_verification": {
+  "identity_max": 0.0,
+  "obweight_max": 1.0658141036401503e-14,
+  "symmetry_max": 0.0,
+  "n_identity": 158,
+  "n_obweight": 24,
+  "n_symmetry": 24,
+  "pass": true
+ },
+ "n_records": 4317,
+ "n_cells": 158,
+ "n_records_in_cells": 4317,
+ "A_within_design": {
+  "d_bppm": {
+   "rho": 0.1713,
+   "ci": [
+    0.11911,
+    0.22285
+   ],
+   "p_perm": 0.0004997501249375312,
+   "n_cells": 158,
+   "n_records": 4317,
+   "median_cell_rho": 0.15926,
+   "frac_cells_positive": 0.7342
+  },
+  "d_mfe": {
+   "rho": 0.14592,
+   "ci": [
+    0.10325,
+    0.19171
+   ],
+   "p_perm": 0.0004997501249375312,
+   "n_cells": 158,
+   "n_records": 4317,
+   "median_cell_rho": 0.138,
+   "frac_cells_positive": 0.7089
+  },
+  "d_ens": {
+   "rho": 0.09104,
+   "ci": [
+    0.0502,
+    0.12817
+   ],
+   "p_perm": 0.0004997501249375312,
+   "n_cells": 158,
+   "n_records": 4317,
+   "median_cell_rho": 0.06157,
+   "frac_cells_positive": 0.6456
+  },
+  "d_bppm_local": {
+   "rho": 0.16739,
+   "ci": [
+    0.11783,
+    0.21953
+   ],
+   "p_perm": 0.0004997501249375312,
+   "n_cells": 158,
+   "n_records": 4317,
+   "median_cell_rho": 0.17382,
+   "frac_cells_positive": 0.6899
+  },
+  "depth_baseline": {
+   "rho": 0.32252,
+   "ci": [
+    0.26645,
+    0.37579
+   ],
+   "p_perm": 0.0004997501249375312,
+   "n_cells": 158,
+   "n_records": 4317,
+   "median_cell_rho": 0.35336,
+   "frac_cells_positive": 0.8671
+  }
+ },
+ "B_vs_free_depth": {
+  "d_bppm": {
+   "diff": -0.15122,
+   "ci": [
+    -0.22798,
+    -0.05443
+   ],
+   "beats_depth": false
+  },
+  "d_mfe": {
+   "diff": -0.1766,
+   "ci": [
+    -0.25208,
+    -0.08244
+   ],
+   "beats_depth": false
+  },
+  "d_ens": {
+   "diff": -0.23148,
+   "ci": [
+    -0.30109,
+    -0.15228
+   ],
+   "beats_depth": false
+  },
+  "d_bppm_local": {
+   "diff": -0.15513,
+   "ci": [
+    -0.22799,
+    -0.06818
+   ],
+   "beats_depth": false
+  }
+ },
+ "staked": {
+  "1": {
+   "text": "at least one of d_bppm, d_mfe, d_ens has a within-design Spearman whose puzzle-clustered CI excludes zero IN THE DECLARED NEGATIVE DIRECTION (positive after negation)",
+   "pass": true,
+   "detail": "在声明方向上离零的:['d_bppm', 'd_ens', 'd_mfe']"
+  },
+  "2": {
+   "text": "NONE of the three beats the free depth baseline: every paired difference CI in arm B covers zero or lies below it",
+   "pass": true,
+   "detail": "打赢深度的:无"
+  },
+  "3": {
+   "text": "the local variant ranks at least as well as the global one, point estimate for point estimate",
+   "pass": false,
+   "detail": "局部 +0.16739 vs 全局 +0.17130"
+  },
+  "4": {
+   "text": "d_bppm and d_mfe agree in sign",
+   "pass": true,
+   "detail": "d_bppm +0.17130, d_mfe +0.14592"
+  }
+ },
+ "K2_wrong_side": [],
+ "verdict": "purpose_built_score_reads_the_intervention_but_does_not_beat_the_free_integer"
+}

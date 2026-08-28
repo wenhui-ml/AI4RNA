@@ -34,7 +34,8 @@ def f(x, d=3):
 
 
 def ci(v, d=4):
-    return f"[{sig(v[0], d)},\\,{sig(v[1], d)}]"
+    # \allowbreak after the thin space: an interval is otherwise one unbreakable atom.
+    return f"[{sig(v[0], d)},\\,\\allowbreak {sig(v[1], d)}]"
 
 
 def pv(x):

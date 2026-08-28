@@ -238,7 +238,8 @@ could plausibly have memorised these molecules.
 \item The result the ledger's C5 row carries: on the identity axis the three predictors differ
 pairwise, and the separation splits into a decomposition axis worth \jdg{axArch} (\jdg{axArchCi})
 and a training-data axis worth \jdg{axData} (\jdg{axDataCi}), differing by \jdg{axGap}
-(\jdg{axGapCi}) --- a separation the conventional readout cannot express, recomputed by two
+(\jdg{axGapCi}). That is a separation the conventional readout cannot express, and it is
+recomputed by two
 independently written estimators agreeing to \jdg{resAgree}.
 \item \texttt{designaudit}, which performs all of the above on a corpus file and whose selftest
 reproduces this paper's headline numbers from the public data.
@@ -358,7 +359,9 @@ two probing profiles, which is exactly the one-to-many map of \S\ref{sec:probing
 outcome used here is arithmetic on reactivities (\S\ref{sec:outcome}). What that line and this one
 share is the premise --- that a prediction about a \emph{change} tests a folding model more
 sharply than a prediction about a state --- and we read the existence of that literature as
-corroboration of the premise, not as evidence for any number below.
+corroboration of the premise, not as evidence for any number below. The separation is also
+measured rather than only asserted: \S\ref{sec:ranking} scores the standard riboSNitch quantities
+on these interventions, beside the predictors and beside the free baseline.
 
 \paragraph{The closest prior analysis of this outcome.} The rescue factor has been related to a
 folding calculation once before, and the difference matters enough to state precisely.
@@ -1184,6 +1187,11 @@ RibonanzaNet                       & \jdg{rkRhoN} & \jdg{rkRhoNCi} & \jdg{rkPosN
 EternaFold                         & \jdg{efRho}  & \jdg{efRhoCi}  & \jdg{efPos}  \\
 \multicolumn{4}{l}{\footnotesize EternaFold's rank agreement resolves from zero at $p=\jdg{efRhoP}$.} \\
 ViennaRNA                          & \jdg{rkRhoV} & \jdg{rkRhoVCi} & \jdg{rkPosV} \\
+\midrule
+\multicolumn{4}{l}{\footnotesize\emph{purpose-built for a mutation: riboSNitch-style change scores}}\\
+pairing-matrix distance            & \jdg{rsBppm}  & \jdg{rsBppmCi}  & \jdg{rsBppmPos}  \\
+MFE base-pair distance             & \jdg{rsMfe}   & \jdg{rsMfeCi}   & \jdg{rsMfePos}   \\
+ensemble free-energy change        & \jdg{rsEns}   & \jdg{rsEnsCi}   & \jdg{rsEnsPos}   \\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -1203,6 +1211,35 @@ all three intervals contain zero. At a rescue threshold of
 \textbf{We therefore do not claim that any of the three predictors beats a depth baseline at this
 task.} The free integer is not beaten by a hand-fitted thermodynamic model, by a model of the same
 form fitted to probing data, or by a transformer trained on two million profiles.
+
+
+\paragraph{A score that \emph{was} built for a mutation loses to the integer by more than the
+predictors do.} The obvious reply to the paragraph above is that none of the three predictors was
+built to answer a question about a mutation. One family was. riboSNitch prediction scores a
+folding calculation by how much a variant reorganises the structure
+\citep{corley2015ribosnitch,kirven2025variantfold}, and its standard quantities are computable
+from the same thermodynamic model already in the table: the Euclidean distance between the
+wild-type and mutant base-pair probability matrices, the base-pair distance between the two MFE
+structures, and the change in ensemble free energy. What is scored here is those quantities, not
+remuRNA, RNAsnp or SNPfold; no claim is made about those implementations. The direction was
+declared before the code existed --- a compensatory flip that rescues \emph{preserves} the
+structure, so a change score should be small where rescue is large --- and all three resolve from
+zero on the declared side, on the same \jdg{rsN} interventions in the same \jdg{rsCells} cells by
+the same statistic. The instrument reads them. \textbf{None of the \jdg{rsNarms} beats the free
+integer, and unlike the three predictors above, none of them ties it either}: every paired
+difference excludes zero on the losing side (\jdg{rsBppmVs}, \jdg{rsBppmVsCi};
+\jdg{rsMfeVs}, \jdg{rsMfeVsCi}; \jdg{rsEnsVs}, \jdg{rsEnsVsCi}). A score designed for exactly this
+question is further behind a declared target's helix depth than the general-purpose predictors are.
+
+\emph{Two things this arm was set up to be unable to explain away.} A global change score could
+lose because the rest of the molecule dilutes it, so the same distance was recomputed inside a
+window around the mutated pair. The declaration staked that the local variant would rank at least
+as well as the global one; it does not (\jdg{rsLocal} against \jdg{rsBppm}), and the paired
+difference against depth barely moves (\jdg{rsLocalVs}, \jdg{rsLocalVsCi}). \textbf{That staked
+prediction failed}, and the failure closes the escape route rather than opening one: localisation
+is not what is missing. And the arm was verified before it was read --- every score is exactly
+\jdg{rsIdent} against the sequence itself, the matrix distance recomputed by an independently
+written accumulation agrees to \jdg{rsObw}, and the distance is symmetric to machine precision.
 
 \paragraph{The predicted change, not only the predicted level.} A mutation experiment suggests a
 different quantity from the one in the table: not the predicted reactivity of the mutant but the
@@ -1683,6 +1720,15 @@ Both readouts reproduce their published contrasts on identical weights and strat
 The rescue column's within-stratum SD lies in $[\jdg{cvSdRescueLo},\jdg{cvSdRescueHi}]$ \quad(\jdg{cvSdRescue}) & correct \\
 The agreement column's within-stratum SD lies in $[\jdg{cvSdRnetLo},\jdg{cvSdRnetHi}]$ \quad(\jdg{cvSdRnet}) & correct \\
 The standardised paired difference excludes zero \quad(\jdg{cvPairedSdCi}) & correct \\
+\midrule
+\multicolumn{2}{@{}l@{}}{\emph{frozen before the purpose-built comparator existed (\S\ref{sec:ranking})}}\\
+At least one riboSNitch-style score resolves from zero \emph{in the declared negative direction}
+  \quad(\jdg{rsBppmCi}, \jdg{rsMfeCi}, \jdg{rsEnsCi}) & correct \\
+None of the three beats the free depth baseline \quad(\jdg{rsNbeat} of \jdg{rsNarms}) & correct \\
+\textbf{The local variant ranks at least as well as the global one} --- \emph{it does not:
+  \jdg{rsLocal} against \jdg{rsBppm}. The failure removes the explanation it was staked to test,
+  so localisation is reported as not being what is missing} & \textbf{failed} \\
+The matrix distance and the MFE distance agree in sign \quad(\jdg{rsBppm}, \jdg{rsMfe}) & correct \\
 \end{longtable}}
 
 \noindent The fifth row of the last block is the one worth reading. Its run returned every staked

@@ -1,0 +1,50 @@
+=== M38:文献里早就有的对照 —— riboSNitch 式突变效应分数 vs 免费的深度整数 ===
+  声明已冻结并推送于本文件存在之前。离线 $0,不用新数据,不联网。
+  声明的方向是**负**:补偿翻转若 rescue 则保住结构 ⇒ 结构变化分数应当小。
+  所有分数取负后再排名,所以下面的 rho 为正 = 声明的方向对了。
+
+  M26 纳入 4317 次干预,158 个设计格
+  野生型 158 条,长度 177-177 nt;要折叠 4475 次
+    ...500/4317  (36s)
+    ...1000/4317  (74s)
+    ...1500/4317  (111s)
+    ...2000/4317  (149s)
+    ...2500/4317  (187s)
+    ...3000/4317  (224s)
+    ...3500/4317  (260s)
+    ...4000/4317  (297s)
+  折叠与打分完成 529s
+
+=== D 验证(在读任何数之前判)===
+  检查1 零点恒等式 d(wt,wt)==0,158 个野生型:最大 0.000e+00  通过
+  检查2 对拍(稠密数组 vs 逐对字典),24 对:最大偏差 1.066e-14  通过
+  检查3 对称性 d(a,b)==d(b,a),24 对:最大偏差 0.000e+00  通过
+  → 验证通过,可以读数
+
+  至少 8 个翻转的格 158,覆盖 4317 次干预 (100.0%)
+
+=== A 格内排名(与 M31 同一个统计量、同一批格、同一个自助与置换)===
+  [格内] d_bppm           rho +0.17130  CI [0.11911, 0.22285]  置换 p 0.00050  格 158  格内为正 0.73
+  [格内] d_mfe            rho +0.14592  CI [0.10325, 0.19171]  置换 p 0.00050  格 158  格内为正 0.71
+  [格内] d_ens            rho +0.09104  CI [0.0502, 0.12817]  置换 p 0.00050  格 158  格内为正 0.65
+  [格内] d_bppm_local     rho +0.16739  CI [0.11783, 0.21953]  置换 p 0.00050  格 158  格内为正 0.69
+  [格内] depth_baseline   rho +0.32252  CI [0.26645, 0.37579]  置换 p 0.00050  格 158  格内为正 0.87
+
+=== B 与免费深度基线按格配对相减(claim 依赖的就是这一臂)===
+  d_bppm           - 深度 = -0.15122   CI [-0.22798, -0.05443]   没有打赢
+  d_mfe            - 深度 = -0.17660   CI [-0.25208, -0.08244]   没有打赢
+  d_ens            - 深度 = -0.23148   CI [-0.30109, -0.15228]   没有打赢
+  d_bppm_local     - 深度 = -0.15513   CI [-0.22799, -0.06818]   没有打赢
+
+=== 声明里下的注,按声明自己的措辞判 ===
+  下注1 成立 —— 在声明方向上离零的:['d_bppm', 'd_ens', 'd_mfe']
+        『at least one of d_bppm, d_mfe, d_ens has a within-design Spearman whose puzzle-clustered CI excludes zero IN THE DECLARED NEGATIVE DIRECTION (positive after negation)』
+  下注2 成立 —— 打赢深度的:无
+        『NONE of the three beats the free depth baseline: every paired difference CI in arm B covers zero or lies below it』
+  下注3 **未成立** —— 局部 +0.16739 vs 全局 +0.17130
+        『the local variant ranks at least as well as the global one, point estimate for point estimate』
+  下注4 成立 —— d_bppm +0.17130, d_mfe +0.14592
+        『d_bppm and d_mfe agree in sign』
+
+判决:purpose_built_score_reads_the_intervention_but_does_not_beat_the_free_integer
+用时 879s
