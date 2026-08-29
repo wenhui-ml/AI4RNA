@@ -115,9 +115,12 @@
 % ------------------------------------------------ generated numbers (the only include)
 \input{figs/rna_numbers}
 
-\title{\bf Pre-Registration Does Not Confer Readability\\[4pt]
-\large Two estimators, declared in advance and both unreadable, on a corpus\\
-a design algorithm produced --- and the calibration that catches them}
+% "Pre-Registration Does Not Confer Readability" was a slogan, and "readable" is a sense of
+% the word this paper coined: a reader meets it in the title before the definition. The title
+% now names the question, and the subtitle names the three things the paper puts under it.
+\title{\bf When a Share of a Benchmark Number Is Not Estimable\\[4pt]
+\large Two estimators of a mediated fraction, the condition under which they agree,\\
+and a calibration in which neither recovers a known truth}
 
 \author{Wenhui Chen\thanks{\texttt{wenhui.chen@titanresearchlabs.ai}}}
 \date{}
@@ -1723,6 +1726,28 @@ A--U & U$\to$A & $\jdg{d3Y3}$ $\jdg{d3Y3Ci}$ & $\jdg{d3E3}$ $\jdg{d3E3Ci}$ \\
 \section{The gradient, method by method}
 \label{app:gradient}
 
+Section~\ref{sec:mediation} reports the decomposition pooled over designs, and
+Fig.~\ref{fig:mediation} plots it method by method. Table~\ref{tab:permethod} is the arithmetic
+behind that figure, given per method so that the pooled number can be checked against the parts it
+came from rather than taken on trust.
+
+Two properties of the table are worth stating because the pooled row cannot show them. First, the
+depth gap $g_m$ is negative for all \jdg{gNMethods} methods: every program in this corpus,
+human and algorithmic alike, placed its G--C pairs shallower in the helix than its A--U pairs.
+That is what makes placement a channel rather than a quirk of one method. Second, the last two
+columns are computed without each other --- the predicted column is the method's own design-side
+gap times the pooled $\beta_{\mathrm{depth}}$, and the observed column is that method's own
+marginal-minus-matched difference --- so the agreement between them is a claim being tested and
+not a fit. The observed attenuation is the larger of the two in magnitude for every method except
+\texttt{Eterna}. That is the residual $\varepsilon$ of \eqref{eq:med} taking one sign across the
+corpus rather than scattering, which \S\ref{sec:quant} reports and does not adjudicate.
+
+The ordering in the table is not an ordering by capability: the gap's size does not track the
+method's own placement strength (Spearman $\jdg{sSpear}$ across \jdg{gNMethods}, \S\ref{sec:gradient}).
+A reader who wants to argue that the effect is manufactured by weak design programs has to argue
+it on that axis, and the table is here so that the argument can be made against the numbers.
+
+\FloatBarrier
 \begin{table}[!htbp]
 \centering\small
 \caption{\textbf{Every method's placement gap and its predicted and observed attenuation.} The gap
@@ -1733,6 +1758,7 @@ Fig.~\ref{fig:mediation} plots.}
 \label{tab:permethod}
 \input{figs/permethod.tex}
 \end{table}
+\FloatBarrier
 
 \section{Preregistration record}
 \label{app:prereg}

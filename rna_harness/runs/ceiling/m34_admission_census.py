@@ -36,15 +36,29 @@ def main() -> int:
     out = {}
 
     # ---- ledger A: the packaged criterion
-    cs = corpora.openknot_m2r(M26.SRC)
+    #
+    # The first version of this census reported the residual as "unaccounted": 160 constructs
+    # that were neither admitted nor refused under a named reason. That looked like a hole in
+    # the criterion and was printed nowhere, so nobody had to explain it. It is not a hole.
+    # mining.mine() skips wild types before any exclusion counter -- a wild type is the control
+    # of a comparison, not a candidate for admission -- while n_input counts every construct in
+    # the corpus. The residual is therefore exactly the number of wild types, and the census now
+    # counts them so that the ledger closes on the page instead of being one subtraction short.
+    cs = list(corpora.openknot_m2r(M26.SRC))
+    n_wt = sum(1 for c in cs if c.get("is_wild_type"))
     admitted, rep = mining.mine(cs)
+    residual = int(rep.n_input - rep.n_admitted - sum(rep.excluded.values()))
     out["designaudit"] = {
         "n_constructs": int(rep.n_input),
+        "n_wild_type": int(n_wt),
+        "n_mutants": int(rep.n_input - n_wt),
         "n_admitted": int(rep.n_admitted),
         "excluded": {k: int(v) for k, v in rep.excluded.items() if v},
         "excluded_total": int(sum(rep.excluded.values())),
         "by_pair_type": {k: int(v) for k, v in rep.by_pair_type.items()},
-        "unaccounted": int(rep.n_input - rep.n_admitted - sum(rep.excluded.values())),
+        "unaccounted": residual,
+        "unaccounted_are_wild_types": bool(residual == n_wt),
+        "ledger_closes": bool(rep.n_input == n_wt + rep.n_admitted + sum(rep.excluded.values())),
     }
 
     # ---- ledger B: the script that produced the paper's numbers

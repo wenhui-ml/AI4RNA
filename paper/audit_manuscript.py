@@ -94,6 +94,12 @@ def main(pdir: str) -> int:
         if f.endswith(".tex") and not f.endswith("_numbers.tex"):
             figtext += open(os.path.join(pdir, "figs", f)).read()
 
+    # A generated TABLE consumes a macro by NAME, not by value: figs/tab_*.tex carries
+    # "\\jdg{rsWindow}", never "15". Matching on the value alone reported such macros as
+    # computed and never shown, which is the opposite of true -- and would equally have hidden
+    # a macro that really had gone dead inside a table.
+    fig_macros = set(re.findall(r"\\jdg\{(\w+)\}", figtext))
+
     def in_a_figure(v: str) -> bool:
         """the value is drawn or annotated in a generated figure"""
         s = re.sub(r"[{}\\,]|ensuremath|texttt|%", "", v).strip()
@@ -104,7 +110,7 @@ def main(pdir: str) -> int:
         return core in figtext or (core.rstrip("0").rstrip(".") or core) in figtext
 
     dead_all = sorted(set(defs) - used)
-    shown = [d for d in dead_all if in_a_figure(defs[d])]
+    shown = [d for d in dead_all if d in fig_macros or in_a_figure(defs[d])]
     dead = [d for d in dead_all if d not in shown]
     if shown:
         print(f"\n[B] {len(shown)} macros unused in text but printed in a figure (fine): "

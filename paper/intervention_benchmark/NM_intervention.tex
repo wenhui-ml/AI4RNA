@@ -121,10 +121,12 @@
 
 \input{figs/nm_numbers}
 
+% A subtitle names the object of study. It is not a place to coordinate three findings:
+% the version this replaces ran to three lines and asserted the corpus, the instrument and
+% the ledger result at once, which is the abstract's job.
 \title{\bf Scoring RNA Structure Prediction on Interventions\\That Have Already Been Performed\\[4pt]
-\large Compensatory mutagenesis in a chemical-probing corpus yields \jdg{nAdmitted} controlled\\
-two-nucleotide experiments, and pricing them channel by channel says which of a\\
-benchmark's numbers is carried by a covariate somebody chose}
+\large \jdg{nAdmitted} controlled two-nucleotide experiments,
+recovered from a public chemical-probing corpus}
 
 \author{Wenhui Chen\thanks{\texttt{wenhui.chen@titanresearchlabs.ai}}}
 \date{}
@@ -616,6 +618,10 @@ agree to \jdg{biasCrosscheck}.
 Two devices carry every interval and every $p$-value below, and they are deliberately different
 from one another.
 
+How much of the corpus each cluster and each stratum holds is counted in
+Appendix~\ref{app:strata}, because an interval over \jdg{ccPuzzles} clusters is only as
+honest as the balance of what it resamples.
+
 \paragraph{Permutation, inside the stratification.}
 The null is that the pair type carries no information about the outcome once placement is held.
 It is tested by permuting the \emph{treatment labels within each stratum} and recomputing
@@ -680,7 +686,8 @@ refused plus the \jdg{nWildTypes} wild types each intervention is defined agains
 construct; the script that produced this paper's estimates walks the released table's
 \jdg{nRowsRaw} rows and applies the same clauses in a different order, so its intermediate tallies
 differ and its admitted set does not --- the two agree on \jdg{nAdmitted} exactly, and that
-agreement is asserted before either ledger is reported. Every exclusion is counted under a named reason and none is a
+agreement is asserted before either ledger is reported; both ledgers are printed in full in
+Appendix~\ref{app:ledger}. Every exclusion is counted under a named reason and none is a
 threshold that could be moved to raise the yield. Helix depth is concentrated at the ends of
 helices (Fig.~\ref{fig:corpus}a), which is what makes depth a usable covariate and, later, an
 uncomfortable baseline.
@@ -920,7 +927,8 @@ headline numbers from the public corpus file, independently of the scripts that 
 and prints every check whether it passes or fails; a declared check that cannot run is reported as
 a failure rather than skipped. Four rules are enforced as code rather than documented: outcome
 permutation under a fixed design, same-population denominators, a placebo mediator that always
-runs, and a linearity test before any product-of-coefficients quantity is reported.
+runs, and a linearity test before any product-of-coefficients quantity is reported. The
+commands and what each returns are in Appendix~\ref{app:code}.
 
 % =====================================================================
 \subsection{Scoring predictors}
@@ -1019,7 +1027,9 @@ so every count here is a lower bound}: the licensed statement remains \emph{not 
 portion of the training corpus we could obtain}, never \emph{no leakage}, and one tier stays
 outside it --- this model's final pre-training stage consumed pseudo-labels covering its own test
 sequences, so a sequence can have been seen without its label having been seen. Grading against
-the full corpus is future work (\S\ref{sec:limitations}).
+the full corpus is future work (\S\ref{sec:limitations}). The tiers, the libraries the exposed
+cells trace to, the dinucleotide-shuffle control and the declaration's own erratum are in
+Appendix~\ref{app:exposure}.
 \end{scopebox}
 
 % =====================================================================
@@ -1244,7 +1254,10 @@ predictors above, none ties it}: every paired difference excludes zero on the lo
 \jdg{rsEnsVsCi}). A localised variant, staked in advance to rule out dilution by the rest of the
 molecule, does not rank better (\jdg{rsLocal}, \jdg{rsLocalCi}, against \jdg{rsBppm},
 \jdg{rsBppmCi}) --- a failed stake whose failure removes the explanation rather than supplying one.
-The arm was verified before it was read, and the record is in Appendix~\ref{app:prereg}.
+The arm was verified before it was read, and the record is in Appendix~\ref{app:prereg};
+all four scores, their cell-level agreement and the paired differences are in
+Appendix~\ref{app:ribosnitch}, and the checks that were run before any of it was read are in
+Appendix~\ref{app:verify}.
 
 \paragraph{The predicted change, not only the predicted level.} A mutation experiment suggests a
 different quantity from the one in the table: not the predicted reactivity of the mutant but the
@@ -1640,6 +1653,187 @@ for knowing where a pair sits in its helix. We report ours, and it is not beaten
 \appendix
 \renewcommand{\thesection}{S\arabic{section}}
 \setcounter{section}{0}
+% =====================================================================
+\section{The admission ledger, from both implementations}
+\label{app:ledger}
+
+Section~\ref{sec:corpus} states the counts; this is the ledger they come from. Two independent
+implementations of Definition~\ref{def:flip} are run on the same release and both are printed,
+because they do not count the same objects and a single column would hide that.
+\texttt{designaudit.mine} is the packaged criterion a reader can install and run, and its unit is
+the construct. \texttt{m26.build} is the script that produced this paper's estimates; it walks the
+released table's rows and applies the same clauses in a different order, so a row that fails two
+clauses is charged to whichever comes first. Their intermediate tallies therefore differ and
+cannot be reconciled term by term. They admit the same \jdg{nAdmitted} interventions, and
+\texttt{m34} asserts that equality before either ledger is written out.
+
+\begin{table}[!htbp]
+\centering\small
+\caption{\textbf{Every construct, and what became of it.} Both implementations of the eligibility
+criterion, on the same release.}
+\label{tab:admission}
+\input{figs/tab_admission.tex}
+\end{table}
+
+The wild-type row is worth a sentence, because a reader checking the arithmetic will otherwise
+find it short. The mining loop skips wild types before any exclusion counter runs --- a wild type
+is the control a comparison is defined against, not a candidate for admission --- while the input
+count is every construct in the release. The difference between the two is therefore exactly the
+\jdg{nWildTypes} wild types, and it is counted rather than left as a residual: the identity in the
+table's footnote is asserted in \texttt{m34} before the table is written, so a release on which it
+stopped holding would fail the build instead of printing an unexplained remainder.
+
+\FloatBarrier
+% =====================================================================
+\section{What the intervals resample}
+\label{app:strata}
+
+Every interval in this paper is a cluster bootstrap over targets, and every estimate is matched
+within a design cell. Those two units do the work, so the reader should be able to see how much
+of the corpus each one holds without re-running anything.
+
+\begin{table}[!htbp]
+\centering\small
+\caption{\textbf{The clustering, counted.} A census of what the estimator matches within and what
+the bootstrap resamples. No effect is estimated here.}
+\label{tab:strata}
+\input{figs/tab_strata.tex}
+\end{table}
+
+The number that matters for the intervals is the last one in the first block and the share beneath
+it. With \jdg{ccPuzzles} clusters, a bootstrap interval is honest only if no single cluster
+dominates the resample; the largest target carries \jdg{stShare} of the corpus and the smallest
+\jdg{stPuzMin} interventions against a median of \jdg{stPuzMed}, so no target can move an interval
+on its own and none is so small that dropping it changes the matched set. Design cells are smaller
+--- \jdg{stCellMin} to \jdg{stCellMax}, median \jdg{stCellMed} --- which is the reason the
+estimator matches within them and weights by $\min(n_A, n_B)$ rather than by cell size: a cell
+that supplies one arm and not the other contributes nothing and is dropped, and the weight makes
+that explicit instead of letting an unbalanced cell contribute a difference it cannot support.
+
+\FloatBarrier
+% =====================================================================
+\section{The purpose-built comparator, in full}
+\label{app:ribosnitch}
+
+Section~\ref{sec:ranking} reports this arm in one paragraph, which is the right length for the
+main text: the arm is a comparison, not a finding, and the finding it bears on is stated there.
+The full readout is here because a reader who wants to argue that the comparator was handicapped
+should be able to see every arm rather than the three that fitted in a table.
+
+The family is riboSNitch prediction, which scores a folding calculation by how much a variant
+reorganises the predicted ensemble. Four such scores are computed on the same
+\jdg{nAdmitted} interventions: the Euclidean distance between wild-type and mutant pairing
+matrices, that same distance restricted to a window around the flipped pair, the base-pair
+distance between the two MFE structures, and the change in ensemble free energy. Each is built for
+exactly this question --- a mutation, and how much the model thinks it does --- which is what
+makes the arm worth running at all.
+
+\begin{table}[!htbp]
+\centering\small
+\caption{\textbf{Four scores built for a mutation, and one integer that is not.} Within-design
+rank agreement with measured rescue, and the paired difference against the free depth baseline.}
+\label{tab:ribosnitch}
+\input{figs/tab_ribosnitch.tex}
+\end{table}
+
+Read the first two columns and every score works: all four resolve from zero, on a corpus where
+the outcome contains no folding model, so a purpose-built change score does read the intervention.
+Read the last column and none of them beats an integer that is free. The local variant was staked
+in advance to rank at least as well as the global one, on the argument that a flip is a local
+event; it does not (\jdg{rsLocal} against \jdg{rsBppm}, and the difference in the table's last
+column), and that stake is recorded as failed in Appendix~\ref{app:prereg}. A failed stake here
+removes an explanation rather than supplying one: the reason the family loses to depth is not that
+its scores were computed over too much of the molecule.
+
+Before any of it was read, three identities were checked on the arm's own machinery: a score of a
+sequence against itself, which must be zero and whose largest observed value across
+\jdg{rsNIdent} cases was \jdg{rsIdentMax}; the symmetry of each distance in its two arguments; and the weights of the within-design
+statistic, which must sum to one. The arm was verified before it was read, not after it
+disappointed.
+
+\FloatBarrier
+% =====================================================================
+\section{The exposure audit, in full}
+\label{app:exposure}
+
+Channel C7 of Table~\ref{tab:channels} asks whether the neural predictor has seen these molecules
+before. Section~\ref{sec:leakage} answers it in a paragraph and states the answer as a bound; this
+is the grading behind it.
+
+Every design window in the corpus is compared against the model's own released training file ---
+\jdg{exTrainN} unique sequences across \jdg{exLibs} libraries --- and graded by the identity of its
+best match. The comparison is exhaustive rather than indexed: no $k$-mer filter is used, so a match
+cannot be missed for being short. The tiers are fixed by the frozen declaration and are reported
+verbatim, including the one that turned out to be empty of interest.
+
+\begin{table}[!htbp]
+\centering\small
+\caption{\textbf{How much of this corpus the model had already read.} Exposure tier of each design
+cell against the released training file, and the libraries the exposed cells trace to.}
+\label{tab:exposure}
+\input{figs/tab_exposure.tex}
+\end{table}
+
+\begin{table}[!htbp]
+\centering\small
+\caption{\textbf{Skill on each arm of the split.} Within-stratum skill slope on the whole corpus
+and on the two halves of the exposure split.}
+\label{tab:exposurearms}
+\input{figs/tab_exposure_arms.tex}
+\end{table}
+
+Three things about this table are load-bearing and none of them is the headline number. First, the
+direction of the error: every count is a \emph{lower} bound, because the released file is a subset
+of the corpus the model was trained on, so a design graded unexposed may still have been seen. The
+audit can therefore only understate exposure, which is the direction that makes the conclusion
+safe rather than the direction that flatters it. Second, the control: the thermodynamic model was
+trained on nothing and falls on the exposed arm exactly as the neural model does
+(\jdg{lkViennaClean} to \jdg{lkViennaExp}), so whatever the exposed cells have in common, being in
+a training file is not the only candidate. Third, what the split does not show: skill does not rise
+monotonically across the tiers for either predictor, which was staked in advance and held.
+
+The negative control is a dinucleotide shuffle, which destroys sequence identity while preserving
+mononucleotide and dinucleotide composition. Shuffled queries reach a median identity of
+\jdg{exShufMed} and a maximum of \jdg{exShufMax} against the same file --- comfortably below the
+\jdg{clThr} threshold, and the reason a design that clears it is not clearing it on composition
+alone.
+
+One erratum belongs here rather than in a footnote. The frozen declaration recorded a length note
+that assumed a \jdg{exDeclLen}\,nt design window; the windows in this release run
+\jdg{exLenRange}\,nt. The declaration was not edited --- a frozen declaration never is --- so the error is recorded
+in the artifact as \texttt{declaration\_erratum} and the eligible comparison set was recomputed per
+query length. The mistake runs in our favour: the shorter the query, the more of the training file
+is eligible to match it, so correcting it can only raise the exposure count, and the count is
+already reported as a bound.
+
+\FloatBarrier
+% =====================================================================
+\section{What was cross-checked before either verdict}
+\label{app:verify}
+
+The two arms above are the ones whose results were least welcome, which is why both were put
+through the same three checks before their conclusions were written down. The checks are recorded
+because a reader has no way to tell, from a number alone, whether it was verified before or after
+it disappointed.
+
+\emph{Reverse control.} The comparator's machinery was used to recompute the three rank
+agreements that Section~\ref{sec:ranking} already reports from an earlier run. If the new arm had
+changed anything about how a rank agreement is computed, they would move. They do not: the largest
+absolute drift across the three is \jdg{vrDriftMax}, so the difference between the arms is the
+score being compared and nothing else.
+
+\emph{Equivalent form.} Each rank agreement was recomputed by a second route --- the covariance
+form of Spearman's $\rho$ rather than the ranked dot product --- in code that does not call the
+first implementation. The largest absolute disagreement is \jdg{vrSpearMax}.
+
+\emph{Independent implementation.} The exposure scan is exhaustive and therefore slow, so a
+$k$-mer-indexed implementation was written against a \jdg{vrKmerN}-sequence subset and the two were
+compared. They return the same exposed set (\jdg{vrKmerExp} designs by each), and the two identity
+scores agree to \jdg{vrEquivMax} on the queries where both are exact. The index was then not used
+for the reported grading, because agreeing on a subset is not the same as being correct on all of
+it.
+
+\FloatBarrier
 % =====================================================================
 \section{Preregistration record}
 \label{app:prereg}
