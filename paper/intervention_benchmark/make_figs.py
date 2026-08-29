@@ -411,9 +411,13 @@ def fig_estimator():
     xs2 = list(range(1, len(QT) + 1))
     # one legend for the figure: panel a's sits directly to the left of panel b's and the two
     # series are the same in both
+    # "forget plot" opts a series out of the plot cycle, and the automatic bar shift comes WITH
+    # that cycle -- both series were drawn at the same offset and the grey one painted over the
+    # green, so the panel showed one bar per group and put the hidden series' labels inside it.
+    # The same defect, from the same edit, is in R1's Fig. 17b.
     rb = "\n".join(
-        rf"""\addplot[fill={c}, draw=none, forget plot] coordinates {{{co(xs2, [d[k] for _l, k in QT])}}};"""
-        for d, c in ((b, FREE), (alt, GREY)))
+        rf"""\addplot[fill={c}, draw=none, forget plot, bar shift={sh}] coordinates {{{co(xs2, [d[k] for _l, k in QT])}}};"""
+        for d, c, sh in ((b, FREE, "-7pt"), (alt, GREY, "+7pt")))
 
     body = rf"""\nextgroupplot[width=8.0cm, height=5.0cm, ybar, bar width=13pt,
     xtick={{{",".join(map(str, xs))}}},
