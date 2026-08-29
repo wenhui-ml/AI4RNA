@@ -1,0 +1,65 @@
+{
+ "id": "M39",
+ "title": "Exposure-graded leakage: the same audit against the model's ACTUAL training sequences instead of a proxy, and bounded because the file is a subset",
+ "frozen_before_code": true,
+ "cost": "offline after one 526 MB public download, $0. No API, no GPU. P_neural comes from M26c's cache; the interventions come from M26.",
+
+ "why": [
+  "C7 is the ledger's leakage channel and the one a reader demands first. It is priced empty. Its",
+  "weakness is not the statistic, it is the comparison set: M26d streamed training sequences from",
+  "RMDB, which is a PROXY for what RibonanzaNet actually saw. A referee gets to say the audit",
+  "checked the wrong corpus.",
+  "",
+  "The Kaggle competition's own train_data_QUICK_START.csv is obtainable from a public mirror",
+  "(HuggingFace TerminatorJ/RNA_chemical_ribonanza). It carries 335,616 rows, 167,808 unique",
+  "sequences, 34 named source libraries and lengths 115-206, and 147,394 of the unique sequences",
+  "are exactly 177 nt -- the length of our design windows. It is the actual training corpus, not a",
+  "stand-in for it.",
+  "",
+  "IT IS ALSO A SUBSET. The full training set is roughly two million sequences; this is the",
+  "high-quality slice. Therefore every count this run produces is a LOWER BOUND on exposure: a",
+  "design found here IS exposed, and a design not found here may still be in the part we do not",
+  "have. That asymmetry is the single most important thing the manuscript must carry out of this",
+  "run, and K3 below makes it a wording rule rather than a hope."
+ ],
+
+ "data": {
+  "file": "train_data_QUICK_START.csv",
+  "provenance": "Kaggle Stanford Ribonanza RNA Folding competition data, public HuggingFace mirror TerminatorJ/RNA_chemical_ribonanza, MIT on the dataset card",
+  "profile_read_before_the_declaration_was_written": "335616 rows, 167808 unique sequences, 34 dataset_name values, lengths 115-206, 149778 unique sequences of length >= 177",
+  "what_it_is_not": "the full ~2M-sequence training set"
+ },
+
+ "method": {
+  "definition_inherited_unchanged": "a design unit (puzzle, method) is EXPOSED at level t when its wild-type sequence, inside the design window, reaches identity >= t against some equal-length substring of some training sequence. The threshold 0.8 is M26d's, fixed here, and may not be tuned after seeing the result.",
+  "no_candidate_generation": "M26d's K0 existed because a k-mer inverted index recorded 'no candidate found' as 'identity 0.0'. This run has no index. Every one of the 158 queries is compared against EVERY training sequence of sufficient length, exhaustively, vectorised. A query with no match is a measured zero and not a missing value, and that is why the failure mode M26d had to patch cannot occur here.",
+  "length_note": "training sequences shorter than the 177 nt design window cannot contain an equal-length substring and so cannot match under the inherited definition. Their count is reported, because it is part of the bound."
+ },
+
+ "arms": {
+  "V": "verification, printed BEFORE any result is read. (i) IDENTITY: a sequence scored against itself returns exactly 1.0. (ii) OBWEIGHT: the maximum identity for a sample of queries recomputed by a second, independently written scan (pure-Python, no numpy) agreeing exactly. (iii) NEGATIVE CONTROL: a dinucleotide-preserving shuffle of each wild type is scored the same way; its identity distribution is reported, and it is what a non-exposed query looks like on this corpus.",
+  "E1": "exposure recount at the inherited 0.8 threshold, reported beside M26d's proxy count of 14 of 158.",
+  "E2": "GRADING. Tiers fixed here: T0 max identity < 0.8; T1 [0.8, 0.9); T2 [0.9, 0.999); T3 >= 0.999 (verbatim). For every design, the best-matching training sequence's dataset_name is recorded, so exposure is attributed to a named source library rather than asserted.",
+  "E3": "rerun M26d's clean-versus-exposed skill contrast on THIS cut, both models, reported as intervals and never as two point estimates (rule 69). M26d's own review found the exposed subset too small to read; if that recurs it is reported as unreadable, not as a null.",
+  "E4": "THE ACTUAL MEMORISATION TEST, which M26d could not run: skill by tier. If the model is trading on memory, skill should RISE with exposure tier. Reported as the per-tier slope with intervals and as the trend across tiers."
+ },
+
+ "constants": {"THRESH": 0.8, "TIERS": [0.8, 0.9, 0.999], "WINDOW_FROM": "M26's sub_start/sub_end", "NBOOT": 2000, "SEED": 20260829, "MIN_CLEAN_INTERVENTIONS": 1000},
+
+ "staked": {
+  "1": "exposure measured against the actual training sequences EXCEEDS the RMDB proxy's 14 of 158 designs",
+  "2": "at least one design reaches T3, i.e. a verbatim or near-verbatim wild type is present in the training file",
+  "3": "skill does NOT rise monotonically across the tiers -- memorisation is still not the explanation",
+  "4": "the unexposed subset's neural skill slope stays inside [0.15, 0.27], bracketing M26d's clean-subset +0.21549"
+ },
+
+ "kill": {
+  "K0": "arm V fails any of its three checks -> the run is void and no number from it may be quoted.",
+  "K1": "fewer than MIN_CLEAN_INTERVENTIONS interventions remain unexposed -> E3 and E4 are void, and only E1 and E2 are reported. A skill contrast on a subset that small is not readable and will not be printed as one.",
+  "K2": "skill rises with exposure tier with an interval excluding zero -> MEMORISATION IS AN EXPLANATION. C7 stops being empty, the ledger row flips from empty to carrying, and the manuscript reports it as a channel that carries. This is the outcome that costs us the cleanest null in the paper, and it is declared here so that it cannot be avoided later.",
+  "K3": "WORDING RULE, binding on the manuscript. The file is a subset, so no sentence may say a design is 'not in the training set' or that leakage is 'absent'. The only permitted claim is the bound: 'not found in the portion of the training corpus we could obtain', with the size of that portion stated. Every count is a lower bound on exposure.",
+  "K4": "the 0.8 threshold and the three tier boundaries are fixed by this declaration. If a different cut would tell a better story, that fact is reported and the cut is not changed."
+ },
+
+ "decision_this_run_gates": "whether C7's price is defended against the actual training corpus or against a proxy, and whether the ledger's C7 row stays empty. It does not touch the eligibility criterion, the identity contrast, the depth baseline, M38, the withdrawal, or R1."
+}
