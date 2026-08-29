@@ -1,0 +1,69 @@
+=== M39:把 C7 的审计从代理换成模型真正的训练序列,并且给出界 ===
+  声明已冻结并推送于本文件存在之前。一次 526 MB 公开下载之后全离线,$0。
+  **这个文件是子集(16.8 万条 / 全集约两百万),所以每一个计数都是曝光的下界。**
+  在这里找到 = 确实曝光;没找到 ≠ 没曝光。声明 K3 把这条写成论文的措辞规则。
+
+  训练唯一序列 167808,来源库 17 个 (6s)
+  按长度分组 5 组
+  设计单元 158,设计窗长度 [52, 59, 68, 73, 75, 76, 80, 93, 96, 100]
+  可参与比对的训练序列(按查询长度):最短查询 52 nt -> 167808 条,最长查询 100 nt -> 167808 条,共 167808 条
+  **声明的 length_note 写的是 177 nt 设计窗,那是训练文件的众数长度,不是我们查询的长度。**
+  不改声明。这个错误的方向对我们有利:查询更短 ⇒ 可比对的训练序列更多 ⇒ 界更紧。
+
+=== V 验证(在读任何结果之前判)===
+  检查1 零点恒等式:序列对自己 = 1.0,6 条  通过
+  检查2 对拍(numpy 向量化 vs 纯 Python,同一 3000 条子集,6 个查询):最大偏差 0.000e+00  通过
+  检查3 阴性对照(双核苷酸保持打乱,158 条):最大同一性 0.6538,中位 0.5200  阈值 0.8  通过
+  → 验证通过,可以读数
+
+=== E1/E2 曝光,以及分级曝光(阈值与分级边界由声明钉死)===
+  **曝光设计单元 20/158 = 12.7%**  (M26d 用 RMDB 代理时是 14/158 = 8.9%)
+    T0 <0.8                 138 个设计单元
+    T1 [0.8,0.9)              5 个设计单元
+    T2 [0.9,0.999)            3 个设计单元
+    T3 >=0.999 逐字            12 个设计单元
+  曝光归因到的来源库:
+      10  OpenKnot1_Twist_EternaPlayers
+       9  PK90_CustomArray
+       1  DasLabBigLib_OneMil_RFAM_windows_100mers
+  未曝光干预 3806,曝光干预 511
+
+=== E3 未曝光 vs 曝光的技能对比(用 M26d 的 arm,逐条并列;差值给区间)===
+
+  --- RibonanzaNet ---
+  RibonanzaNet/all       斜率 +0.20692 (p 0.0025)  n= 4317  CDE +0.0574  基线 +0.0570  **留存 100.7%**  p 0.00050  权重 493
+  RibonanzaNet/clean     斜率 +0.21720 (p 0.0025)  n= 3806  CDE +0.0506  基线 +0.0510  **留存 99.3%**  p 0.00050  权重 443
+  RibonanzaNet/exposed   斜率 +0.13463 (p 0.0025)  n=  511  **K3 重叠不足(权重 53)⇒ 留存不报**
+
+  --- ViennaRNA ---
+  ViennaRNA/all          斜率 +0.12059 (p 0.0025)  n= 4317  CDE +0.0663  基线 +0.0689  **留存 96.3%**  p 0.00050  权重 569
+  ViennaRNA/clean        斜率 +0.13342 (p 0.0025)  n= 3806  CDE +0.0607  基线 +0.0635  **留存 95.5%**  p 0.00050  权重 506
+  ViennaRNA/exposed      斜率 +0.00115 (p 0.9726)  n=  511  **K3 重叠不足(权重 57)⇒ 留存不报**
+  RibonanzaNet   未曝光 − 曝光 的自助区间 [-0.02014, 0.17185]  含 0 ⇒ 读不出差别
+  ViennaRNA      未曝光 − 曝光 的自助区间 [0.06137, 0.20425]  不含 0
+
+=== E4 技能随曝光等级怎么走 —— 记忆假说的直接检验 ===
+  记忆假说预测:等级越高,技能越高。
+  RibonanzaNet   T0: n= 3806  斜率 +0.21720  CI [0.16335, 0.25355]
+  RibonanzaNet   T1: n=  136  斜率 +0.10614  CI [-0.10641, 0.35447]
+  RibonanzaNet   T2: n=   80  斜率 +0.08845  CI [-0.06563, 0.41228]
+  RibonanzaNet   T3: n=  295  斜率 +0.15791  CI [0.08522, 0.22989]
+  ViennaRNA      T0: n= 3806  斜率 +0.13342  CI [0.07211, 0.19207]
+  ViennaRNA      T1: n=  136  斜率 +0.01300  CI [-0.0524, 0.06662]
+  ViennaRNA      T2: n=   80  斜率 +0.09493  CI [0.01422, 0.17438]
+  ViennaRNA      T3: n=  295  斜率 -0.02264  CI [-0.07632, 0.02002]
+  技能随等级单调上升?{'RibonanzaNet': False, 'ViennaRNA': False}
+
+=== 声明里下的注,按声明自己的措辞判 ===
+  下注1 成立 —— 真语料 20/158 vs RMDB 代理 14/158
+        『exposure measured against the actual training sequences EXCEEDS the RMDB proxy's 14 of 158 designs』
+  下注2 成立 —— T3(逐字)设计单元 12 个
+        『at least one design reaches T3, i.e. a verbatim or near-verbatim wild type is present in the training file』
+  下注3 成立 —— 单调上升 = {'RibonanzaNet': False, 'ViennaRNA': False}
+        『skill does NOT rise monotonically across the tiers -- memorisation is still not the explanation』
+  下注4 成立 —— 未曝光子集神经斜率 0.2172
+        『the unexposed subset's neural skill slope stays inside [0.15, 0.27], bracketing M26d's clean-subset +0.21549』
+
+判决:C7_survives_against_the_real_training_corpus_as_a_bound
+  措辞规则(K3):不许写『不在训练集里』或『没有泄漏』。只许写『在我们能拿到的那部分训练语料里没有找到』,并把那部分有多大写出来。
+用时 768s

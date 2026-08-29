@@ -999,14 +999,25 @@ Neither skill depends on the overlap. The thermodynamic row is the control that 
 readable: it was trained on nothing, and it behaves the same way.
 
 \begin{scopebox}
-\textbf{What the audit bounds.} These deposits are the neural model's source libraries, not a
-manifest of the released checkpoint's training set. The licensed statement is \emph{no overlap
-with the training sources we could obtain}, never \emph{no leakage}. One tier in particular is
-outside it: this model's final pre-training stage consumed pseudo-labels covering its own test
-sequences as well as its training sequences, so a sequence can have been seen without its
-experimental label having been seen, and an audit built from deposited measurements cannot
-separate that case from the unseen one. Grading exposure against the full released library, rather
-than against the deposits, is the audit this design still owes.
+\textbf{What the audit bounds, and the audit it owed.} The deposits above are the model's source
+libraries, not a manifest of the released checkpoint's training set, so this manuscript previously
+recorded that grading exposure against the released library was an audit the design still owed. It
+has now been run. Against the competition's own training file --- \jdg{lkTrainReal} unique
+sequences across \jdg{lkLibReal} named libraries --- \jdg{lkExpDesigns} of \jdg{clDesigns} design
+cells are exposed at the same \jdg{clThr} threshold (\jdg{lkExpFrac}) against \jdg{lkProxyDesigns}
+(\jdg{lkProxyFrac}) from the deposits --- itself a conservative figure, because that scan examined only the strongest candidates and so returns a maximum identity no larger than an exhaustive one, by up to \jdg{vIdxGap} on a matched subset --- and \jdg{lkVerbatimT3} wild types appear verbatim. Exposure
+is \emph{higher} than the deposits implied, and the channel is still empty: skill on the
+\jdg{lkExpN} exposed interventions is \jdg{lkNeuralExp} against \jdg{lkNeuralClean} on the
+\jdg{lkCleanN} unexposed ones --- a difference whose interval covers zero (\jdg{lkNeuralDiffCi})
+--- and \textbf{the thermodynamic control, which cannot have memorised anything, falls the same
+way} (\jdg{lkViennaClean} to \jdg{lkViennaExp}, difference \jdg{lkViennaDiffCi}, which does not
+cover zero). Exposed designs are harder, not remembered; skill does not rise with
+exposure tier for either model. \textbf{That file is itself a subset of the full training corpus,
+so every count here is a lower bound}: the licensed statement remains \emph{not found in the
+portion of the training corpus we could obtain}, never \emph{no leakage}, and one tier stays
+outside it --- this model's final pre-training stage consumed pseudo-labels covering its own test
+sequences, so a sequence can have been seen without its label having been seen. Grading against
+the full corpus is future work (\S\ref{sec:limitations}).
 \end{scopebox}
 
 % =====================================================================
@@ -1213,37 +1224,23 @@ task.} The free integer is not beaten by a hand-fitted thermodynamic model, by a
 form fitted to probing data, or by a transformer trained on two million profiles.
 
 
-\paragraph{A score that \emph{was} built for a mutation loses to the integer by more than the
-predictors do.} The obvious reply to the paragraph above is that none of the three predictors was
-built to answer a question about a mutation. One family was. riboSNitch prediction scores a
-folding calculation by how much a variant reorganises the structure
-\citep{corley2015ribosnitch,kirven2025variantfold}, and its standard quantities are computable
-from the same thermodynamic model already in the table: the Euclidean distance between the
-wild-type and mutant base-pair probability matrices, the base-pair distance between the two MFE
-structures, and the change in ensemble free energy. What is scored here is those quantities, not
-remuRNA, RNAsnp or SNPfold; no claim is made about those implementations. The direction was
-declared before the code existed --- a compensatory flip that rescues \emph{preserves} the
-structure, so a change score should be small where rescue is large --- and all three resolve from
-zero on the declared side, on the same \jdg{rsN} interventions in the same \jdg{rsCells} cells by
-the same statistic. The instrument reads them. \textbf{None of the \jdg{rsNarms} beats the free
-integer, and unlike the three predictors above, none of them ties it either}: every paired
-difference excludes zero on the losing side (\jdg{rsBppmVs}, \jdg{rsBppmVsCi};
-\jdg{rsMfeVs}, \jdg{rsMfeVsCi}; \jdg{rsEnsVs}, \jdg{rsEnsVsCi}). A score designed for exactly this
-question is further behind a declared target's helix depth than the general-purpose predictors are.
-
-\emph{Two things this arm was set up to be unable to explain away.} A global change score could
-lose because the rest of the molecule dilutes it, so the same distance was recomputed inside a
-window around the mutated pair. The declaration staked that the local variant would rank at least
-as well as the global one; it does not (\jdg{rsLocal}, \jdg{rsLocalCi}, against \jdg{rsBppm},
-\jdg{rsBppmCi}), and the paired difference against depth barely moves (\jdg{rsLocalVs},
-\jdg{rsLocalVsCi}). \textbf{That staked prediction failed}, and it failed as it was written --- the
-declaration staked a point-for-point comparison, so what the two overlapping intervals license is
-that the local variant \emph{does not rank better}, not that it ranks worse. We put no interval on
-the difference between them and make no claim that requires one. The failure closes the escape
-route rather than opening one: localisation
-is not what is missing. And the arm was verified before it was read --- every score is exactly
-\jdg{rsIdent} against the sequence itself, the matrix distance recomputed by an independently
-written accumulation agrees to \jdg{rsObw}, and the distance is symmetric to machine precision.
+\paragraph{A score that \emph{was} built for a mutation loses by more.} The reply to the paragraph
+above is that none of the three predictors was built to answer a question about a mutation. One
+family was: riboSNitch prediction scores a folding calculation by how much a variant reorganises
+the structure \citep{corley2015ribosnitch,kirven2025variantfold}, and its standard quantities ---
+the distance between the wild-type and mutant base-pair probability matrices, the base-pair
+distance between the two MFE structures, and the change in ensemble free energy --- are computable
+from the same thermodynamic model already in the table. Those quantities are what is scored here,
+not remuRNA, RNAsnp or SNPfold, and we make no claim about those implementations. The direction was
+declared before the code existed --- a flip that rescues \emph{preserves} the structure, so a change
+score should be small where rescue is large --- and all three resolve from zero on the declared
+side, so the instrument reads them. \textbf{None beats the free integer, and unlike the three
+predictors above, none ties it}: every paired difference excludes zero on the losing side
+(\jdg{rsBppmVs}, \jdg{rsBppmVsCi}; \jdg{rsMfeVs}, \jdg{rsMfeVsCi}; \jdg{rsEnsVs},
+\jdg{rsEnsVsCi}). A localised variant, staked in advance to rule out dilution by the rest of the
+molecule, does not rank better (\jdg{rsLocal}, \jdg{rsLocalCi}, against \jdg{rsBppm},
+\jdg{rsBppmCi}) --- a failed stake whose failure removes the explanation rather than supplying one.
+The arm was verified before it was read, and the record is in Appendix~\ref{app:prereg}.
 
 \paragraph{The predicted change, not only the predicted level.} A mutation experiment suggests a
 different quantity from the one in the table: not the predicted reactivity of the mutant but the
@@ -1541,13 +1538,20 @@ public depositions surveyed, \jdg{scSkipped} (\jdg{scSkippedPct}) cannot be eval
 because they publish neither construct naming nor per-row sequence annotation
 (\S\ref{sec:mining}). Compensatory flips are not rare; the annotation needed to find them is.
 
-\paragraph{The leakage audit bounds what it can reach.} The licensed statement from
-the \jdg{lkTrain} sequences graded in \S\ref{sec:leakage} is \emph{no overlap with the training sources we could obtain},
-never \emph{no leakage}; the tier outside it is priced as unpriceable in \S\ref{sec:ledger} and not
-restated here. What that section does not cover belongs here instead: EternaFold is not a clean
-control either. Its parameters were fitted to Eterna cloud-lab data and this corpus is an Eterna
-round, so it is innocent of these molecules but not of the design population that produced them ---
-which weakens C5's training-data arm specifically, and in the direction of understating it.
+\paragraph{The leakage audit bounds what it can reach, and two things it leaves to future work.}
+Exposure is now graded against the model's own training file rather than against deposits
+(\S\ref{sec:leakage}), and the licensed statement is \emph{not found in the portion of the training
+corpus we could obtain}, never \emph{no leakage}. \textbf{Two items are named and left open rather
+than argued around.} \emph{First}, that file is the competition's high-quality slice, so
+\jdg{lkExpFrac} is a lower bound; grading against the full corpus would replace the bound with a
+number and is the natural next audit, and we expect it to raise exposure without changing the
+verdict, because the thermodynamic control falls on the exposed subset exactly as the neural model
+does. \emph{Second}, the pseudo-label tier stays outside any audit built from deposited
+measurements, and is priced as unpriceable in \S\ref{sec:ledger} rather than restated here. What
+neither covers belongs here instead: EternaFold is not a clean control either. Its parameters were
+fitted to Eterna cloud-lab data and this corpus is an Eterna round, so it is innocent of these
+molecules but not of the design population that produced them --- which weakens C5's training-data
+arm specifically, and in the direction of understating it.
 
 \paragraph{An orientation flip cannot deliver every causal quantity.} It preserves the unordered
 pair type, so it does not measure the effect of \emph{being} a C--G rather than an A--U; it
@@ -1730,10 +1734,24 @@ At least one riboSNitch-style score resolves from zero \emph{in the declared neg
   \quad(\jdg{rsBppmCi}, \jdg{rsMfeCi}, \jdg{rsEnsCi}) & correct \\
 None of the three beats the free depth baseline \quad(\jdg{rsNbeat} of \jdg{rsNarms}) & correct \\
 \textbf{The local variant ranks at least as well as the global one} --- \emph{it does not:
-  \jdg{rsLocal} (\jdg{rsLocalCi}) against \jdg{rsBppm} (\jdg{rsBppmCi}). The stake was written as a
-  point-for-point comparison and is graded as one; the intervals overlap, so the licensed reading
-  is that localisation does not help, not that it hurts} & \textbf{failed} \\
+  \jdg{rsLocal} (\jdg{rsLocalCi}) against \jdg{rsBppm} (\jdg{rsBppmCi}), and against depth
+  \jdg{rsLocalVs} (\jdg{rsLocalVsCi}). The stake was written as a point-for-point comparison and
+  is graded as one; the intervals overlap, so the licensed reading is that localisation does not
+  help, not that it hurts} & \textbf{failed} \\
 The matrix distance and the MFE distance agree in sign \quad(\jdg{rsBppm}, \jdg{rsMfe}) & correct \\
+\multicolumn{2}{@{}p{0.95\textwidth}@{}}{\footnotesize\emph{Verified before reading, and after:
+  every score is exactly \jdg{rsIdent} against its own sequence and the matrix distance agrees with
+  an independently written accumulation to \jdg{rsObw}; a later review added the two steps this arm
+  had not taken --- rerunning the earlier arm's own columns reproduces its published values to
+  \jdg{vBackMax}, and the verdict survives a different rank statistic entirely (Kendall
+  \jdg{vKendallD} against depth's \jdg{vKendallDep}).}}\\
+\midrule
+\multicolumn{2}{@{}l@{}}{\emph{frozen before the exposure grading existed (\S\ref{sec:leakage})}}\\
+Exposure against the actual training file exceeds the deposits' \jdg{lkProxyDesigns} designs
+  \quad(\jdg{lkExpDesigns}) & correct \\
+At least one wild type appears verbatim \quad(\jdg{lkVerbatimT3}) & correct \\
+Skill does not rise monotonically with exposure tier, for either model & correct \\
+The unexposed subset's neural slope stays in $[\jdg{lkStakeLo},\jdg{lkStakeHi}]$ \quad(\jdg{lkNeuralClean}) & correct \\
 \end{longtable}}
 
 \noindent The fifth row of the last block is the one worth reading. Its run returned every staked

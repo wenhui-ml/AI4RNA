@@ -1,0 +1,466 @@
+{
+ "declaration": "m39_exposure_tiers_declaration.json",
+ "constants": {
+  "THRESH": 0.8,
+  "TIERS": [
+   0.8,
+   0.9,
+   0.999
+  ],
+  "WINDOW_FROM": "M26's sub_start/sub_end",
+  "NBOOT": 2000,
+  "SEED": 20260829,
+  "MIN_CLEAN_INTERVENTIONS": 1000
+ },
+ "bound_direction": "every count is a LOWER BOUND on exposure",
+ "n_train_unique": 167808,
+ "n_train_libraries": 17,
+ "n_designs": 158,
+ "query_lengths": [
+  52,
+  59,
+  68,
+  73,
+  75,
+  76,
+  80,
+  93,
+  96,
+  100
+ ],
+ "eligible_train_by_query_length": {
+  "52": 167808,
+  "59": 167808,
+  "68": 167808,
+  "73": 167808,
+  "75": 167808,
+  "76": 167808,
+  "80": 167808,
+  "93": 167808,
+  "96": 167808,
+  "100": 167808
+ },
+ "declaration_erratum": "length_note assumed a 177 nt design window; the actual windows are 52-100 nt. The declaration is left unedited. The error enlarges the comparison set, so the reported bound is tighter than the declaration anticipated.",
+ "V_verification": {
+  "self_identity": true,
+  "obweight_max": 0.0,
+  "shuffle_max": 0.6538461538461539,
+  "shuffle_median": 0.52,
+  "pass": true
+ },
+ "E1": {
+  "n_exposed_designs": 20,
+  "n_designs": 158,
+  "frac": 0.1266,
+  "m26d_proxy_count": 14,
+  "m26d_proxy_frac": 0.0886
+ },
+ "E2": {
+  "tiers": {
+   "T0 <0.8": 138,
+   "T1 [0.8,0.9)": 5,
+   "T2 [0.9,0.999)": 3,
+   "T3 >=0.999 逐字": 12
+  },
+  "libraries": {
+   "OpenKnot1_Twist_EternaPlayers": 10,
+   "PK90_CustomArray": 9,
+   "DasLabBigLib_OneMil_RFAM_windows_100mers": 1
+  },
+  "identity_by_design": {
+   "P01|Eterna": 0.65385,
+   "P01|MPNN-RFdiff": 0.59615,
+   "P01|MPNN-fixbb": 0.59615,
+   "P01|Rosetta": 0.59615,
+   "P01|Shujun_shape_struct2seq": 0.59615,
+   "P01|Shujun_struct2seq": 0.59615,
+   "P01|Starting sequence": 1.0,
+   "P01|gRNAde-no3d": 0.61538,
+   "P02|Eterna": 0.62667,
+   "P02|MPNN-RFdiff": 0.53333,
+   "P02|MPNN-fixbb": 0.52,
+   "P02|Rosetta": 0.58667,
+   "P02|Shujun_shape_struct2seq": 0.52,
+   "P02|Shujun_struct2seq": 0.54667,
+   "P02|Starting sequence": 1.0,
+   "P02|gRNAde-no3d": 0.54667,
+   "P03|Eterna": 0.61644,
+   "P03|MPNN-RFdiff": 0.52055,
+   "P03|MPNN-fixbb": 0.82192,
+   "P03|Rosetta": 0.54795,
+   "P03|Shujun_shape_struct2seq": 0.53425,
+   "P03|Shujun_struct2seq": 0.53425,
+   "P03|Starting sequence": 0.9726,
+   "P03|gRNAde": 0.54795,
+   "P04|Eterna": 0.51613,
+   "P04|MPNN-RFdiff": 0.52688,
+   "P04|MPNN-fixbb": 0.50538,
+   "P04|Rosetta": 0.51613,
+   "P04|Shujun_shape_struct2seq": 0.49462,
+   "P04|Shujun_struct2seq": 0.50538,
+   "P04|Starting sequence": 0.52688,
+   "P04|gRNAde": 0.50538,
+   "P05|Eterna": 0.55932,
+   "P05|MPNN-RFdiff": 0.57627,
+   "P05|MPNN-fixbb": 0.55932,
+   "P05|Rosetta": 0.55932,
+   "P05|Shujun_shape_struct2seq": 0.59322,
+   "P05|Shujun_struct2seq": 0.59322,
+   "P05|Starting sequence": 1.0,
+   "P05|gRNAde-no3d": 0.57627,
+   "P06|Eterna": 0.70667,
+   "P06|MPNN-RFdiff": 0.56,
+   "P06|MPNN-fixbb": 0.58667,
+   "P06|Rosetta": 0.56,
+   "P06|Shujun_shape_struct2seq": 0.53333,
+   "P06|Shujun_struct2seq": 0.53333,
+   "P06|Starting sequence": 1.0,
+   "P06|gRNAde-no3d": 0.53333,
+   "P07|Eterna": 0.85,
+   "P07|MPNN-RFdiff": 0.5375,
+   "P07|MPNN-fixbb": 0.5625,
+   "P07|Rosetta": 0.5375,
+   "P07|Shujun_shape_struct2seq": 0.5125,
+   "P07|Shujun_struct2seq": 0.5125,
+   "P07|Starting sequence": 1.0,
+   "P07|gRNAde-no3d": 0.5375,
+   "P08|Eterna": 0.83333,
+   "P08|MPNN-RFdiff": 0.51042,
+   "P08|MPNN-fixbb": 0.48958,
+   "P08|Rosetta": 0.51042,
+   "P08|Shujun_shape_struct2seq": 0.52083,
+   "P08|Shujun_struct2seq": 0.52083,
+   "P08|Starting sequence": 1.0,
+   "P08|gRNAde-no3d": 0.51042,
+   "P09|Eterna": 0.52941,
+   "P09|MPNN-RFdiff": 0.55882,
+   "P09|MPNN-fixbb": 0.55882,
+   "P09|Rosetta": 0.57353,
+   "P09|Shujun_shape_struct2seq": 0.54412,
+   "P09|Shujun_struct2seq": 0.55882,
+   "P09|Starting sequence": 1.0,
+   "P09|gRNAde-no3d": 0.55882,
+   "P10|Eterna": 0.84211,
+   "P10|MPNN-RFdiff": 0.53947,
+   "P10|MPNN-fixbb": 0.53947,
+   "P10|Rosetta": 0.59211,
+   "P10|Shujun_shape_struct2seq": 0.51316,
+   "P10|Shujun_struct2seq": 0.53947,
+   "P10|Starting sequence": 1.0,
+   "P10|gRNAde": 0.55263,
+   "P11|Eterna": 0.86,
+   "P11|MPNN-RFdiff": 0.48,
+   "P11|Rosetta": 0.52,
+   "P11|Shujun_shape_struct2seq": 0.48,
+   "P11|Shujun_struct2seq": 0.5,
+   "P11|Starting sequence": 1.0,
+   "P11|gRNAde-no3d": 0.5,
+   "P12|Eterna": 0.92,
+   "P12|MPNN-RFdiff": 0.48,
+   "P12|MPNN-fixbb": 0.51,
+   "P12|Rosetta": 0.52,
+   "P12|Shujun_shape_struct2seq": 0.47,
+   "P12|Shujun_struct2seq": 0.52,
+   "P12|Starting sequence": 1.0,
+   "P12|gRNAde-no3d": 0.52,
+   "P13|Eterna": 0.53,
+   "P13|MPNN-RFdiff": 0.51,
+   "P13|MPNN-fixbb": 0.49,
+   "P13|Rosetta": 0.51,
+   "P13|Shujun_shape_struct2seq": 0.48,
+   "P13|Shujun_struct2seq": 0.51,
+   "P13|Starting sequence": 1.0,
+   "P13|gRNAde-no3d": 0.49,
+   "P14|Eterna": 0.76,
+   "P14|MPNN-RFdiff": 0.51,
+   "P14|MPNN-fixbb": 0.49,
+   "P14|Rosetta": 0.51,
+   "P14|Shujun_shape_struct2seq": 0.52,
+   "P14|Shujun_struct2seq": 0.53,
+   "P14|Starting sequence": 1.0,
+   "P14|gRNAde-no3d": 0.49,
+   "P15|Eterna": 0.53,
+   "P15|MPNN-RFdiff": 0.5,
+   "P15|MPNN-fixbb": 0.49,
+   "P15|Rosetta": 0.51,
+   "P15|Shujun_shape_struct2seq": 0.52,
+   "P15|Shujun_struct2seq": 0.48,
+   "P15|Starting sequence": 0.92,
+   "P15|gRNAde-no3d": 0.5,
+   "P16|Eterna": 0.5,
+   "P16|MPNN-RFdiff": 0.49,
+   "P16|MPNN-fixbb": 0.53,
+   "P16|Rosetta": 0.5,
+   "P16|Shujun_shape_struct2seq": 0.56,
+   "P16|Shujun_struct2seq": 0.5,
+   "P16|Starting sequence": 0.51,
+   "P16|gRNAde-no3d": 0.5,
+   "P17|Eterna": 0.5,
+   "P17|MPNN-RFdiff": 0.51,
+   "P17|MPNN-fixbb": 0.49,
+   "P17|Rosetta": 0.51,
+   "P17|Shujun_shape_struct2seq": 0.48,
+   "P17|Shujun_struct2seq": 0.49,
+   "P17|Starting sequence": 0.51,
+   "P17|gRNAde": 0.49,
+   "P18|Eterna": 0.5,
+   "P18|MPNN-RFdiff": 0.51,
+   "P18|MPNN-fixbb": 0.54,
+   "P18|Rosetta": 0.49,
+   "P18|Shujun_shape_struct2seq": 0.49,
+   "P18|Shujun_struct2seq": 0.51,
+   "P18|Starting sequence": 0.5,
+   "P18|gRNAde-no3d": 0.49,
+   "P19|Eterna": 0.51,
+   "P19|MPNN-RFdiff": 0.51,
+   "P19|MPNN-fixbb": 0.52,
+   "P19|Rosetta": 0.53,
+   "P19|Shujun_shape_struct2seq": 0.58,
+   "P19|Shujun_struct2seq": 0.51,
+   "P19|Starting sequence": 0.48,
+   "P19|gRNAde-no3d": 0.51,
+   "P20|MPNN-RFdiff": 0.49,
+   "P20|MPNN-fixbb": 0.53,
+   "P20|Rosetta": 0.51,
+   "P20|Shujun_shape_struct2seq": 0.48,
+   "P20|Shujun_struct2seq": 0.48,
+   "P20|Starting sequence": 0.5,
+   "P20|gRNAde": 0.48
+  }
+ },
+ "n_clean": 3806,
+ "n_dirty": 511,
+ "E3_arms": {
+  "RibonanzaNet_all": {
+   "n": 4317,
+   "slope": 0.20692,
+   "slope_p": 0.00249,
+   "weight": 493.0,
+   "cde": 0.0574,
+   "baseline": 0.057,
+   "retention": 1.0071,
+   "p_perm": 0.0005
+  },
+  "RibonanzaNet_clean": {
+   "n": 3806,
+   "slope": 0.2172,
+   "slope_p": 0.00249,
+   "weight": 443.0,
+   "cde": 0.0506,
+   "baseline": 0.051,
+   "retention": 0.9933,
+   "p_perm": 0.0005
+  },
+  "RibonanzaNet_exposed": {
+   "n": 511,
+   "slope": 0.13463,
+   "slope_p": 0.00249,
+   "weight": 53.0,
+   "retention": null
+  },
+  "ViennaRNA_all": {
+   "n": 4317,
+   "slope": 0.12059,
+   "slope_p": 0.00249,
+   "weight": 569.0,
+   "cde": 0.0663,
+   "baseline": 0.0689,
+   "retention": 0.963,
+   "p_perm": 0.0005
+  },
+  "ViennaRNA_clean": {
+   "n": 3806,
+   "slope": 0.13342,
+   "slope_p": 0.00249,
+   "weight": 506.0,
+   "cde": 0.0607,
+   "baseline": 0.0635,
+   "retention": 0.9555,
+   "p_perm": 0.0005
+  },
+  "ViennaRNA_exposed": {
+   "n": 511,
+   "slope": 0.00115,
+   "slope_p": 0.97257,
+   "weight": 57.0,
+   "retention": null
+  }
+ },
+ "E3_difference_ci": {
+  "RibonanzaNet": {
+   "clean_minus_exposed_ci": [
+    -0.02014,
+    0.17185
+   ],
+   "n_boot": 2000,
+   "ci_contains_zero": true
+  },
+  "ViennaRNA": {
+   "clean_minus_exposed_ci": [
+    0.06137,
+    0.20425
+   ],
+   "n_boot": 2000,
+   "ci_contains_zero": false
+  }
+ },
+ "E4_skill_by_tier": {
+  "RibonanzaNet": {
+   "T0": {
+    "n": 3806,
+    "slope": 0.2172,
+    "ci": [
+     0.16335,
+     0.25355
+    ]
+   },
+   "T1": {
+    "n": 136,
+    "slope": 0.10614,
+    "ci": [
+     -0.10641,
+     0.35447
+    ]
+   },
+   "T2": {
+    "n": 80,
+    "slope": 0.08845,
+    "ci": [
+     -0.06563,
+     0.41228
+    ]
+   },
+   "T3": {
+    "n": 295,
+    "slope": 0.15791,
+    "ci": [
+     0.08522,
+     0.22989
+    ]
+   }
+  },
+  "ViennaRNA": {
+   "T0": {
+    "n": 3806,
+    "slope": 0.13342,
+    "ci": [
+     0.07211,
+     0.19207
+    ]
+   },
+   "T1": {
+    "n": 136,
+    "slope": 0.013,
+    "ci": [
+     -0.0524,
+     0.06662
+    ]
+   },
+   "T2": {
+    "n": 80,
+    "slope": 0.09493,
+    "ci": [
+     0.01422,
+     0.17438
+    ]
+   },
+   "T3": {
+    "n": 295,
+    "slope": -0.02264,
+    "ci": [
+     -0.07632,
+     0.02002
+    ]
+   }
+  }
+ },
+ "E4_monotone_rising": {
+  "RibonanzaNet": false,
+  "ViennaRNA": false
+ },
+ "staked": {
+  "1": {
+   "text": "exposure measured against the actual training sequences EXCEEDS the RMDB proxy's 14 of 158 designs",
+   "pass": true,
+   "detail": "真语料 20/158 vs RMDB 代理 14/158"
+  },
+  "2": {
+   "text": "at least one design reaches T3, i.e. a verbatim or near-verbatim wild type is present in the training file",
+   "pass": true,
+   "detail": "T3(逐字)设计单元 12 个"
+  },
+  "3": {
+   "text": "skill does NOT rise monotonically across the tiers -- memorisation is still not the explanation",
+   "pass": true,
+   "detail": "单调上升 = {'RibonanzaNet': False, 'ViennaRNA': False}"
+  },
+  "4": {
+   "text": "the unexposed subset's neural skill slope stays inside [0.15, 0.27], bracketing M26d's clean-subset +0.21549",
+   "pass": true,
+   "detail": "未曝光子集神经斜率 0.2172"
+  }
+ },
+ "verdict": "C7_survives_against_the_real_training_corpus_as_a_bound",
+ "log": [
+  "=== M39:把 C7 的审计从代理换成模型真正的训练序列,并且给出界 ===",
+  "  声明已冻结并推送于本文件存在之前。一次 526 MB 公开下载之后全离线,$0。",
+  "  **这个文件是子集(16.8 万条 / 全集约两百万),所以每一个计数都是曝光的下界。**",
+  "  在这里找到 = 确实曝光;没找到 ≠ 没曝光。声明 K3 把这条写成论文的措辞规则。\n",
+  "  训练唯一序列 167808,来源库 17 个 (6s)",
+  "  按长度分组 5 组",
+  "  设计单元 158,设计窗长度 [52, 59, 68, 73, 75, 76, 80, 93, 96, 100]",
+  "  可参与比对的训练序列(按查询长度):最短查询 52 nt -> 167808 条,最长查询 100 nt -> 167808 条,共 167808 条",
+  "  **声明的 length_note 写的是 177 nt 设计窗,那是训练文件的众数长度,不是我们查询的长度。**",
+  "  不改声明。这个错误的方向对我们有利:查询更短 ⇒ 可比对的训练序列更多 ⇒ 界更紧。",
+  "\n=== V 验证(在读任何结果之前判)===",
+  "  检查1 零点恒等式:序列对自己 = 1.0,6 条  通过",
+  "  检查2 对拍(numpy 向量化 vs 纯 Python,同一 3000 条子集,6 个查询):最大偏差 0.000e+00  通过",
+  "  检查3 阴性对照(双核苷酸保持打乱,158 条):最大同一性 0.6538,中位 0.5200  阈值 0.8  通过",
+  "  → 验证通过,可以读数",
+  "\n=== E1/E2 曝光,以及分级曝光(阈值与分级边界由声明钉死)===",
+  "  **曝光设计单元 20/158 = 12.7%**  (M26d 用 RMDB 代理时是 14/158 = 8.9%)",
+  "    T0 <0.8                 138 个设计单元",
+  "    T1 [0.8,0.9)              5 个设计单元",
+  "    T2 [0.9,0.999)            3 个设计单元",
+  "    T3 >=0.999 逐字            12 个设计单元",
+  "  曝光归因到的来源库:",
+  "      10  OpenKnot1_Twist_EternaPlayers",
+  "       9  PK90_CustomArray",
+  "       1  DasLabBigLib_OneMil_RFAM_windows_100mers",
+  "  未曝光干预 3806,曝光干预 511",
+  "\n=== E3 未曝光 vs 曝光的技能对比(用 M26d 的 arm,逐条并列;差值给区间)===",
+  "\n  --- RibonanzaNet ---",
+  "  RibonanzaNet/all       斜率 +0.20692 (p 0.0025)  n= 4317  CDE +0.0574  基线 +0.0570  **留存 100.7%**  p 0.00050  权重 493",
+  "  RibonanzaNet/clean     斜率 +0.21720 (p 0.0025)  n= 3806  CDE +0.0506  基线 +0.0510  **留存 99.3%**  p 0.00050  权重 443",
+  "  RibonanzaNet/exposed   斜率 +0.13463 (p 0.0025)  n=  511  **K3 重叠不足(权重 53)⇒ 留存不报**",
+  "\n  --- ViennaRNA ---",
+  "  ViennaRNA/all          斜率 +0.12059 (p 0.0025)  n= 4317  CDE +0.0663  基线 +0.0689  **留存 96.3%**  p 0.00050  权重 569",
+  "  ViennaRNA/clean        斜率 +0.13342 (p 0.0025)  n= 3806  CDE +0.0607  基线 +0.0635  **留存 95.5%**  p 0.00050  权重 506",
+  "  ViennaRNA/exposed      斜率 +0.00115 (p 0.9726)  n=  511  **K3 重叠不足(权重 57)⇒ 留存不报**",
+  "  RibonanzaNet   未曝光 − 曝光 的自助区间 [-0.02014, 0.17185]  含 0 ⇒ 读不出差别",
+  "  ViennaRNA      未曝光 − 曝光 的自助区间 [0.06137, 0.20425]  不含 0",
+  "\n=== E4 技能随曝光等级怎么走 —— 记忆假说的直接检验 ===",
+  "  记忆假说预测:等级越高,技能越高。",
+  "  RibonanzaNet   T0: n= 3806  斜率 +0.21720  CI [0.16335, 0.25355]",
+  "  RibonanzaNet   T1: n=  136  斜率 +0.10614  CI [-0.10641, 0.35447]",
+  "  RibonanzaNet   T2: n=   80  斜率 +0.08845  CI [-0.06563, 0.41228]",
+  "  RibonanzaNet   T3: n=  295  斜率 +0.15791  CI [0.08522, 0.22989]",
+  "  ViennaRNA      T0: n= 3806  斜率 +0.13342  CI [0.07211, 0.19207]",
+  "  ViennaRNA      T1: n=  136  斜率 +0.01300  CI [-0.0524, 0.06662]",
+  "  ViennaRNA      T2: n=   80  斜率 +0.09493  CI [0.01422, 0.17438]",
+  "  ViennaRNA      T3: n=  295  斜率 -0.02264  CI [-0.07632, 0.02002]",
+  "  技能随等级单调上升?{'RibonanzaNet': False, 'ViennaRNA': False}",
+  "\n=== 声明里下的注,按声明自己的措辞判 ===",
+  "  下注1 成立 —— 真语料 20/158 vs RMDB 代理 14/158",
+  "        『exposure measured against the actual training sequences EXCEEDS the RMDB proxy's 14 of 158 designs』",
+  "  下注2 成立 —— T3(逐字)设计单元 12 个",
+  "        『at least one design reaches T3, i.e. a verbatim or near-verbatim wild type is present in the training file』",
+  "  下注3 成立 —— 单调上升 = {'RibonanzaNet': False, 'ViennaRNA': False}",
+  "        『skill does NOT rise monotonically across the tiers -- memorisation is still not the explanation』",
+  "  下注4 成立 —— 未曝光子集神经斜率 0.2172",
+  "        『the unexposed subset's neural skill slope stays inside [0.15, 0.27], bracketing M26d's clean-subset +0.21549』",
+  "\n判决:C7_survives_against_the_real_training_corpus_as_a_bound",
+  "  措辞规则(K3):不许写『不在训练集里』或『没有泄漏』。只许写『在我们能拿到的那部分训练语料里没有找到』,并把那部分有多大写出来。",
+  "用时 768s"
+ ]
+}

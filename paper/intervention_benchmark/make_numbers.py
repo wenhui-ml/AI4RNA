@@ -488,8 +488,8 @@ put("rkCausalCells", f"{Ap['P_neural']['n_cells']}")
 put("rkCausalRecs", f"{Ap['P_neural']['n_records']:,}".replace(",", "{,}"))
 
 # what the exposure-graded leakage audit will report, once the library is in hand
-exp("lkTierN", "four exposure tiers")
-exp("lkTierSkill", "per-tier skill slopes")
+# lkTierN / lkTierSkill were PROJECTIONS of this audit. M39 delivered it, so the projections are
+# gone rather than kept beside the measurement they were standing in for.
 
 # ---- how each artifact was licensed. provenance.json is the manuscript's process claim in
 # machine-readable form; audit_manuscript.py refuses the build if it drifts from what is on disk.
@@ -588,6 +588,44 @@ put("rsNarms", f"{len(_b38)}")
 put("rsIdent", f"{_m38['D_verification']['identity_max']:.0f}")
 _ob = _m38["D_verification"]["obweight_max"]
 put("rsObw", "$" + ("%.0e" % _ob).replace("e-0", "e-").replace("e-", "\\times 10^{-") + "}$")
+
+# ---------------------------------------------------------------- M39: C7 against the real corpus
+# The leakage audit re-run against the competition's own training file instead of RMDB deposits.
+# The file is a SUBSET, so every count is a LOWER BOUND -- declaration K3 makes that a wording
+# rule, and no sentence here may say a design is absent from the training set.
+_m39 = J("m39_exposure_tiers.json")
+put("lkTrainReal", f"{_m39['n_train_unique']:,}".replace(",", ","))
+put("lkLibReal", f"{_m39['n_train_libraries']}")
+put("lkExpDesigns", f"{_m39['E1']['n_exposed_designs']}")
+put("lkExpFrac", f"{100*_m39['E1']['frac']:.1f}\\%")
+put("lkProxyDesigns", f"{_m39['E1']['m26d_proxy_count']}")
+put("lkProxyFrac", f"{100*_m39['E1']['m26d_proxy_frac']:.1f}\\%")
+put("lkVerbatimT3", f"{_m39['E2']['tiers']['T3 >=0.999 逐字']}")
+put("lkCleanN", f"{_m39['n_clean']}")
+put("lkExpN", f"{_m39['n_dirty']}")
+_a39 = _m39["E3_arms"]
+put("lkNeuralClean", sig(_a39["RibonanzaNet_clean"]["slope"], 4))
+put("lkNeuralExp", sig(_a39["RibonanzaNet_exposed"]["slope"], 4))
+put("lkViennaClean", sig(_a39["ViennaRNA_clean"]["slope"], 4))
+put("lkViennaExp", sig(_a39["ViennaRNA_exposed"]["slope"], 4))
+put("lkNeuralDiffCi", ci(_m39["E3_difference_ci"]["RibonanzaNet"]["clean_minus_exposed_ci"], 4))
+put("lkViennaDiffCi", ci(_m39["E3_difference_ci"]["ViennaRNA"]["clean_minus_exposed_ci"], 4))
+
+# the staked bracket is read out of the frozen declaration, never retyped: make_check.py refuses
+# a hand-typed decimal in the body and it is right to, because a retyped stake can drift from the
+# declaration it claims to quote.
+import re as _re
+_d39 = json.load(open(os.path.join(CEIL, "m39_exposure_tiers_declaration.json")))
+_lo, _hi = _re.search(r"\[([\d.]+),\s*([\d.]+)\]", _d39["staked"]["4"]).groups()
+put("lkStakeLo", _lo); put("lkStakeHi", _hi)
+
+# M40v: the two verification steps (equivalent form, reverse control) M38 and M39 had not done.
+# Read here so the manuscript's process sentence covers it and the audit's converse check can see it.
+_m40 = J("m40v_verify_m38_m39.json")
+put("vKendallD", sig(_m40["M38_B_equivalent_form"]["rows"]["d_bppm"]["kendall_tau_b"], 4))
+put("vKendallDep", sig(_m40["M38_B_equivalent_form"]["rows"]["depth_baseline"]["kendall_tau_b"], 4))
+put("vBackMax", f"{max(abs(v['delta']) for v in _m40['M38_A_reverse_control']['drift'].values()):.0e}")
+put("vIdxGap", sig(_m40["M39_A_reverse_control"]["max_identity_abs_diff"], 3))
 
 _led = J("m37_channel_ledger.json")
 put("chPriced", f"{_led['check3']['n_priced']}")

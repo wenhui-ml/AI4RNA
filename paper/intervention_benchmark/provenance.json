@@ -24,7 +24,8 @@
   "m35_paired_predictor_differences.json": "m35_paired_predictor_differences_declaration.json",
   "m36_readout_scale.json": "m36_readout_scale_declaration.json",
   "m20_designer_confounding.json": "m20_designer_confounding_declaration.json",
-  "m38_ribosnitch_baseline.json": null
+  "m38_ribosnitch_baseline.json": null,
+  "m39_exposure_tiers.json": null
  },
  "survey": {
   "_rule": "establishes design-side facts BEFORE a declaration can be written, and estimates nothing",
@@ -40,7 +41,8 @@
   "m28r_review.json": "reviews M28's two boundary results before either is written down",
   "m31r_review.json": "reviews M31 before its verdict is read, and supplies the interval K2 was written without",
   "m32r_review.json": "re-checks M32's dynamic range and its 1e-4 censoring floor, neither of which M32's own declaration contained",
-  "m26r4_calibration_symmetry.json": "re-reads M26r3's committed sweep after the manuscript audit found one arm's correlation reported and the other arm's omitted inside the same retraction; shows both correlations are produced by a single sweep point and supplies the span the retraction now rests on"
+  "m26r4_calibration_symmetry.json": "re-reads M26r3's committed sweep after the manuscript audit found one arm's correlation reported and the other arm's omitted inside the same retraction; shows both correlations are produced by a single sweep point and supplies the span the retraction now rests on",
+  "m40v_verify_m38_m39.json": null
  },
  "support": {
   "_rule": "a supporting or display quantity for a claim already made elsewhere; states no new claim",
@@ -48,5 +50,9 @@
   "m31t_recovery_curve.json": "the recovery-versus-budget curve behind Claim 3's figure, so the figure is drawn from a committed artifact",
   "m37_channel_ledger.json": "the channel ledger of Section 5.8: it collects prices already published in the sections named beside them, cross-checks each against the macro this manuscript prints, closes the one identity among them and names the choosers it cannot price. It estimates nothing.",
   "m36_readout_scale_declaration.json": "read so the preregistration table quotes the staked thresholds from the frozen declaration rather than having them retyped beside the measured values; not a result"
+ },
+ "declaration": {
+  "_rule": "a frozen declaration read directly by the generator, so a staked threshold printed in the manuscript is quoted from the declaration and never retyped",
+  "m39_exposure_tiers_declaration.json": null
  }
 }

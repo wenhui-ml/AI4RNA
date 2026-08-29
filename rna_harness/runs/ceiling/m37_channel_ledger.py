@@ -70,6 +70,7 @@ def main() -> int:
     m36 = J("m36_readout_scale.json")
     m25 = J("m25_estimator_benchmark.json")["B"]
     m28r = J("m28r_review.json")["R2_arms"]["ViennaRNA"]
+    m39 = J("m39_exposure_tiers.json")
 
     # ---- the ledger. Each row: who chose it, what it is worth, where the number lives, and the
     # macro the manuscript prints so the two can be compared.
@@ -127,10 +128,19 @@ def main() -> int:
              paper="NM", carries=False, split_closable=True,
              split_why="THE one channel a split is built to close: it is defined by similarity "
                        "between a test molecule and what the model was trained on",
-             price=f"skill slope {m26d['RibonanzaNet_all']['slope']:+.5f} against "
-                   f"{m26d['RibonanzaNet_clean']['slope']:+.5f} on the excised subset",
-             checks=[("clNeuralAll", m26d["RibonanzaNet_all"]["slope"]),
-                     ("clNeuralClean", m26d["RibonanzaNet_clean"]["slope"])]),
+             # repriced against the competition's own training file (M39) instead of the RMDB
+             # deposits (M26d). Exposure is HIGHER there and the channel is still empty, because
+             # the thermodynamic model -- which cannot have memorised anything -- drops the same
+             # way on the exposed subset.
+             price=f"unexposed {m39['E3_arms']['RibonanzaNet_clean']['slope']:+.5f} against "
+                   f"exposed {m39['E3_arms']['RibonanzaNet_exposed']['slope']:+.5f}; the "
+                   f"thermodynamic control drops too "
+                   f"({m39['E3_arms']['ViennaRNA_clean']['slope']:+.5f} to "
+                   f"{m39['E3_arms']['ViennaRNA_exposed']['slope']:+.5f})",
+             checks=[("lkNeuralClean", m39["E3_arms"]["RibonanzaNet_clean"]["slope"]),
+                     ("lkNeuralExp", m39["E3_arms"]["RibonanzaNet_exposed"]["slope"]),
+                     ("lkViennaClean", m39["E3_arms"]["ViennaRNA_clean"]["slope"]),
+                     ("lkViennaExp", m39["E3_arms"]["ViennaRNA_exposed"]["slope"])]),
         dict(id="C8", who="the probe chemistry the depositors chose",
              paper="NM", carries=False, split_closable=False,
              split_why="the chemistry is a property of the assay, not of any partition of molecules",
