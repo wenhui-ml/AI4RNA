@@ -251,7 +251,7 @@ NM_CLAIMS = [
         "Sweep the injected fraction f over [0, 0.75]. Report how far the READING moves against "
         "how far the TRUTH moves. A correlation coefficient at one f is not the quantity; "
         "leave-one-out the endpoint and see whether the sign survives."],
-      artifacts=["m26r3_calibration.json", "m26r4_calibration_symmetry.json"],
+      artifacts=["m26r3_realistic_calibration.json", "m26r4_calibration_symmetry.json"],
       printed=["mcNeuralSpanFrac", "mcViennaSpanFrac"]),
 ]
 
@@ -278,7 +278,7 @@ R1_CLAIMS = [
         "routes under a nonlinear outcome model is standard and the paper must disclaim priority "
         "for it. What is claimed as new is the closed-form gap, the bound by an observable, and "
         "the iff. If the manuscript claims the non-equivalence itself as novel, that is a finding."],
-      artifacts=[],
+      artifacts=["m21_thermo_mediator.json"],
       printed=["eLinearGapPts"]),
  dict(id="R1-C2", label="sec:cal", axis="calibration / retraction",
       section="Results / which route is readable is a question for calibration",
@@ -293,7 +293,7 @@ R1_CLAIMS = [
         "the SPAN of the reading against the SPAN of the truth, not the correlation between them.",
         "Check the f=0 rung returns zero. A ladder whose zero rung does not fall back to nominal "
         "is void by the paper's own definition."],
-      artifacts=["m26r3_calibration.json", "m26r4_calibration_symmetry.json"],
+      artifacts=["m26r3_realistic_calibration.json", "m26r4_calibration_symmetry.json"],
       printed=["calNSpanFrac", "calVSpanFrac", "calNFull", "calVFull"]),
  dict(id="R1-C3", label="sec:mediation", axis="placement channel",
       section="Results / the placement gap and the depth slope",
@@ -310,7 +310,8 @@ R1_CLAIMS = [
         "missing an arm are DROPPED, never extrapolated into.",
         "Check the closure as an identity to 1e-4 and report the residual epsilon. The paper "
         "reports it; a recomputation that does not is not comparable."],
-      artifacts=["m20_designer_confounding.json", "m37_channel_ledger.json"],
+      artifacts=["m20_designer_confounding.json"],
+      companion_artifacts=["m37_channel_ledger.json"],
       printed=["medMarginal", "medMatched", "medRatio", "medFrac"]),
  dict(id="R1-C4", label="sec:energy", axis="energy channel (a null)",
       section="Results / the energy the designs were optimised for",
@@ -341,7 +342,7 @@ R1_CLAIMS = [
         "The bound has two sides. Check the paper reports the SAME side on both corpora -- "
         "reporting one side on one corpus and the other side on the other would make the "
         "comparison meaningless."],
-      artifacts=[],
+      artifacts=["m29_binder_crossdomain.json", "m29r_review.json"],
       printed=["xdN", "xdDtvRatio", "xdGapRatio"]),
  dict(id="R1-C6", label="sec:frame", axis="measurement ceiling",
       section="Results / the measurement frame: what a point is worth",
@@ -355,8 +356,8 @@ R1_CLAIMS = [
         "Identify the repeat groups independently from the corpus and re-estimate. The paper "
         "flags this interval as the exception to its own clustering convention; check the "
         "manuscript actually says so where the number appears."],
-      artifacts=[],
-      printed=[]),
+      artifacts=["r1b_ceiling_interval.json"],
+      printed=["cZLo", "cZHi"]),
 ]
 
 
@@ -509,6 +510,7 @@ def build(tag, folder, paper_dir, texname, numname, claims, title, one_line):
           "what_would_falsify_it": c["falsifier"],
           "independent_route_SPECIFICATION_NOT_IMPLEMENTATION": c["independent_route"],
           "backing_artifacts": c["artifacts"],
+          "companion_paper_artifacts": c.get("companion_artifacts", []),
           "printed_value": {"trust": "DO_NOT_TRUST_RECOMPUTE_INDEPENDENTLY", "macros": printed}})
     write(out, "claims.json", {
       "_note": "printed_value is the claim under audit, not an input to the audit. It is here so "
@@ -522,10 +524,30 @@ def build(tag, folder, paper_dir, texname, numname, claims, title, one_line):
       "claims": rows})
 
     # ---- artifacts.json : the inventory, with trust classes and checksums
-    inputs = [dict(role="INPUT DATA -- public, independently re-derivable, the substrate for the "
-                        "result track", **stat(M2R)),
-              dict(role="INPUT DATA -- public, the benchmark panel; source of the agreement column",
-                   **stat(BENCH))]
+    # C1: a package that only works on the machine that built it is not a package. The substrate
+    # has to be obtainable, and the checksum is what makes "the same file" checkable.
+    OBTAIN = {
+      "release": "OpenKnotBench / OpenKnot AI design data, Eterna and the Das laboratory. Release "
+                 "channel: https://github.com/eternagame/OpenKnotAIDesignData . A neighbouring "
+                 "version of the M2 single-mutant SHAPE data is deposited at "
+                 "https://doi.org/10.5281/zenodo.20101887 (v4.5.2).",
+      "corpus_paper": "Townley J, Kladwang W, Baker D, et al. De novo design of RNA pseudoknots "
+                      "with deep learning. Science 2026;393(6814):931-937. "
+                      "doi:10.1126/science.aeg6829",
+      "version_warning": "Both manuscripts use v4.5.1. If you obtain a different version the "
+                         "sha256 below will not match. That is not a failure of the audit -- it "
+                         "is a fact worth reporting, because a claim reproduced on a different "
+                         "release is a weaker reproduction than one on the same bytes.",
+      "local_path_note": "The absolute path in `path` is where the file sits on the machine that "
+                         "produced the manuscripts. It is recorded so a reader of our run logs "
+                         "can follow them, not because you are expected to have it."}
+    inputs = [dict(role="INPUT DATA -- the substrate for the result track. Mutate-map-rescue "
+                        "library; carries rescue_factor, target_structure, mutA/mutB, sub_start/"
+                        "sub_end and the per-nucleotide reactivities.",
+                   how_to_obtain=OBTAIN, **stat(M2R)),
+              dict(role="INPUT DATA -- the benchmark panel. Source of the structure-agreement "
+                        "column RNet_structure and of target_openknot_score.",
+                   how_to_obtain=OBTAIN, **stat(BENCH))]
     ours = []
     for cls, entries in prov.items():
         if cls.startswith("_"):
@@ -547,10 +569,19 @@ def build(tag, folder, paper_dir, texname, numname, claims, title, one_line):
                 **stat(os.path.join(paper_dir, "provenance.json"))),
            dict(role="the repository's own audit tool",
                 **stat(os.path.join(HERE, "audit_manuscript.py")))]
+    comp = []
+    for c in claims:
+        for k in c.get("companion_artifacts", []):
+            s2 = stat(os.path.join(CEIL, k))
+            s2.update(trust="COMPANION PAPER OUTPUT -- inventoried because a claim points at it",
+                      tracked_by_git=tracked(os.path.join(CEIL, k)))
+            comp.append(s2)
     write(out, "artifacts.json", {
+      "companion_paper_artifacts": comp,
       "input_data": inputs, "manuscript": man,
       "our_run_artifacts": sorted(ours, key=lambda r: r["path"]),
-      "counts": {"input_data": len(inputs), "manuscript": len(man), "our_outputs": len(ours)}})
+      "counts": {"input_data": len(inputs), "manuscript": len(man), "our_outputs": len(ours),
+                 "companion": len(comp)}})
 
     # ---- process_claims.json
     write(out, "process_claims.json", {

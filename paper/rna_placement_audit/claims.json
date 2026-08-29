@@ -12,7 +12,10 @@
     "This is a proposition, not a measurement. Verify it symbolically or by construction. The 'only if' direction is the load-bearing half: given non-affine h, exhibit exposure laws that separate the routes (a point mass at a point where r differs from its mean against the reference law suffices).",
     "PRIORITY NOTE the auditor should check the paper makes: the NON-EQUIVALENCE of the two routes under a nonlinear outcome model is standard and the paper must disclaim priority for it. What is claimed as new is the closed-form gap, the bound by an observable, and the iff. If the manuscript claims the non-equivalence itself as novel, that is a finding."
    ],
-   "backing_artifacts": [],
+   "backing_artifacts": [
+    "m21_thermo_mediator.json"
+   ],
+   "companion_paper_artifacts": [],
    "printed_value": {
     "trust": "DO_NOT_TRUST_RECOMPUTE_INDEPENDENTLY",
     "macros": {
@@ -31,9 +34,10 @@
     "Check the f=0 rung returns zero. A ladder whose zero rung does not fall back to nominal is void by the paper's own definition."
    ],
    "backing_artifacts": [
-    "m26r3_calibration.json",
+    "m26r3_realistic_calibration.json",
     "m26r4_calibration_symmetry.json"
    ],
+   "companion_paper_artifacts": [],
    "printed_value": {
     "trust": "DO_NOT_TRUST_RECOMPUTE_INDEPENDENTLY",
     "macros": {
@@ -55,7 +59,9 @@
     "Check the closure as an identity to 1e-4 and report the residual epsilon. The paper reports it; a recomputation that does not is not comparable."
    ],
    "backing_artifacts": [
-    "m20_designer_confounding.json",
+    "m20_designer_confounding.json"
+   ],
+   "companion_paper_artifacts": [
     "m37_channel_ledger.json"
    ],
    "printed_value": {
@@ -83,6 +89,7 @@
     "m21v_verify.json",
     "m22_review_arms.json"
    ],
+   "companion_paper_artifacts": [],
    "printed_value": {
     "trust": "DO_NOT_TRUST_RECOMPUTE_INDEPENDENTLY",
     "macros": {
@@ -102,7 +109,11 @@
    "independent_route_SPECIFICATION_NOT_IMPLEMENTATION": [
     "The bound has two sides. Check the paper reports the SAME side on both corpora -- reporting one side on one corpus and the other side on the other would make the comparison meaningless."
    ],
-   "backing_artifacts": [],
+   "backing_artifacts": [
+    "m29_binder_crossdomain.json",
+    "m29r_review.json"
+   ],
+   "companion_paper_artifacts": [],
    "printed_value": {
     "trust": "DO_NOT_TRUST_RECOMPUTE_INDEPENDENTLY",
     "macros": {
@@ -121,10 +132,16 @@
    "independent_route_SPECIFICATION_NOT_IMPLEMENTATION": [
     "Identify the repeat groups independently from the corpus and re-estimate. The paper flags this interval as the exception to its own clustering convention; check the manuscript actually says so where the number appears."
    ],
-   "backing_artifacts": [],
+   "backing_artifacts": [
+    "r1b_ceiling_interval.json"
+   ],
+   "companion_paper_artifacts": [],
    "printed_value": {
     "trust": "DO_NOT_TRUST_RECOMPUTE_INDEPENDENTLY",
-    "macros": {}
+    "macros": {
+     "cZLo": "1.7",
+     "cZHi": "7.7"
+    }
    }
   }
  ]

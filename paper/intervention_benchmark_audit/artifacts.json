@@ -1,14 +1,27 @@
 {
+ "companion_paper_artifacts": [],
  "input_data": [
   {
-   "role": "INPUT DATA -- public, independently re-derivable, the substrate for the result track",
+   "role": "INPUT DATA -- the substrate for the result track. Mutate-map-rescue library; carries rescue_factor, target_structure, mutA/mutB, sub_start/sub_end and the per-nucleotide reactivities.",
+   "how_to_obtain": {
+    "release": "OpenKnotBench / OpenKnot AI design data, Eterna and the Das laboratory. Release channel: https://github.com/eternagame/OpenKnotAIDesignData . A neighbouring version of the M2 single-mutant SHAPE data is deposited at https://doi.org/10.5281/zenodo.20101887 (v4.5.2).",
+    "corpus_paper": "Townley J, Kladwang W, Baker D, et al. De novo design of RNA pseudoknots with deep learning. Science 2026;393(6814):931-937. doi:10.1126/science.aeg6829",
+    "version_warning": "Both manuscripts use v4.5.1. If you obtain a different version the sha256 below will not match. That is not a failure of the audit -- it is a fact worth reporting, because a claim reproduced on a different release is a weaker reproduction than one on the same bytes.",
+    "local_path_note": "The absolute path in `path` is where the file sits on the machine that produced the manuscripts. It is recorded so a reader of our run logs can follow them, not because you are expected to have it."
+   },
    "path": "/data/wenhui/openknot_data/Data/OK7a_M2R_data.v4.5.1.csv",
    "exists": true,
    "bytes": 26534702,
    "sha256": "00d62f7d39b37e48507ca5a949ec8358121b306b3d680b2976c4369b3038a31b"
   },
   {
-   "role": "INPUT DATA -- public, the benchmark panel; source of the agreement column",
+   "role": "INPUT DATA -- the benchmark panel. Source of the structure-agreement column RNet_structure and of target_openknot_score.",
+   "how_to_obtain": {
+    "release": "OpenKnotBench / OpenKnot AI design data, Eterna and the Das laboratory. Release channel: https://github.com/eternagame/OpenKnotAIDesignData . A neighbouring version of the M2 single-mutant SHAPE data is deposited at https://doi.org/10.5281/zenodo.20101887 (v4.5.2).",
+    "corpus_paper": "Townley J, Kladwang W, Baker D, et al. De novo design of RNA pseudoknots with deep learning. Science 2026;393(6814):931-937. doi:10.1126/science.aeg6829",
+    "version_warning": "Both manuscripts use v4.5.1. If you obtain a different version the sha256 below will not match. That is not a failure of the audit -- it is a fact worth reporting, because a claim reproduced on a different release is a weaker reproduction than one on the same bytes.",
+    "local_path_note": "The absolute path in `path` is where the file sits on the machine that produced the manuscripts. It is recorded so a reader of our run logs can follow them, not because you are expected to have it."
+   },
    "path": "/data/wenhui/openknot_data/Data/OpenKnotBench_data.v4.5.1.csv",
    "exists": true,
    "bytes": 139830358,
@@ -20,8 +33,8 @@
    "role": "the manuscript",
    "path": "paper/intervention_benchmark/NM_intervention.tex",
    "exists": true,
-   "bytes": 121794,
-   "sha256": "f75fba9e06600c1d88f3577281ee852eb20a734d589e03177bb5031d40c1cc8d"
+   "bytes": 122018,
+   "sha256": "c2040d9f4c19dbecbac8bd6373d88d22f20b94049b347bd047ea79db8d7a0a2f"
   },
   {
    "role": "generated numbers; every printed measurement lives here",
@@ -343,6 +356,7 @@
  "counts": {
   "input_data": 2,
   "manuscript": 6,
-  "our_outputs": 31
+  "our_outputs": 31,
+  "companion": 0
  }
 }
