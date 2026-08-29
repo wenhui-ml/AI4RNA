@@ -1,0 +1,348 @@
+{
+ "input_data": [
+  {
+   "role": "INPUT DATA -- public, independently re-derivable, the substrate for the result track",
+   "path": "/data/wenhui/openknot_data/Data/OK7a_M2R_data.v4.5.1.csv",
+   "exists": true,
+   "bytes": 26534702,
+   "sha256": "00d62f7d39b37e48507ca5a949ec8358121b306b3d680b2976c4369b3038a31b"
+  },
+  {
+   "role": "INPUT DATA -- public, the benchmark panel; source of the agreement column",
+   "path": "/data/wenhui/openknot_data/Data/OpenKnotBench_data.v4.5.1.csv",
+   "exists": true,
+   "bytes": 139830358,
+   "sha256": "22fa72df6d98f86fbf37a57e679f717628a5d5db3737df3f5519901bc9777901"
+  }
+ ],
+ "manuscript": [
+  {
+   "role": "the manuscript",
+   "path": "paper/intervention_benchmark/NM_intervention.tex",
+   "exists": true,
+   "bytes": 121794,
+   "sha256": "f75fba9e06600c1d88f3577281ee852eb20a734d589e03177bb5031d40c1cc8d"
+  },
+  {
+   "role": "generated numbers; every printed measurement lives here",
+   "path": "paper/intervention_benchmark/figs/nm_numbers.tex",
+   "exists": true,
+   "bytes": 25649,
+   "sha256": "92766eb90d001f70391c24295889f580201227abd3d12676de494a36477b6003"
+  },
+  {
+   "role": "the number generator",
+   "path": "paper/intervention_benchmark/make_numbers.py",
+   "exists": true,
+   "bytes": 35565,
+   "sha256": "7fae286cdee0280409162ca14b64978512fa9264edb0a5795d2463205eda308f"
+  },
+  {
+   "role": "the build gate that refuses a hand-typed measurement",
+   "path": "paper/intervention_benchmark/make_check.py",
+   "exists": true,
+   "bytes": 6643,
+   "sha256": "cb39b7cfcf9c1172365f92a4418f10cfa026d1a0fe7b9ea2743869a2b98c5db4"
+  },
+  {
+   "role": "process/provenance declaration",
+   "path": "paper/intervention_benchmark/provenance.json",
+   "exists": true,
+   "bytes": 4631,
+   "sha256": "08445341b8961973d70677ed60896943672b6d44c4c2adeeab9918d71ede1e2b"
+  },
+  {
+   "role": "the repository's own audit tool",
+   "path": "paper/audit_manuscript.py",
+   "exists": true,
+   "bytes": 14546,
+   "sha256": "4bcbc0c1532c50a2d2290344f7014ff55381b04cf6b4ca19c5f7977602aa77a7"
+  }
+ ],
+ "our_run_artifacts": [
+  {
+   "path": "rna_harness/runs/ceiling/m20_designer_confounding.json",
+   "exists": true,
+   "bytes": 3694,
+   "sha256": "cad24119ab263acfe1dddc745c42e359b679b4ae40778142338b996885b35960",
+   "provenance_class": "preregistered",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/m25_estimator_benchmark.json",
+   "exists": true,
+   "bytes": 5950,
+   "sha256": "c01d18ef0a610dad583e547c04781580e7dc01f4ebffbba7414776e64a7e0963",
+   "provenance_class": "preregistered",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/m26_model_scored.json",
+   "exists": true,
+   "bytes": 2217,
+   "sha256": "5301e33e25658a3afd3bdef4c36d65ac669bae101cb3a203947acfa6885d854a",
+   "provenance_class": "preregistered",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/m26b_model_panel.json",
+   "exists": true,
+   "bytes": 4656,
+   "sha256": "e27f80a4fdbc570234a61de82dba0ca2bd65c5e723a61c216d4b72371f75817a",
+   "provenance_class": "preregistered",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/m26c_leakage.json",
+   "exists": true,
+   "bytes": 731,
+   "sha256": "5a8e19719623d8b6849af9efb407821daae494cade807f020656db36cad91f95",
+   "provenance_class": "preregistered",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/m26c_neural_scored.json",
+   "exists": true,
+   "bytes": 2325,
+   "sha256": "e2ecc954c9e5c0a8e283fd4c550bcc09ac5b49fa8794b698548ad3ce8158a740",
+   "provenance_class": "preregistered",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/m26d_clean_subset.json",
+   "exists": true,
+   "bytes": 1727,
+   "sha256": "a7fc4fee3f3fbd39b4adc62e7e803f2f2ea82c9024bf7b98a0c191c25b0ff9b6",
+   "provenance_class": "preregistered",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/m26r3_realistic_calibration.json",
+   "exists": true,
+   "bytes": 1921,
+   "sha256": "f6d5f4d38597987e1eb86b75fa94ffec6e993855238d27758efef80e70cd793c",
+   "provenance_class": "review",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/m26r4_calibration_symmetry.json",
+   "exists": true,
+   "bytes": 3166,
+   "sha256": "dc5465448f807368b0cd9c7dbc9861edd8d6235919ef1f869e01413da6fc44e8",
+   "provenance_class": "review",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/m26v_alpha_verify.json",
+   "exists": true,
+   "bytes": 1547,
+   "sha256": "0b17f37b74b6b20388c9608c09119260caa9165e27a6b1a4d9b4ca8b1636144c",
+   "provenance_class": "review",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/m26w_rescue_provenance.json",
+   "exists": true,
+   "bytes": 277,
+   "sha256": "43f668e35ade3bb63bfe74ef73ee844cf482648f02141e0a684a1b27212a0a19",
+   "provenance_class": "review",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/m27_corpus_survey_all.json",
+   "exists": true,
+   "bytes": 196362,
+   "sha256": "6da500bac09c25cbce0750c0aec5d121408b86c8fff6eb1b05e8f8fedc31c965",
+   "provenance_class": "survey",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/m28_second_corpus.json",
+   "exists": true,
+   "bytes": 65701,
+   "sha256": "716315abcbb49e445d2da042a2f6c8a406ceadedc7a11b1703360dd6c4849874",
+   "provenance_class": "preregistered",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/m28r_review.json",
+   "exists": true,
+   "bytes": 3536,
+   "sha256": "26f160a0d9bdbc7500dc7b67faa00b8df75dc62fadd43b04b2d768917c7f5e5b",
+   "provenance_class": "review",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/m30_selection_audit.json",
+   "exists": true,
+   "bytes": 8936,
+   "sha256": "f5cb79d1b2a1b4dddf3db4381e05ae7ab611123ce13122057f9a0f53f61371a7",
+   "provenance_class": "preregistered",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/m31_which_flips_rescue.json",
+   "exists": true,
+   "bytes": 7949,
+   "sha256": "1fb671ed56e14d2728c9186df81131879c04a313c375ed859291acf123816094",
+   "provenance_class": "preregistered",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/m31r_review.json",
+   "exists": true,
+   "bytes": 1577,
+   "sha256": "4384add2fff761f9b875de7ab5167f9a0efbf57f4a2a8fb575f84ceb4e2fb4c5",
+   "provenance_class": "review",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/m31s_depth_share.json",
+   "exists": true,
+   "bytes": 415,
+   "sha256": "d52a1d8bd2fb65d83fa4042b8f9be3148d73927e3ecdc2189d13117ca9ab95ef",
+   "provenance_class": "support",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/m31t_recovery_curve.json",
+   "exists": true,
+   "bytes": 1811,
+   "sha256": "da67a675ae18405287f652984d06ade1c8fdefa1074f3777a8bc1271e3dd2bf3",
+   "provenance_class": "support",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/m32_third_model_class.json",
+   "exists": true,
+   "bytes": 3786,
+   "sha256": "3eed564d21a8545046f7ddbd695dee02e8d66ffd52ab95aae1d5c4d88cd83505",
+   "provenance_class": "preregistered",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/m32r_review.json",
+   "exists": true,
+   "bytes": 1190,
+   "sha256": "bcf6db2f7d78bf37e08375fe45371ac14a972a9f5d7dd697c4c43f9e1f8a3993",
+   "provenance_class": "review",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/m33_cluster_census.json",
+   "exists": true,
+   "bytes": 625,
+   "sha256": "e4ed025d8962732c84642a1783e58cccd85331ade79abdcc283dbdfdb4b990aa",
+   "provenance_class": "survey",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/m34_admission_census.json",
+   "exists": true,
+   "bytes": 545,
+   "sha256": "25b7f1c83876e505586773cb17e527ccf0d7a7670f7bfdcecc4a13694fa9fd97",
+   "provenance_class": "survey",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/m35_paired_predictor_differences.json",
+   "exists": true,
+   "bytes": 5082,
+   "sha256": "78d89bc97f218008d33ceb465864112e58967d8197a2692111d64cb47d64b221",
+   "provenance_class": "preregistered",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/m36_readout_scale.json",
+   "exists": true,
+   "bytes": 2756,
+   "sha256": "b2f64794209533d82b71f1f9af89ac7d91de7a8e1ef89f90f3cdb76eacc5da1c",
+   "provenance_class": "preregistered",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/m36_readout_scale_declaration.json",
+   "exists": true,
+   "bytes": 3244,
+   "sha256": "e92ef69bde63fc9e89c9331ed6202b51692ec106634398e155a01ca6b2123418",
+   "provenance_class": "support",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/m37_channel_ledger.json",
+   "exists": true,
+   "bytes": 8033,
+   "sha256": "44c416dc26403178520ef8bf6e5c8af30d853be6775eba116efb9071ff1d4e65",
+   "provenance_class": "support",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/m38_ribosnitch_baseline.json",
+   "exists": true,
+   "bytes": 2939,
+   "sha256": "7278d9f43ee3ee6c4864859375153e4ffd6baa23449b3a5f30b525ba485830e4",
+   "provenance_class": "preregistered",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/m39_exposure_tiers.json",
+   "exists": true,
+   "bytes": 14571,
+   "sha256": "59a278083263adb452b6cb52c23eb78468d93998dcd00cbf60c0f47d87a9102e",
+   "provenance_class": "preregistered",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/m39_exposure_tiers_declaration.json",
+   "exists": true,
+   "bytes": 6525,
+   "sha256": "bcfa7a24c6b48e80d21ce45ba4bd2be90f84fbe48c64ec7187529d7b65dda1cc",
+   "provenance_class": "declaration",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/m40v_verify_m38_m39.json",
+   "exists": true,
+   "bytes": 3637,
+   "sha256": "ce6c09489f90f7d4e0d974e23e219300a31cc0e40712e799a82d35a68c4718aa",
+   "provenance_class": "review",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  }
+ ],
+ "counts": {
+  "input_data": 2,
+  "manuscript": 6,
+  "our_outputs": 31
+ }
+}

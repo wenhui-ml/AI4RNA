@@ -1,0 +1,47 @@
+{
+ "request_id": "NM-manuscript-audit",
+ "audited_object": "a finished manuscript plus the committed run artifacts behind it",
+ "recommended_schema": "Sample A (manuscript / proof audit): decompose into atomic claims, per claim a logic pass (T) with quoted evidence and a deterministic recomputation pass (D); result track = verify_gate + reproducibility by an independent route.",
+ "title": "Scoring RNA Structure Prediction on Interventions That Have Already Been Performed",
+ "one_line": "An instrument paper. It recovers controlled two-nucleotide interventions already executed in a public chemical-probing corpus, scores three structure predictors by their response rather than by agreement with a reference, and prices eight channels through which a benchmark number can be carried by a covariate somebody chose.",
+ "abstract_as_printed": "Chemical-probing benchmarks score RNA structure predictors by how far a predicted structure agrees with a reference. Agreement saturates; and on a corpus written by design programs, chosen by a selection rule and scored against a model's own output, the number a benchmark reports is carried by a covariate somebody chose rather than by the property it is named after. We recover 4317 two-nucleotide interventions already executed in a public benchmark -- compensatory orientation flips whose measured outcome contains no folding model -- score three predictors by response, and price 8 such channels. 5 carry the number and 3 are empty. The reference channel carries most: the same molecules read interventionally give +0.2400 standard deviations against +0.0848 read as agreement. The declared target carries as much as any model: helix depth, a free integer, is matched by all three predictors ([-0.0737, +0.0866], [-0.1646, +0.0292], [-0.1383, +0.0477], all covering zero), and what survives with depth held fixed is real but modest (+0.2380, [+0.1741, +0.3069]). The model's own authors carry it along two separable axes -- the decomposition +0.06624 ([+0.0347, +0.1012]) and the training data +0.02470 ([+0.0044, +0.0428]), differing by +0.04155 ([+0.0058, +0.0809]). The empty channel is the folding model's own free energy, the objective every one of these design programs was optimising. We report the prices as direct contrasts and never as shares, because the estimator for a share is uninformative here -- which we show, and withdraw a metric of our own for.",
+ "claim_quotes_as_printed": [
+  {
+   "claim_id": "NM-C1",
+   "verbatim_as_printed": "On this corpus the conventional structure-agreement readout is near saturation for the pairs under comparison, and its answer moves by 4.50x with a defensible change in which pairs are admitted. The interventional readout, on the same molecules and strata, returns a contrast +0.0329 ([+0.0024, +0.0638]) larger and admits no such choice.",
+   "where": "Results / the conventional readout on this corpus"
+  },
+  {
+   "claim_id": "NM-C2",
+   "verbatim_as_printed": "On 4317 executed two-nucleotide interventions, a neural predictor's own output distinguishes G--C from A--U targets in matched contexts by +0.0605 ([+0.0329, +0.0956]), tracking the measurement's +0.0539 ([+0.0220, +0.0911]); a thermodynamic predictor's output does not resolve such a separation, and neither does a second predictor on that same decomposition whose parameters were fitted to chemical mapping (-0.0304, [-0.0628, +0.0105]; -0.00569, [-0.0306, +0.0232]). The instrument distinguishes something one structural decomposition represents and the other does not, without a reference structure entering the comparison. Paired over the same resample, the transformer exceeds the two of them by [+0.0528, +0.1318] and [+0.0347, +0.1012] and they differ from each other by [-0.0428, -0.0042], so the effect decomposes rather than dichotomises: the decomposition is worth +0.06624 ([+0.0347, +0.1012]) and the training data +0.02470 ([+0.0044, +0.0428]), a gap of +0.04155 ([+0.0058, +0.0809]).",
+   "where": "Results / what the instrument reads out"
+  },
+  {
+   "claim_id": "NM-C3",
+   "verbatim_as_printed": "On this task a free integer matches a transformer trained on roughly two million chemical-mapping profiles (+0.3225 against +0.3295, difference [-0.0737, +0.0866]). Holding it fixed, both predictors retain a real but modest ordering ability (+0.2380 and +0.1820, both $p <= <0.001$), worth 1.96 points of recovery when used to break the baseline's ties. Any claim that a structure predictor knows which mutations rescue must be stated as an increment over helix depth, and to our knowledge none has been.",
+   "where": "Results / which flips rescue, and the free baseline nobody reports"
+  },
+  {
+   "claim_id": "NM-C4",
+   "verbatim_as_printed": "Every result above is an answer to the same question asked of a different covariate. The corpus was not sampled: design programs wrote the molecules, a rule chose which of them were made, experimenters chose which pairs to mutate, and the reference against which agreement is scored is itself a model's output. In that setting a benchmark number is carried by a covariate somebody chose, and the work of an instrument is to name each chooser and put a price on the channel. Table [tab:channels] is this paper's ledger. It introduces no new estimate: every price in it is reported and defended in the section named beside it, and each was read back from its own run artifact and checked against the value this manuscript prints (0 disagreements).",
+   "where": "Results / the ledger: who chose the covariate that carries each number"
+  },
+  {
+   "claim_id": "NM-C5",
+   "verbatim_as_printed": "RibonanzaNet was trained on Eterna's OpenKnot campaigns and this corpus is an OpenKnot round, so overlap is the first thing a reader should demand and not the last. The mutants themselves cannot be implicated -- the mutate-map-rescue library postdates the released weights -- but the wild types can, and a memorised wild type would give the model a prior on the molecule. We assembled 861{,}916 unique sequences from 14 of the model's own source libraries, deposited by the same laboratory under names that identify them, and ran four levels. Exact whole-construct overlap with our 14416 sequences is 0. At the design window, 6.37% of our sequences reach $0.8$ identity to some training window, 3.84% reach $0.9$, and 264 appear verbatim -- players reuse their own designs across rounds, which is neither surprising nor benign. Excising every design cell above the 0.80 threshold removes 14 of 158 cells (8.9%) and 324 of 4317 interventions. On the remaining",
+   "where": "Results / the leakage audit, in the main text"
+  },
+  {
+   "claim_id": "NM-C6",
+   "verbatim_as_printed": "",
+   "where": "Results / a metric we withdraw"
+  }
+ ],
+ "independence_conditions": [
+  "Do not import, call or execute any module under rna_harness/. The result track must not run the audited party's implementation.",
+  "Do not take any number in claims.json:printed_value as an input. Those are the claims under audit, supplied so you know what to disagree with.",
+  "The two public CSVs in artifacts.json:input_data are the substrate. Everything else in this repository is OUR output and is evidence about our process, not evidence for a number.",
+  "Derive your own supervision plan. sanity_checks.md lists first-principles invariants this manuscript asserts; they are claims to be checked, not a plan to be adopted."
+ ],
+ "_schema": "manuscript-audit-input/v1"
+}

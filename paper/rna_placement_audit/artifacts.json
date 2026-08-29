@@ -1,0 +1,375 @@
+{
+ "input_data": [
+  {
+   "role": "INPUT DATA -- public, independently re-derivable, the substrate for the result track",
+   "path": "/data/wenhui/openknot_data/Data/OK7a_M2R_data.v4.5.1.csv",
+   "exists": true,
+   "bytes": 26534702,
+   "sha256": "00d62f7d39b37e48507ca5a949ec8358121b306b3d680b2976c4369b3038a31b"
+  },
+  {
+   "role": "INPUT DATA -- public, the benchmark panel; source of the agreement column",
+   "path": "/data/wenhui/openknot_data/Data/OpenKnotBench_data.v4.5.1.csv",
+   "exists": true,
+   "bytes": 139830358,
+   "sha256": "22fa72df6d98f86fbf37a57e679f717628a5d5db3737df3f5519901bc9777901"
+  }
+ ],
+ "manuscript": [
+  {
+   "role": "the manuscript",
+   "path": "paper/rna_placement/R1_placement.tex",
+   "exists": true,
+   "bytes": 125901,
+   "sha256": "fd1afdf46e12c52f6277ad5c412ff45370d05670576ce88355e3dca2d6fe6d67"
+  },
+  {
+   "role": "generated numbers; every printed measurement lives here",
+   "path": "paper/rna_placement/figs/rna_numbers.tex",
+   "exists": true,
+   "bytes": 26639,
+   "sha256": "66c528f1f09748cbb39d6cade070c6b7908b293a9e75ed3ecf563e71fad3ca54"
+  },
+  {
+   "role": "the number generator",
+   "path": "paper/rna_placement/make_numbers.py",
+   "exists": true,
+   "bytes": 32127,
+   "sha256": "4ab395aeb462c47714154d34ac6dd20b1b1d67a3a63b88257963e3b4fb25d860"
+  },
+  {
+   "role": "the build gate that refuses a hand-typed measurement",
+   "path": "paper/rna_placement/make_check.py",
+   "exists": true,
+   "bytes": 6641,
+   "sha256": "bade4c7fcf622aa651d7ffc4fec8f0adc3e1ec198cad973d67431e7f3f3df633"
+  },
+  {
+   "role": "process/provenance declaration",
+   "path": "paper/rna_placement/provenance.json",
+   "exists": true,
+   "bytes": 4548,
+   "sha256": "e6f7feb6dd8d964635156bc2f04e216a1d5bf03d323baa683873a54f68b08ef9"
+  },
+  {
+   "role": "the repository's own audit tool",
+   "path": "paper/audit_manuscript.py",
+   "exists": true,
+   "bytes": 14546,
+   "sha256": "4bcbc0c1532c50a2d2290344f7014ff55381b04cf6b4ca19c5f7977602aa77a7"
+  }
+ ],
+ "our_run_artifacts": [
+  {
+   "path": "rna_harness/runs/ceiling/m13b_gc_placement.json",
+   "exists": true,
+   "bytes": 7630,
+   "sha256": "8279893c4acf35fa8579f72f20fadf875626aaba8b7697821eaae95faaaf690b",
+   "provenance_class": "preregistered",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/m13c_symmetric.json",
+   "exists": true,
+   "bytes": 14639,
+   "sha256": "ac0251f6cca606f230ddd1a370fb1167869f8e1a77e2bd7d7fc7c432ef2eb22f",
+   "provenance_class": "preregistered",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/m14_mutation_intervention.json",
+   "exists": true,
+   "bytes": 2934,
+   "sha256": "5c02ee25075f4d8163883c01e61cb9cbed3a8fd4f30630714be0d924f5bd4036",
+   "provenance_class": "preregistered",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/m16_rescue.json",
+   "exists": true,
+   "bytes": 2128,
+   "sha256": "5f6d4a28c18514f25b17ec9c17eba0898bdac57ec484ed10d25c22bf69456de4",
+   "provenance_class": "preregistered",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/m17d_typeI_diag.json",
+   "exists": true,
+   "bytes": 13376,
+   "sha256": "c470bf58d8d9104b3779de46ef2bc1b3e4a9ec44468723cbc9a6eff6ba99c41d",
+   "provenance_class": "review",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/m18_repaired_null.json",
+   "exists": true,
+   "bytes": 14157,
+   "sha256": "a0da2ac77bb5d2f8bf2def3e22d5fe0283bd273f7d56b6b66429b4344e4396cd",
+   "provenance_class": "preregistered",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/m18v_verify_repair.json",
+   "exists": true,
+   "bytes": 2559,
+   "sha256": "72904de231eada6209012ceb2da75dc8e441c2341067f056ac53c79ca8c8ca0e",
+   "provenance_class": "review",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/m19_m13c_symmetric_repaired.json",
+   "exists": true,
+   "bytes": 14677,
+   "sha256": "a0aff95adfcaab0cbbf19396cec19553f6c553e5aba7cf8dae04e2a8949e1ca2",
+   "provenance_class": "review",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/m19_m13d_stability_repaired.json",
+   "exists": true,
+   "bytes": 4694,
+   "sha256": "eea0859efe37545087317e604441989612cb69e3fac45316d7e41aadd1d66d39",
+   "provenance_class": "review",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/m19_m15_structure_filter_repaired.json",
+   "exists": true,
+   "bytes": 4970,
+   "sha256": "d5e4573f770c5c29e03b782b6ef95fd609e7ec0a4db293fb2f470a8e76a85c13",
+   "provenance_class": "review",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/m20_designer_confounding.json",
+   "exists": true,
+   "bytes": 3694,
+   "sha256": "cad24119ab263acfe1dddc745c42e359b679b4ae40778142338b996885b35960",
+   "provenance_class": "preregistered",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/m21_thermo_mediator.json",
+   "exists": true,
+   "bytes": 3805,
+   "sha256": "cf2677de9a5a4ea66f7d4a4ed4110058483f888bf98244bedd3732c4ba615f83",
+   "provenance_class": "preregistered",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/m21b_direct_contrast.json",
+   "exists": true,
+   "bytes": 495,
+   "sha256": "be764af7fec6f551e5330cf29ec6b50ee6d725efa61d621c4d2289a33ee9e8ec",
+   "provenance_class": "review",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/m21v_verify.json",
+   "exists": true,
+   "bytes": 1199,
+   "sha256": "0bf9df6857dc3fb645bb017a47a7b4f82805f49c0f0858984bcebcead2b58760",
+   "provenance_class": "review",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/m22_review_arms.json",
+   "exists": true,
+   "bytes": 2012,
+   "sha256": "b8d553b4076add425187b918ed8f53c502498cd5f5032e200a5e8c279dda7701",
+   "provenance_class": "preregistered",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/m23_exact_null.json",
+   "exists": true,
+   "bytes": 3052,
+   "sha256": "8a786583412a1ee61e1f70a7ae0aff2128f8b8b4225e5213ae4c4e45d404656a",
+   "provenance_class": "preregistered",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/m23c_imbalance_bound.json",
+   "exists": true,
+   "bytes": 3833,
+   "sha256": "278c17d46319231804326751082a0f1df937fd283999852564d3314ff36d0cd6",
+   "provenance_class": "support",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/m24_cross_round.json",
+   "exists": true,
+   "bytes": 3735,
+   "sha256": "d4855562c2779647857552dd319b3db75c0b6b313a2a11328f8b4cb3a7c9351c",
+   "provenance_class": "preregistered",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/m26r2_positive_control.json",
+   "exists": true,
+   "bytes": 934,
+   "sha256": "1900a717a1cc66c564058f5a4630066504e96876b23d36dfb09c1d04079d6eca",
+   "provenance_class": "review",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/m26r3_realistic_calibration.json",
+   "exists": true,
+   "bytes": 1921,
+   "sha256": "f6d5f4d38597987e1eb86b75fa94ffec6e993855238d27758efef80e70cd793c",
+   "provenance_class": "review",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/m26r4_calibration_symmetry.json",
+   "exists": true,
+   "bytes": 3166,
+   "sha256": "dc5465448f807368b0cd9c7dbc9861edd8d6235919ef1f869e01413da6fc44e8",
+   "provenance_class": "review",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/m28_second_corpus.json",
+   "exists": true,
+   "bytes": 65701,
+   "sha256": "716315abcbb49e445d2da042a2f6c8a406ceadedc7a11b1703360dd6c4849874",
+   "provenance_class": "preregistered",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/m28r_review.json",
+   "exists": true,
+   "bytes": 3536,
+   "sha256": "26f160a0d9bdbc7500dc7b67faa00b8df75dc62fadd43b04b2d768917c7f5e5b",
+   "provenance_class": "review",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/m29_binder_crossdomain.json",
+   "exists": true,
+   "bytes": 2815,
+   "sha256": "ad08c5ba8ebc53c520257582bca0f6c370e16fc4bf595e8496bc5624ec8be104",
+   "provenance_class": "preregistered",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/m29r_review.json",
+   "exists": true,
+   "bytes": 7384,
+   "sha256": "d29ce61d838049c2cfdb9ed2cfe3d38cb1382de1c362ffc306e69887229f3402",
+   "provenance_class": "review",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/m30_selection_audit.json",
+   "exists": true,
+   "bytes": 8936,
+   "sha256": "f5cb79d1b2a1b4dddf3db4381e05ae7ab611123ce13122057f9a0f53f61371a7",
+   "provenance_class": "preregistered",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/m33_cluster_census.json",
+   "exists": true,
+   "bytes": 625,
+   "sha256": "e4ed025d8962732c84642a1783e58cccd85331ade79abdcc283dbdfdb4b990aa",
+   "provenance_class": "survey",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/panel_f1_designs.json",
+   "exists": true,
+   "bytes": 4049670,
+   "sha256": "c7bae6fd06d30e5f9ff5332be32f71b26ad0afded9b162bac33607f286afea6d",
+   "provenance_class": "corpus",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/panel_f1_fifth.json",
+   "exists": true,
+   "bytes": 1440511,
+   "sha256": "cf520466cb8f8e1a8f710889cfdcb7ebe66383d0d72f6089eafc1b87b9fd91e8",
+   "provenance_class": "corpus",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/panel_f1_fourth.json",
+   "exists": true,
+   "bytes": 2676206,
+   "sha256": "4cb31e7c2ca4c2c10c0487ea908554d4781d647ce5b90cf3c6c4be436614693e",
+   "provenance_class": "corpus",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/panel_f1_fresh.json",
+   "exists": true,
+   "bytes": 9367598,
+   "sha256": "d0e78d6245d95fc51cfed776358610a6a3b50c7a0d9cea3cfc534f0cbc136906",
+   "provenance_class": "corpus",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/panel_f1_sixth.json",
+   "exists": true,
+   "bytes": 1285833,
+   "sha256": "bec49eff54b3c42e89823048ea4c205261455f964c1ada6d1bb3b284034016d7",
+   "provenance_class": "corpus",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/panel_f1_third.json",
+   "exists": true,
+   "bytes": 4645662,
+   "sha256": "12bf9c999b3a5fe6c3b13bf34393c9194ccf42e8d4114b85d77ea2f923f296f8",
+   "provenance_class": "corpus",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  },
+  {
+   "path": "rna_harness/runs/ceiling/r1b_ceiling_interval.json",
+   "exists": true,
+   "bytes": 1355,
+   "sha256": "aef4377bd8474ef5fc8c8388e3af360523899ecb3aa774ba9f4461c7ff27cc6a",
+   "provenance_class": "review",
+   "tracked_by_git": true,
+   "trust": "OUR OUTPUT -- evidence about our process, never evidence for a number"
+  }
+ ],
+ "counts": {
+  "input_data": 2,
+  "manuscript": 6,
+  "our_outputs": 34
+ }
+}

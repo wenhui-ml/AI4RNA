@@ -1,0 +1,65 @@
+{
+ "_note": "claims the manuscript makes ABOUT ITS OWN PROCESS. Each is falsifiable from the repository without any answer key, which is what makes them the process track's natural material.",
+ "claims": [
+  {
+   "id": "P1",
+   "claim": "Every measured number printed in the manuscript reaches LaTeX through a generated macro, so a printed figure cannot drift from the run that produced it.",
+   "falsify_by": "find a decimal literal in the .tex body that is a measurement. make_check.py is the gate; run it and see whether it actually refuses one.",
+   "check_command": "python make_check.py   # in the manuscript directory"
+  },
+  {
+   "id": "P2",
+   "claim": "Every experiment classed 'preregistered' has a declaration that was frozen, committed and PUSHED before the code that produced it existed.",
+   "falsify_by": "for each declaration in provenance.json, compare `git log --diff-filter=A` for the declaration and for its script. If the script was added first, the claim is false for that experiment.",
+   "check_command": "git log --diff-filter=A --format='%aI %H' -- <declaration> <script>"
+  },
+  {
+   "id": "P3",
+   "claim": "Staked predictions are graded in the declaration's own wording, including where the prediction failed, and failures are printed in the manuscript.",
+   "falsify_by": "read each declaration's `staked` block and find the corresponding row in the manuscript's preregistration appendix. A stake with no row, or a row whose wording differs from the declaration, is a finding.",
+   "check_command": null
+  },
+  {
+   "id": "P4",
+   "claim": "No claim in the manuscript rests on the withdrawn estimator (a mediated fraction / a ratio of two contrasts).",
+   "falsify_by": "search the results and conclusion for any quantity that is a ratio of two contrasts or is described as a share, fraction or percentage OF an effect.",
+   "check_command": null
+  },
+  {
+   "id": "P5",
+   "claim": "Where two magnitudes are compared, an interval on their DIFFERENCE is reported -- not two separate intervals.",
+   "falsify_by": "find a comparison of two point estimates with no interval on the difference. The paper retracts one such comparison itself; a second one that is not flagged is a finding.",
+   "check_command": null
+  },
+  {
+   "id": "P6",
+   "claim": "Every artifact a generator reads exists and is tracked by git, and every artifact tracked is classified in provenance.json.",
+   "falsify_by": "run the repository's own audit tool and read checks [D] and [H].",
+   "check_command": "python paper/audit_manuscript.py <manuscript-dir>"
+  },
+  {
+   "id": "P7",
+   "claim": "Every key cited in the body exists in refs.bib, so no citation typesets as a question mark.",
+   "falsify_by": "check [J] of the audit tool, or diff the cited keys against the bib keys. This check exists because two such keys once reached a committed PDF.",
+   "check_command": "python paper/audit_manuscript.py <manuscript-dir>   # check [J]"
+  },
+  {
+   "id": "P8",
+   "claim": "Bibliographic entries are real: every author list, volume and DOI was fetched rather than recalled.",
+   "falsify_by": "resolve every DOI and arXiv id in refs.bib and compare the author lists. A placeholder author field, or a DOI that does not resolve, is a finding. Two placeholder author fields were present in an earlier commit.",
+   "check_command": null
+  },
+  {
+   "id": "P9",
+   "claim": "Boundary and unexpected results were put through a four-step verification before any conclusion was changed: (1) an independent reimplementation recomputing the same number, (2) a mathematically equivalent alternative form, (3) a reverse control reproducing the OLD number with the OLD code, (4) a zero/identity self-check.",
+   "falsify_by": "for each result the manuscript calls a boundary or a failed stake, locate all four steps in the committed artifacts. A missing step is a finding even when the conclusion is right.",
+   "check_command": null
+  },
+  {
+   "id": "P10",
+   "claim": "Negative results are reported bounded: an interval containing zero is reported as unresolved, never as a refutation.",
+   "falsify_by": "find a sentence that reads an interval containing zero as evidence of absence.",
+   "check_command": null
+  }
+ ]
+}

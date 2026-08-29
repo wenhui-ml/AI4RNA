@@ -1,0 +1,131 @@
+{
+ "_note": "printed_value is the claim under audit, not an input to the audit. It is here so a disagreement can be located, and it is the only place our numbers appear.",
+ "reference_column_disclosure": "The conventional structure-agreement readout on this corpus is scored against the column RNet_structure of OpenKnotBench_data.v4.5.1.csv. That column is the NEURAL PREDICTOR'S OWN PREDICTED STRUCTURE. The file contains no probing-derived structure column. This is disclosed because it makes one claim's comparator another claim's subject, and an auditor who does not know it will mis-scope both.",
+ "claims": [
+  {
+   "id": "R1-C1",
+   "axis": "estimator theory",
+   "section": "Method / two routes to a mediated fraction, and when they disagree",
+   "estimand": "Let T be a binary exposure and M a bounded observed mediator, with E[Y|T,M] = alpha_T + h(M) (no T-by-M interaction). Let beta be the least-squares slope of Y on M under a fixed reference law, g = E[M|A]-E[M|B], and r(m) = h(m) - beta*m. Claim: (total - controlled-direct) - beta*g equals exactly E[r(M)|A]-E[r(M)|B]; it is bounded by osc(r) * d_TV(P_{M|A},P_{M|B}); and the two routes agree for EVERY pair of exposure laws IF AND ONLY IF h is affine on the support of M.",
+   "what_would_falsify_it": "a counterexample with h affine and the routes disagreeing; or a non-affine h for which no pair of exposure laws separates the routes; or a case violating the stated bound",
+   "independent_route_SPECIFICATION_NOT_IMPLEMENTATION": [
+    "This is a proposition, not a measurement. Verify it symbolically or by construction. The 'only if' direction is the load-bearing half: given non-affine h, exhibit exposure laws that separate the routes (a point mass at a point where r differs from its mean against the reference law suffices).",
+    "PRIORITY NOTE the auditor should check the paper makes: the NON-EQUIVALENCE of the two routes under a nonlinear outcome model is standard and the paper must disclaim priority for it. What is claimed as new is the closed-form gap, the bound by an observable, and the iff. If the manuscript claims the non-equivalence itself as novel, that is a finding."
+   ],
+   "backing_artifacts": [],
+   "printed_value": {
+    "trust": "DO_NOT_TRUST_RECOMPUTE_INDEPENDENTLY",
+    "macros": {
+     "eLinearGapPts": "75.0"
+    }
+   }
+  },
+  {
+   "id": "R1-C2",
+   "axis": "calibration / retraction",
+   "section": "Results / which route is readable is a question for calibration",
+   "estimand": "Inject a KNOWN mediated fraction f into the real mediator and record what each estimator reads back, sweeping f. Claim: the reading covers only a fraction of the range the truth covers, and returns a specific value at total mediation; therefore every mediated fraction this work previously reported is withdrawn.",
+   "what_would_falsify_it": "the sweep's zero rung does not return zero; or the injection changes the mediator's marginal law in a way that alone explains the shortfall",
+   "independent_route_SPECIFICATION_NOT_IMPLEMENTATION": [
+    "Reimplement the injection from the specification in calibration.md and sweep f. Compare the SPAN of the reading against the SPAN of the truth, not the correlation between them.",
+    "Check the f=0 rung returns zero. A ladder whose zero rung does not fall back to nominal is void by the paper's own definition."
+   ],
+   "backing_artifacts": [
+    "m26r3_calibration.json",
+    "m26r4_calibration_symmetry.json"
+   ],
+   "printed_value": {
+    "trust": "DO_NOT_TRUST_RECOMPUTE_INDEPENDENTLY",
+    "macros": {
+     "calNSpanFrac": "12.9\\%",
+     "calVSpanFrac": "28.7\\%",
+     "calNFull": "+131.4\\%",
+     "calVFull": "-842.5\\%"
+    }
+   }
+  },
+  {
+   "id": "R1-C3",
+   "axis": "placement channel",
+   "section": "Results / the placement gap and the depth slope",
+   "estimand": "The matched stratified difference in mean rescue between G-C and A-U targets, computed twice: MARGINALLY (design cell only) and MATCHED (design cell x helix depth x crossing). Claim: the two differ, the difference is quantitatively predicted by the product of a depth slope and a depth gap estimated on disjoint arms, and the residual of that prediction is reported.",
+   "what_would_falsify_it": "the identity marginal - matched = observed attenuation does not close; or the depth slope and the depth gap are estimated on the same records, which would make the prediction circular",
+   "independent_route_SPECIFICATION_NOT_IMPLEMENTATION": [
+    "Compute both contrasts from the public CSV with weight w_s = min(n_A(s), n_B(s)); strata missing an arm are DROPPED, never extrapolated into.",
+    "Check the closure as an identity to 1e-4 and report the residual epsilon. The paper reports it; a recomputation that does not is not comparable."
+   ],
+   "backing_artifacts": [
+    "m20_designer_confounding.json",
+    "m37_channel_ledger.json"
+   ],
+   "printed_value": {
+    "trust": "DO_NOT_TRUST_RECOMPUTE_INDEPENDENTLY",
+    "macros": {
+     "medMarginal": "+0.0250",
+     "medMatched": "+0.0539",
+     "medRatio": "2.2",
+     "medFrac": "71.2\\%"
+    }
+   }
+  },
+  {
+   "id": "R1-C4",
+   "axis": "energy channel (a null)",
+   "section": "Results / the energy the designs were optimised for",
+   "estimand": "The same identity contrast, with the nearest-neighbour free energy the model assigns to the pair held fixed by stratification. Claim: the contrast does not move -- retention near 100% -- so the channel every design program was optimising carries none of the effect; and a placebo mediator, built to have no path to the outcome, does not fire.",
+   "what_would_falsify_it": "the placebo mediator also absorbs a large share, which would void the arm; or the denominator of the retention is taken on a different population from the estimator's own, which inflates it",
+   "independent_route_SPECIFICATION_NOT_IMPLEMENTATION": [
+    "The retention's denominator MUST be computed on the estimator's own retained population. Using the full corpus as denominator is a known way to manufacture a large number here; the paper reports what that error would have produced.",
+    "dG_loc is undefined at non-canonical partners; check the guard exists and report how many records it touches."
+   ],
+   "backing_artifacts": [
+    "m21_thermo_mediator.json",
+    "m21v_verify.json",
+    "m22_review_arms.json"
+   ],
+   "printed_value": {
+    "trust": "DO_NOT_TRUST_RECOMPUTE_INDEPENDENTLY",
+    "macros": {
+     "eRet": "101.9\\%",
+     "eMed": "-1.9\\%",
+     "eMedCi": "[-10.6\\%,\\,+6.8\\%]",
+     "eZ": "+0.22"
+    }
+   }
+  },
+  {
+   "id": "R1-C5",
+   "axis": "external validity of the bound",
+   "section": "Results / the proposition, tested where none of this paper's machinery applies",
+   "estimand": "On a second, unrelated corpus of designed protein binders, the same route bound is put at risk. Claim: the bound does not merely hold, it TRACKS -- the overlap and the route gap move together across the two corpora by comparable ratios.",
+   "what_would_falsify_it": "the bound holds trivially because the gap is near zero on both corpora; or the two ratios are computed on quantities that are not comparable across corpora",
+   "independent_route_SPECIFICATION_NOT_IMPLEMENTATION": [
+    "The bound has two sides. Check the paper reports the SAME side on both corpora -- reporting one side on one corpus and the other side on the other would make the comparison meaningless."
+   ],
+   "backing_artifacts": [],
+   "printed_value": {
+    "trust": "DO_NOT_TRUST_RECOMPUTE_INDEPENDENTLY",
+    "macros": {
+     "xdN": "416",
+     "xdDtvRatio": "2.72",
+     "xdGapRatio": "2.66"
+    }
+   }
+  },
+  {
+   "id": "R1-C6",
+   "axis": "measurement ceiling",
+   "section": "Results / the measurement frame: what a point is worth",
+   "estimand": "A reproducibility ceiling for the wet readout, estimated from repeated measurement groups by a variance-of-moments argument. Claim: the ceiling is a specific value with an interval, and it is the one interval in the paper that resamples repeated measurement groups rather than targets.",
+   "what_would_falsify_it": "the repeat groups are misdefined; or the interval is described as resampling targets, which would be the wrong cluster",
+   "independent_route_SPECIFICATION_NOT_IMPLEMENTATION": [
+    "Identify the repeat groups independently from the corpus and re-estimate. The paper flags this interval as the exception to its own clustering convention; check the manuscript actually says so where the number appears."
+   ],
+   "backing_artifacts": [],
+   "printed_value": {
+    "trust": "DO_NOT_TRUST_RECOMPUTE_INDEPENDENTLY",
+    "macros": {}
+   }
+  }
+ ]
+}

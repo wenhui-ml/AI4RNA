@@ -1,0 +1,187 @@
+{
+ "_note": "printed_value is the claim under audit, not an input to the audit. It is here so a disagreement can be located, and it is the only place our numbers appear.",
+ "reference_column_disclosure": "The conventional structure-agreement readout on this corpus is scored against the column RNet_structure of OpenKnotBench_data.v4.5.1.csv. That column is the NEURAL PREDICTOR'S OWN PREDICTED STRUCTURE. The file contains no probing-derived structure column. This is disclosed because it makes one claim's comparator another claim's subject, and an auditor who does not know it will mis-scope both.",
+ "claims": [
+  {
+   "id": "NM-C1",
+   "axis": "readout scale",
+   "section": "Results / the conventional readout on this corpus",
+   "estimand": "Two contrasts on the SAME molecules and the SAME strata, each standardised by its own within-stratum standard deviation: (a) the interventional contrast, the matched stratified difference in mean rescue factor between G-C-target and A-U-target interventions; (b) the conventional contrast, the same matched stratified difference computed on a structure-agreement column. Claim: (a) is larger than (b) after standardisation, and (b) additionally moves by a factor when the set of admitted pairs is changed in a defensible way.",
+   "what_would_falsify_it": "the two contrasts are not on the same weights/strata; or the agreement column is not what the paper says it is; or the standardisation is not by within-stratum SD",
+   "independent_route_SPECIFICATION_NOT_IMPLEMENTATION": [
+    "From OK7a_M2R_data.v4.5.1.csv alone, rebuild the admitted set with the criterion in criterion.md, then compute the matched stratified difference in means with weight w_s = min(n_A(s), n_B(s)) over strata s = (design cell, min(depth,3), crossing).",
+    "From OpenKnotBench_data.v4.5.1.csv, take the agreement column the paper names in claims.json:reference_column_disclosure and repeat on identical weights and strata.",
+    "Standardise each by the pooled within-stratum SD of ITS OWN outcome column before comparing magnitudes. Comparing the raw contrasts is the error this claim exists to correct; a recomputation that compares them raw has not reproduced the claim."
+   ],
+   "backing_artifacts": [
+    "m36_readout_scale.json",
+    "m25_estimator_benchmark.json"
+   ],
+   "printed_value": {
+    "trust": "DO_NOT_TRUST_RECOMPUTE_INDEPENDENTLY",
+    "macros": {
+     "cvIntvSd": "+0.2400",
+     "cvConvSd": "+0.0848",
+     "cvPairedSd": "+0.1552",
+     "cvPairedSdCi": "[+0.0153,\\,\\allowbreak +0.3019]",
+     "cvSwing": "4.50"
+    }
+   }
+  },
+  {
+   "id": "NM-C2",
+   "axis": "pair identity",
+   "section": "Results / what the instrument reads out",
+   "estimand": "For each of three predictors, the matched stratified difference in the predictor's OWN output for the mutant target pair, between G-C-target and A-U-target interventions, on the same strata as the measured outcome; plus the same difference on the measured rescue factor. Claim: the neural predictor's output separates the two identities, the two nearest-neighbour predictors differ from each other, and the separation decomposes into an architecture axis and a training-data axis whose difference has an interval.",
+   "what_would_falsify_it": "any pair of predictors is compared without an interval on the DIFFERENCE; or the three predictor columns are not read on the same records; or the 1-based vs 0-based indexing of the two prediction sources is crossed",
+   "independent_route_SPECIFICATION_NOT_IMPLEMENTATION": [
+    "Recompute each predictor's pair probability for the named (i,j) in the mutant sequence from a partition function of your own choosing for the thermodynamic arm; for the neural and learned-parameter arms use the released weights named in artifacts.json.",
+    "Take differences of contrasts PAIRED ON THE SAME BOOTSTRAP RESAMPLE, clustering on the 20 puzzles. A recomputation that reports two separate intervals and no interval on their difference has not reproduced the claim.",
+    "Indexing is the trap: one prediction source is 0-based and the other is 1-based. A recomputation that gets the identity contrast right but the pairwise differences wrong should check this first."
+   ],
+   "backing_artifacts": [
+    "m35_paired_predictor_differences.json",
+    "m26_model_scored.json"
+   ],
+   "printed_value": {
+    "trust": "DO_NOT_TRUST_RECOMPUTE_INDEPENDENTLY",
+    "macros": {
+     "resNeural": "+0.0605",
+     "resNeuralCi": "[+0.0329,\\,\\allowbreak +0.0956]",
+     "resVienna": "\\ensuremath{-}0.0304",
+     "resViennaCi": "[\\ensuremath{-}0.0628,\\,\\allowbreak +0.0105]",
+     "efContrast": "\\ensuremath{-}0.00569",
+     "efContrastCi": "[\\ensuremath{-}0.0306,\\,\\allowbreak +0.0232]",
+     "pdNVCi": "[+0.0528,\\,\\allowbreak +0.1318]",
+     "pdNECi": "[+0.0347,\\,\\allowbreak +0.1012]",
+     "pdVECi": "[\\ensuremath{-}0.0428,\\,\\allowbreak \\ensuremath{-}0.0042]",
+     "axArch": "+0.06624",
+     "axArchCi": "[+0.0347,\\,\\allowbreak +0.1012]",
+     "axData": "+0.02470",
+     "axDataCi": "[+0.0044,\\,\\allowbreak +0.0428]",
+     "axGap": "+0.04155",
+     "axGapCi": "[+0.0058,\\,\\allowbreak +0.0809]"
+    }
+   }
+  },
+  {
+   "id": "NM-C3",
+   "axis": "free baseline",
+   "section": "Results / which flips rescue, and the free baseline nobody reports",
+   "estimand": "Within each design cell of at least 8 admitted interventions, the Spearman rank correlation between a score and the measured rescue factor, averaged across cells weighted by cell size, with a cluster bootstrap over the 20 puzzles. Scores: each predictor's pair probability, and HELIX DEPTH -- an integer read off the declared target structure, requiring no model. Claim: the paired difference (predictor minus depth) has an interval covering zero for every predictor, so no predictor beats the free integer; and three purpose-built mutation-effect scores lose to it with intervals that EXCLUDE zero on the losing side.",
+   "what_would_falsify_it": "the difference is read as two point estimates rather than as one interval on the difference -- which is the error the paper itself retracts here; or depth is computed from a predicted structure rather than from the declared target; or the bootstrap resamples interventions rather than puzzles",
+   "independent_route_SPECIFICATION_NOT_IMPLEMENTATION": [
+    "Depth of a pair (a,b) in the declared target structure = the number of consecutive nested pairs stacked outside it, capped by the number stacked inside it; formally min(dep, up) where dep counts k with (a-k-1, b+k+1) paired and up counts k with (a+k+1, b-k-1) paired. No model, no folding, no training data.",
+    "Compute the difference INSIDE each bootstrap resample and take the interval of the differences. Two separately-resampled intervals do not answer this claim.",
+    "The riboSNitch-style scores are: Euclidean distance between the wild-type and mutant base-pair probability matrices; base-pair distance between the two MFE structures; and |dG_ensemble(mut) - dG_ensemble(wt)|. Their declared sign is NEGATIVE (a rescuing flip preserves structure), so negate before ranking."
+   ],
+   "backing_artifacts": [
+    "m31_which_flips_rescue.json",
+    "m31r_review.json",
+    "m38_ribosnitch_baseline.json",
+    "m40v_verify_m38_m39.json"
+   ],
+   "printed_value": {
+    "trust": "DO_NOT_TRUST_RECOMPUTE_INDEPENDENTLY",
+    "macros": {
+     "rkRhoD": "+0.3225",
+     "rkRhoDCi": "[+0.2659,\\,\\allowbreak +0.3743]",
+     "rkRhoN": "+0.3295",
+     "rkDiffNCi": "[\\ensuremath{-}0.0737,\\,\\allowbreak +0.0866]",
+     "rkDiffVCi": "[\\ensuremath{-}0.1646,\\,\\allowbreak +0.0292]",
+     "efVsDepthCi": "[\\ensuremath{-}0.1383,\\,\\allowbreak +0.0477]",
+     "rkPartN": "+0.2380",
+     "rkPartNCi": "[+0.1741,\\,\\allowbreak +0.3069]",
+     "rsBppm": "+0.1713",
+     "rsBppmCi": "[+0.1191,\\,\\allowbreak +0.2228]",
+     "rsBppmVs": "\\ensuremath{-}0.1512",
+     "rsBppmVsCi": "[\\ensuremath{-}0.2280,\\,\\allowbreak \\ensuremath{-}0.0544]",
+     "rsMfeVs": "\\ensuremath{-}0.1766",
+     "rsMfeVsCi": "[\\ensuremath{-}0.2521,\\,\\allowbreak \\ensuremath{-}0.0824]",
+     "rsEnsVs": "\\ensuremath{-}0.2315",
+     "rsEnsVsCi": "[\\ensuremath{-}0.3011,\\,\\allowbreak \\ensuremath{-}0.1523]"
+    }
+   }
+  },
+  {
+   "id": "NM-C4",
+   "axis": "the ledger",
+   "section": "Results / the ledger: who chose the covariate that carries each number",
+   "estimand": "Eight covariate-choice channels, each priced by a direct contrast in its own units. Claim: five carry the number (one of them against the reported effect), three are empty, and the empty three are leakage, probe chemistry and the folding model's own free energy. Separately: the prices are NOT shares and may not be summed, because a share is a mediated fraction and the estimator for it is withdrawn by this paper.",
+   "what_would_falsify_it": "any row is priced by a ratio of two contrasts (that is the withdrawn estimator); or the eight rows are presented as a decomposition of one total; or a channel is priced on a scale it does not share with the row above it",
+   "independent_route_SPECIFICATION_NOT_IMPLEMENTATION": [
+    "This claim is structural, not numerical: check that no row's price is a ratio of two contrasts, that the table is never summed, and that each row's number appears in the section it points at with the same value.",
+    "The one row that IS a decomposition (C2, placement) must close as an identity: marginal - matched = observed attenuation, and predicted/observed = the mediated fraction. Check both to 1e-4 and report the residual."
+   ],
+   "backing_artifacts": [
+    "m37_channel_ledger.json"
+   ],
+   "printed_value": {
+    "trust": "DO_NOT_TRUST_RECOMPUTE_INDEPENDENTLY",
+    "macros": {
+     "chPriced": "8",
+     "chCarry": "5",
+     "chEmpty": "3",
+     "chUnpriced": "2",
+     "chEps": "\\ensuremath{-}0.0083",
+     "chSplit": "1",
+     "chNoSplit": "7",
+     "chSplitCarry": "0"
+    }
+   }
+  },
+  {
+   "id": "NM-C5",
+   "axis": "leakage / exposure",
+   "section": "Results / the leakage audit, in the main text",
+   "estimand": "Fraction of design cells whose wild-type sequence, inside the design window, reaches >=0.8 identity to an equal-length substring of some sequence in the neural model's training file; and the within-stratum skill slope on the exposed subset against the unexposed one, for the neural model AND for a thermodynamic model that cannot have memorised anything. Claim: exposure is higher than an earlier deposit-based proxy implied, the channel is still empty because the thermodynamic control falls the same way, and EVERY COUNT IS A LOWER BOUND because the training file obtained is a subset of the full corpus.",
+   "what_would_falsify_it": "any sentence claims a design is absent from the training set rather than not found in the portion obtained; or the exposure scan uses a candidate index that can record 'no candidate' as 'identity zero'; or the thermodynamic control is omitted, in which case a drop on the exposed subset cannot be told from memory",
+   "independent_route_SPECIFICATION_NOT_IMPLEMENTATION": [
+    "Identity of a query window against a training sequence = max over offsets of (matching positions)/(query length), over every training sequence at least as long as the query. Do it exhaustively; do not build a k-mer candidate index, because an index that finds no candidate must not be allowed to return zero.",
+    "The control is the whole argument. Compute the same exposed-versus-unexposed slope for a purely thermodynamic predictor. If it falls too, exposure marks difficulty, not memory."
+   ],
+   "backing_artifacts": [
+    "m39_exposure_tiers.json",
+    "m26d_clean_subset.json",
+    "m26c_leakage.json"
+   ],
+   "printed_value": {
+    "trust": "DO_NOT_TRUST_RECOMPUTE_INDEPENDENTLY",
+    "macros": {
+     "lkExpDesigns": "20",
+     "lkExpFrac": "12.7\\%",
+     "lkProxyDesigns": "14",
+     "lkVerbatimT3": "12",
+     "lkNeuralClean": "+0.2172",
+     "lkNeuralExp": "+0.1346",
+     "lkNeuralDiffCi": "[\\ensuremath{-}0.0201,\\,\\allowbreak +0.1719]",
+     "lkViennaClean": "+0.1334",
+     "lkViennaExp": "+0.0011",
+     "lkViennaDiffCi": "[+0.0614,\\,\\allowbreak +0.2042]",
+     "vIdxGap": "+0.178"
+    }
+   }
+  },
+  {
+   "id": "NM-C6",
+   "axis": "retraction",
+   "section": "Results / a metric we withdraw",
+   "estimand": "A calibration that injects a KNOWN mediated fraction into the real mediator and asks how much of the injected range the estimator's reading covers. Claim: the reading covers only a small fraction of the range the truth covers, so the estimator is uninformative here and the quantity is withdrawn.",
+   "what_would_falsify_it": "the calibration reports a correlation at a single injection level rather than a span across the sweep -- a correlation at one point is an endpoint artefact and the paper says so",
+   "independent_route_SPECIFICATION_NOT_IMPLEMENTATION": [
+    "Sweep the injected fraction f over [0, 0.75]. Report how far the READING moves against how far the TRUTH moves. A correlation coefficient at one f is not the quantity; leave-one-out the endpoint and see whether the sign survives."
+   ],
+   "backing_artifacts": [
+    "m26r3_calibration.json",
+    "m26r4_calibration_symmetry.json"
+   ],
+   "printed_value": {
+    "trust": "DO_NOT_TRUST_RECOMPUTE_INDEPENDENTLY",
+    "macros": {
+     "mcNeuralSpanFrac": "12.9\\%",
+     "mcViennaSpanFrac": "28.7\\%"
+    }
+   }
+  }
+ ]
+}
