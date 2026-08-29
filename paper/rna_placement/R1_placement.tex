@@ -632,7 +632,8 @@ under each randomisation, $40$ draws in each of \jdg{c5N} populations. Permuting
 the matched set and rejects an order of magnitude too often; permuting the outcome holds the design
 fixed and returns the nominal rate. \emph{Right}: the SD of the statistic under each null, per
 population. The treatment-side null is uniformly the narrower, which is the mechanism rather than
-a coincidence.}
+a coincidence. Two further constructions that hold the design fixed --- Freedman--Lane and a
+blocked permutation --- were run and are reported in Appendix~\ref{app:nulls}.}
 \label{fig:null}
 \end{figure}
 
@@ -886,6 +887,7 @@ route for the reason above. Which of the two flatters a given claim depends on w
 being used to normalise, and that is not the basis on which we chose. The value declared
 before this measurement, $\jdg{ceilDeclared}$, falls between the two routes' SDs rather than
 outside them. \emph{A design-score point is therefore worth $1/\jdg{ceilWithinSd}$ of a within-cell SD, and $\jdg{ceilB}$ of that SD is reproducible signal} --- which is the scale against which \S\ref{sec:score}'s effect should be read.
+Both routes, per population and with their intervals, are in Appendix~\ref{app:ceiling}.
 
 \subsection{Pair identity decides whether the pair forms}
 \label{sec:pairtype}
@@ -1075,6 +1077,21 @@ whether either is reporting anything. That is an empirical question about this c
 signal-to-noise, and it has an experiment: hold the estimator's machinery fixed and vary a truth
 it is supposed to recover.
 
+\begin{figure}[!htbp]
+\centering
+\input{figs/fig13_cal}
+\caption{\textbf{Two attempts to make the estimator read a truth we planted.} \textbf{a}, The
+first attempt. A known share of the effect was routed through a synthetic mediator and the
+estimator recovered it well --- correlation \jdg{posCorr} --- which is why it was reported. The
+mediator was built with a separation this corpus does not have, so what the panel shows is the
+estimator working in a regime, not on these data. \textbf{b}, The second attempt, at the
+separation the corpus actually has, routed through the real mediator. The dashed line in both
+panels is what a working metric returns. At total mediation the thermodynamic arm reads
+\jdg{calVFull}, off this scale and marked rather than drawn. Neither arm follows the truth, which
+is the reason every mediated fraction in this work is withdrawn.}
+\label{fig:cal}
+\end{figure}
+
 \paragraph{The first attempt failed, and its failure has a name.} We built a synthetic mediator
 $M=\phi\,\mathbf 1[\text{G--C}]+\varepsilon$ and conditioned on it. That variable depends on the
 treatment but does not predict the outcome, so it lies on no causal path; conditioning on it
@@ -1174,6 +1191,22 @@ for the second. We do not claim the failure modes themselves are new.
 
 \subsection{The proposition, tested where none of this paper's machinery applies}
 \label{sec:crossdomain}
+
+\begin{figure}[!htbp]
+\centering
+\input{figs/fig14_crossdomain}
+\caption{\textbf{The proposition, put at risk where none of this paper's apparatus applies.} A
+corpus of designed protein binders: hydrophobicity as the treatment, chain length as the mediator,
+measured binding as the outcome. \textbf{a}, The premise --- how much of the mediator the design
+method explains, target by target, against its mean \jdg{xdEta}. \textbf{b}, The two quantities
+the bound is made of, on the binder corpus and on this paper's: the overlap $d_{\rm TV}$ between
+the two exposure laws, and how much of the bound the observed gap actually uses. The corpora
+differ by \jdg{xdDtvRatio} on the first and \jdg{xdGapRatio} on the second, and the bound holds on
+both --- it does not merely hold, it tracks. \textbf{c}, The mediator's conditional mean on the
+binder corpus. Proposition~\ref{prop:routes} says the routes agree exactly when this curve is
+affine, and it is not.}
+\label{fig:crossdomain}
+\end{figure}
 
 A proposition proved on a page and exercised on the corpus that motivated it has been checked
 against itself. Proposition~\ref{prop:routes} makes a claim with no RNA in it --- it is about a
@@ -1760,6 +1793,31 @@ Fig.~\ref{fig:mediation} plots.}
 \end{table}
 \FloatBarrier
 
+% =====================================================================
+\section{The reproducibility ceiling, per population}
+\label{app:ceiling}
+
+Section~\ref{sec:inference} states a ceiling on how far any method can agree with a repeated
+measurement of the same molecule, and uses one number for it. That number is an estimate with an
+interval, it is estimated two ways, and it is not identical across populations. All of it is here,
+because a ceiling quoted without its interval is a bound that cannot be argued with.
+
+\begin{figure}[!htbp]
+\centering
+\input{figs/figA4_ceiling}
+\caption{\textbf{The ceiling, per population and under both estimators.} \textbf{a}, The ceiling
+from repeat groups and from paired duplicates, each with its interval. The two estimators do not
+agree, and the paper uses the lower of them, which is the conservative choice: a lower ceiling
+makes every reported agreement look further from it. \textbf{b}, How many measurements a repeat
+group holds, over the \jdg{ceilGroups} groups the first estimator uses. Most are pairs, which is
+why the second estimator --- built on \jdg{ceilPairs} paired duplicates alone --- is worth
+reporting beside it rather than instead of it.}
+\label{fig:ceiling}
+\end{figure}
+
+\FloatBarrier
+
+
 \section{Preregistration record}
 \label{app:prereg}
 
@@ -1850,6 +1908,36 @@ ladder detection threshold & $\ge0.10$ & \jdg{xdLadderThr} & held \\
 \endgroup
 
 
+\section{Four ways to build the null}
+\label{app:nulls}
+
+Proposition~\ref{prop:null} says that permuting the treatment inside a design rebuilt
+from the permuted labels does not test the hypothesis it appears to test.
+Figure~\ref{fig:null} measures that on two constructions. Two more were run, and they
+are here because a claim that one null is broken is worth more when the alternatives
+that are not broken are shown beside it.
+
+\begin{figure}[!htbp]
+\centering
+\input{figs/figA1_nulls}
+\caption{\textbf{Four ways to build the null, and what each one rejects.} \textbf{a}, The
+false-positive rate at the $0.005$ gate under each construction, with the count of
+rejections over draws beside each bar. Permuting the treatment rebuilds
+the matched set and rejects an order of magnitude too often; the three constructions that hold the
+design fixed do not. \textbf{b}, The dispersion of the statistic under each null. The
+treatment-side null is not merely wrong, it is narrow, which is the mechanism rather than a
+coincidence: a design rebuilt by the permutation is a design matched to the permuted labels.}
+\label{fig:nulls}
+\end{figure}
+
+Freedman--Lane and the blocked construction both hold the design fixed and both return
+nothing at the gate. Neither is used in the main text --- the outcome-side permutation is
+simpler and does the same work --- but they are why that is a choice and not a
+convenience.
+
+\FloatBarrier
+
+
 \section{The energy arm in full}
 \label{app:energy}
 
@@ -1859,6 +1947,22 @@ contrast, from the pooled values and not within exposure arm; consequently the b
 every pair is invariant to a permutation of the labels, which is what
 Prop.~\ref{prop:null} requires of a matched design. The invariance was checked rather than argued:
 over $200$ permutations the (pair-weight, stratum-count) pair took exactly one value.
+
+\begin{figure}[!htbp]
+\centering
+\input{figs/figA2_energy}
+\caption{\textbf{The energy arm: what it could have found, what it found, and what a mediator
+that mediates nothing reads.} \textbf{a}, The constructive power ladder of
+Def.~\ref{def:ladder}: labels are scrambled within stratum so the true effect is zero, a known
+effect $\delta$ is injected, and the arm is asked to detect it. The $\delta=0$ rung does not
+fire, and detection is reliable from \jdg{eLad} upward --- so an arm that reports nothing is
+reporting an absence and not a failure to look. \textbf{b}, Rescue against the model's own local
+free energy, in bins. \textbf{c}, Retention after conditioning on the real mediator, against the
+distribution a placebo mediator produces. The real reading sits inside the placebo's range, which
+is what Appendix~\ref{app:placebo} is for: a mediator with no relation to the outcome must not appear to
+mediate, and a pipeline in which it does is measuring its own machinery.}
+\label{fig:energyarm}
+\end{figure}
 
 \paragraph{The canonicity guard.} The nearest-neighbour tables have no entry for a stack whose
 partner is not a canonical pair, and the library returns a finite but meaningless number in that
@@ -1905,6 +2009,7 @@ without reference to any outcome, and is repeated here so the two can be read ag
 \end{table}
 
 \section{What a placebo mediator is for}
+\label{app:placebo}
 \label{app:traps}
 
 Two quantities in \S\ref{sec:energy} are easy to compute and easy to misread, and both were caught
@@ -1945,6 +2050,19 @@ reports both factors and the resulting bias, with and without the panel caliper,
 populations. The within-cell slope of the outcome on global GC is $\jdg{imbBetaLo}$ to
 $\jdg{imbBetaHi}$ points per unit; the panel caliper's effect is almost entirely on
 $\overline{\Delta\pi}$.
+
+\begin{figure}[!htbp]
+\centering
+\input{figs/figA3_imbalance}
+\caption{\textbf{What residual imbalance inside the caliper could be worth.} \textbf{a}, The bias
+that the covariate imbalance surviving inside the caliper could produce, as a share of the
+measured effect, with and without the panel matching. \textbf{b}, The standardised difference on the
+global-GC covariate. The panel barely moves it, and that is the point: the panel caliper acts
+almost entirely on the other term of the bound, so panel~a's reduction is not bought by
+balancing GC. The panel is not cosmetic --- it is the difference between a bound worth a third of
+the effect and one worth a few per cent --- but it is not doing it here.}
+\label{fig:imbalance}
+\end{figure}
 
 \begin{table}[!htbp]
 \centering\small

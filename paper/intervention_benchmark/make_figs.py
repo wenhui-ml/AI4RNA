@@ -569,17 +569,20 @@ def fig_params():
     pan = J("m26b_model_panel.json")
     ms = pan["models"]
     xs = list(range(1, len(ms) + 1))
+    _ab = lambda n: n[0] + n[-4:]
     sl = [f"{m['skill_slope']:.5f}" for m in ms]
-    names = ",".join("{" + m["model"].replace("_", " ") + "}" for m in ms)
+    # spelled out, four parameter-set names are wider than the slots a four-category axis
+    # gives them and overprinted each other at every rotation tried; panel b already
+    # abbreviates them the same way and the caption expands them once.
+    names = ",".join("{" + _ab(m["model"]) + "}" for m in ms)
     pc = sorted(pan["pairwise_corr"].items(), key=lambda kv: -kv[1])
     ys = list(range(len(pc), 0, -1))
     # the full names are the x tick labels of panel a, immediately to the left; spelled out
     # again here they are 3.4cm wide and the sep that has to clear them eats both plot boxes
-    _ab = lambda n: n[0] + n[-4:]
     plab = ",".join("{" + " vs ".join(_ab(x) for x in k.split("|")) + "}" for k, _v in pc)
     body = rf"""\nextgroupplot[width=7.7cm, height=5.0cm, ybar, bar width=17pt,
     xtick={{{",".join(map(str, xs))}}}, xticklabels={{{names}}},
-    xticklabel style={{font=\tiny, rotate=18, anchor=north east}},
+    xticklabel style={{font=\scriptsize}},
     ylabel={{within-stratum skill slope}}, ymin=0, ymax={max(m['skill_slope'] for m in ms)*1.35:.5f},
     enlarge x limits=0.16, title={{a}}]
 \addplot[fill={THM}, draw=none] coordinates {{{co(xs, sl)}}};
@@ -858,7 +861,7 @@ def figA_exposure():
 
 \nextgroupplot[width=8.6cm, height=5.0cm, ybar, bar width=5.4pt,
     xlabel={{identity to the nearest training sequence}}, ylabel={{design cells}},
-    xmin=0.38, xmax=1.06, ymin=0, ymax={max(hist)*1.34:.0f}, title={{b}}]
+    xmin=0.38, xmax=1.06, ymin=0, ymax={max(hist)*1.52:.0f}, title={{b}}]
 \addplot[fill={GREY}, draw=none] coordinates {{{co(hx, hist)}}};
 \draw[color={INK}, densely dashed, line width=0.8pt]
   (axis cs:{ex['constants']['THRESH']},0) -- (axis cs:{ex['constants']['THRESH']},{max(hist)*1.02:.0f});
@@ -867,13 +870,13 @@ def figA_exposure():
 % the control used to be drawn along the axis line at y=0 with its label lying across the
 % bars; it is a reference range, so it goes in the empty band above them
 \draw[color={THM}, line width=0.9pt]
-  (axis cs:{V['shuffle_median']:.4f},{max(hist)*1.18:.1f})
-  -- (axis cs:{V['shuffle_max']:.4f},{max(hist)*1.18:.1f});
+  (axis cs:{V['shuffle_median']:.4f},{max(hist)*1.34:.1f})
+  -- (axis cs:{V['shuffle_max']:.4f},{max(hist)*1.34:.1f});
 \addplot[color={THM}, mark=triangle*, mark size=2.4pt, only marks, forget plot]
-  coordinates {{({V['shuffle_median']:.4f},{max(hist)*1.18:.1f})
-                ({V['shuffle_max']:.4f},{max(hist)*1.18:.1f})}};
+  coordinates {{({V['shuffle_median']:.4f},{max(hist)*1.34:.1f})
+                ({V['shuffle_max']:.4f},{max(hist)*1.34:.1f})}};
 \node[font=\tiny, color=nmthermo, anchor=west, align=left] at
-  (axis cs:{V['shuffle_max']+0.012:.4f},{max(hist)*1.18:.1f})
+  (axis cs:{V['shuffle_max']+0.012:.4f},{max(hist)*1.34:.1f})
   {{dinucleotide-shuffle\\control, median to max}};"""
     emit("figA4_exposure.tex", group(2, body, hsep="2.1cm"))
 

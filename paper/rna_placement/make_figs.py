@@ -44,6 +44,19 @@ def popnames(keys):
                          "figure are read from POPBY and would be wrong")
     return [POPBY[k] for k in ks]
 
+
+def popnames_subset(keys):
+    """Same map, for an artifact that covers only some of the populations.
+
+    r1b only has the four with repeat groups. A SUBSET is legitimate; an unknown key is not,
+    and would silently print an internal filename as a population name.
+    """
+    ks = list(keys)
+    unknown = [k for k in ks if k not in POPBY]
+    if unknown:
+        raise SystemExit(f"unknown population key(s) {unknown}; POPBY holds {POPFILE}")
+    return [POPBY[k] for k in ks]
+
 BASE = (r"axis lines=left, axis line style={line width=0.5pt, color=" + INK3 + r"},"
         "\n    tick style={line width=0.5pt, color=" + INK3 + r"}, tick align=outside,"
         "\n    label style={font=\\scriptsize, color=" + INK2 + r"},"
@@ -247,7 +260,7 @@ def fig5():
     md = {t: float(np.mean([min(r["depth"], 3) for r in recs if r["pt"] == t]))
           for t in ("CG", "AU")}
 
-    body = rf"""\nextgroupplot[width=4.6cm, height=3.2cm, xbar, bar width=5pt,
+    body = rf"""\nextgroupplot[width=6.8cm, height=4.6cm, xbar, bar width=7pt,
     ytick={{{t1}}}, yticklabels={{{l1}}}, yticklabel style={{font=\tiny}},
     xlabel={{difference in rescue factor}}, xmin=0, xmax=0.155,
     ymin=0.4, ymax={len(keys)+0.6},
@@ -257,7 +270,7 @@ def fig5():
 \addplot[fill={S1}, draw=none] coordinates {{{co([f"{v:.4f}" for v in matc], ys)}}};
 \addlegendentry{{matched}}
 
-\nextgroupplot[width=4.3cm, height=3.2cm,
+\nextgroupplot[width=6.4cm, height=4.6cm,
     xtick={{0,1,2,3}}, xticklabels={{{{0\\(end)}},{{1}},{{2}},{{3+}}}},
     xticklabel style={{align=center}},
     xlabel={{helix depth}}, ylabel={{rescue factor}}, xmin=-0.2, xmax=3.6,
@@ -268,7 +281,7 @@ def fig5():
 \addplot[color={S2}, mark=*, mark size=1.8pt, line width=1.1pt]
   coordinates {{{co(range(4), [f"{v:.4f}" for v in curves['AU']])}}};
 \addlegendentry{{A--U}}"""
-    emit("fig5_rescue.tex", grp(2, body, hsep="1.7cm"))
+    emit("fig5_rescue.tex", grp(2, body, hsep="2.2cm"))
 
 
 # ---------------------------------------------------------------- fig 6: the mediation identity
@@ -387,7 +400,7 @@ def fig9():
     d = J("m21_thermo_mediator.json")
     edges = d["bin_edges"]
     lab = [f"$\\leq${edges[0]:.1f}"] + \
-          [f"{edges[i]:.1f}..{edges[i+1]:.1f}" for i in range(len(edges) - 1)] + \
+          [f"{edges[i+1]:.1f}" for i in range(len(edges) - 1)] + \
           [f"$>${edges[-1]:.1f}"]
     x = list(range(1, len(lab) + 1))
     series = []
@@ -414,16 +427,16 @@ def fig9():
     fx = [min(gx), max(gx)]
     fy = [beta * (v - mgx) for v in fx]
 
-    body = rf"""\nextgroupplot[width=4.2cm, height=3.5cm, ybar, bar width=3.2pt,
+    body = rf"""\nextgroupplot[width=4.8cm, height=4.0cm, ybar, bar width=4pt,
     xtick={{{",".join(map(str, x))}}}, xticklabels={{{",".join("{" + s + "}" for s in lab)}}},
     xticklabel style={{rotate=32, anchor=east, font=\tiny}},
-    xlabel={{$\Delta G_{{\mathrm{{loc}}}}$ bin (kcal/mol)}}, ylabel={{target pairs}},
+    xlabel={{$\Delta G_{{\mathrm{{loc}}}}$ bin, upper edge (kcal/mol)}}, ylabel={{target pairs}},
     legend style={{at={{(0.5,1.02)}}, anchor=south}}, legend columns=3]
 {chr(10).join(series)}
 
-\nextgroupplot[width=4.2cm, height=3.5cm,
+\nextgroupplot[width=4.8cm, height=4.0cm,
     ytick={{{t2}}}, yticklabels={{{l2}}}, yticklabel style={{font=\tiny}},
-    xlabel={{contrast retained after conditioning (\%)}}, ymin=0.4, ymax={len(vals)+0.6}]
+    xlabel={{contrast retained (\%)}}, ymin=0.4, ymax={len(vals)+0.6}]
 {band(pm - 1.96*ps, pm + 1.96*ps, 0.4, len(vals)+0.6, INK3, "0.16")}
 \addplot[color={INK3}, dashed, line width=0.7pt, forget plot]
   coordinates {{({pm:.3f},0.4) ({pm:.3f},{len(vals)+0.6})}};
@@ -432,9 +445,9 @@ def fig9():
 {marks}
 {iv(pm - 1.96*ps, pm + 1.96*ps, 1, INK3, "1.0pt")}
 
-\nextgroupplot[width=4.2cm, height=3.5cm,
+\nextgroupplot[width=4.7cm, height=4.0cm,
     xlabel={{$\Delta G_{{\mathrm{{loc}}}}$ (kcal/mol)}},
-    ylabel={{rescue, centred in stratum}}, legend pos=south east]
+    ylabel={{rescue, centred}}, legend pos=south east]
 \addplot[color={INK3}, line width=0.6pt, forget plot]
   coordinates {{({min(gx):.4f},0) ({max(gx):.4f},0)}};
 \addplot[color={S1}, mark=*, mark size=1.5pt, line width=0.9pt, forget plot]
@@ -442,7 +455,7 @@ def fig9():
 \addplot[color={S2}, dashed, line width=0.8pt]
   coordinates {{{co([f"{v:.4f}" for v in fx], [f"{v:.5f}" for v in fy])}}};
 \addlegendentry{{the linear fit $\beta_{{\Delta G}}$}}"""
-    emit("fig9_energy.tex", grp(3, body, hsep="2.4cm"))
+    emit("fig9_energy.tex", grp(3, body, hsep="1.9cm"))
 
 
 # ---------------------------------------------------------------- fig 10: depth and method
@@ -538,14 +551,14 @@ def fig12():
                     rf"(axis cs:{r['method_component']:.4f},{y}) {{$p={pv(r['method_p'])}$}};"
                     for r, y in zip(order, ys))
 
-    body = rf"""\nextgroupplot[width=5.6cm, height=3.8cm,
+    body = rf"""\nextgroupplot[width=7.2cm, height=4.6cm,
     ytick={{{ticks}}}, yticklabels={{{",".join(names)}}},
     yticklabel style={{align=right, font=\tiny}}, ymin=0.4, ymax={len(order)+0.6},
     xlabel={{G--C minus A--U helix depth,\\per design method}},
-    xlabel style={{align=center}},]
+    xlabel style={{align=center}}, enlarge x limits=0.07,]
 {chr(10).join(L)}
 
-\nextgroupplot[width=4.0cm, height=3.8cm, xbar, bar width=8pt,
+\nextgroupplot[width=5.6cm, height=4.6cm, xbar, bar width=10pt,
     ytick={{{ticks}}}, yticklabels={{{",".join("{{round " + r["round"] + "}}" for r in order)}}},
     yticklabel style={{font=\tiny}}, ymin=0.4, ymax={len(order)+0.6},
     xlabel={{method component,\\after target main effects}},
@@ -553,7 +566,7 @@ def fig12():
     xmin=0, xmax={max(mc)*1.62:.4f}]
 {bars}
 {ann}"""
-    emit("fig12_rounds.tex", grp(2, body, hsep="2.1cm"))
+    emit("fig12_rounds.tex", grp(2, body, hsep="2.4cm"))
 
 
 # ---------------------------------------------------------------- fig 0: architecture
@@ -615,8 +628,300 @@ def fig0():
     emit("fig0_arch.tex", body)
 
 
+
+
+# ---------------------------------------------------------------- the two calibration attempts
+def fig_cal():
+    """Two attempts to make the metric read a truth we planted, in order.
+
+    The companion instrument paper draws the second attempt from the reading side. What is
+    here is the pair: an attempt that appeared to work and the regime that made it appear so.
+    """
+    r2 = J("m26r2_positive_control.json")
+    r3 = J("m26r3_realistic_calibration.json")
+    s2 = r2["sweep"]
+    # \addlegendentry after a "forget plot" binds to the NEXT plot: the dashed truth line was
+    # forgotten, so its entry landed on the measured curve and the legend called the reading
+    # the truth. Panel a has no legend now; both lines are labelled where they are drawn.
+    a = (rf"""\addplot[color={S1}, mark=*, mark size=1.7pt, line width=1.0pt, forget plot]
+  coordinates {{{co([f"{x['true_retention']:.4f}" for x in s2],
+                    [f"{x['measured_retention']:.4f}" for x in s2])}}};
+\node[font=\tiny, color={S1}, anchor=north west] at (axis cs:0.05,0.72) {{what it read}};""")
+    curves = []
+    for nm, col in (("RibonanzaNet", S2), ("ViennaRNA", S3)):
+        sw = r3[nm]["sweep"]
+        curves.append(rf"""\addplot[color={col}, mark=*, mark size=1.6pt, line width=1.0pt]
+  coordinates {{{co([f"{x['true_retention']:.3f}" for x in sw],
+                    [f"{x['measured_retention']:.4f}" for x in sw])}}};
+\addlegendentry{{{nm}}}""")
+    vfull = r3["ViennaRNA"]["sweep"][-1]["measured_retention"]
+    body = rf"""\nextgroupplot[width=7.6cm, height=5.4cm, clip=true,
+    xlabel={{retention injected}}, ylabel={{retention the metric read}},
+    xmin=-0.05, xmax=1.05, ymin=-0.15, ymax=1.45, title={{a}}]
+\addplot[color={INK3}, dashed, line width=0.8pt, forget plot]
+  coordinates {{(0,0) (1,1)}};
+\node[font=\tiny, color={INK3}, rotate=30, anchor=south] at (axis cs:0.72,0.72) {{the truth}};
+{a}
+\node[font=\tiny, color={INK2}, anchor=north west, align=left] at (axis cs:0.02,1.42)
+  {{first attempt: correlation {r2['corr_true_vs_measured']:.3f},\\
+    mean absolute error {r2['mean_abs_error']:.4f}}};
+
+\nextgroupplot[width=7.6cm, height=5.4cm, clip=true,
+    xlabel={{retention injected}},
+    xmin=-0.05, xmax=1.05, ymin=-0.15, ymax=1.45,
+    legend style={{at={{(0.5,-0.28)}}, anchor=north, font=\tiny, draw=none}},
+    legend columns=2, title={{b}}]
+\addplot[color={INK3}, dashed, line width=0.8pt, forget plot]
+  coordinates {{(0,0) (1,1)}};
+\node[font=\tiny, color={INK3}, rotate=30, anchor=south] at (axis cs:0.72,0.72) {{the truth}};
+{chr(10).join(curves)}
+\draw[color={INK2}, -{{Latex[length=1.3mm, width=0.9mm]}}, line width=0.6pt]
+  (axis cs:0.30,-0.10) -- (axis cs:0.02,-0.13);
+\node[font=\tiny, color={INK2}, anchor=west] at (axis cs:0.31,-0.10)
+  {{ViennaRNA reads ${vfull:.1f}$, off scale}};
+\node[font=\tiny, color={INK2}, anchor=north west, align=left] at (axis cs:0.02,1.42)
+  {{second attempt, at the separation\\this corpus actually has}};"""
+    emit("fig13_cal.tex", grp(2, body, hsep="1.6cm"))
+
+
+# ---------------------------------------------------------------- the proposition off this corpus
+def fig_crossdomain():
+    """Proposition 3 put at risk on designed protein binders."""
+    m = J("m29_binder_crossdomain.json")
+    main = m["arms"][0]
+    cmp_ = J("m29r_review.json")["comparison"]
+    pre = main["A_premise"]["eta2_by_target"]
+    xs = list(range(1, len(pre) + 1))
+    D = main["D"]["bins"]
+    zs = [f"{b['z']:.3f}" for b in D]
+    hs = [f"{b['h']:.5f}" for b in D]
+    # Panel b used to plot d_TV beside "tightness" and the caption quoted the paper's two
+    # ratios, 2.72 and 2.66 -- but the second of those is the ratio of the ROUTE GAP, not of
+    # tightness, so the caption named a number the panel did not draw. The two quantities are
+    # in different units and cannot share an axis, so the panel shows each corpus relative to
+    # the binder corpus, which is what a ratio is.
+    two = (("binder", S2), ("rna", S3))
+    QT = [("overlap $d_{\\rm TV}$", "d_TV"), ("route gap", "gap_points")]
+    base = {q: abs(cmp_["binder"][q]) for _l, q in QT}
+    dtv = "\n".join(
+        rf"""\addplot[fill={c}, draw=none] coordinates {{{" ".join(
+            f"({i+1},{abs(cmp_[k][q])/base[q]:.4f}) [{abs(cmp_[k][q])/base[q]:.2f}]"
+            for i, (_l, q) in enumerate(QT))}}};
+\addlegendentry{{{'protein binders' if k == 'binder' else 'this corpus'}}}""" for k, c in two)
+    body = rf"""\nextgroupplot[width=5.4cm, height=5.0cm, ybar, bar width=14pt,
+    xtick={{{",".join(map(str, xs))}}},
+    xticklabels={{{",".join("{" + p["target"] + "}" for p in pre)}}},
+    xticklabel style={{font=\tiny}},
+    ylabel={{$\eta^2$ of method on the mediator}},
+    xmin=0.4, xmax={len(pre)+0.6}, ymin=0,
+    enlarge y limits={{upper,value=0.22}}, title={{a}}]
+\addplot[fill={S1}, draw=none, forget plot] coordinates
+  {{{co(xs, [f"{p['eta2']:.4f}" for p in pre])}}};
+\draw[color={INK2}, dashed, line width=0.7pt]
+  (axis cs:0.4,{main['A_premise']['eta2_mean']:.4f})
+  -- (axis cs:{len(pre)+0.6},{main['A_premise']['eta2_mean']:.4f});
+\node[font=\tiny, color={INK2}, anchor=south east] at
+  (axis cs:{len(pre)+0.6},{main['A_premise']['eta2_mean']:.4f}) {{mean}};
+
+\nextgroupplot[width=5.2cm, height=5.0cm, ybar, bar width=11pt,
+    xtick={{{",".join(str(i+1) for i in range(len(QT)))}}},
+    xticklabels={{{",".join("{" + l + "}" for l, _q in QT)}}},
+    xticklabel style={{font=\tiny}}, xmin=0.45, xmax={len(QT)+0.55}, ymin=0,
+    ylabel={{relative to the binder corpus}},
+    enlarge y limits={{upper,value=0.30}},
+    nodes near coords, point meta=explicit symbolic,
+    every node near coord/.append style={{font=\tiny, color={INK2}}},
+    legend style={{at={{(0.5,-0.30)}}, anchor=north, font=\tiny, draw=none}},
+    legend columns=2, title={{b}}]
+{dtv}
+
+\nextgroupplot[width=5.4cm, height=5.0cm,
+    xlabel={{mediator, bin mean}}, ylabel={{conditional mean of the outcome}},
+    title={{c}}]
+\addplot[color={S2}, mark=*, mark size=1.9pt, line width=1.0pt, forget plot]
+  coordinates {{{co(zs, hs)}}};
+\draw[color={INK3}, densely dotted, line width=0.7pt]
+  (axis cs:{D[0]['z']:.3f},0) -- (axis cs:{D[-1]['z']:.3f},0);"""
+    emit("fig14_crossdomain.tex", grp(3, body, hsep="1.85cm"))
+
+
+# ================================================================ appendix display items
+def figA_nulls():
+    """Four ways to build the null, and what each one's false-positive rate turns out to be."""
+    d = J("m23_exact_null.json")
+    g = d["DGP1"]
+    # "permute the\\treatment" and "permute the\\outcome" are wider than the slot they get on
+    # a four-category axis, and overprinted each other. What is permuted goes in the x label.
+    KEYS = [("N1_permute_t", "treatment"),
+            ("N2_permute_y_cell", "outcome"),
+            ("N3_freedman_lane", r"Freedman--\\Lane"),
+            ("N4_blocked", "blocked")]
+    xs = list(range(1, len(KEYS) + 1))
+    rates = [g["rate"][k] for k, _l in KEYS]
+    sds = [g["null_sd_mean"][k] for k, _l in KEYS]
+    meta = [f"{g['total'][k][0]}/{g['total'][k][1]}" for k, _l in KEYS]
+    # the two zero-height bars put their counts at y=0, exactly where the nominal-rate line
+    # runs, so "0/240" was printed across the dashes. The count belongs under the axis with
+    # the name it belongs to, where nothing else is.
+    lab = ",".join("{" + l + chr(92) + chr(92) + m + "}" for (_k, l), m in zip(KEYS, meta))
+    labb = ",".join("{" + l + "}" for _k, l in KEYS)
+    body = rf"""\nextgroupplot[width=8.2cm, height=5.2cm, ybar, bar width=15pt,
+    xtick={{{",".join(map(str, xs))}}}, xticklabels={{{lab}}},
+    xticklabel style={{align=center, font=\tiny}},
+    xlabel={{what the null permutes}},
+    ylabel={{rejection rate at the ${d['nominal']}$ gate}},
+    xmin=0.4, xmax={len(KEYS)+0.6}, ymin=0, ymax={max(rates)*1.35:.5f},
+    title={{a}}]
+\addplot[fill={S2}, draw=none] coordinates {{{co(xs, [f"{r:.5f}" for r in rates])}}};
+\draw[color={INK2}, dashed, line width=0.8pt]
+  (axis cs:0.4,{d['nominal']}) -- (axis cs:{len(KEYS)+0.6},{d['nominal']});
+\node[font=\tiny, color={INK2}, anchor=south east] at
+  (axis cs:{len(KEYS)+0.6},{d['nominal']}) {{nominal {d['nominal']}}};
+
+\nextgroupplot[width=6.4cm, height=5.2cm, ybar, bar width=13pt,
+    xtick={{{",".join(map(str, xs))}}}, xticklabels={{{labb}}},
+    xticklabel style={{align=center, font=\tiny}},
+    xlabel={{what the null permutes}},
+    ylabel={{SD of the statistic under the null}},
+    xmin=0.4, xmax={len(KEYS)+0.6}, ymin=0,
+    enlarge y limits={{upper,value=0.18}}, title={{b}}]
+\addplot[fill={S1}, draw=none] coordinates {{{co(xs, [f"{v:.5f}" for v in sds])}}};"""
+    emit("figA1_nulls.tex", grp(2, body, hsep="2.0cm"))
+
+
+def figA_energy():
+    """The energy arm: what it can detect, and what a mediator that mediates nothing reads."""
+    m = J("m21_thermo_mediator.json")
+    lad = m["P2_ladder"]
+    ks = sorted(lad, key=float)
+    xs = list(range(1, len(ks) + 1))
+    P3, B2 = m["P3"], m["B2"]
+    bw = B2["binwise"]
+    lo, hi = P3["placebo_retention_range"]
+    mu, sd = P3["placebo_retention_mean"], P3["placebo_retention_sd"]
+    body = rf"""\nextgroupplot[width=6.0cm, height=5.0cm,
+    xlabel={{injected effect $\delta$}}, ylabel={{detected}},
+    xtick={{{",".join(map(str, xs))}}},
+    xticklabels={{{",".join("{" + f"{float(k):g}" + "}" for k in ks)}}},
+    xticklabel style={{font=\tiny, rotate=45, anchor=north east}},
+    ymin=-0.05, ymax=1.15, title={{a}}]
+\addplot[color={S1}, mark=*, mark size=1.7pt, line width=1.0pt]
+  coordinates {{{co(xs, [f"{lad[k]:.4f}" for k in ks])}}};
+\draw[color={INK3}, densely dashed, line width=0.7pt]
+  (axis cs:{1 + [float(k) for k in ks].index(m['P2_threshold'])},-0.05)
+  -- (axis cs:{1 + [float(k) for k in ks].index(m['P2_threshold'])},1.15);
+\node[font=\tiny, color={INK2}, anchor=south west, rotate=90] at
+  (axis cs:{1 + [float(k) for k in ks].index(m['P2_threshold'])},-0.02)
+  {{smallest reliably detected}};
+
+\nextgroupplot[width=4.6cm, height=5.0cm,
+    xlabel={{$\Delta\Delta G_{{\rm loc}}$, bin mean (kcal/mol)}},
+    ylabel={{rescue, centred}}, title={{b}}]
+\addplot[color={S2}, mark=*, mark size=1.8pt, line width=1.0pt]
+  coordinates {{{co([f"{b['dG_mean']:.3f}" for b in bw], [f"{b['rf_centred']:.4f}" for b in bw])}}};
+\draw[color={INK3}, densely dotted, line width=0.7pt]
+  (axis cs:{bw[0]['dG_mean']:.3f},0) -- (axis cs:{bw[-1]['dG_mean']:.3f},0);
+
+\nextgroupplot[width=4.2cm, height=5.0cm,
+    xlabel={{retention}}, ytick={{1,2}},
+    yticklabels={{{{placebo mediator}},{{the real mediator}}}},
+    yticklabel style={{font=\tiny}}, ymin=0.4, ymax=2.6,
+    xmin={min(lo, P3['real_retention']) - 0.02:.4f},
+    xmax={max(hi, P3['real_retention']) + 0.02:.4f},
+    title={{c}}]
+\fill[{INK3}, opacity=0.22] (axis cs:{lo:.4f},0.72) rectangle (axis cs:{hi:.4f},1.28);
+{iv(f"{mu-sd:.4f}", f"{mu+sd:.4f}", 1, INK2, "1.5pt")}
+{pt(f"{mu:.4f}", 1, INK2, "2.2pt")}
+{pt(f"{P3['real_retention']:.4f}", 2, S1, "2.6pt")}
+\node[font=\tiny, color={INK2}, anchor=south] at (axis cs:{mu:.4f},1.32)
+  {{range, and mean $\pm$1\,SD}};"""
+    emit("figA2_energy.tex", grp(3, body, hsep="1.6cm"))
+
+
+def figA_imbalance():
+    """What residual imbalance inside the caliper could be worth, with and without the panel."""
+    d = J("m23c_imbalance_bound.json")
+    rows = d["rows"]
+    pops = []
+    for r in rows:
+        if r["pop"] not in pops:
+            pops.append(r["pop"])
+    ys = list(range(len(pops), 0, -1))
+    t, l = ylabels([EN.get(p, p) for p in pops])
+    series = []
+    for panel, c, lab in ((False, S2, "panel-free"), (True, S1, "panel-matched")):
+        vals = []
+        for p in pops:
+            hit = [r for r in rows if r["pop"] == p and r["panel"] == panel]
+            vals.append(hit[0]["bias_pct_of_effect"] if hit else 0.0)
+        series.append(rf"""\addplot[fill={c}, draw=none] coordinates {{{co([f"{v:.3f}" for v in vals], ys)}}};
+\addlegendentry{{{lab}}}""")
+    # "forget plot" opts the series out of the plot cycle, and the automatic bar shift comes
+    # WITH that cycle: both series were drawn at the same offset and the second painted over
+    # the first, so panel b read as one stacked bar instead of two.
+    smd = []
+    for (panel, c), shift in (((False, S2), "-3.5pt"), ((True, S1), "+3.5pt")):
+        vals = []
+        for p in pops:
+            hit = [r for r in rows if r["pop"] == p and r["panel"] == panel]
+            vals.append(hit[0]["smd_gamma"] if hit else 0.0)
+        smd.append(rf"""\addplot[fill={c}, draw=none, forget plot, bar shift={shift}] coordinates {{{co([f"{v:.4f}" for v in vals], ys)}}};""")
+    body = rf"""\nextgroupplot[width=8.4cm, height=5.2cm, xbar, bar width=6pt,
+    xlabel={{bias, as a share of the measured effect (\%)}},
+    ytick={{{t}}}, yticklabels={{{l}}}, yticklabel style={{font=\tiny}},
+    ymin=0.4, ymax={len(pops)+0.6}, xmin=0,
+    legend style={{at={{(0.5,-0.30)}}, anchor=north, font=\tiny, draw=none}},
+    legend columns=2, title={{a}}]
+{chr(10).join(series)}
+
+\nextgroupplot[width=5.6cm, height=5.2cm, xbar, bar width=6pt,
+    xlabel={{standardised difference on the covariate}},
+    ytick={{{t}}}, yticklabels={{\empty}}, ymin=0.4, ymax={len(pops)+0.6}, xmin=0,
+    title={{b}}]
+{chr(10).join(smd)}"""
+    emit("figA3_imbalance.tex", grp(2, body, hsep="1.5cm"))
+
+
+def figA_ceiling():
+    """The reproducibility ceiling, per population and under both estimators of the noise."""
+    d = J("r1b_ceiling_interval.json")
+    per = d["per_pop"]
+    names = popnames_subset(per.keys())
+    L = []
+    for i, (k, nm) in enumerate(zip(per, names)):
+        v = per[k]
+        y = len(names) - i
+        for tag, col, off in (("a", S1, 0.16), ("b", S2, -0.16)):
+            L.append(iv(f"{v['ci_' + tag][0]:.4f}", f"{v['ci_' + tag][1]:.4f}", f"{y + off}", col))
+            L.append(pt(f"{v['ceiling_' + tag]:.4f}", f"{y + off}", col))
+    t, l = ylabels(names)
+    gs = d["group_sizes"]
+    ks = sorted((int(k) for k in gs), key=int)
+    body = rf"""\nextgroupplot[width=8.2cm, height=5.2cm,
+    xlabel={{reproducibility ceiling}},
+    ytick={{{t}}}, yticklabels={{{l}}}, yticklabel style={{font=\tiny}},
+    ymin=0.4, ymax={len(names)+0.6},
+    legend style={{at={{(0.5,-0.28)}}, anchor=north, font=\tiny, draw=none}},
+    legend columns=2, title={{a}}]
+{chr(10).join(L)}
+\addlegendimage{{color={S1}, mark=*, mark size=2pt, line width=1.4pt}}
+\addlegendentry{{repeat groups}}
+\addlegendimage{{color={S2}, mark=*, mark size=2pt, line width=1.4pt}}
+\addlegendentry{{paired duplicates}}
+
+\nextgroupplot[width=6.2cm, height=5.2cm, ybar, bar width=5pt,
+    xlabel={{measurements in a repeat group}}, ylabel={{groups}},
+    ymode=log, log basis y=10, ymin=0.7,
+    ymax={max(gs.values())*9:.0f}, xmin={min(ks)-1}, xmax={max(ks)+1},
+    title={{b}}]
+\addplot[fill={INK3}, draw=none] coordinates {{{co(ks, [gs[str(k)] for k in ks])}}};"""
+    emit("figA4_ceiling.tex", grp(2, body, hsep="2.6cm"))
+
+
 if __name__ == "__main__":
     print("emitting TikZ display items")
-    for fn in (fig0, fig3, fig4, fig5, fig6, fig7, fig8, fig9, fig10, fig11, fig12):
+    for fn in (fig0, fig3, fig4, fig5, fig6, fig7, fig8, fig9, fig10, fig11, fig12,
+               fig_cal, fig_crossdomain, figA_nulls, figA_energy, figA_imbalance,
+               figA_ceiling):
         fn()
     print("done")
