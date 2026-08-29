@@ -1234,9 +1234,13 @@ question is further behind a declared target's helix depth than the general-purp
 \emph{Two things this arm was set up to be unable to explain away.} A global change score could
 lose because the rest of the molecule dilutes it, so the same distance was recomputed inside a
 window around the mutated pair. The declaration staked that the local variant would rank at least
-as well as the global one; it does not (\jdg{rsLocal} against \jdg{rsBppm}), and the paired
-difference against depth barely moves (\jdg{rsLocalVs}, \jdg{rsLocalVsCi}). \textbf{That staked
-prediction failed}, and the failure closes the escape route rather than opening one: localisation
+as well as the global one; it does not (\jdg{rsLocal}, \jdg{rsLocalCi}, against \jdg{rsBppm},
+\jdg{rsBppmCi}), and the paired difference against depth barely moves (\jdg{rsLocalVs},
+\jdg{rsLocalVsCi}). \textbf{That staked prediction failed}, and it failed as it was written --- the
+declaration staked a point-for-point comparison, so what the two overlapping intervals license is
+that the local variant \emph{does not rank better}, not that it ranks worse. We put no interval on
+the difference between them and make no claim that requires one. The failure closes the escape
+route rather than opening one: localisation
 is not what is missing. And the arm was verified before it was read --- every score is exactly
 \jdg{rsIdent} against the sequence itself, the matrix distance recomputed by an independently
 written accumulation agrees to \jdg{rsObw}, and the distance is symmetric to machine precision.
@@ -1726,8 +1730,9 @@ At least one riboSNitch-style score resolves from zero \emph{in the declared neg
   \quad(\jdg{rsBppmCi}, \jdg{rsMfeCi}, \jdg{rsEnsCi}) & correct \\
 None of the three beats the free depth baseline \quad(\jdg{rsNbeat} of \jdg{rsNarms}) & correct \\
 \textbf{The local variant ranks at least as well as the global one} --- \emph{it does not:
-  \jdg{rsLocal} against \jdg{rsBppm}. The failure removes the explanation it was staked to test,
-  so localisation is reported as not being what is missing} & \textbf{failed} \\
+  \jdg{rsLocal} (\jdg{rsLocalCi}) against \jdg{rsBppm} (\jdg{rsBppmCi}). The stake was written as a
+  point-for-point comparison and is graded as one; the intervals overlap, so the licensed reading
+  is that localisation does not help, not that it hurts} & \textbf{failed} \\
 The matrix distance and the MFE distance agree in sign \quad(\jdg{rsBppm}, \jdg{rsMfe}) & correct \\
 \end{longtable}}
 
