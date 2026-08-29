@@ -1027,9 +1027,11 @@ the full corpus is future work (\S\ref{sec:limitations}).
 \centering
 \input{figs/fig2_calibration}
 \caption{\textbf{Both predictors have skill on this instrument.} Mean measured rescue against
-bins of each predictor's own equilibrium or learned pair probability, with the bin's mean
-probability and size printed beneath each point. The relation is monotone for the thermodynamic
-model; the neural model's is steeper. Neither curve involves a reference structure.}
+equal-count quintiles of each predictor's own equilibrium or learned pair probability; each
+quintile holds a fifth of the \jdg{nAdmitted} admitted interventions, and the tick beneath each
+point is that quintile's mean probability. The relation is monotone for the thermodynamic model;
+the neural model's is steeper, and the two panels are drawn on one $y$ range so that this is a
+property of the measurement and not of the axis. Neither curve involves a reference structure.}
 \label{fig:calibration}
 \end{figure}
 
@@ -1374,7 +1376,10 @@ interval, and none of them divides one small noisy quantity by another.
 cells split by whether their design window is found in the model's own training file. The
 thermodynamic bars are the control that makes the split readable: that model was trained on
 nothing and falls the same way. \textbf{b}, The matched identity contrast on the whole corpus, on cells whose
-design passes the published selection cutoff, and on the cells where that filter did not bind.}
+design passes the published selection cutoff, and on the cells where that filter did not bind.
+Only the two split arms carry intervals; the whole-corpus row is the reference point the split is
+read against, and the quantity the audit actually tests is the difference between the arms,
+\jdg{selDiff} (\jdg{selDiffCi}).}
 \label{fig:audits}
 \end{figure}
 

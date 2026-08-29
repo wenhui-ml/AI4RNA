@@ -66,18 +66,22 @@ def fig_corpus():
         seg["mid"].append(100 * dd["frac_between"])
         seg["hi"].append(100 * dd["frac_above_0.99"])
 
-    body = rf"""\nextgroupplot[width=5.6cm, height=3.6cm, ybar, bar width=9pt,
+    # width= in pgfplots is the width of the CELL, labels included, so the plot box is what is
+    # left after the y label and its ticks. At 5.6cm the two boxes together used two thirds of
+    # the text block and panel b's tick names ran into panel a's bars: the sep has to clear the
+    # NEXT panel's left labels, which live inside it.
+    body = rf"""\nextgroupplot[width=8.0cm, height=5.2cm, ybar, bar width=14pt,
     xlabel={{helix depth of the flipped pair}}, ylabel={{interventions}},
     xtick={{{",".join(map(str, ks))}}}, ymin=0, ymax={max(vs)*1.24:.0f},
     enlarge x limits=0.10, nodes near coords, every node near coord/.append style={{font=\tiny,
     color=nmink}}, title={{a}}]
 \addplot[fill={FREE}, draw=none] coordinates {{{co(ks, vs)}}};
 
-\nextgroupplot[width=4.9cm, height=3.6cm, xbar stacked, bar width=13pt,
+\nextgroupplot[width=7.55cm, height=5.2cm, xbar stacked, bar width=17pt,
     xmin=0, xmax=100, xlabel={{share of interventions (\%)}},
     ytick={{0,1}}, yticklabels={{ViennaRNA, RibonanzaNet}}, y dir=reverse,
     enlarge y limits=0.55, legend columns=3,
-    legend style={{at={{(0.5,-0.52)}}, anchor=north, font=\scriptsize, draw=none,
+    legend style={{at={{(0.5,-0.34)}}, anchor=north, font=\scriptsize, draw=none,
       /tikz/every even column/.append style={{column sep=4pt}}}},
     title={{b}}]
 \addplot[fill={GREY}, draw=none] coordinates {{({seg['lo'][0]:.1f},0) ({seg['lo'][1]:.1f},1)}};
@@ -86,29 +90,34 @@ def fig_corpus():
 \addlegendentry{{between}}
 \addplot[fill={INK}, draw=none] coordinates {{({seg['hi'][0]:.1f},0) ({seg['hi'][1]:.1f},1)}};
 \addlegendentry{{$>0.99$}}"""
-    emit("fig1_corpus.tex", group(2, body, hsep="1.9cm"))
+    emit("fig1_corpus.tex", group(2, body, hsep="2.2cm"))
 
 
 # ---------------------------------------------------------------- Fig 2: calibration
 def fig_calibration():
     v = J("m26_model_scored.json")["D4"]["bins"]
     n = J("m26c_neural_scored.json")["N3"]["bins"]
+    # ONE y range for both panels. The caption says the neural curve is steeper, and with a
+    # per-panel range that word would describe the axis rather than the measurement (rule 68).
+    rf = [b["rf_mean"] for b in v + n]
+    ylo, yhi = min(rf) - 0.05, max(rf) + 0.05
+    # The bin's mean probability used to be printed under each point, where the first one ran
+    # into the y axis. It is the x coordinate's own value, so it belongs on the tick.
     parts = []
-    for bins, col, name, letter, first in ((v, THM, "ViennaRNA", "a", True),
-                                           (n, NEU, "RibonanzaNet", "b", False)):
+    for bins, col, letter, first in ((v, THM, "a", True), (n, NEU, "b", False)):
         xs = list(range(1, len(bins) + 1))
         ys = [f"{b['rf_mean']:.4f}" for b in bins]
-        meta = [f"$P${{=}}{b['p_mean']:.3g}" for b in bins]
-        ylab = "ylabel={mean measured rescue}," if first else ""
-        parts.append(rf"""\nextgroupplot[width=5.3cm, height=3.7cm,
-    xlabel={{bin of the predictor's own pair probability}}, {ylab}
-    xtick={{{",".join(map(str, xs))}}}, enlarge x limits=0.14, enlarge y limits=0.42,
-    nodes near coords, point meta=explicit symbolic,
-    every node near coord/.append style={{font=\tiny, color=nmink, below=4pt}},
+        tk = ",".join(f"{b['p_mean']:.3g}" for b in bins)
+        ylab = r"ylabel={mean rescue}," if first else ""
+        parts.append(rf"""\nextgroupplot[width=8.2cm, height=5.4cm,
+    xlabel={{predictor's own pair probability}}, {ylab}
+    xtick={{{",".join(map(str, xs))}}}, xticklabels={{{tk}}},
+    xticklabel style={{font=\scriptsize}},
+    ymin={ylo:.3f}, ymax={yhi:.3f}, enlarge x limits=0.11,
     title={{{letter}}}]
-\addplot[color={col}, mark=*, mark size=1.7pt, line width=1.0pt]
-  coordinates {{{co(xs, ys, meta)}}};""")
-    emit("fig2_calibration.tex", group(2, "\n\n".join(parts), hsep="2.3cm"))
+\addplot[color={col}, mark=*, mark size=2pt, line width=1.1pt]
+  coordinates {{{co(xs, ys)}}};""")
+    emit("fig2_calibration.tex", group(2, "\n\n".join(parts), hsep="1.6cm"))
 
 
 # ---------------------------------------------------------------- Fig 3: Claim 3
@@ -116,8 +125,10 @@ def fig_ranking():
     m31, m31r, t = (J("m31_which_flips_rescue.json"), J("m31r_review.json"),
                     J("m31t_recovery_curve.json"))
     A = m31["A_within_design"]
+    # the tick names are this panel's left margin, and in a three-panel row that margin is
+    # subtracted from every plot box. "(free)" is in the caption; it does not need to be here.
     rows = [("RibonanzaNet", A["P_neural"], NEU),
-            ("helix depth (free)", A["depth_baseline"], FREE),
+            ("helix depth", A["depth_baseline"], FREE),
             ("ViennaRNA", A["P_vienna"], THM)]
     lines = []
     for i, (_lab, r, c) in enumerate(rows):
@@ -131,8 +142,12 @@ def fig_ranking():
     f = [f"{100*x:.0f}" for x in t["fracs"]]
     c = t["curves"]
 
-    body = rf"""\nextgroupplot[width=4.5cm, height=3.4cm,
-    xlabel={{within-design rank agreement $\rho$}},
+    # Three panels leave little room per box, so every label here is as short as it can be and
+    # still be read: the long forms are in the caption. The legend used to sit above panel b at
+    # the same anchor as the panel letter and overhung both neighbours; it goes below the x
+    # label, into a band where no other panel has anything.
+    body = rf"""\nextgroupplot[width=5.0cm, height=4.8cm,
+    xlabel={{rank agreement $\rho$}},
     ytick={{{",".join(str(len(rows)-i) for i in range(len(rows)))}}},
     yticklabels={{{",".join(r[0] for r in rows)}}},
     yticklabel style={{font=\tiny}}, ymin=0.4, ymax={len(rows)+0.6},
@@ -141,9 +156,9 @@ def fig_ranking():
     title={{a}}]
 {chr(10).join(lines)}
 
-\nextgroupplot[width=4.15cm, height=3.4cm,
-    xlabel={{rescue threshold defining a hit}}, ylabel={{within-cell AUROC}},
-    legend style={{at={{(0.5,1.02)}}, anchor=south, font=\tiny}},
+\nextgroupplot[width=5.0cm, height=4.8cm,
+    xlabel={{rescue threshold for a hit}}, ylabel={{AUROC}},
+    legend style={{at={{(0.5,-0.34)}}, anchor=north, font=\tiny, draw=none}},
     legend columns=3, enlarge y limits=0.22,
     title={{b}}]
 \addplot[color={NEU}, mark=*, mark size=1.3pt, line width=0.9pt]
@@ -156,9 +171,9 @@ def fig_ranking():
   coordinates {{{co(th, [r["P_vienna"] for r in sw])}}};
 \addlegendentry{{ViennaRNA}}
 
-\nextgroupplot[width=4.15cm, height=3.4cm,
-    xlabel={{share of a design's flips built (\%)}},
-    ylabel={{rescuing flips recovered (\%)}},
+\nextgroupplot[width=5.0cm, height=4.8cm,
+    xlabel={{share of flips built (\%)}},
+    ylabel={{flips recovered (\%)}},
     legend style={{at={{(0.97,0.03)}}, anchor=south east, font=\tiny}}, legend columns=1,
     title={{c}}]
 \addplot[color={NEU}, line width=1.1pt]
@@ -170,7 +185,7 @@ def fig_ranking():
 \addplot[color={GREY}, dashed, line width=0.9pt]
   coordinates {{{co(f, [f"{100*y:.3f}" for y in c["random"]])}}};
 \addlegendentry{{random}}"""
-    emit("fig3_ranking.tex", group(3, body, hsep="2.05cm"))
+    emit("fig3_ranking.tex", group(3, body, hsep="1.9cm"))
 
 
 # ---------------------------------------------------------------- Fig 4: the two audits
@@ -193,9 +208,11 @@ def fig_audits():
                    rf"unexposed\\$n${{=}}{d['n_clean']}",
                    rf"exposed\\$n${{=}}{d['n_dirty']}"))
     S3 = s["S3"]
+    # two lines, right-aligned: this panel's tick names are the sep between the two plots, and
+    # "filter did not bind" on one line pushed them into panel a.
     est = [("whole corpus", S3["full"], None, INK),
            ("passes cutoff", S3["pass"], S3["ci_pass"], GREY),
-           ("filter did not bind", S3["fallback"], S3["ci_fallback"], FREE)]
+           (r"filter did\\not bind", S3["fallback"], S3["ci_fallback"], FREE)]
     lines = []
     for i, (_l, e, cc, col) in enumerate(est):
         y = len(est) - i
@@ -209,25 +226,25 @@ def fig_audits():
     # placed above the axis lands: "a" printed on top of "RibonanzaNet". Putting the legend
     # INSIDE the axis then covered the bars, so it goes below the tick labels and the letter
     # keeps the title slot to itself.
-    body = rf"""\nextgroupplot[width=5.4cm, height=3.5cm, ybar, bar width=10pt,
+    body = rf"""\nextgroupplot[width=8.0cm, height=5.0cm, ybar, bar width=15pt,
     xtick={{1,2,3}}, xticklabels={{{tl}}},
     xticklabel style={{align=center, font=\tiny}},
-    ylabel={{within-stratum skill slope}}, enlarge x limits=0.24,
+    ylabel={{skill slope}}, enlarge x limits=0.24,
     ymin={ymin_a:.4f},
-    legend style={{at={{(0.5,-0.34)}}, anchor=north, font=\tiny, draw=none}},
+    legend style={{at={{(0.5,-0.30)}}, anchor=north, font=\tiny, draw=none}},
     legend columns=2,
     title={{a}}]
 {chr(10).join(bars)}
 
-\nextgroupplot[width=4.9cm, height=3.5cm,
+\nextgroupplot[width=8.0cm, height=5.0cm,
     xlabel={{matched G--C $-$ A--U contrast in rescue}},
     ytick={{{",".join(str(len(est)-i) for i in range(len(est)))}}},
     yticklabels={{{",".join("{" + e[0] + "}" for e in est)}}},
-    yticklabel style={{font=\tiny}}, ymin=0.4, ymax={len(est)+0.6},
+    yticklabel style={{font=\tiny, align=right}}, ymin=0.4, ymax={len(est)+0.6},
     extra x ticks={{0}}, extra x tick style={{grid=major,
       grid style={{densely dotted, color={GREY}}}, xticklabel=\empty}}, title={{b}}]
 {chr(10).join(lines)}"""
-    emit("fig4_audits.tex", group(2, body, hsep="2.0cm"))
+    emit("fig4_audits.tex", group(2, body, hsep="2.1cm"))
 
 
 
@@ -296,9 +313,16 @@ def fig_arch():
 
 # ---------------------------------------------------------------- what an intervention is
 def fig_flip():
-    """The criterion and the two conditioning sets, drawn. No measured quantity."""
+    """The criterion and the two conditioning sets, drawn. No measured quantity.
+
+    Everything below is placed on ONE centre. The note under the strands used to be set
+    ragged-right from x=0 with no text width, so it ran off to the right of everything else and
+    dragged the picture's bounding box with it -- \\centering then centred the box, not the
+    drawing, and the strands sat left of the page centre while the note overhung the right.
+    """
+    S, C = 0.68, 4.97          # nucleotide pitch (cm); centre of the drawn row, labels included
     body = r"""\begin{tikzpicture}[font=\scriptsize,
-  nt/.style={draw=nmgrey, line width=0.5pt, minimum size=4.2mm, inner sep=0pt,
+  nt/.style={draw=nmgrey, line width=0.5pt, minimum size=6.0mm, inner sep=0pt,
              font=\scriptsize\ttfamily},
   hit/.style={nt, draw=nmneural, line width=0.9pt, fill=nmneural!8},
   ar/.style={-{Latex[length=1.4mm, width=1mm]}, line width=0.55pt, color=nmink}]
@@ -307,53 +331,58 @@ def fig_flip():
 % flanks OUTSIDE the design window are drawn too, because clause (ii) is about them: a wild
 % type and its compensatory mutant differ at a dozen positions out here, and none of those
 % differences are the intervention.
-\node[font=\scriptsize\bfseries, anchor=east] at (-0.35,0) {wild type};
-\node[font=\scriptsize\bfseries, anchor=east] at (-0.35,-0.75) {mutant};
+\node[font=\scriptsize\bfseries, anchor=east] at (-0.38,0) {wild type};
+\node[font=\scriptsize\bfseries, anchor=east] at (-0.38,-0.86) {mutant};
 \foreach \c [count=\i from 0] in {A,C,G,G,C,A,U,G,C,A,U,G,C,A,U,U,G,A}
-  \node[nt] at (\i*0.48,0) {\c};
+  \node[nt] at (\i*@S@,0) {\c};
 \foreach \c [count=\i from 0] in {U,G,A,G,C,A,U,G,C,A,U,G,C,A,U,C,A,C}
-  \node[nt] at (\i*0.48,-0.75) {\c};
+  \node[nt] at (\i*@S@,-0.86) {\c};
 \foreach \i in {0,1,2,15,16,17} {
-  \node[nt, draw=nmgrey!55, text=nmgrey] at (\i*0.48,0) {\phantom{X}};
-  \node[nt, draw=nmgrey!55, text=nmgrey] at (\i*0.48,-0.75) {\phantom{X}};}
+  \node[nt, draw=nmgrey!55, text=nmgrey] at (\i*@S@,0) {\phantom{X}};
+  \node[nt, draw=nmgrey!55, text=nmgrey] at (\i*@S@,-0.86) {\phantom{X}};}
 \foreach \c [count=\i from 0] in {A,C,G}
-  \node[font=\scriptsize\ttfamily, text=nmgrey] at (\i*0.48,0) {\c};
+  \node[font=\scriptsize\ttfamily, text=nmgrey] at (\i*@S@,0) {\c};
 \foreach \c [count=\i from 15] in {U,G,A}
-  \node[font=\scriptsize\ttfamily, text=nmgrey] at (\i*0.48,0) {\c};
+  \node[font=\scriptsize\ttfamily, text=nmgrey] at (\i*@S@,0) {\c};
 \foreach \c [count=\i from 0] in {U,G,A}
-  \node[font=\scriptsize\ttfamily, text=nmgrey] at (\i*0.48,-0.75) {\c};
+  \node[font=\scriptsize\ttfamily, text=nmgrey] at (\i*@S@,-0.86) {\c};
 \foreach \c [count=\i from 15] in {C,A,C}
-  \node[font=\scriptsize\ttfamily, text=nmgrey] at (\i*0.48,-0.75) {\c};
-\node[hit] at (5*0.48,0) {A}; \node[hit] at (10*0.48,0) {U};
-\node[hit] at (5*0.48,-0.75) {U}; \node[hit] at (10*0.48,-0.75) {A};
-\draw[ar] (5*0.48,-0.30) -- (5*0.48,-0.46);
-\draw[ar] (10*0.48,-0.30) -- (10*0.48,-0.46);
+  \node[font=\scriptsize\ttfamily, text=nmgrey] at (\i*@S@,-0.86) {\c};
+\node[hit] at (5*@S@,0) {A}; \node[hit] at (10*@S@,0) {U};
+\node[hit] at (5*@S@,-0.86) {U}; \node[hit] at (10*@S@,-0.86) {A};
+\draw[ar] (5*@S@,-0.34) -- (5*@S@,-0.52);
+\draw[ar] (10*@S@,-0.34) -- (10*@S@,-0.52);
 \draw[decorate, decoration={brace, amplitude=3pt, mirror}, color=nmgrey]
-  (3*0.48-0.24,-1.10) -- (14*0.48+0.24,-1.10)
+  (3*@S@-0.34,-1.28) -- (14*@S@+0.34,-1.28)
   node[midway, below=3pt, font=\tiny, color=nmink] {design window $[\ell,u)$};
-\node[font=\tiny, color=nmgrey, anchor=north] at (1*0.48,-1.14) {adapter};
-\node[font=\tiny, color=nmgrey, anchor=north] at (16*0.48,-1.14) {barcode};
+\node[font=\tiny, color=nmgrey, anchor=north] at (1*@S@,-1.32) {adapter};
+\node[font=\tiny, color=nmgrey, anchor=north] at (16*@S@,-1.32) {barcode};
 \draw[color=nmthermo, line width=0.7pt]
-  (5*0.48,0.24) .. controls (6.5*0.48,0.80) and (8.5*0.48,0.80) .. (10*0.48,0.24);
-\node[font=\tiny, color=nmthermo, anchor=south] at (7.5*0.48,0.72) {declared pair $(i,j)$};
-\node[align=left, font=\tiny, color=nmink, anchor=north west] at (0,-2.05)
-  {inside the window exactly two positions change, and they exchange: the unordered pair type is
-   preserved (A--U stays A--U).\\Outside it the two constructs differ freely, and none of those
-   differences is part of the intervention.};
+  (5*@S@,0.34) .. controls (6.5*@S@,0.96) and (8.5*@S@,0.96) .. (10*@S@,0.34);
+\node[font=\tiny, color=nmthermo, anchor=south] at (7.5*@S@,0.88) {declared pair $(i,j)$};
+% a centred paragraph breaks its lines early, so the two lines are set by hand: left to TeX
+% this ran to three, and the third sat under the boxes below.
+\node[text width=125mm, align=center, font=\tiny, color=nmink, anchor=north] at (@C@,-2.26)
+  {inside the window exactly two positions change, and they exchange, so the unordered pair type
+   is preserved\\ (A--U stays A--U); outside it the constructs differ freely, and those
+   differences are not the intervention};
 
-\begin{scope}[shift={(0,-3.5)}]
+\begin{scope}[shift={(0,-3.75)}]
 \node[draw=nmthermo, fill=nmthermo!6, rounded corners=2pt, line width=0.7pt,
-      text width=44mm, align=center, inner sep=4pt, font=\scriptsize] (c1) at (1.5,0)
+      text width=52mm, align=center, inner sep=4pt, font=\scriptsize] (c1) at (@L@,0)
   {\textbf{causal question}\\which pair type helps?\\condition on cell, depth, crossing};
 \node[draw=nmfree, fill=nmfree!6, rounded corners=2pt, line width=0.7pt,
-      text width=44mm, align=center, inner sep=4pt, font=\scriptsize] (c2) at (6.9,0)
+      text width=52mm, align=center, inner sep=4pt, font=\scriptsize] (c2) at (@R@,0)
   {\textbf{experimenter's question}\\which flip should I build?\\condition on the cell alone};
-\node[font=\tiny, color=nmink, text width=50mm, align=center, anchor=north] at (1.5,-0.9)
+\node[font=\tiny, color=nmink, text width=52mm, align=center, anchor=north] at (@L@,-1.00)
   {depth is a confounder, and is removed};
-\node[font=\tiny, color=nmink, text width=50mm, align=center, anchor=north] at (6.9,-0.9)
+\node[font=\tiny, color=nmink, text width=52mm, align=center, anchor=north] at (@R@,-1.00)
   {depth is information already held, and is kept};
 \end{scope}
 \end{tikzpicture}"""
+    for k, val in (("@S@", f"{S}"), ("@C@", f"{C}"),
+                   ("@L@", f"{C - 3.05:.2f}"), ("@R@", f"{C + 3.05:.2f}")):
+        body = body.replace(k, val)
     emit("fig_flip.tex", body)
 
 

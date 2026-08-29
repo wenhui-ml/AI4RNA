@@ -27,6 +27,22 @@ CEILING = 0.6956
 EN = {"样本2(主)": "sample 2 (main)", "基准4560": "baseline 4560", "样本3": "sample 3",
       "第四批": "batch 4", "第五批(盲)": "batch 5", "第六批(盲)": "batch 6"}
 POPNAME = [EN[n] for n in ("样本2(主)", "基准4560", "样本3", "第四批", "第五批(盲)", "第六批(盲)")]
+# The artifacts key the six populations by the internal file they were built from, and the
+# correspondence is fixed by the runs (c1_width_null.py, ceiling_probe.py). Figure 2 was
+# printing those file nicknames -- "fresh", "designs", "third" -- while every other figure
+# and table in the paper printed the population names, so the same six rows carried two
+# different sets of labels. One map, and a check that the artifact still agrees with it.
+POPFILE = ["panel_f1_fresh.json", "panel_f1_designs.json", "panel_f1_third.json",
+           "panel_f1_fourth.json", "panel_f1_fifth.json", "panel_f1_sixth.json"]
+POPBY = dict(zip(POPFILE, POPNAME))
+
+
+def popnames(keys):
+    ks = list(keys)
+    if ks != POPFILE:
+        raise SystemExit(f"population set changed: {ks} != {POPFILE}; the labels in this "
+                         "figure are read from POPBY and would be wrong")
+    return [POPBY[k] for k in ks]
 
 BASE = (r"axis lines=left, axis line style={line width=0.5pt, color=" + INK3 + r"},"
         "\n    tick style={line width=0.5pt, color=" + INK3 + r"}, tick align=outside,"
@@ -119,9 +135,9 @@ def ylabels(names):
 def fig3():
     d = J("m18_repaired_null.json")["pops"]
     rows = []
-    for r in d.values():
+    for nm, r in zip(popnames(d), d.values()):
         b = r["arms"]["B_panel_matched"]
-        rows.append((POPNAME[len(rows)], b, b["usable"]))
+        rows.append((nm, b, b["usable"]))
     L, names = [], []
     for k, (nm, a, us) in enumerate(rows):
         y = len(rows) - k
@@ -136,9 +152,13 @@ def fig3():
                  rf"(axis cs:{a['boot_ci_secondary'][1] + .15},{y}) {{{txt}}};")
         names.append(en(nm) + ("" if us else " (n.u.)"))
     ticks, labs = ylabels(names)
-    body = rf"""\begin{{axis}}[width=7.2cm, height=4.4cm, {BASE},
+    # xmin was fixed at -1.2 while batch 6's null band reaches -4.03, so that band was drawn
+    # outside the axis and ran underneath the population names. The band is the comparison
+    # object; it is the axis that has to make room for it, not the band that gets clipped.
+    xlo = 1.06 * min(min(-1.96 * a["null_sd"], a["boot_ci_secondary"][0]) for _n, a, _u in rows)
+    body = rf"""\begin{{axis}}[width=11.0cm, height=6.0cm, {BASE},
     xlabel={{matched-pair difference (OpenKnot points)}},
-    xmin=-1.2, xmax=9.6, ymin=0.4, ymax={len(rows)+0.6},
+    xmin={xlo:.2f}, xmax=9.6, ymin=0.4, ymax={len(rows)+0.6},
     ytick={{{ticks}}}, yticklabels={{{labs}}},]
 {chr(10).join(L)}
 \end{{axis}}
@@ -172,22 +192,22 @@ def fig4():
     v1 = [m14["Y1"][k]["mean"] for k in ks2]
     x3 = list(range(1, len(ks2) + 1))
 
-    body = rf"""\nextgroupplot[width=4.5cm, height=3.5cm, xbar, bar width=4.5pt,
+    body = rf"""\nextgroupplot[width=5.0cm, height=4.7cm, xbar, bar width=6pt,
     ytick={{{t1}}}, yticklabels={{{l1}}}, yticklabel style={{font=\tiny}},
     xlabel={{effect (OpenKnot points)}}, ymin=0.4, ymax={len(nms)+0.6},
-    legend columns=2, legend style={{at={{(0.5,1.02)}}, anchor=south}},]
+    legend columns=1, legend style={{at={{(0.5,1.02)}}, anchor=south, font=\tiny}},]
 {zeroline(0.4, len(nms)+0.6)}
 \addplot[fill={S1}, draw=none] coordinates {{{co([f"{v:.4f}" for v in real], ys)}}};
 \addlegendentry{{true paired set}}
 \addplot[fill={S2}, draw=none] coordinates {{{co([f"{v:.4f}" for v in sh], ys)}}};
 \addlegendentry{{shifted set}}
 
-\nextgroupplot[width=4.1cm, height=3.5cm,
+\nextgroupplot[width=4.7cm, height=4.7cm,
     xtick={{{",".join(map(str, x2))}}},
     xticklabels={{{",".join("{{" + f"{float(k):.1f}" + "}}" for k in ks)}}},
-    xlabel={{matching stringency $k$ (residual SD)}}, ylabel={{median slope}},
-    ymin=-14, ymax=68, legend columns=2,
-    legend style={{at={{(0.5,1.02)}}, anchor=south}}]
+    xlabel={{stringency $k$ (residual SD)}}, ylabel={{median slope}},
+    ymin=-14, ymax=68, legend columns=1,
+    legend style={{at={{(0.5,1.02)}}, anchor=south, font=\tiny}}]
 \addplot[color={S1}, mark=*, mark size=1.8pt, line width=1.1pt]
   coordinates {{{co(x2, [f"{v:.3f}" for v in sp])}}};
 \addlegendentry{{contrast pairing}}
@@ -195,15 +215,15 @@ def fig4():
   coordinates {{{co(x2, [f"{v:.3f}" for v in sc])}}};
 \addlegendentry{{contrast composition}}
 
-\nextgroupplot[width=4.1cm, height=3.5cm, ybar, bar width=9pt,
+\nextgroupplot[width=4.5cm, height=4.7cm, ybar, bar width=11pt,
     xtick={{{",".join(map(str, x3))}}},
     xticklabels={{{",".join("{{" + lab[k] + "}}" for k in ks2)}}},
-    ylabel={{partner reactivity change}}, ymin=0, ymax=0.70,
+    ylabel={{$\Delta$ partner reactivity}}, ymin=0, ymax=0.70,
     nodes near coords, point meta=explicit symbolic,
     every node near coord/.append style={{font=\tiny, color={INK2}}}]
 \addplot[fill={S1}, draw=none] coordinates {{{
     " ".join(f"({a},{b:.4f}) [{b:+.2f}]" for a, b in zip(x3, v1))}}};"""
-    emit("fig4_three_cuts.tex", grp(3, body, hsep="1.6cm"))
+    emit("fig4_three_cuts.tex", grp(3, body, hsep="2.1cm"))
 
 
 # ---------------------------------------------------------------- fig 5: rescue
@@ -264,12 +284,12 @@ def fig6():
         if p["method"] in ("Eterna", "Rosetta"):
             notes.append(rf"\node[font=\tiny, color={INK2}, right=2pt] at "
                          rf"(axis cs:{p['pred']:.5f},{p['obs']:.5f}) {{{esc(p['method'])}}};")
-    body = rf"""\begin{{axis}}[width=6.0cm, height=4.6cm, {BASE},
+    body = rf"""\begin{{axis}}[width=10.2cm, height=6.8cm, {BASE},
     xlabel={{predicted attenuation\quad $g_m \times \beta_{{\rm depth}}$}},
     ylabel={{observed attenuation}},
-    xmin={lo:.5f}, xmax=0.002, ymin={lo:.5f}, ymax=0.002,
+    xmin={lo:.5f}, ymin={lo:.5f}, ymax=0.002,
     title={{depth accounts for {100*a2['mediated_fraction']:.0f}\% of the pooled gap}},
-    xmax=0.006, enlarge y limits=0.08]
+    xmax=0.0035, enlarge y limits=0.08]
 \addplot[color={INK3}, dashed, line width=0.7pt, forget plot]
   coordinates {{({lo:.5f},{lo:.5f}) (0.002,0.002)}};
 {chr(10).join(pts)}
@@ -332,14 +352,14 @@ def fig8():
     ys = list(range(len(pops), 0, -1))
     sa = [float(np.std(d["A"][k]["eff"])) for k in pops]
     sb = [float(np.std(d["B"][k]["eff"])) for k in pops]
-    nm = [en(d["A"][k]["pop"]) if "pop" in d["A"][k] else popname(k) for k in pops]
+    nm = popnames(pops)
     t1, l1 = ylabels(nm)
     ann = "\n".join(
         rf"\node[font=\tiny, color={INK2}, align=center, above=2pt] at (axis cs:{i+1},{r:.5f}) "
         rf"{{{r:.4f}\\{tot[t][0]}/{tot[t][1]}}};"
         for i, (r, t) in enumerate(zip(rates, ("A", "B"))))
 
-    body = rf"""\nextgroupplot[width=4.9cm, height=3.6cm, ybar, bar width=14pt,
+    body = rf"""\nextgroupplot[width=6.2cm, height=4.6cm, ybar, bar width=18pt,
     xtick={{1,2}}, xticklabels={{{{permute the\\treatment}},{{permute the\\outcome}}}},
     xticklabel style={{align=center}}, xmin=0.4, xmax=2.75,
     ylabel={{type-I error at the 0.005 gate}}, ymin=0, ymax={max(rates)*1.42:.5f}]
@@ -347,11 +367,11 @@ def fig8():
 \addplot[fill={S1}, draw=none] coordinates {{(2,{rates[1]:.5f})}};
 \draw[color={INK2}, dashed, line width=0.8pt]
   (axis cs:0.4,{d['nominal']}) -- (axis cs:2.75,{d['nominal']});
-\node[font=\tiny, color={INK2}, anchor=north east] at
-  (axis cs:2.75,{d['nominal']}) {{nominal {d['nominal']}}};
+\node[font=\tiny, color={INK2}, anchor=south west] at
+  (axis cs:0.42,{d['nominal']}) {{nominal {d['nominal']}}};
 {ann}
 
-\nextgroupplot[width=5.4cm, height=3.6cm, xbar, bar width=4.5pt,
+\nextgroupplot[width=6.8cm, height=4.6cm, xbar, bar width=6pt,
     ytick={{{t1}}}, yticklabels={{{l1}}}, yticklabel style={{font=\tiny}},
     xlabel={{SD of the statistic under each null}}, ymin=0.4, ymax={len(pops)+0.6},
     legend style={{at={{(0.5,1.02)}}, anchor=south}}, legend columns=2]
@@ -447,7 +467,7 @@ def fig10():
            f"{max(1.2, r['weight']/230):.2f}pt")
         for r, y in zip(rows, ys))
 
-    body = rf"""\nextgroupplot[width=3.8cm, height=3.6cm, ybar, bar width=13pt,
+    body = rf"""\nextgroupplot[width=5.4cm, height=4.8cm, ybar, bar width=17pt,
     xtick={{1,2,3}}, xticklabels={{{",".join(nm)}}},
     xticklabel style={{align=center}}, xmin=0.35, xmax=3.65,
     ylabel={{C--G $-$ A--U rescue}}, xlabel={{helix depth}},
@@ -457,7 +477,7 @@ def fig10():
 {bars}
 {ann}
 
-\nextgroupplot[width=5.4cm, height=3.6cm,
+\nextgroupplot[width=7.4cm, height=4.8cm,
     ytick={{{t2}}}, yticklabels={{{l2}}}, yticklabel style={{font=\tiny}},
     xlabel={{C--G $-$ A--U rescue, matched within design}}, ymin=0.4, ymax={len(rows)+0.6},]
 {zeroline(0.4, len(rows)+0.6)}
@@ -479,7 +499,7 @@ def fig11():
         L.append(rf"\addplot[color={c}, mark=*, mark size=2.4pt, only marks] "
                  rf"coordinates {{({v['dG_diff']:.5f},{v['rescue_diff']:.5f})}};"
                  "\n" rf"\addlegendentry{{{labtxt}}}")
-    body = rf"""\begin{{axis}}[width=6.2cm, height=4.8cm, {BASE},
+    body = rf"""\begin{{axis}}[width=13.2cm, height=7.0cm, {BASE},
     xlabel={{$\Delta\Delta G_{{\mathrm{{loc}}}}$ between the types (kcal/mol)}},
     ylabel={{$\Delta$ rescue, matched}}, xmin=-2.7, xmax=0.2,
     legend style={{at={{(0.5,-0.26)}}, anchor=north}}, legend columns=2,

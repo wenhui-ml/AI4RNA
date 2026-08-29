@@ -10,7 +10,7 @@
     /pgf/number format/fixed, /pgf/number format/precision=3,
     /pgf/number format/1000 sep={},
     title style={font=\scriptsize, color=rpInk, at={(0,1.03)}, anchor=south west}]
-\nextgroupplot[width=3.8cm, height=3.6cm, ybar, bar width=13pt,
+\nextgroupplot[width=5.4cm, height=4.8cm, ybar, bar width=17pt,
     xtick={1,2,3}, xticklabels={{0\\(helix end)},1,{$\geq$2\\(interior)}},
     xticklabel style={align=center}, xmin=0.35, xmax=3.65,
     ylabel={C--G $-$ A--U rescue}, xlabel={helix depth},
@@ -22,7 +22,7 @@
 \addplot[fill=rpBlue, draw=none, forget plot, bar shift=0pt] coordinates {(3,0.06080) [$p=0.0005$]};
 
 
-\nextgroupplot[width=5.4cm, height=3.6cm,
+\nextgroupplot[width=7.4cm, height=4.8cm,
     ytick={9,8,7,6,5,4,3,2,1}, yticklabels={{Starting sequence},{Shujun\_struct2seq},{MPNN-RFdiff},{Shujun\_shape\_struct2seq},{Eterna},{gRNAde-no3d},{gRNAde},{MPNN-fixbb},{Rosetta}}, yticklabel style={font=\tiny},
     xlabel={C--G $-$ A--U rescue, matched within design}, ymin=0.4, ymax=9.6,]
 \draw[color=rpInkC, densely dotted, line width=0.6pt] (axis cs:0,0.4) -- (axis cs:0,9.6);
