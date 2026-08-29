@@ -693,7 +693,9 @@ helices (Fig.~\ref{fig:corpus}a), which is what makes depth a usable covariate a
 uncomfortable baseline.
 
 The transfer experiment of \S\ref{sec:second} uses two further deposits of natural RNA, probed
-under two chemistries, and nothing about the criterion is altered for them.
+under two chemistries, and nothing about the criterion is altered for them. Those two were not
+picked from a field of candidates: a survey of the public record found executed orientation flips
+in a handful of libraries and nowhere else, and Appendix~\ref{app:survey} counts what it found.
 
 \subsection{The predictors}
 \label{sec:predictors}
@@ -904,6 +906,32 @@ reading is only worth having if the predictor varies, and neither is pinned to i
 \label{fig:corpus}
 \end{figure}
 
+\begin{figure}[!htbp]
+\centering
+\input{figs/fig5_estimator}
+\caption{\textbf{What clause~(iv) buys.} \textbf{a}, The
+fraction of wild-type pairs the predicted structure actually contains, by pair type, on the pairs
+the target declares and on every pair the target contains. Enlarging the set is not benign: it
+adds pairs the inferred structure mostly does not carry, and does so unevenly across pair types.
+\textbf{b}, What the enlargement costs the matched design: the pairs it offers, the matched
+weight that survives, and the strata that weight is spread over. It supplies more pairs and a
+larger nominal weight while the model pairs a smaller share of them, which is why the criterion
+states clause~(iv) rather than taking every pair the target contains.}
+\label{fig:estimator}
+\end{figure}
+
+\begin{figure}[!htbp]
+\centering
+\input{figs/fig6_scale}
+\caption{\textbf{Two readouts cannot be compared until they are on one scale.} \textbf{a}, The two
+contrasts in their raw units. \textbf{b}, Each column's own within-stratum standard deviation ---
+the units the raw numbers are denominated in, and the reason a difference between them was
+meaningless as printed. \textbf{c}, The same two contrasts after each is divided by its own SD,
+and the difference that survives, \jdg{cvPairedSd}\,SD (\jdg{cvPairedSdCi}). Rule~68: put two
+quantities on one scale before comparing their magnitudes, or do not compare them.}
+\label{fig:scale}
+\end{figure}
+
 \subsection{Recovering the interventions}
 \label{sec:mining-results}
 
@@ -976,6 +1004,18 @@ most of the corpus away from their ceilings.
 optical melting, and correlating with one another only \jdg{panCorrLo} to \jdg{panCorrHi} --- gives
 skill slopes from \jdg{panLo} to \jdg{panHi}. Changing parameters within one implementation moves
 the instrument's reading much less than changing model class does.
+
+\begin{figure}[!htbp]
+\centering
+\input{figs/fig8_params}
+\caption{\textbf{Changing parameters is not the axis that moves this instrument.} \textbf{a}, The
+thermodynamic arm repeated under \jdg{panN} parameter sets, two of them fitted to data rather than
+derived from optical melting. The skill slope runs \jdg{panLo} to \jdg{panHi}. \textbf{b}, How
+much the parameter sets agree with one another on this corpus, pair by pair: \jdg{panCorrLo} to
+\jdg{panCorrHi}. They are not interchangeable, and the reading still barely moves --- which is why
+the axis the paper reports is model class and not parameterisation.}
+\label{fig:params}
+\end{figure}
 
 \subsubsection{The leakage audit, in the main text}
 \label{sec:leakage}
@@ -1145,6 +1185,25 @@ carried by that predictor: at most \jdg{bdVienna} for the thermodynamic model an
 for the neural one. These are product-route quantities and our own linearity rule confines them to
 being bounds; they are reported as such and never as point estimates.
 
+\begin{figure}[!htbp]
+\centering
+\input{figs/fig7_contrasts}
+\caption{\textbf{The result, and the differences that license reading it.} \textbf{a}, The matched
+G--C $-$ A--U contrast in the measurement and in each predictor's own probability, each with its
+own puzzle-clustered interval. \textbf{b}, The six paired differences between those four columns.
+M is the measurement, RNet RibonanzaNet, EF EternaFold and VRNA ViennaRNA; colour here marks
+whether the interval covers zero and does not carry over from panel~a.
+These are what permit any statement about one column being larger than another: all four columns
+are resampled over the same \jdg{ccPuzzles} targets within each draw, so a difference has an
+interval of its own rather than being read off two intervals that overlap. Grey marks the one
+difference whose interval covers zero --- the measurement against the transformer, which is the
+agreement the paper claims. \textbf{c}, The two axes the four columns span. Both move the contrast
+toward the measurement, and they differ from each other by \jdg{axGap} (\jdg{axGapCi}), which is
+why the earlier claim that the split followed the decomposition alone is withdrawn
+(\S\ref{sec:result}).}
+\label{fig:contrasts}
+\end{figure}
+
 \subsection{Does the instrument transfer?}
 \label{sec:second}
 
@@ -1187,6 +1246,21 @@ chemistries; only the outcome differs.
 steps read on molecules nobody designed; \jdg{xnAdmitDms} and \jdg{xnAdmitTwoA} interventions over
 \jdg{xnFamilies} families are not enough to carry an effect size across corpora, and we do not
 carry one.
+
+\begin{figure}[!htbp]
+\centering
+\input{figs/fig9_transfer}
+\caption{\textbf{The same instrument on natural RNA, read under two chemistries.} \textbf{a},
+\textbf{b}, Mean measured rescue against each predictor's own pair probability on the
+\jdg{xnAdmitDms} interventions recovered from a natural-RNA deposit under DMS; ticks are the
+bin's mean probability, as in Fig.~\ref{fig:calibration}. \textbf{c}, The within-design rank
+agreement computed separately under each probe chemistry. It is a rank statistic and not a slope:
+the two probes' outcome columns differ in dispersion by a factor of \jdg{xnSdRatio}, so slopes
+under one are not on the scale of slopes under the other and are not drawn together. The paired
+difference between chemistries covers zero for both predictors (\jdg{xnDiffV}, \jdg{xnDiffN}),
+which is what makes the transfer a property of the molecules rather than of one reagent.}
+\label{fig:transfer}
+\end{figure}
 
 \subsection{Which flips rescue, and the free baseline nobody reports}
 \label{sec:ranking}
@@ -1398,6 +1472,23 @@ read against, and the quantity the audit actually tests is the difference betwee
 
 
 % =====================================================================
+\begin{figure}[!htbp]
+\centering
+\input{figs/fig10_withdrawal}
+\caption{\textbf{The metric we withdraw, asked to read a truth we planted.} A known share of the
+effect is routed through the real mediator and the metric is asked to report it back.
+\textbf{a}, What each arm read against what was injected; the dashed line is the answer a working
+metric would return. At total mediation the thermodynamic arm reads \jdg{mcViennaFull}, which is
+off this scale and is marked rather than drawn: an axis wide enough to hold it makes every other
+point unreadable. \textbf{b}, The share of the truth's range each arm's reading actually
+spans over the range where the truth is readable --- \jdg{mcNeuralSpanFrac} and
+\jdg{mcViennaSpanFrac} of it, against the 100\% a working metric would span. \textbf{c}, The correlation with the truth, with the range it takes under leave-one-out
+($\bullet$ all points, $\times$ with the endpoint removed). The thermodynamic arm's positive
+correlation is produced by a single sweep point and changes sign without it, which is why both
+arms are reported and neither is offered as the working one.}
+\label{fig:withdrawal}
+\end{figure}
+
 \subsection{The ledger: who chose the covariate that carries each number}
 \label{sec:ledger}
 
@@ -1476,6 +1567,7 @@ C7's audit --- built from deposited measurements --- cannot separate that case f
 Both are stated here, once, and not repeated in \S\ref{sec:limitations}.
 
 % =====================================================================
+\FloatBarrier
 \section{Discussion}
 \label{sec:discussion}
 
@@ -1685,6 +1777,18 @@ stopped holding would fail the build instead of printing an unexplained remainde
 
 \FloatBarrier
 % =====================================================================
+\begin{figure}[!htbp]
+\centering
+\input{figs/figA1_admission}
+\caption{\textbf{The ledger, as a subtraction that has to close.} \textbf{a}, Every construct in the
+release and what became of it, under the packaged criterion. The wild types are not a refusal ---
+they are the controls each comparison is defined against --- and they are drawn because without
+them the arithmetic appears to be short by \jdg{nWildTypes}. \textbf{b}, The admitted
+interventions by wild-type pair type. The three refusal reasons are named clauses of
+Definition~\ref{def:flip}, not thresholds that could be moved to raise the yield.}
+\label{fig:admission}
+\end{figure}
+
 \section{What the intervals resample}
 \label{app:strata}
 
@@ -1712,6 +1816,17 @@ that explicit instead of letting an unbalanced cell contribute a difference it c
 
 \FloatBarrier
 % =====================================================================
+\begin{figure}[!htbp]
+\centering
+\input{figs/figA2_strata}
+\caption{\textbf{The corpus across the unit the intervals resample.} \textbf{a}, Interventions per
+target, largest to smallest, against an even split. \textbf{b}, The same as a cumulative share.
+A cluster bootstrap over \jdg{ccPuzzles} targets is only as honest as this curve: the largest
+target carries \jdg{stShare} of the corpus, so no single target can move an interval on its own,
+and the smallest carries \jdg{stPuzMin} interventions, so none is too small to drop.}
+\label{fig:strata}
+\end{figure}
+
 \section{The purpose-built comparator, in full}
 \label{app:ribosnitch}
 
@@ -1753,6 +1868,19 @@ disappointed.
 
 \FloatBarrier
 % =====================================================================
+\begin{figure}[!htbp]
+\centering
+\input{figs/figA3_ribosnitch}
+\caption{\textbf{Every arm of the comparator, drawn.} The numbers are Table~\ref{tab:ribosnitch}'s;
+this is what they look like side by side. \textbf{a}, Within-design rank agreement with measured
+rescue, with puzzle-clustered intervals. Every riboSNitch-style score
+resolves from zero: they all read the intervention. \textbf{b}, The same four arms as paired
+differences against the free depth baseline, which is the comparison the section is about. None
+crosses zero from below. The local variant, staked in advance to rank at least as well as the
+global one, does not.}
+\label{fig:ribosnitchfig}
+\end{figure}
+
 \section{The exposure audit, in full}
 \label{app:exposure}
 
@@ -1808,6 +1936,18 @@ already reported as a bound.
 
 \FloatBarrier
 % =====================================================================
+\begin{figure}[!htbp]
+\centering
+\input{figs/figA4_exposure}
+\caption{\textbf{What the model had already read, and what the control reaches.} \textbf{a}, Design cells
+by exposure tier against the released training file. \textbf{b}, The identity of every design
+cell's window to its nearest training sequence, with the \jdg{clThr} threshold marked. The
+triangles are the dinucleotide-shuffle control --- sequences with the same mononucleotide and
+dinucleotide composition and no shared identity --- whose median and maximum both fall below the
+threshold, which is why a design that clears it is not clearing it on composition alone.}
+\label{fig:exposurefig}
+\end{figure}
+
 \section{What was cross-checked before either verdict}
 \label{app:verify}
 
@@ -1832,6 +1972,37 @@ compared. They return the same exposed set (\jdg{vrKmerExp} designs by each), an
 scores agree to \jdg{vrEquivMax} on the queries where both are exact. The index was then not used
 for the reported grading, because agreeing on a subset is not the same as being correct on all of
 it.
+
+\FloatBarrier
+% =====================================================================
+% =====================================================================
+\section{How rare this instrument's raw material is}
+\label{app:survey}
+
+The corpus this paper uses was not selected for being convenient; it was the only one of its kind
+we could find. A survey of \jdg{scDeposits} public deposits, run before the second-corpus
+experiment could be declared at all, counted what each one contains. It estimates no effect and
+none may be read from it.
+
+\begin{figure}[!htbp]
+\centering
+\input{figs/figA5_survey}
+\caption{\textbf{Executed orientation flips are rare in the public record.} \textbf{a}, The survey
+funnel, on a logarithmic count axis: deposits scanned, those carrying the fields the criterion
+needs, those containing at least one orientation flip, and the distinct libraries those represent
+--- a deposit is one library under one probe chemistry, so libraries are the smaller number.
+\textbf{b}, Across every deposit, how many positions each construct differs from its family's
+wild type at. Constructs differing at exactly two positions, the raw material this instrument is
+built from, are a small fraction of the record, and only some of those two-position mutants are
+orientation flips on a declared pair.}
+\label{fig:survey}
+\end{figure}
+
+The survey's own designed-versus-natural label is not reported anywhere in this paper. It is too
+coarse to carry a claim: the two libraries analysed as natural RNA in \S\ref{sec:second} are
+labelled \emph{unclear} by it, so quoting its natural count would contradict our own second
+corpus. Libraries are identified by name instead, and the assertion that the label has not changed
+is a build-time check rather than a sentence.
 
 \FloatBarrier
 % =====================================================================

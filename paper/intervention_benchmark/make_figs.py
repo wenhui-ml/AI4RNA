@@ -386,10 +386,550 @@ def fig_flip():
     emit("fig_flip.tex", body)
 
 
+
+
+# ---------------------------------------------------------------- what clause (iv) buys (M25)
+def fig_estimator():
+    """The criterion's clause (iv) priced, and the two readouts it separates.
+
+    Every number here is already a \\jdg{} macro in the manuscript; this draws them.
+    """
+    b = J("m25_estimator_benchmark.json")["B"]
+    alt = b["R2_all_target_pairs_NOT_P4"]
+    pts = ["CG", "AU", "GU"]
+    xs = list(range(1, len(pts) + 1))
+    arms = ((b, FREE, "declared pairs only"), (alt, GREY, "every target pair"))
+    hb = "\n".join(
+        rf"""\addplot[fill={c}, draw=none] coordinates {{{co(xs, [f"{d['hit_rate'][k]:.4f}" for k in pts])}}};
+\addlegendentry{{{lab}}}""" for d, c, lab in arms)
+
+    # Panel b used to put the two readouts' raw contrasts side by side. Figure~\ref{fig:scale}
+    # already draws exactly those two bars, and drawing them here as well invited the magnitude
+    # comparison that section says is invalid until each is in its own SD. What the enlargement
+    # actually costs the design is a different quantity, and it is not drawn anywhere else.
+    QT = [("pairs", "n_pairs"), ("matched weight", "weight"), ("strata", "strata")]
+    xs2 = list(range(1, len(QT) + 1))
+    # one legend for the figure: panel a's sits directly to the left of panel b's and the two
+    # series are the same in both
+    rb = "\n".join(
+        rf"""\addplot[fill={c}, draw=none, forget plot] coordinates {{{co(xs2, [d[k] for _l, k in QT])}}};"""
+        for d, c in ((b, FREE), (alt, GREY)))
+
+    body = rf"""\nextgroupplot[width=8.0cm, height=5.0cm, ybar, bar width=13pt,
+    xtick={{{",".join(map(str, xs))}}},
+    xticklabels={{{",".join("{" + p[0] + "--" + p[1] + "}" for p in pts)}}},
+    xlabel={{wild-type pair type}}, ylabel={{fraction the model pairs}},
+    ymin=0, ymax=1.12, enlarge x limits=0.22,
+    legend style={{at={{(0.5,-0.30)}}, anchor=north, font=\tiny, draw=none}},
+    legend columns=2, title={{a}}]
+{hb}
+
+\nextgroupplot[width=7.4cm, height=5.0cm, ybar, bar width=13pt,
+    xtick={{{",".join(map(str, xs2))}}},
+    xticklabels={{{",".join("{" + q[0] + "}" for q in QT)}}},
+    xticklabel style={{font=\scriptsize}},
+    ylabel={{count}}, xmin=0.4, xmax={len(QT)+0.6},
+    ymin=0, ymax={max(max(b[k], alt[k]) for _l, k in QT)*1.30:.0f},
+    nodes near coords,
+    every node near coord/.append style={{font=\tiny, color=nmink}},
+    title={{b}}]
+{rb}"""
+    emit("fig5_estimator.tex", group(2, body, hsep="2.4cm"))
+
+
+# ---------------------------------------------------------------- one scale, then compare (M36)
+def fig_scale():
+    """Two readouts on two scales, and the same two after each is put in its own SD."""
+    m = J("m36_readout_scale.json")
+    raw, sc, st = m["P1_raw"], m["scales"], m["standardised"]
+    pairs = [("measured rescue", raw["R1_rescue"], st["rescue_contrast_in_sd"],
+              sc["rescue_within_sd"], FREE),
+             ("inferred structure", raw["R2_rnet"], st["rnet_contrast_in_sd"],
+              sc["rnet_within_sd"], THM)]
+    a = "\n".join(rf"""\addplot[fill={c}, draw=none] coordinates {{({i+1},{r:.5f})}};"""
+                  for i, (_l, r, _s, _sd, c) in enumerate(pairs))
+    bb = "\n".join(rf"""\addplot[fill={c}, draw=none] coordinates {{({i+1},{s:.4f})}};"""
+                   for i, (_l, _r, s, _sd, c) in enumerate(pairs))
+    sd = "\n".join(rf"""\addplot[fill={c}, draw=none] coordinates {{({i+1},{v:.4f})}};"""
+                   for i, (_l, _r, _s, v, c) in enumerate(pairs))
+    tk = r"xtick={1,2}, xticklabels={{rescue},{structure}}, xticklabel style={font=\tiny}"
+    body = rf"""\nextgroupplot[width=5.4cm, height=4.9cm, ybar, bar width=16pt,
+    {tk}, xmin=0.4, xmax=2.6, ymin=0, enlarge y limits={{upper,value=0.14}},
+    ylabel={{contrast, raw units}}, title={{a}}]
+{a}
+
+\nextgroupplot[width=5.2cm, height=4.9cm, ybar, bar width=16pt,
+    {tk}, xmin=0.4, xmax=2.6, ymin=0, enlarge y limits={{upper,value=0.14}},
+    ylabel={{within-stratum SD}}, title={{b}}]
+{sd}
+
+\nextgroupplot[width=5.5cm, height=4.9cm, ybar, bar width=16pt,
+    {tk}, xmin=0.4, xmax=2.6, ymin=0, enlarge y limits={{upper,value=0.14}},
+    ylabel={{contrast, in its own SD}}, title={{c}}]
+{bb}
+\draw[color={INK}, line width=0.7pt]
+  (axis cs:1.5,{st['rescue_contrast_in_sd']:.4f}) -- (axis cs:1.5,{st['rnet_contrast_in_sd']:.4f});
+\node[font=\tiny, color=nmink, right=2pt, align=left] at
+  (axis cs:1.5,{(st['rescue_contrast_in_sd']+st['rnet_contrast_in_sd'])/2:.4f})
+  {{difference\\{st['paired_diff_in_sd']:.4f}\,SD}};"""
+    emit("fig6_scale.tex", group(3, body, hsep="1.75cm"))
+
+
+# ---------------------------------------------------------------- the result, and its differences
+def fig_contrasts():
+    """The four readouts, the six paired differences, and the two axes.
+
+    Panel a prints each readout's own interval, as the manuscript's table does. Panel b is why
+    they may be compared at all: M35 resampled all four columns over the SAME 20 puzzles per
+    draw, so every difference below carries an interval of its own (rule 69). Nothing here is a
+    second estimate of a quantity in panel a -- the two panels answer different questions.
+    """
+    A = J("m32_third_model_class.json")["A_identity_contrast"]
+    m35 = J("m35_paired_predictor_differences.json")
+    pd, ax = m35["paired_differences"], m35["post_hoc_axes"]
+
+    rows = [("measured rescue", A["measured_rescue"], INK),
+            ("RibonanzaNet", A["P_neural_from_m26v"], NEU),
+            ("EternaFold", A["P_eterna"], MID),
+            ("ViennaRNA", A["P_vienna"], THM)]
+    L = []
+    for i, (_l, d, c) in enumerate(rows):
+        y = len(rows) - i
+        L.append(rf"\addplot[color={c}, line width=1.5pt, forget plot] "
+                 rf"coordinates {{({d['ci'][0]},{y}) ({d['ci'][1]},{y})}};")
+        L.append(rf"\addplot[color={c}, mark=*, mark size=2.2pt, only marks, forget plot] "
+                 rf"coordinates {{({d['effect']},{y})}};")
+
+    # short forms: panel a spells the four names out immediately to the left, and a tick label
+    # wider than about 1.6cm forces the three plot boxes below 3.8cm to fit the measure
+    DIFF = [("M $-$ RNet", "measured_minus_neural"),
+            ("M $-$ EF", "measured_minus_eterna"),
+            ("M $-$ VRNA", "measured_minus_vienna"),
+            ("RNet $-$ EF", "neural_minus_eterna"),
+            ("RNet $-$ VRNA", "neural_minus_vienna"),
+            ("EF $-$ VRNA", "vienna_minus_eterna")]
+    D = []
+    for i, (_l, k) in enumerate(DIFF):
+        d = pd[k]
+        # a difference whose interval covers zero is drawn grey: it is the one thing this
+        # panel exists to make visible, and colour is how a reader sees it without arithmetic
+        c = GREY if d["covers_zero"] else FREE
+        s = -1.0 if k == "vienna_minus_eterna" else 1.0   # printed as EternaFold - ViennaRNA
+        y = len(DIFF) - i
+        lo, hi = sorted([s * d["ci"][0], s * d["ci"][1]])
+        D.append(rf"\addplot[color={c}, line width=1.5pt, forget plot] "
+                 rf"coordinates {{({lo:.5f},{y}) ({hi:.5f},{y})}};")
+        D.append(rf"\addplot[color={c}, mark=*, mark size=2.2pt, only marks, forget plot] "
+                 rf"coordinates {{({s*d['effect']:.5f},{y})}};")
+
+    AX = [("architecture", ax["architecture_axis_neural_minus_eterna"], NEU),
+          ("training data", ax["training_data_axis_eterna_minus_vienna"], MID),
+          ("their difference", ax["architecture_minus_training_data"], FREE)]
+    X = []
+    for i, (_l, d, c) in enumerate(AX):
+        y = len(AX) - i
+        X.append(rf"\addplot[color={c}, line width=1.5pt, forget plot] "
+                 rf"coordinates {{({d['ci'][0]},{y}) ({d['ci'][1]},{y})}};")
+        X.append(rf"\addplot[color={c}, mark=*, mark size=2.2pt, only marks, forget plot] "
+                 rf"coordinates {{({d['effect']},{y})}};")
+
+    zero = (r"extra x ticks={0}, extra x tick style={grid=major, "
+            r"grid style={densely dotted, color=" + GREY + r"}, xticklabel=\empty}")
+    body = rf"""\nextgroupplot[width=5.0cm, height=5.2cm,
+    xlabel={{matched contrast}},
+    ytick={{{",".join(str(len(rows)-i) for i in range(len(rows)))}}},
+    yticklabels={{{",".join("{" + r[0] + "}" for r in rows)}}},
+    yticklabel style={{font=\tiny}}, ymin=0.4, ymax={len(rows)+0.6},
+    {zero}, title={{a}}]
+{chr(10).join(L)}
+
+\nextgroupplot[width=5.0cm, height=5.2cm,
+    xlabel={{paired difference}},
+    ytick={{{",".join(str(len(DIFF)-i) for i in range(len(DIFF)))}}},
+    yticklabels={{{",".join("{" + d[0] + "}" for d in DIFF)}}},
+    yticklabel style={{font=\tiny}}, ymin=0.4, ymax={len(DIFF)+0.6},
+    {zero}, title={{b}}]
+{chr(10).join(D)}
+
+\nextgroupplot[width=5.0cm, height=5.2cm,
+    xlabel={{contrast moved}},
+    ytick={{{",".join(str(len(AX)-i) for i in range(len(AX)))}}},
+    yticklabels={{{",".join("{" + a[0] + "}" for a in AX)}}},
+    yticklabel style={{font=\tiny}}, ymin=0.4, ymax={len(AX)+0.6},
+    {zero}, title={{c}}]
+{chr(10).join(X)}"""
+    emit("fig7_contrasts.tex", group(3, body, hsep="1.55cm"))
+
+
+
+
+# ---------------------------------------------------------------- parameters are not the axis
+def fig_params():
+    """The thermodynamic arm repeated under every parameter set the implementation ships."""
+    pan = J("m26b_model_panel.json")
+    ms = pan["models"]
+    xs = list(range(1, len(ms) + 1))
+    sl = [f"{m['skill_slope']:.5f}" for m in ms]
+    names = ",".join("{" + m["model"].replace("_", " ") + "}" for m in ms)
+    pc = sorted(pan["pairwise_corr"].items(), key=lambda kv: -kv[1])
+    ys = list(range(len(pc), 0, -1))
+    # the full names are the x tick labels of panel a, immediately to the left; spelled out
+    # again here they are 3.4cm wide and the sep that has to clear them eats both plot boxes
+    _ab = lambda n: n[0] + n[-4:]
+    plab = ",".join("{" + " vs ".join(_ab(x) for x in k.split("|")) + "}" for k, _v in pc)
+    body = rf"""\nextgroupplot[width=7.7cm, height=5.0cm, ybar, bar width=17pt,
+    xtick={{{",".join(map(str, xs))}}}, xticklabels={{{names}}},
+    xticklabel style={{font=\tiny, rotate=18, anchor=north east}},
+    ylabel={{within-stratum skill slope}}, ymin=0, ymax={max(m['skill_slope'] for m in ms)*1.35:.5f},
+    enlarge x limits=0.16, title={{a}}]
+\addplot[fill={THM}, draw=none] coordinates {{{co(xs, sl)}}};
+
+\nextgroupplot[width=7.7cm, height=5.0cm, xbar, bar width=8pt,
+    xmin=0, xmax=1.0, xlabel={{correlation between two parameter sets}},
+    ytick={{{",".join(map(str, ys))}}}, yticklabels={{{plab}}},
+    yticklabel style={{font=\tiny}}, ymin=0.4, ymax={len(pc)+0.6}, title={{b}}]
+\addplot[fill={GREY}, draw=none] coordinates {{{co([f"{v:.4f}" for _k, v in pc], ys)}}};"""
+    emit("fig8_params.tex", group(2, body, hsep="2.1cm"))
+
+
+# ---------------------------------------------------------------- does it transfer (M28)
+def fig_transfer():
+    """The same instrument on natural RNA, read under two probe chemistries."""
+    d = J("m28_second_corpus.json")
+    dep = d["deposits"][0]
+    C, two = dep["C"], d["D_two_probes"]["M2SL5"]
+    parts = []
+    for nm, col, letter in (("ViennaRNA", THM, "a"), ("RibonanzaNet", NEU, "b")):
+        cal = C[nm]["calibration"]
+        xs = list(range(1, len(cal) + 1))
+        ys = [f"{c['rescue']:.4f}" for c in cal]
+        tk = ",".join(f"{c['pred']:.3g}" for c in cal)
+        ylab = "ylabel={mean measured rescue}, " if letter == "a" else ""
+        parts.append(rf"""\nextgroupplot[width=5.5cm, height=4.9cm,
+    xlabel={{{nm}'s pair probability}}, {ylab}%
+    xtick={{{",".join(map(str, xs))}}}, xticklabels={{{tk}}},
+    xticklabel style={{font=\tiny}}, ymin=0, ymax=0.52,
+    enlarge x limits=0.12, title={{{letter}}}]
+\addplot[color={col}, mark=*, mark size=1.9pt, line width=1.1pt]
+  coordinates {{{co(xs, ys)}}};""")
+    # NOT the raw slopes. The two probes' outcome columns differ in dispersion by a factor of
+    # two (m28r.R2_outcome_scale), so a slope under one is not on the same scale as a slope
+    # under the other and putting them side by side would be the rule-68 defect this paper
+    # retracts elsewhere. The scale-free within-design Spearman is what the review compared.
+    rev = J("m28r_review.json")["R2_arms"]
+    pr = ["DMS", "2A3"]
+    xs2 = [1, 2]
+    bars = "\n".join(
+        rf"""\addplot[fill={c}, draw=none] coordinates {{{co(xs2, [f"{rev[nm]['within_spearman'][p]:.4f}" for p in pr])}}};
+\addlegendentry{{{nm}}}""" for nm, c in (("RibonanzaNet", NEU), ("ViennaRNA", THM)))
+    parts.append(rf"""\nextgroupplot[width=5.0cm, height=4.9cm, ybar, bar width=11pt,
+    xtick={{1,2}}, xticklabels={{{{DMS}},{{2A3}}}},
+    xlabel={{probe chemistry}}, ylabel={{within-design $\rho$}},
+    xmin=0.45, xmax=2.55, ymin=0, ymax=0.40,
+    legend style={{at={{(0.5,-0.30)}}, anchor=north, font=\tiny, draw=none}},
+    legend columns=2, title={{c}}]
+{bars}""")
+    emit("fig9_transfer.tex", group(3, "\n\n".join(parts), hsep="1.8cm"))
+
+
+# ---------------------------------------------------------------- the metric we withdraw
+def fig_withdrawal():
+    """A known mediated fraction is injected; the metric is asked to read it back.
+
+    This is the figure the withdrawal rests on, so it draws the truth line the reading is
+    supposed to follow and lets the reader see that neither arm follows it.
+    """
+    r3, r4 = J("m26r3_realistic_calibration.json"), J("m26r4_calibration_symmetry.json")
+    arms = (("RibonanzaNet", NEU), ("ViennaRNA", THM))
+    curves = []
+    for nm, col in arms:
+        sw = r3[nm]["sweep"]
+        curves.append(rf"""\addplot[color={col}, mark=*, mark size=1.6pt, line width=1.0pt]
+  coordinates {{{co([f"{s['true_retention']:.3f}" for s in sw],
+                    [f"{s['measured_retention']:.4f}" for s in sw])}}};
+\addlegendentry{{{nm}}}""")
+    sp = "\n".join(
+        rf"\addplot[fill={c}, draw=none] coordinates {{({i+1},{r4['arms'][nm]['span_ratio']:.4f})}};"
+        for i, (nm, c) in enumerate(arms))
+    lo = "\n".join(
+        rf"""\addplot[color={c}, line width=1.5pt, forget plot]
+  coordinates {{({r4['arms'][nm]['loo_corr_min']:.4f},{2-i}) ({r4['arms'][nm]['loo_corr_max']:.4f},{2-i})}};
+\addplot[color={c}, mark=*, mark size=2.2pt, only marks, forget plot]
+  coordinates {{({r4['arms'][nm]['corr']:.4f},{2-i})}};
+\addplot[color={c}, mark=x, mark size=2.6pt, only marks, forget plot]
+  coordinates {{({r4['arms'][nm]['corr_without_endpoint']:.4f},{2-i})}};"""
+        for i, (nm, c) in enumerate(arms))
+    # clip=true, against COMMON. The thermodynamic arm reads -8.4 at full mediation -- a real
+    # number and the whole reason the metric is withdrawn -- and with the shared clip=false it
+    # drew a line up the page and off the float. It is annotated instead of being drawn to
+    # scale, because an axis that holds it makes every other point unreadable.
+    vfull = r3["ViennaRNA"]["sweep"][-1]["measured_retention"]
+    body = rf"""\nextgroupplot[width=6.4cm, height=5.0cm, clip=true,
+    xlabel={{retention injected}}, ylabel={{retention the metric read}},
+    xmin=-0.05, xmax=1.05, ymin=-0.15, ymax=1.45,
+    legend style={{at={{(0.5,-0.30)}}, anchor=north, font=\tiny, draw=none}},
+    legend columns=2, title={{a}}]
+\addplot[color={GREY}, dashed, line width=0.8pt, forget plot]
+  coordinates {{(0,0) (1,1)}};
+\node[font=\tiny, color=nmgrey, rotate=32, anchor=south] at (axis cs:0.62,0.62) {{the truth}};
+{chr(10).join(curves)}
+% the label goes to the RIGHT of the plunge, in the empty wedge under the truth line, with a
+% leader back to it: placed beside the axis it sat across both the plunge and the truth line
+\draw[color={THM}, -{{Latex[length=1.3mm, width=0.9mm]}}, line width=0.6pt]
+  (axis cs:0.30,-0.10) -- (axis cs:0.02,-0.13);
+\node[font=\tiny, color=nmthermo, anchor=west] at (axis cs:0.31,-0.10)
+  {{VRNA reads ${vfull:.1f}$, off scale}};
+
+\nextgroupplot[width=4.4cm, height=5.0cm, ybar, bar width=15pt,
+    xtick={{1,2}}, xticklabels={{{{RNet}},{{VRNA}}}},
+    xticklabel style={{font=\tiny}}, xmin=0.4, xmax=2.6,
+    ylabel={{share of the truth's range read}}, ymin=0, ymax=1.0, title={{b}}]
+{sp}
+% \addplot inside an ybar axis is a BAR, not a line: this reference used to render as two
+% tall dashed rectangles standing beside the data.
+\draw[color={GREY}, dashed, line width=0.8pt]
+  (axis cs:0.4,1) -- (axis cs:2.6,1);
+\node[font=\tiny, color=nmgrey, anchor=north east] at (axis cs:2.6,0.985)
+  {{a working metric}};
+
+\nextgroupplot[width=5.4cm, height=5.0cm,
+    xlabel={{correlation with the truth}},
+    ytick={{1,2}}, yticklabels={{{{ViennaRNA}},{{RibonanzaNet}}}},
+    yticklabel style={{font=\tiny}}, ymin=0.4, ymax=2.6,
+    xmin=-1.05, xmax=1.05,
+    extra x ticks={{0}}, extra x tick style={{grid=major,
+      grid style={{densely dotted, color={GREY}}}, xticklabel=\empty}}, title={{c}}]
+{lo}"""
+    emit("fig10_withdrawal.tex", group(3, body, hsep="1.78cm"))
+
+
+
+
+# ================================================================ appendix display items
+def figA_admission():
+    """The admission ledger drawn as what it is: a subtraction that has to close."""
+    a = J("m34_admission_census.json")["designaudit"]
+    steps = [("constructs read", a["n_constructs"], INK),
+             ("wild types, not candidates", -a["n_wild_type"], GREY),
+             ("not two positions", -a["excluded"]["not_two_positions"], GREY),
+             ("pair not canonical", -a["excluded"]["pair_not_canonical"], GREY),
+             ("no measured outcome", -a["excluded"]["no_outcome"], GREY),
+             ("admitted", a["n_admitted"], FREE)]
+    run, bars, ticks = 0, [], []
+    for i, (lab, v, c) in enumerate(steps):
+        y = len(steps) - i
+        if i == 0 or i == len(steps) - 1:
+            lo, hi = 0, abs(v)
+        else:
+            lo, hi = run + v, run
+        # NOT \addplot with xbar: two coordinates there are two bars drawn from the axis
+        # origin, so every step printed as a full-length bar and the waterfall read as though
+        # nothing had been subtracted. A segment is a segment.
+        bars.append(rf"\draw[color={c}, line width=9pt] "
+                    rf"(axis cs:{lo},{y}) -- (axis cs:{hi},{y});")
+        bars.append(rf"\node[font=\tiny, color=nmink, right=2pt] at "
+                    rf"(axis cs:{max(lo, hi)},{y}) {{{abs(v)}}};")
+        run = abs(v) if i == 0 else (run + v if i < len(steps) - 1 else run)
+        ticks.append(lab)
+    pt = [("C--G", a["by_pair_type"]["CG"]), ("A--U", a["by_pair_type"]["AU"]),
+          ("G--U", a["by_pair_type"]["GU"])]
+    xs = list(range(1, len(pt) + 1))
+    # the default ticks land every 2000 and "10,000" ran into "12,000"
+    body = rf"""\nextgroupplot[width=8.4cm, height=5.0cm,
+    xmin=0, xmax={a['n_constructs']*1.16:.0f}, xlabel={{constructs}},
+    xtick={{0,4000,8000,12000}},
+    ytick={{{",".join(str(len(steps)-i) for i in range(len(steps)))}}},
+    yticklabels={{{",".join("{" + t + "}" for t in ticks)}}},
+    yticklabel style={{font=\tiny}}, ymin=0.4, ymax={len(steps)+0.6}, title={{a}}]
+{chr(10).join(bars)}
+
+\nextgroupplot[width=5.4cm, height=5.0cm, ybar, bar width=17pt,
+    xtick={{{",".join(map(str, xs))}}},
+    xticklabels={{{",".join("{" + p[0] + "}" for p in pt)}}},
+    xlabel={{wild-type pair type}}, ylabel={{interventions admitted}},
+    ymin=0, ymax={max(v for _l, v in pt)*1.3:.0f}, enlarge x limits=0.24,
+    nodes near coords, every node near coord/.append style={{font=\tiny, color=nmink}},
+    title={{b}}]
+\addplot[fill={FREE}, draw=none] coordinates {{{co(xs, [v for _l, v in pt])}}};"""
+    emit("figA1_admission.tex", group(2, body, hsep="2.4cm"))
+
+
+def figA_strata():
+    """What the cluster bootstrap resamples, and how evenly the corpus sits across it."""
+    cc = J("m33_cluster_census.json")
+    counts = cc["per_puzzle"]["counts"]
+    xs = list(range(1, len(counts) + 1))
+    tot = sum(counts)
+    cum, run = [], 0.0
+    for c in counts:
+        run += 100.0 * c / tot
+        cum.append(f"{run:.2f}")
+    pc = cc["per_design_cell"]
+    body = rf"""\nextgroupplot[width=8.4cm, height=5.0cm, ybar, bar width=6.5pt,
+    xlabel={{target, largest to smallest}}, ylabel={{interventions}},
+    xmin=0.3, xmax={len(counts)+0.7}, ymin=0, ymax={max(counts)*1.18:.0f},
+    xtick={{1,5,10,15,20}}, title={{a}}]
+\addplot[fill={FREE}, draw=none] coordinates {{{co(xs, counts)}}};
+\draw[color={INK}, densely dashed, line width=0.7pt]
+  (axis cs:0.3,{cc['n_interventions']/len(counts):.1f})
+  -- (axis cs:{len(counts)+0.7},{cc['n_interventions']/len(counts):.1f});
+\node[font=\tiny, color=nmink, anchor=south east] at
+  (axis cs:{len(counts)+0.7},{cc['n_interventions']/len(counts):.1f}) {{even split}};
+
+\nextgroupplot[width=6.2cm, height=5.0cm,
+    xlabel={{targets, cumulative}}, ylabel={{share of the corpus (\%)}},
+    xmin=0, xmax={len(counts)+0.5}, ymin=0, ymax=104, title={{b}}]
+\addplot[color={NEU}, mark=*, mark size=1.3pt, line width=1.0pt]
+  coordinates {{{co(xs, cum)}}};
+\addplot[color={GREY}, dashed, line width=0.8pt, forget plot]
+  coordinates {{(0,0) ({len(counts)},100)}};
+\node[font=\tiny, color=nmink, anchor=south east, align=right] at (axis cs:{len(counts)},3)
+  {{largest target {100*cc['per_puzzle']['largest_share']:.1f}\%\\
+    design cells {pc['min']}--{pc['max']}, median {pc['median']}}};"""
+    emit("figA2_strata.tex", group(2, body, hsep="2.0cm"))
+
+
+def figA_ribosnitch():
+    """Five arms, one of them free, and the four differences that decide the section."""
+    rs = J("m38_ribosnitch_baseline.json")
+    ra, rb = rs["A_within_design"], rs["B_vs_free_depth"]
+    ROWS = [("pairing matrix", "d_bppm", NEU), ("\\quad local window", "d_bppm_local", MID),
+            ("MFE distance", "d_mfe", THM), ("$\\Delta G_{\\rm ens}$ change", "d_ens", GREY),
+            ("helix depth, free", "depth_baseline", FREE)]
+    L, D = [], []
+    for i, (_l, k, c) in enumerate(ROWS):
+        y = len(ROWS) - i
+        d = ra[k]
+        L.append(rf"\addplot[color={c}, line width=1.5pt, forget plot] "
+                 rf"coordinates {{({d['ci'][0]},{y}) ({d['ci'][1]},{y})}};")
+        L.append(rf"\addplot[color={c}, mark=*, mark size=2.1pt, only marks, forget plot] "
+                 rf"coordinates {{({d['rho']},{y})}};")
+        if k in rb:
+            e = rb[k]
+            D.append(rf"\addplot[color={c}, line width=1.5pt, forget plot] "
+                     rf"coordinates {{({e['ci'][0]},{y}) ({e['ci'][1]},{y})}};")
+            D.append(rf"\addplot[color={c}, mark=*, mark size=2.1pt, only marks, forget plot] "
+                     rf"coordinates {{({e['diff']},{y})}};")
+    zero = (r"extra x ticks={0}, extra x tick style={grid=major, "
+            r"grid style={densely dotted, color=" + GREY + r"}, xticklabel=\empty}")
+    yt = ",".join(str(len(ROWS) - i) for i in range(len(ROWS)))
+    yl = ",".join("{" + r[0] + "}" for r in ROWS)
+    # panel b repeats panel a's rows in the same order and at the same heights, so spelling the
+    # names out twice bought nothing and cost a sep wide enough to hold them -- which put them
+    # on top of panel a's rightmost interval.
+    body = rf"""\nextgroupplot[width=7.9cm, height=5.0cm,
+    xlabel={{within-design rank agreement $\rho$}},
+    ytick={{{yt}}}, yticklabels={{{yl}}},
+    yticklabel style={{font=\tiny}}, ymin=0.4, ymax={len(ROWS)+0.6},
+    {zero}, title={{a}}]
+{chr(10).join(L)}
+
+\nextgroupplot[width=7.9cm, height=5.0cm,
+    xlabel={{paired difference against depth}},
+    ytick={{{yt}}}, yticklabels={{\empty}},
+    ymin=0.4, ymax={len(ROWS)+0.6}, xmax=0.025,
+    {zero}, title={{b}}]
+{chr(10).join(D)}
+\node[font=\tiny, color=nmgrey, anchor=west] at (axis cs:{rb['d_ens']['ci'][0]},1)
+  {{depth against itself}};"""
+    emit("figA3_ribosnitch.tex", group(2, body, hsep="1.4cm"))
+
+
+def figA_exposure():
+    """How much of the corpus the model had already read, and what the control reaches."""
+    ex = J("m39_exposure_tiers.json")
+    tr = {k.split()[0]: v for k, v in ex["E2"]["tiers"].items()}
+    order = ["T0", "T1", "T2", "T3"]
+    xs = list(range(1, len(order) + 1))
+    ids = sorted(ex["E2"]["identity_by_design"].values())
+    edges = [round(0.40 + 0.05 * i, 2) for i in range(13)]
+    hist = [sum(1 for v in ids if edges[i] <= v < edges[i + 1]) for i in range(len(edges) - 1)]
+    hist[-1] += sum(1 for v in ids if v >= edges[-1])
+    hx = [f"{(edges[i]+edges[i+1])/2:.3f}" for i in range(len(edges) - 1)]
+    V = ex["V_verification"]
+    body = rf"""\nextgroupplot[width=6.0cm, height=5.0cm, ybar, bar width=17pt,
+    xtick={{{",".join(map(str, xs))}}},
+    xticklabels={{{",".join("{" + t + "}" for t in order)}}},
+    xlabel={{exposure tier}}, ylabel={{design cells}},
+    ymin=0, ymax={max(tr.values())*1.28:.0f}, enlarge x limits=0.19,
+    nodes near coords, every node near coord/.append style={{font=\tiny, color=nmink}},
+    title={{a}}]
+\addplot[fill={NEU}, draw=none] coordinates {{{co(xs, [tr[t] for t in order])}}};
+
+\nextgroupplot[width=8.6cm, height=5.0cm, ybar, bar width=5.4pt,
+    xlabel={{identity to the nearest training sequence}}, ylabel={{design cells}},
+    xmin=0.38, xmax=1.06, ymin=0, ymax={max(hist)*1.34:.0f}, title={{b}}]
+\addplot[fill={GREY}, draw=none] coordinates {{{co(hx, hist)}}};
+\draw[color={INK}, densely dashed, line width=0.8pt]
+  (axis cs:{ex['constants']['THRESH']},0) -- (axis cs:{ex['constants']['THRESH']},{max(hist)*1.02:.0f});
+\node[font=\tiny, color=nmink, anchor=south, align=center] at
+  (axis cs:{ex['constants']['THRESH']},{max(hist)*1.02:.0f}) {{threshold}};
+% the control used to be drawn along the axis line at y=0 with its label lying across the
+% bars; it is a reference range, so it goes in the empty band above them
+\draw[color={THM}, line width=0.9pt]
+  (axis cs:{V['shuffle_median']:.4f},{max(hist)*1.18:.1f})
+  -- (axis cs:{V['shuffle_max']:.4f},{max(hist)*1.18:.1f});
+\addplot[color={THM}, mark=triangle*, mark size=2.4pt, only marks, forget plot]
+  coordinates {{({V['shuffle_median']:.4f},{max(hist)*1.18:.1f})
+                ({V['shuffle_max']:.4f},{max(hist)*1.18:.1f})}};
+\node[font=\tiny, color=nmthermo, anchor=west, align=left] at
+  (axis cs:{V['shuffle_max']+0.012:.4f},{max(hist)*1.18:.1f})
+  {{dinucleotide-shuffle\\control, median to max}};"""
+    emit("figA4_exposure.tex", group(2, body, hsep="2.1cm"))
+
+
+def figA_survey():
+    """How rare this instrument's raw material is in the public record."""
+    sv = J("m27_corpus_survey_all.json")
+    rows = sv["rows"]
+    ev = [r for r in rows if "n_orientation_flip" in r]
+    hit = [r for r in ev if r["n_orientation_flip"] > 0]
+    bylib: dict = {}
+    for r in hit:
+        bylib[r["name"]] = max(bylib.get(r["name"], 0), r["n_orientation_flip"])
+    funnel = [(r"deposits\\scanned", len(rows)), (r"evaluable", len(ev)),
+              (r"carry\\a flip", len(hit)), (r"distinct\\libraries", len(bylib))]
+    xs = list(range(1, len(funnel) + 1))
+    mh: dict = {}
+    for r in rows:
+        for k, v in (r.get("mutation_hist") or {}).items():
+            mh[int(k)] = mh.get(int(k), 0) + v
+    ks = sorted(k for k in mh if k <= 3)
+    # On a log axis, "nodes near coords" prints the LOG of the value: 1024 deposits printed as
+    # 3.01 and 3.8M constructs as 6.579. The label has to be supplied explicitly.
+    gp = lambda v: f"{v:,}".replace(",", "{,}")
+    body = rf"""\nextgroupplot[width=7.4cm, height=5.0cm, ybar, bar width=19pt,
+    xtick={{{",".join(map(str, xs))}}},
+    xticklabels={{{",".join("{" + f[0] + "}" for f in funnel)}}},
+    xticklabel style={{align=center, font=\tiny}},
+    ylabel={{count}}, ymode=log, log basis y=10, ymin=1, ymax={len(rows)*7:.0f},
+    enlarge x limits=0.17,
+    nodes near coords, point meta=explicit symbolic,
+    every node near coord/.append style={{font=\tiny, color=nmink}},
+    title={{a}}]
+\addplot[fill={MID}, draw=none] coordinates {{{co(xs, [f[1] for f in funnel],
+                                                  [gp(f[1]) for f in funnel])}}};
+
+\nextgroupplot[width=6.6cm, height=5.0cm, ybar, bar width=19pt,
+    xtick={{{",".join(map(str, ks))}}},
+    xlabel={{positions changed against the family's wild type}},
+    ylabel={{constructs}}, ymode=log, log basis y=10, ymin=1,
+    ymax={max(mh[k] for k in ks)*40:.0f}, enlarge x limits=0.22,
+    nodes near coords, point meta=explicit symbolic,
+    every node near coord/.append style={{font=\tiny, color=nmink}},
+    title={{b}}]
+\addplot[fill={GREY}, draw=none] coordinates {{{co(ks, [mh[k] for k in ks],
+                                                   [gp(mh[k]) for k in ks])}}};"""
+    emit("figA5_survey.tex", group(2, body, hsep="2.2cm"))
+
+
 if __name__ == "__main__":
     print("emitting TikZ display items")
     ok = True
-    for fn in (fig_arch, fig_flip, fig_corpus, fig_calibration, fig_ranking, fig_audits):
+    for fn in (fig_arch, fig_flip, fig_corpus, fig_calibration, fig_ranking, fig_audits,
+               fig_estimator, fig_scale, fig_contrasts, fig_params, fig_transfer,
+               fig_withdrawal, figA_admission, figA_strata, figA_ribosnitch,
+               figA_exposure, figA_survey):
         try:
             fn()
         except FileNotFoundError as e:
