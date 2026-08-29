@@ -302,7 +302,8 @@ def fig7():
 
     body = rf"""\nextgroupplot[width=6.2cm, height=4.3cm, xbar, bar width=6pt,
     ytick={{{t1}}}, yticklabels={{{l1}}}, yticklabel style={{font=\tiny}},
-    xlabel={{CG $-$ AU helix-depth gap\quad(more negative: G--C placed shallower)}},
+    xlabel={{CG $-$ AU helix-depth gap\\(more negative: G--C placed shallower)}},
+    xlabel style={{align=center}},
     xmin={lo:.4f}, xmax=0, ymin=0.4, ymax={len(pm)+0.6}]
 \addplot[fill={S1}, draw=none, bar shift=0pt] coordinates {{{co([f"{g:.4f}" for g, _ in oth], [y for _, y in oth])}}};
 \addplot[fill={S2}, draw=none, bar shift=0pt] coordinates {{{co([f"{g:.4f}" for g, _ in hum], [y for _, y in hum])}}};
@@ -520,13 +521,15 @@ def fig12():
     body = rf"""\nextgroupplot[width=5.6cm, height=3.8cm,
     ytick={{{ticks}}}, yticklabels={{{",".join(names)}}},
     yticklabel style={{align=right, font=\tiny}}, ymin=0.4, ymax={len(order)+0.6},
-    xlabel={{G--C minus A--U helix depth, per design method}},]
+    xlabel={{G--C minus A--U helix depth,\\per design method}},
+    xlabel style={{align=center}},]
 {chr(10).join(L)}
 
 \nextgroupplot[width=4.0cm, height=3.8cm, xbar, bar width=8pt,
     ytick={{{ticks}}}, yticklabels={{{",".join("{{round " + r["round"] + "}}" for r in order)}}},
     yticklabel style={{font=\tiny}}, ymin=0.4, ymax={len(order)+0.6},
-    xlabel={{method component after target main effects}},
+    xlabel={{method component,\\after target main effects}},
+    xlabel style={{align=center}},
     xmin=0, xmax={max(mc)*1.62:.4f}]
 {bars}
 {ann}"""

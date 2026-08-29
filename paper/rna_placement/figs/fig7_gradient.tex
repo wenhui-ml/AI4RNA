@@ -12,7 +12,8 @@
     title style={font=\scriptsize, color=rpInk, at={(0,1.03)}, anchor=south west}]
 \nextgroupplot[width=6.2cm, height=4.3cm, xbar, bar width=6pt,
     ytick={9,8,7,6,5,4,3,2,1}, yticklabels={{Eterna  (human)},{gRNAde-no3d},{Shujun struct2seq},{Starting sequence  (human)},{gRNAde},{Shujun shape struct2seq},{MPNN-fixbb},{Rosetta},{MPNN-RFdiff}}, yticklabel style={font=\tiny},
-    xlabel={CG $-$ AU helix-depth gap\quad(more negative: G--C placed shallower)},
+    xlabel={CG $-$ AU helix-depth gap\\(more negative: G--C placed shallower)},
+    xlabel style={align=center},
     xmin=-0.8684, xmax=0, ymin=0.4, ymax=9.6]
 \addplot[fill=rpBlue, draw=none, bar shift=0pt] coordinates {(-0.5101,8) (-0.4303,7) (-0.2982,5) (-0.2500,4) (-0.2497,3) (-0.1922,2) (-0.1271,1)};
 \addplot[fill=rpOrange, draw=none, bar shift=0pt] coordinates {(-0.7118,9) (-0.4217,6)};

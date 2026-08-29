@@ -13,7 +13,8 @@
 \nextgroupplot[width=5.6cm, height=3.8cm,
     ytick={4,3,2,1}, yticklabels={{round 1\\17 targets, 9 methods},{round 2\\17 targets, 7 methods},{round 3 (this paper)\\20 targets, 10 methods},{round 4\\20 targets, 10 methods}},
     yticklabel style={align=right, font=\tiny}, ymin=0.4, ymax=4.6,
-    xlabel={G--C minus A--U helix depth, per design method},]
+    xlabel={G--C minus A--U helix depth,\\per design method},
+    xlabel style={align=center},]
 \addplot[color=rpBlue, mark=*, mark size=1.6pt, only marks, opacity=0.85, forget plot] coordinates {(-0.4761,4) (-0.3309,4) (-0.3146,4) (-0.2639,4) (-0.2628,4) (0.1221,4) (0.1430,4) (0.1840,4) (0.1959,4)};
 \addplot[color=rpInk, mark=|, mark size=3.2pt, only marks, forget plot] coordinates {(-0.0877,4)};
 \addplot[color=rpBlue, mark=*, mark size=1.6pt, only marks, opacity=0.85, forget plot] coordinates {(-0.5127,3) (-0.4778,3) (-0.3759,3) (-0.2775,3) (-0.2628,3) (-0.2620,3) (-0.2406,3)};
@@ -26,7 +27,8 @@
 \nextgroupplot[width=4.0cm, height=3.8cm, xbar, bar width=8pt,
     ytick={4,3,2,1}, yticklabels={{{round 1}},{{round 2}},{{round 3}},{{round 4}}},
     yticklabel style={font=\tiny}, ymin=0.4, ymax=4.6,
-    xlabel={method component after target main effects},
+    xlabel={method component,\\after target main effects},
+    xlabel style={align=center},
     xmin=0, xmax=0.5160]
 \addplot[fill=rpBlue, draw=none, forget plot, bar shift=0pt] coordinates {(0.3185,4)};
 \addplot[fill=rpInkC, draw=none, forget plot, bar shift=0pt] coordinates {(0.0796,3)};

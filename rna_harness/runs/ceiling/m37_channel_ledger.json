@@ -29,7 +29,12 @@
       "carries": true,
       "split_closable": false,
       "split_why": "the reference column is the scored model's own output on whichever side of a split the molecule lands",
-      "price": "+0.2400 SD measured against +0.0848 SD read as agreement"
+      "price": "+0.2400 SD measured against +0.0848 SD read as agreement",
+      "price_macros": [
+        "cvIntvSd",
+        "cvConvSd",
+        "cvSwing"
+      ]
     },
     {
       "id": "C2",
@@ -38,7 +43,13 @@
       "carries": true,
       "split_closable": false,
       "split_why": "placement is a property of how the molecule was written, and it travels with the molecule into either side",
-      "price": "marginal +0.0250 against matched +0.0539; 71.2% of the gap predicted by beta*g"
+      "price": "marginal +0.0250 against matched +0.0539; 71.2% of the gap predicted by beta*g",
+      "price_macros": [
+        "medMarginal",
+        "medMatched",
+        "medObs",
+        "medPred"
+      ]
     },
     {
       "id": "C3",
@@ -47,7 +58,11 @@
       "carries": true,
       "split_closable": false,
       "split_why": "depth is read off a target somebody declared and travels with the molecule",
-      "price": "depth alone +0.3225 against the transformer's +0.3295"
+      "price": "depth alone +0.3225 against the transformer's +0.3295",
+      "price_macros": [
+        "rkRhoD",
+        "rkRhoN"
+      ]
     },
     {
       "id": "C4",
@@ -57,7 +72,10 @@
       "direction": "against",
       "split_closable": false,
       "split_why": "the selection rule decided which molecules exist to be split at all",
-      "price": "skill against the selecting score, Spearman -0.2455 [-0.37726, -0.09286]"
+      "price": "skill against the selecting score, Spearman -0.2455 [-0.37726, -0.09286]",
+      "price_macros": [
+        "selRhoRank"
+      ]
     },
     {
       "id": "C5",
@@ -66,7 +84,11 @@
       "carries": true,
       "split_closable": false,
       "split_why": "the contrast is between models, not between molecules; a split reassigns molecules and leaves it untouched",
-      "price": "decomposition +0.06624, training data +0.02470"
+      "price": "decomposition +0.06624, training data +0.02470",
+      "price_macros": [
+        "axArch",
+        "axData"
+      ]
     },
     {
       "id": "C6",
@@ -75,7 +97,13 @@
       "carries": false,
       "split_closable": false,
       "split_why": "a free energy is a property of the sequence, not of its relatedness to a training set",
-      "price": "retention 101.9%, mediated -1.9% [-10.6, 6.8], placebo z +0.22"
+      "price": "retention 101.9%, mediated -1.9% [-10.6, 6.8], placebo z +0.22",
+      "price_macros": [
+        "eRet",
+        "eZ",
+        "resVienna",
+        "bdViennaAbs"
+      ]
     },
     {
       "id": "C7",
@@ -84,7 +112,13 @@
       "carries": false,
       "split_closable": true,
       "split_why": "THE one channel a split is built to close: it is defined by similarity between a test molecule and what the model was trained on",
-      "price": "unexposed +0.21720 against exposed +0.13463; the thermodynamic control drops too (+0.13342 to +0.00115)"
+      "price": "unexposed +0.21720 against exposed +0.13463; the thermodynamic control drops too (+0.13342 to +0.00115)",
+      "price_macros": [
+        "lkNeuralClean",
+        "lkNeuralExp",
+        "lkViennaClean",
+        "lkViennaExp"
+      ]
     },
     {
       "id": "C8",
@@ -93,7 +127,10 @@
       "carries": false,
       "split_closable": false,
       "split_why": "the chemistry is a property of the assay, not of any partition of molecules",
-      "price": "paired rank difference across the two chemistries [-0.0761, 0.2305], covering zero"
+      "price": "paired rank difference across the two chemistries [-0.0761, 0.2305], covering zero",
+      "price_macros": [
+        "xnDiffV"
+      ]
     }
   ],
   "unpriced": [
@@ -112,7 +149,7 @@
   "log": [
     "=== M37:通道账本 —— 每个数是被谁选的协变量扛着的 ===\n",
     "--- 检查 1:账本上的价格 vs 论文实际印出来的宏(对拍)---",
-    "  18 个价格全部与论文印出来的宏一致",
+    "  21 个价格全部与论文印出来的宏一致",
     "\n--- 检查 2:placement 通道是分解,必须作为恒等式闭合 ---",
     "  marginal - matched = -0.02896;记录的 observed_attenuation = -0.02896;差 0.00e+00",
     "  predicted / observed = 0.71202;记录的 mediated_fraction = 0.71210;差 8.34e-05",

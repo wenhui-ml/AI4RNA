@@ -85,6 +85,29 @@ def undefined_citations() -> list:
     return sorted(cited - keys)
 
 
+
+# ---------------------------------------------------------------------------
+# A p-value macro that carries its own relation ("<0.001") must not be preceded by one.
+# "$p=\jdg{X}$" typesets "p =< 0.001" and "$p\le\jdg{X}$" typesets "p <= <0.001"; eleven such
+# sites reached a built PDF. The converse also fails: a macro carrying a bare number needs the
+# relation the site was about to supply, so dropping "=" everywhere is not the fix either.
+# ---------------------------------------------------------------------------
+def pvalue_relations() -> list:
+    tex = open(TEX).read()
+    nums = open(os.path.join(HERE, "figs",
+                             "nm_numbers.tex" if "NM" in os.path.basename(TEX)
+                             else "rna_numbers.tex")).read()
+    carries = {m.group(1) for m in re.finditer(r"\\csname\s+jdg@(\w+)\\endcsname\{<", nums)}
+    out = []
+    for m in re.finditer(r"(=|\\le|\\ge|<|>)\s*\\jdg\{(\w+)\}", tex):
+        if m.group(2) in carries:
+            out.append(f"{m.group(2)}: preceded by {m.group(1)!r} and already carries '<'")
+    for m in re.finditer(r"\bp\s*\\jdg\{(\w+)\}", tex):
+        if m.group(1) not in carries:
+            out.append(f"{m.group(1)}: written as 'p<macro>' but carries no relation")
+    return out
+
+
 def main() -> int:
     bad, badw = [], []
     defined = set(re.findall(r"\\csname\s+jdg@\w+\\endcsname\{([^}]*)\}",
@@ -116,12 +139,17 @@ def main() -> int:
         print(f"\n**{len(bad)} hand-typed decimal(s) in the manuscript body:**")
         for ln, v, ctx in bad:
             print(f"  line {ln}: {v}   |  {ctx}")
+    pv_bad = pvalue_relations()
+    if pv_bad:
+        print(f"\n**{len(pv_bad)} p-value relation defect(s):**")
+        for b in pv_bad:
+            print(f"  {b}")
     missing_keys = undefined_citations()
     if missing_keys:
         print(f"\n**{len(missing_keys)} citation key(s) cited in the body and absent from refs.bib:**")
         for k in missing_keys:
             print(f"  {k}   -> would typeset as [?]")
-    if bad or badw or missing_keys:
+    if bad or badw or missing_keys or pv_bad:
         print("\nEvery measured number must come from make_numbers.py via \\jdg{}, "
               "and every cited key must exist in refs.bib.")
         return 1

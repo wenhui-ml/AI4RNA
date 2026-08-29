@@ -555,7 +555,7 @@ and the estimator is the pair-weighted mean of $y_u-y_v$ over $M$. No model prod
 \label{prop:null}
 Write $X=(t,\gamma,\pi)$, so that by \eqref{eq:matched} the matched set is $M=M(X)$ and the
 statistic is $T(y,X)$.
-\begin{enumerate}[leftmargin=1.6em,itemsep=1pt,topsep=2pt,label=(\roman*)]
+\begin{enumerate}[leftmargin=2.4em,itemsep=1pt,topsep=2pt,label=(\roman*)]
 \item \emph{Identity.} For any dataset, permuting molecule identity within cell --- carrying every
 coordinate of $X$ together --- and permuting $y$ within cell induce the same distribution of $T$.
 No hypothesis is needed.
@@ -962,8 +962,8 @@ $\jdg{eBinwiseDg}$, and it is not.
 \begin{claimbox}
 \textbf{What is left after the fraction is withdrawn is a pair of direct contrasts.} On
 $\jdg{dW}$ matched pair-weights over $\jdg{dStrata}$ strata ($n=\jdg{dN}$), the outcome separates
-the two pair types by $\jdg{dOut}$ (\jdg{dOutCi}, $p=\jdg{dOutP}$); $\Delta G_{\mathrm{loc}}$
-separates them by $\jdg{dDg}$\,kcal/mol (\jdg{dDgCi}, $p=\jdg{dDgP}$), a tight interval far from
+the two pair types by $\jdg{dOut}$ (\jdg{dOutCi}, $p\jdg{dOutP}$); $\Delta G_{\mathrm{loc}}$
+separates them by $\jdg{dDg}$\,kcal/mol (\jdg{dDgCi}, $p\jdg{dDgP}$), a tight interval far from
 zero; and the same model's ensemble probability that the pair forms separates them by $\jdg{dPm}$
 (\jdg{dPmCi}, $p=\jdg{dPmP}$), which does not resolve from zero. \textbf{The model's pipeline
 absorbs a $|\jdg{dDg}|$\,kcal/mol local energy difference into a probability difference too small
@@ -1471,7 +1471,7 @@ loop cannot be optimising towards.
 
 What replaces the retention reading is a comparison of two bounds, and it needs no mediation
 estimator at all. Between the two pair types the local nearest-neighbour energy differs by
-$\jdg{dDg}$\,kcal/mol ($\jdg{dDgCi}$, $p=\jdg{dDgP}$) --- a tight interval far from zero --- while
+$\jdg{dDg}$\,kcal/mol ($\jdg{dDgCi}$, $p\jdg{dDgP}$) --- a tight interval far from zero --- while
 the same model's ensemble probability that the pair forms differs by $\jdg{dPm}$
 ($\jdg{dPmCi}$), which does not resolve from zero. Their structural bounds are $\jdg{dDgBound}$
 and $\jdg{dPmBound}$, a factor of $\jdg{dBoundRatio}$ apart. The model's pipeline absorbs a large
@@ -1807,7 +1807,7 @@ at least two thirds of methods negative in every round & $\ge 2/3$ &
   $\jdg{xrSign}$ pooled & \textbf{failed on round 1} \\
 human-designed arm in the most negative third of each round & --- &
   ranks $\jdg{xrEterna}$ & held \\
-method component misses $0.005$ somewhere & --- & $\jdg{xrMcClears}$ of four clear & held \\
+method component misses $0.005$ somewhere & --- & $\jdg{xrMcClears}$ of $\jdg{xrRounds}$ clear & held \\
 \midrule
 \multicolumn{4}{@{}l@{}}{\emph{frozen before the cross-domain arm existed
   (\S\ref{sec:crossdomain}; protein binders, $n=\jdg{xdN}$)}}\\

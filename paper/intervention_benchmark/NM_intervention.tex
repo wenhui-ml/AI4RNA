@@ -447,7 +447,7 @@ structure and $w$, $m$ for the wild-type and mutant sequences.
 \label{def:flip}
 A construct is an \emph{admissible intervention} on the pair $(i,j)\in P$ when all five of the
 following hold:
-\begin{enumerate}[leftmargin=1.6em,itemsep=1pt,label=(\roman*)]
+\begin{enumerate}[leftmargin=2.4em,itemsep=1pt,label=(\roman*)]
 \item $|w| = |m|$;
 \item $\{k \in [\ell,u) : w_k \neq m_k\} = \{i,j\}$ exactly --- two positions, both inside the
 design window, and no others;
@@ -649,7 +649,7 @@ correction. What it does instead is fix the gate at $0.005$ in advance, declare 
 predictions before the run, and rest no claim on a $p$-value alone --- every claim carries an
 interval, and the ones that matter carry an interval \emph{on a difference}. A reader who prefers
 a corrected threshold can apply one: the claims that would survive a Bonferroni correction at
-thirty tests are exactly those reported with $p=\jdg{resOutP}$, which is the smallest attainable
+thirty tests are exactly those reported with $p\jdg{resOutP}$, which is the smallest attainable
 value at the permutation count used.
 
 \paragraph{What is not done.}
@@ -1068,11 +1068,11 @@ covering interval is not evidence of no effect --- the fault this paper records 
 condition in Appendix~\ref{app:prereg} and retracts again in \S\ref{sec:second}. Every difference
 below is therefore computed on \emph{one} resample of the \jdg{ccPuzzles} puzzles per draw, with
 all four columns evaluated on that same draw, so the differences are paired. All three resolve:
-the transformer exceeds the thermodynamic model by \jdg{pdNV} (\jdg{pdNVCi}, $p=\jdg{pdNVP}$) and
-the learned-parameter model by \jdg{pdNE} (\jdg{pdNECi}, $p=\jdg{pdNEP}$), and the two
+the transformer exceeds the thermodynamic model by \jdg{pdNV} (\jdg{pdNVCi}, $p\jdg{pdNVP}$) and
+the learned-parameter model by \jdg{pdNE} (\jdg{pdNECi}, $p\jdg{pdNEP}$), and the two
 nearest-neighbour models differ from \emph{each other} by \jdg{pdVE} (\jdg{pdVECi},
 $p=\jdg{pdVEP}$). The measurement is indistinguishable from the transformer (\jdg{pdMN},
-\jdg{pdMNCi}, $p=\jdg{pdMNP}$) and separated from both others (\jdg{pdMV}, \jdg{pdMVCi}, $p=\jdg{pdMVP}$;
+\jdg{pdMNCi}, $p=\jdg{pdMNP}$) and separated from both others (\jdg{pdMV}, \jdg{pdMVCi}, $p\jdg{pdMVP}$;
 \jdg{pdME}, \jdg{pdMECi}, $p=\jdg{pdMEP}$).
 
 \textbf{That last difference is what we predicted would cover zero, and it does not.} We staked
@@ -1126,7 +1126,7 @@ and the design cell is not the independent unit --- cells sharing a target are n
 a sign test over them overstates its own evidence. The suggestive pattern is reported here, once,
 with its interval, and no conclusion rests on it.
 
-\paragraph{An upper bound on what could run through each model.} Multiplying each predictor's own
+\paragraph{An upper bound on what could run through each model.}\label{sec:bound} Multiplying each predictor's own
 matched contrast by its within-stratum slope on the outcome (\jdg{gmVienna} and \jdg{gmNeural})
 and dividing by the measured contrast bounds the share of the identity effect that could be
 carried by that predictor: at most \jdg{bdVienna} for the thermodynamic model and \jdg{bdNeural}
@@ -1198,7 +1198,7 @@ within-design rank agreement with rescue & $\rho$ & 95\% CI & cells positive \\
 RibonanzaNet                       & \jdg{rkRhoN} & \jdg{rkRhoNCi} & \jdg{rkPosN} \\
 \textbf{helix depth, free}         & \jdg{rkRhoD} & \jdg{rkRhoDCi} & \jdg{rkPosD} \\
 EternaFold                         & \jdg{efRho}  & \jdg{efRhoCi}  & \jdg{efPos}  \\
-\multicolumn{4}{l}{\footnotesize EternaFold's rank agreement resolves from zero at $p=\jdg{efRhoP}$.} \\
+\multicolumn{4}{l}{\footnotesize EternaFold's rank agreement resolves from zero at $p\jdg{efRhoP}$.} \\
 ViennaRNA                          & \jdg{rkRhoV} & \jdg{rkRhoVCi} & \jdg{rkPosV} \\
 \midrule
 \multicolumn{4}{l}{\footnotesize\emph{purpose-built for a mutation: riboSNitch-style change scores}}\\
@@ -1269,8 +1269,8 @@ rather than a ranking one: at a rescue threshold of \jdg{rkThresh}, with a base 
 
 \paragraph{What survives when depth is held fixed.} Partial rank correlation given depth, with
 nothing fitted and the permutation performed inside (cell, depth) blocks, is \jdg{rkPartN}
-(\jdg{rkPartNCi}, $p=\jdg{rkPartNP}$) for the neural predictor and \jdg{rkPartV}
-(\jdg{rkPartVCi}, $p=\jdg{rkPartVP}$) for the thermodynamic one. Both survive the two control
+(\jdg{rkPartNCi}, $p\jdg{rkPartNP}$) for the neural predictor and \jdg{rkPartV}
+(\jdg{rkPartVCi}, $p\jdg{rkPartVP}$) for the thermodynamic one. Both survive the two control
 populations of this paper: on the \jdg{rkSelCells} cells that fail the published selection cutoff
 of Methods~\ref{sec:selection} it is \jdg{rkSelN} (\jdg{rkSelNCi}), and on the \jdg{rkLeakCells}
 cells surviving the leakage cut it is \jdg{rkLeakN} (\jdg{rkLeakNCi}). The predictors are not
@@ -1289,7 +1289,7 @@ the whole of the practical claim, and it is small.
 \claimhead{claim:depth} On this task a free integer matches a transformer trained on roughly two million
 chemical-mapping profiles (\jdg{rkRhoD} against \jdg{rkRhoN}, difference \jdg{rkDiffNCi}). Holding
 it fixed, both predictors retain a real but modest ordering ability (\jdg{rkPartN} and
-\jdg{rkPartV}, both $p\le\jdg{rkPartNP}$), worth \jdg{rkGainN} points of recovery when used to
+\jdg{rkPartV}, both $p\jdg{rkPartNP}$), worth \jdg{rkGainN} points of recovery when used to
 break the baseline's ties. \textbf{Any claim that a structure predictor knows which mutations
 rescue must be stated as an increment over helix depth}, and to our knowledge none has been.
 \end{claimbox}
@@ -1370,10 +1370,10 @@ interval, and none of them divides one small noisy quantity by another.
 \begin{figure}[t]
 \centering
 \input{figs/fig4_audits}
-\caption{\textbf{The two audits, in the main text.} \textbf{a}, Within-stratum skill slope before
-and after excising design cells whose windows resemble the neural model's source libraries. The
-thermodynamic row is the control that makes the comparison readable: it was trained on nothing and
-behaves the same way. \textbf{b}, The matched identity contrast on the whole corpus, on cells whose
+\caption{\textbf{The two audits, in the main text.} \textbf{a}, Within-stratum skill slope on the whole corpus and on the
+cells split by whether their design window is found in the model's own training file. The
+thermodynamic bars are the control that makes the split readable: that model was trained on
+nothing and falls the same way. \textbf{b}, The matched identity contrast on the whole corpus, on cells whose
 design passes the published selection cutoff, and on the cells where that filter did not bind.}
 \label{fig:audits}
 \end{figure}
@@ -1413,8 +1413,10 @@ leakage every reader demands first and it is empty. C8 is the probe chemistry, a
 the rank statistic after we retracted a slope comparison that said otherwise. \textbf{And C6 is the
 folding model's own free energy --- the covariate every one of these design programs was
 optimising, the first explanation anyone would offer for the identity effect, and the one channel
-that is empty} (\jdg{resVienna}, \jdg{resViennaCi}; a bound of \jdg{bdVienna} on what could run
-through it). The companion study measures that channel in full and reaches the same place.
+that is empty} (\jdg{resVienna}, \jdg{resViennaCi}; at most \jdg{bdViennaAbs} of the
+contrast can run through it, stated in the contrast's own units and not as a share
+of it --- \S\ref{sec:bound} keeps the share form, where the qualification it needs
+is stated with it). The companion study measures that channel in full and reaches the same place.
 
 \paragraph{What a fairer split would close, and what it would leave.} When a benchmark number
 turns out to be carried by something other than the ability it names, this field's established

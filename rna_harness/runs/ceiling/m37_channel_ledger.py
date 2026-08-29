@@ -50,6 +50,11 @@ def num(s):
     """The numeric value a printed macro carries, or None if it is not a bare number."""
     t = (s.replace("\\ensuremath{-}", "-").replace("\\%", "").replace("\\,", "")
           .replace("$", "").replace("{", "").replace("}", "").strip())
+    if t.startswith("[") and t.endswith("]"):
+        try:
+            return [float(x) for x in t.strip("[]").replace("\\allowbreak", "").split(",")]
+        except ValueError:
+            return None
     try:
         return float(t)
     except ValueError:
@@ -71,6 +76,8 @@ def main() -> int:
     m25 = J("m25_estimator_benchmark.json")["B"]
     m28r = J("m28r_review.json")["R2_arms"]["ViennaRNA"]
     m39 = J("m39_exposure_tiers.json")
+    r3v = J("m26r3_realistic_calibration.json")["ViennaRNA"]
+    m26v = J("m26v_alpha_verify.json")
 
     # ---- the ledger. Each row: who chose it, what it is worth, where the number lives, and the
     # macro the manuscript prints so the two can be compared.
@@ -123,7 +130,9 @@ def main() -> int:
                    f"{100 * m21p['mediated_fraction']:+.1f}% "
                    f"{[round(100 * x, 1) for x in m21p['mediated_fraction_ci95']]}, "
                    f"placebo z {m21p['z_vs_placebo']:+.2f}",
-             checks=[("eRet", 100 * m21["retention"]), ("eZ", m21p["z_vs_placebo"])]),
+             checks=[("eRet", 100 * m21["retention"]), ("eZ", m21p["z_vs_placebo"]),
+                     ("resVienna", m26v["pmut"]["designaudit"]),
+                     ("bdViennaAbs", abs(r3v["alpha"] * r3v["gamma_real"]))]),
         dict(id="C7", who="the model's training set, through window overlap",
              paper="NM", carries=False, split_closable=True,
              split_why="THE one channel a split is built to close: it is defined by similarity "
@@ -146,7 +155,7 @@ def main() -> int:
              split_why="the chemistry is a property of the assay, not of any partition of molecules",
              price=f"paired rank difference across the two chemistries "
                    f"{m28r['paired_boot_corr_diff']['ci95']}, covering zero",
-             checks=[]),
+             checks=[("xnDiffV", m28r["paired_boot_corr_diff"]["ci95"])]),
     ]
     UNPRICED = [
         dict(id="U1", who="the experimenters, through WHICH pairs were given a compensatory mutant",
@@ -170,7 +179,13 @@ def main() -> int:
                     got = num(mm[mac]); src = pk
             if got is None:
                 drift.append((c["id"], mac, "macro not defined in either paper", val)); continue
-            if abs(got - val) > max(1e-3, abs(val) * 0.02):
+            if isinstance(val, (list, tuple)):
+                # an interval macro: compare element-wise, so a channel priced by an interval is
+                # covered by the drift check instead of silently uncheckable
+                if not (isinstance(got, (list, tuple)) and len(got) == len(val)
+                        and all(abs(a - b) <= max(1e-3, abs(b) * 0.02) for a, b in zip(got, val))):
+                    drift.append((c["id"], mac, got, val))
+            elif not isinstance(got, float) or abs(got - val) > max(1e-3, abs(val) * 0.02):
                 drift.append((c["id"], mac, got, val))
     if drift:
         for d in drift:
@@ -239,7 +254,11 @@ def main() -> int:
             mark = "反向承载"
         log(f"  {c['id']}  [{c['paper']}] {mark:6s} {c['who']}")
         log(f"        {c['price']}")
-    OUT["channels"] = [{k: v for k, v in c.items() if k != "checks"} for c in CH]
+    # keep the macro names, not just the values. The manuscript's table used to be emitted from a
+    # SECOND hand-written list, so it could price a channel from a retired artifact while this
+    # check passed on the ledger's own list. One list now, and make_numbers.py asserts against it.
+    OUT["channels"] = [dict({k: v for k, v in c.items() if k != "checks"},
+                            price_macros=[m for m, _v in c["checks"]]) for c in CH]
     OUT["unpriced"] = UNPRICED
 
     ok = (not drift and OUT["check2_identity"]["attenuation_closes"] and empty_ok

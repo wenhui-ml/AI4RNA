@@ -9,15 +9,16 @@
     legend style={font=\scriptsize, draw=none, fill=none},
     title style={font=\footnotesize\bfseries, at={(0,1.02)}, anchor=south west}]
 \nextgroupplot[width=5.4cm, height=3.5cm, ybar, bar width=10pt,
-    xtick={1,2,3}, xticklabels={{all\\$n${=}4317},{excised\\$n${=}3993},{leaked\\$n${=}324}},
+    xtick={1,2,3}, xticklabels={{all\\$n${=}4317},{unexposed\\$n${=}3806},{exposed\\$n${=}511}},
     xticklabel style={align=center, font=\tiny},
     ylabel={within-stratum skill slope}, enlarge x limits=0.24,
-    ymin=-0.0229,
-    legend style={at={(0.5,1.03)}, anchor=south}, legend columns=2,
+    ymin=0.0000,
+    legend style={at={(0.5,-0.34)}, anchor=north, font=\tiny, draw=none},
+    legend columns=2,
     title={a}]
-\addplot[fill=nmneural, draw=none] coordinates {(1,0.20692) (2,0.21549) (3,0.10022)};
+\addplot[fill=nmneural, draw=none] coordinates {(1,0.20692) (2,0.2172) (3,0.13463)};
 \addlegendentry{RibonanzaNet}
-\addplot[fill=nmthermo, draw=none] coordinates {(1,0.12059) (2,0.12881) (3,-0.01761)};
+\addplot[fill=nmthermo, draw=none] coordinates {(1,0.12059) (2,0.13342) (3,0.00115)};
 \addlegendentry{ViennaRNA}
 
 \nextgroupplot[width=4.9cm, height=3.5cm,

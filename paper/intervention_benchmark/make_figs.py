@@ -175,20 +175,23 @@ def fig_ranking():
 
 # ---------------------------------------------------------------- Fig 4: the two audits
 def fig_audits():
-    d, s = J("m26d_clean_subset.json"), J("m30_selection_audit.json")
-    arms, xs = ["all", "clean", "leaked"], [1, 2, 3]
+    # Panel a used M26d, whose comparison set was RMDB deposits -- a PROXY. M39 re-ran the same
+    # audit against the model's own training file, so the figure printed a retired number while
+    # the text beside it printed the current one. One artifact now.
+    d, s = J("m39_exposure_tiers.json"), J("m30_selection_audit.json")
+    arms, xs = ["all", "clean", "exposed"], [1, 2, 3]
     bars, allys = [], []
     for mdl, col in (("RibonanzaNet", NEU), ("ViennaRNA", THM)):
-        ys = [float(d["arms"][f"{mdl}_{a}"]["slope"]) for a in arms]
+        ys = [float(d["E3_arms"][f"{mdl}_{a}"]["slope"]) for a in arms]
         allys += ys
         bars.append(rf"\addplot[fill={col}, draw=none] coordinates {{{co(xs, ys)}}};"
                     "\n" rf"\addlegendentry{{{mdl}}}")
-    # ViennaRNA's leaked-subset slope is NEGATIVE; a floor of zero silently deletes that bar
+    # ViennaRNA's exposed-subset slope is near zero; a floor of zero would silently delete the bar
     ymin_a = min(0.0, min(allys)) * 1.3
     tl = ",".join("{" + t + "}" for t in
-                  (rf"all\\$n${{=}}{d['arms']['ViennaRNA_all']['n']}",
-                   rf"excised\\$n${{=}}{d['n_clean']}",
-                   rf"leaked\\$n${{=}}{d['n_dirty']}"))
+                  (rf"all\\$n${{=}}{d['E3_arms']['ViennaRNA_all']['n']}",
+                   rf"unexposed\\$n${{=}}{d['n_clean']}",
+                   rf"exposed\\$n${{=}}{d['n_dirty']}"))
     S3 = s["S3"]
     est = [("whole corpus", S3["full"], None, INK),
            ("passes cutoff", S3["pass"], S3["ci_pass"], GREY),
@@ -202,12 +205,17 @@ def fig_audits():
         lines.append(rf"\addplot[color={col}, mark=*, mark size=2pt, only marks, forget plot] "
                      rf"coordinates {{({e},{y})}};")
 
+    # the panel letter sat at the group plot's title anchor, which is exactly where a legend
+    # placed above the axis lands: "a" printed on top of "RibonanzaNet". Putting the legend
+    # INSIDE the axis then covered the bars, so it goes below the tick labels and the letter
+    # keeps the title slot to itself.
     body = rf"""\nextgroupplot[width=5.4cm, height=3.5cm, ybar, bar width=10pt,
     xtick={{1,2,3}}, xticklabels={{{tl}}},
     xticklabel style={{align=center, font=\tiny}},
     ylabel={{within-stratum skill slope}}, enlarge x limits=0.24,
     ymin={ymin_a:.4f},
-    legend style={{at={{(0.5,1.03)}}, anchor=south}}, legend columns=2,
+    legend style={{at={{(0.5,-0.34)}}, anchor=north, font=\tiny, draw=none}},
+    legend columns=2,
     title={{a}}]
 {chr(10).join(bars)}
 
