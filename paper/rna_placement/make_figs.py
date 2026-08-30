@@ -431,12 +431,15 @@ def fig9():
     xtick={{{",".join(map(str, x))}}}, xticklabels={{{",".join("{" + s + "}" for s in lab)}}},
     xticklabel style={{rotate=32, anchor=east, font=\tiny}},
     xlabel={{$\Delta G_{{\mathrm{{loc}}}}$ bin, upper edge (kcal/mol)}}, ylabel={{target pairs}},
+    enlarge x limits=0.09,
     legend style={{at={{(0.5,1.02)}}, anchor=south}}, legend columns=3]
 {chr(10).join(series)}
 
 \nextgroupplot[width=4.8cm, height=4.0cm,
     ytick={{{t2}}}, yticklabels={{{l2}}}, yticklabel style={{font=\tiny}},
-    xlabel={{contrast retained (\%)}}, ymin=0.4, ymax={len(vals)+0.6}]
+    xlabel={{contrast retained (\%)}}, ymin=0.4, ymax={len(vals)+0.6},
+    xmin={min(pm - 1.96*ps, min(vals)) - 1.5:.2f},
+    xmax={max(pm + 1.96*ps, max(vals), 100) + 1.5:.2f}]
 {band(pm - 1.96*ps, pm + 1.96*ps, 0.4, len(vals)+0.6, INK3, "0.16")}
 \addplot[color={INK3}, dashed, line width=0.7pt, forget plot]
   coordinates {{({pm:.3f},0.4) ({pm:.3f},{len(vals)+0.6})}};

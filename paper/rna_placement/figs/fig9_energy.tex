@@ -14,6 +14,7 @@
     xtick={1,2,3,4,5}, xticklabels={{$\leq$-5.7},{-4.5},{-3.3},{-2.4},{$>$-2.4}},
     xticklabel style={rotate=32, anchor=east, font=\tiny},
     xlabel={$\Delta G_{\mathrm{loc}}$ bin, upper edge (kcal/mol)}, ylabel={target pairs},
+    enlarge x limits=0.09,
     legend style={at={(0.5,1.02)}, anchor=south}, legend columns=3]
 \addplot[fill=rpBlue, draw=none] coordinates {(1,776) (2,871) (3,392) (4,584) (5,438)};
 \addlegendentry{C--G}
@@ -24,7 +25,9 @@
 
 \nextgroupplot[width=4.8cm, height=4.0cm,
     ytick={4,3,2,1}, yticklabels={{real, 5 bins},{real, 3 bins},{real, 8 bins},{placebo mediator}}, yticklabel style={font=\tiny},
-    xlabel={contrast retained (\%)}, ymin=0.4, ymax=4.6]
+    xlabel={contrast retained (\%)}, ymin=0.4, ymax=4.6,
+    xmin=90.71,
+    xmax=111.07]
 \fill[rpInkC, opacity=0.16] (axis cs:92.20719999999999,0.4) rectangle (axis cs:109.57279999999999,4.6);
 \addplot[color=rpInkC, dashed, line width=0.7pt, forget plot]
   coordinates {(100.890,0.4) (100.890,4.6)};
