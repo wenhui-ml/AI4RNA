@@ -1,0 +1,29 @@
+=== 逐条重算 rescue,窗口 = 以两个被干预位点为中心的 +-w,以及全设计窗
+
+=== E0 空操作对照(设计区序列与野生型完全相同)74 条
+  rescue 均值 0.273 中位 0.2822 标准差 0.2323 范围 [-0.3471, 0.7721]
+  其中越过 rescue 判定阈 0.5 的比例 22.97%  <- 这就是『把噪声叫成 rescue』的经验假阳性率
+  可用双突变体 4614   V2 位点核对:4614 条中不匹配 0 (0.0000%)  -> 通过
+  V1 全窗复现语料列:Pearson 1.000000  最大绝对差 0.001426  (M26w 发表 1.0, 0.001426)  -> 通过
+
+=== E1 各窗口之间的一致性(与全窗的 Spearman)
+  w=5      n= 4614  与全窗 Spearman +0.8258  均值 0.4687
+  w=10     n= 4614  与全窗 Spearman +0.8936  均值 0.4504
+  w=15     n= 4614  与全窗 Spearman +0.9273  均值 0.4387
+  w=25     n= 4614  与全窗 Spearman +0.9595  均值 0.4263
+  w=None   n= 4614  与全窗 Spearman +1.0000  均值 0.4147
+
+=== E2 用每个窗口的 rescue 重算本文的头条量
+  w=5     格 158  干预 4317  深度@25% 0.3413  Vien+0.0026  Eter+0.0085  RNAs+0.0047  Ribo+0.0013   RNet-Vie@10% -0.00977
+  w=10    格 158  干预 4317  深度@25% 0.3402  Vien+0.0099  Eter+0.0117  RNAs+0.0113  Ribo+0.0045   RNet-Vie@10% -0.01127
+  w=15    格 158  干预 4317  深度@25% 0.3465  Vien+0.0057  Eter+0.0109  RNAs+0.0057  Ribo+0.0033   RNet-Vie@10% -0.01139
+  w=25    格 158  干预 4317  深度@25% 0.3511  Vien+0.0020  Eter+0.0080  RNAs+0.0025  Ribo+0.0020   RNet-Vie@10% -0.01297
+  w=None  格 158  干预 4317  深度@25% 0.3489  Vien-0.0016  Eter-0.0005  RNAs+0.0027  Ribo+0.0080   RNet-Vie@10% -0.01593
+
+=== 预注册记分(第 4 条需区间,交由主文的 M44/M47 口径判定,此处只报点估计)
+  1_w15_ranks_with_full_above_0.8              成立
+  2_depth_matched_or_better_every_window       成立
+  3_small_budget_gap_negative_every_window     成立
+  4_no_window_makes_a_model_win                见正文
+
+写出 /data/wenhui/openclaude_rna/rna_harness/runs/ceiling/m48_locality.json  用时 2.7s
