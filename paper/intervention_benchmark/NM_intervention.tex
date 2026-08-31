@@ -145,9 +145,11 @@ compensatory orientation flips whose measured outcome contains no folding model 
 \jdg{reNimpl} independent implementations by response, and price \jdg{chPriced} such channels. \jdg{chCarry} carry the number, \jdg{chEmpty} are
 empty and \jdg{chUnres} is unresolved. The reference channel carries most: the same molecules read
 interventionally give \jdg{cvIntvSd} standard deviations against \jdg{cvConvSd} read as agreement.
-The declared target carries as much as any model: helix depth, a free integer, is matched by all
-three predictors (\jdg{rkDiffNCi}, \jdg{rkDiffVCi}, \jdg{efVsDepthCi}, all covering zero), and what
-survives with depth held fixed is real but modest (\jdg{rkPartN}, \jdg{rkPartNCi}). The model's own
+The declared target carries as much as any model: helix depth, a free integer, is matched by
+every predictor scored against it --- the three on the ranking axis (\jdg{rkDiffNCi},
+\jdg{rkDiffVCi}, \jdg{efVsDepthCi}) and all \jdg{reNimpl} at every budget below, all intervals
+covering zero --- and what survives with depth held fixed is real but modest (\jdg{rkPartN},
+\jdg{rkPartNCi}). The model's own
 authors carry it along two separable axes --- the decomposition \jdg{axArch} (\jdg{axArchCi}) and
 the training data \jdg{axData} (\jdg{axDataCi}), differing by \jdg{axGap} (\jdg{axGapCi}).
 \textbf{The empty channel is the folding model's own free energy}, the objective every one of these
@@ -2162,6 +2164,14 @@ one design, all three are matched or beaten by helix depth: an integer read off 
 target that costs nothing, is not reported as a baseline anywhere we have found, and against which
 the differences are \jdg{rkDiffNCi}, \jdg{rkDiffVCi} and \jdg{efVsDepthCi}, all covering zero.
 What survives with depth held fixed is real and modest, \jdg{rkPartN} (\jdg{rkPartNCi}).
+
+That readout answers who carries the number. It does not answer what the number buys, and the
+second question turns out to be the one with the sharper answer. Converted to a fixed experimental
+budget, none of twelve implementation-minus-depth intervals excludes zero at any budget; the
+panel's largest structure-agreement margin, \jdg{dcTransF1}, is worth \jdg{dcTransN} of this
+corpus's \jdg{dcNrescue} rescuing interventions, \jdg{dcTransPct} of them; and at the tightest
+budget the margin's sign inverts, \jdg{tvGapTen}~\jdg{tvGapCiTen}. \textbf{A structure-benchmark
+margin is not a decision margin, and the gap between them is budget-structured rather than noise.}
 
 What organises those results is not the instrument but the axis they all lie on. On a corpus this
 one's shape --- written by design programs, filtered by a rule, mutated at pairs somebody picked,
