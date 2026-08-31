@@ -1,0 +1,378 @@
+{
+ "declaration": "m46_inversion_declaration.json",
+ "cost": "offline, $0",
+ "wording_rules": {
+  "W1": "a crossing point read off a swept curve is a DESCRIPTION of this corpus, not an estimate of a population quantity; it may not be quoted with an interval it does not have.",
+  "W2": "if staked 1 fails the inversion must be reported as target-carried, and the abstract and conclusion claims built on it must be withdrawn in the same edit, not softened.",
+  "W3": "this run adds no second corpus and may not be described as replication. The transfer corpus holds 143 and 152 interventions over 3 families and cannot carry an effect size; that sentence stays as it is."
+ },
+ "not_a_test": "This run cannot establish that the inversion generalises beyond this corpus. It can only establish whether, within this corpus, the claim survives the choices that were made freely when it was first computed.",
+ "n_cells": 158,
+ "n_targets": 20,
+ "depth_sign": 1.0,
+ "V_reverse_control": {
+  "cells": {
+   "0.1": {
+    "ours": -0.015915,
+    "published": -0.01591,
+    "abs_diff": 5.1e-06
+   },
+   "0.25": {
+    "ours": 0.01008,
+    "published": 0.01008,
+    "abs_diff": 4e-07
+   },
+   "0.5": {
+    "ours": 0.033952,
+    "published": 0.03396,
+    "abs_diff": 7.7e-06
+   }
+  },
+  "max_abs_diff": 7.7e-06,
+  "pass": true
+ },
+ "E1_leave_one_target_out": {
+  "0.1": {
+   "full": -0.01592,
+   "n_drops": 20,
+   "min": -0.01843,
+   "max": -0.01317,
+   "sign_stable": true,
+   "worst_target": "P04",
+   "by_target": {
+    "P01": -0.0165,
+    "P02": -0.01804,
+    "P03": -0.01728,
+    "P04": -0.01317,
+    "P05": -0.01772,
+    "P06": -0.01489,
+    "P07": -0.01504,
+    "P08": -0.01799,
+    "P09": -0.01538,
+    "P10": -0.01593,
+    "P11": -0.01781,
+    "P12": -0.01585,
+    "P13": -0.01706,
+    "P14": -0.01438,
+    "P15": -0.01667,
+    "P16": -0.01319,
+    "P17": -0.01843,
+    "P18": -0.01361,
+    "P19": -0.01511,
+    "P20": -0.01424
+   }
+  },
+  "0.25": {
+   "full": 0.01008,
+   "n_drops": 20,
+   "min": 0.00601,
+   "max": 0.01482,
+   "sign_stable": true,
+   "worst_target": "P02",
+   "by_target": {
+    "P01": 0.011,
+    "P02": 0.00601,
+    "P03": 0.00836,
+    "P04": 0.01482,
+    "P05": 0.00775,
+    "P06": 0.01324,
+    "P07": 0.0117,
+    "P08": 0.00787,
+    "P09": 0.01264,
+    "P10": 0.00769,
+    "P11": 0.00723,
+    "P12": 0.00792,
+    "P13": 0.01137,
+    "P14": 0.01093,
+    "P15": 0.0092,
+    "P16": 0.01319,
+    "P17": 0.00726,
+    "P18": 0.01134,
+    "P19": 0.01119,
+    "P20": 0.01082
+   }
+  },
+  "0.5": {
+   "full": 0.03395,
+   "n_drops": 20,
+   "min": 0.0283,
+   "max": 0.03916,
+   "sign_stable": true,
+   "worst_target": "P12",
+   "by_target": {
+    "P01": 0.033,
+    "P02": 0.03062,
+    "P03": 0.03512,
+    "P04": 0.03513,
+    "P05": 0.03433,
+    "P06": 0.03916,
+    "P07": 0.03398,
+    "P08": 0.03429,
+    "P09": 0.03626,
+    "P10": 0.02967,
+    "P11": 0.03339,
+    "P12": 0.0283,
+    "P13": 0.03525,
+    "P14": 0.0391,
+    "P15": 0.03333,
+    "P16": 0.03462,
+    "P17": 0.03183,
+    "P18": 0.03403,
+    "P19": 0.0347,
+    "P20": 0.03303
+   }
+  }
+ },
+ "E2_per_target": {
+  "budget": 0.1,
+  "n_targets": 20,
+  "n_negative": 12,
+  "n_zero": 2,
+  "n_positive": 6,
+  "values": {
+   "P01": 0.0,
+   "P02": 0.05357,
+   "P03": 0.01099,
+   "P04": -0.09524,
+   "P05": 0.02532,
+   "P06": -0.04167,
+   "P07": -0.03333,
+   "P08": 0.01887,
+   "P09": -0.03077,
+   "P10": -0.01538,
+   "P11": 0.02273,
+   "P12": -0.01695,
+   "P13": 0.0,
+   "P14": -0.03425,
+   "P15": -0.0069,
+   "P16": -0.09231,
+   "P17": 0.03191,
+   "P18": -0.04918,
+   "P19": -0.03061,
+   "P20": -0.03876
+  }
+ },
+ "E3_budget_sweep": {
+  "points": [
+   {
+    "budget": 0.05,
+    "gap": -0.01645,
+    "n_scorable_cells": 155
+   },
+   {
+    "budget": 0.075,
+    "gap": -0.01751,
+    "n_scorable_cells": 155
+   },
+   {
+    "budget": 0.1,
+    "gap": -0.01592,
+    "n_scorable_cells": 155
+   },
+   {
+    "budget": 0.125,
+    "gap": -0.01273,
+    "n_scorable_cells": 155
+   },
+   {
+    "budget": 0.15,
+    "gap": -0.00531,
+    "n_scorable_cells": 155
+   },
+   {
+    "budget": 0.175,
+    "gap": 0.00106,
+    "n_scorable_cells": 155
+   },
+   {
+    "budget": 0.2,
+    "gap": 0.00477,
+    "n_scorable_cells": 155
+   },
+   {
+    "budget": 0.225,
+    "gap": 0.00424,
+    "n_scorable_cells": 155
+   },
+   {
+    "budget": 0.25,
+    "gap": 0.01008,
+    "n_scorable_cells": 155
+   },
+   {
+    "budget": 0.275,
+    "gap": 0.0069,
+    "n_scorable_cells": 155
+   },
+   {
+    "budget": 0.3,
+    "gap": 0.0122,
+    "n_scorable_cells": 155
+   },
+   {
+    "budget": 0.325,
+    "gap": 0.01273,
+    "n_scorable_cells": 155
+   },
+   {
+    "budget": 0.35,
+    "gap": 0.01167,
+    "n_scorable_cells": 155
+   },
+   {
+    "budget": 0.375,
+    "gap": 0.01432,
+    "n_scorable_cells": 155
+   },
+   {
+    "budget": 0.4,
+    "gap": 0.02175,
+    "n_scorable_cells": 155
+   },
+   {
+    "budget": 0.425,
+    "gap": 0.02175,
+    "n_scorable_cells": 155
+   },
+   {
+    "budget": 0.45,
+    "gap": 0.02493,
+    "n_scorable_cells": 155
+   },
+   {
+    "budget": 0.475,
+    "gap": 0.03077,
+    "n_scorable_cells": 155
+   },
+   {
+    "budget": 0.5,
+    "gap": 0.03395,
+    "n_scorable_cells": 155
+   }
+  ],
+  "n_points": 19,
+  "n_sign_changes": 1,
+  "crossing_between": [
+   0.15,
+   0.175
+  ],
+  "W1": "a crossing read off this curve describes this corpus; it carries no interval"
+ },
+ "E4_threshold_sweep": {
+  "0.3": {
+   "n_scorable": 157,
+   "gap_low_budget": -0.00226,
+   "gap_high_budget": 0.00936,
+   "inverts": true
+  },
+  "0.4": {
+   "n_scorable": 157,
+   "gap_low_budget": -0.0063,
+   "gap_high_budget": 0.01653,
+   "inverts": true
+  },
+  "0.5": {
+   "n_scorable": 155,
+   "gap_low_budget": -0.01592,
+   "gap_high_budget": 0.03395,
+   "inverts": true
+  },
+  "0.6": {
+   "n_scorable": 144,
+   "gap_low_budget": -0.00882,
+   "gap_high_budget": 0.03616,
+   "inverts": true
+  },
+  "0.7": {
+   "n_scorable": 119,
+   "gap_low_budget": 0.00202,
+   "gap_high_budget": 0.06465,
+   "inverts": false
+  }
+ },
+ "E5_other_pairs": {
+  "pairs": {
+   "EternaFold|ViennaRNA": {
+    "low": -0.00053,
+    "high": 0.01061,
+    "inverts": true
+   },
+   "EternaFold|RNAstructure": {
+    "low": -0.00159,
+    "high": 0.00849,
+    "inverts": true
+   },
+   "EternaFold|RibonanzaNet": {
+    "low": 0.01538,
+    "high": -0.02334,
+    "inverts": true
+   },
+   "RNAstructure|ViennaRNA": {
+    "low": 0.00106,
+    "high": 0.00212,
+    "inverts": false
+   },
+   "RNAstructure|RibonanzaNet": {
+    "low": 0.01698,
+    "high": -0.03183,
+    "inverts": true
+   },
+   "RibonanzaNet|ViennaRNA": {
+    "low": -0.01592,
+    "high": 0.03395,
+    "inverts": true
+   }
+  },
+  "n_inverting": 5,
+  "n_pairs": 6
+ },
+ "staked": {
+  "1_sign_stable_under_leave_one_out": true,
+  "2_exactly_one_crossing": true,
+  "3_another_pair_inverts": true,
+  "4_survives_another_threshold": true
+ },
+ "staked_text": {
+  "1": "the sign of the 10% gap is negative under ALL leave-one-target-out drops -- the inversion is not carried by one target",
+  "2": "the gap crosses zero exactly once as budget is swept from its smallest to its largest value",
+  "3": "at least one ordered pair other than RibonanzaNet/ViennaRNA also inverts between the smallest and largest budget",
+  "4": "the 10% inversion retains its sign at an alternative rescue threshold"
+ },
+ "elapsed_s": 0.4,
+ "log": [
+  "格 158  靶标 20  深度方向 +1",
+  "\n=== V 反向对照:必须复现 M44 发表的三个 gap",
+  "   10%  本次 -0.01592  M44 -0.01591  差 5.12e-06",
+  "   25%  本次 +0.01008  M44 +0.01008  差 4.24e-07",
+  "   50%  本次 +0.03395  M44 +0.03396  差 7.75e-06",
+  "  -> 通过",
+  "\n=== E1 留一靶标:逐个删掉一个靶标,重算 gap",
+  "   10%  全量 -0.01592   留一范围 [-0.01843, -0.01317]   符号全部一致:是",
+  "   25%  全量 +0.01008   留一范围 [+0.00601, +0.01482]   符号全部一致:是",
+  "   50%  全量 +0.03395   留一范围 [+0.02830, +0.03916]   符号全部一致:是",
+  "\n=== E2 逐靶标:单个靶标上 10% 预算的 gap",
+  "  可算的靶标 20:反转(负) 12,持平 2,同向(正) 6",
+  "\n=== E3 预算扫描:gap 作为预算的连续函数",
+  "  0.050:-0.0164  0.075:-0.0175  0.100:-0.0159  0.125:-0.0127  0.150:-0.0053  0.175:+0.0011  0.200:+0.0048  0.225:+0.0042  0.250:+0.0101  0.275:+0.0069",
+  "  0.300:+0.0122  0.325:+0.0127  0.350:+0.0117  0.375:+0.0143  0.400:+0.0217  0.425:+0.0217  0.450:+0.0249  0.475:+0.0308  0.500:+0.0340",
+  "  符号变化次数 1,发生在预算 [0.15, 0.175] 之间",
+  "\n=== E4 rescue 阈值扫描:反转是否只在一个阈值上成立",
+  "  阈值 0.3:可计分 157  低预算 -0.00226  高预算 +0.00936  反转",
+  "  阈值 0.4:可计分 157  低预算 -0.00630  高预算 +0.01653  反转",
+  "  阈值 0.5:可计分 155  低预算 -0.01592  高预算 +0.03395  反转",
+  "  阈值 0.6:可计分 144  低预算 -0.00882  高预算 +0.03616  反转",
+  "  阈值 0.7:可计分 119  低预算 +0.00202  高预算 +0.06465  不反转",
+  "\n=== E5 其它序对:反转是不是这一对独有的",
+  "  EternaFold     - ViennaRNA       低 -0.00053  高 +0.01061  **反转**",
+  "  EternaFold     - RNAstructure    低 -0.00159  高 +0.00849  **反转**",
+  "  EternaFold     - RibonanzaNet    低 +0.01538  高 -0.02334  **反转**",
+  "  RNAstructure   - ViennaRNA       低 +0.00106  高 +0.00212  ",
+  "  RNAstructure   - RibonanzaNet    低 +0.01698  高 -0.03183  **反转**",
+  "  RibonanzaNet   - ViennaRNA       低 -0.01592  高 +0.03395  **反转**",
+  "\n=== 预注册记分",
+  "  1_sign_stable_under_leave_one_out      成立",
+  "  2_exactly_one_crossing                 成立",
+  "  3_another_pair_inverts                 成立",
+  "  4_survives_another_threshold           成立"
+ ]
+}
