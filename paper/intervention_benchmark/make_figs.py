@@ -288,7 +288,7 @@ def fig_arch():
 \draw[ar] (iv) -- (est);
 
 \node[data, text width=34mm] (pred) at (5.4,-2.4)
-  {three predictors\\two decompositions\\(\S\ref{sec:predictors})};
+  {four implementations\\two model families\\(\S\ref{sec:predictors})};
 \draw[ar] (pred) -- (est);
 
 \node[core, text width=34mm] (res) at (0,-2.4)
