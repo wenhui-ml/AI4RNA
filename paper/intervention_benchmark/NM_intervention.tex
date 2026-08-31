@@ -142,8 +142,8 @@ selection rule and scored against a model's own output, the number a benchmark r
 by a covariate somebody chose rather than by the property it is named after. We recover
 \jdg{nAdmitted} two-nucleotide interventions already executed in a public benchmark ---
 compensatory orientation flips whose measured outcome contains no folding model --- score three
-predictors by response, and price \jdg{chPriced} such channels. \jdg{chCarry} carry the number and
-\jdg{chEmpty} are empty. The reference channel carries most: the same molecules read
+predictors by response, and price \jdg{chPriced} such channels. \jdg{chCarry} carry the number, \jdg{chEmpty} are
+empty and \jdg{chUnres} is unresolved. The reference channel carries most: the same molecules read
 interventionally give \jdg{cvIntvSd} standard deviations against \jdg{cvConvSd} read as agreement.
 The declared target carries as much as any model: helix depth, a free integer, is matched by all
 three predictors (\jdg{rkDiffNCi}, \jdg{rkDiffVCi}, \jdg{efVsDepthCi}, all covering zero), and what
@@ -206,9 +206,12 @@ programs, filtered by a selection rule, mutated at pairs somebody picked, and sc
 reference column that is itself a model's output --- so a benchmark number on this corpus is a
 statement about a chosen covariate until it is shown otherwise. Section~\ref{sec:ledger} is the
 ledger that results: \jdg{chPriced} channels, each named by its chooser and priced by a direct
-contrast, of which \jdg{chCarry} carry the number and \jdg{chEmpty} are empty. The three empty ones
-are the ones a reader would demand --- leakage, probe chemistry, and \emph{the folding model's own
-free energy}, the objective every one of these design programs was optimising. That last row is the
+contrast, of which \jdg{chCarry} carry the number, \jdg{chEmpty} are empty and \jdg{chUnres} is
+unresolved. The ones that do not carry are the ones a reader would demand --- leakage, probe
+chemistry, and \emph{the folding model's own free energy}, the objective every one of these design
+programs was optimising --- and they are not of a kind: the probe-chemistry row's interval covers
+zero but reaches far enough to permit the whole effect, so it is marked unresolved rather than
+counted as a null. The free-energy row is the
 paper's sharpest result and it is a null: the explanation everyone reaches for first is the one
 channel that is not carrying anything. \textbf{The prices are not shares and cannot be added up},
 for a reason that is itself a result (\S\ref{sec:withdrawal}).
@@ -229,8 +232,8 @@ refuses \jdg{nExclTwoPos}, \jdg{nExclNonCanon} and \jdg{nExclNoOutcome} construc
 stated reasons.
 \item \textbf{A ledger of \jdg{chPriced} covariate-choice channels} (\S\ref{sec:ledger}), each
 named by who chose it and priced by a direct contrast with an interval, \jdg{chCarry} carrying the
-number and \jdg{chEmpty} empty --- together with the \jdg{chUnpriced} choosers we can name and
-cannot price. The incumbent readout is one row of it: exhausted on this corpus, carrying a
+number, \jdg{chEmpty} empty and \jdg{chUnres} unresolved --- together with the \jdg{chUnpriced}
+choosers we can name and cannot price. The incumbent readout is one row of it: exhausted on this corpus, carrying a
 researcher degree of freedom worth \jdg{cvSwing}$\times$, and read against the interventional
 readout on the same molecules, pairs and strata it is worth \jdg{cvConvSd} against \jdg{cvIntvSd}
 standard deviations.
@@ -1588,7 +1591,8 @@ value this manuscript prints (\jdg{chDrift} disagreements).
 \centering\small
 \caption{\textbf{The eight channels this instrument priced.} A channel is a covariate somebody
 chose; its price is what the identity readout is worth with that covariate free against held, on
-this corpus. \jdg{chCarry} carry and \jdg{chEmpty} are empty. Prices are in each channel's own
+this corpus. \jdg{chCarry} carry, \jdg{chEmpty} are empty, and \jdg{chUnres} is unresolved --- an
+interval covering zero is not an empty channel, and the row says which it is. Prices are in each channel's own
 units and are \emph{not} commensurable --- see the text --- so the table is read down the last
 column, never across it.}
 \label{tab:channels}
@@ -1599,11 +1603,16 @@ column, never across it.}
 one of those (C4) carries it \emph{against} the effect we report rather than with it. Only one row
 is a decomposition and so only one has a residual: C2's attenuation is predicted to within
 \jdg{chEps} by the product of a depth slope and a depth gap estimated on disjoint arms, and the
-rest of it is not accounted for. The three
-empty channels are worth as much as the five that carry, because of which they are. C7 is the
-leakage every reader demands first and it is empty. C8 is the probe chemistry, and it is empty on
-the rank statistic after we retracted a slope comparison that said otherwise. \textbf{And C6 is the
-folding model's own free energy --- the covariate every one of these design programs was
+rest of it is not accounted for. The
+channels that do \emph{not} carry are worth as much as the five that do, because of which they
+are --- and they are not all of a kind, which an earlier version of this table did not say. C7 is
+the leakage every reader demands first, and it is empty with a control that moves the right way:
+the thermodynamic predictor's skill falls on the exposed subset too, so what the exposed designs
+have is something other than memorisation. \textbf{C8 is not empty and is now marked unresolved.}
+Its paired difference between probe chemistries covers zero (\jdg{xnDiffV}), but the interval
+reaches \jdg{xnBdV} against a within-design rank agreement of \jdg{xnRhoMaxV}: it permits a probe
+effect as large as the whole quantity being measured, so it excludes nothing and may not be read
+as a null. \textbf{And C6 is the folding model's own free energy --- the covariate every one of these design programs was
 optimising, the first explanation anyone would offer for the identity effect, and the one channel
 that is empty} (\jdg{resVienna}, \jdg{resViennaCi}; at most \jdg{bdViennaAbs} of the
 contrast can run through it, stated in the contrast's own units and not as a share
@@ -1811,9 +1820,10 @@ one's shape --- written by design programs, filtered by a rule, mutated at pairs
 and scored against a column that is a model's own output --- a benchmark number is carried by a
 covariate somebody chose until it is shown otherwise, and an instrument's job is to name each
 chooser and price the channel. Section~\ref{sec:ledger} does that for \jdg{chPriced} of them.
-\jdg{chCarry} carry the number; \jdg{chEmpty} are empty; \jdg{chUnpriced} choosers we can name and
-cannot price, and we say which. The three empty channels are the ones a reader demands first, and
-the emptiest is the free energy every one of these programs was written to minimise.
+\jdg{chCarry} carry the number; \jdg{chEmpty} are empty; \jdg{chUnres} is unresolved and is
+labelled so rather than counted as empty; \jdg{chUnpriced} choosers we can name and cannot price,
+and we say which. The channels that do not carry are the ones a reader demands first, and the
+emptiest is the free energy every one of these programs was written to minimise.
 
 The result that matters most for how the instrument will be used is Claim~\ref{claim:depth}, which
 is one row of that ledger: a benchmark that does not report the free baseline will credit a model
