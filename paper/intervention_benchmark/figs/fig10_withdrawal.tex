@@ -24,10 +24,12 @@
 \addlegendentry{ViennaRNA}
 % the label goes to the RIGHT of the plunge, in the empty wedge under the truth line, with a
 % leader back to it: placed beside the axis it sat across both the plunge and the truth line
-\draw[color=nmthermo, -{Latex[length=1.3mm, width=0.9mm]}, line width=0.6pt]
-  (axis cs:0.30,-0.10) -- (axis cs:0.02,-0.13);
-\node[font=\tiny, color=nmthermo, anchor=west] at (axis cs:0.31,-0.10)
-  {VRNA reads $-8.4$, off scale};
+\addplot[color=nmthermo, mark=triangle*, mark size=2.6pt, only marks, forget plot]
+  coordinates {(0,-0.13)};
+\draw[color=nmthermo, line width=0.55pt]
+  (axis cs:0.02,-0.12) -- (axis cs:0.26,0.15);
+\node[font=\tiny, color=nmthermo, anchor=west, align=left] at (axis cs:0.27,0.16)
+  {ViennaRNA reads $-8.4$ here,\\below the axis};
 
 \nextgroupplot[width=4.4cm, height=5.0cm, ybar, bar width=15pt,
     xtick={1,2}, xticklabels={{RNet},{VRNA}},

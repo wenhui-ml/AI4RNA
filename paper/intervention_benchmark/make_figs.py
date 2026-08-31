@@ -146,7 +146,7 @@ def fig_ranking():
     # still be read: the long forms are in the caption. The legend used to sit above panel b at
     # the same anchor as the panel letter and overhung both neighbours; it goes below the x
     # label, into a band where no other panel has anything.
-    body = rf"""\nextgroupplot[width=5.0cm, height=4.8cm,
+    body = rf"""\nextgroupplot[width=4.9cm, height=4.8cm,
     xlabel={{rank agreement $\rho$}},
     ytick={{{",".join(str(len(rows)-i) for i in range(len(rows)))}}},
     yticklabels={{{",".join(r[0] for r in rows)}}},
@@ -156,7 +156,7 @@ def fig_ranking():
     title={{a}}]
 {chr(10).join(lines)}
 
-\nextgroupplot[width=5.0cm, height=4.8cm,
+\nextgroupplot[width=4.9cm, height=4.8cm,
     xlabel={{rescue threshold for a hit}}, ylabel={{AUROC}},
     legend style={{at={{(0.5,-0.34)}}, anchor=north, font=\tiny, draw=none}},
     legend columns=3, enlarge y limits=0.22,
@@ -171,21 +171,26 @@ def fig_ranking():
   coordinates {{{co(th, [r["P_vienna"] for r in sw])}}};
 \addlegendentry{{ViennaRNA}}
 
-\nextgroupplot[width=5.0cm, height=4.8cm,
+\nextgroupplot[width=4.9cm, height=4.8cm,
     xlabel={{share of flips built (\%)}},
     ylabel={{flips recovered (\%)}},
-    legend style={{at={{(0.97,0.03)}}, anchor=south east, font=\tiny}}, legend columns=1,
+    % the curves fill the diagonal band, so there is no empty corner inside this panel;
+    % the legend goes below, in the same band as panel b's
+    legend style={{at={{(0.5,-0.34)}}, anchor=north, font=\tiny, draw=none}}, legend columns=1,
     title={{c}}]
 \addplot[color={NEU}, line width=1.1pt]
   coordinates {{{co(f, [f"{100*y:.3f}" for y in c["depth_then_P_neural"]])}}};
-\addlegendentry{{depth$+$model}}
+\addlegendentry{{depth, then model}}
 \addplot[color={FREE}, line width=1.1pt]
   coordinates {{{co(f, [f"{100*y:.3f}" for y in c["depth_only"]])}}};
-\addlegendentry{{depth}}
-\addplot[color={GREY}, dashed, line width=0.9pt]
+\addlegendentry{{depth alone}}
+% the third entry made the legend wide enough to reach the curves; the random line is
+% labelled where it is drawn instead
+\addplot[color={GREY}, dashed, line width=0.9pt, forget plot]
   coordinates {{{co(f, [f"{100*y:.3f}" for y in c["random"]])}}};
-\addlegendentry{{random}}"""
-    emit("fig3_ranking.tex", group(3, body, hsep="1.9cm"))
+\node[font=\tiny, color=nmgrey, rotate=34, anchor=north west] at (axis cs:52,50)
+  {{random order}};"""
+    emit("fig3_ranking.tex", group(3, body, hsep="1.75cm"))
 
 
 # ---------------------------------------------------------------- Fig 4: the two audits
@@ -488,14 +493,24 @@ def fig_contrasts():
     draw, so every difference below carries an interval of its own (rule 69). Nothing here is a
     second estimate of a quantity in panel a -- the two panels answer different questions.
     """
+    # Panel a MUST draw what the manuscript's own table prints. m32 re-bootstrapped three of
+    # these four columns for its own arm, so drawing m32's block here put the measurement at
+    # [+0.0231,+0.0872] and ViennaRNA at [-0.0649,+0.0099] in a figure whose caption sits a
+    # page from a table printing [+0.0220,+0.0911] and [-0.0628,+0.0105] for the same two
+    # quantities. Same sources as the macros: m26v for the three, m32 for EternaFold.
+    v = J("m26v_alpha_verify.json")
     A = J("m32_third_model_class.json")["A_identity_contrast"]
     m35 = J("m35_paired_predictor_differences.json")
     pd, ax = m35["paired_differences"], m35["post_hoc_axes"]
 
-    rows = [("measured rescue", A["measured_rescue"], INK),
-            ("RibonanzaNet", A["P_neural_from_m26v"], NEU),
+    _mk = lambda d: {"effect": d["designaudit"], "ci": d["ci"]}
+    rows = [("measured rescue", _mk(v["rf"]), INK),
+            ("RibonanzaNet", _mk(v["nmut"]), NEU),
             ("EternaFold", A["P_eterna"], MID),
-            ("ViennaRNA", A["P_vienna"], THM)]
+            ("ViennaRNA", _mk(v["pmut"]), THM)]
+    # and the manuscript prints EternaFold's from m32, so that one agrees by construction
+    assert abs(A["P_neural_from_m26v"]["effect"] - v["nmut"]["designaudit"]) < 1e-6, \
+        "m32's imported neural point estimate no longer matches m26v's"
     L = []
     for i, (_l, d, c) in enumerate(rows):
         y = len(rows) - i
@@ -526,11 +541,14 @@ def fig_contrasts():
         D.append(rf"\addplot[color={c}, mark=*, mark size=2.2pt, only marks, forget plot] "
                  rf"coordinates {{({s*d['effect']:.5f},{y})}};")
 
-    AX = [("architecture", ax["architecture_axis_neural_minus_eterna"], NEU),
-          ("training data", ax["training_data_axis_eterna_minus_vienna"], MID),
-          ("their difference", ax["architecture_minus_training_data"], FREE)]
+    # the caption explains one colour rule -- covers zero or does not -- and panel c used a
+    # third scheme, so the sentence was true of b and silently false of c
+    AX = [("architecture", ax["architecture_axis_neural_minus_eterna"]),
+          ("training data", ax["training_data_axis_eterna_minus_vienna"]),
+          ("difference", ax["architecture_minus_training_data"])]
     X = []
-    for i, (_l, d, c) in enumerate(AX):
+    for i, (_l, d) in enumerate(AX):
+        c = GREY if (d["ci"][0] <= 0 <= d["ci"][1]) else FREE
         y = len(AX) - i
         X.append(rf"\addplot[color={c}, line width=1.5pt, forget plot] "
                  rf"coordinates {{({d['ci'][0]},{y}) ({d['ci'][1]},{y})}};")
@@ -539,7 +557,7 @@ def fig_contrasts():
 
     zero = (r"extra x ticks={0}, extra x tick style={grid=major, "
             r"grid style={densely dotted, color=" + GREY + r"}, xticklabel=\empty}")
-    body = rf"""\nextgroupplot[width=5.0cm, height=5.2cm,
+    body = rf"""\nextgroupplot[width=4.85cm, height=5.2cm,
     xlabel={{matched contrast}},
     ytick={{{",".join(str(len(rows)-i) for i in range(len(rows)))}}},
     yticklabels={{{",".join("{" + r[0] + "}" for r in rows)}}},
@@ -547,7 +565,7 @@ def fig_contrasts():
     {zero}, title={{a}}]
 {chr(10).join(L)}
 
-\nextgroupplot[width=5.0cm, height=5.2cm,
+\nextgroupplot[width=4.85cm, height=5.2cm,
     xlabel={{paired difference}},
     ytick={{{",".join(str(len(DIFF)-i) for i in range(len(DIFF)))}}},
     yticklabels={{{",".join("{" + d[0] + "}" for d in DIFF)}}},
@@ -555,14 +573,16 @@ def fig_contrasts():
     {zero}, title={{b}}]
 {chr(10).join(D)}
 
-\nextgroupplot[width=5.0cm, height=5.2cm,
+\nextgroupplot[width=4.85cm, height=5.2cm,
     xlabel={{contrast moved}},
     ytick={{{",".join(str(len(AX)-i) for i in range(len(AX)))}}},
     yticklabels={{{",".join("{" + a[0] + "}" for a in AX)}}},
     yticklabel style={{font=\tiny}}, ymin=0.4, ymax={len(AX)+0.6},
     {zero}, title={{c}}]
 {chr(10).join(X)}"""
-    emit("fig7_contrasts.tex", group(3, body, hsep="1.55cm"))
+    # the sep holds the NEXT panel's row labels: at 1.55cm panel b's names started 11pt
+    # inside panel a's axis box, and panel c's the same inside b's
+    emit("fig7_contrasts.tex", group(3, body, hsep="2.05cm"))
 
 
 
@@ -682,10 +702,12 @@ def fig_withdrawal():
 {chr(10).join(curves)}
 % the label goes to the RIGHT of the plunge, in the empty wedge under the truth line, with a
 % leader back to it: placed beside the axis it sat across both the plunge and the truth line
-\draw[color={THM}, -{{Latex[length=1.3mm, width=0.9mm]}}, line width=0.6pt]
-  (axis cs:0.30,-0.10) -- (axis cs:0.02,-0.13);
-\node[font=\tiny, color=nmthermo, anchor=west] at (axis cs:0.31,-0.10)
-  {{VRNA reads ${vfull:.1f}$, off scale}};
+\addplot[color={THM}, mark=triangle*, mark size=2.6pt, only marks, forget plot]
+  coordinates {{(0,-0.13)}};
+\draw[color={THM}, line width=0.55pt]
+  (axis cs:0.02,-0.12) -- (axis cs:0.26,0.15);
+\node[font=\tiny, color=nmthermo, anchor=west, align=left] at (axis cs:0.27,0.16)
+  {{ViennaRNA reads ${vfull:.1f}$ here,\\below the axis}};
 
 \nextgroupplot[width=4.4cm, height=5.0cm, ybar, bar width=15pt,
     xtick={{1,2}}, xticklabels={{{{RNet}},{{VRNA}}}},
