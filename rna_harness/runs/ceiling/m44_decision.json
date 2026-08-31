@@ -1,0 +1,559 @@
+{
+ "declaration": "m44_decision_declaration.json",
+ "cost": "offline, $0",
+ "not_a_test": {
+  "choose_by_agreement_vs_choose_by_response": "A reader who picks a predictor by the incumbent benchmark and a reader who picks by the intervention readout choose THE SAME MODEL on this corpus -- RibonanzaNet is first on both, which is M43's null. Comparing those two readers is therefore null by construction, not by measurement. It is named here so it cannot later be presented as a finding."
+ },
+ "n_interventions": 4317,
+ "n_cells": 158,
+ "n_cells_scored": 155,
+ "V": {
+  "V1_oracle_at_full_budget": 1.0,
+  "V2_random": 0.26276,
+  "V2_expected_base_rate": 0.26264,
+  "V3_reproduces_m31": {
+   "ViennaRNA": {
+    "ours": 0.34695,
+    "m31": 0.34695,
+    "abs_diff": 0.0
+   },
+   "RibonanzaNet": {
+    "ours": 0.35703,
+    "m31": 0.35703,
+    "abs_diff": 1e-06
+   },
+   "depth": {
+    "ours": 0.34854,
+    "m31": 0.34854,
+    "abs_diff": 1e-06
+   }
+  },
+  "V3_pass": true
+ },
+ "E1": {
+  "0.1": {
+   "random": {
+    "recovery": 0.11519,
+    "minus_depth": null,
+    "minus_depth_ci": [
+     null,
+     null
+    ]
+   },
+   "depth": {
+    "recovery": 0.16127,
+    "minus_depth": null,
+    "minus_depth_ci": [
+     null,
+     null
+    ]
+   },
+   "ViennaRNA": {
+    "recovery": 0.17241,
+    "minus_depth": 0.01114,
+    "minus_depth_ci": [
+     -0.00849,
+     0.03579
+    ]
+   },
+   "EternaFold": {
+    "recovery": 0.17188,
+    "minus_depth": 0.01061,
+    "minus_depth_ci": [
+     -0.00764,
+     0.0339
+    ]
+   },
+   "RNAstructure": {
+    "recovery": 0.17347,
+    "minus_depth": 0.0122,
+    "minus_depth_ci": [
+     -0.00556,
+     0.03446
+    ]
+   },
+   "RibonanzaNet": {
+    "recovery": 0.1565,
+    "minus_depth": -0.00477,
+    "minus_depth_ci": [
+     -0.02026,
+     0.01693
+    ]
+   },
+   "depth_then_ViennaRNA": {
+    "recovery": 0.16552,
+    "minus_depth": 0.00424,
+    "minus_depth_ci": [
+     -0.0081,
+     0.01956
+    ]
+   },
+   "depth_then_EternaFold": {
+    "recovery": 0.16499,
+    "minus_depth": 0.00371,
+    "minus_depth_ci": [
+     -0.00676,
+     0.01802
+    ]
+   },
+   "depth_then_RNAstructure": {
+    "recovery": 0.16658,
+    "minus_depth": 0.00531,
+    "minus_depth_ci": [
+     -0.0064,
+     0.02007
+    ]
+   },
+   "depth_then_RibonanzaNet": {
+    "recovery": 0.16817,
+    "minus_depth": 0.0069,
+    "minus_depth_ci": [
+     -0.00521,
+     0.02164
+    ]
+   },
+   "oracle": {
+    "recovery": 0.25676,
+    "minus_depth": 0.09549,
+    "minus_depth_ci": [
+     0.0697,
+     0.12838
+    ]
+   }
+  },
+  "0.25": {
+   "random": {
+    "recovery": 0.26258,
+    "minus_depth": null,
+    "minus_depth_ci": [
+     null,
+     null
+    ]
+   },
+   "depth": {
+    "recovery": 0.34854,
+    "minus_depth": null,
+    "minus_depth_ci": [
+     null,
+     null
+    ]
+   },
+   "ViennaRNA": {
+    "recovery": 0.34695,
+    "minus_depth": -0.00159,
+    "minus_depth_ci": [
+     -0.02969,
+     0.02871
+    ]
+   },
+   "EternaFold": {
+    "recovery": 0.34801,
+    "minus_depth": -0.00053,
+    "minus_depth_ci": [
+     -0.02558,
+     0.0303
+    ]
+   },
+   "RNAstructure": {
+    "recovery": 0.35119,
+    "minus_depth": 0.00265,
+    "minus_depth_ci": [
+     -0.02398,
+     0.03201
+    ]
+   },
+   "RibonanzaNet": {
+    "recovery": 0.35703,
+    "minus_depth": 0.00849,
+    "minus_depth_ci": [
+     -0.01214,
+     0.03472
+    ]
+   },
+   "depth_then_ViennaRNA": {
+    "recovery": 0.35968,
+    "minus_depth": 0.01114,
+    "minus_depth_ci": [
+     0.00126,
+     0.02379
+    ]
+   },
+   "depth_then_EternaFold": {
+    "recovery": 0.35862,
+    "minus_depth": 0.01008,
+    "minus_depth_ci": [
+     -0.00095,
+     0.02359
+    ]
+   },
+   "depth_then_RNAstructure": {
+    "recovery": 0.36127,
+    "minus_depth": 0.01273,
+    "minus_depth_ci": [
+     0.00199,
+     0.02594
+    ]
+   },
+   "depth_then_RibonanzaNet": {
+    "recovery": 0.36817,
+    "minus_depth": 0.01963,
+    "minus_depth_ci": [
+     0.01127,
+     0.03048
+    ]
+   },
+   "oracle": {
+    "recovery": 0.54748,
+    "minus_depth": 0.19894,
+    "minus_depth_ci": [
+     0.16163,
+     0.24314
+    ]
+   }
+  },
+  "0.5": {
+   "random": {
+    "recovery": 0.50786,
+    "minus_depth": null,
+    "minus_depth_ci": [
+     null,
+     null
+    ]
+   },
+   "depth": {
+    "recovery": 0.63448,
+    "minus_depth": null,
+    "minus_depth_ci": [
+     null,
+     null
+    ]
+   },
+   "ViennaRNA": {
+    "recovery": 0.60477,
+    "minus_depth": -0.02971,
+    "minus_depth_ci": [
+     -0.06233,
+     0.01548
+    ]
+   },
+   "EternaFold": {
+    "recovery": 0.61538,
+    "minus_depth": -0.0191,
+    "minus_depth_ci": [
+     -0.05546,
+     0.02715
+    ]
+   },
+   "RNAstructure": {
+    "recovery": 0.6069,
+    "minus_depth": -0.02759,
+    "minus_depth_ci": [
+     -0.06041,
+     0.02002
+    ]
+   },
+   "RibonanzaNet": {
+    "recovery": 0.63873,
+    "minus_depth": 0.00424,
+    "minus_depth_ci": [
+     -0.02906,
+     0.05057
+    ]
+   },
+   "depth_then_ViennaRNA": {
+    "recovery": 0.64934,
+    "minus_depth": 0.01485,
+    "minus_depth_ci": [
+     0.00382,
+     0.02914
+    ]
+   },
+   "depth_then_EternaFold": {
+    "recovery": 0.6504,
+    "minus_depth": 0.01592,
+    "minus_depth_ci": [
+     0.00564,
+     0.02968
+    ]
+   },
+   "depth_then_RNAstructure": {
+    "recovery": 0.6504,
+    "minus_depth": 0.01592,
+    "minus_depth_ci": [
+     0.00463,
+     0.03104
+    ]
+   },
+   "depth_then_RibonanzaNet": {
+    "recovery": 0.65729,
+    "minus_depth": 0.02281,
+    "minus_depth_ci": [
+     0.01078,
+     0.03913
+    ]
+   },
+   "oracle": {
+    "recovery": 0.8939,
+    "minus_depth": 0.25942,
+    "minus_depth_ci": [
+     0.23197,
+     0.29414
+    ]
+   }
+  }
+ },
+ "E2": {
+  "pairs": [
+   {
+    "leader": "ViennaRNA",
+    "trailing": "RNAstructure",
+    "budget": 0.1,
+    "incumbent_margin_f1": 0.01082,
+    "decision_margin_recovery": -0.00106,
+    "extra_rescuing_interventions": -2.0
+   },
+   {
+    "leader": "ViennaRNA",
+    "trailing": "RNAstructure",
+    "budget": 0.25,
+    "incumbent_margin_f1": 0.01082,
+    "decision_margin_recovery": -0.00424,
+    "extra_rescuing_interventions": -8.0
+   },
+   {
+    "leader": "ViennaRNA",
+    "trailing": "RNAstructure",
+    "budget": 0.5,
+    "incumbent_margin_f1": 0.01082,
+    "decision_margin_recovery": -0.00213,
+    "extra_rescuing_interventions": -4.0
+   },
+   {
+    "leader": "EternaFold",
+    "trailing": "ViennaRNA",
+    "budget": 0.1,
+    "incumbent_margin_f1": 0.05667,
+    "decision_margin_recovery": -0.00053,
+    "extra_rescuing_interventions": -1.0
+   },
+   {
+    "leader": "EternaFold",
+    "trailing": "ViennaRNA",
+    "budget": 0.25,
+    "incumbent_margin_f1": 0.05667,
+    "decision_margin_recovery": 0.00106,
+    "extra_rescuing_interventions": 2.0
+   },
+   {
+    "leader": "EternaFold",
+    "trailing": "ViennaRNA",
+    "budget": 0.5,
+    "incumbent_margin_f1": 0.05667,
+    "decision_margin_recovery": 0.01061,
+    "extra_rescuing_interventions": 20.0
+   },
+   {
+    "leader": "EternaFold",
+    "trailing": "RNAstructure",
+    "budget": 0.1,
+    "incumbent_margin_f1": 0.06749,
+    "decision_margin_recovery": -0.00159,
+    "extra_rescuing_interventions": -3.0
+   },
+   {
+    "leader": "EternaFold",
+    "trailing": "RNAstructure",
+    "budget": 0.25,
+    "incumbent_margin_f1": 0.06749,
+    "decision_margin_recovery": -0.00318,
+    "extra_rescuing_interventions": -6.0
+   },
+   {
+    "leader": "EternaFold",
+    "trailing": "RNAstructure",
+    "budget": 0.5,
+    "incumbent_margin_f1": 0.06749,
+    "decision_margin_recovery": 0.00848,
+    "extra_rescuing_interventions": 16.0
+   },
+   {
+    "leader": "RibonanzaNet",
+    "trailing": "ViennaRNA",
+    "budget": 0.1,
+    "incumbent_margin_f1": 0.26,
+    "decision_margin_recovery": -0.01591,
+    "extra_rescuing_interventions": -30.0
+   },
+   {
+    "leader": "RibonanzaNet",
+    "trailing": "ViennaRNA",
+    "budget": 0.25,
+    "incumbent_margin_f1": 0.26,
+    "decision_margin_recovery": 0.01008,
+    "extra_rescuing_interventions": 19.0
+   },
+   {
+    "leader": "RibonanzaNet",
+    "trailing": "ViennaRNA",
+    "budget": 0.5,
+    "incumbent_margin_f1": 0.26,
+    "decision_margin_recovery": 0.03396,
+    "extra_rescuing_interventions": 64.0
+   },
+   {
+    "leader": "RibonanzaNet",
+    "trailing": "EternaFold",
+    "budget": 0.1,
+    "incumbent_margin_f1": 0.20333,
+    "decision_margin_recovery": -0.01538,
+    "extra_rescuing_interventions": -29.0
+   },
+   {
+    "leader": "RibonanzaNet",
+    "trailing": "EternaFold",
+    "budget": 0.25,
+    "incumbent_margin_f1": 0.20333,
+    "decision_margin_recovery": 0.00902,
+    "extra_rescuing_interventions": 17.0
+   },
+   {
+    "leader": "RibonanzaNet",
+    "trailing": "EternaFold",
+    "budget": 0.5,
+    "incumbent_margin_f1": 0.20333,
+    "decision_margin_recovery": 0.02335,
+    "extra_rescuing_interventions": 44.0
+   },
+   {
+    "leader": "RibonanzaNet",
+    "trailing": "RNAstructure",
+    "budget": 0.1,
+    "incumbent_margin_f1": 0.27082,
+    "decision_margin_recovery": -0.01697,
+    "extra_rescuing_interventions": -32.0
+   },
+   {
+    "leader": "RibonanzaNet",
+    "trailing": "RNAstructure",
+    "budget": 0.25,
+    "incumbent_margin_f1": 0.27082,
+    "decision_margin_recovery": 0.00584,
+    "extra_rescuing_interventions": 11.0
+   },
+   {
+    "leader": "RibonanzaNet",
+    "trailing": "RNAstructure",
+    "budget": 0.5,
+    "incumbent_margin_f1": 0.27082,
+    "decision_margin_recovery": 0.03183,
+    "extra_rescuing_interventions": 60.0
+   }
+  ],
+  "n_rescuing_interventions_total": 1885,
+  "agreement_from_m43": {
+   "ViennaRNA": 0.61916,
+   "EternaFold": 0.67583,
+   "RNAstructure": 0.60834,
+   "RibonanzaNet": 0.87916
+  }
+ },
+ "E3_held_out": {
+  "n_splits": 200,
+  "rules_picked": {
+   "depth_then_RibonanzaNet": 132,
+   "EternaFold": 11,
+   "RibonanzaNet": 31,
+   "RNAstructure": 19,
+   "depth_then_RNAstructure": 5,
+   "ViennaRNA": 2
+  },
+  "in_sample_mean": 0.3715,
+  "held_out_mean": 0.35605,
+  "shrinkage": 0.01545,
+  "held_out_ci": [
+   0.32007,
+   0.38342
+  ]
+ },
+ "E4_free_information_fraction": {
+  "budget": 0.25,
+  "best_implementation": "RibonanzaNet",
+  "depth_gain_over_random": 0.08596,
+  "best_gain_over_random": 0.09445,
+  "fraction_of_the_best_gain_delivered_by_depth": 0.9101
+ },
+ "staked": {
+  "1_no_impl_beats_depth_at_any_budget": true,
+  "2_incumbent_margin_does_not_predict": false,
+  "2_detail": {
+   "agreement_gap": 0.26,
+   "max_recovery_gap": 0.03396
+  },
+  "3_held_out_not_above_in_sample": true,
+  "4_depth_delivers_at_least_80pc": true
+ },
+ "elapsed_s": 28.1,
+ "log": [
+  "干预 4317  设计格(>=8) 158  可计分的格 155  深度方向 +1",
+  "\n=== V 臂 验证(先于任何结果)",
+  "  V1 oracle 在 100% 预算下捞回 1.000000  -> 通过",
+  "  V2 random 前25% 捞回 0.26276  对照期望基率 0.26264  -> 通过",
+  "  V3 ViennaRNA      本次 0.34695  M31 发表 0.34695  差 0.000000",
+  "  V3 RibonanzaNet   本次 0.35703  M31 发表 0.35703  差 0.000001",
+  "  V3 depth          本次 0.34854  M31 发表 0.34854  差 0.000001",
+  "\n=== E1 固定预算下的捞回率,每一条与免费深度基线的差都带区间",
+  "\n  预算 10%",
+  "    random                 0.11519",
+  "    depth                  0.16127",
+  "    ViennaRNA              0.17241  减深度 +0.01114  CI [-0.00849, 0.03579]  unresolved",
+  "    EternaFold             0.17188  减深度 +0.01061  CI [-0.00764, 0.0339]  unresolved",
+  "    RNAstructure           0.17347  减深度 +0.01220  CI [-0.00556, 0.03446]  unresolved",
+  "    RibonanzaNet           0.15650  减深度 -0.00477  CI [-0.02026, 0.01693]  unresolved",
+  "    depth_then_ViennaRNA   0.16552  减深度 +0.00424  CI [-0.0081, 0.01956]  unresolved",
+  "    depth_then_EternaFold  0.16499  减深度 +0.00371  CI [-0.00676, 0.01802]  unresolved",
+  "    depth_then_RNAstructure 0.16658  减深度 +0.00531  CI [-0.0064, 0.02007]  unresolved",
+  "    depth_then_RibonanzaNet 0.16817  减深度 +0.00690  CI [-0.00521, 0.02164]  unresolved",
+  "    oracle                 0.25676  减深度 +0.09549  CI [0.0697, 0.12838]  **区间不含0**",
+  "\n  预算 25%",
+  "    random                 0.26258",
+  "    depth                  0.34854",
+  "    ViennaRNA              0.34695  减深度 -0.00159  CI [-0.02969, 0.02871]  unresolved",
+  "    EternaFold             0.34801  减深度 -0.00053  CI [-0.02558, 0.0303]  unresolved",
+  "    RNAstructure           0.35119  减深度 +0.00265  CI [-0.02398, 0.03201]  unresolved",
+  "    RibonanzaNet           0.35703  减深度 +0.00849  CI [-0.01214, 0.03472]  unresolved",
+  "    depth_then_ViennaRNA   0.35968  减深度 +0.01114  CI [0.00126, 0.02379]  **区间不含0**",
+  "    depth_then_EternaFold  0.35862  减深度 +0.01008  CI [-0.00095, 0.02359]  unresolved",
+  "    depth_then_RNAstructure 0.36127  减深度 +0.01273  CI [0.00199, 0.02594]  **区间不含0**",
+  "    depth_then_RibonanzaNet 0.36817  减深度 +0.01963  CI [0.01127, 0.03048]  **区间不含0**",
+  "    oracle                 0.54748  减深度 +0.19894  CI [0.16163, 0.24314]  **区间不含0**",
+  "\n  预算 50%",
+  "    random                 0.50786",
+  "    depth                  0.63448",
+  "    ViennaRNA              0.60477  减深度 -0.02971  CI [-0.06233, 0.01548]  unresolved",
+  "    EternaFold             0.61538  减深度 -0.01910  CI [-0.05546, 0.02715]  unresolved",
+  "    RNAstructure           0.60690  减深度 -0.02759  CI [-0.06041, 0.02002]  unresolved",
+  "    RibonanzaNet           0.63873  减深度 +0.00424  CI [-0.02906, 0.05057]  unresolved",
+  "    depth_then_ViennaRNA   0.64934  减深度 +0.01485  CI [0.00382, 0.02914]  **区间不含0**",
+  "    depth_then_EternaFold  0.65040  减深度 +0.01592  CI [0.00564, 0.02968]  **区间不含0**",
+  "    depth_then_RNAstructure 0.65040  减深度 +0.01592  CI [0.00463, 0.03104]  **区间不含0**",
+  "    depth_then_RibonanzaNet 0.65729  减深度 +0.02281  CI [0.01078, 0.03913]  **区间不含0**",
+  "    oracle                 0.89390  减深度 +0.25942  CI [0.23197, 0.29414]  **区间不含0**",
+  "\n=== E2 常规基准的幅度,换算成实验",
+  "  可计分格 155  其中真正 rescue 的干预共 1885",
+  "  ViennaRNA      领先 RNAstructure    常规 F1 差 +0.01082  →  25% 预算下捞回差 -0.00424  ≈ -8.0 个干预(全语料)",
+  "  EternaFold     领先 ViennaRNA       常规 F1 差 +0.05667  →  25% 预算下捞回差 +0.00106  ≈ +2.0 个干预(全语料)",
+  "  EternaFold     领先 RNAstructure    常规 F1 差 +0.06749  →  25% 预算下捞回差 -0.00318  ≈ -6.0 个干预(全语料)",
+  "  RibonanzaNet   领先 ViennaRNA       常规 F1 差 +0.26000  →  25% 预算下捞回差 +0.01008  ≈ +19.0 个干预(全语料)",
+  "  RibonanzaNet   领先 EternaFold      常规 F1 差 +0.20333  →  25% 预算下捞回差 +0.00902  ≈ +17.0 个干预(全语料)",
+  "  RibonanzaNet   领先 RNAstructure    常规 F1 差 +0.27082  →  25% 预算下捞回差 +0.00584  ≈ +11.0 个干预(全语料)",
+  "\n=== E3 留出检验(按靶标对半分,在前一半选规则,在后一半用)",
+  "  200 次划分;被选中的规则 {'depth_then_RibonanzaNet': 132, 'EternaFold': 11, 'RibonanzaNet': 31, 'RNAstructure': 19, 'depth_then_RNAstructure': 5, 'ViennaRNA': 2}",
+  "  样本内 0.37150  留出 0.35605  收缩 +0.01545",
+  "\n=== E4 免费信息的份额:深度拿走最佳实现(RibonanzaNet)对随机增益的 91.0%",
+  "\n=== 预注册记分",
+  "  1_no_impl_beats_depth_at_any_budget          成立",
+  "  2_incumbent_margin_does_not_predict          **失败**",
+  "  3_held_out_not_above_in_sample               成立",
+  "  4_depth_delivers_at_least_80pc               成立"
+ ]
+}
