@@ -693,6 +693,15 @@ estimator. We say this explicitly because the natural overstatement is that matc
 and on this design it is not. A vectorised and a readable implementation of all four estimators
 agree to \jdg{biasCrosscheck}.
 
+\textbf{What that benchmark does and does not license.} It shows that the adjustment machinery
+recovers the truth when the confounding is placement of the kind we simulated, at this corpus's own
+$\beta$ and $g$. It does \textbf{not} show that real placement confounding is adequately captured by
+cell, depth and crossing --- no benchmark built from a confounder we chose can show that, and we do
+not claim it. Assumption~\ref{ass:placement} is therefore an assumption in the strict sense: the
+statistical machinery conditioned on it is validated, and the identification resting on it is
+asserted. Where a result would change sign under its failure we say so at the result; where the
+sensitivity analysis bounds the damage we report the bound rather than the assumption.
+
 \subsection{Inference}
 \label{sec:inference}
 
@@ -1792,6 +1801,16 @@ work of an instrument is to name each chooser and put a price on the channel. Ta
 is this paper's ledger. It introduces no new estimate: every price in it is reported and defended in
 the section named beside it, and each was read back from its own run artifact and checked against the
 value this manuscript prints (\jdg{chDrift} disagreements).
+
+\textbf{What this table is, stated so it cannot be over-read.} It is a \emph{channel attribution
+ledger}: a list of the covariates somebody chose, each priced by a direct contrast in its own units.
+It is \textbf{not} a causal decomposition and not a variance decomposition. The channels are not
+orthogonal --- they share structure, they are correlated, the design is hierarchical, and selection
+induces dependence among them --- so no row's price is the portion of a total that row owns, and no
+set of rows partitions anything. The prohibition is not stylistic caution: the common scale a
+decomposition would need is the mediated fraction, and \S\ref{sec:withdrawal} withdraws our own
+estimator for it. A reader who wants the stronger object should read the ledger as evidence that
+the stronger object is not available on this corpus.
 
 \begin{table}[!htbp]
 \centering\small
