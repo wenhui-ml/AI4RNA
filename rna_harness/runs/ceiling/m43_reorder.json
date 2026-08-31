@@ -1,0 +1,182 @@
+{
+ "declaration": "m43_reorder_declaration.json",
+ "cost": "offline, $0",
+ "declaration_erratum": {
+  "field": "definitions.why_this_matters_here",
+  "asserted": "EternaFold enters this paper as ViennaRNA's langdon2018 parameter set and is therefore a parameter variant, not an implementation",
+  "actual": "M32 builds and runs the real EternaFold binary (CONTRAfold codebase), github.com/eternagame/EternaFold @ 87b9aac5, binary md5 5e1306e54be09835a383c1d3c41573dc, verified on disk",
+  "cause": "read from rna_harness/oracles/registry.py, which carries a langdon2018 ViennaRNA oracle for design search and is not what the manuscript scores",
+  "effect": "the rule stands; its application was wrong. The paper already has three independent implementations and RNAstructure is a fourth, not a third.",
+  "declaration_not_edited": true
+ },
+ "coverage": {
+  "pmut": {
+   "missing": 0,
+   "frac": 0.0
+  },
+  "nmut": {
+   "missing": 0,
+   "frac": 0.0
+  },
+  "emut": {
+   "missing": 0,
+   "frac": 0.0
+  },
+  "smut": {
+   "missing": 0,
+   "frac": 0.0
+  }
+ },
+ "dropped_for_coverage": [],
+ "R_resp": {
+  "ViennaRNA": {
+   "rho": 0.2557,
+   "ci": [
+    0.18984,
+    0.32161
+   ],
+   "rho_disattenuated": 0.28554
+  },
+  "EternaFold": {
+   "rho": 0.27649,
+   "ci": [
+    0.21109,
+    0.34443
+   ],
+   "rho_disattenuated": 0.30875
+  },
+  "RNAstructure": {
+   "rho": 0.25705,
+   "ci": [
+    0.19641,
+    0.31841
+   ],
+   "rho_disattenuated": 0.28705
+  },
+  "RibonanzaNet": {
+   "rho": 0.32947,
+   "ci": [
+    0.26902,
+    0.39048
+   ],
+   "rho_disattenuated": 0.36792
+  }
+ },
+ "n_cells": 158,
+ "n_targets": 20,
+ "V": {
+  "V1_rnastructure_smoke": {
+   "n_pairs": 28,
+   "mfe": "(((...(((...)))...)))",
+   "max_p": 0.7188
+  },
+  "V2_note": "ViennaRNA-vs-RNAstructure MFE agreement is measured in stage_agree, on the same wild types both readouts use, and reported as V2_mfe_agreement",
+  "V3_neural_cache_present": 4475,
+  "V2_mfe_agreement_vienna_vs_rnastructure": 0.9709
+ },
+ "R_agree": {
+  "ViennaRNA": 0.61916,
+  "EternaFold": 0.67583,
+  "RNAstructure": 0.60834,
+  "RibonanzaNet": 0.87916
+ },
+ "E2": {
+  "ranking_agree": {
+   "RibonanzaNet": 1,
+   "EternaFold": 2,
+   "ViennaRNA": 3,
+   "RNAstructure": 4
+  },
+  "ranking_resp": {
+   "RibonanzaNet": 1,
+   "EternaFold": 2,
+   "RNAstructure": 3,
+   "ViennaRNA": 4
+  },
+  "kendall_tau": 0.6667,
+  "swaps": [
+   {
+    "pair": [
+     "ViennaRNA",
+     "RNAstructure"
+    ],
+    "agree_diff": 0.01082,
+    "resp_diff": -0.00135,
+    "dd_ci": [
+     -0.04209,
+     0.017
+    ],
+    "resolved": false
+   }
+  ],
+  "n_resolved_swaps": 0
+ },
+ "E3_parameter_variants": {
+  "Turner1999": {
+   "rho": 0.25414,
+   "ci": [
+    0.17601,
+    0.33299
+   ],
+   "matched_records": 4317
+  },
+  "Andronescu2007": {
+   "rho": 0.26681,
+   "ci": [
+    0.19639,
+    0.33924
+   ],
+   "matched_records": 4317
+  }
+ },
+ "span": {
+  "implementations": 0.07377,
+  "parameter_variants": 0.01267
+ },
+ "elapsed_s": 728.9,
+ "log": [
+  "=== 建立干预集合(M26.build,turner2004)",
+  "  干预 4317  设计格 158",
+  "  缓存:RibonanzaNet 4475 条,EternaFold 4475 条",
+  "=== RNAstructure 6.6:唯一序列 4475",
+  "    RNAstructure 500/4475  15s",
+  "    RNAstructure 1000/4475  27s",
+  "    RNAstructure 1500/4475  40s",
+  "    RNAstructure 2000/4475  52s",
+  "    RNAstructure 2500/4475  65s",
+  "    RNAstructure 3000/4475  77s",
+  "    RNAstructure 3500/4475  89s",
+  "    RNAstructure 4000/4475  102s",
+  "    RNAstructure 完成 4475 条,用时 114s",
+  "  覆盖缺失 {}",
+  "\n=== R_resp 干预响应排名(格内加权 Spearman,按靶标自助)",
+  "  ViennaRNA      rho = +0.25570   CI [0.18984, 0.32161]   去衰减 +0.28554",
+  "  EternaFold     rho = +0.27649   CI [0.21109, 0.34443]   去衰减 +0.30876",
+  "  RNAstructure   rho = +0.25705   CI [0.19641, 0.31841]   去衰减 +0.28704",
+  "  RibonanzaNet   rho = +0.32947   CI [0.26902, 0.39048]   去衰减 +0.36792",
+  "=== V 臂 验证(先于任何排名)",
+  "  V1 RNAstructure 冒烟:(((...(((...)))...)))  最大配对概率 0.7188",
+  "  V3 RibonanzaNet 缓存 4475 条序列(M26c 写入,本次只读)",
+  "\n=== R_agree 常规结构一致性(每个实现自己的原生结构,同一批野生型)",
+  "  设计格 158(有野生型且被干预集合用到)",
+  "  RNet_structure 覆盖 158/158  (按设计区序列连接;两个文件的全长序列重叠为 0)",
+  "    EternaFold 结构 50/158",
+  "    EternaFold 结构 100/158",
+  "    EternaFold 结构 150/158",
+  "  V4 我们算的 RibonanzaNet F1 与文件自带的 RNet_F1 列:最大偏差 0.0000(n=158)",
+  "  V2 ViennaRNA 与 RNAstructure 的 MFE 结构 F1 中位 0.9709(同一个近邻模型的两个独立实现,低了说明接线错了)",
+  "  ViennaRNA      mean F1 = 0.61916   (n=158)",
+  "  EternaFold     mean F1 = 0.67583   (n=158)",
+  "  RNAstructure   mean F1 = 0.60834   (n=158)",
+  "  RibonanzaNet   mean F1 = 0.87916   (n=158)",
+  "\n=== E2 重排检验",
+  "  ViennaRNA(agree 3 / resp 4) EternaFold(agree 2 / resp 2) RNAstructure(agree 4 / resp 3) RibonanzaNet(agree 1 / resp 1)",
+  "  Kendall tau(R_agree, R_resp) = 0.6667",
+  "  ViennaRNA vs RNAstructure: agree +0.01082  resp -0.00135  差之差 CI [-0.04209, 0.017]  -> unresolved(区间含 0)",
+  "\n=== E3 参数变体(同一个 ViennaRNA 引擎换参数文件,不计入实现数)",
+  "  Turner1999       rho = +0.25414  CI [0.17601, 0.33299]",
+  "  Andronescu2007   rho = +0.26681  CI [0.19639, 0.33924]",
+  "\n  实现之间的跨度 +0.07377   参数变体之间 0.01267",
+  "  写出逐干预分数表 m43_predictor_scores.csv(4317 行)"
+ ]
+}

@@ -1,0 +1,69 @@
+{
+  "id": "M44",
+  "title": "What the incumbent benchmark's margin buys at a fixed experimental budget, with an interval on every difference and a held-out test",
+  "frozen_before_code": true,
+  "cost": "offline, $0. Every predictor score is already on disk in m43_predictor_scores.csv; this run reads that table and the corpus, folds nothing, and calls no model.",
+  "why": [
+    "M43 answered the reorder question and the answer was no: the intervention readout ranks the",
+    "four implementations in the incumbent order, Kendall tau +0.6667, and the single order change",
+    "is unresolved. So the utility argument cannot be 'this benchmark changes which model you pick'.",
+    "",
+    "What M43 did establish is that the MARGINS do not survive: best-to-worst spans 0.27082 on",
+    "structure agreement and 0.07377 on intervention response, a 3.67-fold compression, and the",
+    "best implementation's edge over a free integer covariate is 0.007. That is a statement about",
+    "numbers. This run turns it into a statement about experiments: at a fixed budget, how many",
+    "more rescuing interventions does a reader recover by acting on the incumbent margin?",
+    "",
+    "M31 already computes recovery at one budget for three rules and reports it as point estimates",
+    "with no interval on any difference, which is the comparison rule 69 forbids. Every difference",
+    "here carries an interval resampled by target."
+  ],
+  "not_a_test_and_declared_as_such": {
+    "choose_by_agreement_vs_choose_by_response": "A reader who picks a predictor by the incumbent benchmark and a reader who picks by the intervention readout choose THE SAME MODEL on this corpus -- RibonanzaNet is first on both, which is M43's null. Comparing those two readers is therefore null by construction, not by measurement. It is named here so it cannot later be presented as a finding."
+  },
+  "decision": {
+    "actor": "someone holding a design cell -- one target, one design method -- and a budget to build and probe only a fraction of its candidate compensatory flips",
+    "objective": "maximise the number of built flips whose measured rescue factor reaches the threshold",
+    "threshold": "M31's THRESH_MAIN = 0.5, inherited unchanged and not re-tuned",
+    "information_available_at_decision_time": "the wild-type sequence, the declared target structure, and any predictor's output. NOT the measured rescue factor."
+  },
+  "rules": {
+    "random": "the floor, averaged over draws",
+    "depth": "helix depth of the flipped pair, read off the declared target. Costs nothing and uses no model.",
+    "ViennaRNA / EternaFold / RNAstructure / RibonanzaNet": "the implementation's pair probability for the target pair on the mutant",
+    "depth_then_model": "depth, with the implementation's probability breaking ties -- the paper's existing rule",
+    "oracle": "the measured rescue factor itself, as the attainable ceiling on any rule"
+  },
+  "arms": {
+    "V": "verification before any result. (i) recovery under the `oracle` rule equals 1.0 at any budget large enough to hold every rescuing flip in the cell. (ii) recovery under `random` reproduces the base rate of rescuing flips. (iii) M31's published recovery_topk for P_vienna, P_neural and depth_baseline reproduces to five decimals; if it does not, this run is void and is reported as a reproduction failure.",
+    "E1": "recovery at budgets 10%, 25%, 50% for every rule, with a bootstrap interval by TARGET on every rule's difference from `depth`. Point estimates are never compared without that interval.",
+    "E2": "THE TRANSLATION. For each pair of implementations, the incumbent margin (difference in mean structure-agreement F1, from M43) against the decision margin (difference in recovery at each budget), with an interval on the second. Reported also in CONSTRUCTS: recovery points x mean cell size x number of cells, so the answer is a count of experiments and not a fraction.",
+    "E3": "HELD OUT. Targets are split in half by a fixed seed; the rule that wins on the first half is applied to the second, and its recovery there is reported beside its in-sample recovery. This guards against a rule that looks good because it was chosen after seeing the outcome. Repeated over the split.",
+    "E4": "the free-information floor stated as a fraction: depth's gain over random, divided by the best implementation's gain over random."
+  },
+  "constants": {
+    "THRESH_MAIN": 0.5,
+    "BUDGETS": [0.10, 0.25, 0.50],
+    "NMIN": 8,
+    "NBOOT": 2000,
+    "SEED": 20260902,
+    "NSPLIT": 200,
+    "NRANDOM_DRAWS": 200
+  },
+  "staked": {
+    "1": "no implementation's recovery advantage over the free depth baseline excludes zero at any of the three budgets",
+    "2": "the incumbent margin does NOT predict the decision margin: RibonanzaNet leads ViennaRNA by more than 0.20 in mean structure-agreement F1 and by less than 3 recovery points at every budget",
+    "3": "held-out recovery for the winning rule does not exceed its in-sample recovery",
+    "4": "depth alone delivers at least 80% of the best implementation's gain over random"
+  },
+  "kill": {
+    "coverage": "if fewer than 100 design cells carry at least NMIN interventions and at least one rescuing flip, no recovery number is reported at that budget",
+    "K_unresolved": "an interval covering zero means unresolved. If staked 1 holds -- every model's advantage over the free baseline is unresolved -- that is reported as 'no implementation is demonstrably better than a covariate that costs nothing, at this sample size', never as 'the models are equivalent'.",
+    "no_rule_invention": "the rule set is fixed here. A rule added after seeing recovery numbers is a new experiment with its own declaration, not an arm of this one."
+  },
+  "wording_rules_binding_on_the_manuscript": {
+    "W1": "every recovery comparison is quoted with the interval on the difference, never as two point estimates",
+    "W2": "the incumbent margin and the decision margin are named as different quantities and never subtracted from one another",
+    "W3": "a null on staked 1 is reported as a bound on what a model buys, with the bound stated in constructs"
+  }
+}

@@ -1,0 +1,49 @@
+=== 建立干预集合(M26.build,turner2004)
+  干预 4317  设计格 158
+  缓存:RibonanzaNet 4475 条,EternaFold 4475 条
+=== RNAstructure 6.6:唯一序列 4475
+    RNAstructure 500/4475  15s
+    RNAstructure 1000/4475  27s
+    RNAstructure 1500/4475  40s
+    RNAstructure 2000/4475  52s
+    RNAstructure 2500/4475  65s
+    RNAstructure 3000/4475  77s
+    RNAstructure 3500/4475  89s
+    RNAstructure 4000/4475  102s
+    RNAstructure 完成 4475 条,用时 114s
+  覆盖缺失 {}
+
+=== R_resp 干预响应排名(格内加权 Spearman,按靶标自助)
+  ViennaRNA      rho = +0.25570   CI [0.18984, 0.32161]   去衰减 +0.28554
+  EternaFold     rho = +0.27649   CI [0.21109, 0.34443]   去衰减 +0.30876
+  RNAstructure   rho = +0.25705   CI [0.19641, 0.31841]   去衰减 +0.28704
+  RibonanzaNet   rho = +0.32947   CI [0.26902, 0.39048]   去衰减 +0.36792
+=== V 臂 验证(先于任何排名)
+  V1 RNAstructure 冒烟:(((...(((...)))...)))  最大配对概率 0.7188
+  V3 RibonanzaNet 缓存 4475 条序列(M26c 写入,本次只读)
+
+=== R_agree 常规结构一致性(每个实现自己的原生结构,同一批野生型)
+  设计格 158(有野生型且被干预集合用到)
+  RNet_structure 覆盖 158/158  (按设计区序列连接;两个文件的全长序列重叠为 0)
+    EternaFold 结构 50/158
+    EternaFold 结构 100/158
+    EternaFold 结构 150/158
+  V4 我们算的 RibonanzaNet F1 与文件自带的 RNet_F1 列:最大偏差 0.0000(n=158)
+  V2 ViennaRNA 与 RNAstructure 的 MFE 结构 F1 中位 0.9709(同一个近邻模型的两个独立实现,低了说明接线错了)
+  ViennaRNA      mean F1 = 0.61916   (n=158)
+  EternaFold     mean F1 = 0.67583   (n=158)
+  RNAstructure   mean F1 = 0.60834   (n=158)
+  RibonanzaNet   mean F1 = 0.87916   (n=158)
+
+=== E2 重排检验
+  ViennaRNA(agree 3 / resp 4) EternaFold(agree 2 / resp 2) RNAstructure(agree 4 / resp 3) RibonanzaNet(agree 1 / resp 1)
+  Kendall tau(R_agree, R_resp) = 0.6667
+  ViennaRNA vs RNAstructure: agree +0.01082  resp -0.00135  差之差 CI [-0.04209, 0.017]  -> unresolved(区间含 0)
+
+=== E3 参数变体(同一个 ViennaRNA 引擎换参数文件,不计入实现数)
+  Turner1999       rho = +0.25414  CI [0.17601, 0.33299]
+  Andronescu2007   rho = +0.26681  CI [0.19639, 0.33924]
+
+  实现之间的跨度 +0.07377   参数变体之间 0.01267
+  写出逐干预分数表 m43_predictor_scores.csv(4317 行)
+写出 /data/wenhui/openclaude_rna/rna_harness/runs/ceiling/m43_reorder.json  用时 728.9s
