@@ -983,6 +983,13 @@ assert _MAT["ViennaRNA|RNAstructure"] > _MAT["EternaFold|ViennaRNA"] > _MAT["Ete
     "EternaFold no longer sits between the two families; the sentence in sec:reorder is stale"
 put("pwEtfNN", f"{min(_MAT['EternaFold|ViennaRNA'], _MAT['EternaFold|RNAstructure']):.4f}")
 put("pwEtfNeural", f"{_MAT['EternaFold|RibonanzaNet']:.4f}")
+# the near-miss that made the reverse control worth having: the published full-length V2 against the
+# window-restricted cell of the same pair. Read out, never retyped, because a retyped near-miss is
+# exactly the kind of number that drifts.
+_rv = _m43s["checks"]["reverse_v2_full_length"]
+put("pwV2Full", f"{_rv['ours']:.4f}")
+put("pwV2Win", f"{_m43s['checks']['window_restricted_same_pair']:.4f}")
+put("pwV2Gap", f"{abs(_m43s['checks']['window_restricted_same_pair'] - _rv['ours']):.4f}")
 
 # ============================================ M44: what that margin buys at a fixed tube budget
 # The translation the instrument exists to make. Recovery at a fixed budget, every difference from
@@ -1020,6 +1027,12 @@ put("dcHoldShrink", sig(_h["shrinkage"], 4)); put("dcHoldN", f"{_h['n_splits']}"
 put("dcHoldTop", max(_h["rules_picked"], key=_h["rules_picked"].get).replace("_", r"\_"))
 put("dcHoldTopN", f"{max(_h['rules_picked'].values())}")
 put("dcHoldNrule", f"{len(_h['rules_picked'])}")
+# M44's staked criterion 2 quotes two thresholds. They are read out of the frozen declaration rather
+# than retyped into the body, the same rule lkStakeLo/Hi follow.
+_d44 = json.load(open(os.path.join(CEIL, "m44_decision_declaration.json")))
+_m = _re.search(r"more than ([\d.]+) in mean structure-agreement F1 and by less than ([\d.]+)",
+                _d44["staked"]["2"])
+put("dcStakeAgree", _m.group(1)); put("dcStakeRec", _m.group(2))
 
 # ============================ M44v: the review that had to exist before any of the above is printed
 # depth is an INTEGER, so it ties, and a stable sort breaks ties on the CSV's row order. Everything
@@ -1051,6 +1064,47 @@ for _f, _k in (("0.1", "Ten"), ("0.25", "Qtr"), ("0.5", "Half")):
 put("tvGapNres", f"{sum(1 for f in _g if _g[f]['excludes_zero'])}")
 assert _g["0.1"]["point"] < 0 < _g["0.5"]["point"], "the inversion this paragraph reports is gone"
 assert _g["0.1"]["excludes_zero"], "the 10% inversion no longer excludes zero"
+
+# ================================ M45: the ceiling on what any public corpus could ever supply
+# The breadth question, answered by measurement instead of by argument. W1 of the declaration: every
+# number here is an UPPER BOUND on CANDIDATES and may not be written as interventions.
+_m45 = J("m45_flip_ceiling.json")
+assert _m45["V"]["pass"] and _m45["flank_cut_is_inert"], "M45 checks did not pass"
+put("dmSeq", f"{_m45['n_unique']:,}".replace(",", "{,}"))
+put("dmRows", f"{_m45['n_rows']:,}".replace(",", "{,}"))
+put("dmLib", f"{_m45['W4_library_count']['after_collapsing_chemistry']}")
+put("dmDsName", f"{_m45['W4_library_count']['dataset_name_values']}")
+put("dmCand", f"{_m45['E1']['candidates_total']}")
+put("dmContrib", f"{_m45['E2']['n_contributing_libraries']}")
+put("dmTop", f"{max(_m45['E2']['by_library'].values())}")
+put("dmTopName", max(_m45["E2"]["by_library"], key=_m45["E2"]["by_library"].get).replace("_", r"\_"))
+put("dmNetNew", f"{_m45['E4']['net_new']}")
+put("dmSnFrac", pct(_m45["E3"]["frac"], 1))
+# the conversion measured where Definition 1 can be applied at all
+_c45 = _m45["E5_calibration"]
+put("dmOwnReg", f"{_c45['own_corpus_design_regions']:,}".replace(",", "{,}"))
+put("dmOwnCand", f"{_c45['candidates_on_own_corpus']:,}".replace(",", "{,}"))
+put("dmConv", pct(_c45["conversion_rate"], 2))
+put("dmExpected", f"{_m45['E1']['expected_admissible_at_calibrated_rate']:.0f}")
+# construct anatomy, identical across every library -- measured, not assumed
+_pre = {v["const_prefix"] for v in _m45["construct_anatomy"].values()}
+_suf = {v["const_suffix"] for v in _m45["construct_anatomy"].values()}
+assert len(_pre) == 1 and len(_suf) == 1, "the construct anatomy is not uniform any more"
+put("dmPre", f"{_pre.pop()}"); put("dmSuf", f"{_suf.pop()}")
+# the detector's own standing
+_v45 = _m45["V"]
+put("dmRecall", f"{_v45['V3']['recall']:.4f}")
+put("dmKnown", f"{_v45['V3']['known_published_double_mutant_pairs']:,}".replace(",", "{,}"))
+put("dmBrute", f"{_v45['V4']['brute_force']:,}".replace(",", "{,}"))
+put("dmPlanted", f"{_v45['V2']['planted']}")
+assert _v45["V3"]["transpositions_equal_known"], "V3's internal identity no longer holds"
+# how far the largest public corpus is from this paper's own yield
+put("dmRatio", f"{4170/_m45['E1']['candidates_total']:.0f}$\\times$")
+# the single-nucleotide-mutant library is named in the text, so its count is read out rather than
+# asserted: single mutants of DIFFERENT parents are not near neighbours of each other.
+_snm = [v["candidates"] for k, v in _m45["per_library"].items() if "Single_nt_mutants" in k]
+assert _snm, "the single-nucleotide-mutant library is no longer in the corpus"
+put("dmCandZero", f"{max(_snm)}")
 
 # ================================================================ write
 out = [
