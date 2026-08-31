@@ -952,12 +952,86 @@ def figA_survey():
     emit("figA5_survey.tex", group(2, body, hsep="2.2cm"))
 
 
+
+# ---------------------------------------------------------------- Fig 11: the budget crossing
+def fig_budget():
+    """The claim of Reading 2 as an object rather than as three numbers.
+
+    a: the incumbent margin's decision gap as budget is swept, with the crossing marked and the
+       leave-one-target-out envelope behind it, so a reader can see the sign is not carried by a
+       target rather than being told so.
+    b: every ordered pair at the smallest and largest budget. The one pair that does not cross is
+       the two implementations of one model family.
+    """
+    m46, m43 = J("m46_inversion.json"), J("m43_reorder.json")
+    pts = m46["E3_budget_sweep"]["points"]
+    xs = [100 * p["budget"] for p in pts]
+    ys = [p["gap"] for p in pts]
+    lo, hi = m46["E3_budget_sweep"]["crossing_between"]
+    L = m46["E1_leave_one_target_out"]
+    # the drop envelope is only measured at the three declared budgets
+    ex = [100 * float(f) for f in sorted(L, key=float)]
+    emin = [L[f]["min"] for f in sorted(L, key=float)]
+    emax = [L[f]["max"] for f in sorted(L, key=float)]
+
+    A = m43["R_agree"]
+    P = m46["E5_other_pairs"]["pairs"]
+    names, low, high, same = [], [], [], []
+    SHORT = {"RibonanzaNet": "RNet", "EternaFold": "Etf", "RNAstructure": "Rst",
+             "ViennaRNA": "Vie"}
+    for k, v in sorted(P.items(), key=lambda kv: -abs(kv[1]["high"] - kv[1]["low"])):
+        a, b = k.split("|")
+        names.append(f"{SHORT[a]}$-${SHORT[b]}")
+        low.append(v["low"]); high.append(v["high"]); same.append(not v["inverts"])
+
+    ymin = min(min(ys), min(emin), min(low), min(high)) - 0.008
+    ymax = max(max(ys), max(emax), max(low), max(high)) + 0.008
+    body = rf"""\nextgroupplot[width=6.9cm, height=5.0cm,
+    xlabel={{per cent of the design built}},
+    ylabel={{RNet $-$ Vie recovery}},
+    xmin=0, xmax={max(xs)+3:.0f}, ymin={ymin:.3f}, ymax={ymax:.3f},
+    title={{a}}]
+\addplot[draw=none, forget plot] coordinates {{({lo*100:.1f},{ymin:.3f}) ({hi*100:.1f},{ymin:.3f})}};
+\addplot[color={GREY}, line width=0.4pt, dashed, forget plot]
+  coordinates {{(0,0) ({max(xs)+3:.0f},0)}};
+\addplot[color={GREY}, line width=1.1pt, forget plot, opacity=0.55]
+  coordinates {{{co([f"{x:.1f}" for x in ex], [f"{v:.5f}" for v in emin])}}};
+\addplot[color={GREY}, line width=1.1pt, forget plot, opacity=0.55]
+  coordinates {{{co([f"{x:.1f}" for x in ex], [f"{v:.5f}" for v in emax])}}};
+\addplot[color={NEU}, line width=1.4pt, mark=*, mark size=1.3pt, forget plot]
+  coordinates {{{co([f"{x:.1f}" for x in xs], [f"{y:.5f}" for y in ys])}}};
+\addplot[color={INK}, line width=0.5pt, forget plot]
+  coordinates {{({lo*100:.1f},{ymin:.3f}) ({lo*100:.1f},{ymax:.3f})}};
+\addplot[color={INK}, line width=0.5pt, forget plot]
+  coordinates {{({hi*100:.1f},{ymin:.3f}) ({hi*100:.1f},{ymax:.3f})}};
+\node[font=\scriptsize, color={INK}, anchor=west] at (axis cs:{hi*100+1.5:.1f},{ymin+0.006:.3f})
+  {{sign changes here}};
+
+\nextgroupplot[width=6.4cm, height=5.0cm,
+    xlabel={{recovery gap}}, xmin={ymin:.3f}, xmax={ymax:.3f},
+    ytick={{{",".join(str(len(names)-i) for i in range(len(names)))}}},
+    yticklabels={{{",".join(names)}}},
+    ymin=0.4, ymax={len(names)+0.6},
+    title={{b}}]
+\addplot[color={GREY}, line width=0.4pt, dashed, forget plot]
+  coordinates {{(0,0.4) (0,{len(names)+0.6})}};"""
+    for i, (l, h, sm) in enumerate(zip(low, high, same)):
+        y = len(names) - i
+        c = GREY if sm else NEU
+        body += (rf"""
+\addplot[color={c}, line width=1.3pt, forget plot, -{{Latex[length=3pt]}}]
+  coordinates {{({l:.5f},{y}) ({h:.5f},{y})}};
+\addplot[color={c}, mark=*, mark size=1.5pt, only marks, forget plot]
+  coordinates {{({l:.5f},{y})}};""")
+    emit("fig11_budget.tex", group(2, body, hsep="1.9cm"))
+
+
 if __name__ == "__main__":
     print("emitting TikZ display items")
     ok = True
     for fn in (fig_arch, fig_flip, fig_corpus, fig_calibration, fig_ranking, fig_audits,
                fig_estimator, fig_scale, fig_contrasts, fig_params, fig_transfer,
-               fig_withdrawal, figA_admission, figA_strata, figA_ribosnitch,
+               fig_withdrawal, fig_budget, figA_admission, figA_strata, figA_ribosnitch,
                figA_exposure, figA_survey):
         try:
             fn()

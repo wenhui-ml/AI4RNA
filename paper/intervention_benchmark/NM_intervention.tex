@@ -137,30 +137,33 @@ recovered from a public chemical-probing corpus}
 \begin{abstract}
 \noindent
 Chemical-probing benchmarks score RNA structure predictors by how far a predicted structure agrees
-with a reference. Agreement saturates; and on a corpus written by design programs, chosen by a
-selection rule and scored against a model's own output, the number a benchmark reports is carried
-by a covariate somebody chose rather than by the property it is named after. We recover
-\jdg{nAdmitted} two-nucleotide interventions already executed in a public benchmark ---
-compensatory orientation flips whose measured outcome contains no folding model --- score
-\jdg{reNimpl} independent implementations by response, and price \jdg{chPriced} such channels. \jdg{chCarry} carry the number, \jdg{chEmpty} are
-empty and \jdg{chUnres} is unresolved. The reference channel carries most: the same molecules read
-interventionally give \jdg{cvIntvSd} standard deviations against \jdg{cvConvSd} read as agreement.
-The declared target carries as much as any model: helix depth, a free integer, is matched by
-every predictor scored against it --- the three on the ranking axis (\jdg{rkDiffNCi},
-\jdg{rkDiffVCi}, \jdg{efVsDepthCi}) and all \jdg{reNimpl} at every budget below, all intervals
-covering zero --- and what survives with depth held fixed is real but modest (\jdg{rkPartN},
-\jdg{rkPartNCi}). The model's own
-authors carry it along two separable axes --- the decomposition \jdg{axArch} (\jdg{axArchCi}) and
-the training data \jdg{axData} (\jdg{axDataCi}), differing by \jdg{axGap} (\jdg{axGapCi}).
-\textbf{The empty channel is the folding model's own free energy}, the objective every one of these
-design programs was optimising. \textbf{And a benchmark
-margin is not a decision margin}: converted to a fixed experimental budget
-(Claim~\ref{claim:budget}), the panel's largest structure-agreement margin, \jdg{dcTransF1},
-buys \jdg{dcTransPct} of this corpus's rescuing interventions; none of twelve
-implementation-minus-depth intervals excludes zero; and at the tightest budget the margin's sign
-inverts, \jdg{tvGapTen} \jdg{tvGapCiTen}. We report the prices as direct contrasts and never as shares,
-because the estimator for a share is uninformative here --- which we show, and withdraw a metric of
-our own for.
+with a reference. We argue, and measure, that such a number is not self-interpreting, and that it
+fails in two separate ways. It can be \emph{carried by a covariate somebody chose} --- these
+corpora are written by design programs, filtered by a rule, mutated at pairs an experimenter
+picked, and scored against a column that is itself a model's output. And it can be entirely real
+and still \emph{buy nothing}, because agreement is not the quantity an experimenter acts on.
+
+We build an instrument that makes both readable on the same molecules. Compensatory orientation
+flips already executed in a public corpus are recovered by a stated criterion --- \jdg{nAdmitted}
+two-nucleotide interventions whose outcome is measured and contains no folding model --- and
+\jdg{reNimpl} independent predictor implementations are scored by their response to them.
+\emph{Reading one} prices \jdg{chPriced} covariate-choice channels: \jdg{chCarry} carry the
+number, \jdg{chEmpty} are bounded and empty, \jdg{chUnres} is unresolved. The same molecules read
+interventionally rather than as agreement give \jdg{cvIntvSd} standard deviations against
+\jdg{cvConvSd}; the empty channel is the folding model's own free energy, the objective every one
+of these design programs was optimising. \emph{Reading two} converts the incumbent benchmark's
+margin into experiments. At a fixed budget no implementation is distinguishable from helix depth, a
+free integer; the panel's largest agreement margin, \jdg{dcTransF1}, is worth \jdg{dcTransPct} of
+this corpus's rescuing interventions; and the gap changes sign exactly \jdg{ivNcross} time as
+budget is swept, at \jdg{ivCrossA}--\jdg{ivCrossB} of a design built. \textbf{A model's agreement
+advantage is an average, and the better it ranks on that average the further from the top of its
+own ranked list the advantage lies --- while a budgeted experimenter only ever sees the top.}
+
+Prices are reported as direct contrasts and never as shares, because the estimator for a share is
+uninformative here, which we show and withdraw a metric of our own for. We also report what this
+instrument cannot reach: the largest public probing corpus, \jdg{dmSeq} sequences over
+\jdg{dmLib} libraries, holds \jdg{dmCand} candidate interventions in total, so its domain has to be
+written into a library on purpose rather than found.
 \end{abstract}
 
 % =====================================================================
@@ -270,7 +273,8 @@ is the second reading and the one no benchmark performs on itself. Across \jdg{r
 implementations and three budgets, no model is distinguishable from a free integer as a standalone
 ranker of which interventions to build; the panel's largest structure-agreement margin,
 \jdg{dcTransF1}, is worth \jdg{dcTransPct} of this corpus's rescuing interventions; and at the
-tightest budget the margin's sign \emph{inverts} (\jdg{tvGapTen} \jdg{tvGapCiTen}).
+tightest budget the margin's sign \emph{inverts} (\jdg{tvGapTen} \jdg{tvGapCiTen}) --- a
+crossing that survives every choice that produced it (Claim~\ref{claim:budget}).
 \item \textbf{The instrument's domain, stated as a specification a laboratory can act on}
 (\S\ref{sec:ceiling}): the resolution ceiling as a range under three split rules, the
 signal-to-noise gate above which the outcome is worth reading, and the measured fact that the
@@ -1957,18 +1961,69 @@ and grades itself on in Appendix~\ref{app:prereg}. The stake is graded as writte
 and \jdg{tvGapHalf} \jdg{tvGapCiHalf} at 50\%; \jdg{tvGapNres} of the three exclude zero, and
 \textbf{they exclude it on opposite sides.} A \jdg{dcTransF1} structure-agreement margin does not
 merely fail to transfer to the decision --- \textbf{at the tightest budget it points the wrong
-way}, with an interval that excludes zero. This is what the instrument is for. The conventional
-benchmark is not wrong; it is answering a different question, and the sign of its answer is not
-guaranteed to survive the translation into how many tubes you have.
+way}, with an interval that excludes zero.
+
+\paragraph{It is a curve with one crossing, not three points.} A sign read off three budgets, one
+rescue threshold, one predictor pair and \jdg{ccPuzzles} targets is exactly the kind of claim that
+should be attacked at each of those choices before it is believed, and every one of them was made
+freely. Swept over \jdg{ivSweepN} budgets from \jdg{ivSweepLo} to \jdg{ivSweepHi} of a design
+built, the gap runs from \jdg{ivGapLo} to \jdg{ivGapHi} and changes sign \textbf{exactly
+\jdg{ivNcross} time}, between \jdg{ivCrossA} and \jdg{ivCrossB} of the design built. Dropping each
+target in turn leaves the sign unchanged at all \jdg{ivNbudget} budgets and all \jdg{ivLooN} drops
+--- at the tightest budget the gap ranges \jdg{ivLooLo} to \jdg{ivLooHi} across the drops, never
+approaching zero --- and taken one target at a time, \jdg{ivTgtNeg} of \jdg{ivTgtN} individually
+show the inversion, \jdg{ivTgtTie} tie and \jdg{ivTgtPos} run the other way. \jdg{ivThrInv} of
+\jdg{ivThrN} rescue thresholds preserve it; the one that does not leaves only \jdg{ivThrFailN}
+scorable cells. \textbf{``Budget-structured rather than noise'' is therefore not an inference from
+three points; it is a measured crossing.} What it is not is a replication: this is one corpus, and
+\S\ref{sec:ceiling} reports why a second of comparable size does not exist to be had.
+
+\paragraph{And one ordering explains every pair.} The inversion is not a quirk of the pair that
+was quoted first. Of the \jdg{dcNpair} ordered pairs, \jdg{ivCrossFam} invert between the smallest
+and largest budget and \jdg{ivSameFam} does not --- and which is which is fully determined. The one
+that does not invert is \emph{the two nearest-neighbour implementations against each other}, the
+pair that agrees at \jdg{pwNN} in structure space and is therefore one family. Every pair that
+crosses families inverts, and \textbf{in every case the large budget favours the model that ranks
+higher on structure agreement, while the small budget favours the one that ranks lower.} A single
+ordering --- the incumbent benchmark's own --- predicts all six outcomes.
+
+That is the mechanism, and it is worth more than the sign. \textbf{A model's structure-agreement
+advantage is an average, and on this corpus the better a model ranks on that average the further
+from the top of its own ranked list its advantage lies.} The experimenter never sees the average.
+At a budget of \jdg{ivCrossA} they see only the top of the list, which is precisely where the
+ordering is reversed. The conventional benchmark is not wrong; it is answering a different
+question, and the sign of its answer is not guaranteed to survive the translation into how many
+tubes you have.
+
+\begin{figure}[t]
+\centering
+\input{figs/fig11_budget}
+\caption{\textbf{The incumbent margin's decision gap crosses zero once, and which pairs cross is
+determined by model family.} \textbf{a}, RibonanzaNet minus ViennaRNA recovery as the fraction of
+each design built is swept over \jdg{ivSweepN} budgets. The grey envelope is the range over
+\jdg{ivLooN} leave-one-target-out drops at the three declared budgets: the sign is not carried by
+any target. The gap changes sign exactly \jdg{ivNcross} time, between \jdg{ivCrossA} and
+\jdg{ivCrossB} of the design built. \textbf{b}, every ordered pair, from its smallest-budget gap
+(dot) to its largest-budget gap (arrowhead). \jdg{ivCrossFam} of \jdg{dcNpair} cross zero; the
+grey one that does not is ViennaRNA against RNAstructure, the two implementations of one model
+family, which agree at \jdg{pwNN} in structure space. In every crossing pair the large budget
+favours whichever model ranks higher on structure agreement.}
+\label{fig:budget}
+\end{figure}
 
 \begin{claimbox}
 \claimhead{claim:budget} Across \jdg{reNimpl} independent implementations and three budgets, no
 model is distinguishable from a free integer as a standalone ranker of which interventions to
-build (\jdg{dcNpair}~ordered pairs, twelve intervals, none excluding zero). The panel's largest
-structure-agreement margin, \jdg{dcTransF1}, converts to \jdg{dcTransPct} of the rescuing
-interventions in this corpus, and at the tightest budget its sign inverts
-(\jdg{tvGapTen}~\jdg{tvGapCiTen}). \textbf{A structure-benchmark margin is not a decision margin,
-and the difference is budget-structured rather than noise.}
+build (twelve intervals, none excluding zero). The panel's largest structure-agreement margin,
+\jdg{dcTransF1}, converts to \jdg{dcTransPct} of the rescuing interventions in this corpus, and at
+the tightest budget its sign inverts (\jdg{tvGapTen}~\jdg{tvGapCiTen}). The inversion is a measured
+crossing rather than three points: swept over \jdg{ivSweepN} budgets the gap changes sign exactly
+\jdg{ivNcross} time, at \jdg{ivCrossA}--\jdg{ivCrossB} of a design built, and it survives dropping
+any target, \jdg{ivThrInv} of \jdg{ivThrN} rescue thresholds, and \jdg{ivCrossFam} of the
+\jdg{dcNpair} predictor pairs --- the only pair that does not invert being the two implementations
+of one model family. \textbf{A structure-benchmark margin is an average, and the better a model
+ranks on that average the further from the top of its own list its advantage lies. A budgeted
+experimenter only ever sees the top.}
 \end{claimbox}
 
 % =====================================================================
@@ -2046,6 +2101,25 @@ the OpenKnot benchmark and mutate-and-map-rescue tables, and the RMDB deposits n
 Appendix~\ref{app:prereg}.]} The analysed file is the versioned release
 \texttt{OK7a\_M2R\_data.v4.5.1.csv}; every count in this paper is a count over that file, and a
 different version of it is a different corpus.
+
+\paragraph{What we are deliberately not doing, and why each is bounded rather than open.} Three
+questions are raised by the results above and answered here by saying what would settle them,
+because running them would lengthen the chain without changing what the paper claims.
+\emph{First}, whether the crossing of \S\ref{sec:reorder} generalises beyond this corpus. It is a
+statement about benchmarks rather than about RNA --- an average advantage that lives away from the
+top of a ranked list will not transfer to a budgeted decision in any field --- and testing it
+properly means repeating the conversion in a domain with its own executed interventions, not
+finding more RNA. We state the mechanism precisely enough to be attacked and do not claim the
+generalisation. \emph{Second}, whether a prospectively designed library behaves as
+\S\ref{sec:ceiling} predicts. The specification there costs $4n$ slots and a signal floor; nothing
+short of synthesising it will confirm it, and we prefer to state a falsifiable design than to
+simulate one. \emph{Third}, whether real placement confounding is captured by design cell, depth
+and crossing. Assumption~\ref{ass:placement} cannot be tested from observational data at all
+(\S\ref{sec:estimation}), and the honest bound is the sensitivity analysis already reported rather
+than a further estimator.
+
+None of the three is a missing control for a claim made here. Each is the next experiment for a
+claim we have deliberately not made.
 
 % =====================================================================
 
@@ -2151,7 +2225,10 @@ whose outcome is measured, whose internal control is the molecule it was made fr
 no folding model enters. Recovering them by a stated rule turns a probing corpus into a benchmark
 of \emph{response} rather than of agreement.
 
-What the instrument then reads is not what we expected to report. On the identity axis it
+What the instrument then reads is not what we expected to report. On the identity axis --- which
+throughout this paper names a contrast between C--G and A--U \emph{targets} in matched contexts,
+and never the causal effect of being one rather than the other, because an orientation flip
+preserves the unordered pair type and changes only its context (\S\ref{sec:mining}) --- it
 separates the predictors: a transformer's own pairing probability distinguishes C--G from A--U
 targets in matched contexts by \jdg{resNeural} (\jdg{resNeuralCi}) where the measurement puts them
 \jdg{resOut} (\jdg{resOutCi}) apart, and neither predictor built on the nearest-neighbour
@@ -2161,8 +2238,13 @@ decomposes into a decomposition axis worth \jdg{axArch} (\jdg{axArchCi}) and a t
 worth \jdg{axData} (\jdg{axDataCi}); we had written that the second was absent, and the interval
 said otherwise. On the axis an experimenter would actually use, which flips to build inside
 one design, all three are matched or beaten by helix depth: an integer read off the declared
-target that costs nothing, is not reported as a baseline anywhere we have found, and against which
-the differences are \jdg{rkDiffNCi}, \jdg{rkDiffVCi} and \jdg{efVsDepthCi}, all covering zero.
+target that costs nothing, and against which the differences are \jdg{rkDiffNCi}, \jdg{rkDiffVCi}
+and \jdg{efVsDepthCi}, all covering zero. \textbf{What is new is not that helix position carries
+information} --- pairs at helix ends are well known to carry lower pairing probability than pairs
+in the middle --- \textbf{but that it is not used as a scored baseline that a model must show an
+increment over.} We state that as a bounded search rather than as a claim about the literature: it
+appears in none of the benchmarks surveyed in \S\ref{sec:background} and in none of the
+mutate-and-map work this corpus comes from, and we have looked no further than that.
 What survives with depth held fixed is real and modest, \jdg{rkPartN} (\jdg{rkPartNCi}).
 
 That readout answers who carries the number. It does not answer what the number buys, and the

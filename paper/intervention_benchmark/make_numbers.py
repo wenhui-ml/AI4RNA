@@ -1065,6 +1065,61 @@ put("tvGapNres", f"{sum(1 for f in _g if _g[f]['excludes_zero'])}")
 assert _g["0.1"]["point"] < 0 < _g["0.5"]["point"], "the inversion this paragraph reports is gone"
 assert _g["0.1"]["excludes_zero"], "the 10% inversion no longer excludes zero"
 
+# ============================= M46: the inversion, hardened against the choices that produced it
+# The headline of Reading 2 rested on 20 targets, one threshold, one predictor pair and three budget
+# points. This arm asks whether it survives each of those choices being made differently.
+_m46 = J("m46_inversion.json")
+assert _m46["V_reverse_control"]["pass"], "M46 does not reproduce M44; nothing here bears on it"
+_lo = str(min(_m46["E3_budget_sweep"]["points"], key=lambda p: p["budget"])["budget"])
+_L = _m46["E1_leave_one_target_out"]
+put("ivLooLo", sig(_L["0.1"]["min"], 4)); put("ivLooHi", sig(_L["0.1"]["max"], 4))
+put("ivLooN", f"{_L['0.1']['n_drops']}")
+assert all(_L[f]["sign_stable"] for f in _L), "staked 1 has failed; W2 requires withdrawal"
+put("ivLooStable", f"{sum(1 for f in _L if _L[f]['sign_stable'])}")
+put("ivNbudget", f"{len(_L)}")
+_E2 = _m46["E2_per_target"]
+put("ivTgtNeg", f"{_E2['n_negative']}"); put("ivTgtN", f"{_E2['n_targets']}")
+put("ivTgtPos", f"{_E2['n_positive']}"); put("ivTgtTie", f"{_E2['n_zero']}")
+_S = _m46["E3_budget_sweep"]
+put("ivSweepN", f"{_S['n_points']}")
+put("ivSweepLo", pct(min(p["budget"] for p in _S["points"]), 0))
+put("ivSweepHi", pct(max(p["budget"] for p in _S["points"]), 0))
+put("ivGapLo", sig(min(_S["points"], key=lambda p: p["budget"])["gap"], 4))
+put("ivGapHi", sig(max(_S["points"], key=lambda p: p["budget"])["gap"], 4))
+put("ivNcross", f"{_S['n_sign_changes']}")
+put("ivCrossA", pct(_S["crossing_between"][0], 1)); put("ivCrossB", pct(_S["crossing_between"][1], 1))
+_P = _m46["E5_other_pairs"]
+put("ivPairInv", f"{_P['n_inverting']}"); put("ivPairN", f"{_P['n_pairs']}")
+_T = _m46["E4_threshold_sweep"]
+put("ivThrInv", f"{sum(1 for v in _T.values() if v.get('inverts'))}")
+put("ivThrN", f"{len(_T)}")
+put("ivThrFail", ", ".join(k for k, v in _T.items() if not v.get("inverts")))
+put("ivThrFailN", f"{[v for k, v in _T.items() if not v.get('inverts')][0]['n_scorable']}")
+# THE SHAPE OF THE FINDING, and it is not the one the first draft asserted. Two of the inverting
+# pairs do not involve the neural model at all, so "the neural model's advantage lives in the tail"
+# is false as written. What is true is stronger: a SINGLE TOTAL ORDER explains all six pairs, and it
+# is the incumbent benchmark's own ordering.
+#
+# Family membership is taken from M43s's measured pairwise agreement, not from a chosen F1 gap:
+# ViennaRNA and RNAstructure agree at 0.9710 and every other pair at 0.909 or less, so they are one
+# family and nothing else is. The prediction tested here is then: every CROSS-family pair inverts
+# with the high budget favouring the model that ranks higher on structure agreement, and the one
+# WITHIN-family pair does not invert. Both halves are asserted, so the sentence cannot go stale.
+_SAME_FAMILY = 0.95
+_nfam = _ninv = 0
+for _k, _v in _P["pairs"].items():
+    _a, _b = _k.split("|")
+    _same = _MAT[f"{_a}|{_b}"] >= _SAME_FAMILY
+    if _same:
+        _nfam += 1
+        assert not _v["inverts"], f"{_k} is one family and now inverts"
+    else:
+        assert _v["inverts"], f"{_k} crosses families and no longer inverts"
+        assert (_v["high"] > 0) == (_ag[_a] > _ag[_b]), f"{_k}: the high budget no longer favours agreement"
+        _ninv += 1
+put("ivCrossFam", f"{_ninv}"); put("ivSameFam", f"{_nfam}")
+put("ivTailPairs", f"{_ninv}")
+
 # ================================ M45: the ceiling on what any public corpus could ever supply
 # The breadth question, answered by measurement instead of by argument. W1 of the declaration: every
 # number here is an UPPER BOUND on CANDIDATES and may not be written as interventions.
