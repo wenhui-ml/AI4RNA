@@ -277,17 +277,55 @@ sv2 = J("m27_corpus_survey_all.json")
 _rows = sv2["rows"]
 _ev = [r for r in _rows if "n_orientation_flip" in r]      # the rest carry a `skipped` reason
 _hit = [r for r in _ev if r["n_orientation_flip"] > 0]
-_bylib: dict[str, int] = {}
-for r in _hit:                                              # one entry per library, not per probe
-    _bylib[r["name"]] = max(_bylib.get(r["name"], 0), r["n_orientation_flip"])
+# The library count and the flip count come from M41's lineage arm, NOT from the survey's own
+# deposit `name` field. Keying on that field counted one 15,000-construct design set three times,
+# because RMDB carries it under three deposit names -- and the third of those is four replicates
+# of it, so its 136 flips are 34 x 4. M41 establishes the design set by construct-name identity
+# (lineage Jaccard 1.0000 within, 0.0000 between) and counts flips on the deduplicated set.
+m41 = J("m41_domain.json")
+_L = m41["L"]
+assert _L["n_libraries_manuscript_prints"] == 6 and _L["flips_manuscript_prints"] == 4340, \
+    "M41 no longer records the values this correction replaces; the erratum text would be stale"
+assert m41["V"]["V1_pass"] and m41["V"]["V1b_pass"], \
+    "M41's lineage verification did not pass; the corrected census may not be printed"
 put("scDeposits", f"{sv2['n_deposits_scanned']:,}".replace(",", "{,}"))
 put("scEval", f"{len(_ev)}")
 put("scSkipped", f"{len(_rows) - len(_ev)}")
 put("scSkippedPct", pct((len(_rows) - len(_ev)) / len(_rows), 0))
 put("scHits", f"{len(_hit)}")
-put("scLibs", f"{len(_bylib)}")
+put("scLibs", f"{_L['n_libraries_lineage_correct']}")
 put("scFlipsRec", f"{sv2['total_flips']:,}".replace(",", "{,}"))   # deposition-probe records
-put("scFlips", f"{sum(_bylib.values()):,}".replace(",", "{,}"))    # counted once per library
+put("scFlips", f"{_L['n_distinct_flips_total']:,}".replace(",", "{,}"))   # once per DESIGN SET
+put("scLibsDeposit", f"{len(set(r['name'] for r in _hit))}")       # what the deposit names say
+put("scBiggest", f"{max(v['n_distinct_flips'] for v in _L['libraries'].values()):,}".replace(",", "{,}"))
+put("scBiggestPct", pct(max(v["n_distinct_flips"] for v in _L["libraries"].values())
+                        / _L["n_distinct_flips_total"], 1))
+
+# arm A: what the whole remaining public record yields once the criterion runs, not a pattern count
+_A = m41["A_new_admitted"]
+put("scNewAdmit", f"{sum(_A.values())}")
+put("scNewLibs", f"{len(_A)}")
+
+# arm Q: the admission gate, calibrated, and the measurement ceiling it implies
+_Q = m41["Q"]
+put("qcAsserted", f"{_Q['asserted_gate']:.1f}")
+put("qcPooledR", f"{_Q['pooled_split_half_r']:+.4f}")
+put("qcReliab", f"{_Q['spearman_brown_reliability']:.4f}")
+put("qcCeiling", f"{_Q['attenuation_ceiling_on_any_predictor']:.4f}")
+put("qcCross07", f"{_Q['reliability_crossings']['0.7']:.2f}")
+put("qcLoBin", f"{min(b['split_half_r'] for b in _Q['bins'] if not b['underpowered']):.4f}")
+put("qcHiBin", f"{max(b['split_half_r'] for b in _Q['bins'] if not b['underpowered']):.4f}")
+put("qcNbins", f"{_Q['nbins']}")
+# the lineage agreements the census correction rests on, and the two reliability thresholds the
+# crossing table is read at -- both fixed in the declaration, neither chosen after seeing a curve
+_jin = sorted(set(m41["V"]["V1_lineage_jaccard"].values()))
+_jout = sorted(set(m41["V"]["V1b_reverse_control"].values()))
+assert _jin == [1.0] and _jout == [0.0], f"lineage agreements changed: {_jin} / {_jout}"
+put("scLinIn", f"{_jin[0]:.4f}")
+put("scLinOut", f"{_jout[0]:.4f}")
+_thr = sorted(float(k) for k in _Q["reliability_crossings"])
+put("qcThrA", f"{_thr[1]:.1f}")
+put("qcThrB", f"{_thr[2]:.1f}")
 # The survey's designed/natural label is NOT reported. It is too coarse to carry a claim:
 # the two libraries this paper analyses as natural RNA (M2SL5, M3SARS) are labelled
 # "unclear" by it, so its n_natural_with_interventions = 0 would contradict our own
@@ -334,9 +372,13 @@ put("xnSlopeNTwoA", sig(sl5a["C"]["RibonanzaNet"]["slope"], 5))
 
 # the frameshift deposit: exhaustive, and unusable for a reason worth one sentence
 fse = d28["M3SARS_DMS_0000"]
+fse2 = d28["M3SARS_2A3_0000"]
 gate = m28r["R1_reference_gating"]["M3SARS_DMS_0000"]
 put("xnFseFlips", f"{sum(g['n_flips'] for g in gate)}")
 put("xnFseAdmit", f"{fse['A']['n_admitted']}")
+# the same LIBRARY under the other probe, at the same cutoff. Printing the DMS zero alone said
+# that a poorly measured corpus yields nothing; the library's other deposit yields this.
+put("xnFseAdmitTwoA", f"{fse2['A']['n_admitted']}")
 put("xnFseSnLo", f"{min(g['wt_sn'] for g in gate):.3f}")
 put("xnFseSnHi", f"{max(g['wt_sn'] for g in gate):.3f}")
 put("xnSl5SnLo", f"{min(g['wt_sn'] for g in m28r['R1_reference_gating']['M2SL5_DMS_0000']):.3f}")
@@ -430,6 +472,12 @@ put("rkRhoDpVCi", ci(A31["dP_vienna"]["ci"]))
 put("rkRhoDpP", f"{A31['dP_neural']['p_perm']:.4f}")
 put("rkRhoDpVP", f"{A31['dP_vienna']['p_perm']:.2f}")
 put("rkPosDp", pct(A31["dP_neural"]["frac_cells_positive"], 0))
+# disattenuated against M41's measurement ceiling: an observed rank correlation divided by the
+# largest one this outcome permits. Both series are attenuated by the same factor, so the ratio
+# between them is unchanged and the correction cannot manufacture a separation.
+_ceil = m41["Q"]["attenuation_ceiling_on_any_predictor"]
+put("rkRhoDAtt", sig(A31["depth_baseline"]["rho"] / _ceil))
+put("rkRhoNAtt", sig(A31["P_neural"]["rho"] / _ceil))
 # the interval K2 was missing
 R1_, R2_, R3_ = m31r["R1_vs_free_baseline"], m31r["R2_partial_given_depth"], m31r["R3_tiebreak"]
 put("rkDiffN", sig(R1_["rho"]["P_neural"] - R1_["rho"]["depth"], 5))

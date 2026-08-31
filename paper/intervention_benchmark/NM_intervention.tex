@@ -479,12 +479,30 @@ deposition we could enumerate in the RMDB: \jdg{scDeposits} records. \jdg{scSkip
 nor per-row sequence annotation, and without one of the two there is no way to decide which
 constructs belong to the same design cell --- the criterion never gets as far as clause (ii). On
 the \jdg{scEval} that could be evaluated, \jdg{scHits} deposition records carry at least one
-admissible orientation flip. Those \jdg{scHits} records are \jdg{scLibs} distinct libraries,
-because the RMDB deposits a library once per chemical probe: \jdg{scFlips} flips counted once per
-library, \jdg{scFlipsRec} counted per deposited record. We report the first number. The binding
-constraint on applying this instrument to public data is therefore not that compensatory flips are
-rare in libraries --- they are not --- but that most depositions do not publish enough annotation
-to tell whether they contain any.
+admissible orientation flip.
+
+Counting the libraries behind those records takes one step that is easy to get wrong, and we got
+it wrong first. A repository deposits a library once per chemical probe, so records overcount
+libraries by a factor of two; but it also deposits the \emph{same design set} under more than one
+name, and one of those deposits here is four replicates of another. Keyed on the deposit name,
+the \jdg{scHits} records are \jdg{scLibsDeposit} libraries. Keyed on the design set --- construct
+names compared after normalising a deposit-specific formatting convention, with within-set
+agreement \jdg{scLinIn} and between-set agreement \jdg{scLinOut} --- they are \jdg{scLibs}. The flip counts
+move with the unit: \jdg{scFlipsRec} counted per deposited record, \jdg{scFlips} counted once per
+design set. We report the design-set numbers throughout, and Appendix~\ref{app:survey} carries
+the comparison.
+
+Two things follow, and they point in opposite directions. The binding constraint on applying this
+instrument to public data is not that compensatory flips are rare inside libraries --- they are
+not --- but that most depositions do not publish enough annotation to tell whether they contain
+any. And the flips that do exist are concentrated rather than spread: \jdg{scBiggest} of the
+\jdg{scFlips}, or \jdg{scBiggestPct}, sit in a single library, whose reference profiles are too
+poorly measured for the outcome to be computed on most of them
+(\S\ref{sec:second}). Run through the criterion rather than counted by pattern, the
+\jdg{scNewLibs} libraries in this record that the present paper does not already analyse yield
+\jdg{scNewAdmit} admissible interventions between them. That is a statement about the surveyed record and not about what exists:
+a corpus with the required annotation would supply more, and the point of stating the boundary is
+to say what such a corpus would have to look like.
 
 We identify these libraries by name and do not use the survey's own designed-versus-natural
 label, which is too coarse to carry a claim at this granularity: the two libraries analysed as
@@ -542,6 +560,45 @@ deviation of \jdg{rpMaxDiff} and a median of \jdg{rpMedDiff}. \textbf{The outcom
 anywhere in it.} Nothing in this paper is therefore circular in the way a profile-constrained
 structure comparison would be.
 
+\subsection{How much the outcome can resolve, and the gate that follows from it}
+\label{sec:ceiling}
+
+An outcome that contains no model can still contain too much noise to score one. Before any
+predictor is compared to another, the measurement has to be asked what it can resolve at all, and
+that question has an answer computable from the corpus itself without a second experiment: split
+the reactivity columns that enter \eqref{eq:rescue} into two halves and recompute the outcome on
+each. The two halves are two measurements of the same intervention, so their agreement is the
+outcome's internal consistency, and it is a property of the measurement rather than of anything a
+model does.
+
+Across the \jdg{nAdmitted} admitted interventions the two halves agree at $\jdg{qcPooledR}$.
+Stepped up to the whole measurement, that is a reliability of \jdg{qcReliab}, and the correlation
+that \emph{any} predictor can attain with this outcome is bounded above by its square root,
+\jdg{qcCeiling}. \textbf{This bound is the instrument's resolution, and it is what makes the
+comparisons below legible.} The two quantities Section~\ref{sec:ranking} puts side by side ---
+\jdg{rkRhoD} for a covariate that needs no model and \jdg{rkRhoN} for the neural predictor ---
+sit at roughly a third of it. Their near-equality is therefore not the measurement saturating:
+corrected for attenuation they are \jdg{rkRhoDAtt} and \jdg{rkRhoNAtt}, still indistinguishable,
+and both still far from what this outcome would permit.
+
+\paragraph{The gate, measured rather than asserted.} The same split-half statistic, computed
+within sextiles of the construct's reference signal-to-noise, is what a laboratory holding a
+different corpus needs in order to decide whether this instrument will read on it. Reliability
+rises with signal-to-noise across the \jdg{qcNbins} bins, from \jdg{qcLoBin} in the lowest to
+\jdg{qcHiBin} in the highest, and it does not rise monotonically: the fourth bin sits below the
+third, which we report because it was predicted not to happen. It crosses \jdg{qcThrA} only above
+reference signal-to-noise \jdg{qcCross07} and reaches \jdg{qcThrB} in no bin.
+
+The admission cutoff used for the second corpus (\S\ref{sec:second}) is \jdg{qcAsserted}, and it
+was never estimated from anything --- the deposit it rejects reaches \jdg{xnFseSnHi} and the one
+it accepts starts at \jdg{xnSl5SnLo}, so nothing was ever observed on either side of it. We leave
+that cutoff where it is, because moving it after seeing which corpora it admits is exactly the
+tuning this paper refuses elsewhere, and we state instead what the curve says: at
+\jdg{qcAsserted} the outcome is admitted at the bottom of its reliability range, and a corpus
+that wants the instrument at full resolution needs reference signal-to-noise above
+\jdg{qcCross07}. That sentence, and not the cutoff, is the transferable part.
+
+% =====================================================================
 \subsection{Estimation, and the one assumption it needs}
 \label{sec:estimation}
 
@@ -1214,13 +1271,18 @@ designed. We applied them unchanged to natural RNA from \jdg{xnFamilies} familie
 \jdg{xnProbes} probe chemistries, with no parameter of the criterion altered.
 
 The criterion transfers. It admits \jdg{xnAdmitDms} interventions under one chemistry and
-\jdg{xnAdmitTwoA} under the other, \jdg{xnShared} of them the same molecular events seen twice,
-and it refuses everything it should: a frameshift-element deposit contributes \jdg{xnFseFlips}
-candidate flips and \jdg{xnFseAdmit} usable ones, because its reference profiles carry
-signal-to-noise \jdg{xnFseSnLo} to \jdg{xnFseSnHi} against a cutoff of \jdg{xnSnCut}. The
-deposit we do use clears it: its lowest reference signal-to-noise is \jdg{xnSl5SnLo}. A corpus
-whose wild types are poorly measured yields nothing, which is the correct behaviour and not a
-failure of transfer.
+\jdg{xnAdmitTwoA} under the other, \jdg{xnShared} of them the same molecular events seen twice.
+It also refuses, and the refusal is where the unit matters again. A frameshift-element library
+contributes \jdg{xnFseFlips} candidate flips; its DMS deposit yields \jdg{xnFseAdmit} usable
+ones, because that deposit's reference profiles carry signal-to-noise \jdg{xnFseSnLo} to
+\jdg{xnFseSnHi} against a cutoff of \jdg{xnSnCut}. The same library's deposit under the other
+probe, at the same cutoff, yields \jdg{xnFseAdmitTwoA}. The zero is a property of one deposit and
+not of the library, and an earlier version of this section read it as the second: it reported the
+zero alone and concluded that a poorly measured corpus yields nothing. What the two deposits
+together show is narrower and more useful --- the gate acts on the measurement rather than on the
+molecules, so the same designs pass or fail according to how well that deposit was read. The
+deposit we do use clears the gate comfortably: its lowest reference signal-to-noise is
+\jdg{xnSl5SnLo}.
 
 The scoring step transfers too, and stating that correctly took a retraction. Within-stratum
 rank agreement between each predictor and measured rescue is \jdg{xnRhoVDms}
@@ -1265,6 +1327,10 @@ which is what makes the transfer a property of the molecules rather than of one 
 
 \subsection{Which flips rescue, and the free baseline nobody reports}
 \label{sec:ranking}
+
+Both quantities below are attenuated by the outcome's own reliability, whose bound
+Section~\ref{sec:ceiling} establishes at \jdg{qcCeiling}; they are reported uncorrected, as
+measured, and the corrected pair is given there.
 
 The contrast above is a causal one and conditions on helix depth, because design programs choose
 both what a pair is and where it goes. An experimenter asks a different question --- given this
