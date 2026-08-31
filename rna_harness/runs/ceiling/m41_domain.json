@@ -1,0 +1,627 @@
+{
+ "declaration": "m41_domain_declaration.json",
+ "cost": "offline, $0",
+ "V": {
+  "V1_lineage_jaccard": {
+   "15KLIB_2A3_0000|15KREP_2A3_0000": 1.0,
+   "15KLIB_2A3_0000|15KREP_2A3_0001": 1.0,
+   "15KREP_2A3_0000|15KREP_2A3_0001": 1.0
+  },
+  "V1_pass": true,
+  "V1b_reverse_control": {
+   "15KLIB_2A3_0000|M3SARS_2A3_0000": 0.0,
+   "15KLIB_2A3_0000|M2SL5_2A3_0000": 0.0,
+   "M3SARS_2A3_0000|M2SL5_2A3_0000": 0.0
+  },
+  "V1b_pass": true
+ },
+ "L": {
+  "libraries": {
+   "15K_library": {
+    "deposits": [
+     "15KLIB_2A3_0000",
+     "15KLIB_DMS_0000",
+     "15KREP_2A3_0000",
+     "15KREP_DMS_0000",
+     "15KREP_2A3_0001",
+     "15KREP_DMS_0001"
+    ],
+    "n_deposits": 6,
+    "n_distinct_constructs": 15000,
+    "n_distinct_flips": 34
+   },
+   "M3SARS_fse": {
+    "deposits": [
+     "M3SARS_2A3_0000",
+     "M3SARS_DMS_0000"
+    ],
+    "n_deposits": 2,
+    "n_distinct_constructs": 16071,
+    "n_distinct_flips": 3954
+   },
+   "M2SL5": {
+    "deposits": [
+     "M2SL5_2A3_0000",
+     "M2SL5_DMS_0000"
+    ],
+    "n_deposits": 2,
+    "n_distinct_constructs": 2499,
+    "n_distinct_flips": 160
+   },
+   "TTYH2_ECS": {
+    "deposits": [
+     "TTYH2_DMS_0001"
+    ],
+    "n_deposits": 1,
+    "flip_count_route": "sequence_spectrum__deposit_publishes_no_names",
+    "n_distinct_constructs": 0,
+    "n_distinct_flips": 22
+   }
+  },
+  "n_deposits": 11,
+  "n_distinct_flips_total": 4170,
+  "n_libraries_lineage_correct": 4,
+  "n_libraries_manuscript_prints": 6,
+  "flips_manuscript_prints": 4340
+ },
+ "A": {
+  "15K_library": {
+   "already_analysed": false,
+   "deposits": {
+    "15KLIB_2A3_0000": {
+     "rmdb_id": "15KLIB_2A3_0000",
+     "n_constructs": 15000,
+     "window_cols": 103,
+     "n_families_offset_ok": 18,
+     "n_families_offset_dropped": 0,
+     "n_admitted": 1,
+     "excluded": {
+      "no_wild_type": 0,
+      "ambiguous": 0,
+      "length_mismatch": 0,
+      "not_two_positions": 0,
+      "not_orientation_flip": 830,
+      "pair_not_canonical": 36,
+      "tag_position_mismatch": 33,
+      "singles_missing": 0,
+      "low_sn": 0,
+      "no_outcome": 0
+     },
+     "by_pair_type": {
+      "CG": 1
+     },
+     "sn_reference_min": -0.125,
+     "sn_reference_median": 4.7995,
+     "sn_reference_max": 39.516
+    },
+    "15KLIB_DMS_0000": {
+     "rmdb_id": "15KLIB_DMS_0000",
+     "n_constructs": 15000,
+     "window_cols": 103,
+     "n_families_offset_ok": 18,
+     "n_families_offset_dropped": 0,
+     "n_admitted": 1,
+     "excluded": {
+      "no_wild_type": 0,
+      "ambiguous": 0,
+      "length_mismatch": 0,
+      "not_two_positions": 0,
+      "not_orientation_flip": 830,
+      "pair_not_canonical": 36,
+      "tag_position_mismatch": 33,
+      "singles_missing": 0,
+      "low_sn": 0,
+      "no_outcome": 0
+     },
+     "by_pair_type": {
+      "CG": 1
+     },
+     "sn_reference_min": -1.672,
+     "sn_reference_median": 4.0505,
+     "sn_reference_max": 26.422
+    },
+    "15KREP_2A3_0000": {
+     "rmdb_id": "15KREP_2A3_0000",
+     "n_constructs": 15000,
+     "window_cols": 100,
+     "n_families_offset_ok": 18,
+     "n_families_offset_dropped": 0,
+     "n_admitted": 0,
+     "excluded": {
+      "no_wild_type": 0,
+      "ambiguous": 0,
+      "length_mismatch": 0,
+      "not_two_positions": 0,
+      "not_orientation_flip": 830,
+      "pair_not_canonical": 36,
+      "tag_position_mismatch": 2,
+      "singles_missing": 32,
+      "low_sn": 0,
+      "no_outcome": 0
+     },
+     "by_pair_type": {},
+     "sn_reference_min": -0.045,
+     "sn_reference_median": 0.244,
+     "sn_reference_max": 15.382
+    },
+    "15KREP_DMS_0000": {
+     "rmdb_id": "15KREP_DMS_0000",
+     "n_constructs": 15000,
+     "window_cols": 100,
+     "n_families_offset_ok": 18,
+     "n_families_offset_dropped": 0,
+     "n_admitted": 0,
+     "excluded": {
+      "no_wild_type": 0,
+      "ambiguous": 0,
+      "length_mismatch": 0,
+      "not_two_positions": 0,
+      "not_orientation_flip": 830,
+      "pair_not_canonical": 36,
+      "tag_position_mismatch": 2,
+      "singles_missing": 32,
+      "low_sn": 0,
+      "no_outcome": 0
+     },
+     "by_pair_type": {},
+     "sn_reference_min": -0.036,
+     "sn_reference_median": 0.267,
+     "sn_reference_max": 14.86
+    },
+    "15KREP_2A3_0001": {
+     "rmdb_id": "15KREP_2A3_0001",
+     "void": "offset_unrecoverable",
+     "n_constructs": 60000,
+     "n_families_seen": 0
+    },
+    "15KREP_DMS_0001": {
+     "rmdb_id": "15KREP_DMS_0001",
+     "void": "offset_unrecoverable",
+     "n_constructs": 60000,
+     "n_families_seen": 0
+    }
+   },
+   "admission_identical_across_deposits": false
+  },
+  "M3SARS_fse": {
+   "already_analysed": true,
+   "deposits": {
+    "M3SARS_2A3_0000": {
+     "rmdb_id": "M3SARS_2A3_0000",
+     "n_constructs": 16071,
+     "window_cols": 130,
+     "n_families_offset_ok": 3,
+     "n_families_offset_dropped": 0,
+     "n_admitted": 75,
+     "excluded": {
+      "no_wild_type": 0,
+      "ambiguous": 0,
+      "length_mismatch": 0,
+      "not_two_positions": 0,
+      "not_orientation_flip": 11805,
+      "pair_not_canonical": 0,
+      "tag_position_mismatch": 0,
+      "singles_missing": 0,
+      "low_sn": 3879,
+      "no_outcome": 0
+     },
+     "by_pair_type": {
+      "AU": 43,
+      "CG": 32
+     },
+     "sn_reference_min": -0.022,
+     "sn_reference_median": 0.514,
+     "sn_reference_max": 11.829
+    },
+    "M3SARS_DMS_0000": {
+     "rmdb_id": "M3SARS_DMS_0000",
+     "n_constructs": 16071,
+     "window_cols": 130,
+     "n_families_offset_ok": 3,
+     "n_families_offset_dropped": 0,
+     "n_admitted": 0,
+     "excluded": {
+      "no_wild_type": 0,
+      "ambiguous": 0,
+      "length_mismatch": 0,
+      "not_two_positions": 0,
+      "not_orientation_flip": 11805,
+      "pair_not_canonical": 0,
+      "tag_position_mismatch": 0,
+      "singles_missing": 0,
+      "low_sn": 3954,
+      "no_outcome": 0
+     },
+     "by_pair_type": {},
+     "sn_reference_min": -0.082,
+     "sn_reference_median": 0.258,
+     "sn_reference_max": 6.196
+    }
+   },
+   "admission_identical_across_deposits": false
+  },
+  "M2SL5": {
+   "already_analysed": true,
+   "deposits": {
+    "M2SL5_2A3_0000": {
+     "rmdb_id": "M2SL5_2A3_0000",
+     "n_constructs": 2499,
+     "window_cols": 139,
+     "n_families_offset_ok": 3,
+     "n_families_offset_dropped": 0,
+     "n_admitted": 152,
+     "excluded": {
+      "no_wild_type": 0,
+      "ambiguous": 0,
+      "length_mismatch": 0,
+      "not_two_positions": 0,
+      "not_orientation_flip": 1121,
+      "pair_not_canonical": 33,
+      "tag_position_mismatch": 0,
+      "singles_missing": 0,
+      "low_sn": 8,
+      "no_outcome": 0
+     },
+     "by_pair_type": {
+      "CG": 82,
+      "AU": 54,
+      "GU": 16
+     },
+     "sn_reference_min": 0.004,
+     "sn_reference_median": 7.799,
+     "sn_reference_max": 23.905
+    },
+    "M2SL5_DMS_0000": {
+     "rmdb_id": "M2SL5_DMS_0000",
+     "n_constructs": 2499,
+     "window_cols": 139,
+     "n_families_offset_ok": 3,
+     "n_families_offset_dropped": 0,
+     "n_admitted": 143,
+     "excluded": {
+      "no_wild_type": 0,
+      "ambiguous": 0,
+      "length_mismatch": 0,
+      "not_two_positions": 0,
+      "not_orientation_flip": 1121,
+      "pair_not_canonical": 33,
+      "tag_position_mismatch": 0,
+      "singles_missing": 0,
+      "low_sn": 17,
+      "no_outcome": 0
+     },
+     "by_pair_type": {
+      "CG": 80,
+      "AU": 51,
+      "GU": 12
+     },
+     "sn_reference_min": -1.224,
+     "sn_reference_median": 5.558,
+     "sn_reference_max": 22.928
+    }
+   },
+   "admission_identical_across_deposits": false
+  },
+  "TTYH2_ECS": {
+   "already_analysed": false,
+   "deposits": {
+    "TTYH2_DMS_0001": {
+     "rmdb_id": "TTYH2_DMS_0001",
+     "n_constructs": 173,
+     "read_path": "nameless_modal",
+     "modal_length": 128,
+     "n_at_modal_length": 121,
+     "window_cols": 115,
+     "n_singles": 0,
+     "n_admitted": 0,
+     "excluded": {
+      "length_off_mode": 52,
+      "not_two_positions": 92,
+      "not_orientation_flip": 28,
+      "pair_not_canonical": 0,
+      "singles_missing": 0,
+      "low_sn": 0,
+      "no_outcome": 0
+     },
+     "by_pair_type": {},
+     "sn_reference_min": 0.0,
+     "sn_reference_median": 0.0,
+     "sn_reference_max": 0.0
+    }
+   },
+   "admission_identical_across_deposits": true
+  }
+ },
+ "A_new_admitted": {
+  "15K_library": 2,
+  "TTYH2_ECS": 0
+ },
+ "primary_admitted_n": 4317,
+ "Q": {
+  "calibrated": true,
+  "n_usable": 4319,
+  "nbins": 6,
+  "min_bin": 30,
+  "pooled_split_half_r": 0.6692,
+  "spearman_brown_reliability": 0.8018,
+  "attenuation_ceiling_on_any_predictor": 0.8955,
+  "bins": [
+   {
+    "bin": 0,
+    "n": 699,
+    "sn_lo": 0.008,
+    "sn_hi": 3.169,
+    "sn_median": 1.317,
+    "split_half_r": 0.5343,
+    "split_half_spearman": 0.5934,
+    "R_mean": 0.4058,
+    "R_sd": 0.2224,
+    "underpowered": false
+   },
+   {
+    "bin": 1,
+    "n": 741,
+    "sn_lo": 3.169,
+    "sn_hi": 6.425,
+    "sn_median": 4.722,
+    "split_half_r": 0.6124,
+    "split_half_spearman": 0.6776,
+    "R_mean": 0.4332,
+    "R_sd": 0.2488,
+    "underpowered": false
+   },
+   {
+    "bin": 2,
+    "n": 719,
+    "sn_lo": 6.425,
+    "sn_hi": 9.329,
+    "sn_median": 7.801,
+    "split_half_r": 0.6857,
+    "split_half_spearman": 0.7221,
+    "R_mean": 0.4159,
+    "R_sd": 0.2444,
+    "underpowered": false
+   },
+   {
+    "bin": 3,
+    "n": 720,
+    "sn_lo": 9.329,
+    "sn_hi": 13.263,
+    "sn_median": 11.1385,
+    "split_half_r": 0.7209,
+    "split_half_spearman": 0.7076,
+    "R_mean": 0.4425,
+    "R_sd": 0.2431,
+    "underpowered": false
+   },
+   {
+    "bin": 4,
+    "n": 720,
+    "sn_lo": 13.263,
+    "sn_hi": 18.5443,
+    "sn_median": 15.628,
+    "split_half_r": 0.6872,
+    "split_half_spearman": 0.718,
+    "R_mean": 0.4378,
+    "R_sd": 0.234,
+    "underpowered": false
+   },
+   {
+    "bin": 5,
+    "n": 720,
+    "sn_lo": 18.5443,
+    "sn_hi": 43.312,
+    "sn_median": 22.496,
+    "split_half_r": 0.7409,
+    "split_half_spearman": 0.7839,
+    "R_mean": 0.4122,
+    "R_sd": 0.2978,
+    "underpowered": false
+   }
+  ],
+  "reliability_crossings": {
+   "0.5": 0.008,
+   "0.7": 9.329,
+   "0.9": null
+  },
+  "asserted_gate": 1.0,
+  "monotone_in_sn": false
+ },
+ "Q_superset": {
+  "calibrated": true,
+  "n_usable": 4690,
+  "nbins": 6,
+  "min_bin": 30,
+  "pooled_split_half_r": 0.6674,
+  "spearman_brown_reliability": 0.8005,
+  "attenuation_ceiling_on_any_predictor": 0.8947,
+  "bins": [
+   {
+    "bin": 0,
+    "n": 782,
+    "sn_lo": -0.272,
+    "sn_hi": 2.4175,
+    "sn_median": 0.7965,
+    "split_half_r": 0.4883,
+    "split_half_spearman": 0.5431,
+    "R_mean": 0.378,
+    "R_sd": 0.2217,
+    "underpowered": false
+   },
+   {
+    "bin": 1,
+    "n": 766,
+    "sn_lo": 2.4175,
+    "sn_hi": 5.671,
+    "sn_median": 4.0615,
+    "split_half_r": 0.649,
+    "split_half_spearman": 0.7086,
+    "R_mean": 0.4218,
+    "R_sd": 0.2633,
+    "underpowered": false
+   },
+   {
+    "bin": 2,
+    "n": 796,
+    "sn_lo": 5.671,
+    "sn_hi": 9.033,
+    "sn_median": 7.18,
+    "split_half_r": 0.6551,
+    "split_half_spearman": 0.6985,
+    "R_mean": 0.4102,
+    "R_sd": 0.2463,
+    "underpowered": false
+   },
+   {
+    "bin": 3,
+    "n": 782,
+    "sn_lo": 9.033,
+    "sn_hi": 12.732,
+    "sn_median": 10.693,
+    "split_half_r": 0.7385,
+    "split_half_spearman": 0.7364,
+    "R_mean": 0.4228,
+    "R_sd": 0.2456,
+    "underpowered": false
+   },
+   {
+    "bin": 4,
+    "n": 781,
+    "sn_lo": 12.732,
+    "sn_hi": 18.46,
+    "sn_median": 15.14,
+    "split_half_r": 0.7021,
+    "split_half_spearman": 0.7237,
+    "R_mean": 0.4339,
+    "R_sd": 0.2397,
+    "underpowered": false
+   },
+   {
+    "bin": 5,
+    "n": 783,
+    "sn_lo": 18.46,
+    "sn_hi": 43.312,
+    "sn_median": 22.316,
+    "split_half_r": 0.7346,
+    "split_half_spearman": 0.773,
+    "R_mean": 0.408,
+    "R_sd": 0.2942,
+    "underpowered": false
+   }
+  ],
+  "reliability_crossings": {
+   "0.5": 2.4175,
+   "0.7": 9.033,
+   "0.9": null
+  },
+  "asserted_gate": 1.0,
+  "monotone_in_sn": false
+ },
+ "Q_pool_by_source": {
+  "15K_library": 2,
+  "primary": 4317
+ },
+ "Q_superset_by_source": {
+  "15K_library": 2,
+  "primary": 4688
+ },
+ "D": [
+  {
+   "library": "15K_library",
+   "already_analysed": false,
+   "n_deposits": 6,
+   "n_admitted_total": 2,
+   "sn_reference_median": 2.1588,
+   "sn_reference_min": -1.672,
+   "voids": [
+    "offset_unrecoverable"
+   ]
+  },
+  {
+   "library": "M3SARS_fse",
+   "already_analysed": true,
+   "n_deposits": 2,
+   "n_admitted_total": 75,
+   "sn_reference_median": 0.386,
+   "sn_reference_min": -0.082,
+   "voids": []
+  },
+  {
+   "library": "M2SL5",
+   "already_analysed": true,
+   "n_deposits": 2,
+   "n_admitted_total": 295,
+   "sn_reference_median": 6.6785,
+   "sn_reference_min": -1.224,
+   "voids": []
+  },
+  {
+   "library": "TTYH2_ECS",
+   "already_analysed": false,
+   "n_deposits": 1,
+   "n_admitted_total": 0,
+   "sn_reference_median": 0.0,
+   "sn_reference_min": 0.0,
+   "voids": []
+  }
+ ],
+ "elapsed_s": 130.3,
+ "log": [
+  "\n==========================================================================\n=== V 臂 验证(先于任何结果)\n==========================================================================",
+  "  V1 同谱系构建名 Jaccard {'15KLIB_2A3_0000|15KREP_2A3_0000': 1.0, '15KLIB_2A3_0000|15KREP_2A3_0001': 1.0, '15KREP_2A3_0000|15KREP_2A3_0001': 1.0}  -> 通过",
+  "  V1b 反向对照(不同库不得塌缩) {'15KLIB_2A3_0000|M3SARS_2A3_0000': 0.0, '15KLIB_2A3_0000|M2SL5_2A3_0000': 0.0, 'M3SARS_2A3_0000|M2SL5_2A3_0000': 0.0}  -> 通过",
+  "\n==========================================================================\n=== L 臂 谱系更正:库=设计集,不是沉积,也不是沉积名\n==========================================================================",
+  "    15K_library    去重构建  15000  谱系正确翻转 34",
+  "    M3SARS_fse     去重构建  16071  谱系正确翻转 3954",
+  "    M2SL5          去重构建   2499  谱系正确翻转 160",
+  "    TTYH2_ECS      去重构建      0  谱系正确翻转 22",
+  "  沉积 11  →  谱系去重后的库 4 (论文印 6)",
+  "\n==========================================================================\n=== A 臂 准入:每一个尚未分析的库\n==========================================================================",
+  "  15K_library    15KLIB_2A3_0000    纳入 1",
+  "  15K_library    15KLIB_DMS_0000    纳入 1",
+  "  15K_library    15KREP_2A3_0000    纳入 0",
+  "  15K_library    15KREP_DMS_0000    纳入 0",
+  "  15K_library    15KREP_2A3_0001    作废 offset_unrecoverable",
+  "  15K_library    15KREP_DMS_0001    作废 offset_unrecoverable",
+  "    ↳ 同谱系沉积的准入台账一致:False  [1, 1, 0, 0]",
+  "  M3SARS_fse     M3SARS_2A3_0000    纳入 75",
+  "  M3SARS_fse     M3SARS_DMS_0000    纳入 0",
+  "    ↳ 同谱系沉积的准入台账一致:False  [75, 0]",
+  "  M2SL5          M2SL5_2A3_0000     纳入 152",
+  "  M2SL5          M2SL5_DMS_0000     纳入 143",
+  "    ↳ 同谱系沉积的准入台账一致:False  [152, 143]",
+  "  TTYH2_ECS      TTYH2_DMS_0001     纳入 0",
+  "\n  公开记录里此前未用过的库共提供纳入干预:{'15K_library': 2, 'TTYH2_ECS': 0}",
+  "\n  载入主语料以估计信度曲线 ...",
+  "    主语料重建出的干预 4752",
+  "    Definition 1 在主语料上纳入 4317(论文印的数),用于限定 Q 臂",
+  "    其中匹配上纳入集合的重建记录 4317",
+  "\n  --- 主臂:仅纳入的干预(declaration 声明的口径) ---",
+  "\n==========================================================================\n=== Q 臂 准入闸门:测曲线,而不是断言阈值\n==========================================================================",
+  "  可用于信度估计的干预 4319 / 4319",
+  "    bin0  SN [   0.008,    3.169)  n=   699  半分信度 r=+0.5343",
+  "    bin1  SN [   3.169,    6.425)  n=   741  半分信度 r=+0.6124",
+  "    bin2  SN [   6.425,    9.329)  n=   719  半分信度 r=+0.6857",
+  "    bin3  SN [   9.329,   13.263)  n=   720  半分信度 r=+0.7209",
+  "    bin4  SN [  13.263,   18.544)  n=   720  半分信度 r=+0.6872",
+  "    bin5  SN [  18.544,   43.312)  n=   720  半分信度 r=+0.7409",
+  "  半分信度首次达到阈值的 SN 下沿:{'0.5': 0.008, '0.7': 9.329, '0.9': None}   (旧断言值 1.0)",
+  "  合并半分信度 r=+0.6692 → Spearman-Brown 全测信度 0.8018 → 任何预测器可达相关的上界 0.8955",
+  "\n  --- 次臂:所有可重建的双突变(超集,报告出来但不作判据) ---",
+  "\n==========================================================================\n=== Q 臂 准入闸门:测曲线,而不是断言阈值\n==========================================================================",
+  "  可用于信度估计的干预 4690 / 4690",
+  "    bin0  SN [  -0.272,    2.417)  n=   782  半分信度 r=+0.4883",
+  "    bin1  SN [   2.417,    5.671)  n=   766  半分信度 r=+0.6490",
+  "    bin2  SN [   5.671,    9.033)  n=   796  半分信度 r=+0.6551",
+  "    bin3  SN [   9.033,   12.732)  n=   782  半分信度 r=+0.7385",
+  "    bin4  SN [  12.732,   18.460)  n=   781  半分信度 r=+0.7021",
+  "    bin5  SN [  18.460,   43.312)  n=   783  半分信度 r=+0.7346",
+  "  半分信度首次达到阈值的 SN 下沿:{'0.5': 2.4175, '0.7': 9.033, '0.9': None}   (旧断言值 1.0)",
+  "  合并半分信度 r=+0.6674 → Spearman-Brown 全测信度 0.8005 → 任何预测器可达相关的上界 0.8947",
+  "\n==========================================================================\n=== D 臂 域:候选翻转 x 参考信噪比\n==========================================================================",
+  "  15K_library    纳入      2  参考SN中位 2.1588  作废 ['offset_unrecoverable']",
+  "  M3SARS_fse     纳入     75  参考SN中位 0.386  作废 -",
+  "  M2SL5          纳入    295  参考SN中位 6.6785  作废 -",
+  "  TTYH2_ECS      纳入      0  参考SN中位 0.0  作废 -"
+ ]
+}
