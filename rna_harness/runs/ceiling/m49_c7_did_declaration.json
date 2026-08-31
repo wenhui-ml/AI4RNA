@@ -1,0 +1,55 @@
+{
+  "id": "m49_c7_did",
+  "title": "C7 is read as empty on a covering interval. Apply C8's own criterion to it, and test the arm asymmetry the current reading does not explain.",
+  "frozen_before_code": true,
+  "cost": "offline, $0 -- no API, no GPU, no new download. Reads M26's records, m26c_pneural_cache.npz, and m39_exposure_tiers.json.",
+
+  "why": [
+    "The ledger marks C7 (leakage) EMPTY on a difference whose interval covers zero, and marks C8 (probe chemistry) UNRESOLVED on a difference whose interval covers zero. The stated reason for C8 is that its interval reaches far enough to permit the whole quantity being measured. That criterion was never applied to C7.",
+    "M39 reports RibonanzaNet 0.21720 (clean) -> 0.13463 (exposed) and ViennaRNA 0.13342 -> 0.00115. The manuscript reads this as 'exposed designs are harder, not remembered'. That reading does not explain why the model which CANNOT have memorised anything loses all of its skill on the exposed subset while the model which could still retains some.",
+    "The quantity that separates 'exposed designs are harder' from 'partial memorisation' is the difference in drops, and this paper's own rule 69 forbids comparing two point estimates without an interval on their difference. No such interval exists. This run computes it."
+  ],
+
+  "known_before_the_run": {
+    "note": "These are arithmetic on numbers M39 already published, and are declared as ALREADY KNOWN rather than as predictions, so that nothing below can be read as a stake that was safe.",
+    "did_point_estimate": "(0.13342-0.00115) - (0.21720-0.13463) = +0.04970",
+    "c7_reach_ratio": "0.17185 / 0.21720 = 0.791",
+    "c8_reach_ratio": "0.2305 / 0.3024 = 0.762"
+  },
+
+  "arms": {
+    "A1": "reproduce M39's four arm slopes (RibonanzaNet/ViennaRNA x clean/exposed) with an estimator written here and importing nothing from m39 or m26d",
+    "A2": "reproduce M39's two published clean-minus-exposed intervals at the same seed and NBOOT",
+    "A3": "the PAIRED difference-in-differences, both models evaluated inside the same target-clustered resample draw, with a percentile interval",
+    "A4": "exposure-label permutation null for the DiD: permute which design cells carry the exposed label, count-matched at 20 of 158, strata untouched",
+    "A5": "each arm's own slope interval on the exposed subset, so that 'the neural model retains skill where the control does not' is either resolved or reported as unresolved",
+    "A6": "the reach ratio -- interval endpoint against the quantity being measured -- computed identically for C7 and for C8"
+  },
+
+  "verification_before_any_arm_is_read": {
+    "V1_zero_point": "the DiD of a model against ITSELF must be exactly 0.0 in every resample draw",
+    "V2_equivalent_form": "the DiD is (vienna_drop - neural_drop) and is algebraically also (gap_on_exposed - gap_on_clean). Both routes must be computed and must agree to 1e-12 in every draw.",
+    "V3_reverse_control": "the four arm slopes must reproduce M39's published values to 1e-4, and A2 must reproduce M39's two published intervals to 1e-4, before A3 is read",
+    "V4_identity": "the within-stratum slope of a column on itself must be exactly 1.0, and the slope on a constant column must be None rather than 0"
+  },
+
+  "kill_conditions": {
+    "K1": "if A1 fails to reproduce any of M39's four slopes to 1e-4, this run is VOID -- it is not measuring the same object",
+    "K2": "if V1 or V2 fails at any draw, VOID",
+    "K3": "if the A4 permutation null is not centred within 0.010 of zero, the permutation is rebuilding structure and A4 is reported as failed rather than as a null",
+    "K4": "if fewer than 15 of the 20 exposed cells survive into the DiD (a cell with no within-stratum variance drops out), the exposed arm is too thin and A3 is reported without a p-value"
+  },
+
+  "staked_predictions": [
+    {"id": "S1", "text": "the DiD interval EXCLUDES zero", "note": "genuine stake -- the point estimate is known, the interval is not"},
+    {"id": "S2", "text": "the A4 permutation null is centred within 0.010 of zero and the observed DiD sits above its 95th percentile"},
+    {"id": "S3", "text": "the neural model's slope on the exposed subset has an interval EXCLUDING zero, i.e. it demonstrably retains skill where the thermodynamic control does not"},
+    {"id": "S4", "text": "the reach ratio for C7 is at least 0.5, so C7 must be reclassified from empty to unresolved under C8's own criterion"}
+  ],
+
+  "wording_rules_binding_on_the_manuscript": {
+    "W1": "the DiD is reported in ABSOLUTE units. The relative version (each model's drop as a fraction of its own clean skill) is NOT computed and NOT reported, because it is a ratio of two noisy quantities and section 5.7 withdraws this paper's own estimator for exactly that shape.",
+    "W2": "whatever A3 returns, C7 is reclassified from empty to unresolved if S4 holds, because the criterion applied to C8 must be applied to C7. A reclassification is not a finding about leakage; it is the ledger being made self-consistent.",
+    "W3": "if the DiD resolves, the licensed statement is that the two models do not lose skill on the exposed subset by the same amount. It is NOT 'the neural model memorised', which this design cannot show, and the manuscript must say so at the number."
+  }
+}
