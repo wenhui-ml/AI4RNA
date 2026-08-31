@@ -1,0 +1,53 @@
+可计分格 155  深度方向 +1
+
+=== V 反向对照:先复现 M44 的十二个点估计
+  十二个量,最大差 4.54e-06  -> 通过
+
+=== 冻结规则算出 delta_tube(只用免费基线和语料几何,不碰任何模型)
+  深度捞回 0.16127@0.1 → 0.63448@0.5   斜率 1.18302/单位预算
+  格大小中位 25 ⇒ 一条构建体 = 0.04000 的预算
+  **delta_tube = 0.04732**  (一条额外构建体买到的捞回)
+
+=== E1/E3/E4  delta_star = TOST 在 alpha=0.05 下宣告等价所需的最小 margin
+
+  预算 10%   (delta_tube = 0.04732)
+    ViennaRNA                差 +0.01114  90%CI [-0.00533,+0.03077]  delta*=0.03077  等价
+    EternaFold               差 +0.01061  90%CI [-0.00531,+0.02958]  delta*=0.02958  等价
+    RNAstructure             差 +0.01220  90%CI [-0.00353,+0.03016]  delta*=0.03016  等价
+    RibonanzaNet             差 -0.00477  90%CI [-0.01850,+0.01123]  delta*=0.01850  等价
+    depth_then_ViennaRNA     差 +0.00424  90%CI [-0.00666,+0.01548]  delta*=0.01548  等价
+    depth_then_EternaFold    差 +0.00371  90%CI [-0.00602,+0.01542]  delta*=0.01542  等价
+    depth_then_RNAstructure  差 +0.00531  90%CI [-0.00478,+0.01633]  delta*=0.01633  等价
+    depth_then_RibonanzaNet  差 +0.00690  90%CI [-0.00401,+0.01880]  delta*=0.01880  等价
+    depth                    差 +0.00000  90%CI [+0.00000,+0.00000]  delta*=0.00000  (自比,零点)
+
+  预算 25%   (delta_tube = 0.04732)
+    ViennaRNA                差 -0.00159  90%CI [-0.02600,+0.02535]  delta*=0.02600  等价
+    EternaFold               差 -0.00053  90%CI [-0.02334,+0.02458]  delta*=0.02458  等价
+    RNAstructure             差 +0.00265  90%CI [-0.02114,+0.02792]  delta*=0.02792  等价
+    RibonanzaNet             差 +0.00849  90%CI [-0.01060,+0.02944]  delta*=0.02944  等价
+    depth_then_ViennaRNA     差 +0.01114  90%CI [+0.00237,+0.02198]  delta*=0.02198  等价
+    depth_then_EternaFold    差 +0.01008  90%CI [+0.00092,+0.02156]  delta*=0.02156  等价
+    depth_then_RNAstructure  差 +0.01273  90%CI [+0.00360,+0.02366]  delta*=0.02366  等价
+    depth_then_RibonanzaNet  差 +0.01963  90%CI [+0.01217,+0.02784]  delta*=0.02784  等价
+    depth                    差 +0.00000  90%CI [+0.00000,+0.00000]  delta*=0.00000  (自比,零点)
+
+  预算 50%   (delta_tube = 0.04732)
+    ViennaRNA                差 -0.02971  90%CI [-0.05927,+0.00486]  delta*=0.05927  **不等价**
+    EternaFold               差 -0.01910  90%CI [-0.05092,+0.01618]  delta*=0.05092  **不等价**
+    RNAstructure             差 -0.02759  90%CI [-0.05559,+0.00504]  delta*=0.05559  **不等价**
+    RibonanzaNet             差 +0.00424  90%CI [-0.02624,+0.03976]  delta*=0.03976  等价
+    depth_then_ViennaRNA     差 +0.01485  90%CI [+0.00478,+0.02656]  delta*=0.02656  等价
+    depth_then_EternaFold    差 +0.01592  90%CI [+0.00608,+0.02749]  delta*=0.02749  等价
+    depth_then_RNAstructure  差 +0.01592  90%CI [+0.00575,+0.02855]  delta*=0.02855  等价
+    depth_then_RibonanzaNet  差 +0.02281  90%CI [+0.01210,+0.03583]  delta*=0.03583  等价
+    depth                    差 +0.00000  90%CI [+0.00000,+0.00000]  delta*=0.00000  (自比,零点)
+
+=== 预注册记分
+  1_all_implementations_equivalent_at_delta_tube   **失败**
+  2_depth_against_itself_below_0001                成立
+  3_some_stacked_arm_not_equivalent                **失败**
+  4_delta_tube_in_range                            成立
+  ** W2 触发:必须逐臂改写,不许整体软化 **
+
+写出 /data/wenhui/openclaude_rna/rna_harness/runs/ceiling/m47_equivalence.json  用时 35.5s
