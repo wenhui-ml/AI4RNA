@@ -162,7 +162,8 @@ own ranked list the advantage lies --- while a budgeted experimenter only ever s
 Prices are reported as direct contrasts and never as shares, because the estimator for a share is
 uninformative here, which we show and withdraw a metric of our own for. We also report what this
 instrument cannot reach: the largest public probing corpus, \jdg{dmSeq} sequences over
-\jdg{dmLib} libraries, holds \jdg{dmCand} candidate interventions in total, so its domain has to be
+\jdg{dmLib} libraries, holds \jdg{dmCand} candidate orientation-flip \emph{sequence pairs} in
+total --- from which the eligibility and signal gates would retain far fewer --- so its domain has to be
 written into a library on purpose rather than found.
 \end{abstract}
 
@@ -197,9 +198,12 @@ which our use departs from the technique's own literature. Mutate-and-map and mu
 use mutations to \emph{establish} which nucleotides pair \citep{kladwang2011two,tian2014correcting,
 cheng2017rna}; the mutation is an instrument aimed at the molecule. We aim it at the model instead:
 given a mutant that was actually made, what did the model predict would happen to the target pair,
-and did the measurement agree? No reference structure enters that comparison, so the degeneracy
-that makes profile-based scoring awkward does not arise, and the saturation does not either,
-because the quantity being predicted is a change rather than a state.
+and did the measurement agree? \textbf{No \emph{inferred} structure enters the outcome of that
+comparison} --- the declared target does enter, and says which pair is the target, how deep it sits
+and whether it crosses (\S\ref{sec:mining}), but nothing on the measured side is a structure
+anybody inferred or any model produced. That is what removes the degeneracy that makes
+profile-based scoring awkward, and the saturation does not arise either, because the quantity being
+predicted is a change rather than a state.
 
 Three things had to be true for this to be a method rather than an observation, and the paper
 establishes them in order. The interventions must be recoverable by a stated rule rather than by
@@ -279,7 +283,8 @@ crossing that survives every choice that produced it (Claim~\ref{claim:budget}).
 (\S\ref{sec:ceiling}): the resolution ceiling as a range under three split rules, the
 signal-to-noise gate above which the outcome is worth reading, and the measured fact that the
 largest public probing corpus --- \jdg{dmSeq} sequences over \jdg{dmLib} libraries --- has a ceiling
-of \jdg{dmCand} candidate interventions, so this instrument's reach cannot be enlarged by finding a
+of \jdg{dmCand} candidate orientation-flip sequence pairs, fewer still after eligibility and
+signal gating, so this instrument's reach cannot be enlarged by finding a
 bigger corpus and has to be written into a library on purpose.
 \item \texttt{designaudit}, which performs all of the above on a corpus file and whose selftest
 reproduces this paper's headline numbers from the public data.
@@ -661,11 +666,18 @@ algorithmically generated insert and delete panels. Searching every one of them 
 sequence pairs that \emph{could} be compensatory orientation flips returns \textbf{\jdg{dmCand}
 candidate pairs in total}, from \jdg{dmContrib} of the \jdg{dmLib} libraries, \jdg{dmTop} of them
 from the largest contributor alone. None overlaps this paper's corpus, so all \jdg{dmNetNew} are
-new; and at the rate at which candidates survive Definition~1 where Definition~1 can be applied at
-all --- \jdg{dmOwnCand} candidates on this paper's own \jdg{dmOwnReg} design regions against
-\jdg{nAdmitted} admitted, \jdg{dmConv} --- the expected admissible yield of that entire corpus is
-about \jdg{dmExpected} interventions. This paper's corpus is \jdg{dmRatio} larger than the ceiling
-of the biggest public alternative.
+new; \textbf{Three quantities have to be kept apart here and we keep them apart.} \jdg{dmCand} is a
+count of \emph{candidate sequence pairs}. Definition~1 then requires the two positions to be a
+designed pair in a declared target structure, which no file in that corpus carries, and the signal
+gate of this section requires an outcome worth reading. Neither can be applied there at all, so the
+number of \emph{eligible} interventions in that corpus is not measured by anything here and the
+number of \emph{scorable} ones still less. What can be said is an extrapolation and is labelled as
+one: on this paper's own \jdg{dmOwnReg} design regions the same search returns \jdg{dmOwnCand}
+candidates against \jdg{nAdmitted} admitted, a conversion of \jdg{dmConv}, and transporting that
+rate gives roughly \jdg{dmExpected}. \textbf{It is a transport from one corpus, not a conversion
+probability}: the libraries differ in composition, design mechanism and annotation, and nothing
+here establishes that they convert alike. Even taken at face value it leaves this paper's
+\jdg{nAdmitted} admitted interventions more than two orders of magnitude above it.
 
 \textbf{That is not a sampling accident, and it is the most useful thing this section reports.}
 These are \emph{design} libraries: they are built to maximise the diversity of molecules assayed,
@@ -2155,8 +2167,8 @@ cannot carry an effect size across corpora, and none is carried.
 The obvious repair is a second corpus of comparable size, and \S\ref{sec:ceiling} reports the
 search for one rather than the wish for one. The largest public probing corpus --- \jdg{dmSeq}
 sequences, \jdg{dmLib} libraries, four synthesis platforms, two chemistries --- has a ceiling of
-\jdg{dmCand} candidate interventions in total, about \jdg{dmExpected} of them expected to survive
-Definition~1. \textbf{This limitation is therefore not one more experiment away.} It is a property
+\jdg{dmCand} candidate orientation-flip sequence pairs in total, of which an extrapolation from
+this corpus's own conversion rate would retain about \jdg{dmExpected} under Definition~1. \textbf{This limitation is therefore not one more experiment away.} It is a property
 of how probing libraries are built: design libraries spend every slot on a new molecule, and an
 intervention needs four slots spent on one. We state the cost of the alternative in
 \S\ref{sec:ceiling} because that, and not another appeal to future work, is what a laboratory can

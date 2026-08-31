@@ -1154,7 +1154,9 @@ put("dmBrute", f"{_v45['V4']['brute_force']:,}".replace(",", "{,}"))
 put("dmPlanted", f"{_v45['V2']['planted']}")
 assert _v45["V3"]["transpositions_equal_known"], "V3's internal identity no longer holds"
 # how far the largest public corpus is from this paper's own yield
-put("dmRatio", f"{4170/_m45['E1']['candidates_total']:.0f}$\\times$")
+# dmRatio was a ratio of two DIFFERENT layers -- admitted interventions over candidate pairs --
+# and the sentence that printed it has been withdrawn. Kept out of the file rather than
+# silently left defined, because an unused macro is an invitation to reuse a bad comparison.
 # the single-nucleotide-mutant library is named in the text, so its count is read out rather than
 # asserted: single mutants of DIFFERENT parents are not near neighbours of each other.
 _snm = [v["candidates"] for k, v in _m45["per_library"].items() if "Single_nt_mutants" in k]
