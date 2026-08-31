@@ -1,0 +1,57 @@
+=== V 臂 验证(先于任何计数)
+  V3 本文语料:野生型格 160  双突变体 4752  已发表配对 4678
+     探测器换位 4678  候选 4602  命中 4602  召回 0.9838  -> 通过
+  V4 子集 2500:穷举 2324 对,分块 2324 对 -> 一致
+  V2 植入 199 个真实取向翻转,找回 199  -> 通过
+  V1 零点 [0, 0, 0] -> 通过
+
+=== E5 标定:本文语料全部设计区 14,194 条 → 候选 88,020,Definition 1 纳入 4317,转化率 0.04905
+
+=== 载入完整语料
+  行 1,643,680  唯一序列 806,573  dataset_name 取值 46  SN_filter==1 243,009  (35s)
+  W4 折叠探针化学后 23 个库(M42 记录 23)
+
+=== 构建体解剖:每个库的恒定两翼(量出来的)
+  恒定前缀 {26: 23}   恒定后缀 {21: 23}
+
+=== E1 上界:逐库(设计区),并与全长比对以检查两翼里有没有条形码
+    DasLabBigLib_OneMil_OpenKnot_Round_2_train         唯一 125,123  设计区 130  换位    10  候选    10  (全长    10)  41s
+    OpenKnot1_Twist_EternaPlayers                      唯一  82,172  设计区 130  换位   174  候选   172  (全长   172)  45s
+    DasLabBigLib_OneMil_RFAM_windows_100mers           唯一  75,656  设计区 130  换位     0  候选     0  (全长     0)  48s
+    DasLabBigLib_OneMil_Coronavirus_genomes_SARS_relat 唯一  70,000  设计区 130  换位     0  候选     0  (全长     0)  51s
+    DasLabBigLib_OneMil_Coronavirus_genomes_SARS_relat 唯一  70,000  设计区 130  换位     0  候选     0  (全长     0)  54s
+    DasLabBigLib_OneMil_Coronavirus_genomes_SARS_relat 唯一  63,351  设计区 130  换位     0  候选     0  (全长     0)  57s
+    DasLabBigLib_OneMil_15K_REP                        唯一  60,000  设计区 130  换位     0  候选     0  (全长     0)  60s
+    DasLabBigLib_OneMil_RNAmake_designs                唯一  52,224  设计区 130  换位     0  候选     0  (全长     0)  62s
+    DasLabBigLib_OneMil_RNAmake_designs_delete_longest 唯一  52,224  设计区 130  换位     0  候选     0  (全长     0)  64s
+    DasLabBigLib_OneMil_RNAmake_designs_insert_bps_int 唯一  51,886  设计区 130  换位     0  候选     0  (全长     0)  67s
+    DasLabBigLib_OneMil_Single_nt_mutants_OpenKnot_Pil 唯一  51,000  设计区 130  换位     0  候选     0  (全长     0)  69s
+    DasLabBigLib_OneMil_RFAM_REP                       唯一  15,541  设计区 130  换位     0  候选     0  (全长     0)  70s
+    15k                                                唯一  15,000  设计区 123  换位     0  候选     0  (全长     0)  70s
+    DasLabBigLib_OneMil_Replicates_from_previous_libra 唯一  15,000  设计区 130  换位     0  候选     0  (全长     0)  71s
+    PK50_AltChemMap_NovaSeq                            唯一   2,729  设计区  68  换位    16  候选    15  (全长    15)  71s
+    PK50_CustomArray                                   唯一   2,729  设计区  68  换位    16  候选    15  (全长    15)  71s
+    PK50_Twist                                         唯一   2,729  设计区  68  换位    16  候选    15  (全长    15)  71s
+    PK50_Twist_epPCR                                   唯一   2,729  设计区  68  换位    16  候选    15  (全长    15)  71s
+    PK50_Wu_Twist                                      唯一   2,729  设计区  68  换位    16  候选    15  (全长    15)  71s
+    SL5_M2seq                                          唯一   2,499  设计区 159  换位     0  候选     0  (全长     0)  72s
+    PK90_CustomArray                                   唯一   2,173  设计区 108  换位     8  候选     8  (全长     8)  72s
+    PK90_Twist                                         唯一   2,173  设计区 108  换位     8  候选     8  (全长     8)  72s
+    PK90_Twist_epPCR                                   唯一   2,173  设计区 108  换位     8  候选     8  (全长     8)  72s
+
+  设计区与全长给出同一个数:是 —— 两翼里没有条形码
+
+  候选合计 205   换位合计 208
+  有贡献的库 10 / 23:{'OpenKnot1_Twist_EternaPlayers': 172, 'PK50_AltChemMap_NovaSeq': 15, 'PK50_CustomArray': 15, 'PK50_Twist': 15, 'PK50_Twist_epPCR': 15, 'PK50_Wu_Twist': 15, 'DasLabBigLib_OneMil_OpenKnot_Round_2_train': 10, 'PK90_CustomArray': 8, 'PK90_Twist': 8, 'PK90_Twist_epPCR': 8}
+  按本文语料的转化率折算,期望可纳入 10.1(本文现有 4170)
+
+=== E3 两端都过 SN_filter:51 / 205
+=== E4 与本文语料交叠 0;净新增 205
+
+=== 预注册记分
+  1_ceiling_exceeds_4170             **失败**
+  2_more_than_four_libraries         成立
+  3_wc_filter_removes_majority       **失败**
+  4_sn_retains_at_least_20pc         成立
+
+写出 /data/wenhui/openclaude_rna/rna_harness/runs/ceiling/m45_flip_ceiling.json  用时 71.9s
