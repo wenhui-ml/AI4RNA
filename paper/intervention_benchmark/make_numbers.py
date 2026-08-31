@@ -734,6 +734,27 @@ for _k, _tag in (("nmut", "MN"), ("emut", "ME"), ("pmut", "MV")):
 put("convNeural", sig(_a4["nmut"]["converted_contrast"], 4))
 put("rhoNeural", sig(_m50["A5_bridge"]["nmut"]["rho_within"], 4))
 put("rhoVienna", sig(_m50["A5_bridge"]["pmut"]["rho_within"], 4))
+
+# ---- M51: section 5.6 chose the level arm over the change arm because it was larger and said in
+# print that it put no interval on the difference. Here is the interval, and the comparison the
+# section is actually about -- both arms against the free integer -- on both arms rather than one.
+_m51 = J("m51_level_vs_change.json")
+_lv, _vd = _m51["A2_level_minus_change"], _m51["A3_vs_depth"]
+for _k, _tag in (("RibonanzaNet", "Neural"), ("ViennaRNA", "Vienna"), ("EternaFold", "Etf")):
+    put("lvc" + _tag, sig(_lv[_k]["difference"], 4))
+    put("lvc" + _tag + "Ci", ci(_lv[_k]["ci95"], 4))
+    put("chgDep" + _tag + "Ci", ci(_vd[_k + "_change"]["ci95"], 4))
+    put("lvlDep" + _tag + "Ci", ci(_vd[_k + "_level"]["ci95"], 4))
+put("lvcNres", f"{_m51['n_resolving']}")
+put("lvcNarms", f"{len(_lv)}")
+# The section's claim is that neither arm beats a free integer. That is only sayable if every
+# level arm covers zero against depth AND every change arm resolves on the losing side; if either
+# half stopped holding, the sentence stating it would be a different sentence.
+assert all(_vd[k + "_level"]["ci_contains_zero"] for k in _lv), \
+    "a level arm now separates from the free depth baseline; the sentence saying none does is stale"
+assert all((not _vd[k + "_change"]["ci_contains_zero"]) and _vd[k + "_change"]["difference"] < 0
+           for k in _lv), \
+    "a change arm no longer resolves on the losing side against depth; the sentence is stale"
 # The whole point of the section is that these two routes give different answers on the same
 # comparison. If that ever stopped being true, the paragraph explaining why both are reported
 # would be describing something that is not there.

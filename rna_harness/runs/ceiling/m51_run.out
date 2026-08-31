@@ -1,0 +1,37 @@
+=== M51:给 §5.6 那句“不给区间”补上区间 ===
+  声明已冻结并推送于本文件存在之前。全离线,$0。
+  记录 4317,四列齐备之外缺 0  (236s)
+  至少 8 个翻转的设计格 158,覆盖 4317 次干预
+
+=== V 验证(先于任何 arm)===
+  V4 与自身 +1.000000000000   与自身取负 -1.000000000000
+  V2 点积路 vs 秩协方差路 max|Δ| = 5.55e-17
+  V3 RibonanzaNet   level +0.32947(论文 +0.3295)  change +0.04913(论文 +0.0491)
+  V3 ViennaRNA      level +0.25570(论文 +0.2557)  change -0.01842(论文 -0.0184)
+  V3 EternaFold     level +0.27649(论文 +0.2765)  change -0.04576(论文 -0.0458)
+  V3 depth          +0.32252(论文 +0.3225)
+  V 全部通过 —— 现在才读 arm
+
+=== A2/A3 配对差(同一次目标聚类抽样)===
+  V1 一臂对自己 max|.| = 0.0
+  A2 RibonanzaNet   level +0.32947 − change +0.04913 = +0.28034  [0.21876, 0.34103]  不含 0
+  A2 ViennaRNA      level +0.25570 − change -0.01842 = +0.27412  [0.20615, 0.34711]  不含 0
+  A2 EternaFold     level +0.27649 − change -0.04576 = +0.32225  [0.24398, 0.40289]  不含 0
+
+  A3 两臂各自对免费深度基线的配对差:
+    RibonanzaNet   level   − depth = +0.00695  [-0.07771, 0.08946]  含 0
+    RibonanzaNet   change  − depth = -0.27340  [-0.34632, -0.20233]  不含 0
+    ViennaRNA      level   − depth = -0.06682  [-0.16452, 0.02967]  含 0
+    ViennaRNA      change  − depth = -0.34094  [-0.39862, -0.28465]  不含 0
+    EternaFold     level   − depth = -0.04603  [-0.14087, 0.04747]  含 0
+    EternaFold     change  − depth = -0.36828  [-0.42684, -0.30695]  不含 0
+
+=== 预注册记分 ===
+  S1  成立   +0.28034 [0.21876, 0.34103]
+  S2  成立   +0.27412 [0.20615, 0.34711]
+  S3  成立   +0.32225 [0.24398, 0.40289];最大的是 EternaFold
+  S4  成立   RibonanzaNet +0.28034, ViennaRNA +0.27412, EternaFold +0.32225
+
+  裁定:level_minus_change_resolves_in_3_of_3   用时 423s
+
+写出 /data/wenhui/openclaude_rna/rna_harness/runs/ceiling/m51_level_vs_change.json

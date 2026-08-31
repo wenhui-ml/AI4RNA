@@ -1,0 +1,172 @@
+{
+ "declaration": "m51_level_vs_change_declaration.json",
+ "cost": "offline, $0 -- no API, no GPU, no download. Reads M26's records plus the cached neural and EternaFold posteriors.",
+ "n_records": 4317,
+ "n_missing_a_column": 0,
+ "n_cells": 158,
+ "n_covered": 4317,
+ "V2_max_gap": 5.551115123125783e-17,
+ "A1_reverse_control": {
+  "RibonanzaNet_level": 3.125e-05,
+  "RibonanzaNet_change": 2.548e-05,
+  "ViennaRNA_level": 4.03e-06,
+  "ViennaRNA_change": 1.76e-05,
+  "EternaFold_level": 6.46e-06,
+  "EternaFold_change": 4.394e-05,
+  "depth": 2.095e-05
+ },
+ "point_estimates": {
+  "RibonanzaNet_level": 0.32947,
+  "RibonanzaNet_change": 0.04913,
+  "ViennaRNA_level": 0.2557,
+  "ViennaRNA_change": -0.01842,
+  "EternaFold_level": 0.27649,
+  "EternaFold_change": -0.04576,
+  "depth_level": 0.32252
+ },
+ "V": {
+  "V4_self_is_one": true,
+  "V4_neg_is_minus_one": true,
+  "V2_equivalent_form": true,
+  "V3_reverse_control": true,
+  "V1_self_difference_exactly_zero": true
+ },
+ "A2_level_minus_change": {
+  "RibonanzaNet": {
+   "level": 0.32947,
+   "change": 0.04913,
+   "difference": 0.28034,
+   "ci95": [
+    0.21876,
+    0.34103
+   ],
+   "ci_contains_zero": false
+  },
+  "ViennaRNA": {
+   "level": 0.2557,
+   "change": -0.01842,
+   "difference": 0.27412,
+   "ci95": [
+    0.20615,
+    0.34711
+   ],
+   "ci_contains_zero": false
+  },
+  "EternaFold": {
+   "level": 0.27649,
+   "change": -0.04576,
+   "difference": 0.32225,
+   "ci95": [
+    0.24398,
+    0.40289
+   ],
+   "ci_contains_zero": false
+  }
+ },
+ "A3_vs_depth": {
+  "RibonanzaNet_level": {
+   "difference": 0.00695,
+   "ci95": [
+    -0.07771,
+    0.08946
+   ],
+   "ci_contains_zero": true
+  },
+  "RibonanzaNet_change": {
+   "difference": -0.2734,
+   "ci95": [
+    -0.34632,
+    -0.20233
+   ],
+   "ci_contains_zero": false
+  },
+  "ViennaRNA_level": {
+   "difference": -0.06682,
+   "ci95": [
+    -0.16452,
+    0.02967
+   ],
+   "ci_contains_zero": true
+  },
+  "ViennaRNA_change": {
+   "difference": -0.34094,
+   "ci95": [
+    -0.39862,
+    -0.28465
+   ],
+   "ci_contains_zero": false
+  },
+  "EternaFold_level": {
+   "difference": -0.04603,
+   "ci95": [
+    -0.14087,
+    0.04747
+   ],
+   "ci_contains_zero": true
+  },
+  "EternaFold_change": {
+   "difference": -0.36828,
+   "ci95": [
+    -0.42684,
+    -0.30695
+   ],
+   "ci_contains_zero": false
+  }
+ },
+ "staked": {
+  "S1": {
+   "text": "for the neural predictor the paired level-minus-change difference EXCLUDES zero",
+   "pass": true,
+   "detail": "+0.28034 [0.21876, 0.34103]"
+  },
+  "S2": {
+   "text": "for ViennaRNA the paired level-minus-change difference EXCLUDES zero",
+   "pass": true,
+   "detail": "+0.27412 [0.20615, 0.34711]"
+  },
+  "S3": {
+   "text": "for EternaFold the paired level-minus-change difference EXCLUDES zero, and is the largest of the three, because its change arm resolves on the wrong side",
+   "pass": true,
+   "detail": "+0.32225 [0.24398, 0.40289];最大的是 EternaFold"
+  },
+  "S4": {
+   "text": "all three differences are POSITIVE, i.e. the level arm is the larger in every case",
+   "pass": true,
+   "detail": "RibonanzaNet +0.28034, ViennaRNA +0.27412, EternaFold +0.32225"
+  }
+ },
+ "n_resolving": 3,
+ "verdict": "level_minus_change_resolves_in_3_of_3",
+ "log": [
+  "=== M51:给 §5.6 那句“不给区间”补上区间 ===",
+  "  声明已冻结并推送于本文件存在之前。全离线,$0。",
+  "  记录 4317,四列齐备之外缺 0  (236s)",
+  "  至少 8 个翻转的设计格 158,覆盖 4317 次干预",
+  "\n=== V 验证(先于任何 arm)===",
+  "  V4 与自身 +1.000000000000   与自身取负 -1.000000000000",
+  "  V2 点积路 vs 秩协方差路 max|Δ| = 5.55e-17",
+  "  V3 RibonanzaNet   level +0.32947(论文 +0.3295)  change +0.04913(论文 +0.0491)",
+  "  V3 ViennaRNA      level +0.25570(论文 +0.2557)  change -0.01842(论文 -0.0184)",
+  "  V3 EternaFold     level +0.27649(论文 +0.2765)  change -0.04576(论文 -0.0458)",
+  "  V3 depth          +0.32252(论文 +0.3225)",
+  "  V 全部通过 —— 现在才读 arm",
+  "\n=== A2/A3 配对差(同一次目标聚类抽样)===",
+  "  V1 一臂对自己 max|.| = 0.0",
+  "  A2 RibonanzaNet   level +0.32947 − change +0.04913 = +0.28034  [0.21876, 0.34103]  不含 0",
+  "  A2 ViennaRNA      level +0.25570 − change -0.01842 = +0.27412  [0.20615, 0.34711]  不含 0",
+  "  A2 EternaFold     level +0.27649 − change -0.04576 = +0.32225  [0.24398, 0.40289]  不含 0",
+  "\n  A3 两臂各自对免费深度基线的配对差:",
+  "    RibonanzaNet   level   − depth = +0.00695  [-0.07771, 0.08946]  含 0",
+  "    RibonanzaNet   change  − depth = -0.27340  [-0.34632, -0.20233]  不含 0",
+  "    ViennaRNA      level   − depth = -0.06682  [-0.16452, 0.02967]  含 0",
+  "    ViennaRNA      change  − depth = -0.34094  [-0.39862, -0.28465]  不含 0",
+  "    EternaFold     level   − depth = -0.04603  [-0.14087, 0.04747]  含 0",
+  "    EternaFold     change  − depth = -0.36828  [-0.42684, -0.30695]  不含 0",
+  "\n=== 预注册记分 ===",
+  "  S1  成立   +0.28034 [0.21876, 0.34103]",
+  "  S2  成立   +0.27412 [0.20615, 0.34711]",
+  "  S3  成立   +0.32225 [0.24398, 0.40289];最大的是 EternaFold",
+  "  S4  成立   RibonanzaNet +0.28034, ViennaRNA +0.27412, EternaFold +0.32225",
+  "\n  裁定:level_minus_change_resolves_in_3_of_3   用时 423s"
+ ]
+}

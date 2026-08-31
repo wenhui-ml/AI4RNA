@@ -1563,8 +1563,23 @@ predicted \emph{change}, $\Delta P$. Scored on the same cells, $\Delta P$ agrees
 neural predictor, \jdg{rkRhoDpV} (\jdg{rkRhoDpVCi}, $p=\jdg{rkRhoDpVP}$) for ViennaRNA, and
 \jdg{efDp} (\jdg{efDpCi}, $p=\jdg{efDpP}$) for EternaFold, which excludes zero on the \emph{wrong
 side}. Across the three the predicted change is once weakly positive, once null and once weakly
-negative, and none approaches its own level arm. We report the level arm in the table because it
-is the larger of the two, and put no interval on the difference between them.
+negative.
+
+\textbf{The table reports the level arm, and an earlier version of this paragraph justified that
+by saying it was the larger of the two and declined to put an interval on the difference.} That is
+a choice between two arms made on two point estimates, which is the shape this paper withdraws a
+metric for in \S\ref{sec:withdrawal}, so the interval is now computed. Paired on one resample the
+level arm exceeds the change arm by \jdg{lvcNeural} (\jdg{lvcNeuralCi}) for the neural predictor,
+\jdg{lvcVienna} (\jdg{lvcViennaCi}) for the thermodynamic one and \jdg{lvcEtf} (\jdg{lvcEtfCi})
+for EternaFold: \jdg{lvcNres} of \jdg{lvcNarms} exclude zero, so the choice is not close. It was
+still made before the change arm was scored, and reporting the interval does not turn a declared
+choice into a fitted one.
+
+\textbf{The comparison this section is actually about survives on both arms, and on the change arm
+it is not close either.} Against the free depth baseline every level arm covers zero
+(\jdg{lvlDepNeuralCi}, \jdg{lvlDepViennaCi}, \jdg{lvlDepEtfCi}) and every change arm resolves on
+the losing side (\jdg{chgDepNeuralCi}, \jdg{chgDepViennaCi}, \jdg{chgDepEtfCi}). Neither quantity
+a predictor can offer here beats an integer read off the declared target.
 
 \paragraph{What each predictor knows is close to what depth knows.} Within the same cells, the
 neural predictor's rank agreement with depth is \jdg{rkDepN} against \jdg{rkRhoN} with the
@@ -2667,6 +2682,22 @@ Depth alone delivers at least 80\% of the best implementation's gain over random
 \multicolumn{2}{@{}p{0.95\textwidth}@{}}{\footnotesize\emph{The last row holds at the declared
   budget and tie rule and is at its boundary elsewhere: under randomised ties at the 10\% budget the
   share is \jdg{tvShareRTen}, below the staked $80\%$. Reported, not buried.}}\\
+\midrule
+\multicolumn{2}{@{}l@{}}{\emph{frozen before the level and change arms were differenced (\S\ref{sec:ranking})}}\\
+The level arm exceeds the change arm for the neural predictor, interval excluding zero
+  \quad(\jdg{lvcNeural}, \jdg{lvcNeuralCi}) & correct \\
+The same for the thermodynamic predictor \quad(\jdg{lvcVienna}, \jdg{lvcViennaCi}) & correct \\
+The same for EternaFold, and its gap is the largest of the three because its change arm resolves
+  on the wrong side \quad(\jdg{lvcEtf}, \jdg{lvcEtfCi}) & correct \\
+All three differences are positive \quad(\jdg{lvcNres} of \jdg{lvcNarms} resolve) & correct \\
+\multicolumn{2}{@{}p{0.95\textwidth}@{}}{\footnotesize\emph{This block exists because the section
+  said in print that it was not computing this interval. The declaration bound the manuscript
+  before the number existed: the sentence declining the interval goes whatever the run returns, and
+  the reported arm does not change, because re-choosing it on a result would be the fitting this
+  paper refuses elsewhere. Verified before reading: a column's within-design rank agreement with
+  itself is exactly $+1$ and with its own negation exactly $-1$, the ranked-dot-product and
+  rank-covariance routes agree to $6\times10^{-17}$, and all seven published rank agreements
+  reproduce.}}\\
 \midrule
 \multicolumn{2}{@{}l@{}}{\emph{frozen before the four columns were put on one scale (\S\ref{sec:result})}}\\
 \textbf{Standardising each column by its own within-stratum SD removes the word
