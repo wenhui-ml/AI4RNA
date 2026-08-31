@@ -1,0 +1,36 @@
+{
+ "id": "m46_inversion",
+ "frozen_before_code": true,
+ "cost": "offline, $0 -- reads m43_predictor_scores.csv and m44_decision.json, folds nothing",
+ "question": "Is the sign inversion of the incumbent margin a property of the BUDGET, or is it carried by a few targets, one rescue threshold and one pair of predictors?",
+ "why_this_and_not_a_second_corpus": [
+  "M44 reports that RibonanzaNet minus ViennaRNA recovery is -0.01592 [-0.02785, -0.00358] at the 10% budget and +0.03395 [+0.01212, +0.05689] at 50%. That inversion is now a headline of the paper.",
+  "It rests on 20 independent targets, one corpus, one outcome and three budget points. The obvious repair is a second corpus; M45 has just measured that no second corpus of comparable size exists in the public record, so that repair is unavailable and pretending otherwise would extend the chain without adding information.",
+  "The available repair is to ask whether the claim is fragile in the ways it could be fragile HERE: to a few targets, to the choice of rescue threshold, to the choice of predictor pair, and to the choice of three budget points rather than a curve.",
+  "A curve is the positive form of this question. Three points can only support an inference that the sign changes; a crossing measured across a swept budget is the claim itself."
+ ],
+ "arms": {
+  "V": "reverse control: reproduce M44's three published gaps from an implementation that does not import M44",
+  "E1": "leave-one-target-out: drop each target in turn and recompute the gap at each budget",
+  "E2": "per-target: how many individual targets show the inversion at the tightest budget",
+  "E3": "budget sweep: the gap as a continuous function of budget, and where it crosses zero",
+  "E4": "threshold sweep: does the inversion survive alternative rescue thresholds",
+  "E5": "other pairs: is the inversion unique to RibonanzaNet vs ViennaRNA"
+ },
+ "staked": {
+  "1": "the sign of the 10% gap is negative under ALL leave-one-target-out drops -- the inversion is not carried by one target",
+  "2": "the gap crosses zero exactly once as budget is swept from its smallest to its largest value",
+  "3": "at least one ordered pair other than RibonanzaNet/ViennaRNA also inverts between the smallest and largest budget",
+  "4": "the 10% inversion retains its sign at an alternative rescue threshold"
+ },
+ "kill": [
+  "the reverse control does not reproduce M44's three published gaps to 1e-4 -> void; the two runs are then not measuring the same quantity and nothing here bears on M44",
+  "fewer than 10 targets remain scorable at any swept budget -> that budget is not reported"
+ ],
+ "wording_rules": {
+  "W1": "a crossing point read off a swept curve is a DESCRIPTION of this corpus, not an estimate of a population quantity; it may not be quoted with an interval it does not have.",
+  "W2": "if staked 1 fails the inversion must be reported as target-carried, and the abstract and conclusion claims built on it must be withdrawn in the same edit, not softened.",
+  "W3": "this run adds no second corpus and may not be described as replication. The transfer corpus holds 143 and 152 interventions over 3 families and cannot carry an effect size; that sentence stays as it is."
+ },
+ "not_a_test": "This run cannot establish that the inversion generalises beyond this corpus. It can only establish whether, within this corpus, the claim survives the choices that were made freely when it was first computed."
+}
