@@ -1,0 +1,54 @@
+{
+ "id": "m45_flip_ceiling",
+ "frozen_before_code": true,
+ "cost": "offline, $0 -- reads a file already on disk, folds nothing, calls no API",
+ "question": "How many candidate compensatory orientation flips could the FULL released Ribonanza corpus ever supply, and from how many independent source libraries? This is the ceiling on the breadth deficiency, computed before any decision to pursue it.",
+ "why_now": [
+  "The simulated Nature Methods review ranks generalization breadth as the FIRST deficiency, above statistical rigor and above novelty, and asks for a second ecosystem: different laboratory, different RNA family, different probing chemistry, different intervention-generation mechanism.",
+  "The public RMDB record is close to exhausted: M41 arm A scanned every library not previously analysed and the entire remaining record yielded 2 further admissible interventions.",
+  "M42 pulled the full released corpus for a leakage haystack: 806573 unique sequences over 1643680 rows. It has never been asked whether it CONTAINS interventions.",
+  "It cannot be asked directly. The file carries sequence_id, sequence, experiment_type, dataset_name, reads, signal_to_noise, SN_filter and 206 reactivity columns with their errors. It carries NO target structure and NO construct name. Definition 1 needs both.",
+  "So this run computes the ceiling instead: the number of sequence pairs that COULD be compensatory orientation flips on sequence evidence alone. If that ceiling is small, the breadth line is closed by measurement rather than by opinion. If it is large, the blocker is structure recovery, which is a data-acquisition problem and not a methodological one."
+ ],
+ "quantity": {
+  "definition": "Within a (dataset_name, length) group, an ORDERED-PAIR-PRESERVING TRANSPOSITION is a pair of distinct sequences at Hamming distance exactly 2 whose nucleotide compositions are identical -- equivalently, one is the other with the characters at two positions exchanged. A CANDIDATE FLIP is such a pair whose exchanged unordered character set is a Watson-Crick or wobble pair type: {A,U}, {G,C} or {G,U}.",
+  "why_this_is_the_right_upper_bound": "Every admissible intervention under Definition 1 is a candidate flip. The converse fails, and fails by a lot: Definition 1 additionally requires that the two positions be a DESIGNED PAIR in a declared target structure, and requires the signal gates. Neither is checkable here.",
+  "so_the_number_is": "an upper bound on what this corpus could contribute, and never a count of interventions."
+ },
+ "arms": {
+  "V": "verification, run before any count is reported",
+  "E1": "the ceiling: candidate flips over the full corpus, total and per dataset_name",
+  "E2": "breadth: how many distinct source libraries contribute, and the concentration of the count across them",
+  "E3": "usable fraction: the same counts restricted to SN_filter == 1, and to pairs where BOTH members pass",
+  "E4": "overlap: how many candidate pairs involve a sequence already in this paper's corpus, so the new material is reported net rather than gross"
+ },
+ "method": {
+  "search": "Pigeonhole blocking. A pair at Hamming distance 2 leaves at least one of three contiguous thirds free of mismatches, so indexing on (dataset_name, length, third_index, third_content, composition) cannot miss one. Candidates are then verified by exact Hamming distance. The blocking is EXACT for this class -- no bucket is skipped, no size cap is applied, and if a bucket is too large to verify the run VOIDS rather than silently excluding it.",
+  "composition_in_the_key": "a transposition preserves nucleotide composition exactly, so composition belongs in the blocking key; it is what keeps adapter-sharing buckets from collapsing into whole-library all-pairs comparisons.",
+  "dedup": "pairs are counted once, unordered, on unique sequences; a sequence appearing under both chemistries is one sequence."
+ },
+ "V_checks_that_must_pass_before_any_count_is_printed": {
+  "V1_zero": "a sequence is never paired with itself; a synthetic set built with no valid flip returns exactly 0",
+  "V2_planted_positive": "K synthetic orientation flips planted into a slice of the real data are recovered exactly, K of K, with no extras attributable to the planting",
+  "V3_reverse_control": "run the same detector on THIS PAPER'S OWN corpus sequences, where the admissible interventions are already known, and recover them. A detector that cannot find the flips we have already published has no standing to count flips we have not.",
+  "V4_pigeonhole_completeness": "on one library small enough to permit it, brute-force all-pairs Hamming and require the blocked search to return the identical pair set. Any difference voids the run."
+ },
+ "staked": {
+  "1": "the candidate-flip ceiling on the full corpus EXCEEDS this paper's 4170 lineage-corrected admissible flips",
+  "2": "candidates come from MORE than the 4 source libraries this paper currently uses",
+  "3": "the Watson-Crick/wobble filter removes a MAJORITY of Hamming-2 transposition pairs, i.e. most transpositions are not valid pair types",
+  "4": "restricting to SN_filter == 1 on both members retains at least 20% of the candidates"
+ },
+ "kill": [
+  "V2 does not recover the planted flips exactly -> void, report as a detector failure",
+  "V4 disagrees with brute force on any pair -> void; the blocking is then unsound and every count from it is unusable",
+  "V3 recovers fewer than 90% of this paper's known admissible interventions -> void, and the shortfall is reported as a defect of this run and not of the corpus"
+ ],
+ "wording_rules": {
+  "W1": "the result is an UPPER BOUND on candidates. It may never be written as a number of interventions, of usable interventions, or of new data.",
+  "W2": "a library appearing in the per-library table is not thereby usable: no target structure exists for any of them in this file, and without one Definition 1 cannot be applied at all.",
+  "W3": "if the ceiling is large, the licensed statement is that the blocker is structure recovery, NOT that breadth is solved.",
+  "W4": "the count of distinct dataset_name values must be REPORTED, because M42 recorded 23 source libraries while a separate probe of the same file recorded 46 dataset_name values. This run resolves that discrepancy or records that it did not."
+ },
+ "not_a_test": "This run cannot establish that any pair it counts is a designed compensatory pair. Nothing here is evidence about any predictor, and no number from it enters any claim about model behaviour."
+}
