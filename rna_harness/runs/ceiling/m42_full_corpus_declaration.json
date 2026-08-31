@@ -1,0 +1,54 @@
+{
+  "id": "M42",
+  "title": "The leakage audit against the whole released training corpus, and what happens to the word 'bound'",
+  "frozen_before_code": true,
+  "cost": "offline, $0. The 2.36 GB train_data.csv is already on disk. No API, no GPU. M39 took 768 s on 167,808 sequences; this is 4.81x that corpus, so roughly one hour of CPU under the core cap.",
+  "why": [
+    "C7 is the ledger's leakage channel and it is priced empty. M39 audited it against",
+    "train_data_QUICK_START.csv -- 167,808 unique sequences -- and declared every count a LOWER",
+    "BOUND because that file is a subset. Both reviews name this as the place the paper does not",
+    "close.",
+    "",
+    "The competition's full train_data.csv is now on disk, obtained with the user's own Kaggle",
+    "credential after they accepted the competition rules. Running the same audit against it is the",
+    "only remaining experiment in this programme that a reviewer asked for and that we can do."
+  ],
+  "data": {
+    "file": "/data/tmp/ribonanza/train_data.csv",
+    "provenance": "Kaggle, Stanford Ribonanza RNA Folding, competition file train_data.csv, downloaded 2026-08-31 with the account holder's own API token after they accepted the competition rules",
+    "profile_read_before_this_declaration_was_written": "1,643,680 rows; 806,573 unique sequences; 46 dataset_name values; lengths 115-206; experiment_type split 821,840 / 821,840 between 2A3_MaP and DMS_MaP; SN_filter 438,239 pass / 1,205,441 fail",
+    "containment_verified": "every one of QUICK_START's 167,808 unique sequences appears in this file; the difference set is empty in that direction, and 12 dataset_name values are new. The two are nested, not overlapping snapshots, so M39's counts can only tighten and cannot be overturned.",
+    "what_it_is_still_not": "the model's full training input. RibonanzaNet's final pre-training stage consumed pseudo-labels covering its own test sequences. This file is the corpus with experimental labels; the pseudo-label stage remains unaudited by any arm in this paper."
+  },
+  "inherited_unchanged": {
+    "threshold": "0.8, M26d's, fixed and not re-tuned after seeing any result here",
+    "tiers": "T0 <0.8, T1 [0.8,0.9), T2 [0.9,0.999), T3 >=0.999",
+    "definition": "a design unit is EXPOSED at level t when its wild-type sequence, inside the design window, reaches identity >= t against some equal-length substring of some training sequence",
+    "no_index": "every query is compared against every training sequence of sufficient length, exhaustively and vectorised, so a zero is a measured zero. M26d's K0 failure mode cannot occur.",
+    "queries": "the same 158 design units and the same windows M39 used"
+  },
+  "the_question_this_run_must_settle_about_m39": {
+    "issue": "M39's declaration states that the full training set is 'roughly two million sequences', which is why its counts are bounds. The competition's train_data.csv holds 806,573 unique sequences. Those two numbers disagree and the disagreement decides whether C7's wording stays 'lower bound' or becomes 'exact on the labelled corpus'.",
+    "what_this_run_reports": "the measured size of the released training file, stated plainly, with no attempt to reconcile it to M39's figure. If M39's 'roughly two million' cannot be sourced, that is recorded as a declaration_erratum against M39 and M39's declaration is NOT edited.",
+    "what_this_run_may_NOT_do": "it may not upgrade the wording on its own. Even if 806,573 is the entire labelled training corpus, the pseudo-label stage is unaudited, so the strongest permitted statement is bounded by that and is written out in K3 below."
+  },
+  "arms": {
+    "V": "verification printed BEFORE any result. (i) a sequence scored against itself returns exactly 1.0. (ii) a dinucleotide-preserving shuffle of each wild type is scored the same way and its identity distribution is reported as what a non-exposed query looks like. (iii) restricting this run's training set to QUICK_START's 167,808 sequences reproduces M39's E1 count of 20 of 158 EXACTLY. If it does not, this run is void and is reported as a reproduction failure of M39, not as a result about the full corpus.",
+    "E1": "exposure recount at 0.8, reported beside M39's 20 of 158 and M26d's proxy 14 of 158.",
+    "E2": "the tier table recomputed, with each exposed design's best match attributed to a named source library.",
+    "E3": "M26d's clean-versus-exposed skill contrast on THIS cut, both models, as intervals and never as two point estimates.",
+    "E4": "skill by tier. If the model trades on memory, skill should RISE with exposure tier. Reported as the per-tier values with intervals and as the trend."
+  },
+  "constants": {"THRESH": 0.8, "TIERS": [0.8, 0.9, 0.999], "NBOOT": 2000, "SEED": 20260902, "MIN_CLEAN_INTERVENTIONS": 1000},
+  "staked": {
+    "1": "exposure at 0.8 is HIGHER than M39's 20 of 158, because the comparison set is 4.81x larger",
+    "2": "every one of M39's 12 T3 designs is still T3 here -- a verbatim match cannot be undone by adding data",
+    "3": "skill still does NOT rise monotonically across the tiers, so memorisation still does not explain the result",
+    "4": "at least one design moves up a tier"
+  },
+  "kill": {
+    "V3": "if QUICK_START-restricted exposure does not reproduce M39's 20 of 158 exactly, the run is void",
+    "K_unresolved": "an interval covering zero is unresolved, never refuted",
+    "K3_wording_rule_binding_on_the_manuscript": "The permitted sentence is: exposure is measured against the released training corpus in full, and the count is exact ON THAT CORPUS. The FORBIDDEN sentences are 'not in the training set', 'no leakage', and any phrasing that implies the model's whole training input was audited. The pseudo-label stage is named in the same paragraph as the count, every time the count appears, because a sequence can have been seen without its experimental label having been seen."
+  }
+}
