@@ -1,0 +1,492 @@
+{
+ "reads": "m43_predictor_scores.csv + m44_decision.json",
+ "cost": "offline, $0",
+ "n_cells": 158,
+ "n_cells_scored": 155,
+ "depth_sign": 1.0,
+ "S3_reverse_control": {
+  "max_abs_diff": 4.8e-06,
+  "pass": true,
+  "cells": {
+   "0.1|depth": {
+    "ours": 0.161273,
+    "published": 0.16127,
+    "abs_diff": 3.2e-06
+   },
+   "0.1|ViennaRNA": {
+    "ours": 0.172414,
+    "published": 0.17241,
+    "abs_diff": 3.8e-06
+   },
+   "0.1|EternaFold": {
+    "ours": 0.171883,
+    "published": 0.17188,
+    "abs_diff": 3.3e-06
+   },
+   "0.1|RNAstructure": {
+    "ours": 0.173475,
+    "published": 0.17347,
+    "abs_diff": 4.8e-06
+   },
+   "0.1|RibonanzaNet": {
+    "ours": 0.156499,
+    "published": 0.1565,
+    "abs_diff": 1.3e-06
+   },
+   "0.1|depth_then_ViennaRNA": {
+    "ours": 0.165517,
+    "published": 0.16552,
+    "abs_diff": 2.8e-06
+   },
+   "0.1|depth_then_EternaFold": {
+    "ours": 0.164987,
+    "published": 0.16499,
+    "abs_diff": 3.3e-06
+   },
+   "0.1|depth_then_RNAstructure": {
+    "ours": 0.166578,
+    "published": 0.16658,
+    "abs_diff": 1.8e-06
+   },
+   "0.1|depth_then_RibonanzaNet": {
+    "ours": 0.16817,
+    "published": 0.16817,
+    "abs_diff": 2e-07
+   },
+   "0.1|oracle": {
+    "ours": 0.256764,
+    "published": 0.25676,
+    "abs_diff": 3.9e-06
+   },
+   "0.25|depth": {
+    "ours": 0.348541,
+    "published": 0.34854,
+    "abs_diff": 1.1e-06
+   },
+   "0.25|ViennaRNA": {
+    "ours": 0.34695,
+    "published": 0.34695,
+    "abs_diff": 4e-07
+   },
+   "0.25|EternaFold": {
+    "ours": 0.348011,
+    "published": 0.34801,
+    "abs_diff": 6e-07
+   },
+   "0.25|RNAstructure": {
+    "ours": 0.351194,
+    "published": 0.35119,
+    "abs_diff": 3.6e-06
+   },
+   "0.25|RibonanzaNet": {
+    "ours": 0.357029,
+    "published": 0.35703,
+    "abs_diff": 8e-07
+   },
+   "0.25|depth_then_ViennaRNA": {
+    "ours": 0.359682,
+    "published": 0.35968,
+    "abs_diff": 1.7e-06
+   },
+   "0.25|depth_then_EternaFold": {
+    "ours": 0.358621,
+    "published": 0.35862,
+    "abs_diff": 7e-07
+   },
+   "0.25|depth_then_RNAstructure": {
+    "ours": 0.361273,
+    "published": 0.36127,
+    "abs_diff": 3.2e-06
+   },
+   "0.25|depth_then_RibonanzaNet": {
+    "ours": 0.36817,
+    "published": 0.36817,
+    "abs_diff": 2e-07
+   },
+   "0.25|oracle": {
+    "ours": 0.54748,
+    "published": 0.54748,
+    "abs_diff": 1e-07
+   },
+   "0.5|depth": {
+    "ours": 0.634483,
+    "published": 0.63448,
+    "abs_diff": 2.8e-06
+   },
+   "0.5|ViennaRNA": {
+    "ours": 0.604775,
+    "published": 0.60477,
+    "abs_diff": 4.5e-06
+   },
+   "0.5|EternaFold": {
+    "ours": 0.615385,
+    "published": 0.61538,
+    "abs_diff": 4.6e-06
+   },
+   "0.5|RNAstructure": {
+    "ours": 0.606897,
+    "published": 0.6069,
+    "abs_diff": 3.4e-06
+   },
+   "0.5|RibonanzaNet": {
+    "ours": 0.638727,
+    "published": 0.63873,
+    "abs_diff": 3.2e-06
+   },
+   "0.5|depth_then_ViennaRNA": {
+    "ours": 0.649337,
+    "published": 0.64934,
+    "abs_diff": 3.1e-06
+   },
+   "0.5|depth_then_EternaFold": {
+    "ours": 0.650398,
+    "published": 0.6504,
+    "abs_diff": 2.1e-06
+   },
+   "0.5|depth_then_RNAstructure": {
+    "ours": 0.650398,
+    "published": 0.6504,
+    "abs_diff": 2.1e-06
+   },
+   "0.5|depth_then_RibonanzaNet": {
+    "ours": 0.657294,
+    "published": 0.65729,
+    "abs_diff": 4.4e-06
+   },
+   "0.5|oracle": {
+    "ours": 0.893899,
+    "published": 0.8939,
+    "abs_diff": 8e-07
+   }
+  }
+ },
+ "S4_identities": {
+  "full_budget_is_one": {
+   "depth": 1.0,
+   "ViennaRNA": 1.0,
+   "EternaFold": 1.0,
+   "RNAstructure": 1.0,
+   "RibonanzaNet": 1.0,
+   "depth_then_ViennaRNA": 1.0,
+   "depth_then_EternaFold": 1.0,
+   "depth_then_RNAstructure": 1.0,
+   "depth_then_RibonanzaNet": 1.0,
+   "oracle": 1.0,
+   "constant": 1.0
+  },
+  "random_matches_closed_form": {
+   "0.1": {
+    "closed_form": 0.11527,
+    "empirical": 0.1152,
+    "abs_diff": 7e-05
+   },
+   "0.25": {
+    "closed_form": 0.26264,
+    "empirical": 0.26233,
+    "abs_diff": 0.00031
+   },
+   "0.5": {
+    "closed_form": 0.50851,
+    "empirical": 0.50902,
+    "abs_diff": 0.00051
+   }
+  },
+  "constant_score_equals_random": {
+   "0.1": {
+    "constant_random_ties": 0.11528,
+    "random_rule": 0.11527,
+    "abs_diff": 1e-05
+   },
+   "0.25": {
+    "constant_random_ties": 0.26252,
+    "random_rule": 0.26264,
+    "abs_diff": 0.00012
+   },
+   "0.5": {
+    "constant_random_ties": 0.50796,
+    "random_rule": 0.50851,
+    "abs_diff": 0.00055
+   }
+  },
+  "pass": true
+ },
+ "S2_equivalent_form": {
+  "max_abs_diff": 0.0,
+  "pass": true
+ },
+ "S1_tie_rule": {
+  "0.1": {
+   "depth": {
+    "stable_ties": 0.16127,
+    "random_ties": 0.1583,
+    "delta": -0.00297
+   },
+   "ViennaRNA": {
+    "stable_ties": 0.17241,
+    "random_ties": 0.17225,
+    "delta": -0.00017
+   },
+   "EternaFold": {
+    "stable_ties": 0.17188,
+    "random_ties": 0.17188,
+    "delta": 0.0
+   },
+   "RNAstructure": {
+    "stable_ties": 0.17347,
+    "random_ties": 0.17324,
+    "delta": -0.00023
+   },
+   "RibonanzaNet": {
+    "stable_ties": 0.1565,
+    "random_ties": 0.1565,
+    "delta": 0.0
+   },
+   "depth_then_ViennaRNA": {
+    "stable_ties": 0.16552,
+    "random_ties": 0.16552,
+    "delta": 0.0
+   },
+   "depth_then_EternaFold": {
+    "stable_ties": 0.16499,
+    "random_ties": 0.16499,
+    "delta": 0.0
+   },
+   "depth_then_RNAstructure": {
+    "stable_ties": 0.16658,
+    "random_ties": 0.16658,
+    "delta": 0.0
+   },
+   "depth_then_RibonanzaNet": {
+    "stable_ties": 0.16817,
+    "random_ties": 0.16817,
+    "delta": 0.0
+   }
+  },
+  "0.25": {
+   "depth": {
+    "stable_ties": 0.34854,
+    "random_ties": 0.35113,
+    "delta": 0.00259
+   },
+   "ViennaRNA": {
+    "stable_ties": 0.34695,
+    "random_ties": 0.34695,
+    "delta": 0.0
+   },
+   "EternaFold": {
+    "stable_ties": 0.34801,
+    "random_ties": 0.34801,
+    "delta": 0.0
+   },
+   "RNAstructure": {
+    "stable_ties": 0.35119,
+    "random_ties": 0.35119,
+    "delta": 0.0
+   },
+   "RibonanzaNet": {
+    "stable_ties": 0.35703,
+    "random_ties": 0.35703,
+    "delta": 0.0
+   },
+   "depth_then_ViennaRNA": {
+    "stable_ties": 0.35968,
+    "random_ties": 0.35968,
+    "delta": 0.0
+   },
+   "depth_then_EternaFold": {
+    "stable_ties": 0.35862,
+    "random_ties": 0.35862,
+    "delta": 0.0
+   },
+   "depth_then_RNAstructure": {
+    "stable_ties": 0.36127,
+    "random_ties": 0.36127,
+    "delta": 0.0
+   },
+   "depth_then_RibonanzaNet": {
+    "stable_ties": 0.36817,
+    "random_ties": 0.36817,
+    "delta": 0.0
+   }
+  },
+  "0.5": {
+   "depth": {
+    "stable_ties": 0.63448,
+    "random_ties": 0.63782,
+    "delta": 0.00334
+   },
+   "ViennaRNA": {
+    "stable_ties": 0.60477,
+    "random_ties": 0.60477,
+    "delta": 0.0
+   },
+   "EternaFold": {
+    "stable_ties": 0.61538,
+    "random_ties": 0.61538,
+    "delta": 0.0
+   },
+   "RNAstructure": {
+    "stable_ties": 0.6069,
+    "random_ties": 0.6069,
+    "delta": 0.0
+   },
+   "RibonanzaNet": {
+    "stable_ties": 0.63873,
+    "random_ties": 0.63873,
+    "delta": 0.0
+   },
+   "depth_then_ViennaRNA": {
+    "stable_ties": 0.64934,
+    "random_ties": 0.64934,
+    "delta": 0.0
+   },
+   "depth_then_EternaFold": {
+    "stable_ties": 0.6504,
+    "random_ties": 0.6504,
+    "delta": 0.0
+   },
+   "depth_then_RNAstructure": {
+    "stable_ties": 0.6504,
+    "random_ties": 0.6504,
+    "delta": 0.0
+   },
+   "depth_then_RibonanzaNet": {
+    "stable_ties": 0.65729,
+    "random_ties": 0.65729,
+    "delta": 0.0
+   }
+  }
+ },
+ "S1_max_abs_shift": 0.00334,
+ "E4_by_budget": {
+  "0.1|stable": {
+   "best_implementation": "RNAstructure",
+   "random": 0.11561,
+   "depth": 0.16127,
+   "best": 0.17347,
+   "fraction": 0.7891
+  },
+  "0.1|random": {
+   "best_implementation": "RNAstructure",
+   "random": 0.11561,
+   "depth": 0.15808,
+   "best": 0.17322,
+   "fraction": 0.7373
+  },
+  "0.25|stable": {
+   "best_implementation": "RibonanzaNet",
+   "random": 0.26351,
+   "depth": 0.34854,
+   "best": 0.35703,
+   "fraction": 0.9092
+  },
+  "0.25|random": {
+   "best_implementation": "RibonanzaNet",
+   "random": 0.26351,
+   "depth": 0.35161,
+   "best": 0.35703,
+   "fraction": 0.942
+  },
+  "0.5|stable": {
+   "best_implementation": "RibonanzaNet",
+   "random": 0.50925,
+   "depth": 0.63448,
+   "best": 0.63873,
+   "fraction": 0.9672
+  },
+  "0.5|random": {
+   "best_implementation": "RibonanzaNet",
+   "random": 0.50925,
+   "depth": 0.63801,
+   "best": 0.63873,
+   "fraction": 0.9944
+  }
+ },
+ "staked2_missing_interval": {
+  "0.1": {
+   "point": -0.01592,
+   "ci": [
+    -0.02785,
+    -0.00358
+   ],
+   "excludes_zero": true
+  },
+  "0.25": {
+   "point": 0.01008,
+   "ci": [
+    -0.00957,
+    0.0291
+   ],
+   "excludes_zero": false
+  },
+  "0.5": {
+   "point": 0.03395,
+   "ci": [
+    0.01212,
+    0.05689
+   ],
+   "excludes_zero": true
+  }
+ },
+ "staked2_verdict_unchanged": "graded as written -> FAILED; the interval is reported beside it and does not regrade it",
+ "elapsed_s": 17.4,
+ "log": [
+  "格 158  可计分 155  深度方向 +1  (M44 发表 158/155/+1)",
+  "\n=== ③ 反向对照:同一个 tie 规则必须复现已发表的 JSON",
+  "  30 个量,最大绝对差 4.80e-06  -> 通过",
+  "\n=== ④ 零点 / 恒等式自检",
+  "  100% 预算下每一条规则都必须捞回 1.0:通过",
+  "  random 在 10%:闭式 0.11527  实测 0.11520  差 0.00007",
+  "  random 在 25%:闭式 0.26264  实测 0.26233  差 0.00031",
+  "  random 在 50%:闭式 0.50851  实测 0.50902  差 0.00051",
+  "  常数分数+随机解 tie 在 10%:0.11528 对 random 的 0.11527  差 0.00001",
+  "  常数分数+随机解 tie 在 25%:0.26252 对 random 的 0.26264  差 0.00012",
+  "  常数分数+随机解 tie 在 50%:0.50796 对 random 的 0.50851  差 0.00055",
+  "\n=== ② 等价形式:加权平均的每格召回 == 汇总命中 / 汇总阳性",
+  "  最大绝对差 0.00e+00  -> 通过",
+  "\n=== ① 对拍 + 唯一改动:把 tie 从『按文件行序』换成『随机、取平均』",
+  "    改动的只有这一处。任何移动都只能来自它。",
+  "\n  预算 10%",
+  "    depth                    行序 0.16127   随机 0.15830   Δ -0.00297",
+  "    ViennaRNA                行序 0.17241   随机 0.17225   Δ -0.00017",
+  "    EternaFold               行序 0.17188   随机 0.17188   Δ +0.00000",
+  "    RNAstructure             行序 0.17347   随机 0.17324   Δ -0.00023",
+  "    RibonanzaNet             行序 0.15650   随机 0.15650   Δ +0.00000",
+  "    depth_then_ViennaRNA     行序 0.16552   随机 0.16552   Δ +0.00000",
+  "    depth_then_EternaFold    行序 0.16499   随机 0.16499   Δ +0.00000",
+  "    depth_then_RNAstructure  行序 0.16658   随机 0.16658   Δ +0.00000",
+  "    depth_then_RibonanzaNet  行序 0.16817   随机 0.16817   Δ +0.00000",
+  "\n  预算 25%",
+  "    depth                    行序 0.34854   随机 0.35113   Δ +0.00259",
+  "    ViennaRNA                行序 0.34695   随机 0.34695   Δ +0.00000",
+  "    EternaFold               行序 0.34801   随机 0.34801   Δ +0.00000",
+  "    RNAstructure             行序 0.35119   随机 0.35119   Δ +0.00000",
+  "    RibonanzaNet             行序 0.35703   随机 0.35703   Δ +0.00000",
+  "    depth_then_ViennaRNA     行序 0.35968   随机 0.35968   Δ +0.00000",
+  "    depth_then_EternaFold    行序 0.35862   随机 0.35862   Δ +0.00000",
+  "    depth_then_RNAstructure  行序 0.36127   随机 0.36127   Δ +0.00000",
+  "    depth_then_RibonanzaNet  行序 0.36817   随机 0.36817   Δ +0.00000",
+  "\n  预算 50%",
+  "    depth                    行序 0.63448   随机 0.63782   Δ +0.00334",
+  "    ViennaRNA                行序 0.60477   随机 0.60477   Δ +0.00000",
+  "    EternaFold               行序 0.61538   随机 0.61538   Δ +0.00000",
+  "    RNAstructure             行序 0.60690   随机 0.60690   Δ +0.00000",
+  "    RibonanzaNet             行序 0.63873   随机 0.63873   Δ +0.00000",
+  "    depth_then_ViennaRNA     行序 0.64934   随机 0.64934   Δ +0.00000",
+  "    depth_then_EternaFold    行序 0.65040   随机 0.65040   Δ +0.00000",
+  "    depth_then_RNAstructure  行序 0.65040   随机 0.65040   Δ +0.00000",
+  "    depth_then_RibonanzaNet  行序 0.65729   随机 0.65729   Δ +0.00000",
+  "\n  行序 tie 造成的最大位移 +0.00334",
+  "\n=== E4 复算:免费深度拿走最佳实现增益的多少 —— 逐预算,并注明该预算下最佳的是谁",
+  "  10% / stable  最佳=RNAstructure    深度份额 0.7891",
+  "  10% / random  最佳=RNAstructure    深度份额 0.7373",
+  "  25% / stable  最佳=RibonanzaNet    深度份额 0.9092",
+  "  25% / random  最佳=RibonanzaNet    深度份额 0.942",
+  "  50% / stable  最佳=RibonanzaNet    深度份额 0.9672",
+  "  50% / random  最佳=RibonanzaNet    深度份额 0.9944",
+  "\n=== staked 2 缺的那个区间:RibonanzaNet − ViennaRNA 捞回差,按靶标自助",
+  "  10%  -0.01592  CI [-0.02785, -0.00358]  **不含0**",
+  "  25%  +0.01008  CI [-0.00957, +0.02910]  unresolved",
+  "  50%  +0.03395  CI [+0.01212, +0.05689]  **不含0**"
+ ]
+}
