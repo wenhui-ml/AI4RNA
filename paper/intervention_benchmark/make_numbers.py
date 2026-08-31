@@ -679,6 +679,38 @@ _d39 = json.load(open(os.path.join(CEIL, "m39_exposure_tiers_declaration.json"))
 _lo, _hi = _re.search(r"\[([\d.]+),\s*([\d.]+)\]", _d39["staked"]["4"]).groups()
 put("lkStakeLo", _lo); put("lkStakeHi", _hi)
 
+# ------------------------------------------------- M42: the same audit on the FULL released corpus
+# M39 searched the competition's QUICK_START slice and the manuscript called every count from it a
+# lower bound, PREDICTING that the full file would raise exposure. It does not: the exposed design
+# count, the exposed intervention count and both skill slopes are unchanged to every digit, and one
+# wild type moves from near-verbatim into verbatim. The prediction is recorded as failed here rather
+# than reworded, and M39's frozen declaration is not edited.
+_m42 = J("m42_full_corpus.json")
+put("lkFullTrain", f"{_m42['n_train_unique_full']:,}".replace(",", "{,}"))
+put("lkFullRows", f"{_m42['n_train_rows_full']:,}".replace(",", "{,}"))
+put("lkFullLib", f"{_m42['n_train_libraries_full']}")
+put("lkFullGrow", f"{_m42['n_train_unique_full']/_m39['n_train_unique']:.1f}$\\times$")
+put("lkFullExp", f"{_m42['E1']['n_exposed_designs']}")
+put("lkFullFrac", f"{100*_m42['E1']['frac']:.1f}\\%")
+_T3KEY = [k for k in _m42["E2"]["tiers"] if k.startswith("T3 ")][0]
+put("lkFullVerbatim", f"{_m42['E2']['tiers'][_T3KEY]}")
+put("lkFullMoved", f"{_m42['E2']['n_designs_moved_up']}")
+put("lkFullShuf", sig(_m42["V"]["shuffle_max"], 4))
+_a42 = _m42["E3_arms"]
+put("lkFullNeuralClean", sig(_a42["RibonanzaNet_clean"]["slope"], 4))
+put("lkFullViennaClean", sig(_a42["ViennaRNA_clean"]["slope"], 4))
+put("lkFullCleanN", f"{_m42['n_clean']}")
+put("lkFullExpN", f"{_m42['n_dirty']}")
+
+# The containment check is what licenses calling this the SAME search enlarged, rather than a second
+# unrelated one: every QUICK_START sequence is inside the full file, and restricting the full file
+# back to QUICK_START returns M39's published count.
+assert _m42["containment_ok"], "QUICK_START is not nested inside the full corpus"
+assert _m42["V"]["quick_restricted_exposed"] == _m39["E1"]["n_exposed_designs"], "V3 kill check"
+assert _m42["n_clean"] == _m39["n_clean"] and _m42["n_dirty"] == _m39["n_dirty"]
+for _k in ("RibonanzaNet_clean", "ViennaRNA_clean"):
+    assert abs(_a42[_k]["slope"] - _a39[_k]["slope"]) < 1e-9, _k
+
 # M40v: the two verification steps (equivalent form, reverse control) M38 and M39 had not done.
 # Read here so the manuscript's process sentence covers it and the audit's converse check can see it.
 _m40 = J("m40v_verify_m38_m39.json")

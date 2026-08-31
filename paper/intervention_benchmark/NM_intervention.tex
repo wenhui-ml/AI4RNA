@@ -1139,12 +1139,29 @@ is \emph{higher} than the deposits implied, and the channel is still empty: skil
 --- and \textbf{the thermodynamic control, which cannot have memorised anything, falls the same
 way} (\jdg{lkViennaClean} to \jdg{lkViennaExp}, difference \jdg{lkViennaDiffCi}, which does not
 cover zero). Exposed designs are harder, not remembered; skill does not rise with
-exposure tier for either model. \textbf{That file is itself a subset of the full training corpus,
-so every count here is a lower bound}: the licensed statement remains \emph{not found in the
-portion of the training corpus we could obtain}, never \emph{no leakage}, and one tier stays
-outside it --- this model's final pre-training stage consumed pseudo-labels covering its own test
-sequences, so a sequence can have been seen without its label having been seen. Grading against
-the full corpus is future work (\S\ref{sec:limitations}). The tiers, the libraries the exposed
+exposure tier for either model.
+
+That file was the competition's high-quality slice, so this manuscript previously called every
+count above a lower bound and predicted, in print, that searching the whole released corpus would
+raise exposure. \textbf{We have now searched the whole released corpus, and the prediction is
+wrong.} Against all \jdg{lkFullTrain} unique sequences in \jdg{lkFullRows} rows across
+\jdg{lkFullLib} libraries --- \jdg{lkFullGrow} the sequences and every library the earlier file
+omitted --- exposure is \jdg{lkFullExp} of \jdg{clDesigns} design cells (\jdg{lkFullFrac}), the
+same cells; \jdg{lkFullExpN} exposed and \jdg{lkFullCleanN} unexposed interventions, the same
+split; and both skill slopes reproduce to every printed digit (\jdg{lkFullNeuralClean},
+\jdg{lkFullViennaClean}). \jdg{lkFullMoved} design cell moves up a tier, from near-identical into
+verbatim (\jdg{lkFullVerbatim} verbatim wild types against \jdg{lkVerbatimT3}). That is the entire
+difference a \jdg{lkFullGrow} enlargement of the search makes. A dinucleotide-preserving shuffle of
+each query reaches at most \jdg{lkFullShuf} identity against the same corpus, so the match statistic
+is not returning composition, and restricting the enlarged search back to the earlier file returns
+the earlier count exactly --- without which the two runs would not be the same search.
+
+\textbf{The counts are therefore exact on the released \emph{labelled} corpus, and are still not a
+statement about the training set}: the licensed statement remains \emph{not found in the portion of
+the training corpus we could obtain}, never \emph{no leakage}, because one tier stays outside any
+audit built from released measurements --- this model's final pre-training stage consumed
+pseudo-labels covering its own test sequences, so a sequence can have been seen without its label
+having been seen. That tier is priced as unpriceable in \S\ref{sec:ledger}, not argued away. The tiers, the libraries the exposed
 cells trace to, the dinucleotide-shuffle control and the declaration's own erratum are in
 Appendix~\ref{app:exposure}.
 \end{scopebox}
@@ -1744,16 +1761,20 @@ public depositions surveyed, \jdg{scSkipped} (\jdg{scSkippedPct}) cannot be eval
 because they publish neither construct naming nor per-row sequence annotation
 (\S\ref{sec:mining}). Compensatory flips are not rare; the annotation needed to find them is.
 
-\paragraph{The leakage audit bounds what it can reach, and two things it leaves to future work.}
-Exposure is now graded against the model's own training file rather than against deposits
-(\S\ref{sec:leakage}), and the licensed statement is \emph{not found in the portion of the training
-corpus we could obtain}, never \emph{no leakage}. \textbf{Two items are named and left open rather
-than argued around.} \emph{First}, that file is the competition's high-quality slice, so
-\jdg{lkExpFrac} is a lower bound; grading against the full corpus would replace the bound with a
-number and is the natural next audit, and we expect it to raise exposure without changing the
-verdict, because the thermodynamic control falls on the exposed subset exactly as the neural model
-does. \emph{Second}, the pseudo-label tier stays outside any audit built from deposited
-measurements, and is priced as unpriceable in \S\ref{sec:ledger} rather than restated here. What
+\paragraph{The leakage audit reaches the whole released corpus, and one tier past it.}
+Exposure is graded against the model's own training file rather than against deposits
+(\S\ref{sec:leakage}), and against all of it: the earlier count came from the competition's
+high-quality slice and was printed here as a lower bound, with the stated expectation that
+searching the full file would raise it. It does not --- \jdg{lkFullGrow} the sequences returns the
+same \jdg{lkFullExp} exposed cells and the same slopes to every digit --- and \textbf{that failed
+prediction is recorded as failed}, in the preregistration table and in the frozen declaration's
+scorecard, rather than reworded into a success. What the enlargement bought is a smaller claim held
+more firmly: \jdg{lkFullFrac} is now exact on the released labelled corpus, not a bound on it.
+\textbf{One item remains open, and it is not reachable by enlarging any search.} The pseudo-label
+pre-training tier stays outside any audit built from released measurements --- a sequence can have
+been seen without its label having been seen --- so the licensed statement is still \emph{not found
+in the portion of the training corpus we could obtain}, never \emph{no leakage}, and the tier is
+priced as unpriceable in \S\ref{sec:ledger} rather than restated here. What
 neither covers belongs here instead: EternaFold is not a clean control either. Its parameters were
 fitted to Eterna cloud-lab data and this corpus is an Eterna round, so it is innocent of these
 molecules but not of the design population that produced them --- which weakens C5's training-data
@@ -2219,9 +2240,19 @@ Exposure against the actual training file exceeds the deposits' \jdg{lkProxyDesi
 At least one wild type appears verbatim \quad(\jdg{lkVerbatimT3}) & correct \\
 Skill does not rise monotonically with exposure tier, for either model & correct \\
 The unexposed subset's neural slope stays in $[\jdg{lkStakeLo},\jdg{lkStakeHi}]$ \quad(\jdg{lkNeuralClean}) & correct \\
+\midrule
+\multicolumn{2}{@{}l@{}}{\emph{frozen before the full-corpus regrading existed (\S\ref{sec:leakage})}}\\
+\textbf{Exposure exceeds the earlier file's \jdg{lkExpDesigns} designs, because the searched
+  corpus is \jdg{lkFullGrow} larger} --- \emph{it does not: \jdg{lkFullExp} of \jdg{clDesigns},
+  the same cells, and both skill slopes reproduce to every printed digit. The stake was written
+  as a prediction that a larger haystack holds more needles, and it is graded as one. What the
+  enlargement licenses is a smaller claim held more firmly, not a larger count} & \textbf{failed} \\
+Every verbatim design from the earlier file is still verbatim \quad(\jdg{lkVerbatimT3} of \jdg{lkVerbatimT3}) & correct \\
+Skill still does not rise monotonically with exposure tier & correct \\
+At least one design moves up a tier \quad(\jdg{lkFullMoved}) & correct \\
 \end{longtable}}
 
-\noindent The fifth row of the last block is the one worth reading. Its run returned every staked
+\noindent The fifth row of the ranking block is the one worth reading. Its run returned every staked
 prediction satisfied and emitted the verdict \texttt{\jdg{rkVerdict}}; the verdict was not read,
 because the condition that was supposed to be able to refuse it could not have. The repair --- the paired
 interval, the partial rank correlation given depth, and a tie-breaking ranker that fits nothing
