@@ -13,7 +13,7 @@ COST: $0, offline.
 """
 from __future__ import annotations
 
-import collections, json, os, sys
+import collections, math, json, os, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 CEIL = os.path.abspath(os.path.join(HERE, "..", "..", "rna_harness", "runs", "ceiling"))
@@ -679,6 +679,52 @@ _d39 = json.load(open(os.path.join(CEIL, "m39_exposure_tiers_declaration.json"))
 _lo, _hi = _re.search(r"\[([\d.]+),\s*([\d.]+)\]", _d39["staked"]["4"]).groups()
 put("lkStakeLo", _lo); put("lkStakeHi", _hi)
 
+# ---- M49: the criterion that moved C8 off "empty", applied to C7, and an interval on the
+# asymmetry C7's reading rests on. Two of its four stakes failed and the failures are the result:
+# the difference in drops does not resolve, so neither the memorisation reading nor the
+# difficulty reading is excluded, which is what forces C7 to unresolved alongside the reach ratio.
+_m49 = J("m49_c7_did.json")
+_d49 = _m49["A3_did"]
+put("didPoint", sig(_d49["point"], 4))
+put("didCi", ci(_d49["ci95"], 4))
+put("didVienna", sig(_d49["vienna_drop"], 4))
+put("didNeural", sig(_d49["neural_drop"], 4))
+put("didPermP", f"{_m49['A4_permutation']['p_one_sided']:.3f}")
+put("didPermCentre", sig(_m49["A4_permutation"]["null_median"], 4))
+put("didPermN", f"{_m49['A4_permutation']['n_perm']}")
+put("lkNeuralExpCi", ci(_m49["A5_exposed_arm"]["RibonanzaNet"]["ci95"], 4))
+put("lkViennaExpCi", ci(_m49["A5_exposed_arm"]["ViennaRNA"]["ci95"], 4))
+put("chReachSeven", f"{_m49['A6_reach']['C7']['ratio']:.2f}")
+# ---- the permutation floor. A permutation p cannot fall below 1/(1+B), and B is a property of
+# the code that produced the p-values, not of the manuscript, so it is READ OUT of that code
+# rather than typed. The paragraph in Methods claimed a Bonferroni correction at thirty tests was
+# satisfiable by the values reported; against this paper's own gate of 0.005 it is not, because
+# the floor sits above the corrected threshold. That claim is withdrawn there and these are the
+# three numbers the withdrawal rests on.
+_src26 = open(os.path.join(CEIL, "m26_model_scored.py")).read()
+_B = int(_re.search(r"NBINS,\s*NPERM,\s*NPLACEBO\s*=\s*\d+,\s*(\d+)", _src26).group(1))
+_gate, _ntests = 0.005, 30
+put("permFloor", f"{1/(1+_B):.5f}")
+put("permBonf", f"{_gate/_ntests:.6f}")
+put("permBneed", f"{math.ceil(_ntests/_gate)-1:,}".replace(",", ","))
+assert 1/(1+_B) > _gate/_ntests, (
+    "the permutation floor now clears the corrected threshold; the Methods paragraph saying a "
+    "corrected p-value is unattainable here is stale")
+
+put("chReachEight", f"{_m49['A6_reach']['C8']['ratio']:.2f}")
+# The reclassification is not a matter of taste: C7's interval reaches FURTHER, relative to the
+# quantity it is about, than the interval that moved C8. If that ever stopped holding, the row
+# below would be asserting something the run does not support.
+assert _m49["A6_reach"]["C7"]["ratio"] >= _m49["A6_reach"]["C8"]["ratio"], (
+    "C7 no longer reaches as far as C8 relative to its own quantity; the reclassification that "
+    "the ledger row states is no longer forced by the criterion it cites")
+assert _d49["ci_contains_zero"], (
+    "the difference-in-differences now resolves; the manuscript sentence saying the asymmetry is "
+    "unresolved is stale and the memorisation reading can no longer be left open")
+assert _m49["A5_exposed_arm"]["ViennaRNA"]["ci_contains_zero"], (
+    "the thermodynamic control now resolves from zero on the exposed subset; the sentence saying "
+    "it does not is stale")
+
 # ------------------------------------------------- M42: the same audit on the FULL released corpus
 # M39 searched the competition's QUICK_START slice and the manuscript called every count from it a
 # lower bound, PREDICTING that the full file would raise exposure. It does not: the exposed design
@@ -751,8 +797,8 @@ _ROWS = [
      r"\jdg{resVienna} \jdg{resViennaCi}; at most \jdg{bdViennaAbs} of the contrast can run "
      r"through it", "empty"),
     ("C7", "the training set", "window overlap with the model's own training file",
-     r"\jdg{lkNeuralClean} unexposed against \jdg{lkNeuralExp} exposed; the thermodynamic "
-     r"control falls too, \jdg{lkViennaClean} to \jdg{lkViennaExp}", "empty"),
+     r"\jdg{lkNeuralClean} unexposed against \jdg{lkNeuralExp} exposed \jdg{lkNeuralDiffCi}; "
+     r"the interval reaches \jdg{chReachSeven} of the quantity, so it excludes nothing", "unresolved"),
     ("C8", "the depositors", "which probe chemistry the outcome was read under",
      r"\jdg{xnDiffV}; the interval reaches \jdg{xnBdV} against a rank agreement of "
      r"\jdg{xnRhoMaxV}, so it excludes nothing", "unresolved"),

@@ -148,7 +148,7 @@ flips already executed in a public corpus are recovered by a stated criterion --
 two-nucleotide interventions whose outcome is measured and contains no folding model --- and
 \jdg{reNimpl} independent predictor implementations are scored by their response to them.
 \emph{Reading one} prices \jdg{chPriced} covariate-choice channels: \jdg{chCarry} carry the
-number, \jdg{chEmpty} are bounded and empty, \jdg{chUnres} is unresolved. Read interventionally
+number, \jdg{chEmpty} bounded and empty, \jdg{chUnres} unresolved. Read interventionally
 rather than as agreement, the same molecules give \jdg{cvIntvSd} standard deviations against
 \jdg{cvConvSd}; the empty channel is the folding model's own free energy, the objective every one
 of these design programs was optimising. \emph{Reading two} converts the incumbent benchmark's
@@ -231,9 +231,9 @@ entirely real and still \emph{buy nothing}, because the quantity it reports is n
 experimenter acts on. The first failure is invisible because the number looks the same either way;
 the second because nobody converts. Section~\ref{sec:ledger} is the ledger that results:
 \jdg{chPriced} channels, each named by its chooser and priced by a direct contrast, of which
-\jdg{chCarry} carry the number, \jdg{chEmpty} are empty and \jdg{chUnres} is unresolved --- the
-empty ones including \emph{the folding model's own free energy}, the objective every one of these
-design programs was optimising. \textbf{The prices are not shares and cannot be added up}, for a
+\jdg{chCarry} carrying the number, \jdg{chEmpty} empty and \jdg{chUnres} unresolved. The one
+this paper is entitled to call empty is \emph{the folding model's own free energy}, the objective
+every one of these design programs was optimising. \textbf{The prices are not shares and cannot be added up}, for a
 reason that is itself a result: \S\ref{sec:withdrawal} retracts a quantity this work previously
 reported, because calibrating that estimator against a known truth shows it does not measure what
 it was read as measuring. No claim below depends on it.
@@ -798,10 +798,19 @@ interval here should be read as at least as wide as printed. The second is multi
 paper reports of order thirty contrasts and rank statistics and applies no family-wise or
 false-discovery correction; what it does instead is fix the gate at $0.005$ in advance, declare
 each arm's predictions before the run, and rest no claim on a $p$-value alone --- every claim
-carries an interval, and the ones that matter carry an interval \emph{on a difference}. A reader
-who prefers a corrected threshold can apply one: the claims surviving a Bonferroni correction at
-thirty tests are exactly those reported with $p\jdg{resOutP}$, the smallest attainable value at
-the permutation count used.
+carries an interval, and the ones that matter carry an interval \emph{on a difference}.
+
+\textbf{A reader who wants a corrected threshold cannot get one from these $p$-values, and the
+reason is arithmetic rather than statistical.} A permutation $p$ cannot fall below $1/(1+B)$, so at
+the permutation count used here the smallest attainable value is \jdg{permFloor}. A Bonferroni
+correction at thirty tests against this paper's own gate of $0.005$ asks for \jdg{permBonf}, which
+is below that floor: \emph{no} $p$-value in this manuscript could clear it, whatever the effect. It
+would take $B\ge\jdg{permBneed}$ permutations for the question even to be askable. An earlier
+version of this paragraph said the claims reported at $p\jdg{resOutP}$ were exactly those surviving
+such a correction; that is true only against the conventional $0.05$, which this paragraph rejects
+two sentences earlier, and it is withdrawn. What follows is not that the claims are weaker than
+stated but that a corrected $p$-value is the wrong instrument to ask for here, and the intervals
+are what the claims rest on.
 
 \paragraph{What is not done.} No model is fitted to the outcome, so there is no regression to be
 misspecified and no coefficient whose standard error depends on a variance assumption
@@ -930,7 +939,17 @@ RibonanzaNet agreement with the target reached $\mathrm{F1}\ge\jdg{selCut}$, wit
 design tested anyway when none passed. That rule conditions the corpus on a neural model's own
 prediction, and we did not check it until an outside reading of the repository pointed at it.
 
-Every one of the \jdg{selCells} tested designs matches a design in the public pool of
+\textbf{The selection variable and the outcome come from two different released files, and that is
+what makes this audit meaningful rather than circular.} The OpenKnot score the rule names is the
+\texttt{target\_openknot\_score} column of the benchmark release
+\texttt{OpenKnotBench\_data.v4.5.1.csv}, a prior campaign that measured these designs without
+mutants; the rescue factor every result in this paper is computed on is the
+\texttt{rescue\_factor} column of \texttt{OK7a\_M2R\_data.v4.5.1.csv}, a later library that
+re-synthesised selected designs together with their single and double mutants. Had the two been
+one measurement, C4 would be selection on a function of the outcome and no amount of conditioning
+would repair it. They are not, and a reader can check that from the two filenames.
+
+Every one of the \jdg{selCells} tested designs matches a design in that public pool of
 \jdg{selPool} byte for byte, all in round \jdg{selRound}, so the rule can be replayed rather than
 assumed. \textbf{It does not reproduce.} Over the \jdg{selNCells} non-control cells the published
 rule recovers the tested design \jdg{selRepro} times (\jdg{selAgree}); the same argmax with the F1
@@ -1048,7 +1067,8 @@ analyst.
 \claimhead{claim:readout} On this corpus the conventional structure-agreement readout is near
 saturation for the pairs compared, and its answer moves by \jdg{cvSwing}$\times$ with a defensible
 change in which pairs are admitted. The interventional readout, on the same molecules and strata,
-returns a contrast \jdg{cvPaired} (\jdg{cvPairedCi}) larger and admits no such choice.
+returns a contrast \jdg{cvPairedSd} standard deviations larger (\jdg{cvPairedSdCi}) --- the only
+scale on which the two may be differenced --- and admits no such choice.
 \end{claimbox}
 
 % =====================================================================
@@ -1199,12 +1219,24 @@ against the competition's own training file --- \jdg{lkTrainReal} unique sequenc
 the same \jdg{clThr} threshold (\jdg{lkExpFrac}) against \jdg{lkProxyDesigns} (\jdg{lkProxyFrac})
 from the deposits, itself conservative because that scan examined only the strongest candidates and
 so understates a maximum identity by up to \jdg{vIdxGap} on a matched subset; \jdg{lkVerbatimT3}
-wild types appear verbatim. Exposure is \emph{higher} than the deposits implied, and the channel is
-still empty: skill on the \jdg{lkExpN} exposed interventions is \jdg{lkNeuralExp} against
-\jdg{lkNeuralClean} on the \jdg{lkCleanN} unexposed ones, a difference whose interval covers zero
-(\jdg{lkNeuralDiffCi}), and \textbf{the thermodynamic control, which cannot have memorised
-anything, falls the same way} (\jdg{lkViennaClean} to \jdg{lkViennaExp}, difference
-\jdg{lkViennaDiffCi}, which does not cover zero). Exposed designs are harder, not remembered.
+wild types appear verbatim. Exposure is \emph{higher} than the deposits implied, and the channel
+\textbf{does not resolve}. Skill on the \jdg{lkExpN} exposed interventions is \jdg{lkNeuralExp}
+(\jdg{lkNeuralExpCi}) against \jdg{lkNeuralClean} on the \jdg{lkCleanN} unexposed ones, a
+difference whose interval covers zero (\jdg{lkNeuralDiffCi}); the thermodynamic control, which
+cannot have memorised anything, falls on the exposed subset too, \jdg{lkViennaClean} to
+\jdg{lkViennaExp} (\jdg{lkViennaExpCi}), a drop whose interval does not cover zero
+(\jdg{lkViennaDiffCi}).
+
+\textbf{We previously read that pair as \emph{exposed designs are harder, not remembered}, and it
+does not license that.} The two models do not fall by the same amount --- \jdg{didVienna} against
+\jdg{didNeural} --- and a reading in which the model that could have memorised keeps skill the
+control loses fits those two numbers as well as ours does. Separating them requires an interval on
+the \emph{difference of the drops}, which this paper demands of every other pair of point estimates
+and had not computed here. It is \jdg{didPoint} (\jdg{didCi}) and it covers zero; permuting the
+exposure label across design cells, count-matched, over \jdg{didPermN} draws puts the observed
+value at $p=\jdg{didPermP}$ against a null centred on \jdg{didPermCentre}. \textbf{Neither reading
+is excluded.} What is licensed is that exposure changes what both models can do on these molecules,
+and that this corpus cannot say whether it changes them differently.
 
 That file was the competition's high-quality slice, so this manuscript previously called every
 count above a lower bound and predicted in print that searching the whole released corpus would
@@ -1609,7 +1641,9 @@ quantity by another.
 \caption{\textbf{The two audits, in the main text.} \textbf{a}, Within-stratum skill slope on the
 whole corpus and on cells split by whether their design window is found in the model's own
 training file. The thermodynamic bars are the control that makes the split readable: that model
-was trained on nothing and falls the same way. \textbf{b}, The matched identity contrast on the
+was trained on nothing and falls on the exposed subset too. Whether the two fall by the same
+amount is a difference of differences, and it does not resolve (\jdg{didPoint}, \jdg{didCi}).
+\textbf{b}, The matched identity contrast on the
 whole corpus, on cells passing the published selection cutoff, and on cells where that filter did
 not bind. Only the split arms carry intervals; the quantity the audit tests is the difference
 between them, \jdg{selDiff} (\jdg{selDiffCi}).}
@@ -1659,7 +1693,7 @@ estimator for it.
 \centering\small
 \caption{\textbf{The eight channels this instrument priced.} A channel is a covariate somebody
 chose; its price is what the identity readout is worth with that covariate free against held.
-\jdg{chCarry} carry, \jdg{chEmpty} are empty, \jdg{chUnres} is unresolved --- an interval covering
+\jdg{chCarry} carrying, \jdg{chEmpty} empty, \jdg{chUnres} unresolved --- an interval covering
 zero is not an empty channel, and the row says which it is. Prices are in each channel's own units
 and are \emph{not} commensurable, so the table is read down the last column, never across it.}
 \label{tab:channels}
@@ -1671,15 +1705,18 @@ one of those (C4) carries it \emph{against} the effect we report rather than wit
 is a decomposition and so only one has a residual: C2's attenuation is predicted to within
 \jdg{chEps} by the product of a depth slope and a depth gap estimated on disjoint arms. The
 channels that do \emph{not} carry are worth as much as those that do, because of which they are ---
-and they are not all of a kind. C7 is the leakage every reader demands first, and it is empty with
-a control that moves the right way: the thermodynamic predictor's skill falls on the exposed subset
-too, so what the exposed designs have is something other than memorisation. \textbf{C8 is not empty
-and is marked unresolved}: its paired difference between probe chemistries covers zero
-(\jdg{xnDiffV}), but the interval reaches \jdg{xnBdV} against a within-design rank agreement of
-\jdg{xnRhoMaxV}, permitting a probe effect as large as the whole quantity being measured, so it
-excludes nothing and may not be read as a null. \textbf{And C6 is the folding model's own free
-energy --- the covariate every one of these design programs was optimising, the first explanation
-anyone would offer for the identity effect, and the one channel that is empty} (\jdg{resVienna},
+and they are not all of a kind. \textbf{Two are unresolved rather than empty, and one of those was
+reclassified by applying to it the criterion the other had already been given.} C8's paired
+difference between probe chemistries covers zero (\jdg{xnDiffV}) while its interval reaches
+\jdg{chReachEight} of the quantity being measured, so it excludes nothing and may not be read as a
+null. C7 --- the leakage every reader demands first --- has an interval that covers zero and
+reaches \jdg{chReachSeven} of its own quantity, \emph{further} than the one that moved C8, and the
+asymmetry its earlier reading rested on does not resolve either (\jdg{didPoint}, \jdg{didCi}). A
+criterion stated for one channel binds the other, so C7 is now marked unresolved; that is the
+ledger being made self-consistent, not a finding about leakage. \textbf{What is left is C6, the
+folding model's own free energy --- the covariate every one of these design programs was
+optimising, the first explanation anyone would offer for the identity effect, and now the only
+channel this paper calls empty} (\jdg{resVienna},
 \jdg{resViennaCi}; at most \jdg{bdViennaAbs} of the contrast can run through it, in the contrast's
 own units rather than as a share of it --- \S\ref{sec:bound} keeps the share form with the
 qualification it needs).
@@ -1688,8 +1725,8 @@ qualification it needs).
 out to be carried by something other than the ability it names, this field's established remedy is
 to change the split: homology-aware partitions, family-held-out folds, rebuilt test sets
 \citep{szikszai2022generalize,flamm2022caveats,qiu2023sequence,chanrg2026,szikszai2026gauging}.
-That remedy is exact for the channel it was built for, and it is why C7 above is empty. It is also
-why the rest of the table exists. A split reassigns \emph{molecules}, so it closes a channel only
+That remedy is exact for the channel it was built for, and C7 is that channel. It is also why the
+rest of the table exists. A split reassigns \emph{molecules}, so it closes a channel only
 when the covariate is a property of how molecules resemble one another; a covariate that is a
 property of a \emph{choice somebody made about} a molecule travels with it into whichever side it
 lands on. Classifying every row on that criterion, with the reason recorded in the artifact,
@@ -2070,10 +2107,20 @@ graded against all of the model's own training file (\S\ref{sec:leakage}), so \j
 exact on the released labelled corpus rather than a bound on it --- but the pseudo-label
 pre-training tier stays outside any audit built from released measurements, since a sequence can
 have been seen without its label having been seen. It is priced as unpriceable in
-\S\ref{sec:ledger}. What neither covers belongs here instead: EternaFold is not a clean control.
-Its parameters were fitted to Eterna cloud-lab data and this corpus is an Eterna round, so it is
-innocent of these molecules but not of the design population that produced them --- which weakens
-C5's training-data arm specifically, and in the direction of understating it.
+\S\ref{sec:ledger}. \textbf{What the audit does not do is exclude a leakage effect}: the exposed
+and unexposed subsets differ by an interval that covers zero and reaches \jdg{chReachSeven} of the
+skill it is a difference in, and the asymmetry between the two models' drops does not resolve
+either (\jdg{didPoint}, \jdg{didCi}), which is why C7 is marked unresolved rather than empty. What neither covers belongs here instead: EternaFold is not a clean
+control. Its parameters were fitted to Eterna cloud-lab data and this corpus is an Eterna round,
+so it is innocent of these molecules but not of the design population that produced them.
+\textbf{An earlier version of this paragraph asserted a direction for that contamination without
+deriving one, and asserted it the wrong way round.} The training-data axis is EternaFold minus
+ViennaRNA, and familiarity with the population these molecules came from can only move EternaFold
+closer to how they actually behave, which is the direction that \emph{enlarges} that difference.
+So \jdg{axData} (\jdg{axDataCi}) is an upper bound on what parameter provenance is worth rather
+than a lower one, and \jdg{axArch} is correspondingly a lower bound on how far the decomposition
+leads it. We cannot price the contamination and do not try; we can say which way it runs, and it
+runs the opposite way to what this paragraph previously said.
 
 \paragraph{An orientation flip cannot deliver every causal quantity.} It preserves the unordered
 pair type, so it measures whether a model's prediction of the consequences of this substitution
@@ -2145,7 +2192,7 @@ by design programs, filtered by a rule, mutated at pairs somebody picked, scored
 that is a model's own output --- a benchmark number is carried by a covariate somebody chose until
 it is shown otherwise, and an instrument's job is to name each chooser and price the channel.
 Section~\ref{sec:ledger} does that for \jdg{chPriced} of them: \jdg{chCarry} carry the number,
-\jdg{chEmpty} are empty, \jdg{chUnres} is unresolved and labelled so rather than counted as empty,
+\jdg{chEmpty} is empty, \jdg{chUnres} are unresolved and labelled so rather than counted as empty,
 and \jdg{chUnpriced} choosers we can name and cannot price. The channels that do not carry are the
 ones a reader demands first, and the emptiest is the free energy every one of these programs was
 written to minimise.
@@ -2580,6 +2627,32 @@ Depth alone delivers at least 80\% of the best implementation's gain over random
 \multicolumn{2}{@{}p{0.95\textwidth}@{}}{\footnotesize\emph{The last row holds at the declared
   budget and tie rule and is at its boundary elsewhere: under randomised ties at the 10\% budget the
   share is \jdg{tvShareRTen}, below the staked $80\%$. Reported, not buried.}}\\
+\midrule
+\multicolumn{2}{@{}l@{}}{\emph{frozen before the leakage channel was re-examined (\S\ref{sec:leakage})}}\\
+\textbf{The difference between the two models' drops on the exposed subset excludes zero} ---
+  \emph{it does not: \jdg{didPoint} (\jdg{didCi}). The reading this manuscript had printed, that
+  exposed designs are harder rather than remembered, and the reading that they are partly
+  remembered, are both left standing by that interval. The channel is marked unresolved and
+  neither reading is asserted} & \textbf{failed} \\
+\textbf{The exposure-label permutation puts the observed asymmetry above its 95th percentile} ---
+  \emph{it does not: $p=\jdg{didPermP}$ over \jdg{didPermN} draws against a null centred on
+  \jdg{didPermCentre}. The null being centred is the check passing; the observed value not
+  clearing it is the stake failing, and the two are separate facts} & \textbf{failed} \\
+The neural model's slope on the exposed subset excludes zero \quad(\jdg{lkNeuralExp},
+  \jdg{lkNeuralExpCi}) & correct \\
+C7's interval reaches at least half the quantity it is a difference in, so the criterion that moved
+  C8 moves it too \quad(\jdg{chReachSeven} against C8's \jdg{chReachEight}) & correct \\
+\multicolumn{2}{@{}p{0.95\textwidth}@{}}{\footnotesize\emph{Erratum on the third row's wording. It
+  was frozen as ``the neural model's exposed-subset interval excludes zero, i.e.\ it demonstrably
+  retains skill where the thermodynamic control does not''. The first clause is what the row is
+  graded on and it passed; the second clause is a comparison between two arms, which is exactly
+  what the first row's interval refuses to resolve. The declaration is not edited --- a frozen
+  declaration never is --- and the gloss is withdrawn here rather than carried into the main text.
+  Verified before any of it was read: an estimator importing nothing from the earlier run
+  reproduces its four arm slopes to $4\times10^{-6}$ and both of its published intervals exactly,
+  the demeaned and Frisch--Waugh--Lovell routes agree to $10^{-15}$, the two algebraic forms of the
+  difference of differences agree to $6\times10^{-17}$, and a model's difference against itself is
+  exactly zero.}}\\
 \end{longtable}}
 
 \noindent The fifth row of the ranking block is the one worth reading. Its run returned every staked
