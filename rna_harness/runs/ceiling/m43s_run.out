@@ -1,0 +1,28 @@
+设计格 158(M43 发表 158)  野生型 158
+
+=== 四个实现在同一批野生型上的原生结构
+    RNAstructure 完成 158 条,用时 7s
+    EternaFold 结构 50/158
+    EternaFold 结构 100/158
+    EternaFold 结构 150/158
+  覆盖 {'ViennaRNA': 158, 'EternaFold': 158, 'RNAstructure': 158, 'RibonanzaNet': 158}
+
+=== 实现之间两两一致(设计窗口内,配对集合的 F1,按格取中位)
+                     ViennaRNA    EternaFold  RNAstructure  RibonanzaNet
+  ViennaRNA             1.0000        0.9090        0.9710        0.7124
+  EternaFold            0.9090        1.0000        0.9000        0.7740
+  RNAstructure          0.9710        0.9000        1.0000        0.7207
+  RibonanzaNet          0.7124        0.7740        0.7207        1.0000
+
+=== 检验(先于任何评分)
+  自比恒等 {'ViennaRNA': 1.0, 'EternaFold': 1.0, 'RNAstructure': 1.0, 'RibonanzaNet': 1.0}  -> 通过
+  对称性最大偏差 0.00e+00  -> 通过
+  反向对照 ViennaRNA|RNAstructure 全长 本次 0.9709  M43 发表 0.9709  -> 通过   (窗口内的同一对是 0.9710,是另一个量)
+
+=== 记分(声明冻结于 425f3271,本次不改动它)
+  1_two_nn_implementations_cluster                 成立
+  2_rankings_are_not_identical                     成立
+  3_at_least_one_swap_resolves                     **失败**
+  4_variants_span_less_than_implementations        成立
+
+写出 /data/wenhui/openclaude_rna/rna_harness/runs/ceiling/m43s_score.json  用时 28.0s

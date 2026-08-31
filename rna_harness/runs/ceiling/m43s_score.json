@@ -1,0 +1,140 @@
+{
+ "scores": "m43_reorder_declaration.json",
+ "reads": "m43_reorder.json",
+ "cost": "offline, $0",
+ "declaration_not_edited": true,
+ "why": "m43_reorder.json carries staked:null; the declaration stakes four predictions",
+ "pairwise_median_f1": {
+  "ViennaRNA|ViennaRNA": 1.0,
+  "ViennaRNA|EternaFold": 0.90901,
+  "ViennaRNA|RNAstructure": 0.97101,
+  "ViennaRNA|RibonanzaNet": 0.71241,
+  "EternaFold|ViennaRNA": 0.90901,
+  "EternaFold|EternaFold": 1.0,
+  "EternaFold|RNAstructure": 0.9,
+  "EternaFold|RibonanzaNet": 0.77402,
+  "RNAstructure|ViennaRNA": 0.97101,
+  "RNAstructure|EternaFold": 0.9,
+  "RNAstructure|RNAstructure": 1.0,
+  "RNAstructure|RibonanzaNet": 0.72066,
+  "RibonanzaNet|ViennaRNA": 0.71241,
+  "RibonanzaNet|EternaFold": 0.77402,
+  "RibonanzaNet|RNAstructure": 0.72066,
+  "RibonanzaNet|RibonanzaNet": 1.0
+ },
+ "n_cells_pairwise": {
+  "ViennaRNA|ViennaRNA": 158,
+  "ViennaRNA|EternaFold": 158,
+  "ViennaRNA|RNAstructure": 158,
+  "ViennaRNA|RibonanzaNet": 158,
+  "EternaFold|ViennaRNA": 158,
+  "EternaFold|EternaFold": 158,
+  "EternaFold|RNAstructure": 158,
+  "EternaFold|RibonanzaNet": 158,
+  "RNAstructure|ViennaRNA": 158,
+  "RNAstructure|EternaFold": 158,
+  "RNAstructure|RNAstructure": 158,
+  "RNAstructure|RibonanzaNet": 158,
+  "RibonanzaNet|ViennaRNA": 158,
+  "RibonanzaNet|EternaFold": 158,
+  "RibonanzaNet|RNAstructure": 158,
+  "RibonanzaNet|RibonanzaNet": 158
+ },
+ "checks": {
+  "identity": {
+   "ViennaRNA": 1.0,
+   "EternaFold": 1.0,
+   "RNAstructure": 1.0,
+   "RibonanzaNet": 1.0
+  },
+  "symmetry_max_abs": 0.0,
+  "reverse_v2_full_length": {
+   "published": 0.9709,
+   "ours": 0.9709,
+   "abs_diff": 0.0
+  },
+  "window_restricted_same_pair": 0.97101,
+  "pass": true
+ },
+ "staked": {
+  "1_two_nn_implementations_cluster": true,
+  "2_rankings_are_not_identical": true,
+  "3_at_least_one_swap_resolves": false,
+  "4_variants_span_less_than_implementations": true
+ },
+ "staked_detail": {
+  "1": {
+   "ViennaRNA_vs_RNAstructure": 0.97101,
+   "ViennaRNA_vs_RibonanzaNet": 0.71241,
+   "RNAstructure_vs_RibonanzaNet": 0.72066,
+   "note": "M43 computed only the first of these three and did not grade the stake"
+  },
+  "2": {
+   "ranking_agree": {
+    "RibonanzaNet": 1,
+    "EternaFold": 2,
+    "ViennaRNA": 3,
+    "RNAstructure": 4
+   },
+   "ranking_resp": {
+    "RibonanzaNet": 1,
+    "EternaFold": 2,
+    "RNAstructure": 3,
+    "ViennaRNA": 4
+   },
+   "kendall_tau": 0.6667
+  },
+  "3": {
+   "n_swaps": 1,
+   "n_resolved": 0,
+   "swaps": [
+    {
+     "pair": [
+      "ViennaRNA",
+      "RNAstructure"
+     ],
+     "agree_diff": 0.01082,
+     "resp_diff": -0.00135,
+     "dd_ci": [
+      -0.04209,
+      0.017
+     ],
+     "resolved": false
+    }
+   ]
+  },
+  "4": {
+   "implementations": 0.07377,
+   "parameter_variants": 0.01267,
+   "ratio": 5.82
+  }
+ },
+ "staked_text": {
+  "1": "RNAstructure and ViennaRNA agree more closely with each other on R_agree than either does with RibonanzaNet -- they are two implementations of one model family",
+  "2": "the two rankings are NOT identical: at least one pair of predictors changes order between R_agree and R_resp",
+  "3": "at least one of those order changes survives its interval, i.e. is not merely unresolved",
+  "4": "the parameter variants span LESS of the R_resp range than the implementations do"
+ },
+ "n_failed": 1,
+ "elapsed_s": 28.0,
+ "log": [
+  "设计格 158(M43 发表 158)  野生型 158",
+  "\n=== 四个实现在同一批野生型上的原生结构",
+  "  覆盖 {'ViennaRNA': 158, 'EternaFold': 158, 'RNAstructure': 158, 'RibonanzaNet': 158}",
+  "\n=== 实现之间两两一致(设计窗口内,配对集合的 F1,按格取中位)",
+  "                     ViennaRNA    EternaFold  RNAstructure  RibonanzaNet",
+  "  ViennaRNA             1.0000        0.9090        0.9710        0.7124",
+  "  EternaFold            0.9090        1.0000        0.9000        0.7740",
+  "  RNAstructure          0.9710        0.9000        1.0000        0.7207",
+  "  RibonanzaNet          0.7124        0.7740        0.7207        1.0000",
+  "\n=== 检验(先于任何评分)",
+  "  自比恒等 {'ViennaRNA': 1.0, 'EternaFold': 1.0, 'RNAstructure': 1.0, 'RibonanzaNet': 1.0}  -> 通过",
+  "  对称性最大偏差 0.00e+00  -> 通过",
+  "  反向对照 ViennaRNA|RNAstructure 全长 本次 0.9709  M43 发表 0.9709  -> 通过   (窗口内的同一对是 0.9710,是另一个量)",
+  "\n=== 记分(声明冻结于 425f3271,本次不改动它)",
+  "  1_two_nn_implementations_cluster                 成立",
+  "  2_rankings_are_not_identical                     成立",
+  "  3_at_least_one_swap_resolves                     **失败**",
+  "  4_variants_span_less_than_implementations        成立"
+ ]
+}
