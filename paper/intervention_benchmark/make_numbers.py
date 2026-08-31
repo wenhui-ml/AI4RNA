@@ -303,15 +303,23 @@ put("scBiggestPct", pct(max(v["n_distinct_flips"] for v in _L["libraries"].value
 
 # arm A: what the whole remaining public record yields once the criterion runs, not a pattern count
 _A = m41["A_new_admitted"]
-put("scNewAdmit", f"{sum(_A.values())}")
 put("scNewLibs", f"{len(_A)}")
 
 # arm Q: the admission gate, calibrated, and the measurement ceiling it implies
 _Q = m41["Q"]
 put("qcAsserted", f"{_Q['asserted_gate']:.1f}")
-put("qcPooledR", f"{_Q['pooled_split_half_r']:+.4f}")
-put("qcReliab", f"{_Q['spearman_brown_reliability']:.4f}")
-put("qcCeiling", f"{_Q['attenuation_ceiling_on_any_predictor']:.4f}")
+# The ceiling depends on how the reactivity columns are split, and the first version of this
+# reported one rule as if it were the answer. Odd/even puts each column beside its most similar
+# neighbour in the other half and inflates the agreement; contiguous confounds the halves with
+# position. All three are printed and every claim rests on the conservative end.
+_cr = _Q["ceiling_range"]
+put("qcCeilLo", f"{min(_cr):.4f}")
+put("qcCeilHi", f"{max(_cr):.4f}")
+put("qcCeiling", f"{_Q['ceiling_conservative']:.4f}")
+for _r, _lab in (("odd_even", "Oe"), ("contiguous", "Cg"), ("random", "Rd")):
+    put(f"qcR{_lab}", f"{_Q['by_split_rule'][_r]['split_half_r']:+.4f}")
+    put(f"qcCeil{_lab}", f"{_Q['by_split_rule'][_r]['ceiling']:.4f}")
+put("qcQn", f"{_Q['n_usable']}")
 put("qcCross07", f"{_Q['reliability_crossings']['0.7']:.2f}")
 put("qcLoBin", f"{min(b['split_half_r'] for b in _Q['bins'] if not b['underpowered']):.4f}")
 put("qcHiBin", f"{max(b['split_half_r'] for b in _Q['bins'] if not b['underpowered']):.4f}")
@@ -475,7 +483,7 @@ put("rkPosDp", pct(A31["dP_neural"]["frac_cells_positive"], 0))
 # disattenuated against M41's measurement ceiling: an observed rank correlation divided by the
 # largest one this outcome permits. Both series are attenuated by the same factor, so the ratio
 # between them is unchanged and the correction cannot manufacture a separation.
-_ceil = m41["Q"]["attenuation_ceiling_on_any_predictor"]
+_ceil = m41["Q"]["ceiling_conservative"]        # the conservative end, never the permissive one
 put("rkRhoDAtt", sig(A31["depth_baseline"]["rho"] / _ceil))
 put("rkRhoNAtt", sig(A31["P_neural"]["rho"] / _ceil))
 # the interval K2 was missing

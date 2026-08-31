@@ -265,12 +265,23 @@ def _R(di, dj, dij, keep):
     return None if den <= 0 else 1.0 - float(np.linalg.norm(dij[keep])) / den
 
 
-def rescue_split(rec, win=None):
-    """(R on all usable columns, R on the even ones, R on the odd ones).
+SPLIT_RULES = ("odd_even", "contiguous", "random")
+_SPLIT_RNG = np.random.default_rng(20260831)
+
+
+def rescue_split(rec, win=None, rule="odd_even"):
+    """(R on all usable columns, R on one half, R on the other), under a named split rule.
 
     The split-half is INTERNAL to one measurement: it asks whether the rescue factor is a stable
     quantity at this signal-to-noise, using no second experiment. That is what another laboratory
     can check on its own corpus before deciding whether this instrument will read on it.
+
+    THE RULE MATTERS AND THE FIRST VERSION OF THIS RAN ONLY ONE. Reactivity is spatially
+    autocorrelated -- neighbouring nucleotides belong to the same structural element -- so an
+    odd/even split puts each column beside its most similar neighbour in the OTHER half and
+    inflates the agreement. A contiguous split does the opposite, confounding the halves with
+    position. All three are computed and all three are reported; the ceiling is a range, not a
+    number, and the conservative end is the one any claim rests on.
     """
     wt = rec["wt"].react
     di, dj, dij = rec["s1"].react - wt, rec["s2"].react - wt, rec["mut"].react - wt
@@ -280,7 +291,16 @@ def rescue_split(rec, win=None):
         m[:lo] = False
         m[hi:] = False
     idx = np.where(m)[0]
-    return _R(di, dj, dij, idx), _R(di, dj, dij, idx[0::2]), _R(di, dj, dij, idx[1::2])
+    full = _R(di, dj, dij, idx)
+    if rule == "odd_even":
+        a, b = idx[0::2], idx[1::2]
+    elif rule == "contiguous":
+        h = len(idx) // 2
+        a, b = idx[:h], idx[h:]
+    else:
+        p = _SPLIT_RNG.permutation(len(idx)); h = len(idx) // 2
+        a, b = idx[p[:h]], idx[p[h:]]
+    return full, _R(di, dj, dij, a), _R(di, dj, dij, b)
 
 
 def load_primary():
@@ -394,15 +414,27 @@ def arm_Q(pool):
     # Brown steps it up to the whole measurement, and the square root of that bounds the
     # correlation any predictor can attain with the underlying signal. Reported because the
     # manuscript compares predictors against each other and never against this bound.
-    rp = float(np.corrcoef([p["h0"] for p in ok], [p["h1"] for p in ok])[0, 1])
-    sb = 2 * rp / (1 + rp)
-    ceil = math.sqrt(sb) if sb > 0 else float("nan")
-    log(f"  合并半分信度 r={rp:+.4f} → Spearman-Brown 全测信度 {sb:.4f} "
-        f"→ 任何预测器可达相关的上界 {ceil:.4f}")
+    byrule = {}
+    for r_ in SPLIT_RULES:
+        sel = [p for p in ok if p.get(f"h0_{r_}") is not None and p.get(f"h1_{r_}") is not None]
+        rp_ = float(np.corrcoef([p[f"h0_{r_}"] for p in sel], [p[f"h1_{r_}"] for p in sel])[0, 1])
+        sb_ = 2 * rp_ / (1 + rp_)
+        byrule[r_] = {"n": len(sel), "split_half_r": round(rp_, 4),
+                      "spearman_brown": round(sb_, 4),
+                      "ceiling": round(math.sqrt(sb_), 4) if sb_ > 0 else None}
+        log(f"  分半规则 {r_:11s} n={len(sel):5d}  r={rp_:+.4f}  全测信度 {sb_:.4f}  "
+            f"上界 {math.sqrt(sb_):.4f}")
+    ceils = [v["ceiling"] for v in byrule.values() if v["ceiling"]]
+    log(f"  **上界是一个区间 [{min(ceils):.4f}, {max(ceils):.4f}],任何主张只靠保守端**")
+    rp = byrule["odd_even"]["split_half_r"]; sb = byrule["odd_even"]["spearman_brown"]
+    ceil = byrule["odd_even"]["ceiling"]
     return {"calibrated": True, "n_usable": len(ok), "nbins": NBINS, "min_bin": MIN_BIN,
-            "pooled_split_half_r": round(rp, 4),
-            "spearman_brown_reliability": round(sb, 4),
-            "attenuation_ceiling_on_any_predictor": round(ceil, 4),
+            "by_split_rule": byrule,
+            "ceiling_range": [min(ceils), max(ceils)],
+            "ceiling_conservative": min(ceils),
+            "pooled_split_half_r": rp,
+            "spearman_brown_reliability": sb,
+            "attenuation_ceiling_on_any_predictor": ceil,
             "bins": bins, "reliability_crossings": cross, "asserted_gate": OLD_GATE,
             "monotone_in_sn": all(live[i]["split_half_r"] <= live[i + 1]["split_half_r"] + 1e-9
                                   for i in range(len(live) - 1))}
@@ -472,11 +504,14 @@ def main():
             if lib in ALREADY_ANALYSED:
                 continue
             for rec in recs:
-                R, h0, h1 = rescue_split(rec)
-                if R is None:
+                halves = {r_: rescue_split(rec, rule=r_) for r_ in SPLIT_RULES}
+                if halves["odd_even"][0] is None:
                     continue
-                pool.append({"src": lib, "rid": rid, "sn": rec["sn"],
-                             "R": R, "h0": h0, "h1": h1})
+                row = {"src": lib, "rid": rid, "sn": rec["sn"], "R": halves["odd_even"][0]}
+                for r_ in SPLIT_RULES:
+                    row[f"h0_{r_}"], row[f"h1_{r_}"] = halves[r_][1], halves[r_][2]
+                row["h0"], row["h1"] = row["h0_odd_even"], row["h1_odd_even"]
+                pool.append(row)
         # the lineage check the declaration did not foresee: one library, one ledger
         led = [d.get("n_admitted") for d in A[lib]["deposits"].values() if "n_admitted" in d]
         A[lib]["admission_identical_across_deposits"] = (len(set(led)) <= 1) if led else None
@@ -496,10 +531,13 @@ def main():
     log(f"    Definition 1 在主语料上纳入 {n_adm}(论文印的数),用于限定 Q 臂")
     superset = list(pool)
     for rec in prim:
-        R, h0, h1 = rescue_split(rec, win=rec["win"])
-        if R is None:
+        halves = {r_: rescue_split(rec, win=rec["win"], rule=r_) for r_ in SPLIT_RULES}
+        if halves["odd_even"][0] is None:
             continue
-        row = {"src": "primary", "rid": rec["exp"], "sn": rec["sn"], "R": R, "h0": h0, "h1": h1}
+        row = {"src": "primary", "rid": rec["exp"], "sn": rec["sn"], "R": halves["odd_even"][0]}
+        for r_ in SPLIT_RULES:
+            row[f"h0_{r_}"], row[f"h1_{r_}"] = halves[r_][1], halves[r_][2]
+        row["h0"], row["h1"] = row["h0_odd_even"], row["h1_odd_even"]
         superset.append(row)
         if (rec["design"], rec["mut_seq"]) in keys:
             pool.append(row)

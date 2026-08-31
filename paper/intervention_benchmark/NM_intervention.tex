@@ -499,10 +499,18 @@ any. And the flips that do exist are concentrated rather than spread: \jdg{scBig
 \jdg{scFlips}, or \jdg{scBiggestPct}, sit in a single library, whose reference profiles are too
 poorly measured for the outcome to be computed on most of them
 (\S\ref{sec:second}). Run through the criterion rather than counted by pattern, the
-\jdg{scNewLibs} libraries in this record that the present paper does not already analyse yield
-\jdg{scNewAdmit} admissible interventions between them. That is a statement about the surveyed record and not about what exists:
-a corpus with the required annotation would supply more, and the point of stating the boundary is
-to say what such a corpus would have to look like.
+\jdg{scNewLibs} libraries in this record that the present paper does not already analyse cannot be
+run through it as deposited, and the reasons are worth more than a count would be. One publishes no
+construct names at all, only record identifiers, so there is nothing to read a mutation from. The
+other's barcode falls \emph{inside} its reactivity window, and because no design window is
+deposited the reactivity window is the only stand-in available; used as one it reports a
+compensatory mutant as differing at four or five positions rather than two, and clause~(ii)
+refuses it. Both refusals are correct behaviour on the annotation supplied, and neither is a
+statement about the molecules. The binding condition is therefore nameable rather than numerical:
+this instrument reads a corpus that publishes a design window, per-construct naming or sequence,
+both single mutants of every double, and a reference profile above the signal-to-noise the outcome
+needs (\S\ref{sec:ceiling}). That is what a deposit must carry, and it is the transferable part of
+this survey.
 
 We identify these libraries by name and do not use the survey's own designed-versus-natural
 label, which is too coarse to carry a claim at this granularity: the two libraries analysed as
@@ -571,15 +579,23 @@ each. The two halves are two measurements of the same intervention, so their agr
 outcome's internal consistency, and it is a property of the measurement rather than of anything a
 model does.
 
-Across the \jdg{nAdmitted} admitted interventions the two halves agree at $\jdg{qcPooledR}$.
-Stepped up to the whole measurement, that is a reliability of \jdg{qcReliab}, and the correlation
-that \emph{any} predictor can attain with this outcome is bounded above by its square root,
-\jdg{qcCeiling}. \textbf{This bound is the instrument's resolution, and it is what makes the
-comparisons below legible.} The two quantities Section~\ref{sec:ranking} puts side by side ---
-\jdg{rkRhoD} for a covariate that needs no model and \jdg{rkRhoN} for the neural predictor ---
-sit at roughly a third of it. Their near-equality is therefore not the measurement saturating:
-corrected for attenuation they are \jdg{rkRhoDAtt} and \jdg{rkRhoNAtt}, still indistinguishable,
-and both still far from what this outcome would permit.
+How the columns are split changes the answer, and reporting one rule as though it were the
+answer is the first mistake this section made. Reactivity is spatially autocorrelated ---
+neighbouring nucleotides belong to the same structural element --- so splitting into odd and even
+columns places each column beside its most similar neighbour in the \emph{other} half and inflates
+the agreement, while splitting into contiguous halves confounds them with position instead. Over
+the \jdg{qcQn} interventions pooled here the two halves agree at \jdg{qcROe} under an odd--even
+split, \jdg{qcRCg} under a contiguous one and \jdg{qcRRd} under a random one. Stepped up to the
+whole measurement and square-rooted, those are ceilings of \jdg{qcCeilOe}, \jdg{qcCeilCg} and
+\jdg{qcCeilRd} on the correlation that \emph{any} predictor can attain with this outcome.
+
+\textbf{The instrument's resolution is therefore a range, \jdg{qcCeilLo} to \jdg{qcCeilHi}, and
+every claim below rests on the conservative end.} That is what makes the comparisons legible. The
+two quantities Section~\ref{sec:ranking} puts side by side --- \jdg{rkRhoD} for a covariate that
+needs no model and \jdg{rkRhoN} for the neural predictor --- sit at about four tenths of
+\jdg{qcCeilLo}. Their near-equality is therefore not the measurement saturating: corrected for
+attenuation against that end they are \jdg{rkRhoDAtt} and \jdg{rkRhoNAtt}, still indistinguishable,
+and both still far from what this outcome would permit even at its least generous reading.
 
 \paragraph{The gate, measured rather than asserted.} The same split-half statistic, computed
 within sextiles of the construct's reference signal-to-noise, is what a laboratory holding a
