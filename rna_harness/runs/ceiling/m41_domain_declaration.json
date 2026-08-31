@@ -1,0 +1,68 @@
+{
+  "id": "M41",
+  "title": "The instrument's domain of applicability: lineage-corrected census, every remaining public library run through the criterion, and the admission gate calibrated instead of asserted",
+  "frozen_before_code": true,
+  "cost": "offline, $0. RMDB deposits already downloaded; ViennaRNA local; no API, no GPU.",
+  "why": [
+    "Two reviews now say the same thing in different words: the paper's binding weakness is not",
+    "rigour, it is that the instrument is characterised on one corpus. The remedy is not to promise",
+    "more data. It is to measure the domain in which the instrument reads AT ALL, over the whole",
+    "public record, and to state the measurement-quality condition under which it reads.",
+    "",
+    "That converts a limitation into a method characterisation, which is what an Article-class",
+    "method paper is required to carry. It also fixes two defects found while preparing this run,",
+    "both recorded below as inputs and not as predictions."
+  ],
+  "inputs_established_before_this_declaration_was_written": {
+    "lineage_audit": {
+      "what_was_run": "construct-name and sequence comparison across the 11 census hit deposits, before this declaration existed",
+      "finding": "15KLIB_2A3/DMS_0000, 15KREP_2A3/DMS_0000 and 15KREP_2A3/DMS_0001 are ONE design set of 15000 constructs, not three libraries. After normalising a name-formatting quirk in 15KREP_0000 and 15KREP_0001 (the family name is written twice, '14125_construct1' -> '14125_construct114125_construct1'), the three deposits' construct-name sets have Jaccard 1.0000. Raw sequences differ only by padding (170 nt against 177 nt). 15KREP_0001 is 4 replicates of it: 60000 = 15000 x 4, and its 136 flips are 34 x 4.",
+      "reverse_control": "the other candidate libraries do not collapse: 15KLIB / M3SARS / M2SL5 / TTYH2 are pairwise Jaccard 0.0000 on both names and sequences",
+      "identities_checked": "6+2+2+1 = 11 = the census hit count; 60000 = 15000*4; 136 = 34*4",
+      "consequence": "the manuscript prints scLibs = 6 and scFlips = 4340 in BOTH the Method section and Appendix S6. Both are wrong. The lineage-correct values are 4 distinct libraries and 4170 distinct flips. This is recorded as a declaration_erratum against M27, whose declaration is NOT edited."
+    },
+    "gate_is_uncalibrated": {
+      "what_was_read": "the manuscript's own macros",
+      "finding": "the second-corpus admission gate is a reference signal-to-noise cutoff of 1.0. The rejected deposit (M3SARS) has reference SNR 0.029-0.779; the admitted one (M2SL5) has lowest reference SNR 4.324. The cutoff sits in an empty interval between 0.779 and 4.324 with no observation on either side of it.",
+      "consequence": "the cutoff is currently an assertion. No claim in the paper is known to depend on its exact value, and arm Q measures whether any does."
+    },
+    "internal_inconsistency": "Section 'The eligibility criterion' states that corpus quality fields never enter the criterion, while the second corpus applies an SNR gate at admission. Both are true of different steps and the manuscript does not separate them. Arm Q's output is the text that separates them."
+  },
+  "method": {
+    "unit_of_the_census": "a LIBRARY is a distinct design set, established by construct-name identity after the doubling normalisation, NOT a deposit and NOT a deposit name. Deposits and records continue to be reported alongside, because the ratio between them is itself the finding.",
+    "criterion_unchanged": "Definition 1 is applied exactly as published, including the M28 variant for deposits that declare no target structure (clause (iii) cannot run there; dropping it makes the test harder, not easier). No clause is altered for this run.",
+    "ttyh2_read_path": "TTYH2_DMS_0001 publishes no 'name:' fields, only 'ID:TTYH_ECS_BC_nnn', so the mutation-tag route cannot run on it. Its wild type is taken as the modal sequence at the modal length, which is the route M27's survey already used to count it. Constructs at other lengths (the deposit is 3'-truncated unevenly) are EXCLUDED and counted, not repaired. This path is declared here, before it is written, because inventing a read path after seeing a yield is how a null becomes a positive."
+  },
+  "arms": {
+    "V": "verification, printed BEFORE any result. (i) the lineage finding above reproduces from a second, independently written comparison. (ii) re-running the published criterion on M2SL5 reproduces the manuscript's 143 and 152 admitted interventions exactly; if it does not, this run stops and nothing else in it is read. (iii) a within-library permutation of the wild-type assignment admits materially fewer interventions than the true assignment.",
+    "L": "LINEAGE. The census recomputed with the library unit above: distinct libraries, distinct flips, deposits, records. Reported as a correction with the old and new values side by side.",
+    "A": "ADMISSION. Every library in the public record that has not already been analysed is run through the criterion: the 15K library and TTYH2. Reported per library as candidates -> admitted, with every refusal under its named reason. A library yielding zero is reported as zero and as the reason for zero.",
+    "Q": "THE GATE, CALIBRATED. Rather than asserting a cutoff, measure the curve. Across every admitted intervention in every library and in the primary corpus, bin by the construct's reference signal-to-noise and report, per bin: (a) yield, the fraction of candidate flips that survive admission; (b) outcome reliability, the split-half correlation of the measured rescue factor within the bin; (c) rank stability, the within-cell Spearman between the two probe chemistries where both exist. The deliverable is the SNR at which (b) and (c) cross a stated threshold, which is what another laboratory needs in order to decide whether its own corpus qualifies -- and it is the first form in which this gate becomes a method rather than a parameter.",
+    "D": "DOMAIN. The two coordinates of arm Q and arm A plotted as the instrument's empirical support: candidate flips against reference SNR, one point per library, usable and unusable separated by the calibrated gate rather than by the asserted one."
+  },
+  "constants": {
+    "SNR_BINS": "quantile bins of the pooled reference SNR, count fixed at 6 here and not chosen after seeing yields",
+    "SPLIT_HALF_SEED": 20260831,
+    "NBOOT": 2000,
+    "MIN_BIN": 30,
+    "OLD_GATE": 1.0
+  },
+  "staked": {
+    "1": "the lineage-correct library count is 4, strictly fewer than the 6 the manuscript prints",
+    "2": "the 15K library yields a NON-ZERO number of admitted interventions, and that number is under 34",
+    "3": "TTYH2 yields fewer than 22, because the length-truncation exclusion removes some candidates",
+    "4": "outcome reliability rises monotonically with reference SNR across the six bins",
+    "5": "the calibrated gate does NOT land at 1.0, because 1.0 was never estimated from anything"
+  },
+  "kill": {
+    "V2": "if the published 143/152 do not reproduce exactly, the whole run is void and is reported as a reproduction failure of the manuscript, not as a result about new libraries",
+    "underpower": "arm Q's bins are pre-judged fragile. A bin with fewer than MIN_BIN interventions is reported as under-powered and no threshold is read off it. If fewer than four bins clear MIN_BIN, arm Q reports NO calibrated gate and the manuscript keeps the asserted one, labelled as asserted.",
+    "no_manufacturing": "if arms A and Q both come back empty, that is the result. The scope statement stands on the census alone and is written as a bound on what the public record contains, never as 'nearly exhausted'."
+  },
+  "wording_rules_binding_on_the_manuscript": {
+    "W1": "the scope claim is stated as an empirical support boundary of the surveyed record, never as a claim about what exists in the world. Permitted form: 'within the public RMDB record our survey could enumerate, executed orientation flips are sparse and concentrated'. Forbidden: 'we have exhausted the public record'.",
+    "W2": "libraries that share a lineage are counted once, and the deposit count is never used where the library count is meant",
+    "W3": "an interval covering zero on any arm here is reported as unresolved, never as refuted or as empty",
+    "W4": "the calibrated gate, if arm Q produces one, replaces the asserted 1.0 everywhere or nowhere. It may not be applied to new libraries while the published corpora keep the old one."
+  }
+}
