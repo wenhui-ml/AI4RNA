@@ -1,0 +1,58 @@
+{
+  "id": "M43",
+  "title": "Does the intervention readout reorder the predictors that structure agreement ranks? An independent fourth implementation, and the rule that decides what counts as a predictor",
+  "frozen_before_code": true,
+  "cost": "offline, $0. RNAstructure 6.6 and ViennaRNA are local; RibonanzaNet probabilities come from M26c's cache; no API, no GPU beyond what M26c already spent. Timed at 0.68 s per partition function on a 177 nt construct, about 4,475 unique sequences, run under the 160-core cap.",
+  "why": [
+    "A new benchmark that ranks predictors in the same order as the incumbent one adds a number and",
+    "changes no decision. A new benchmark that REORDERS them changes which model a reader picks.",
+    "That distinction, and not the size of any single correlation, is what makes a measurement",
+    "worth adopting, and this paper has never tested it.",
+    "",
+    "The paper says 'three predictors are three predictors' and leaves it there. Three is honest and",
+    "it is not a field. But the cheap way to reach six is to swap ViennaRNA's parameter files, and",
+    "that is padding of exactly the kind this paper criticises elsewhere. The rule below is stated",
+    "before any count is reported."
+  ],
+  "definitions": {
+    "predictor": "an independent implementation: its own codebase, its own authors, its own recurrence. ViennaRNA, RNAstructure and RibonanzaNet are three.",
+    "parameter_variant": "the same engine reading a different parameter file. turner1999 and andronescu2007 under ViennaRNA are parameter variants, NOT predictors. They are run, and reported in their own table, and the headline count is implementations.",
+    "why_this_matters_here": "EternaFold enters this paper as ViennaRNA's langdon2018 parameter set rather than as its own binary. Under the rule above it is a parameter variant of ViennaRNA and not a fourth implementation, and the manuscript currently presents it alongside the others without saying so. M43 reports it in both places and says which it is."
+  },
+  "readouts": {
+    "R_agree": "the INCUMBENT ranking. For each design cell's wild type, the predictor's minimum-free-energy (or, for the neural model, its shipped) secondary structure is compared with the declared target structure, and the F1 over base pairs is recorded. The predictor's score is the mean over cells. This is the conventional structure-agreement benchmark, computed identically for every predictor. It is NOT the corpus's own agreement column, which is one model's prediction and cannot rank the others.",
+    "R_resp": "THIS PAPER'S ranking. The within-cell Spearman between the predictor's pair probability for the declared target pair on the mutant and the measured rescue factor, pooled as the paper already pools it. Unchanged from Section 'Which flips rescue'.",
+    "same_molecules": "both readouts are computed on the same design cells and the same interventions, with the stratum weights asserted byte-identical before either is read, exactly as the existing conventional-readout subsection does."
+  },
+  "arms": {
+    "V": "verification, printed BEFORE any ranking. (i) RNAstructure's pair probability for a sequence against itself and for a hairpin with a known answer. (ii) On the wild types, RNAstructure's and ViennaRNA's MFE structures agree above a reported floor -- they implement the same nearest-neighbour model, so a large disagreement means the wiring is wrong, not that the field is diverse. (iii) the recovered RibonanzaNet probabilities reproduce M26c's cached values exactly.",
+    "E1": "score every implementation and every parameter variant on both readouts.",
+    "E2": "THE REORDER TEST. The two rankings side by side; Kendall tau between them; and for every pair of predictors that changes order, a bootstrap interval on the difference of differences, resampled by target. A pair whose interval covers zero is reported as unresolved and is NOT counted as a reorder.",
+    "E3": "the parameter variants, in their own table, with the span they cover reported against the span the implementations cover. If parameter files move the ranking as much as implementations do, that is the result and it is reported as such.",
+    "E4": "the measurement ceiling from M41 applied: every R_resp value is reported raw and divided by 0.8955, so a reader can see that no ordering here is an artefact of attenuation."
+  },
+  "constants": {
+    "NBOOT": 2000,
+    "SEED": 20260901,
+    "MIN_CELL": 8,
+    "F1_ON": "wild types only, one per design cell",
+    "RNASTRUCTURE_VERSION": "6.6",
+    "CEILING_FROM_M41": 0.8955
+  },
+  "staked": {
+    "1": "RNAstructure and ViennaRNA agree more closely with each other on R_agree than either does with RibonanzaNet -- they are two implementations of one model family",
+    "2": "the two rankings are NOT identical: at least one pair of predictors changes order between R_agree and R_resp",
+    "3": "at least one of those order changes survives its interval, i.e. is not merely unresolved",
+    "4": "the parameter variants span LESS of the R_resp range than the implementations do"
+  },
+  "kill": {
+    "coverage": "if any implementation fails to produce a usable pair probability on more than 5% of interventions, it is dropped from the ranking and the drop is reported, not patched by imputing a probability",
+    "K_unresolved": "an interval covering zero is unresolved. If staked 3 fails -- every order change is unresolved -- the finding is reported as 'the two readouts do not demonstrably reorder on this corpus at this sample size', and NOT as agreement between them. Those are different statements and only the first is supported by a null.",
+    "no_padding": "the headline predictor count is the number of independent implementations. If the manuscript later wants a larger number it must add an implementation, not a parameter file."
+  },
+  "wording_rules_binding_on_the_manuscript": {
+    "W1": "EternaFold is described as ViennaRNA's langdon2018 parameter set wherever it is counted, and is not presented as an independent implementation",
+    "W2": "a reorder is claimed only for pairs whose interval excludes zero",
+    "W3": "R_agree is named as the conventional readout computed here for comparison, and is never conflated with the corpus's own shipped agreement column"
+  }
+}
