@@ -238,10 +238,21 @@ shows it does not measure what it was read as measuring. The retraction is place
 next to the calibration table that forced it, and the paper's claims are stated so that none of
 them depends on it.
 
-\paragraph{What this paper is about.} Not a new predictor, and not, in the end, a new benchmark.
-\textbf{Its object is benchmark \emph{interpretation}}, and its claim is that a benchmark number
-fails to be self-interpreting in two separate ways which must both be checked before the number
-licenses anything. It can be \emph{carried by a covariate somebody chose} rather than by the
+\paragraph{What this paper is about.} We introduce \textbf{an intervention-based instrument for
+auditing benchmark scores}: a method that takes a probing corpus and a set of predictors and
+returns, for a benchmark number computed on them, whether it measures the construct it is named
+after and whether its margin survives translation into an experimental decision. It does not
+replace structure-agreement benchmarks and it is not a predictor. It interrogates what their
+scores mean.
+
+The instrument has three stages, and the paper is organised as them. \textbf{Recover}: a stated
+criterion mines controlled two-nucleotide interventions that somebody already executed
+(\S\ref{sec:mining}). \textbf{Measure}: predictors are scored by their response to those
+interventions, on an outcome into which no folding model enters (\S\ref{sec:outcome}).
+\textbf{Translate}: the resulting margin is converted into experiments at a fixed budget
+(\S\ref{sec:reorder}). Stages two and three are what make the two audits possible, because a
+benchmark number fails to be self-interpreting in two separate ways which must both be checked
+before the number licenses anything. It can be \emph{carried by a covariate somebody chose} rather than by the
 property it is named after --- design programs wrote the molecules, a rule chose which were made,
 experimenters chose which pairs to mutate, and the reference against which agreement is scored is
 itself a model's output. And it can be entirely real and still \emph{buy nothing}, because the
@@ -734,6 +745,24 @@ two single mutants and the double, at reference signal-to-noise above \jdg{qcCro
 libraries of \jdg{dmSeq} constructs, that is a rounding error in synthesis and the difference
 between a corpus this instrument can read and one it cannot.
 
+\begin{figure}[t]
+\centering
+\input{figs/fig12_domain}
+\caption{\textbf{The instrument's domain, as three measured axes.} A corpus has to supply
+interventions, and an outcome worth reading, before any of this paper's readings can be taken on
+it. \textbf{a}, intervention density: candidate orientation-flip pairs per $10^4$ unique sequences
+for each of the \jdg{dmLib} public libraries, ranked, on a log axis because the spread is three
+orders of magnitude. The dashed line is this paper's corpus, counted the same way. Libraries
+contributing none are drawn at the axis floor. \textbf{b}, measurement reliability against
+reference signal-to-noise, split-half within sextiles; the marked crossing at \jdg{qcCross07} is
+the gate below which the outcome is not worth reading at full resolution. \textbf{c}, the two axes
+together for the deposited libraries that could be graded at all. \textbf{The admissible corner is
+the top right, and it is nearly empty} --- which is the specification, not a complaint: a library
+built for this instrument reserves four slots per intervention and keeps reference
+signal-to-noise above the gate.}
+\label{fig:domain}
+\end{figure}
+
 Two facts underwrite the search rather than being assumed by it. Every one of the \jdg{dmLib}
 libraries carries exactly a \jdg{dmPre}-nucleotide constant prefix and a \jdg{dmSuf}-nucleotide
 constant suffix, measured; and searching the design region and searching the whole construct return
@@ -1082,7 +1111,9 @@ survive the conversion at every budget. The two readings are not two papers abou
 are the two questions that have to be answered before a benchmark margin licenses a decision, and
 this paper's claim is that neither one is optional.
 
-\subsection*{Part I. The instrument}
+\subsection*{Part I. The instrument: recover, then measure}
+
+\noindent The two stages that have to work before anything can be audited. What the conventional readout can still resolve here sets what an alternative has to beat; then the interventions the corpus already contains are recovered, predictors are scored by their response, and the whole thing is repeated on molecules nobody designed.
 
 \subsection{The conventional readout on this corpus}
 \label{sec:conventional}
@@ -1863,7 +1894,7 @@ sequences, so a sequence can have been seen without its experimental label havin
 C7's audit --- built from deposited measurements --- cannot separate that case from the unseen one.
 Both are stated here, once, and not repeated in \S\ref{sec:limitations}.
 
-\subsection*{Part III. Reading 2 --- what the number buys}
+\subsection*{Part III. Reading 2 --- what the number buys, and the translate stage}
 
 \noindent Reading~1 asks whether a benchmark number is carried by the property it names. Even when it is, a second question remains and is almost never asked: what does the margin \emph{do}? A margin is a claim about a decision only if it survives being converted into one, and the conversion is available here because the outcome is an experiment somebody already ran.
 
@@ -2190,7 +2221,7 @@ Appendix~\ref{app:prereg}.]} The analysed file is the versioned release
 \texttt{OK7a\_M2R\_data.v4.5.1.csv}; every count in this paper is a count over that file, and a
 different version of it is a different corpus.
 
-\paragraph{What we are deliberately not doing, and why each is bounded rather than open.} Three
+\paragraph{What we are deliberately not doing, and why each is bounded rather than open.} Four
 questions are raised by the results above and answered here by saying what would settle them,
 because running them would lengthen the chain without changing what the paper claims.
 \emph{First}, whether the crossing of \S\ref{sec:reorder} generalises beyond this corpus. It is a
@@ -2206,7 +2237,15 @@ and crossing. Assumption~\ref{ass:placement} cannot be tested from observational
 (\S\ref{sec:estimation}), and the honest bound is the sensitivity analysis already reported rather
 than a further estimator.
 
-None of the three is a missing control for a claim made here. Each is the next experiment for a
+\emph{Fourth}, whether a contemporary foundation model orthogonal to all
+\jdg{reNimpl} of these would change the picture. It would extend the panel but not the argument:
+the panel already spans two model families with measured geometry (\S\ref{sec:reorder}), and a
+fifth member of either family would move the response readout by less than \jdg{reSpanImpl}. A
+genuinely orthogonal architecture is worth adding and we have not added one, and the honest
+statement is that our conclusions are about the \jdg{reNimpl} scored and about what an average
+advantage does under budget, not about the field.
+
+None of the four is a missing control for a claim made here. Each is the next experiment for a
 claim we have deliberately not made.
 
 % =====================================================================

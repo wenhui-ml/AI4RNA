@@ -1026,12 +1026,86 @@ def fig_budget():
     emit("fig11_budget.tex", group(2, body, hsep="1.9cm"))
 
 
+
+# ---------------------------------------------------------------- Fig 12: the domain specification
+def fig_domain():
+    """What a corpus must supply before this instrument can read it, as three measured axes.
+
+    a: intervention density. Candidate orientation-flip pairs per 10^4 unique sequences, for every
+       public library in the released corpus, against this paper's own. Log scale, because the
+       spread is three orders of magnitude and that IS the finding.
+    b: measurement reliability against reference signal-to-noise, with the threshold crossing
+       marked -- the gate a laboratory applies before trusting the outcome.
+    c: the two axes together for the deposited libraries that could be graded, so a reader can see
+       which corner is admissible and how empty it is.
+    """
+    m45, m41 = J("m45_flip_ceiling.json"), J("m41_domain.json")
+    per = m45["per_library"]
+    dens = sorted(((v["candidates"] / v["n_unique"] * 1e4, k) for k, v in per.items()),
+                  reverse=True)
+    # this paper's corpus on the same axis: admitted interventions per 10^4 design regions
+    own = m45["E5_calibration"]
+    own_d = own["admissible_under_definition_1"] / own["own_corpus_design_regions"] * 1e4
+    FLOOR = 0.02                                  # so zeros are visible on a log axis
+    ys = [max(d, FLOOR) for d, _ in dens]
+    n = len(ys)
+
+    bins = m41["Q"]["bins"]
+    sn = [b["sn_median"] for b in bins]
+    rel = [b["split_half_r"] for b in bins]
+    cross = m41["Q"]["reliability_crossings"].get("0.7")
+
+    D = [d for d in m41["D"] if d["n_admitted_total"] > 0 or d["sn_reference_median"] > 0]
+    dx = [max(d["n_admitted_total"], 0.5) for d in D]
+    dy = [d["sn_reference_median"] for d in D]
+    dn = [d["library"].replace("_", r"\_") for d in D]
+
+    body = rf"""\nextgroupplot[width=5.4cm, height=4.6cm, ymode=log,
+    xlabel={{public libraries, ranked}}, ylabel={{candidate pairs per $10^4$ seq.}},
+    xmin=0, xmax={n+1}, ymin={FLOOR*0.6:.3f}, ymax={max(max(ys), own_d)*3:.2f},
+    title={{a}}]
+\addplot[ybar, bar width=3.4pt, fill={GREY}, draw=none, forget plot]
+  coordinates {{{co(list(range(1, n+1)), [f"{y:.4f}" for y in ys])}}};
+\addplot[color={NEU}, line width=0.9pt, dashed, forget plot]
+  coordinates {{(0,{own_d:.4f}) ({n+1},{own_d:.4f})}};
+\node[font=\scriptsize, color={NEU}, anchor=north east] at (axis cs:{n+1},{own_d*0.8:.4f})
+  {{this corpus}};
+
+\nextgroupplot[width=5.2cm, height=4.6cm,
+    xlabel={{reference signal-to-noise}}, ylabel={{split-half reliability}},
+    ymin=0.45, ymax=0.80, title={{b}}]
+\addplot[color={FREE}, line width=1.3pt, mark=*, mark size=1.6pt, forget plot]
+  coordinates {{{co([f"{x:.2f}" for x in sn], [f"{y:.4f}" for y in rel])}}};
+\addplot[color={GREY}, line width=0.4pt, dashed, forget plot]
+  coordinates {{({min(sn):.2f},0.7) ({max(sn):.2f},0.7)}};"""
+    if cross:
+        body += rf"""
+\addplot[color={INK}, line width=0.5pt, forget plot]
+  coordinates {{({cross:.3f},0.45) ({cross:.3f},0.80)}};
+\node[font=\scriptsize, color={INK}, anchor=south west, rotate=90]
+  at (axis cs:{cross:.3f},0.46) {{gate}};"""
+    body += rf"""
+
+\nextgroupplot[width=5.2cm, height=4.6cm, xmode=log,
+    xlabel={{admitted interventions}}, ylabel={{reference SN (median)}},
+    xmin=0.3, xmax={max(dx)*4:.0f}, ymin=-0.6, ymax={max(dy)*1.5:.1f},
+    title={{c}}]
+\addplot[color={GREY}, line width=0.4pt, dashed, forget plot]
+  coordinates {{(0.3,{cross if cross else 9.3:.3f}) ({max(dx)*4:.0f},{cross if cross else 9.3:.3f})}};
+\addplot[color={THM}, mark=*, mark size=2pt, only marks, forget plot]
+  coordinates {{{co([f"{x:.1f}" for x in dx], [f"{y:.3f}" for y in dy])}}};"""
+    for x, y, nm in zip(dx, dy, dn):
+        body += (rf"""
+\node[font=\tiny, color={INK}, anchor=south] at (axis cs:{x:.1f},{y:.3f}) {{{nm[:11]}}};""")
+    emit("fig12_domain.tex", group(3, body, hsep="1.55cm"))
+
+
 if __name__ == "__main__":
     print("emitting TikZ display items")
     ok = True
     for fn in (fig_arch, fig_flip, fig_corpus, fig_calibration, fig_ranking, fig_audits,
                fig_estimator, fig_scale, fig_contrasts, fig_params, fig_transfer,
-               fig_withdrawal, fig_budget, figA_admission, figA_strata, figA_ribosnitch,
+               fig_withdrawal, fig_budget, fig_domain, figA_admission, figA_strata, figA_ribosnitch,
                figA_exposure, figA_survey):
         try:
             fn()
