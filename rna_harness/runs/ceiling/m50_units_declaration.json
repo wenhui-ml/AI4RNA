@@ -1,0 +1,56 @@
+{
+  "id": "m50_units",
+  "title": "Section 5.4 subtracts four columns that are not on one scale, in a section that prints the conversion factor 40 lines later. Put them on a common scale and re-read the comparison.",
+  "frozen_before_code": true,
+  "cost": "offline, $0 -- no API, no GPU, no download. Reads M26's records, m26c_pneural_cache.npz, m32_eterna_cache.npz.",
+
+  "why": [
+    "Section 5.1 states the rule: two readouts on different columns 'are not on one scale and may not simply be subtracted', and it obeys the rule by reporting each column's pooled within-stratum SD and testing the standardised difference on one design-clustered resample.",
+    "Section 5.4 breaks that rule. Its table holds the matched contrast in the measured rescue factor (+0.0539) beside the matched contrast in each predictor's own pair probability (+0.0605, -0.0304, -0.00569), and it subtracts across them: 'The measurement is indistinguishable from the transformer (-0.00662)'. That subtraction carries the word 'tracking' in Claim 2 and in the abstract.",
+    "The same section then prints the conversion factor. Its upper-bound paragraph multiplies each predictor's contrast by that predictor's within-stratum slope on the outcome (+0.12059, +0.20692) and divides by the measured contrast, giving 6.8% and 23.2%. 0.0605 x 0.20692 / 0.0539 = 0.2323, so the arithmetic is the paper's own.",
+    "So the section knows the probability column must be multiplied by a slope before it can enter rescue units, uses that fact to compute a bound, and forty lines earlier subtracts the unmultiplied number."
+  ],
+
+  "algebraic_bridge_established_before_the_run": {
+    "note": "Verified symbolically and numerically before this declaration was written, so the run tests it rather than discovers it.",
+    "identity": "bound = Delta_p * g / alpha_R = rho * (Delta_p/SD_p) / (alpha_R/SD_R), because g = rho * SD_R / SD_p",
+    "consequence": "the slope route is the SD route attenuated by rho. The two routes answer different questions -- 'does the predictor separate the pair types as sharply, each in its own units' versus 'how much of the measured effect could travel through this predictor' -- and neither is a correction of the other. What is not either question is the raw subtraction."
+  },
+
+  "arms": {
+    "A1": "pooled within-stratum SD of each of the four columns on the matched set",
+    "A2": "each column's matched contrast divided by its own within-stratum SD, with a target-clustered 95% interval",
+    "A3": "paired differences of the SD-standardised contrasts, measurement minus each predictor, all four columns evaluated inside the SAME resample draw",
+    "A4": "slope route: each predictor's contrast multiplied by its own within-stratum slope on the outcome, differenced against the measured contrast, with the slope RESAMPLED inside the same draw rather than held as a constant",
+    "A5": "numerical check of the bridge identity on the point estimates",
+    "A6": "reverse control -- reproduce the four published contrasts, the three published raw paired differences, and the two published bounds"
+  },
+
+  "verification_before_any_arm_is_read": {
+    "V1_zero_point": "a column standardised against itself gives a paired difference of exactly 0 in every draw; a constant column has SD 0 and must be refused rather than divided by",
+    "V2_equivalent_form": "the standardised contrast computed as (contrast / SD) must equal the contrast recomputed after the column itself is standardised, to 1e-9, in every draw",
+    "V3_reverse_control": "the four raw contrasts must reproduce the manuscript's published values to 1e-4, and the raw paired difference measurement-minus-transformer must reproduce -0.00662 to 1e-4, before any standardised number is read",
+    "V4_bridge": "the identity above must hold to 1e-9 on the point estimates for both predictors that have a published bound"
+  },
+
+  "kill_conditions": {
+    "K1": "if A6 fails to reproduce any published contrast or the published raw difference to 1e-4, VOID -- the estimator is not the paper's",
+    "K2": "if V1, V2 or V4 fails, VOID",
+    "K3": "if any column's pooled within-stratum SD is below 0.01, that column is reported WITHOUT a standardised value rather than divided by a number too small to be stable",
+    "K4": "if the two routes disagree in SIGN on the same comparison, neither is reported as the answer and both are reported as the finding"
+  },
+
+  "staked_predictions": [
+    {"id": "S1", "text": "the paired interval on the SD-standardised measurement-minus-transformer difference EXCLUDES zero, so the word 'indistinguishable' does not survive standardisation"},
+    {"id": "S2", "text": "the slope-route difference between the measured contrast and the transformer's contrast converted into rescue units EXCLUDES zero"},
+    {"id": "S3", "text": "the SD-standardised measurement-minus-transformer difference is POSITIVE, i.e. the measurement separates the pair types more sharply in its own units than the transformer does in its own"},
+    {"id": "S4", "text": "the bridge identity holds to 1e-9"}
+  ],
+
+  "wording_rules_binding_on_the_manuscript": {
+    "W1": "a difference between two columns in raw units may not be printed as licensing a conclusion. The raw paired differences are either removed or kept with an explicit statement, at the number, that they are not on one scale.",
+    "W2": "the word 'tracking' in Claim 2 and in the abstract must be restated in whichever unit this run supports, or withdrawn. It may not be left as it is.",
+    "W3": "the manuscript must state that the two routes answer different questions and give the bridge identity, rather than presenting either as a correction of the other.",
+    "W4": "differences BETWEEN predictors (transformer minus thermodynamic, and the two nearest-neighbour models against each other) are within one unit system and are NOT affected by this run. The decomposition and training-data axes of Claim 2 stand unless this run says otherwise."
+  }
+}
