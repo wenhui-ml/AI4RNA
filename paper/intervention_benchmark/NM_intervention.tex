@@ -152,8 +152,9 @@ number, \jdg{chEmpty} are bounded and empty, \jdg{chUnres} is unresolved. The sa
 interventionally rather than as agreement give \jdg{cvIntvSd} standard deviations against
 \jdg{cvConvSd}; the empty channel is the folding model's own free energy, the objective every one
 of these design programs was optimising. \emph{Reading two} converts the incumbent benchmark's
-margin into experiments. At a fixed budget no implementation is distinguishable from helix depth, a
-free integer; the panel's largest agreement margin, \jdg{dcTransF1}, is worth \jdg{dcTransPct} of
+margin into experiments. At a fixed budget no implementation outperforms helix depth, a free integer, and
+\jdg{eqNeq} of \jdg{eqNcomp} comparisons are formally equivalent to it within the gain one extra
+construct buys; the panel's largest agreement margin, \jdg{dcTransF1}, is worth \jdg{dcTransPct} of
 this corpus's rescuing interventions; and the gap changes sign exactly \jdg{ivNcross} time as
 budget is swept, at \jdg{ivCrossA}--\jdg{ivCrossB} of a design built. \textbf{A model's agreement
 advantage is an average, and the better it ranks on that average the further from the top of its
@@ -274,8 +275,10 @@ recomputed by two
 independently written estimators agreeing to \jdg{resAgree}.
 \item \textbf{The conversion of a benchmark margin into experiments} (\S\ref{sec:reorder}), which
 is the second reading and the one no benchmark performs on itself. Across \jdg{reNimpl} independent
-implementations and three budgets, no model is distinguishable from a free integer as a standalone
-ranker of which interventions to build; the panel's largest structure-agreement margin,
+implementations and three budgets, no model outperforms a free integer as a standalone ranker of
+which interventions to build, and against a margin fixed as the gain one extra construct buys,
+\jdg{eqNeq} of \jdg{eqNcomp} comparisons are formally equivalent to it while the other
+\jdg{eqNfail} fail on the side of being worse; the panel's largest structure-agreement margin,
 \jdg{dcTransF1}, is worth \jdg{dcTransPct} of this corpus's rescuing interventions; and at the
 tightest budget the margin's sign \emph{inverts} (\jdg{tvGapTen} \jdg{tvGapCiTen}) --- a
 crossing that survives every choice that produced it (Claim~\ref{claim:budget}).
@@ -610,6 +613,44 @@ value at Pearson $\jdg{rpPearson}$ and Spearman $\jdg{rpSpearman}$ --- same mean
 deviation of \jdg{rpMaxDiff} and a median of \jdg{rpMedDiff}. \textbf{The outcome is measurement-derived end to end; no folding model appears
 anywhere in it.} Nothing in this paper is therefore circular in the way a profile-constrained
 structure comparison would be.
+
+\paragraph{A window-level outcome scoring a pair-level prediction.} A predictor emits a probability
+for \emph{one} pair; \eqref{eq:rescue} normalises over \emph{every} position in the design window.
+An intervention could therefore restore its own pair while a distant helix reorganises, or fail at
+its own pair while the window stays quiet, and if the outcome were dominated by distal structure
+then what this paper scores would not be the response at the target pair. That is a question about
+the estimand rather than about a margin, so we answer it by measurement: \eqref{eq:rescue} is
+recomputed with all three norms restricted to within $\pm w$ of either intervened position.
+Across \jdg{lcNwin} window widths the recomputed outcome ranks with the full-window one at
+\jdg{lcRhoFifteen} for $\pm15$ and never below \jdg{lcRhoLo}, and \textbf{every conclusion this
+paper draws survives at every width}: helix depth's recovery at a 25\% budget moves only between
+\jdg{lcDepthFive} and \jdg{lcDepthTwentyFive} against \jdg{lcDepthFull} on the full window, no
+implementation's advantage over depth exceeds \jdg{lcAdvMax} at any width, and the sign inversion
+of \S\ref{sec:reorder} is negative at every one of them (\jdg{lcGapMax} at its weakest against
+\jdg{lcGapFull} on the full window). We adopt no window: the full-window value the corpus released
+remains the reported outcome, and this is a statement that distal changes do not dominate the
+ranking on this corpus, not that the outcome is local.
+
+\begin{scopebox}
+\textbf{An empirical null for the outcome, from constructs we did not know were there.} The check
+that the window is centred on the intervention failed on \jdg{noopN} constructs, and diagnosing it
+rather than relaxing it produced a control this benchmark did not have. Those constructs carry
+mutation tags whose substitution is null --- an \texttt{A} at position 40 replaced by an
+\texttt{A} --- so their design-region sequence is identical to the wild type's. They were
+nonetheless synthesised, probed and given a rescue factor independently. \textbf{They are therefore
+the outcome measured when nothing was changed.} Definition~\ref{def:flip} had already refused all
+\jdg{noopN} under its two-positions clause and none is among the \jdg{nAdmitted} admitted, which is
+the criterion behaving correctly on a construct class nobody had looked at.
+
+Their rescue factor has mean \jdg{noopMean}, median \jdg{noopMed}, standard deviation
+\jdg{noopSd} and runs from \jdg{noopLo} to \jdg{noopHi}, and \textbf{\jdg{noopFP} of them cross the
+\jdg{noopThr} threshold at which this paper calls an intervention rescued.} That is a measured
+false-positive rate for the binary outcome, and we are aware of no benchmark in this neighbourhood
+that reports one. It does not bias any comparison here --- every ranker is scored against the same
+labels, so a shared false-positive rate attenuates them together --- but it is most of the reason
+the attainable ceiling of \S\ref{sec:ceiling} sits at \jdg{qcCeilLo}--\jdg{qcCeilHi} rather than
+near one, and any predictor's correlation with this outcome should be read against it.
+\end{scopebox}
 
 \subsection{How much the outcome can resolve, and the gate that follows from it}
 \label{sec:ceiling}
@@ -1913,11 +1954,41 @@ oracle                & \jdg{dcOracleTen} & \jdg{dcOracleQtr} & \jdg{dcOracleHal
 \end{tabular}
 \end{center}
 
-\noindent \textbf{Not one of the twelve model-minus-depth intervals excludes zero.} No
-implementation, at any budget, is distinguishable from the free integer as a standalone ranker. The
+\noindent \textbf{Not one of the twelve model-minus-depth intervals excludes zero.} The
 levels behind the 25\% column, for scale: random recovers \jdg{dcRandQtr}, depth \jdg{dcDepthQtr},
 ViennaRNA \jdg{dcVieQtr}, RibonanzaNet \jdg{dcRnetQtr}, depth with the model breaking ties
 \jdg{dcStackQtr}, and a perfect oracle \jdg{dcOracleQtr}.
+
+\paragraph{An interval covering zero is not equivalence, and this paper says so elsewhere.} A
+confidence interval containing zero is a failure to resolve a difference, not evidence that there
+is none --- which is exactly the reason C8's channel is marked \emph{unresolved} rather than empty
+in \S\ref{sec:ledger}. Applying the weaker standard here would leave the paper holding two. An
+equivalence claim needs a margin, so we fix one by a rule that touches only the free baseline and
+the geometry of the corpus, and therefore cannot have been chosen to suit the differences it
+judges: \textbf{a ranker difference is negligible if building one more construct would have gained
+more.} Free depth gains \jdg{eqSlope} of recovery per unit of budget, the median design cell holds
+\jdg{eqMedCell} candidates so one construct is \jdg{eqOneTube} of a budget, and the margin is
+therefore $\delta = \jdg{eqDelta}$. Each comparison then reports $\delta^\star$, the smallest
+margin at which two one-sided tests would declare equivalence at $\alpha=0.05$ --- the larger
+absolute endpoint of its 90\% target-clustered interval --- so a reader who rejects our $\delta$
+can apply their own. Depth against itself returns $\delta^\star = \jdg{eqSelfDs}$.
+
+\textbf{\jdg{eqNeq} of the \jdg{eqNcomp} comparisons are equivalent to free depth within one
+construct, and \jdg{eqNfail} are not.} The three that are not are \jdg{eqFailNames}, all at the
+\jdg{eqFailBudget} budget, with $\delta^\star$ from \jdg{eqFailDsLo} to \jdg{eqFailDsHi}. They fail
+in the direction that matters: their point estimates are negative, as far as \jdg{eqFailWorst}, so
+what the data cannot rule out is that the three implementations sharing the nearest-neighbour
+decomposition are \emph{worse} than a free integer by more than one construct's worth. At the 10\% and
+25\% budgets all \jdg{reNimpl} are equivalent to free depth within $\delta$.
+
+\textbf{The same margin disciplines our own positive result.} Composition --- depth with a model
+breaking its ties --- is statistically resolved: \jdg{eqBestPt}, 90\% interval \jdg{eqBestCi} at
+the 25\% budget. It is also equivalent to plain depth within one construct, $\delta^\star =
+\jdg{eqBestDs}$, and so is every other stacked arm (largest $\delta^\star$ \jdg{eqStackMaxDs}).
+Both halves are true and we report both: \emph{the composition gain is resolvable and is worth less
+than one extra tube}. Taken together, at every budget everything in this panel, including the best
+ranker we can compose from it, sits within one construct of free helix depth --- except where it
+sits worse.
 What is distinguishable is the composition: using a model only to break depth's ties recovers
 \jdg{dcStackVsQtr}~\jdg{dcStackVsCiQtr} more at the 25\% budget and
 \jdg{dcStackVsHalf}~\jdg{dcStackVsCiHalf} at 50\%. This is the same shape as
@@ -2025,8 +2096,10 @@ favours whichever model ranks higher on structure agreement.}
 
 \begin{claimbox}
 \claimhead{claim:budget} Across \jdg{reNimpl} independent implementations and three budgets, no
-model is distinguishable from a free integer as a standalone ranker of which interventions to
-build (twelve intervals, none excluding zero). The panel's largest structure-agreement margin,
+model outperforms a free integer as a standalone ranker of which interventions to build: none of
+\jdg{eqNcomp} intervals excludes zero, and against a margin fixed as the gain one extra construct
+buys ($\delta=\jdg{eqDelta}$), \jdg{eqNeq} of \jdg{eqNcomp} comparisons are equivalent to free
+depth while the remaining \jdg{eqNfail} fail on the side of being \emph{worse}. The panel's largest structure-agreement margin,
 \jdg{dcTransF1}, converts to \jdg{dcTransPct} of the rescuing interventions in this corpus, and at
 the tightest budget its sign inverts (\jdg{tvGapTen}~\jdg{tvGapCiTen}). The inversion is a measured
 crossing rather than three points: swept over \jdg{ivSweepN} budgets the gap changes sign exactly
@@ -2685,6 +2758,28 @@ The unexposed subset's neural slope stays in $[\jdg{lkStakeLo},\jdg{lkStakeHi}]$
 Every verbatim design from the earlier file is still verbatim \quad(\jdg{lkVerbatimT3} of \jdg{lkVerbatimT3}) & correct \\
 Skill still does not rise monotonically with exposure tier & correct \\
 At least one design moves up a tier \quad(\jdg{lkFullMoved}) & correct \\
+\midrule
+\multicolumn{2}{@{}l@{}}{\emph{frozen before the equivalence test existed (\S\ref{sec:reorder})}}\\
+\textbf{Every implementation is equivalent to free depth at the one-construct margin} ---
+  \emph{\jdg{eqNfail} of \jdg{eqNcomp} are not, all at the \jdg{eqFailBudget} budget
+  (\jdg{eqFailNames}), and they fail on the side of being worse. The manuscript sentence claiming
+  none is distinguishable has been rewritten arm by arm rather than softened} & \textbf{failed} \\
+Depth against itself returns $\delta^\star$ below \jdg{eqStakeSelf} \quad(\jdg{eqSelfDs}) & correct \\
+\textbf{At least one depth-then-model arm is NOT equivalent, so the margin can separate something}
+  --- \emph{none is: the largest is \jdg{eqStackMaxDs} against a margin of \jdg{eqDelta}. Our own
+  composition gain is statistically resolved and worth less than one extra construct, and the paper
+  now says both} & \textbf{failed} \\
+The margin lies in $[\jdg{eqStakeLo},\jdg{eqStakeHi}]$ \quad(\jdg{eqDelta}) & correct \\
+\midrule
+\multicolumn{2}{@{}l@{}}{\emph{frozen before the locality analysis existed (\S\ref{sec:outcome})}}\\
+The $\pm15$ window ranks with the full window above $0.8$ \quad(\jdg{lcRhoFifteen}) & correct \\
+Helix depth stays matched or better at every window \quad(largest advantage \jdg{lcAdvMax}) & correct \\
+The small-budget inversion keeps its sign at every window \quad(\jdg{lcGapMax} at its weakest) & correct \\
+\multicolumn{2}{@{}p{0.95\textwidth}@{}}{\footnotesize\emph{The position check fired first, at
+  \jdg{noopFired} against a \jdg{noopKill} kill, and was diagnosed rather than relaxed: \jdg{noopN} constructs carry
+  a null substitution and have the wild type's design-region sequence, so they hold no intervention
+  for a window to be centred on. Definition~\ref{def:flip} had already refused all of them. They
+  became the empirical null of \S\ref{sec:outcome}.}}\\
 \midrule
 \multicolumn{2}{@{}l@{}}{\emph{frozen before the fourth implementation was scored (\S\ref{sec:reorder})}}\\
 The two nearest-neighbour implementations agree more with each other than either does with the

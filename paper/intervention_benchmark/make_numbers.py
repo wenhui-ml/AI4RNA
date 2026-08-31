@@ -1163,6 +1163,84 @@ _snm = [v["candidates"] for k, v in _m45["per_library"].items() if "Single_nt_mu
 assert _snm, "the single-nucleotide-mutant library is no longer in the corpus"
 put("dmCandZero", f"{max(_snm)}")
 
+# ============================ M47: formal equivalence, replacing "the interval covers zero"
+# The margin comes out of a rule frozen before the code and touching only the free baseline and the
+# corpus geometry, so it cannot have been chosen to suit the differences it judges.
+_m47 = J("m47_equivalence.json")
+assert _m47["V_reverse_control"]["pass"], "M47 does not reproduce M44"
+_D = _m47["delta_tube"]
+assert "void" not in _D, "delta_tube was voided by its own range check"
+put("eqDelta", sig(_D["delta"], 4))
+put("eqSlope", sig(_D["slope_per_unit_budget"], 4))
+put("eqMedCell", f"{_D['median_cell_size']:.0f}")
+put("eqOneTube", pct(_D["one_construct_is_this_much_budget"], 0))
+_E = _m47["E1_E3_E4"]
+_S47 = _m47["summary"]
+put("eqNcomp", f"{_S47['n_implementation_comparisons']}")
+put("eqNeq", f"{_S47['n_equivalent_at_delta_tube']}")
+put("eqNfail", f"{_S47['n_implementation_comparisons'] - _S47['n_equivalent_at_delta_tube']}")
+put("eqSelfDs", f"{_S47['depth_self_delta_star']:.5f}")
+# the three that fail, named, with the direction that makes the failure meaningful
+_fail = sorted(((k, v) for k, v in _E.items()
+                if k.split("|")[1] in _IMPL4 and not v["equivalent_at_delta_tube"]),
+               key=lambda kv: -kv[1]["delta_star"])
+put("eqFailN", f"{len(_fail)}")
+put("eqFailBudget", pct(float(_fail[0][0].split("|")[0]), 0) if _fail else "---")
+put("eqFailNames", ", ".join(k.split("|")[1] for k, _ in _fail))
+put("eqFailDsHi", sig(_fail[0][1]["delta_star"], 4) if _fail else "---")
+put("eqFailDsLo", sig(_fail[-1][1]["delta_star"], 4) if _fail else "---")
+put("eqFailWorst", sig(min(v["point"] for _, v in _fail), 4) if _fail else "---")
+assert _fail and all(v["point"] < 0 for _, v in _fail), \
+    "the failing arms are no longer on the worse side; the sentence about direction is stale"
+assert len({k.split("|")[0] for k, _ in _fail}) == 1, "the failures now span more than one budget"
+# the stacked arms: statistically resolved, and still under one construct
+_stack = {k: v for k, v in _E.items() if k.split("|")[1].startswith("depth_then_")}
+put("eqStackMaxDs", sig(max(v["delta_star"] for v in _stack.values()), 4))
+assert all(v["equivalent_at_delta_tube"] for v in _stack.values()), \
+    "a stacked arm now exceeds one construct; the sentence saying none does is stale"
+_best = _E["0.25|depth_then_RibonanzaNet"]
+put("eqBestPt", sig(_best["point"], 4)); put("eqBestDs", sig(_best["delta_star"], 4))
+put("eqBestCi", ci(_best["ci90"], 4))
+
+# ================================ M48: is a window-level outcome ground truth for a pair prediction
+_m48 = J("m48_locality.json")
+assert _m48["V1_reproduces_column"]["pass"] and _m48["V2_position_check"]["pass"]
+_A48 = _m48["E1_window_agreement"]; _H48 = _m48["E2_headline_by_window"]
+for _w, _k in (("5", "Five"), ("10", "Ten"), ("15", "Fifteen"), ("25", "TwentyFive")):
+    put(f"lcRho{_k}", sig(_A48[_w]["spearman_vs_full"], 4))
+    put(f"lcDepth{_k}", f"{_H48[_w]['depth@0.25']:.4f}")
+    put(f"lcGap{_k}", sig(_H48[_w]["RNet-Vie@0.1"], 4))
+put("lcDepthFull", f"{_H48['None']['depth@0.25']:.4f}")
+put("lcGapFull", sig(_H48["None"]["RNet-Vie@0.1"], 4))
+put("lcNwin", f"{len(_A48)}")
+put("lcRhoLo", sig(min(v["spearman_vs_full"] for k, v in _A48.items() if k != "None"), 4))
+_live = [v for v in _H48.values() if not v.get("underpowered")]
+put("lcGapMax", sig(max(v["RNet-Vie@0.1"] for v in _live), 4))
+put("lcAdvMax", sig(max(v[f"{n}@{f}"] for v in _live for n in _IMPL4 for f in (0.1, 0.25, 0.5)), 4))
+assert all(v["RNet-Vie@0.1"] < 0 for v in _live), "the inversion no longer holds at every window"
+put("lcV1Pearson", f"{_m48['V1_reproduces_column']['pearson']:.6f}")
+
+# ---- the empirical null the failed check produced
+_N0 = _m48["E0_noop_null"]
+put("noopN", f"{_N0['n']}")
+put("noopMean", f"{_N0['mean']:.4f}"); put("noopMed", f"{_N0['median']:.4f}")
+put("noopSd", f"{_N0['sd']:.4f}")
+put("noopLo", sig(_N0["min"], 4)); put("noopHi", sig(_N0["max"], 4))
+put("noopFP", pct(_N0["frac_above_rescue_threshold"], 1))
+put("noopThr", f"{_N0['rescue_threshold']}")
+assert _N0["none_admitted"], "a no-op control has entered the admitted set"
+# the rate at which the position check fired BEFORE the no-ops were diagnosed out of it: read from
+# the two counts rather than retyped from the log, so it cannot drift from them.
+_v2 = _m48["V2_position_check"]
+put("noopFired", pct(_N0["n"] / (_N0["n"] + _v2["n_checked"]), 2))
+put("noopKill", pct(0.01, 0))
+# the staked range for the margin, read out of M47's frozen declaration
+_d47 = json.load(open(os.path.join(CEIL, "m47_equivalence_declaration.json")))
+_mm = _re.search(r"between ([\d.]+) and ([\d.]+)", _d47["staked"]["4"])
+put("eqStakeLo", _mm.group(1)); put("eqStakeHi", _mm.group(2))
+_m2 = _re.search(r"below ([\d.]+)", _d47["staked"]["2"])
+put("eqStakeSelf", _m2.group(1))
+
 # ================================================================ write
 out = [
     "% GENERATED by make_numbers.py -- do not edit.",
