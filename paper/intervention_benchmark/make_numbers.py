@@ -923,6 +923,135 @@ put("vrKmerN", _n(_vf["M39_A_reverse_control"]["n_subset"]))
 put("vrKmerExp", f"{_vf['M39_A_reverse_control']['exhaustive_exposed']}")
 put("vrSpearMax", f"{max(abs(r['spearman_dot_recomputed'] - r['m38_committed']) for r in _vf['M38_B_equivalent_form']['rows'].values()):.0f}")
 
+
+# ================================================ M43: a fourth implementation, and the reorder test
+# The peer question was whether the intervention readout REORDERS the predictors relative to the
+# structure benchmark. It does not, and the honest report of that is the tau plus the one swap's
+# interval -- not a claim that the two agree, and not a claim that they disagree.
+#
+# The distinction the arm turns on, and that the declaration got wrong about EternaFold (recorded
+# there as an erratum, not edited away): an IMPLEMENTATION is an independent codebase; a PARAMETER
+# VARIANT is the same engine reading a different file. Conflating them would let a paper claim six
+# predictors while scoring one program six times.
+_m43 = J("m43_reorder.json")
+_ag, _rs = _m43["R_agree"], _m43["R_resp"]
+_IMPL4 = ("ViennaRNA", "EternaFold", "RNAstructure", "RibonanzaNet")
+for _n, _k in zip(_IMPL4, ("Vie", "Etf", "Rst", "Rnet")):
+    put(f"reAgree{_k}", f"{_ag[_n]:.4f}")
+    put(f"reResp{_k}", sig(_rs[_n]["rho"], 4))
+    put(f"reRespCi{_k}", ci(_rs[_n]["ci"], 4))
+put("reNimpl", f"{len(_IMPL4)}")
+put("reTau", sig(_m43["E2"]["kendall_tau"], 4))
+put("reNswap", f"{len(_m43['E2']['swaps'])}")
+put("reNresolved", f"{_m43['E2']['n_resolved_swaps']}")
+_sw = _m43["E2"]["swaps"][0]
+put("reSwapA", _sw["pair"][0]); put("reSwapB", _sw["pair"][1])
+put("reSwapAgree", sig(_sw["agree_diff"], 4)); put("reSwapResp", sig(_sw["resp_diff"], 4))
+put("reSwapCi", ci(_sw["dd_ci"], 4))
+put("reSpanImpl", sig(_m43["span"]["implementations"], 4))
+put("reSpanParam", sig(_m43["span"]["parameter_variants"], 4))
+put("reSpanRatio", f"{_m43['span']['implementations']/_m43['span']['parameter_variants']:.1f}$\\times$")
+put("reNvar", f"{len(_m43['E3_parameter_variants'])}")
+put("reVarNames", ", ".join(sorted(_m43["E3_parameter_variants"])))
+put("reMfeAgree", f"{_m43['V']['V2_mfe_agreement_vienna_vs_rnastructure']:.4f}")
+put("reNcells", f"{_m43['n_cells']}")
+# the incumbent margin this paper keeps quoting, computed once here so no two places can disagree
+put("reIncMargin", sig(_ag["RibonanzaNet"] - _ag["ViennaRNA"], 5))
+put("reIncMarginWorst", sig(_ag["RibonanzaNet"] - _ag["RNAstructure"], 5))
+assert all(_m43["coverage"][c]["missing"] == 0 for c in _m43["coverage"]), "M43 coverage gap"
+
+# ------------- M43s: the scorecard M43 did not write, and the pairwise matrix stake 1 needed
+# M43 froze four staked predictions and its artifact carries staked:null. Three grade from the
+# published run; the fourth needs the implementation-by-implementation agreement matrix, of which
+# M43 computed exactly one cell.
+_m43s = J("m43s_score.json")
+assert _m43s["checks"]["pass"], "M43s checks did not pass; its scorecard may not be printed"
+_MAT = _m43s["pairwise_median_f1"]
+_ab = {"ViennaRNA": "Vie", "EternaFold": "Etf", "RNAstructure": "Rst", "RibonanzaNet": "Rnet"}
+for _a in _ab:
+    for _b in _ab:
+        if _a != _b:
+            put(f"pw{_ab[_a]}{_ab[_b]}", f"{_MAT[f'{_a}|{_b}']:.4f}")
+put("pwNN", f"{_MAT['ViennaRNA|RNAstructure']:.4f}")
+put("pwNNvsNeuralLo", f"{min(_MAT['ViennaRNA|RibonanzaNet'], _MAT['RNAstructure|RibonanzaNet']):.4f}")
+put("pwNNvsNeuralHi", f"{max(_MAT['ViennaRNA|RibonanzaNet'], _MAT['RNAstructure|RibonanzaNet']):.4f}")
+put("pwNfail", f"{_m43s['n_failed']}")
+put("pwNstake", f"{len(_m43s['staked'])}")
+# EternaFold is the separator: same decomposition as the thermodynamic pair, same data as the
+# neural one, and it lands between them in structure space rather than beside either.
+assert _MAT["ViennaRNA|RNAstructure"] > _MAT["EternaFold|ViennaRNA"] > _MAT["EternaFold|RibonanzaNet"], \
+    "EternaFold no longer sits between the two families; the sentence in sec:reorder is stale"
+put("pwEtfNN", f"{min(_MAT['EternaFold|ViennaRNA'], _MAT['EternaFold|RNAstructure']):.4f}")
+put("pwEtfNeural", f"{_MAT['EternaFold|RibonanzaNet']:.4f}")
+
+# ============================================ M44: what that margin buys at a fixed tube budget
+# The translation the instrument exists to make. Recovery at a fixed budget, every difference from
+# the FREE depth baseline carrying an interval, and the incumbent margin converted into constructs.
+_m44 = J("m44_decision.json")
+_E1 = _m44["E1"]
+put("dcNcells", f"{_m44['n_cells_scored']}")
+put("dcNrescue", f"{_m44['E2']['n_rescuing_interventions_total']}")
+for _f, _k in (("0.1", "Ten"), ("0.25", "Qtr"), ("0.5", "Half")):
+    put(f"dcRand{_k}", f"{_E1[_f]['random']['recovery']:.4f}")
+    put(f"dcDepth{_k}", f"{_E1[_f]['depth']['recovery']:.4f}")
+    put(f"dcOracle{_k}", f"{_E1[_f]['oracle']['recovery']:.4f}")
+    for _n, _kk in zip(_IMPL4, ("Vie", "Etf", "Rst", "Rnet")):
+        put(f"dc{_kk}{_k}", f"{_E1[_f][_n]['recovery']:.4f}")
+        put(f"dc{_kk}Vs{_k}", sig(_E1[_f][_n]["minus_depth"], 4))
+        put(f"dc{_kk}VsCi{_k}", ci(_E1[_f][_n]["minus_depth_ci"], 4))
+    put(f"dcStack{_k}", f"{_E1[_f]['depth_then_RibonanzaNet']['recovery']:.4f}")
+    put(f"dcStackVs{_k}", sig(_E1[_f]["depth_then_RibonanzaNet"]["minus_depth"], 4))
+    put(f"dcStackVsCi{_k}", ci(_E1[_f]["depth_then_RibonanzaNet"]["minus_depth_ci"], 4))
+# the headline translation: the incumbent's biggest margin, in tubes
+_pair = [r for r in _m44["E2"]["pairs"]
+         if r["leader"] == "RibonanzaNet" and r["trailing"] == "ViennaRNA" and r["budget"] == 0.25][0]
+put("dcTransF1", sig(_pair["incumbent_margin_f1"], 5))
+put("dcTransRec", sig(_pair["decision_margin_recovery"], 5))
+put("dcTransN", f"{abs(_pair['extra_rescuing_interventions']):.0f}")
+put("dcTransPct", f"{100*_pair['extra_rescuing_interventions']/_m44['E2']['n_rescuing_interventions_total']:.1f}\\%")
+assert abs(_pair["incumbent_margin_f1"] - (_ag["RibonanzaNet"] - _ag["ViennaRNA"])) < 1e-9
+# how many of the six ordered pairs change sign between the two scales
+_flip = [r for r in _m44["E2"]["pairs"] if r["budget"] == 0.25 and r["decision_margin_recovery"] < 0]
+put("dcNflip", f"{len(_flip)}")
+put("dcNpair", f"{len([r for r in _m44['E2']['pairs'] if r['budget'] == 0.25])}")
+_h = _m44["E3_held_out"]
+put("dcHoldIn", f"{_h['in_sample_mean']:.4f}"); put("dcHoldOut", f"{_h['held_out_mean']:.4f}")
+put("dcHoldShrink", sig(_h["shrinkage"], 4)); put("dcHoldN", f"{_h['n_splits']}")
+put("dcHoldTop", max(_h["rules_picked"], key=_h["rules_picked"].get).replace("_", r"\_"))
+put("dcHoldTopN", f"{max(_h['rules_picked'].values())}")
+put("dcHoldNrule", f"{len(_h['rules_picked'])}")
+
+# ============================ M44v: the review that had to exist before any of the above is printed
+# depth is an INTEGER, so it ties, and a stable sort breaks ties on the CSV's row order. Everything
+# above would be partly a statement about how the file was written if that order carried anything.
+_m44v = J("m44v_verify.json")
+assert _m44v["S3_reverse_control"]["pass"], "M44v cannot reproduce M44"
+assert _m44v["S2_equivalent_form"]["pass"] and _m44v["S4_identities"]["pass"]
+put("tvBack", "$" + f"{_m44v['S3_reverse_control']['max_abs_diff']:.0e}".replace("e-0", r"\times 10^{-") + "}$")
+put("tvBackN", f"{len(_m44v['S3_reverse_control']['cells'])}")
+put("tvShift", sig(_m44v["S1_max_abs_shift"], 4))
+_t25 = _m44v["S1_tie_rule"]["0.25"]
+put("tvDepthQtr", sig(_t25["depth"]["delta"], 4))
+put("tvDepthHalf", sig(_m44v["S1_tie_rule"]["0.5"]["depth"]["delta"], 4))
+put("tvDepthTen", sig(_m44v["S1_tie_rule"]["0.1"]["depth"]["delta"], 4))
+put("tvNzero", f"{sum(1 for f in _m44v['S1_tie_rule'] for r in _m44v['S1_tie_rule'][f] if r != 'depth' and _m44v['S1_tie_rule'][f][r]['delta'] == 0)}")
+put("tvNother", f"{sum(1 for f in _m44v['S1_tie_rule'] for r in _m44v['S1_tie_rule'][f] if r != 'depth')}")
+# the free share, at every budget and under both tie rules -- the bare 25% number is a cherry-pick
+_e4 = _m44v["E4_by_budget"]
+for _f, _k in (("0.1", "Ten"), ("0.25", "Qtr"), ("0.5", "Half")):
+    put(f"tvShare{_k}", f"{100*_e4[f'{_f}|stable']['fraction']:.1f}\\%")
+    put(f"tvShareR{_k}", f"{100*_e4[f'{_f}|random']['fraction']:.1f}\\%")
+    put(f"tvBest{_k}", _e4[f"{_f}|stable"]["best_implementation"])
+_shares = [_e4[k]["fraction"] for k in _e4]
+put("tvShareLo", f"{100*min(_shares):.1f}\\%"); put("tvShareHi", f"{100*max(_shares):.1f}\\%")
+# staked 2's missing interval
+_g = _m44v["staked2_missing_interval"]
+for _f, _k in (("0.1", "Ten"), ("0.25", "Qtr"), ("0.5", "Half")):
+    put(f"tvGap{_k}", sig(_g[_f]["point"], 4)); put(f"tvGapCi{_k}", ci(_g[_f]["ci"], 4))
+put("tvGapNres", f"{sum(1 for f in _g if _g[f]['excludes_zero'])}")
+assert _g["0.1"]["point"] < 0 < _g["0.5"]["point"], "the inversion this paragraph reports is gone"
+assert _g["0.1"]["excludes_zero"], "the 10% inversion no longer excludes zero"
+
 # ================================================================ write
 out = [
     "% GENERATED by make_numbers.py -- do not edit.",

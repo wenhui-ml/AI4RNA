@@ -141,8 +141,8 @@ with a reference. Agreement saturates; and on a corpus written by design program
 selection rule and scored against a model's own output, the number a benchmark reports is carried
 by a covariate somebody chose rather than by the property it is named after. We recover
 \jdg{nAdmitted} two-nucleotide interventions already executed in a public benchmark ---
-compensatory orientation flips whose measured outcome contains no folding model --- score three
-predictors by response, and price \jdg{chPriced} such channels. \jdg{chCarry} carry the number, \jdg{chEmpty} are
+compensatory orientation flips whose measured outcome contains no folding model --- score
+\jdg{reNimpl} independent implementations by response, and price \jdg{chPriced} such channels. \jdg{chCarry} carry the number, \jdg{chEmpty} are
 empty and \jdg{chUnres} is unresolved. The reference channel carries most: the same molecules read
 interventionally give \jdg{cvIntvSd} standard deviations against \jdg{cvConvSd} read as agreement.
 The declared target carries as much as any model: helix depth, a free integer, is matched by all
@@ -151,7 +151,12 @@ survives with depth held fixed is real but modest (\jdg{rkPartN}, \jdg{rkPartNCi
 authors carry it along two separable axes --- the decomposition \jdg{axArch} (\jdg{axArchCi}) and
 the training data \jdg{axData} (\jdg{axDataCi}), differing by \jdg{axGap} (\jdg{axGapCi}).
 \textbf{The empty channel is the folding model's own free energy}, the objective every one of these
-design programs was optimising. We report the prices as direct contrasts and never as shares,
+design programs was optimising. \textbf{And a benchmark
+margin is not a decision margin}: converted to a fixed experimental budget
+(Claim~\ref{claim:budget}), the panel's largest structure-agreement margin, \jdg{dcTransF1},
+buys \jdg{dcTransPct} of this corpus's rescuing interventions; none of twelve
+implementation-minus-depth intervals excludes zero; and at the tightest budget the margin's sign
+inverts, \jdg{tvGapTen} \jdg{tvGapCiTen}. We report the prices as direct contrasts and never as shares,
 because the estimator for a share is uninformative here --- which we show, and withdraw a metric of
 our own for.
 \end{abstract}
@@ -776,9 +781,16 @@ in a handful of libraries and nowhere else, and Appendix~\ref{app:survey} counts
 \subsection{The predictors}
 \label{sec:predictors}
 
-Three predictors are scored. They were chosen to differ along the two axes that could plausibly
-explain a result --- the structural decomposition, and where the parameters came from --- rather
-than to sample the field, which three predictors cannot do.
+\jdg{reNimpl} predictors are scored, and one distinction governs what that number means. An
+\textbf{implementation} is an independent codebase; a \textbf{parameter variant} is the same engine
+reading a different file. The distinction is not pedantry, because it is measurable: across the
+\jdg{reNimpl} implementations the intervention readout spans \jdg{reSpanImpl}, and across
+\jdg{reNvar} parameter sets inside one of them (\jdg{reVarNames}) it spans \jdg{reSpanParam} ---
+\jdg{reSpanRatio} narrower (\S\ref{sec:reorder}). A panel assembled without the distinction can
+report a wide predictor sweep while scoring one program repeatedly. The \jdg{reNimpl} here were
+chosen to differ along the two axes that could plausibly explain a result --- the structural
+decomposition, and where the parameters came from --- rather than to sample the field, which
+\jdg{reNimpl} predictors cannot do.
 
 \begin{center}
 \small
@@ -790,6 +802,8 @@ ViennaRNA      & nearest-neighbour & optical melting
                & \jdg{dynVHi} / \jdg{dynVLo} / \jdg{dynVMed} \\
 EternaFold     & nearest-neighbour & chemical mapping
                & \jdg{efHi} / \jdg{efLo} / \jdg{efMed} \\
+RNAstructure   & nearest-neighbour & optical melting
+               & --- \\
 RibonanzaNet   & transformer       & chemical mapping
                & \jdg{dynNHi} / \jdg{dynNLo} / \jdg{dynNMed} \\
 \bottomrule
@@ -812,9 +826,18 @@ which the other two confound: if the identity result belongs to being a transfor
 should behave like ViennaRNA; if it belongs to having been fitted to probing data, EternaFold
 should behave like RibonanzaNet.
 
-\textbf{RibonanzaNet} is a transformer trained on roughly two million chemical-mapping profiles
-\citep{ribonanzanet2024}, whose head emits a pairing score directly from pairwise features without
-a thermodynamic model anywhere in the path.
+\textbf{RNAstructure} is the second independent implementation of the nearest-neighbour model
+\citep{reuter2010rnastructure}, written by a different group from a different codebase against
+substantially the same thermodynamics. It is what makes the implementation/variant distinction
+above testable rather than asserted: it and ViennaRNA should agree, and they do --- their MFE
+structures on these wild types agree at \jdg{reMfeAgree} median $F_1$, which is also the wiring
+check that a low value would have failed.
+
+\textbf{RibonanzaNet} is a transformer \citep{ribonanzanet2024} whose head emits a pairing score
+directly from pairwise features without a thermodynamic model anywhere in the path. Its released
+labelled corpus, counted here rather than quoted, holds \jdg{lkFullRows} profiles over
+\jdg{lkFullTrain} unique sequences (\S\ref{sec:leakage}); its final pre-training stage additionally
+consumed pseudo-labels, which no count from a released file can reach.
 
 Two further controls address the obvious alternatives. A panel of \jdg{panN} parameter sets
 within one implementation --- \jdg{panNames}, two of them fitted to data rather than derived from
@@ -835,7 +858,12 @@ and pushed before the code that produced its numbers existed
 outcome of every stake, marks those that failed as failed, and states which of the artifacts this
 paper reads were declared that way and which were not. Two results below exist because a declared
 kill condition fired, and one because a kill condition was written incorrectly and the review that
-caught it is reported rather than the run's own verdict.
+caught it is reported rather than the run's own verdict. \textbf{The protocol has failed on its own
+terms once in a way worth naming}: one declaration froze \jdg{pwNstake} predictions and its run
+wrote no scorecard at all, so the stakes were graded afterwards from the artifact and from one
+quantity the run had not computed. A declared check that is only written down is not a check;
+Appendix~\ref{app:prereg} marks that block as scored after the fact rather than presenting it as
+though the run had done it.
 
 
 \subsection{How the corpus was selected}
@@ -1506,6 +1534,167 @@ flips recovered against the share of its flips built. Using a predictor only to 
 ties --- no fitting, no weights --- is the whole of the practical gain.}
 \label{fig:ranking}
 \end{figure}
+
+\subsection{What the benchmark's margin buys, in tubes}
+\label{sec:reorder}
+
+A benchmark margin is a claim about a decision only if it survives being converted into one. This
+section makes the conversion twice: first asking whether the intervention readout \emph{reorders}
+the panel relative to the conventional one, and then asking what the conventional margin is worth
+at a fixed experimental budget.
+
+\paragraph{The readout does not reorder the panel; it flattens it.} Scoring
+\jdg{reNimpl} independent implementations on the same \jdg{reNcells} design cells under both
+readouts:
+
+\begin{center}\small
+\begin{tabular}{@{}lcc@{}}
+\toprule
+implementation & structure agreement $F_1$ & intervention response $\rho$ \\
+\midrule
+RibonanzaNet & \jdg{reAgreeRnet} & \jdg{reRespRnet}~\jdg{reRespCiRnet} \\
+EternaFold   & \jdg{reAgreeEtf}  & \jdg{reRespEtf}~\jdg{reRespCiEtf} \\
+ViennaRNA    & \jdg{reAgreeVie}  & \jdg{reRespVie}~\jdg{reRespCiVie} \\
+RNAstructure & \jdg{reAgreeRst}  & \jdg{reRespRst}~\jdg{reRespCiRst} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent Kendall's $\tau$ between the two orderings is \jdg{reTau}: \jdg{reNswap} adjacent pair
+changes places --- \jdg{reSwapA} leads \jdg{reSwapB} by \jdg{reSwapAgree} on agreement and trails
+it by \jdg{reSwapResp} on response --- and the difference of those two differences \jdg{reSwapCi}
+covers zero, so \jdg{reNresolved} swaps are resolved. \textbf{We report no reorder.}
+The interesting number is not the order but the scale. Best-to-worst spans \jdg{reIncMarginWorst}
+on structure agreement and \jdg{reSpanImpl} on intervention response --- the panel is nearly four
+times narrower on the readout that corresponds to an experiment. Inside one implementation,
+\jdg{reNvar} parameter sets span \jdg{reSpanParam}, \jdg{reSpanRatio} narrower still, which is the
+measurement licensing the implementation/variant distinction of \S\ref{sec:predictors}.
+
+That distinction is visible in structure space too, and it is what tells us the panel is not four
+interchangeable programs. Folding the same \jdg{reNcells} wild types and comparing the
+implementations to \emph{each other} rather than to a reference, the two nearest-neighbour
+implementations agree at \jdg{pwNN} median $F_1$ and each agrees with the transformer at only
+\jdg{pwNNvsNeuralLo}--\jdg{pwNNvsNeuralHi}. EternaFold lands between them, as the panel's design
+predicts it must: it keeps the thermodynamic decomposition and replaces the parameters' provenance,
+and it sits at \jdg{pwEtfNN} with the thermodynamic pair against \jdg{pwEtfNeural} with the neural
+model. The architecture axis and the training-data axis separate here as \emph{measured geometry},
+not as an assertion about how the panel was assembled.
+
+\begin{center}\footnotesize\setlength{\tabcolsep}{5pt}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+median pairwise $F_1$ & ViennaRNA & EternaFold & RNAstructure & RibonanzaNet \\
+\midrule
+ViennaRNA    & ---              & \jdg{pwVieEtf}  & \jdg{pwVieRst}  & \jdg{pwVieRnet} \\
+EternaFold   & \jdg{pwEtfVie}   & ---             & \jdg{pwEtfRst}  & \jdg{pwEtfRnet} \\
+RNAstructure & \jdg{pwRstVie}   & \jdg{pwRstEtf}  & ---             & \jdg{pwRstRnet} \\
+RibonanzaNet & \jdg{pwRnetVie}  & \jdg{pwRnetEtf} & \jdg{pwRnetRst} & --- \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\paragraph{The conversion: a fixed budget of tubes.} Across \jdg{dcNcells} scorable cells
+containing \jdg{dcNrescue} genuinely rescuing interventions, each rule ranks a cell's candidates
+and the top fraction is ``built''; the score is the share of that cell's rescuing interventions
+recovered, weighted by how many it has. Every entry below is a difference from the free helix-depth
+baseline, with a target-clustered interval, because the comparison a reader needs is against what
+costs nothing.
+
+\begin{center}\footnotesize\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+& \multicolumn{3}{c}{share of rescuing interventions recovered} \\
+\cmidrule(l){2-4}
+rule & 10\% built & 25\% built & 50\% built \\
+\midrule
+random                & \jdg{dcRandTen}  & \jdg{dcRandQtr}  & \jdg{dcRandHalf} \\
+helix depth (free)    & \jdg{dcDepthTen} & \jdg{dcDepthQtr} & \jdg{dcDepthHalf} \\
+\midrule
+ViennaRNA             & \jdg{dcVieVsTen}~\jdg{dcVieVsCiTen}    & \jdg{dcVieVsQtr}~\jdg{dcVieVsCiQtr}    & \jdg{dcVieVsHalf}~\jdg{dcVieVsCiHalf} \\
+EternaFold            & \jdg{dcEtfVsTen}~\jdg{dcEtfVsCiTen}    & \jdg{dcEtfVsQtr}~\jdg{dcEtfVsCiQtr}    & \jdg{dcEtfVsHalf}~\jdg{dcEtfVsCiHalf} \\
+RNAstructure          & \jdg{dcRstVsTen}~\jdg{dcRstVsCiTen}    & \jdg{dcRstVsQtr}~\jdg{dcRstVsCiQtr}    & \jdg{dcRstVsHalf}~\jdg{dcRstVsCiHalf} \\
+RibonanzaNet          & \jdg{dcRnetVsTen}~\jdg{dcRnetVsCiTen}  & \jdg{dcRnetVsQtr}~\jdg{dcRnetVsCiQtr}  & \jdg{dcRnetVsHalf}~\jdg{dcRnetVsCiHalf} \\
+\midrule
+depth, model breaks ties & \jdg{dcStackVsTen}~\jdg{dcStackVsCiTen} & \jdg{dcStackVsQtr}~\jdg{dcStackVsCiQtr} & \jdg{dcStackVsHalf}~\jdg{dcStackVsCiHalf} \\
+\midrule
+oracle                & \jdg{dcOracleTen} & \jdg{dcOracleQtr} & \jdg{dcOracleHalf} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent \textbf{Not one of the twelve model-minus-depth intervals excludes zero.} No
+implementation, at any budget, is distinguishable from the free integer as a standalone ranker. The
+levels behind the 25\% column, for scale: random recovers \jdg{dcRandQtr}, depth \jdg{dcDepthQtr},
+ViennaRNA \jdg{dcVieQtr}, RibonanzaNet \jdg{dcRnetQtr}, depth with the model breaking ties
+\jdg{dcStackQtr}, and a perfect oracle \jdg{dcOracleQtr}.
+What is distinguishable is the composition: using a model only to break depth's ties recovers
+\jdg{dcStackVsQtr}~\jdg{dcStackVsCiQtr} more at the 25\% budget and
+\jdg{dcStackVsHalf}~\jdg{dcStackVsCiHalf} at 50\%. This is the same shape as
+Claim~\ref{claim:depth}, now priced.
+
+\paragraph{The incumbent margin, converted.} RibonanzaNet leads ViennaRNA by \jdg{dcTransF1} on
+structure agreement --- the largest margin in the panel, and the kind of margin a methods paper is
+written around. At a 25\% budget it converts to \jdg{dcTransRec} of recovery: \textbf{about
+\jdg{dcTransN} additional rescuing interventions out of \jdg{dcNrescue}, or \jdg{dcTransPct} of
+them.} Of the \jdg{dcNpair} ordered pairs in the panel, \jdg{dcNflip} change sign between the two
+scales: the model that leads on structure agreement recovers \emph{fewer} interventions. A
+held-out check keeps this honest --- choosing the winning rule on half the targets and applying it
+to the other half, over \jdg{dcHoldN} splits, picks \jdg{dcHoldTop} \jdg{dcHoldTopN} times out of
+\jdg{dcHoldNrule} rules and loses \jdg{dcHoldShrink} to shrinkage (\jdg{dcHoldIn} in sample,
+\jdg{dcHoldOut} held out), so the composition survives being chosen on data it is not scored on.
+
+\begin{scopebox}
+\textbf{The review this table needed before it could be printed.} Helix depth is an
+\emph{integer}, so it ties constantly, and the ranking above resolves ties with a stable sort ---
+which breaks them on the order rows were written to disk. Construct order is position order, and
+position is not obviously independent of rescue. Had it carried anything, the free baseline's
+standing would have been partly a fact about file layout, and no summary statistic in the table
+could have shown it. The check was built rather than argued: an implementation that does not import
+the original reproduces \jdg{tvBackN} of its published quantities to \jdg{tvBack} (its rounding),
+recovery at a 100\% budget is exactly $1$ for every rule including a constant score, the random
+rule matches its closed form, and a constant score with randomised ties equals the random rule.
+Only then was one thing changed --- ties broken at random and averaged.
+
+\textbf{Depth is the rule that moves, and it moves in the direction that acquits it.}
+\jdg{tvNzero} of the \jdg{tvNother} non-depth rule-by-budget cells shift by exactly zero, which is
+the confirmation that ties lived where the review said and essentially nowhere else. Depth shifts
+\jdg{tvDepthQtr} at 25\% and \jdg{tvDepthHalf} at 50\%: the file's row order was \emph{costing} the
+free baseline, and under a tie rule carrying no file information it is stronger, not weaker. At
+10\% the row order flatters it by \jdg{tvDepthTen}. The largest displacement anywhere in the table
+is \jdg{tvShift}, against intervals an order of magnitude wider.
+
+Two things the review forces into this section rather than out of it. \emph{First}, the share of the
+best implementation's gain over random that the free integer already delivers is
+\textbf{budget-dependent and must be quoted with its budget}: \jdg{tvShareQtr} at 25\% but
+\jdg{tvShareTen} at 10\% and \jdg{tvShareHalf} at 50\%, and \jdg{tvShareLo} to \jdg{tvShareHi}
+across budgets and both tie rules (under random ties, \jdg{tvShareRTen}, \jdg{tvShareRQtr} and
+\jdg{tvShareRHalf}) --- and the best implementation is not even the same model at
+every budget (\jdg{tvBestTen} at 10\%, \jdg{tvBestQtr} above it). A single headline percentage here
+would be a choice of budget presented as a property of the models. \emph{Second}, our staked
+criterion for ``the incumbent margin does not predict the decision'' compared two point estimates
+with no interval on their difference --- the error this paper retracts in \S\ref{sec:withdrawal}
+and grades itself on in Appendix~\ref{app:prereg}. The stake is graded as written and stays
+\textbf{failed}; the interval it needed is reported here and does not regrade it.
+\end{scopebox}
+
+\noindent That interval is the sharper result. The RibonanzaNet-minus-ViennaRNA recovery gap is
+\jdg{tvGapTen} \jdg{tvGapCiTen} at the 10\% budget, \jdg{tvGapQtr} \jdg{tvGapCiQtr} at 25\%,
+and \jdg{tvGapHalf} \jdg{tvGapCiHalf} at 50\%; \jdg{tvGapNres} of the three exclude zero, and
+\textbf{they exclude it on opposite sides.} A \jdg{dcTransF1} structure-agreement margin does not
+merely fail to transfer to the decision --- \textbf{at the tightest budget it points the wrong
+way}, with an interval that excludes zero. This is what the instrument is for. The conventional
+benchmark is not wrong; it is answering a different question, and the sign of its answer is not
+guaranteed to survive the translation into how many tubes you have.
+
+\begin{claimbox}
+\claimhead{claim:budget} Across \jdg{reNimpl} independent implementations and three budgets, no
+model is distinguishable from a free integer as a standalone ranker of which interventions to
+build (\jdg{dcNpair}~ordered pairs, twelve intervals, none excluding zero). The panel's largest
+structure-agreement margin, \jdg{dcTransF1}, converts to \jdg{dcTransPct} of the rescuing
+interventions in this corpus, and at the tightest budget its sign inverts
+(\jdg{tvGapTen}~\jdg{tvGapCiTen}). \textbf{A structure-benchmark margin is not a decision margin,
+and the difference is budget-structured rather than noise.}
+\end{claimbox}
 
 \subsection{A metric we withdraw}
 \label{sec:withdrawal}
@@ -2250,6 +2439,38 @@ The unexposed subset's neural slope stays in $[\jdg{lkStakeLo},\jdg{lkStakeHi}]$
 Every verbatim design from the earlier file is still verbatim \quad(\jdg{lkVerbatimT3} of \jdg{lkVerbatimT3}) & correct \\
 Skill still does not rise monotonically with exposure tier & correct \\
 At least one design moves up a tier \quad(\jdg{lkFullMoved}) & correct \\
+\midrule
+\multicolumn{2}{@{}l@{}}{\emph{frozen before the fourth implementation was scored (\S\ref{sec:reorder})}}\\
+The two nearest-neighbour implementations agree more with each other than either does with the
+  transformer \quad(\jdg{pwNN} against \jdg{pwNNvsNeuralLo}--\jdg{pwNNvsNeuralHi}) & correct \\
+The two rankings are not identical \quad(Kendall \jdg{reTau}) & correct \\
+\textbf{At least one order change survives its interval} --- \emph{it does not: the single swap is
+  \jdg{reSwapCi}, which covers zero. The paper reports no reorder, which is this stake failing and
+  not a result we set out to find} & \textbf{failed} \\
+Parameter variants span less of the response range than implementations \quad(\jdg{reSpanParam}
+  against \jdg{reSpanImpl}) & correct \\
+\multicolumn{2}{@{}p{0.95\textwidth}@{}}{\footnotesize\emph{This block exists because the run did
+  not write it. The declaration froze \jdg{pwNstake} predictions and the artifact recorded a null
+  scorecard; three were gradable from it and the fourth needed an agreement matrix of which the run
+  had computed one cell. Scoring it afterwards is reported as what it is. Verified before grading:
+  every implementation against itself is exactly $1$, the matrix equals its transpose to $0$, and
+  the one cell the run did publish reproduces to $10^{-9}$ --- after a first attempt compared it
+  against a window-restricted value that differs from it by $0.0001$, close enough to have passed a
+  loose tolerance as a reproduction of a quantity it is not.}}\\
+\midrule
+\multicolumn{2}{@{}l@{}}{\emph{frozen before the budgeted decision experiment existed (\S\ref{sec:reorder})}}\\
+No implementation's recovery advantage over free depth excludes zero at any budget & correct \\
+\textbf{The incumbent margin does not predict the decision margin: above $0.20$ in agreement and
+  below $3$ recovery points at every budget} --- \emph{the agreement gap is \jdg{reIncMargin} but
+  the recovery gap reaches \jdg{tvGapHalf} at the 50\% budget, over the threshold we set. Graded as
+  written. The interval the stake should have carried, \jdg{tvGapCiHalf} there and
+  \jdg{tvGapCiTen} at 10\%, is reported in \S\ref{sec:reorder} and does not regrade it} & \textbf{failed} \\
+Held-out recovery does not exceed in-sample \quad(\jdg{dcHoldOut} against \jdg{dcHoldIn}) & correct \\
+Depth alone delivers at least 80\% of the best implementation's gain over random
+  \quad(\jdg{tvShareQtr}) & correct \\
+\multicolumn{2}{@{}p{0.95\textwidth}@{}}{\footnotesize\emph{The last row holds at the declared
+  budget and tie rule and is at its boundary elsewhere: under randomised ties at the 10\% budget the
+  share is \jdg{tvShareRTen}, below the staked $80\%$. Reported, not buried.}}\\
 \end{longtable}}
 
 \noindent The fifth row of the ranking block is the one worth reading. Its run returned every staked
