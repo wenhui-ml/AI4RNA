@@ -1313,9 +1313,8 @@ four columns evaluated on that draw, so the differences are paired. All three re
 transformer exceeds the thermodynamic model by \jdg{pdNV} (\jdg{pdNVCi}, $p\jdg{pdNVP}$) and the
 learned-parameter model by \jdg{pdNE} (\jdg{pdNECi}, $p\jdg{pdNEP}$), and the two
 nearest-neighbour models differ from \emph{each other} by \jdg{pdVE} (\jdg{pdVECi},
-$p=\jdg{pdVEP}$). The measurement is indistinguishable from the transformer (\jdg{pdMN},
-\jdg{pdMNCi}, $p=\jdg{pdMNP}$) and separated from both others (\jdg{pdMV}, \jdg{pdMVCi},
-$p\jdg{pdMVP}$; \jdg{pdME}, \jdg{pdMECi}, $p=\jdg{pdMEP}$).
+$p=\jdg{pdVEP}$). Those three are between predictors, in one unit system, and nothing below
+changes them.
 
 \textbf{That last difference is what we predicted would cover zero, and it does not.} We staked
 before the run that the two nearest-neighbour models would be indistinguishable --- the earlier
@@ -1333,6 +1332,40 @@ written dictionary implementation, agreeing to \jdg{resAgree}; the EternaFold ro
 through a third script whose reproduction of the ViennaRNA row agrees with the published value
 exactly.
 
+\paragraph{A difference involving the measurement needs a scale, and there are two of them.} One
+column is a measured rescue factor and the other is a probability. \S\ref{sec:conventional} states
+that such columns may not simply be subtracted, and an earlier version of this section subtracted
+them anyway, reporting the measurement as indistinguishable from the transformer at \jdg{pdMN}.
+\textbf{That number is withdrawn as a licensing quantity}; it is kept in the sentence above only
+as the thing being corrected.
+
+Two scales are available. Dividing each column by its own pooled within-stratum SD --- \jdg{sdMeas}
+for the measurement against \jdg{sdNeural}, \jdg{sdEtf} and \jdg{sdVienna} for the predictors,
+computed on the admitted set rather than on the intersected subset \S\ref{sec:conventional} uses
+--- asks whether a predictor separates the pair types as sharply, in its own units, as the
+measurement does in its. Multiplying a predictor's contrast by its within-stratum slope on the
+outcome, which is the conversion \S\ref{sec:bound} already performs, asks how much of the measured
+effect could travel through that predictor. The two are related exactly: since
+$g=\rho\,\mathrm{SD}_R/\mathrm{SD}_p$, \textbf{the slope route is the SD route attenuated by
+$\rho$}, the predictor's own within-stratum correlation with the outcome (\jdg{rhoNeural} for the
+transformer, \jdg{rhoVienna} for the thermodynamic model). Neither route corrects the other. The
+raw subtraction is neither route.
+
+On the SD scale the four contrasts are \jdg{stdMeas}, \jdg{stdNeural}, \jdg{stdEtf} and
+\jdg{stdVienna} standard deviations, and paired on one resample \textbf{the measurement and the
+transformer remain indistinguishable} (\jdg{stdMN}\,SD, \jdg{stdMNCi}) while the measurement is
+separated from EternaFold (\jdg{stdME}\,SD, \jdg{stdMECi}) and from ViennaRNA (\jdg{stdMV}\,SD,
+\jdg{stdMVCi}). On the slope scale the transformer's contrast converts to \jdg{convNeural} in
+rescue units against the measurement's \jdg{resOut}, and \textbf{that shortfall does resolve}
+(\jdg{slMN}, \jdg{slMNCi}); so does EternaFold's (\jdg{slME}, \jdg{slMECi}) and ViennaRNA's
+(\jdg{slMV}, \jdg{slMVCi}). \textbf{Both are true, and Claim~\ref{claim:identity} is entitled to
+the first only.} The transformer's output separates C--G from A--U as sharply as the measurement
+does, each in its own units; it does not follow that the transformer's separation accounts for the
+measurement's, and at most \jdg{bdNeural} of it can (\S\ref{sec:bound}). Where this paper says a
+predictor \emph{tracks} the measurement it means the first and never the second. We staked in
+advance that standardisation would remove the word \emph{indistinguishable}; it does not, and that
+stake is graded as failed in Appendix~\ref{app:prereg}.
+
 \paragraph{The third predictor has the most room to move, and uses least of it.} A null contrast
 from a saturated predictor would say nothing, so the dynamic ranges of \S\ref{sec:predictors} are
 the first thing to check against this table. EternaFold is the least saturated of the three ---
@@ -1348,7 +1381,9 @@ and dropping every censored record moves the estimate to \jdg{efClean} (\jdg{efC
 \begin{claimbox}
 \claimhead{claim:identity} On \jdg{nAdmitted} executed two-nucleotide interventions, a neural
 predictor's own output distinguishes G--C from A--U targets in matched contexts by \jdg{resNeural}
-(\jdg{resNeuralCi}), tracking the measurement's \jdg{resOut} (\jdg{resOutCi}); neither a
+(\jdg{resNeuralCi}), tracking the measurement's \jdg{resOut} (\jdg{resOutCi}) --- a correspondence
+that holds in each column's own units (\jdg{stdMN}\,SD, \jdg{stdMNCi}) and \emph{not} as a share
+of the measured effect, of which at most \jdg{bdNeural} can run through the model. Neither a
 thermodynamic predictor nor a second predictor on that same decomposition fitted to chemical
 mapping resolves such a separation (\jdg{resVienna}, \jdg{resViennaCi}; \jdg{efContrast},
 \jdg{efContrastCi}). The instrument distinguishes something one structural decomposition
@@ -2165,9 +2200,10 @@ What the instrument reads is not what we expected to report. On the identity axi
 this paper a contrast between C--G and A--U \emph{targets} in matched contexts, never the causal
 effect of being one rather than the other (\S\ref{sec:mining}) --- it separates the predictors: a
 transformer's own pairing probability distinguishes them by \jdg{resNeural} (\jdg{resNeuralCi})
-where the measurement puts them \jdg{resOut} (\jdg{resOutCi}) apart, and neither predictor built on
-the nearest-neighbour decomposition does so (\jdg{resVienna}, \jdg{resViennaCi}; \jdg{efContrast},
-\jdg{efContrastCi}). The separation decomposes into a decomposition axis worth \jdg{axArch}
+where the measurement puts them \jdg{resOut} (\jdg{resOutCi}) apart --- indistinguishable once each
+column is put on its own scale (\jdg{stdMN}\,SD, \jdg{stdMNCi}), which is the only sense in which
+the two may be compared --- and neither predictor built on the nearest-neighbour decomposition does
+so (\jdg{resVienna}, \jdg{resViennaCi}; \jdg{efContrast}, \jdg{efContrastCi}). The separation decomposes into a decomposition axis worth \jdg{axArch}
 (\jdg{axArchCi}) and a training-data axis worth \jdg{axData} (\jdg{axDataCi}); we had written that
 the second was absent, and the interval said otherwise. On the axis an experimenter would actually
 use --- which flips to build inside one design --- all of them are matched or beaten by helix
@@ -2627,6 +2663,26 @@ Depth alone delivers at least 80\% of the best implementation's gain over random
 \multicolumn{2}{@{}p{0.95\textwidth}@{}}{\footnotesize\emph{The last row holds at the declared
   budget and tie rule and is at its boundary elsewhere: under randomised ties at the 10\% budget the
   share is \jdg{tvShareRTen}, below the staked $80\%$. Reported, not buried.}}\\
+\midrule
+\multicolumn{2}{@{}l@{}}{\emph{frozen before the four columns were put on one scale (\S\ref{sec:result})}}\\
+\textbf{Standardising each column by its own within-stratum SD removes the word
+  \emph{indistinguishable} from the measurement-against-transformer comparison} --- \emph{it does
+  not: \jdg{stdMN}\,SD (\jdg{stdMNCi}). The comparison survives the correction it needed. What the
+  correction changes is what the word is allowed to mean, and Claim~\ref{claim:identity} now says
+  so} & \textbf{failed} \\
+The slope route resolves the same comparison \quad(\jdg{slMN}, \jdg{slMNCi}) & correct \\
+The standardised difference is positive, the measurement separating the pair types more sharply in
+  its own units \quad(\jdg{stdMN}\,SD) & correct \\
+The bridge identity holds, so the two routes are one relation and not two answers & correct \\
+\multicolumn{2}{@{}p{0.95\textwidth}@{}}{\footnotesize\emph{The first and second rows are the
+  result. On the scale each column is denominated in, the measurement and the transformer are not
+  distinguishable; on the scale that asks how much of the measured effect could travel through the
+  model, they are. Both follow from the same numbers because the second is the first multiplied by
+  the model's own within-stratum correlation with the outcome, \jdg{rhoNeural}. Verified before
+  either was read: the four published contrasts and the raw difference this section previously
+  reported reproduce to $5\times10^{-5}$, dividing a contrast by its column's SD equals recomputing
+  it after standardising the column, and the bridge holds exactly with the correlation computed
+  independently of the slope rather than rearranged out of it.}}\\
 \midrule
 \multicolumn{2}{@{}l@{}}{\emph{frozen before the leakage channel was re-examined (\S\ref{sec:leakage})}}\\
 \textbf{The difference between the two models' drops on the exposed subset excludes zero} ---

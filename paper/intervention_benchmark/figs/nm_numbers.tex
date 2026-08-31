@@ -53,6 +53,7 @@
 \expandafter\def\csname jdg@clThr\endcsname{0.80}
 \expandafter\def\csname jdg@clViennaAll\endcsname{+0.12059}
 \expandafter\def\csname jdg@clViennaClean\endcsname{+0.12881}
+\expandafter\def\csname jdg@convNeural\endcsname{+0.0125}
 \expandafter\def\csname jdg@cvAlt\endcsname{+0.0891}
 \expandafter\def\csname jdg@cvAltHitAU\endcsname{0.406}
 \expandafter\def\csname jdg@cvAltHitCG\endcsname{0.628}
@@ -502,6 +503,8 @@
 \expandafter\def\csname jdg@resViennaCi\endcsname{[\ensuremath{-}0.0628,\,\allowbreak +0.0105]}
 \expandafter\def\csname jdg@resViennaP\endcsname{0.979}
 \expandafter\def\csname jdg@resWeight\endcsname{902}
+\expandafter\def\csname jdg@rhoNeural\endcsname{+0.2877}
+\expandafter\def\csname jdg@rhoVienna\endcsname{+0.2129}
 \expandafter\def\csname jdg@rkAucD\endcsname{0.6743}
 \expandafter\def\csname jdg@rkAucN\endcsname{0.6931}
 \expandafter\def\csname jdg@rkBase\endcsname{43.7\%}
@@ -620,6 +623,10 @@
 \expandafter\def\csname jdg@scNewLibs\endcsname{2}
 \expandafter\def\csname jdg@scSkipped\endcsname{705}
 \expandafter\def\csname jdg@scSkippedPct\endcsname{69\%}
+\expandafter\def\csname jdg@sdEtf\endcsname{0.3314}
+\expandafter\def\csname jdg@sdMeas\endcsname{0.2190}
+\expandafter\def\csname jdg@sdNeural\endcsname{0.3044}
+\expandafter\def\csname jdg@sdVienna\endcsname{0.3866}
 \expandafter\def\csname jdg@selAgree\endcsname{0.8643}
 \expandafter\def\csname jdg@selAgreeB\endcsname{0.9643}
 \expandafter\def\csname jdg@selCells\endcsname{160}
@@ -673,6 +680,12 @@
 \expandafter\def\csname jdg@skNeuralWt\endcsname{+0.24929}
 \expandafter\def\csname jdg@skVienna\endcsname{+0.12059}
 \expandafter\def\csname jdg@skViennaP\endcsname{0.002}
+\expandafter\def\csname jdg@slME\endcsname{+0.0549}
+\expandafter\def\csname jdg@slMECi\endcsname{[+0.0221,\,\allowbreak +0.0890]}
+\expandafter\def\csname jdg@slMN\endcsname{+0.0414}
+\expandafter\def\csname jdg@slMNCi\endcsname{[+0.0092,\,\allowbreak +0.0766]}
+\expandafter\def\csname jdg@slMV\endcsname{+0.0576}
+\expandafter\def\csname jdg@slMVCi\endcsname{[+0.0241,\,\allowbreak +0.0909]}
 \expandafter\def\csname jdg@stCellMax\endcsname{45}
 \expandafter\def\csname jdg@stCellMed\endcsname{25}
 \expandafter\def\csname jdg@stCellMin\endcsname{12}
@@ -680,6 +693,16 @@
 \expandafter\def\csname jdg@stPuzMed\endcsname{225}
 \expandafter\def\csname jdg@stPuzMin\endcsname{130}
 \expandafter\def\csname jdg@stShare\endcsname{6.8\%}
+\expandafter\def\csname jdg@stdEtf\endcsname{\ensuremath{-}0.0172}
+\expandafter\def\csname jdg@stdME\endcsname{+0.2635}
+\expandafter\def\csname jdg@stdMECi\endcsname{[+0.1116,\,\allowbreak +0.4469]}
+\expandafter\def\csname jdg@stdMN\endcsname{+0.0474}
+\expandafter\def\csname jdg@stdMNCi\endcsname{[\ensuremath{-}0.0950,\,\allowbreak +0.2066]}
+\expandafter\def\csname jdg@stdMV\endcsname{+0.3249}
+\expandafter\def\csname jdg@stdMVCi\endcsname{[+0.1459,\,\allowbreak +0.5305]}
+\expandafter\def\csname jdg@stdMeas\endcsname{+0.2463}
+\expandafter\def\csname jdg@stdNeural\endcsname{+0.1989}
+\expandafter\def\csname jdg@stdVienna\endcsname{\ensuremath{-}0.0786}
 \expandafter\def\csname jdg@tvBack\endcsname{$5\times 10^{-6}$}
 \expandafter\def\csname jdg@tvBackN\endcsname{30}
 \expandafter\def\csname jdg@tvBestHalf\endcsname{RibonanzaNet}

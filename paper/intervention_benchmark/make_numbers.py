@@ -712,6 +712,31 @@ assert 1/(1+_B) > _gate/_ntests, (
     "corrected p-value is unattainable here is stale")
 
 put("chReachEight", f"{_m49['A6_reach']['C8']['ratio']:.2f}")
+
+# ---- M50: section 5.4 differenced four columns that are not on one scale. Two scales exist and
+# they answer different questions; the bridge between them is g = rho * SD_R/SD_p, so the slope
+# route is the SD route attenuated by rho. Both are reported, because the run found that the
+# comparison RESOLVES on one and does not on the other, and saying only one would be choosing.
+_m50 = J("m50_units.json")
+_sd, _a2, _a3, _a4 = (_m50["A1_within_sd"], _m50["A2_standardised"],
+                      _m50["A3_paired_standardised_difference"], _m50["A4_slope_route"])
+for _k, _tag in (("rf", "Meas"), ("nmut", "Neural"), ("emut", "Etf"), ("pmut", "Vienna")):
+    put("sd" + _tag, f(_sd[_k], 4))
+    put("std" + _tag, sig(_a2[_k]["standardised_contrast"], 4))
+for _k, _tag in (("nmut", "MN"), ("emut", "ME"), ("pmut", "MV")):
+    put("std" + _tag, sig(_a3[_k]["point"], 4)); put("std" + _tag + "Ci", ci(_a3[_k]["ci95"], 4))
+    put("sl" + _tag, sig(_a4[_k]["point"], 4)); put("sl" + _tag + "Ci", ci(_a4[_k]["ci95"], 4))
+put("convNeural", sig(_a4["nmut"]["converted_contrast"], 4))
+put("rhoNeural", sig(_m50["A5_bridge"]["nmut"]["rho_within"], 4))
+put("rhoVienna", sig(_m50["A5_bridge"]["pmut"]["rho_within"], 4))
+# The whole point of the section is that these two routes give different answers on the same
+# comparison. If that ever stopped being true, the paragraph explaining why both are reported
+# would be describing something that is not there.
+assert _a3["nmut"]["ci_contains_zero"] and not _a4["nmut"]["ci_contains_zero"], (
+    "the two unit routes no longer disagree about whether measurement and transformer resolve; "
+    "the paragraph in section 5.4 that reports both because they disagree is stale")
+assert not _a3["emut"]["ci_contains_zero"] and not _a3["pmut"]["ci_contains_zero"], (
+    "a nearest-neighbour predictor is no longer separated from the measurement on the SD scale")
 # The reclassification is not a matter of taste: C7's interval reaches FURTHER, relative to the
 # quantity it is about, than the interval that moved C8. If that ever stopped holding, the row
 # below would be asserting something the run does not support.

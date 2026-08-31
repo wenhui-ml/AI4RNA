@@ -1,0 +1,47 @@
+=== M50:把 §5.4 的四列放到同一把尺子上再相减 ===
+  声明已冻结并推送于本文件存在之前。全离线,$0。
+  记录缓存命中(4317 条),源文件未变
+  干预 4317,其中有 EternaFold 值的 4317  (0s)
+
+=== V 验证(先于任何 arm)===
+  V1 常数列层内 SD = 0.0  -> 通过
+  V3 measurement    对比 +0.05393  论文 +0.05390  |Δ| 2.84e-05   层内 SD 0.2190
+  V3 RibonanzaNet   对比 +0.06055  论文 +0.06050  |Δ| 5.27e-05   层内 SD 0.3044
+  V3 EternaFold     对比 -0.00569  论文 -0.00569  |Δ| 3.86e-07   层内 SD 0.3314
+  V3 ViennaRNA      对比 -0.03039  论文 -0.03040  |Δ| 1.29e-05   层内 SD 0.3866
+  V3 原始相减 measurement-RNet -0.00662  论文 -0.00662  |Δ| 4.30e-06
+  V2 先除 vs 后除 max|Δ| = 5.55e-17  -> 通过
+  V4 ViennaRNA      g +0.12059(论文 +0.12059)  rho +0.21291  |g - rho*SDr/SDp| 2.78e-17
+      上界 slope 路 -0.06795  rho x SD 路 -0.06795  论文 +0.0680  桥 |Δ| 1.39e-17
+  V4 RibonanzaNet   g +0.20692(论文 +0.20692)  rho +0.28767  |g - rho*SDr/SDp| 5.55e-17
+      上界 slope 路 +0.23234  rho x SD 路 +0.23234  论文 +0.2320  桥 |Δ| 2.78e-17
+  V 全部通过 —— 现在才读 arm
+
+=== A2/A3/A4 目标聚类自助(四列同一次抽样)===
+  V1 一列对自己的标准化差 max|.| = 0.0
+
+  A2 每列除以自己的层内 SD:
+    measurement    +0.24628 SD  [0.09517, 0.42527]
+    RibonanzaNet   +0.19890 SD  [0.10782, 0.33719]
+    EternaFold     -0.01717 SD  [-0.09091, 0.07219]
+    ViennaRNA      -0.07860 SD  [-0.16831, 0.03153]
+
+  A3 配对差(measurement − 预测器,标准化后,同一次抽样):
+    measurement − RibonanzaNet   +0.04737 SD  [-0.09502, 0.20661]  含 0
+    measurement − EternaFold     +0.26345 SD  [0.11161, 0.4469]  不含 0
+    measurement − ViennaRNA      +0.32487 SD  [0.14588, 0.53049]  不含 0
+
+  A4 slope 路(预测器对比 × 自身层内斜率,折进 rescue 单位;斜率同抽样内重算):
+    RibonanzaNet   折算后 +0.01253   measurement − 它 = +0.04140  [0.00919, 0.07662]  不含 0
+    EternaFold     折算后 -0.00093   measurement − 它 = +0.05486  [0.0221, 0.08898]  不含 0
+    ViennaRNA      折算后 -0.00366   measurement − 它 = +0.05759  [0.02408, 0.09088]  不含 0
+
+=== 预注册记分 ===
+  S1  **失败**   标准化后 measurement − RNet = +0.04737 SD [-0.09502, 0.20661]
+  S2  成立   slope 路 +0.04140 [0.00919, 0.07662]
+  S3  成立   符号 +
+  S4  成立   桥 max|Δ| 0.00e+00
+
+  裁定:indistinguishable_survives_standardisation   用时 110s
+
+写出 /data/wenhui/openclaude_rna/rna_harness/runs/ceiling/m50_units.json

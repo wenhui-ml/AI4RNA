@@ -1,0 +1,227 @@
+{
+ "declaration": "m50_units_declaration.json",
+ "cost": "offline, $0 -- no API, no GPU, no download. Reads M26's records, m26c_pneural_cache.npz, m32_eterna_cache.npz.",
+ "bridge": {
+  "note": "Verified symbolically and numerically before this declaration was written, so the run tests it rather than discovers it.",
+  "identity": "bound = Delta_p * g / alpha_R = rho * (Delta_p/SD_p) / (alpha_R/SD_R), because g = rho * SD_R / SD_p",
+  "consequence": "the slope route is the SD route attenuated by rho. The two routes answer different questions -- 'does the predictor separate the pair types as sharply, each in its own units' versus 'how much of the measured effect could travel through this predictor' -- and neither is a correction of the other. What is not either question is the raw subtraction."
+ },
+ "n": {
+  "all": 4317,
+  "with_eternafold": 4317
+ },
+ "A6_reverse_control": {
+  "contrasts": {
+   "rf": 0.05393,
+   "nmut": 0.06055,
+   "emut": -0.00569,
+   "pmut": -0.03039
+  },
+  "published": {
+   "rf": 0.0539,
+   "nmut": 0.0605,
+   "pmut": -0.0304,
+   "emut": -0.00569
+  },
+  "raw_pdMN": -0.00662,
+  "published_pdMN": -0.00662,
+  "max_abs_drift": 5.273e-05
+ },
+ "A1_within_sd": {
+  "rf": 0.219,
+  "nmut": 0.3044,
+  "emut": 0.3314,
+  "pmut": 0.3866
+ },
+ "K3_columns_refused": [],
+ "V2_max_gap": 5.551115123125783e-17,
+ "A5_bridge": {
+  "pmut": {
+   "slope": 0.12059,
+   "published_slope": 0.12059,
+   "rho_within": 0.21291,
+   "g_vs_rho_SDratio": 0.0,
+   "bound_slope_route": -0.06795,
+   "bound_via_rho_and_std": -0.06795,
+   "published_bound": 0.068,
+   "bridge_gap": 0.0
+  },
+  "nmut": {
+   "slope": 0.20692,
+   "published_slope": 0.20692,
+   "rho_within": 0.28767,
+   "g_vs_rho_SDratio": 0.0,
+   "bound_slope_route": 0.23234,
+   "bound_via_rho_and_std": 0.23234,
+   "published_bound": 0.232,
+   "bridge_gap": 0.0
+  }
+ },
+ "V": {
+  "V1_constant_sd_is_zero": true,
+  "V3_reverse_control": true,
+  "V2_equivalent_form": true,
+  "V4_bridge": true,
+  "V1_self_difference_exactly_zero": true
+ },
+ "A2_standardised": {
+  "rf": {
+   "standardised_contrast": 0.24628,
+   "ci95": [
+    0.09517,
+    0.42527
+   ],
+   "within_sd": 0.219
+  },
+  "nmut": {
+   "standardised_contrast": 0.1989,
+   "ci95": [
+    0.10782,
+    0.33719
+   ],
+   "within_sd": 0.3044
+  },
+  "emut": {
+   "standardised_contrast": -0.01717,
+   "ci95": [
+    -0.09091,
+    0.07219
+   ],
+   "within_sd": 0.3314
+  },
+  "pmut": {
+   "standardised_contrast": -0.0786,
+   "ci95": [
+    -0.16831,
+    0.03153
+   ],
+   "within_sd": 0.3866
+  }
+ },
+ "A3_paired_standardised_difference": {
+  "nmut": {
+   "point": 0.04737,
+   "ci95": [
+    -0.09502,
+    0.20661
+   ],
+   "ci_contains_zero": true
+  },
+  "emut": {
+   "point": 0.26345,
+   "ci95": [
+    0.11161,
+    0.4469
+   ],
+   "ci_contains_zero": false
+  },
+  "pmut": {
+   "point": 0.32487,
+   "ci95": [
+    0.14588,
+    0.53049
+   ],
+   "ci_contains_zero": false
+  }
+ },
+ "A4_slope_route": {
+  "nmut": {
+   "converted_contrast": 0.01253,
+   "point": 0.0414,
+   "ci95": [
+    0.00919,
+    0.07662
+   ],
+   "ci_contains_zero": false,
+   "slope": 0.20692
+  },
+  "emut": {
+   "converted_contrast": -0.00093,
+   "point": 0.05486,
+   "ci95": [
+    0.0221,
+    0.08898
+   ],
+   "ci_contains_zero": false,
+   "slope": 0.1641
+  },
+  "pmut": {
+   "converted_contrast": -0.00366,
+   "point": 0.05759,
+   "ci95": [
+    0.02408,
+    0.09088
+   ],
+   "ci_contains_zero": false,
+   "slope": 0.12059
+  }
+ },
+ "K4_routes_disagree_in_sign": {
+  "nmut": false,
+  "emut": false,
+  "pmut": false
+ },
+ "staked": {
+  "S1": {
+   "text": "the paired interval on the SD-standardised measurement-minus-transformer difference EXCLUDES zero, so the word 'indistinguishable' does not survive standardisation",
+   "pass": false,
+   "detail": "标准化后 measurement − RNet = +0.04737 SD [-0.09502, 0.20661]"
+  },
+  "S2": {
+   "text": "the slope-route difference between the measured contrast and the transformer's contrast converted into rescue units EXCLUDES zero",
+   "pass": true,
+   "detail": "slope 路 +0.04140 [0.00919, 0.07662]"
+  },
+  "S3": {
+   "text": "the SD-standardised measurement-minus-transformer difference is POSITIVE, i.e. the measurement separates the pair types more sharply in its own units than the transformer does in its own",
+   "pass": true,
+   "detail": "符号 +"
+  },
+  "S4": {
+   "text": "the bridge identity holds to 1e-9",
+   "pass": true,
+   "detail": "桥 max|Δ| 0.00e+00"
+  }
+ },
+ "verdict": "indistinguishable_survives_standardisation",
+ "log": [
+  "=== M50:把 §5.4 的四列放到同一把尺子上再相减 ===",
+  "  声明已冻结并推送于本文件存在之前。全离线,$0。",
+  "  记录缓存命中(4317 条),源文件未变",
+  "  干预 4317,其中有 EternaFold 值的 4317  (0s)",
+  "\n=== V 验证(先于任何 arm)===",
+  "  V1 常数列层内 SD = 0.0  -> 通过",
+  "  V3 measurement    对比 +0.05393  论文 +0.05390  |Δ| 2.84e-05   层内 SD 0.2190",
+  "  V3 RibonanzaNet   对比 +0.06055  论文 +0.06050  |Δ| 5.27e-05   层内 SD 0.3044",
+  "  V3 EternaFold     对比 -0.00569  论文 -0.00569  |Δ| 3.86e-07   层内 SD 0.3314",
+  "  V3 ViennaRNA      对比 -0.03039  论文 -0.03040  |Δ| 1.29e-05   层内 SD 0.3866",
+  "  V3 原始相减 measurement-RNet -0.00662  论文 -0.00662  |Δ| 4.30e-06",
+  "  V2 先除 vs 后除 max|Δ| = 5.55e-17  -> 通过",
+  "  V4 ViennaRNA      g +0.12059(论文 +0.12059)  rho +0.21291  |g - rho*SDr/SDp| 2.78e-17",
+  "      上界 slope 路 -0.06795  rho x SD 路 -0.06795  论文 +0.0680  桥 |Δ| 1.39e-17",
+  "  V4 RibonanzaNet   g +0.20692(论文 +0.20692)  rho +0.28767  |g - rho*SDr/SDp| 5.55e-17",
+  "      上界 slope 路 +0.23234  rho x SD 路 +0.23234  论文 +0.2320  桥 |Δ| 2.78e-17",
+  "  V 全部通过 —— 现在才读 arm",
+  "\n=== A2/A3/A4 目标聚类自助(四列同一次抽样)===",
+  "  V1 一列对自己的标准化差 max|.| = 0.0",
+  "\n  A2 每列除以自己的层内 SD:",
+  "    measurement    +0.24628 SD  [0.09517, 0.42527]",
+  "    RibonanzaNet   +0.19890 SD  [0.10782, 0.33719]",
+  "    EternaFold     -0.01717 SD  [-0.09091, 0.07219]",
+  "    ViennaRNA      -0.07860 SD  [-0.16831, 0.03153]",
+  "\n  A3 配对差(measurement − 预测器,标准化后,同一次抽样):",
+  "    measurement − RibonanzaNet   +0.04737 SD  [-0.09502, 0.20661]  含 0",
+  "    measurement − EternaFold     +0.26345 SD  [0.11161, 0.4469]  不含 0",
+  "    measurement − ViennaRNA      +0.32487 SD  [0.14588, 0.53049]  不含 0",
+  "\n  A4 slope 路(预测器对比 × 自身层内斜率,折进 rescue 单位;斜率同抽样内重算):",
+  "    RibonanzaNet   折算后 +0.01253   measurement − 它 = +0.04140  [0.00919, 0.07662]  不含 0",
+  "    EternaFold     折算后 -0.00093   measurement − 它 = +0.05486  [0.0221, 0.08898]  不含 0",
+  "    ViennaRNA      折算后 -0.00366   measurement − 它 = +0.05759  [0.02408, 0.09088]  不含 0",
+  "\n=== 预注册记分 ===",
+  "  S1  **失败**   标准化后 measurement − RNet = +0.04737 SD [-0.09502, 0.20661]",
+  "  S2  成立   slope 路 +0.04140 [0.00919, 0.07662]",
+  "  S3  成立   符号 +",
+  "  S4  成立   桥 max|Δ| 0.00e+00",
+  "\n  裁定:indistinguishable_survives_standardisation   用时 110s"
+ ]
+}

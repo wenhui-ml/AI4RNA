@@ -54,9 +54,17 @@ def log(s=""):
     print(s, flush=True); LOG.append(s)
 
 
+def _plain(o):
+    """numpy scalars are not JSON serialisable and numpy 2 names its bool `bool`, so the error
+    message reads as if a Python bool had failed. Convert rather than guess at every call site."""
+    if isinstance(o, (np.bool_, np.integer, np.floating)):
+        return o.item()
+    raise TypeError(repr(o))
+
+
 def save(OUT):
     OUT["log"] = LOG
-    json.dump(OUT, open(OUTJ, "w"), indent=1, ensure_ascii=False)
+    json.dump(OUT, open(OUTJ, "w"), indent=1, ensure_ascii=False, default=_plain)
     log(f"\n写出 {OUTJ}")
 
 
