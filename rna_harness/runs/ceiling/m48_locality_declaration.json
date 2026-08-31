@@ -1,0 +1,37 @@
+{
+ "id": "m48_locality",
+ "frozen_before_code": true,
+ "cost": "offline, $0 -- reads the corpus's raw reactivity columns and cached predictor scores; folds nothing",
+ "question": "The predictor is a probability for ONE pair. The outcome is a rescue factor computed over the WHOLE design window. Are the two the same object closely enough that the second can serve as ground truth for the first?",
+ "why_this_is_a_validity_question_and_not_a_robustness_check": [
+  "A predictor emits p_m for the target pair (i,j). The rescue factor normalises the double mutant's profile disruption against the two single mutants' over every position in the design window.",
+  "An intervention can therefore restore its own pair while a distant helix reorganises, or fail at its own pair while the window looks quiet. If the outcome is dominated by distal structure, then what every arm of this paper scores is not the response at the target pair, and that is a threat to the estimand rather than to a robustness margin.",
+  "This affects BOTH readings, not one result, which is why it is worth an experiment rather than a sentence."
+ ],
+ "method": {
+  "windows": "the rescue factor is recomputed with the norm taken over positions within +-w of either intervened position, for w in {5, 10, 15, 25}, and over the full design window as the corpus computes it",
+  "everything_else_held": "the same wild types, the same single mutants, the same double mutants, the same formula, the same missing-data mask. Only the set of positions entering the three norms changes.",
+  "what_is_then_recomputed": "the paper's own headline quantities under each window: each implementation's within-design rank agreement with rescue, helix depth's, and the budgeted recovery gaps of Reading 2"
+ },
+ "V_checks_before_any_result": {
+  "V1": "with w = the full design window, the recomputation must reproduce the corpus's released rescue_factor column at the agreement M26w already published (Pearson 1.0, max abs diff 0.001426). Any drift means this run is not recomputing the published outcome and nothing downstream is interpretable.",
+  "V2": "the positions parsed from mutA and mutB must be exactly the positions at which the double mutant differs from its wild type, for every record used. A window centred on the wrong nucleotide would be a silent and total failure."
+ },
+ "staked": {
+  "1": "the +-15 window's rescue values rank-correlate with the full-window values above 0.8",
+  "2": "helix depth remains matched or better than every implementation at every window -- the paper's central ranking claim does not depend on window width",
+  "3": "the sign of the RibonanzaNet-minus-ViennaRNA recovery gap at the smallest budget is negative at every window",
+  "4": "no window produces an implementation whose advantage over depth has a 95 per cent interval excluding zero"
+ },
+ "kill": [
+  "V1 does not reproduce the published column -> void",
+  "V2 fails for more than 1 per cent of records -> void; the window is then not centred on the intervention",
+  "fewer than 500 interventions survive at any window -> that window is reported as underpowered rather than compared"
+ ],
+ "wording_rules": {
+  "W1": "no window is 'the right one'. This arm reports STABILITY across windows. If one window is more favourable to any claim in this paper, that window may not be adopted and the full-window result stays the reported one.",
+  "W2": "if a headline sign flips at any window, the manuscript states the claim as window-dependent. The window is not discarded and the claim is not quietly narrowed.",
+  "W3": "a high correlation between local and global rescue does not establish that the outcome is local. It establishes that this corpus's distal changes do not dominate the ranking, which is the weaker statement the paper may make."
+ },
+ "not_a_test": "This run introduces no new predictor, no new corpus and no new outcome definition. It varies one set of positions inside a formula the corpus already released."
+}
