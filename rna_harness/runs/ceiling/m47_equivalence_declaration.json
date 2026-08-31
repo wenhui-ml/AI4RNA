@@ -1,0 +1,45 @@
+{
+ "id": "m47_equivalence",
+ "frozen_before_code": true,
+ "cost": "offline, $0 -- reads m43_predictor_scores.csv and m44_decision.json, folds nothing",
+ "question": "The manuscript claims that no implementation is distinguishable from a free integer as a standalone ranker, and supports it with twelve confidence intervals that cover zero. A confidence interval covering zero is a failure to reject a difference, not evidence of equivalence. This run replaces that argument with a formal one.",
+ "why_this_is_not_optional": [
+  "The paper makes exactly this criticism of itself elsewhere: C8's channel was downgraded from 'empty' to 'unresolved' because its interval, while covering zero, reached far enough to permit the whole effect. The same standard has to apply to Reading 2 or the paper holds two standards.",
+  "An equivalence claim needs a margin. Without one, 'indistinguishable' means only that this corpus was too small to resolve a difference, which is a statement about our sample and not about the models."
+ ],
+ "the_margin_and_how_it_is_fixed": {
+  "rule": "delta_tube is the recovery gain that ONE additional construct buys in a design cell of median size, at the operative budget. A ranker difference smaller than that is one an experimenter removes by building one more tube, so it cannot change a decision.",
+  "computation": "slope of recovery against budget for the FREE DEPTH baseline, evaluated between the smallest and largest declared budgets, multiplied by 1/median(cell size). Depth alone, so the margin never touches the model-versus-depth quantities it will be applied to.",
+  "why_this_rule_and_not_a_number": "delta cannot be chosen after seeing the differences it will judge. It is therefore derived from a rule that involves only the free baseline and the corpus geometry, both fixed before any model enters.",
+  "not_to_be_rechosen": "delta_tube is whatever the rule returns. It is not adjusted after the equivalence bounds are read."
+ },
+ "the_ungameable_quantity": {
+  "name": "minimum equivalence margin, delta_star",
+  "definition": "the smallest margin at which two one-sided tests at alpha = 0.05 would declare equivalence, which is the larger absolute endpoint of the 90 per cent target-clustered bootstrap interval on the difference.",
+  "why_it_matters": "it is reported for every comparison so that a reader who rejects our delta can apply their own. A claim of equivalence at a margin the reader does not accept is then visibly a claim about that margin rather than about the models."
+ },
+ "arms": {
+  "V": "reproduce M44's twelve point estimates before anything else",
+  "E1": "delta_star for all twelve implementation-minus-depth comparisons, at all three budgets",
+  "E2": "delta_tube from the frozen rule, and which comparisons are equivalent at it",
+  "E3": "the four depth-then-model arms, where the paper DOES claim a difference -- a positive control that should not come out equivalent if the claim is real",
+  "E4": "depth against itself: delta_star must be at the numerical floor"
+ },
+ "staked": {
+  "1": "every implementation-minus-depth comparison is equivalent to free depth at delta_tube, at every budget",
+  "2": "depth against itself returns delta_star below 0.001",
+  "3": "at least one depth-then-model arm is NOT equivalent at delta_tube, so the margin can distinguish something",
+  "4": "delta_tube lies between 0.01 and 0.10"
+ },
+ "kill": [
+  "the reverse control does not reproduce M44's twelve point estimates to 1e-4 -> void",
+  "delta_tube falls outside [0.005, 0.20] -> the rule has produced a margin no experimenter would accept and the arm is reported as void rather than used"
+ ],
+ "wording_rules": {
+  "W1": "the word equivalent may never appear without its margin named in the same sentence.",
+  "W2": "if staked 1 fails for any arm, the manuscript sentence 'no implementation is distinguishable from a free integer' is replaced arm by arm, not softened globally.",
+  "W3": "delta_star is a property of this corpus's resolution. A small delta_star means this corpus could resolve a small difference and did not find one; it is not a claim that no difference exists in the world.",
+  "W4": "TOST establishes equivalence WITHIN a margin. It never establishes identity."
+ },
+ "not_a_test": "This run introduces no new outcome, no new predictor and no new corpus. It replaces one inferential argument with another on numbers already published."
+}
