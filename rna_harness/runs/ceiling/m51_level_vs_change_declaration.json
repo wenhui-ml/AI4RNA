@@ -1,0 +1,44 @@
+{
+  "id": "m51_level_vs_change",
+  "title": "Section 5.6 chooses the level arm over the change arm because it is larger, and says in print that it puts no interval on the difference. Put one on it.",
+  "frozen_before_code": true,
+  "cost": "offline, $0 -- no API, no GPU, no download. Reads M26's records plus the cached neural and EternaFold posteriors.",
+
+  "why": [
+    "A mutation experiment suggests two quantities from the same predictor: the level it assigns the mutant, and the change between mutant and wild type. Section 5.6 reports both, then says: 'We report the level arm in the table because it is the larger of the two, and we put no interval on the difference between them.'",
+    "That is a post-hoc choice between two arms justified by a comparison of two point estimates, with the interval on their difference explicitly declined. It is the same shape as the retention ratio this paper withdraws and the same shape as the kill condition it grades as failed, and it sits in the section whose table carries the paper's practical claim.",
+    "The two arms are computed on the same cells, the same outcome and the same clusters, so the paired difference costs one resample loop. There is no reason for it to be absent other than that it was not run."
+  ],
+
+  "arms": {
+    "A1": "reverse control: reproduce the six published within-design rank agreements -- level and change, for each of the three predictors",
+    "A2": "the paired difference level minus change, per predictor, both arms evaluated inside the SAME target-clustered resample draw, with a percentile interval",
+    "A3": "the same difference against the free depth baseline, so the section's actual claim -- that neither arm beats a free integer -- is stated on both arms rather than only on the one that was reported"
+  },
+
+  "verification_before_any_arm_is_read": {
+    "V1_zero_point": "an arm's paired difference against ITSELF is exactly 0.0 in every draw",
+    "V2_equivalent_form": "the weighted within-cell Spearman computed as a dot product of centred normalised rank vectors must equal the same quantity computed from the covariance of ranks divided by their standard deviations, to 1e-12",
+    "V3_reverse_control": "the six published rank agreements must reproduce to 1e-4 before any difference is read",
+    "V4_identity": "a column's within-design rank agreement with itself is exactly +1, and with its own negation exactly -1"
+  },
+
+  "kill_conditions": {
+    "K1": "if A1 fails to reproduce any published rank agreement to 1e-4, VOID",
+    "K2": "if V1, V2 or V4 fails, VOID",
+    "K3": "if fewer than 20 design cells survive the >= 8 flip rule, the arm is too thin and is reported without intervals"
+  },
+
+  "staked_predictions": [
+    {"id": "S1", "text": "for the neural predictor the paired level-minus-change difference EXCLUDES zero"},
+    {"id": "S2", "text": "for ViennaRNA the paired level-minus-change difference EXCLUDES zero"},
+    {"id": "S3", "text": "for EternaFold the paired level-minus-change difference EXCLUDES zero, and is the largest of the three, because its change arm resolves on the wrong side"},
+    {"id": "S4", "text": "all three differences are POSITIVE, i.e. the level arm is the larger in every case"}
+  ],
+
+  "wording_rules_binding_on_the_manuscript": {
+    "W1": "the sentence 'we put no interval on the difference between them' is removed whatever this run returns, and replaced by the interval.",
+    "W2": "if a difference does not resolve, the manuscript may not describe the level arm as 'the larger of the two' without saying in the same sentence that the difference between them does not resolve.",
+    "W3": "this run does not change which arm the table reports. The level arm was declared as the reported one before the change arm was scored, and re-choosing it now on a result would be the fitting this paper refuses. What changes is what the manuscript is entitled to say about the choice."
+  }
+}
