@@ -521,10 +521,12 @@ def fig_contrasts():
 
     # short forms: panel a spells the four names out immediately to the left, and a tick label
     # wider than about 1.6cm forces the three plot boxes below 3.8cm to fit the measure
-    DIFF = [("M $-$ RNet", "measured_minus_neural"),
-            ("M $-$ EF", "measured_minus_eterna"),
-            ("M $-$ VRNA", "measured_minus_vienna"),
-            ("RNet $-$ EF", "neural_minus_eterna"),
+    # The three measurement-against-predictor differences used to be drawn here and are gone.
+    # One column is a measured rescue factor and the others are probabilities, so those three are
+    # not on the axis the other three live on; M50 reports them on two scales in the text and
+    # neither is this one. What remains is the set that IS one unit system: predictor against
+    # predictor. Drawing all six on a shared axis is the fault section 5.4 now withdraws.
+    DIFF = [("RNet $-$ EF", "neural_minus_eterna"),
             ("RNet $-$ VRNA", "neural_minus_vienna"),
             ("EF $-$ VRNA", "vienna_minus_eterna")]
     D = []

@@ -25,16 +25,10 @@
 
 \nextgroupplot[width=4.85cm, height=5.2cm,
     xlabel={paired difference},
-    ytick={6,5,4,3,2,1},
-    yticklabels={{M $-$ RNet},{M $-$ EF},{M $-$ VRNA},{RNet $-$ EF},{RNet $-$ VRNA},{EF $-$ VRNA}},
-    yticklabel style={font=\tiny}, ymin=0.4, ymax=6.6,
+    ytick={3,2,1},
+    yticklabels={{RNet $-$ EF},{RNet $-$ VRNA},{EF $-$ VRNA}},
+    yticklabel style={font=\tiny}, ymin=0.4, ymax=3.6,
     extra x ticks={0}, extra x tick style={grid=major, grid style={densely dotted, color=nmgrey}, xticklabel=\empty}, title={b}]
-\addplot[color=nmgrey, line width=1.5pt, forget plot] coordinates {(-0.04164,6) (0.03200,6)};
-\addplot[color=nmgrey, mark=*, mark size=2.2pt, only marks, forget plot] coordinates {(-0.00662,6)};
-\addplot[color=nmfree, line width=1.5pt, forget plot] coordinates {(0.02203,5) (0.09946,5)};
-\addplot[color=nmfree, mark=*, mark size=2.2pt, only marks, forget plot] coordinates {(0.05962,5)};
-\addplot[color=nmfree, line width=1.5pt, forget plot] coordinates {(0.03388,4) (0.13206,4)};
-\addplot[color=nmfree, mark=*, mark size=2.2pt, only marks, forget plot] coordinates {(0.08432,4)};
 \addplot[color=nmfree, line width=1.5pt, forget plot] coordinates {(0.03472,3) (0.10124,3)};
 \addplot[color=nmfree, mark=*, mark size=2.2pt, only marks, forget plot] coordinates {(0.06624,3)};
 \addplot[color=nmfree, line width=1.5pt, forget plot] coordinates {(0.05277,2) (0.13176,2)};

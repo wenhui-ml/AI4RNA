@@ -1344,8 +1344,8 @@ for the measurement against \jdg{sdNeural}, \jdg{sdEtf} and \jdg{sdVienna} for t
 computed on the admitted set rather than on the intersected subset \S\ref{sec:conventional} uses
 --- asks whether a predictor separates the pair types as sharply, in its own units, as the
 measurement does in its. Multiplying a predictor's contrast by its within-stratum slope on the
-outcome, which is the conversion \S\ref{sec:bound} already performs, asks how much of the measured
-effect could travel through that predictor. The two are related exactly: since
+outcome, which is the conversion this section performs below to bound what runs through each
+model, asks how much of the measured effect could travel through that predictor. The two are related exactly: since
 $g=\rho\,\mathrm{SD}_R/\mathrm{SD}_p$, \textbf{the slope route is the SD route attenuated by
 $\rho$}, the predictor's own within-stratum correlation with the outcome (\jdg{rhoNeural} for the
 transformer, \jdg{rhoVienna} for the thermodynamic model). Neither route corrects the other. The
@@ -2567,7 +2567,10 @@ The transformer exceeds the learned-parameter model, interval excluding zero
   zero} --- \emph{it does not: \jdg{pdVE} (\jdg{pdVECi}). This is the prediction whose failure
   removed \emph{and not the training data} from the abstract, Claim~\ref{claim:identity} and the
   Conclusion} & \textbf{failed} \\
-The measurement and the transformer are indistinguishable \quad(\jdg{pdMNCi}) & correct \\
+The measurement and the transformer are indistinguishable --- \emph{graded as written, on a raw
+  difference across two scales that \S\ref{sec:result} now withdraws as a licensing quantity. The
+  verdict is unchanged when the comparison is redone on the scale it needed (\jdg{stdMN}\,SD,
+  \jdg{stdMNCi}), which is luck rather than design and is recorded as such} & correct \\
 \midrule
 \multicolumn{2}{@{}l@{}}{\emph{frozen before the readout-scale arm existed (\S\ref{sec:conventional})}}\\
 Both readouts reproduce their published contrasts on identical weights and strata & correct \\
@@ -2578,7 +2581,8 @@ The standardised paired difference excludes zero \quad(\jdg{cvPairedSdCi}) & cor
 \multicolumn{2}{@{}l@{}}{\emph{frozen before the purpose-built comparator existed (\S\ref{sec:ranking})}}\\
 At least one riboSNitch-style score resolves from zero \emph{in the declared negative direction}
   \quad(\jdg{rsBppmCi}, \jdg{rsMfeCi}, \jdg{rsEnsCi}) & correct \\
-None of the three beats the free depth baseline \quad(\jdg{rsNbeat} of \jdg{rsNarms}) & correct \\
+The staked direction holds and none of the three beats the free depth baseline
+  \quad(\jdg{rsNbeat} of \jdg{rsNarms}) & correct \\
 \textbf{The local variant ranks at least as well as the global one} --- \emph{it does not:
   \jdg{rsLocal} (\jdg{rsLocalCi}) against \jdg{rsBppm} (\jdg{rsBppmCi}), and against depth
   \jdg{rsLocalVs} (\jdg{rsLocalVsCi}). The stake was written as a point-for-point comparison and

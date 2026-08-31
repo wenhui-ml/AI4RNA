@@ -590,12 +590,17 @@ put("efEquiv", f"{m32['P1_equivalence']['abs_diff']:.0e}".replace("e+00", ""))
 # the fault it retracts twice. All four columns resampled over the SAME 20 puzzles per draw.
 m35 = J("m35_paired_predictor_differences.json")
 _pd = m35["paired_differences"]
+# Only the predictor-against-predictor differences are emitted with an interval and a p-value:
+# those three are inside one unit system. The three measurement-against-predictor differences are
+# raw subtractions across two scales, which section 5.4 now withdraws as licensing quantities; MN
+# survives as a bare point estimate because the manuscript prints it as the thing being corrected,
+# and MV and ME are not emitted at all rather than left computed and unshown.
 for k, tag in (("neural_minus_vienna", "NV"), ("neural_minus_eterna", "NE"),
-               ("vienna_minus_eterna", "VE"), ("measured_minus_neural", "MN"),
-               ("measured_minus_vienna", "MV"), ("measured_minus_eterna", "ME")):
+               ("vienna_minus_eterna", "VE")):
     d = _pd[k]
     put(f"pd{tag}", sig(d["effect"], 5)); put(f"pd{tag}Ci", ci(d["ci"]))
     put(f"pd{tag}P", pv(d["p_perm"]))
+put("pdMN", sig(_pd["measured_minus_neural"]["effect"], 5))
 _ax = m35["post_hoc_axes"]
 put("axArch", sig(_ax["architecture_axis_neural_minus_eterna"]["effect"], 5))
 put("axArchCi", ci(_ax["architecture_axis_neural_minus_eterna"]["ci"]))
