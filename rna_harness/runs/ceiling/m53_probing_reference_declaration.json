@@ -1,0 +1,57 @@
+{
+  "id": "m53_probing_reference",
+  "title": "Every agreement number in this paper is scored against something a person or a model wrote down: the designer's declared target, or RibonanzaNet's own structure column. Score them against a structure derived from the probing data instead.",
+  "frozen_before_code": true,
+  "cost": "offline, $0 -- no API, no download, no GPU. Reads two files already on disk, runs ViennaRNA, the RNAstructure binary and the EternaFold binary on 160 wild types.",
+
+  "why": [
+    "Section 5.1 already states, in its own paragraph, that the agreement column it examines is RibonanzaNet's shipped RNet_structure and that the comparison should be read as one model's output examined two ways. That disclosure is not in the abstract's corresponding sentence, and it is the paper's largest attack surface.",
+    "Section 5.10's agreement ranking is a different thing and has been mis-described in review: m43's stage_agree scores every implementation against the DECLARED TARGET, not against any model. RibonanzaNet's 0.87916 is not self-agreement. But the declared target is the designer's intention, not the molecule's structure, and a benchmark scored against intention measures how well a predictor reproduces what a design program was aiming at.",
+    "A reference that is neither is available and already on disk. OK7a_M2_data.v4.5.2.csv carries M2_structure for the wild types, inferred from the mutate-and-map contact map rather than from any sequence-to-structure model in this panel.",
+    "Whether the paper's numbers survive that swap is not known to us. This run is a test, not a repair."
+  ],
+
+  "known_before_freezing": {
+    "note": "Computed while assessing whether this run was possible at all, and recorded here rather than presented later as a finding.",
+    "coverage": "158 of our 158 design cells have a wild-type M2_structure; 160 cells carry one in the file",
+    "reference_disagreement": "the probing-derived reference recovers 2916 of 4678 declared-target pairs inside the design windows, 0.623 -- the two references are substantially different, so the swap is not cosmetic",
+    "not_yet_known": "nothing about any contrast, ranking, margin or interval under the new reference has been computed"
+  },
+
+  "arms": {
+    "A1": "the agreement ranking recomputed against the probing-derived reference: each implementation's own native structure for the wild type, F1 over pairs inside the design window, exactly m43's scoring with the reference swapped. Reports the four scores, the incumbent margin RibonanzaNet minus ViennaRNA, the Kendall tau against the response ranking, and whether the one reorder swap survives its interval.",
+    "A2": "Section 5.1's agreement readout with the column swapped. On m25's own key set -- the pairs both readouts can score -- five agreement columns: RibonanzaNet's shipped structure frequency (the published one), ViennaRNA's MFE, RNAstructure's MFE, EternaFold's MEA, and the probing-derived structure, which is not a model at all. For each: the matched C-G minus A-U contrast, its pooled within-stratum SD, and the paired difference against the intervention readout in SD units, on one design-clustered resample.",
+    "A3": "helix depth read from the probing-derived structure instead of from the declared target. The free baseline's within-design rank agreement is recomputed on it and paired against the declared version, and against every predictor's level arm.",
+    "A4": "whether the probing-derived reference is independent of the panel at all: F1 between it and each of the four implementations' structures on the same wild types. ShapeKnots is an RNAstructure-family algorithm, so this is not a formality."
+  },
+
+  "verification_before_any_arm_is_read": {
+    "V1_zero_point": "F1 of a structure against itself is exactly 1.0 and against the empty structure exactly 0.0",
+    "V2_external_columns": "our F1 of the probing structure against the declared target must reproduce the file's own M2_F1 column, and our F1 of RibonanzaNet's structure against the declared target must reproduce its RNet_F1 column, both to 1e-3. Neither column is under our control, and both fail loudly if the coordinate shift between the two released files is wrong.",
+    "V3_reverse_control": "before any reference is swapped, reproduce m25's B block (4293 pairs, 549 strata, 892 weight, rescue +0.0527, inferred +0.0198), m36's standardisation (within-SDs 0.2195 and 0.2335, contrasts +0.2400 and +0.0848, paired +0.1552 with CI [0.01533, 0.30193]) and m43's four agreement scores (0.61916, 0.67583, 0.60834, 0.87916)",
+    "V4_coverage": "count the design cells carrying a wild-type probing structure and report it beside every A1 and A3 number",
+    "V5_equivalent_form": "the matched contrast from the estimator written in this file must equal m25's E4_matched on the same records to 1e-12"
+  },
+
+  "kill_conditions": {
+    "K1": "if V3 fails to reproduce any published number to its printed precision, VOID",
+    "K2": "if V1, V2 or V5 fails, VOID",
+    "K3": "if fewer than 150 design cells carry a probing-derived structure, VOID -- the swap would be a different corpus",
+    "K4": "if A4 shows the probing reference agreeing with any panel member above F1 0.90, A1 is reported as NOT independent of the panel, and its ranking is not described as a neutral reference anywhere in the manuscript"
+  },
+
+  "staked_predictions": [
+    {"id": "S1", "text": "the incumbent margin, RibonanzaNet minus ViennaRNA, is SMALLER against the probing-derived reference than the 0.260 it has against the declared target"},
+    {"id": "S2", "text": "RibonanzaNet still ranks first of the four against the probing-derived reference"},
+    {"id": "S3", "text": "Section 5.1's paired difference -- the intervention readout minus the agreement readout, in SD units -- still EXCLUDES zero when the agreement column is the probing-derived structure rather than RibonanzaNet's own, so Claim 2 does not depend on which model wrote the column"},
+    {"id": "S4", "text": "helix depth read from the probing-derived structure still exceeds every predictor's level arm, so the free baseline is not an artifact of the declared target"}
+  ],
+
+  "wording_rules_binding_on_the_manuscript": {
+    "W1": "whatever this run returns, the abstract's sentence comparing the interventional and agreement readouts names the source of the agreement column, and Claim 3 says the integer is read from the declared target structure rather than only that it is free.",
+    "W2": "the DECLARED target remains the primary reference for Reading 2. This is decided here, before the result, because Reading 2 is a statement about the margin the incumbent benchmark actually distributes, and that margin is scored against the declared target. The probing-derived reference is reported as a robustness axis. Re-choosing the primary reference after seeing which one flatters the paper would be the fitting this paper refuses elsewhere.",
+    "W3": "if A4 shows the probing reference is close to a panel member, that is stated in the same paragraph as A1 and not in a footnote.",
+    "W4": "this run does not change the stratification. Helix depth inside the strata stays as read from the declared target, because changing it would move every estimate in the paper for a reason unrelated to what is tested here. A3 changes the BASELINE only.",
+    "W5": "a failed stake is reported in the preregistration table as failed and the affected claim is narrowed in the body. If S1 fails -- if the margin is larger against the probing reference -- that is reported as the stake failing and not rewritten as a strengthening."
+  }
+}
