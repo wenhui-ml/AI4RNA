@@ -769,6 +769,56 @@ put("unShare", f"{100*_cp['share_reproduced']:.1f}\\%")
 put("unFams", f"{_vr['n_clusters']}")
 put("unMaxSeq", "5")
 
+# ---------------------------------------------------------------- the family, corrected (M64)
+# Limitation (vii) used to hand the reader the correction to do themselves. The family is frozen
+# in M64's declaration; the resolution the correction needs was bought at 10^6 draws.
+m64 = J("m64_multiplicity_and_shape.json")
+_A, _B = m64["A"], m64["B"]
+put("fwM", f"{len(m64['family_found'])}")
+_thr = f"{m64['alpha'] / len(m64['family_found']):.2e}".split("e")
+put("fwThr", "%s\\times10^{%d}" % (_thr[0], int(_thr[1])))
+put("fwFloor", f"{len(m64['at_floor'])}")
+put("fwFloorP", f"{1.0/2001:.4f}")
+put("fwFloorOther", f"{len(m64['at_floor']) - 5}")
+put("fwHolmPub", f"{_A['n_holm']}")
+put("fwBhPub", f"{_A['n_bh']}")
+put("fwHolmNew", f"{m64['B_corrected']['n_holm']}")
+put("fwBhNew", f"{m64['B_corrected']['n_bh']}")
+put("fwDraws", f"{m64['nperm_buy']:,}".replace(",", "{,}"))
+_names = {"rescueAUP": "AU", "rescueGUP": "GU", "eP": "Cde", "eDZeroP": "DZero", "eDTwoP": "DTwo"}
+for k, tag in _names.items():
+    v = _B[k]
+    put(f"fwZ{tag}", f"{v['z']:+.2f}")
+    put(f"fwGe{tag}", f"{v['n_ge']}")
+    _m, _e = f"{v['p']:.0e}".split("e")
+    put(f"fwP{tag}", "$<10^{-6}$" if v["n_ge"] == 0 else ("$%s\\times10^{%d}$" % (_m, int(_e))))
+    e = m64["S4"]["arms"][k]
+    put(f"fwD{tag}", sig(e["d_vec"], 4))
+put("fwSdMax", f"{max(abs(m64['S4']['arms'][k]['sd_vec'] / m64['S4']['arms'][k]['sd_published'] - 1) for k in ('rescueAUP', 'rescueGUP', 'eP') ) * 100:.0f}\\%")
+_C = m64["C_shape"]
+put("shpSkew", f"{_C['skew']:+.2f}")
+put("shpKurt", f"{_C['exkurt']:+.1f}")
+put("shpMin", sig(_C["min"], 4))
+put("shpMax", sig(_C["max"], 4))
+put("shpMed", sig(_C["q"]["50"], 4))
+put("shpQOne", sig(_C["q"]["1"], 4))
+put("shpQNn", sig(_C["q"]["99"], 4))
+put("shpNeg", f"{100*_C['frac_negative']:.1f}\\%")
+put("shpRank", sig(m64["C_rank"]["diff"], 4))
+put("shpRankP", ("$<10^{-5}$" if m64["C_rank"]["p"] <= 1.01e-5 else f"{m64['C_rank']['p']:.1e}"))
+put("shpTrim", sig(m64["C_trim"]["diff"], 4))
+put("shpTrimRet", f"{100*m64['C_trim']['retention']:.1f}\\%")
+put("shpTrimN", f"{m64['C_trim']['n_kept']}")
+_D = m64["D"]
+put("supFrac", f"{100*_D['fraction']:.1f}\\%")
+put("supUsed", f"{_D['n_used']}")
+put("supBase", f"{_D['n_base']}")
+put("supSmdDepth", sig(_D["smd"]["depth"], 3))
+put("supSmdCross", sig(_D["smd"]["crossed"], 3))
+put("supSmdRf", sig(_D["smd"]["rf"], 3))
+put("supSmdDg", sig(_D["smd"]["dG"], 3))
+put("supSmdMax", f"{_D['max_abs_smd_of_three']:.3f}")
+
 # ---------------------------------------------------------------- how the corpus was selected
 # (M30). R1's premise is that the covariate distribution was produced by a design algorithm; it
 # was also produced by a selection rule, and the paper has to say so.

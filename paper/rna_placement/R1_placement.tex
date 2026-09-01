@@ -340,7 +340,8 @@ nosek2018preregistration,gelman2014statistical}. Evidential claims are held to a
 it could have detected. Appendix~\ref{app:prereg} lists every staked prediction and
 both of the two that were wrong. That discipline produced one methodological by-product we state as
 a proposition, because it invalidates the permutation test most naturally written for a matched
-design of this kind.
+design of this kind. Figure~\ref{fig:arch} is the map of what follows: which section estimates
+which quantity, and which of the paths never calls a folding predictor.
 
 \begin{figure}[!t]
 \centering
@@ -933,11 +934,14 @@ Two limits of the inference are stated here rather than left to a referee. Every
 contrast rests on $\jdg{ccPuzzlesR}$ resampled targets, and a percentile bootstrap on that few
 clusters is known to be optimistic; no correction is applied, the cluster count is reported beside
 each estimate instead, and every interval should be read as at least as wide as printed. And this
-paper reports of order fifty contrasts, slopes and rank statistics across its arms with no
-family-wise or false-discovery correction. What it does instead is fix the gate at $0.005$ in
-advance, declare each arm's predictions before its code exists, and rest no claim on a $p$-value
-alone; where an arm does not clear the gate it is reported as not clearing it
-(\S\ref{sec:gradient}) rather than promoted on a weaker threshold.
+paper reports \jdg{fwM} $p$-values across its arms, which is a family. \S\ref{sec:family}
+corrects it: the membership rule was frozen before any correction was computed, the load-bearing
+permutation nulls were re-run at \jdg{fwDraws} draws because the published ones could not resolve
+below the Holm threshold, and every claim this paper rests on survives Holm at $\alpha=0.005$ over
+all \jdg{fwM}. Beside that the paper fixes the gate at $0.005$ in advance, declares each arm's
+predictions before its code exists, and rests no claim on a $p$-value alone; where an arm does not
+clear the gate it is reported as not clearing it (\S\ref{sec:gradient}) rather than promoted on a
+weaker threshold.
 
 This manuscript's generators read \jdg{pvTotal} artifacts, and they were not all licensed the same
 way; saying which is which is part of the record. \jdg{pvPreReg} are \emph{experiments}, each
@@ -1068,7 +1072,8 @@ $\jdg{rescueGUStrata}$ strata, width-matched noise firing $\jdg{rescueGUNoise}$ 
 Leave-one-target-out moves the first to
 $\jdg{rescueAULoo}$ and the second to $\jdg{rescueGULoo}$; width-matched pure noise fires
 $\jdg{rescueAUNoise}$ times. The ladder returns $\jdg{rescueAUDelta0}$ at $\delta=0$ and clears the
-observed effects by $\jdg{rescueAUMargin}\times$ and $\jdg{rescueGUMargin}\times$.
+observed effects by $\jdg{rescueAUMargin}\times$ and $\jdg{rescueGUMargin}\times$;
+Figure~\ref{fig:rescue} puts both contrasts beside the unmatched versions of the same pairs.
 \end{claimbox}
 
 \begin{figure}[!htbp]
@@ -1136,7 +1141,8 @@ those $\pm3$ & \jdg{cxSites3} & \jdg{cxE3} & \jdg{cxCi3} & \jdg{cxP3} & \jdg{cxR
 \textbf{The contrast is not the mutated bases' own chemistry.} Deleting both mutated positions
 retains \jdg{cxRet0} of the effect ($\jdg{cxE0}$, $p=\jdg{cxP0}$); deleting them with three
 nucleotides on either side, so that nothing within four nucleotides of a changed base enters any
-distance, still retains \jdg{cxRet3} ($\jdg{cxE3}$, $p=\jdg{cxP3}$).
+distance, still retains \jdg{cxRet3} ($\jdg{cxE3}$, $p=\jdg{cxP3}$). Table~\ref{tab:chem} carries the
+whole radius sweep.
 \end{claimbox}
 
 \paragraph{What the cut does not show, stated because the complement was also run.} Restricted to
@@ -1232,6 +1238,22 @@ say it is not there. The same construction also exposes a trap in the naive rati
 stratified estimate by the \emph{full}-population baseline gives $\jdg{eRetWrong}$, of which
 $\jdg{eSel}$ is selection, the energy-overlap region is one where the identity contrast is
 larger to begin with, and none of it is mediation.
+
+\paragraph{Which records the stratified estimate runs on, since the data choose them.} Adding the
+energy dimension leaves \jdg{supUsed} of the \jdg{supBase} records the unstratified estimator uses
+on the same contrast, or \jdg{supFrac}, and those are not a random \jdg{supFrac}: they are the
+records whose stratum holds both pair types at the same $\Delta G_{\mathrm{loc}}$, which is a
+condition on the data. Measured against the records it drops, the surviving subset is balanced on
+crossing (standardised difference $\jdg{supSmdCross}$) and nearly so on the outcome itself
+($\jdg{supSmdRf}$), separated on $\Delta G_{\mathrm{loc}}$ by construction ($\jdg{supSmdDg}$),
+and \emph{shallower}: $\jdg{supSmdDepth}$ on helix depth, which exceeds the $0.20$ we registered
+as the bar. A kill condition frozen before the measurement says what follows, so we say it here
+rather than argue it. \textbf{The retention of $\jdg{eRet}$ is arithmetic on one population and is
+not affected}, because its denominator is the same restricted records with the energy dimension
+removed --- that was the repair of \S\ref{sec:energy}'s own first version. What is affected is how
+far outside that population the number reaches: it is the direct effect on the overlap region,
+which runs shallower than the corpus, and it should be read as that and not as a corpus-wide
+quantity.
 
 \paragraph{It is not the terminal penalty acting alone.} The terminal A--U penalty is charged only
 at a helix end, so the hypothesis that it generates the effect makes a positional prediction, and
@@ -1397,7 +1419,8 @@ here.
 Proposition~\ref{prop:routes} says the two routes may disagree and says when. It does not say
 whether either is reporting anything. That is an empirical question about this corpus at this
 signal-to-noise, and it has an experiment: hold the estimator's machinery fixed and vary a truth
-it is supposed to recover.
+it is supposed to recover. Figure~\ref{fig:cal} is that experiment, in its failed first form and
+in its second.
 
 \begin{figure}[!htbp]
 \centering
@@ -1598,6 +1621,7 @@ apparatus has no purchase. We ran it on a corpus of designed \emph{protein} bind
 records over \jdg{xdCells} target-by-method cells for \jdg{xdTargets}, with binder hydrophobicity
 as the treatment, chain length as the mediator, and measured binding as the outcome. Nothing about
 base pairs, helices, folding models or chemical probing survives the transfer.
+Figure~\ref{fig:crossdomain} carries the result and the two quantities the bound is built from.
 
 The premise transfers first, which is why the rest is readable: the method a binder came from
 explains $\eta^2=\jdg{xdEta}$ of the mediator within a target (\jdg{xdEtaLo} to \jdg{xdEtaHi}
@@ -1735,6 +1759,8 @@ $\varepsilon$ of \eqref{eq:med}. Orange marks the two human-designed arms.}
 worth on the score every design in the corpus already has, using Def.~\ref{def:mp} with
 $\delta=0.05$, $\kappa_\gamma=0.02$ and $\kappa_\pi=0.2$. \emph{The predictor panel appears here
 for the first time, and only inside $\pi$}: no claim depends on any predictor being right.
+Table~\ref{tab:score} carries every population's matched difference and Figure~\ref{fig:matched}
+puts each of them against the design-fixed null.
 
 \begin{table}[!htbp]
 \centering\small
@@ -1792,7 +1818,8 @@ $\jdg{c5Cut}$ leaves $\jdg{c5Sig}$ of $\jdg{c5N}$ populations clearing $p\le0.00
 
 \jdg{gNMethods} methods produced designs for the same \jdg{ccPuzzlesR} targets, so the depth gap decomposes into a
 target component and a method component. \emph{This arm never touches $R$}: it is computed from
-target structures and sequences alone.
+target structures and sequences alone. Figure~\ref{fig:gradient} gives each method's gap and the
+method component against its null.
 
 \begin{figure}[!htbp]
 \centering
@@ -1826,6 +1853,7 @@ rounds, with \emph{disjoint} puzzle sets, verified empty intersection in all thr
 different method mixes, none of which has been read at any earlier point in this work. The depth
 gap is computed from target structures and design sequences alone, so this arm is blind to every
 outcome by construction, and the loader asserts that no score or reactivity column is opened.
+Figure~\ref{fig:rounds} shows every round.
 
 \begin{figure}[!htbp]
 \centering
@@ -1888,7 +1916,7 @@ The statistic is the one already in use, computed per molecule so that every sou
 commensurate: the mean helix depth of a molecule's G--C target pairs minus that of its A--U pairs,
 admitted when the molecule holds at least four of each. No probing data enters, and the manuscript
 was wrong to say a probing readout was needed: placement is a design-side quantity and needs only
-sequences with structures.
+sequences with structures. Table~\ref{tab:undesigned} is what came back.
 
 \begin{table}[!htbp]
 \centering\small
@@ -1996,6 +2024,87 @@ anything here; what is settled is that the two orderings differ, so the choice i
 Nothing about a \emph{split} addresses it, for the reason in \S\ref{sec:intro}: the covariate is a
 property of the molecule and follows it into whichever split it is placed in.
 
+% =====================================================================
+\subsection{What survives when the whole family is corrected at once}
+\label{sec:family}
+
+An earlier version of this paper told the reader to correct for multiplicity themselves. That is
+the wrong division of labour twice over. Choosing the family after seeing the corrections is
+exactly the freedom a correction exists to remove, so the authors have to fix it first; and the
+published numbers could not have cleared a family-wise bar in any case, for a reason that has
+nothing to do with the evidence. The rule was frozen before anything was computed: every generated
+number in this manuscript whose value is a probability and which is a $p$-value either by where it
+is printed or by what its generator calls it. That is \jdg{fwM} tests. Null arms, failed stakes and supporting
+per-population rows are all in it; nothing was left out for being inconvenient.
+
+\textbf{The obstacle was resolution, not evidence.} Holm at this paper's own $0.005$ needs
+$0.005/\jdg{fwM}=\jdg{fwThr}$ at the strictest rank. But \jdg{fwFloor} of the \jdg{fwM} sit at
+exactly $\jdg{fwFloorP}$, which is $1/(2000+1)$: the smallest number a $2000$-draw permutation
+null can print. The bar is below the floor. On the numbers as published, Holm rejects \jdg{fwHolmPub} of
+\jdg{fwM} and Benjamini--Hochberg at $q=0.005$ rejects \jdg{fwBhPub}; both headline pair-type
+contrasts are rejected by the second and not by the first, and their $p$ is the floor to four
+decimals. So we bought the resolution.
+
+\textbf{The purchase is only legitimate if the fine null is the same null}, which is a checkable
+statement and was checked before any fine draw was used. Under a within-stratum label permutation
+the stratum counts are fixed, so the weight $\min(n_A,n_B)$ of \eqref{eq:contrast} is constant,
+the set of usable strata is invariant, and the within-stratum difference of means is an affine
+function of the sum of a uniformly random $n_A$-subset. That rewrite turns $10^6$ permutations
+into $10^6$ subset sums (Table~\ref{tab:family}). At the original $2000$ draws it must reproduce
+the original: it returns
+the published statistic for all five arms and a null width within \jdg{fwSdMax} of the published
+one, and had it not, the declaration's K0 voided the purchase and left the limitation standing.
+
+\begin{table}[!htbp]
+\centering\small
+\caption{\textbf{The load-bearing tests, on a null resolved to \jdg{fwDraws} draws.} The statistic
+is unchanged; only the number of draws against which it is read is. The last column is the Holm
+threshold at that test's rank in the family of \jdg{fwM}. The seven remaining floor members are
+supporting per-population rows, are named in the declaration as out of scope, and were not re-run.}
+\label{tab:family}
+\begin{tabular}{@{}llrrrll@{}}
+\toprule
+test & \S & statistic & $z$ & draws $\ge$ obs. & $p$ & Holm threshold \\
+\midrule
+G--C above A--U            & \ref{sec:pairtype} & $\jdg{fwDAU}$    & $\jdg{fwZAU}$    & \jdg{fwGeAU}    & \jdg{fwPAU}    & $\jdg{fwThr}$ \\
+G--C above G--U            & \ref{sec:pairtype} & $\jdg{fwDGU}$    & $\jdg{fwZGU}$    & \jdg{fwGeGU}    & \jdg{fwPGU}    & $\jdg{fwThr}$ \\
+identity given $\Delta G_{\mathrm{loc}}$ & \ref{sec:energy} & $\jdg{fwDCde}$   & $\jdg{fwZCde}$   & \jdg{fwGeCde}   & \jdg{fwPCde}   & $\jdg{fwThr}$ \\
+identity at helix depth $0$        & \ref{sec:energy} & $\jdg{fwDDZero}$ & $\jdg{fwZDZero}$ & \jdg{fwGeDZero} & \jdg{fwPDZero} & $\jdg{fwThr}$ \\
+identity at helix depth $\ge2$     & \ref{sec:energy} & $\jdg{fwDDTwo}$  & $\jdg{fwZDTwo}$  & \jdg{fwGeDTwo}  & \jdg{fwPDTwo}  & $\jdg{fwThr}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{claimbox}
+\textbf{The claims this paper rests on survive correction over every $p$-value it prints.} With
+the five load-bearing nulls resolved to \jdg{fwDraws} draws, Holm at $\alpha=0.005$ over the
+frozen family of \jdg{fwM} rejects \jdg{fwHolmNew} rather than \jdg{fwHolmPub}, and all five are
+among them: the two headline pair-type contrasts, the identity contrast conditioned on the model's
+own local free energy, and that contrast at helix depth $0$ and at depth $\ge2$ separately. Not one
+of the \jdg{fwDraws} permutations of the A--U or the G--U null reached the observed statistic.
+Benjamini--Hochberg at $q=0.005$ rejects \jdg{fwBhNew} either way; \textbf{Holm is the number this
+paper quotes}, because it is the one valid under arbitrary dependence, and \jdg{fwM} statistics
+computed on overlapping records are anything but independent.
+\end{claimbox}
+
+\paragraph{The outcome is skewed, and the finding does not depend on the skew.} $R$ is a ratio of
+distances: bounded above by $1$, unbounded below, and in this corpus it has skew $\jdg{shpSkew}$
+and excess kurtosis $\jdg{shpKurt}$, a median of $\jdg{shpMed}$, a $1$st and $99$th percentile of
+$\jdg{shpQOne}$ and $\jdg{shpQNn}$, and a minimum of $\jdg{shpMin}$ against a maximum of
+$\jdg{shpMax}$; \jdg{shpNeg} of pairs return a negative value, meaning the compensatory double
+mutant moved the profile further from wild type than the single mutants did. A difference of means on that shape can in principle be a statement about a tail.
+It is not one here. Replacing $R$ by its rank within the same strata the headline uses gives a
+contrast of $\jdg{shpRank}$ on the $0$--$1$ rank scale, permutation $p$ \jdg{shpRankP}; trimming
+the most extreme $5\%$ at each end, which removes every value below $\jdg{shpQOne}$'s
+neighbourhood and leaves $\jdg{shpTrimN}$ pairs, gives $\jdg{shpTrim}$, or $\jdg{shpTrimRet}$ of
+the untrimmed contrast. The effect is in the body of the distribution.
+
+\paragraph{Three things this does not buy.} It does not make a corrected $p$ into a true finding;
+it removes one objection and leaves every other one where it was. It says nothing about
+multiplicity across analyses that were run and not reported --- the preregistration record is the
+only control on that, and it is a weaker one, because it constrains what gets reported rather than
+what gets computed. And the resolution was bought for five tests, named in the declaration before
+the corrections were computed; the other floor members are reported at the resolution they have.
 
 \section{Analysis}
 \label{sec:analysis}
@@ -2223,13 +2332,17 @@ say so where they are reported: the method component of \S\ref{sec:gradient}, wh
 clear the $0.005$ gate, and the G--U contrast, which clears its ladder rung by a factor of
 \jdg{rescueGUMargin} (\S\ref{sec:pairtype}).
 
-\paragraph{(vii) No multiplicity correction.} Freezing every criterion before the code exists
-controls which analyses get run and reported; it does not control the family-wise error rate across
-the analyses that were run. This paper reports on the order of fifty contrasts, slopes and rank
-statistics, and applies no correction to any of them. The $0.005$ gate is a stricter threshold than
-convention and the headline arms clear it by margins reported beside them, but a reader assembling
-a family from these tables should apply their own correction; we have not applied one on their
-behalf.
+\paragraph{(vii) Multiplicity is corrected for what was reported, not for what was run.}
+\S\ref{sec:family} applies Holm at $\alpha=0.005$ over the frozen family of every $p$-value this
+paper prints, and every claim the paper rests on survives it. What that does not reach is
+multiplicity across analyses that were computed and not reported. The preregistration record is
+the only control on that one, and it is weaker in kind: it constrains what may be reported, not
+what may be computed. Two further caveats belong with the correction itself. Benjamini--Hochberg
+is reported beside Holm and is not quoted, because $q$-value control is not valid under arbitrary
+dependence and these \jdg{fwM} statistics share records. And the resolution purchase covers the
+five load-bearing tests named in the declaration; the \jdg{fwFloorOther} remaining
+permutation $p$-values that sit at their null's floor are supporting per-population rows, and are
+reported at the resolution they have rather than re-run.
 
 \paragraph{(viii) Prior art.} GC placement as a design heuristic predates this work
 \citep{lee2014eterna}; what is measured here is its effect on pair formation and on the
@@ -2310,7 +2423,8 @@ $\jdg{dgLooseEff}$ ($p=\jdg{dgLooseP}$) to $\jdg{dgTightEff}$ ($p=\jdg{dgTightP}
 $\jdg{dgRetain}$ of the unbalanced $\jdg{dgBase}$, against a within-cell spread of
 $\jdg{dgSd}$\,kcal/mol in the balancing variable itself. \emph{Free energy is a mediator here rather
 than a confounder}, the treatment moves it by construction, so attenuation under balancing
-is expected and the surviving majority is the quantity of interest.
+is expected and the surviving majority is the quantity of interest. Table~\ref{tab:filter} carries
+the corpus authors' own structure filter on the same populations.
 
 \begin{table}[!htbp]
 \centering\small
@@ -2350,7 +2464,9 @@ number of paired positions and their run structure and destroys the alignment, s
 effect survives it and a placement effect does not. Shifted arms return $\jdg{p4Lo}$ to
 $\jdg{p4Hi}$. The leak diagnostic confirms the shifted arms are not weakly treated: they admit a
 true placement gap of $\jdg{p4LeakLo}$ to $\jdg{p4LeakHi}$ against the real arm's $\jdg{p4RealLo}$
-to $\jdg{p4RealHi}$, about $\jdg{p4LeakPct}$.
+to $\jdg{p4RealHi}$, about $\jdg{p4LeakPct}$. Table~\ref{tab:pc} carries Cut~2 at all four
+stringencies and Table~\ref{tab:sign} the four single-nucleotide interventions of Cut~3;
+Figure~\ref{fig:cuts} puts the three side by side.
 
 \begin{table}[!htbp]
 \centering\small
@@ -2436,7 +2552,8 @@ Fig.~\ref{fig:mediation} plots.}
 Section~\ref{sec:inference} states a ceiling on how far any method can agree with a repeated
 measurement of the same molecule, and uses one number for it. That number is an estimate with an
 interval, it is estimated two ways, and it is not identical across populations. All of it is here,
-because a ceiling quoted without its interval is a bound that cannot be argued with.
+because a ceiling quoted without its interval is a bound that cannot be argued with
+(Figure~\ref{fig:ceiling}).
 
 \begin{figure}[!htbp]
 \centering
@@ -2632,6 +2749,27 @@ with an affine $h$, the printed ratio reads one & $>0.85$ & min \jdg{pcRatioMin}
 the printed ratio tracks the true linear share & $\rho\ge0.80$ & \jdg{pcSpearman} & held \\
 error at a true linear share of one & $\le0.20$ & \jdg{pcLamErr1} & held \\
 the published decomposition reproduces & $\le0.005$ & \jdg{medFrac} & held \\
+\midrule
+\multicolumn{4}{@{}p{0.97\linewidth}@{}}{\emph{frozen before the multiplicity arm existed
+  (\S\ref{sec:family}). The \jdg{fwM} family members were named in the declaration before any
+  correction was computed, so the family could not be chosen to make a claim survive. S3 predicts
+  this paper's own failure and is graded held on that failure.}}\\
+the frozen family is the one found in the manuscript & \jdg{fwM} & \jdg{fwM} & held \\
+BH rejects both headline contrasts as published & both & both & held \\
+Holm does not, and the reason is the floor & floor & $\jdg{fwFloorP}=1/2001$ & held \\
+the fine engine reproduces the published null & $\le10\%$ & \jdg{fwSdMax} & held \\
+both headline contrasts survive Holm once resolved & $<\jdg{fwThr}$ & \jdg{fwPAU}, \jdg{fwPGU} &
+  held \\
+the energy-conditioned contrast survives Holm & $<\jdg{fwThr}$ & \jdg{fwPCde} & held \\
+the contrast holds on within-stratum ranks & $p\le0.005$ & \jdg{shpRankP} & held \\
+trimming $5\%$ at each tail keeps half the effect & $\ge50\%$ & \jdg{shpTrimRet} & held \\
+the energy-stratified subset is representative & $\le0.20$ SMD & \jdg{supSmdMax} &
+  \textbf{failed} \\
+\multicolumn{4}{@{}p{0.97\linewidth}@{}}{\footnotesize\emph{The subset is balanced on crossing
+  (\jdg{supSmdCross}) and on the outcome (\jdg{supSmdRf}) but runs \jdg{supSmdDepth} shallower in
+  helix depth. K3 of the declaration says what follows and \S\ref{sec:energy} says it: the
+  controlled direct effect is reported as the effect on the overlap region, which is shallower
+  than the corpus.}}\\[2pt]
 \end{longtable}
 \endgroup
 
@@ -2690,7 +2828,7 @@ Proposition~\ref{prop:null} says that permuting the treatment inside a design re
 from the permuted labels does not test the hypothesis it appears to test.
 Figure~\ref{fig:null} measures that on two constructions. Two more were run, and they
 are here because a claim that one null is broken is worth more when the alternatives
-that are not broken are shown beside it.
+that are not broken are shown beside it (Figure~\ref{fig:nulls}).
 
 \begin{figure}[!htbp]
 \centering
@@ -2722,6 +2860,7 @@ contrast, from the pooled values and not within exposure arm; consequently the b
 every pair is invariant to a permutation of the labels, which is what
 Prop.~\ref{prop:null} requires of a matched design. The invariance was checked rather than argued:
 over the permutations of that check the (pair-weight, stratum-count) pair took exactly one value.
+Figure~\ref{fig:energyarm} carries the arm's ladder, its binwise reading and its placebo.
 
 \begin{figure}[!htbp]
 \centering
@@ -2823,7 +2962,7 @@ reference departs from exactness when $y$ depends on the matching covariates, an
 reports both factors and the resulting bias, with and without the panel caliper, for all six
 populations. The within-cell slope of the outcome on global GC is $\jdg{imbBetaLo}$ to
 $\jdg{imbBetaHi}$ points per unit; the panel caliper's effect is almost entirely on
-$\overline{\Delta\pi}$.
+$\overline{\Delta\pi}$, which Figure~\ref{fig:imbalance} separates from the balance it does not buy.
 
 \begin{figure}[!htbp]
 \centering
