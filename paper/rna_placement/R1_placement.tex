@@ -115,12 +115,15 @@
 % ------------------------------------------------ generated numbers (the only include)
 \input{figs/rna_numbers}
 
-% "Pre-Registration Does Not Confer Readability" was a slogan, and "readable" is a sense of
-% the word this paper coined: a reader meets it in the title before the definition. The title
-% now names the question, and the subtitle names the three things the paper puts under it.
-\title{\bf When a Share of a Benchmark Number Is Not Estimable\\[4pt]
-\large Two estimators of a mediated fraction, the condition under which they agree,\\
-and a calibration in which neither recovers a known truth}
+% Two earlier titles sold the methodology: "Pre-Registration Does Not Confer Readability" was a
+% slogan, and "When a Share of a Benchmark Number Is Not Estimable" put the estimator question in
+% front of the finding. The subtitle that went with the second one, "a calibration in which neither
+% recovers a known truth", also stopped being true once the surviving route was calibrated
+% (Sec. 5.6): on this mediator both routes recover. The title now names what was found and what it
+% costs a leaderboard, and the propositions are described as instruments where they are used.
+\title{\bf A Benchmark Number Carried by a Covariate Its Generators Chose\\[4pt]
+\large Base-pair identity, where the designer put it,\\
+and what holding placement fixed does to an RNA design leaderboard}
 
 \author{Wenhui Chen\thanks{\texttt{wenhui.chen@titanresearchlabs.ai}}}
 \date{}
@@ -188,21 +191,40 @@ bound holds there too. It holds; we do not claim it governs the size of the gap 
 \section{Introduction}
 \label{sec:intro}
 
-Pre-registration answers one question about an analysis: was the statistic chosen before the data
-were seen \citep{simmons2011falsepositive,nosek2018preregistration}. It does not answer a second
-one, which is whether that statistic, on that data, reports anything at all. The two are usually conflated because they coincide in the setting where pre-registration became
-standard: a well-powered randomised trial with a large standardised effect. They come apart in
-exactly the setting this paper is about, which is an observational corpus that some algorithm
-generated for a different purpose, carrying effects an order of magnitude smaller than the ones
-the estimator's guidance was written for.
+A benchmark whose items were produced by the systems it ranks has a failure mode a held-out split
+does not touch. The generators have preferences; those preferences put structure into the
+covariates of the items themselves; and a covariate of an item follows the item into whichever
+split it is placed in. If a benchmark number is partly carried by such a covariate, re-splitting
+moves the number around and cannot remove it, and the ranking the benchmark reports is a ranking
+in which that covariate is doing some of the work.
 
-We report two instances from one pipeline. Both statistics were frozen in a declaration and pushed
-before the analysis code existed, both came with permutation tests and constructive power ladders,
-and both were unreadable in ways none of that machinery could detect. The first is a mediated
-fraction whose two estimators disagree by $\jdg{eLinearGapPts}$ percentage points on the same
-records; the second is a skill slope that returns the opposite verdict from a rank statistic on
-the same records. In each case the pre-registration did its job and the number still could not be
-read.
+This paper takes one benchmark of that kind and follows a single covariate the whole way: from
+whether an individual designed base pair physically forms, through the covariate that hides it,
+to what the leaderboard does when the covariate is held fixed. The covariate is a design choice so
+ordinary that no one records it, \emph{where in the helix a designer puts a G--C pair}, and every
+program in the corpus makes the same choice in the same direction.
+
+Getting an answer at that resolution requires a readout that does not route through the model
+under examination, and pricing the covariate requires deciding which of two standard estimators
+may be read at all on a corpus like this. Both requirements are met below rather than assumed, and
+the second turned out to be the harder one: a pre-registered mediation estimator can pass every
+check this paper's protocol imposes and still report a number that has no relation to the truth.
+Pre-registration answers whether a statistic was chosen before the data were seen
+\citep{simmons2011falsepositive,nosek2018preregistration}; it does not answer whether that
+statistic, on that data, reports anything at all. The two are usually conflated, because they
+coincide where pre-registration became standard: a well-powered randomised trial with a large
+standardised effect. They come apart on an observational corpus that some algorithm generated for
+a different purpose, carrying effects an order of magnitude smaller than the ones the estimator's
+guidance was written for.
+
+We report two frozen statistics that came apart that way, and one that did not. All were declared
+and pushed before the analysis code existed, all came with permutation tests and constructive power
+ladders. A mediated fraction's two estimators disagree by $\jdg{eLinearGapPts}$ percentage points
+on the same records, and a skill slope returns the opposite verdict from a rank statistic on the
+same records; in neither case could the machinery detect it. Injecting a known truth is what
+separates the readable from the unreadable, and it does separate them: the conditioning route
+recovers $\jdg{calNSpanFrac}$ and $\jdg{calVSpanFrac}$ of an injected range and is withdrawn, the
+product route recovers \jdg{pcSpan} and is kept (\S\ref{sec:cal}, \S\ref{sec:pcal}).
 
 The corpus that makes this concrete is one of designed RNA, and the setting matters because it is
 what puts the effect sizes where they are. Designing an RNA that folds to a target structure has
@@ -330,24 +352,10 @@ and section pointers only.}
 \end{figure}
 
 \begin{claimbox}
-\textbf{Contributions.}
+\textbf{Contributions.} \emph{The first five are findings about a corpus and its leaderboard. The
+last two are instruments this corpus forced us to build; we report them because they are needed to
+read the first five, not as the paper's claim on the reader.}
 \begin{enumerate}[leftmargin=1.6em,itemsep=2pt,topsep=2pt,label=\textbf{\arabic*.}]
-\item \textbf{An exact account of when the two mediation routes may be interchanged, and a bound
-  that says where they will not be} (Proposition~\ref{prop:routes}). They differ by
-  $\mathbb E[r(M)\mid A]-\mathbb E[r(M)\mid B]$ and agree for all exposure laws iff the
-  conditional mean is affine; the disagreement is bounded by
-  $\operatorname{osc}(r)\,d_{\mathrm{TV}}$, which is small exactly when the arms overlap, i.e.\ exactly when the conditioning route is
-  identified. On this corpus they disagree by
-  $\jdg{eLinearGapPts}$ points and the affinity condition fails as measured
-  ($\jdg{eBinwise}$).
-\item \textbf{A constructive calibration for an estimator, and the demonstration that published
-  guidance does not substitute for it} (\S\ref{sec:cal}). Inject a known mediated fraction into
-  the real mediator and read back what the estimator says: across $\jdg{calSweep}$ its reading
-  covers $\jdg{calNSpanFrac}$ and $\jdg{calVSpanFrac}$ of the range the truth covers, and at total
-  mediation it returns $\jdg{calNFull}$ and $\jdg{calVFull}$. Our
-  standardised total effect is $\jdg{calStdC}$ against a recommended floor of $\jdg{calStdCThr}$
-  and $n=\jdg{dN}$ against $\jdg{calNThr}$, so the guidance passes us. The quantity that governs
-  is not in the guidance: the mediator separates the arms by $\jdg{posSepReal}$ pooled SD.
 \item \textbf{Base-pair identity predicts formation, measured interventionally}
   (\S\ref{sec:pairtype}): matched within design on helix depth and crossing, a G--C target pair is
   rescued $\jdg{rescueAU}$ above a matched A--U pair and $\jdg{rescueGU}$ above a matched G--U
@@ -356,11 +364,12 @@ and section pointers only.}
   (\S\ref{sec:chem}): recomputing the readout with the mutated bases and three nucleotides either
   side deleted, so that every position entering it carries the same base in the wild type and in
   all three mutants, retains \jdg{cxRet3} of the effect ($p=\jdg{cxP3}$).
-\item \textbf{Placement is the mediator, and it is a decomposition rather than a caveat}
-  (\S\ref{sec:mediation}, \S\ref{sec:quant}): the attenuation of the marginal contrast is
-  $\jdg{medObs}$ and the product of two independently estimated quantities predicts $\jdg{medPred}$
-  of it, \textbf{$\jdg{medFrac}$}, which is a linear share of that attenuation and not an estimated
-  mediated fraction.
+\item \textbf{The thermodynamic explanation accounts for none of it, and the covariate the
+  designers chose accounts for most of it} (\S\ref{sec:energy}, \S\ref{sec:mediation}): conditioning
+  on the model's own local free energy retains \jdg{eRet} of the contrast against a placebo's
+  \jdg{ePlaceboMean}$\pm$\jdg{ePlaceboSd}, on the neural half of the corpus as on the whole
+  (\S\ref{sec:subsets}), while the marginal contrast is attenuated by $\jdg{medObs}$ and a linear
+  depth term reproduces $\jdg{medPred}$ of that attenuation.
 \item \textbf{Holding the covariate fixed reorders the released leaderboard}
   (\S\ref{sec:leaderboard}): \jdg{lbBMoved} of \jdg{lbBNMeth} methods move by up to
   \jdg{lbBMaxMove} places (Kendall $\tau=\jdg{lbBTau}$, \jdg{lbBTauCi}) where holding the target
@@ -372,11 +381,24 @@ and section pointers only.}
 \item \textbf{The placement gradient is a property of the design method} (\S\ref{sec:gradient}),
   spanning $\jdg{gSpread}$ depth units across \jdg{gNMethods} methods designing for the same targets, with
   the human-designed arm at the pre-registered extreme, reported at the strength it has.
-\item \textbf{Two inference rules for this class of design.} A permutation must hold a calipered
-  matched set fixed (Prop.~\ref{prop:null}; measured type-I error $\jdg{nullRateOld}$ against
-  $\jdg{nullRateNew}$ at a nominal $0.005$), and the stratified and product-of-coefficients routes
-  to a mediated fraction agree only under a linearity that must be tested rather than assumed
-  (Prop.~\ref{prop:routes}).
+\item \textbf{A constructive calibration, which decides which of two estimators may be read here}
+  (\S\ref{sec:cal}, \S\ref{sec:pcal}). Inject a known mediated fraction into the real mediator and
+  read back what the estimator says. One route covers $\jdg{calNSpanFrac}$ and $\jdg{calVSpanFrac}$
+  of the range the truth covers and is withdrawn; the other covers \jdg{pcSpan} and is kept. The
+  published guidance passes us on both of its thresholds, and the quantity that governs is not in
+  it: it is how far the mediator separates the arms, $\jdg{posSepReal}$ pooled SD for the first
+  and $\jdg{pcSep}$ for the second.
+\item \textbf{Two inference rules this class of design forces.} A permutation must hold a calipered
+  matched set fixed, or its type-I error is $\jdg{nullRateOld}$ against $\jdg{nullRateNew}$ at a
+  nominal $0.005$ (Prop.~\ref{prop:null}). And the stratified and product-of-coefficients routes to
+  a mediated fraction differ by $\mathbb E[r(M)\mid A]-\mathbb E[r(M)\mid B]$, agreeing for all
+  exposure laws iff the conditional mean is affine, with the disagreement bounded by
+  $\operatorname{osc}(r)\,d_{\mathrm{TV}}$, whose second factor is the overlap the conditioning
+  route needs to be identified (Prop.~\ref{prop:routes}); here they disagree by
+  $\jdg{eLinearGapPts}$ points. The same proof step applied to the conditional mean rather than to
+  its residual bounds what a channel can carry without any mediation estimator at all
+  (Prop.~\ref{prop:carry}). \emph{We claim no priority for the non-equivalence itself
+  (\S\ref{sec:routes}); what these buy is the right to read the numbers above.}
 \end{enumerate}
 \end{claimbox}
 
@@ -502,6 +524,15 @@ the corpus cannot support.
 \section{Method}
 \label{sec:method}
 
+\noindent This section defines the quantities the paper measures and then states three
+propositions. The propositions are here because the corpus would not let us proceed without them:
+the permutation test one would naturally write for a matched design of this kind does not test
+what it appears to, and the two standard routes to a mediated fraction disagree on this corpus by
+\jdg{eLinearGapPts} points and in sign. \emph{They are instruments, not the paper's contribution};
+we claim no priority for the non-equivalence itself (\S\ref{sec:routes}), each proof is elementary,
+and the proofs are in Appendix~\ref{app:proofs} so that this section reads as the tooling it is. A
+reader who accepts the tools can go to \S\ref{sec:results} and use this section for reference.
+
 \subsection{Quantities}
 \label{sec:quantities}
 
@@ -620,7 +651,7 @@ M \;=\; \bigl\{(u,v)\in c\times c \;:\; t_u-t_v\ge\delta,\;
 and the estimator is the pair-weighted mean of $y_u-y_v$ over $M$. No model produces the estimate.
 \end{definition}
 
-\subsection{Inference: the randomisation must hold the design fixed}
+\subsection{First instrument: the randomisation must hold the design fixed}
 \label{sec:inference}
 
 \begin{proposition}[Design-fixed randomisation]
@@ -640,16 +671,7 @@ compared against a null computed on a different design.
 \end{enumerate}
 \end{proposition}
 
-\begin{proof}
-(i) For a within-cell permutation $\sigma$, the dataset $(y, X\circ\sigma)$ becomes
-$(y\circ\sigma^{-1}, X)$ after relabelling molecules by $\sigma^{-1}$, and $T$ is invariant to
-relabelling; averaging over the symmetric group gives one law. (ii) Exactness of a permutation
-reference requires the permuted quantity to be exchangeable under the hypothesis, which is the
-stated condition; $y\perp t$ does not imply it. (iii) Let $X'$ replace $t$ by $t\circ\sigma$ and
-leave $\gamma,\pi$ in place. Then $X'$ carries the product of the marginals of $t$ and
-$(\gamma,\pi)$ where $X$ carries their joint law, so whenever $t\not\perp\gamma$ within cell the
-two differ and $M(X')\neq M(X)$ in distribution.
-\end{proof}
+\noindent\emph{Proof in Appendix~\ref{app:proofs}.}
 
 \noindent \textbf{(iii), measured.} Once $t$ is decoupled from $\gamma$, the caliper on $\gamma$
 admits pairs it would otherwise exclude, so $|M(X')|>|M(X)|$ typically, the null is computed on a
@@ -731,7 +753,7 @@ pair type, $g$ from depths that never see $R$. A mediated fraction near one is t
 identity rather than a fitted agreement, and \S\ref{sec:quant} reports the residual it does not
 close.
 
-\subsection{Two routes to a mediated fraction, and when they disagree}
+\subsection{Second instrument: two routes to a mediated fraction, and when they disagree}
 \label{sec:routes}
 
 Proposition~\ref{prop:med} estimates a mediated part as a product of coefficients. The same
@@ -773,24 +795,7 @@ The two routes agree for every pair of exposure laws if and only if $h$ is affin
 $M$.
 \end{proposition}
 
-\begin{proof}
-Taking expectations in \eqref{eq:nointeract} under each exposure,
-$\mathbb E[Y\mid T]=\alpha_T+\mathbb E[h(M)\mid T]$, so
-$\Delta^{\mathrm{tot}}-\Delta^{\mathrm{cde}}=\mathbb E[h(M)\mid A]-\mathbb E[h(M)\mid B]$.
-Substituting $h(m)=\beta m+r(m)$ and using linearity of expectation gives
-$\mathbb E[h(M)\mid A]-\mathbb E[h(M)\mid B]=\beta g+\mathbb E[r(M)\mid A]-\mathbb E[r(M)\mid B]$,
-which is \eqref{eq:routes}. For \eqref{eq:routebound}, let $c=\tfrac12(\sup r+\inf r)$; then
-$\|r-c\|_\infty=\tfrac12\operatorname{osc}(r)$ and, since the constant cancels in the difference,
-$|\mathbb E[r\mid A]-\mathbb E[r\mid B]| = |\int (r-c)\,\mathrm d(P_{M\mid A}-P_{M\mid B})|
-\le \|r-c\|_\infty\,\|P_{M\mid A}-P_{M\mid B}\|_1
-= \operatorname{osc}(r)\,d_{\mathrm{TV}}(P_{M\mid A},P_{M\mid B})$.
-If $h$ is affine then $r$ is constant, the right-hand side of \eqref{eq:routes} vanishes and the
-routes agree for all exposure laws. Conversely, if $h$ is not affine on $\operatorname{supp}P_M$ then $r$ is not $P_M$-a.s.\ constant,
-so there is $m_0\in\operatorname{supp}P_M$ with $r(m_0)\neq \mathbb E_{P_M}[r(M)]$; taking
-$P_{M\mid A}$ to be point mass at $m_0$ and $P_{M\mid B}=P_M$ makes the right-hand side of
-\eqref{eq:routes} equal to $r(m_0)-\mathbb E_{P_M}[r(M)]\neq0$. Boundedness of the support ensures
-$\operatorname{osc}(r)<\infty$ throughout.
-\end{proof}
+\noindent\emph{Proof in Appendix~\ref{app:proofs}.}
 
 \paragraph{The premise, tested rather than assumed.} Both propositions above rest on
 \eqref{eq:nointeract}: within a stratum the exposure shifts the outcome by a constant that does
@@ -826,12 +831,7 @@ $\mathbb E[h(M)\mid A]-\mathbb E[h(M)\mid B]$, so for any constant $c$
 \end{equation}
 \end{proposition}
 
-\begin{proof}
-The first equality is the display in the proof of Proposition~\ref{prop:routes} before $h$ is
-split. The middle term follows because the constant $c$ cancels in the difference; the right-hand
-term is that middle term bounded by $\|h-c\|_\infty\|P_{M\mid A}-P_{M\mid B}\|_1$ at
-$c=\tfrac12(\sup h+\inf h)$.
-\end{proof}
+\noindent\emph{Proof in Appendix~\ref{app:proofs}.}
 
 \noindent \eqref{eq:carrybound} is what a channel ledger needs and \eqref{eq:routes} is not:
 it bounds \emph{the mediated part itself} rather than the gap between two estimators of it, it
@@ -2524,6 +2524,53 @@ the published decomposition reproduces & $\le0.005$ & \jdg{medFrac} & held \\
 \end{longtable}
 \endgroup
 
+
+\section{Proofs}
+\label{app:proofs}
+
+The three propositions are instruments rather than the paper's claim on the reader, so
+their statements stay where they are used and their proofs are collected here. Each is
+elementary; that is a property of the propositions and not a defect of the proofs.
+
+\paragraph{Proposition~\ref{prop:null}.}
+\begin{proof}
+(i) For a within-cell permutation $\sigma$, the dataset $(y, X\circ\sigma)$ becomes
+$(y\circ\sigma^{-1}, X)$ after relabelling molecules by $\sigma^{-1}$, and $T$ is invariant to
+relabelling; averaging over the symmetric group gives one law. (ii) Exactness of a permutation
+reference requires the permuted quantity to be exchangeable under the hypothesis, which is the
+stated condition; $y\perp t$ does not imply it. (iii) Let $X'$ replace $t$ by $t\circ\sigma$ and
+leave $\gamma,\pi$ in place. Then $X'$ carries the product of the marginals of $t$ and
+$(\gamma,\pi)$ where $X$ carries their joint law, so whenever $t\not\perp\gamma$ within cell the
+two differ and $M(X')\neq M(X)$ in distribution.
+\end{proof}
+
+\paragraph{Proposition~\ref{prop:routes}.}
+\begin{proof}
+Taking expectations in \eqref{eq:nointeract} under each exposure,
+$\mathbb E[Y\mid T]=\alpha_T+\mathbb E[h(M)\mid T]$, so
+$\Delta^{\mathrm{tot}}-\Delta^{\mathrm{cde}}=\mathbb E[h(M)\mid A]-\mathbb E[h(M)\mid B]$.
+Substituting $h(m)=\beta m+r(m)$ and using linearity of expectation gives
+$\mathbb E[h(M)\mid A]-\mathbb E[h(M)\mid B]=\beta g+\mathbb E[r(M)\mid A]-\mathbb E[r(M)\mid B]$,
+which is \eqref{eq:routes}. For \eqref{eq:routebound}, let $c=\tfrac12(\sup r+\inf r)$; then
+$\|r-c\|_\infty=\tfrac12\operatorname{osc}(r)$ and, since the constant cancels in the difference,
+$|\mathbb E[r\mid A]-\mathbb E[r\mid B]| = |\int (r-c)\,\mathrm d(P_{M\mid A}-P_{M\mid B})|
+\le \|r-c\|_\infty\,\|P_{M\mid A}-P_{M\mid B}\|_1
+= \operatorname{osc}(r)\,d_{\mathrm{TV}}(P_{M\mid A},P_{M\mid B})$.
+If $h$ is affine then $r$ is constant, the right-hand side of \eqref{eq:routes} vanishes and the
+routes agree for all exposure laws. Conversely, if $h$ is not affine on $\operatorname{supp}P_M$ then $r$ is not $P_M$-a.s.\ constant,
+so there is $m_0\in\operatorname{supp}P_M$ with $r(m_0)\neq \mathbb E_{P_M}[r(M)]$; taking
+$P_{M\mid A}$ to be point mass at $m_0$ and $P_{M\mid B}=P_M$ makes the right-hand side of
+\eqref{eq:routes} equal to $r(m_0)-\mathbb E_{P_M}[r(M)]\neq0$. Boundedness of the support ensures
+$\operatorname{osc}(r)<\infty$ throughout.
+\end{proof}
+
+\paragraph{Proposition~\ref{prop:carry}.}
+\begin{proof}
+The first equality is the display in the proof of Proposition~\ref{prop:routes} before $h$ is
+split. The middle term follows because the constant $c$ cancels in the difference; the right-hand
+term is that middle term bounded by $\|h-c\|_\infty\|P_{M\mid A}-P_{M\mid B}\|_1$ at
+$c=\tfrac12(\sup h+\inf h)$.
+\end{proof}
 
 \section{Four ways to build the null}
 \label{app:nulls}
