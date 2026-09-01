@@ -1,0 +1,517 @@
+{
+ "seed": 20260901,
+ "V": {
+  "effect": 0.05393,
+  "ci": [
+   0.0216,
+   0.0879
+  ],
+  "p": 0.0005,
+  "weight": 902.0,
+  "strata": 553,
+  "reproduces_published": true,
+  "recompute_corr": 0.8762,
+  "recompute_medabs": 0.0002
+ },
+ "A0_experiment_type": {
+  "2A3_MaP": 14416
+ },
+ "A1_denominator": {
+  "effect": 0.07002,
+  "ci": [
+   0.056,
+   0.0828
+  ],
+  "p": 0.0005,
+  "weight": 902.0,
+  "strata": 553
+ },
+ "A2_numerator": {
+  "effect": 0.02622,
+  "ci": [
+   0.0115,
+   0.0439
+  ],
+  "p": 0.0005,
+  "weight": 902.0,
+  "strata": 553
+ },
+ "A2b_rho_i": {
+  "effect": 0.05204,
+  "ci": [
+   0.0415,
+   0.0633
+  ],
+  "p": 0.0005,
+  "weight": 902.0,
+  "strata": 553
+ },
+ "A2c_rho_j": {
+  "effect": 0.04478,
+  "ci": [
+   0.034,
+   0.0552
+  ],
+  "p": 0.0005,
+  "weight": 902.0,
+  "strata": 553
+ },
+ "A3_conditioned": {
+  "effect": 0.01147,
+  "ci": [
+   -0.0233,
+   0.0476
+  ],
+  "p": 0.31334,
+  "weight": 571.0,
+  "strata": 475,
+  "retention": 0.2127,
+  "ci_excludes_zero": false
+ },
+ "A4_decomposition": {
+  "D_mean": 0.4434,
+  "rho_ij_mean": 0.2635,
+  "from_numerator": -0.05914,
+  "from_denominator": 0.09386,
+  "sum": 0.03472,
+  "observed": 0.05393,
+  "denominator_share": 0.6135
+ },
+ "A5_m16_diagnostic_superseded": {
+  "recomputed_both_sides": {
+   "CG": {
+    "mean": 0.3211,
+    "n": 6122
+   },
+   "AU": {
+    "mean": 0.2877,
+    "n": 2232
+   },
+   "GU": {
+    "mean": 0.3047,
+    "n": 280
+   }
+  },
+  "m16_published_one_side": {
+   "CG": 0.3261,
+   "AU": 0.2881,
+   "GU": 0.3076
+  },
+  "note": "M16 indexed single mutants by mutA only; its diagnostic used one side of each pair."
+ },
+ "B1_reliability": {
+  "n": 4453,
+  "draws": 200,
+  "sd_R_q25": 0.009,
+  "sd_R_median": 0.0204,
+  "sd_R_q75": 0.0525,
+  "between_pair_sd_R": 0.2541,
+  "effect_in_measurement_sd": 2.645,
+  "effect_in_between_sd": 0.212,
+  "icc_like": 0.5574
+ },
+ "B2_denominator": {
+  "quantiles": {
+   "q01": 0.1266,
+   "q05": 0.1864,
+   "q10": 0.2246,
+   "q25": 0.2998,
+   "q50": 0.4165,
+   "q75": 0.5586,
+   "q95": 0.7858
+  },
+  "frac_below_0p05": 0.0,
+  "dropped_decile": {
+   "effect": 0.0338,
+   "ci": [
+    -0.008,
+    0.078
+   ],
+   "p": 0.0025,
+   "weight": 753.0,
+   "strata": 498
+  },
+  "retention": 0.6268
+ },
+ "B3_splithalf": {
+  "n_splits": 200,
+  "corr": -0.9875,
+  "both_positive": 1.0,
+  "mean_half_effect": 0.05436
+ },
+ "C": {
+  "rescue": {
+   "n": 4453,
+   "methods": 9,
+   "raw": {
+    "MPNN-RFdiff": 0.4256,
+    "MPNN-fixbb": 0.44697,
+    "gRNAde-no3d": 0.38562,
+    "Rosetta": 0.29469,
+    "Shujun_struct2seq": 0.42289,
+    "Shujun_shape_struct2seq": 0.42648,
+    "Eterna": 0.46312,
+    "Starting sequence": 0.4716,
+    "gRNAde": 0.41036
+   },
+   "raw_rank": {
+    "Starting sequence": 1,
+    "Eterna": 2,
+    "MPNN-fixbb": 3,
+    "Shujun_shape_struct2seq": 4,
+    "MPNN-RFdiff": 5,
+    "Shujun_struct2seq": 6,
+    "gRNAde": 7,
+    "gRNAde-no3d": 8,
+    "Rosetta": 9
+   },
+   "target_only": {
+    "value": {
+     "MPNN-RFdiff": 0.00878,
+     "MPNN-fixbb": 0.0291,
+     "gRNAde-no3d": -0.04032,
+     "Rosetta": -0.12198,
+     "Shujun_struct2seq": 0.00464,
+     "Shujun_shape_struct2seq": 0.00861,
+     "Eterna": 0.04809,
+     "Starting sequence": 0.0539,
+     "gRNAde": 0.00679
+    },
+    "rank": {
+     "Starting sequence": 1,
+     "Eterna": 2,
+     "MPNN-fixbb": 3,
+     "MPNN-RFdiff": 4,
+     "Shujun_shape_struct2seq": 5,
+     "gRNAde": 6,
+     "Shujun_struct2seq": 7,
+     "gRNAde-no3d": 8,
+     "Rosetta": 9
+    },
+    "strata_used": 20,
+    "tau_vs_raw": 0.8889,
+    "max_move": 1,
+    "moved": 4,
+    "move": {
+     "Starting sequence": 0,
+     "Eterna": 0,
+     "MPNN-fixbb": 0,
+     "MPNN-RFdiff": 1,
+     "Shujun_shape_struct2seq": -1,
+     "gRNAde": 1,
+     "Shujun_struct2seq": -1,
+     "gRNAde-no3d": 0,
+     "Rosetta": 0
+    },
+    "tau_vs_prev": 0.8889
+   },
+   "target_plus_placement": {
+    "value": {
+     "MPNN-RFdiff": 0.00917,
+     "MPNN-fixbb": 0.02965,
+     "gRNAde-no3d": -0.04093,
+     "Rosetta": -0.12085,
+     "Shujun_struct2seq": 0.00514,
+     "Shujun_shape_struct2seq": 0.00812,
+     "Eterna": 0.04764,
+     "Starting sequence": 0.05309,
+     "gRNAde": 0.00507
+    },
+    "rank": {
+     "Starting sequence": 1,
+     "Eterna": 2,
+     "MPNN-fixbb": 3,
+     "MPNN-RFdiff": 4,
+     "Shujun_shape_struct2seq": 5,
+     "Shujun_struct2seq": 6,
+     "gRNAde": 7,
+     "gRNAde-no3d": 8,
+     "Rosetta": 9
+    },
+    "strata_used": 125,
+    "tau_vs_raw": 0.9444,
+    "max_move": 1,
+    "moved": 2,
+    "move": {
+     "Starting sequence": 0,
+     "Eterna": 0,
+     "MPNN-fixbb": 0,
+     "MPNN-RFdiff": 1,
+     "Shujun_shape_struct2seq": -1,
+     "Shujun_struct2seq": 0,
+     "gRNAde": 0,
+     "gRNAde-no3d": 0,
+     "Rosetta": 0
+    },
+    "tau_vs_prev": 0.9444,
+    "tau_boot_ci": [
+     0.7778,
+     1.0
+    ],
+    "tau_boot_frac_below_1": 0.73
+   },
+   "tau": 0.9444,
+   "max_move": 1
+  },
+  "benchmark_score": {
+   "n": 22879,
+   "methods": 12,
+   "raw": {
+    "M2": 81.20576,
+    "Eterna": 85.38342,
+    "MPNN-fixbb": 83.25928,
+    "gRNAde": 82.07849,
+    "MPNN-RFdiff": 84.01168,
+    "Rosetta": 73.81323,
+    "Struct2SeQ": 85.47951,
+    "gRNAde-no3d": 86.48037,
+    "Starting sequence": 85.07403,
+    "codesign-RFdiff": 88.03037,
+    "Rosetta-LoRes": 76.60599,
+    "3DRNA": 57.46524
+   },
+   "raw_rank": {
+    "codesign-RFdiff": 1,
+    "gRNAde-no3d": 2,
+    "Struct2SeQ": 3,
+    "Eterna": 4,
+    "Starting sequence": 5,
+    "MPNN-RFdiff": 6,
+    "MPNN-fixbb": 7,
+    "gRNAde": 8,
+    "M2": 9,
+    "Rosetta-LoRes": 10,
+    "Rosetta": 11,
+    "3DRNA": 12
+   },
+   "target_only": {
+    "value": {
+     "M2": -1.70776,
+     "Eterna": 1.63604,
+     "MPNN-fixbb": -0.32049,
+     "gRNAde": -0.68766,
+     "MPNN-RFdiff": 1.12379,
+     "Rosetta": -10.42934,
+     "Struct2SeQ": 2.09344,
+     "gRNAde-no3d": 2.46698,
+     "Starting sequence": 1.41055,
+     "codesign-RFdiff": 5.78618,
+     "Rosetta-LoRes": -6.87551,
+     "3DRNA": -23.11357
+    },
+    "rank": {
+     "codesign-RFdiff": 1,
+     "gRNAde-no3d": 2,
+     "Struct2SeQ": 3,
+     "Eterna": 4,
+     "Starting sequence": 5,
+     "MPNN-RFdiff": 6,
+     "MPNN-fixbb": 7,
+     "gRNAde": 8,
+     "M2": 9,
+     "Rosetta-LoRes": 10,
+     "Rosetta": 11,
+     "3DRNA": 12
+    },
+    "strata_used": 267,
+    "tau_vs_raw": 1.0,
+    "max_move": 0,
+    "moved": 0,
+    "move": {
+     "codesign-RFdiff": 0,
+     "gRNAde-no3d": 0,
+     "Struct2SeQ": 0,
+     "Eterna": 0,
+     "Starting sequence": 0,
+     "MPNN-RFdiff": 0,
+     "MPNN-fixbb": 0,
+     "gRNAde": 0,
+     "M2": 0,
+     "Rosetta-LoRes": 0,
+     "Rosetta": 0,
+     "3DRNA": 0
+    },
+    "tau_vs_prev": 1.0
+   },
+   "target_plus_gc": {
+    "value": {
+     "M2": -0.91574,
+     "MPNN-RFdiff": -0.08213,
+     "Eterna": 1.37994,
+     "gRNAde": -1.16157,
+     "Struct2SeQ": 2.27714,
+     "Rosetta": -8.06224,
+     "MPNN-fixbb": -1.20992,
+     "gRNAde-no3d": 0.73849,
+     "Starting sequence": 1.82528,
+     "codesign-RFdiff": 1.37426,
+     "Rosetta-LoRes": -6.80491,
+     "3DRNA": -15.97221
+    },
+    "rank": {
+     "Struct2SeQ": 1,
+     "Starting sequence": 2,
+     "Eterna": 3,
+     "codesign-RFdiff": 4,
+     "gRNAde-no3d": 5,
+     "MPNN-RFdiff": 6,
+     "M2": 7,
+     "gRNAde": 8,
+     "MPNN-fixbb": 9,
+     "Rosetta-LoRes": 10,
+     "Rosetta": 11,
+     "3DRNA": 12
+    },
+    "strata_used": 915,
+    "tau_vs_raw": 0.697,
+    "max_move": 3,
+    "moved": 7,
+    "move": {
+     "Struct2SeQ": 2,
+     "Starting sequence": 3,
+     "Eterna": 1,
+     "codesign-RFdiff": -3,
+     "gRNAde-no3d": -3,
+     "MPNN-RFdiff": 0,
+     "M2": 2,
+     "gRNAde": 0,
+     "MPNN-fixbb": -2,
+     "Rosetta-LoRes": 0,
+     "Rosetta": 0,
+     "3DRNA": 0
+    },
+    "tau_vs_prev": 0.697,
+    "tau_boot_ci": [
+     0.6364,
+     0.8485
+    ],
+    "tau_boot_frac_below_1": 1.0
+   }
+  }
+ },
+ "D": {
+  "D1_depth": {
+   "delta_tot": 0.03237725096306889,
+   "delta_cde": 0.057116684010170005,
+   "mediated": -0.024739433047101113,
+   "osc_h": 0.17705246373720096,
+   "d_TV": 0.11901947902867062,
+   "crude": 0.021072691994744253,
+   "tight": 0.018715695310588195,
+   "bins_live": 4,
+   "h": [
+    0.34408,
+    0.44435,
+    0.48757,
+    0.52113
+   ],
+   "pA": [
+    0.36754,
+    0.3054,
+    0.2048,
+    0.12227
+   ],
+   "pB": [
+    0.24852,
+    0.31122,
+    0.2617,
+    0.17856
+   ],
+   "g": -0.3084404958661057,
+   "beta": 0.05339377010875325,
+   "beta_g": -0.016468800928504706,
+   "residual_gap": -0.008270632118596407,
+   "crude_pct": 85.17855665739876,
+   "tight_pct": 75.65127007945414,
+   "linear_share_pct": 66.56903129974705
+  },
+  "D2_tight_ci": {
+   "bins": 13,
+   "point_tight_pct": 406.5,
+   "point_crude_pct": 827.91,
+   "nboot": 400,
+   "ci": [
+    143.19,
+    8172.6
+   ],
+   "frac_below_100": 0.0
+  },
+  "D3": {
+   "thermodynamic": {
+    "n": 1122,
+    "methods": [
+     "Eterna",
+     "Rosetta"
+    ],
+    "delta_tot": 0.02668,
+    "delta_cde": 0.00922,
+    "retention_pct": 34.5,
+    "in_placebo_band": false,
+    "bins_live": 5
+   },
+   "neural": {
+    "n": 2753,
+    "methods": [
+     "MPNN-fixbb",
+     "MPNN-RFdiff",
+     "gRNAde",
+     "gRNAde-no3d",
+     "Shujun_struct2seq",
+     "Shujun_shape_struct2seq"
+    ],
+    "delta_tot": 0.055,
+    "delta_cde": 0.12049,
+    "retention_pct": 219.1,
+    "in_placebo_band": false,
+    "bins_live": 5
+   },
+   "all": {
+    "n": 4453,
+    "methods": "all",
+    "delta_tot": 0.05393,
+    "delta_cde": 0.07779,
+    "retention_pct": 144.2,
+    "in_placebo_band": false,
+    "bins_live": 5
+   },
+   "both_hold": false,
+   "summary": "thermo 34.5%, neural 219.1%"
+  }
+ },
+ "scoring": {
+  "S1": {
+   "pass": true,
+   "note": "A1 分母对比 +0.0700 [+0.0560, +0.0828]"
+  },
+  "S2": {
+   "pass": false,
+   "note": "A3 留存 21.3%,区间含 0"
+  },
+  "S3": {
+   "pass": false,
+   "note": "B2 留存 62.7%"
+  },
+  "S4": {
+   "pass": false,
+   "note": "B3 对半相关 -0.9875"
+  },
+  "S5": {
+   "pass": true,
+   "note": "C1 tau +0.9444,最大名次移动 1"
+  },
+  "S6": {
+   "pass": true,
+   "note": "D1 depth 紧界 75.7%"
+  },
+  "S7": {
+   "pass": false,
+   "note": "thermo 34.5%, neural 219.1%"
+  }
+ },
+ "kill_conditions_fired": [
+  "K1_readout_is_chemistry",
+  "K2_outcome_too_noisy",
+  "K5_null_is_method_dependent"
+ ],
+ "n_pass": 3.0
+}

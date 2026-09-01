@@ -1,0 +1,56 @@
+{
+  "_rule": "m61_readout_and_consequence_declaration.json is frozen and is NOT edited. Defects found after the run are recorded here, the repair is named, and the stakes are NOT reissued: they were graded once, in the declaration's own wording, on m61_readout_and_consequence.json.",
+  "supersedes": "m61_readout_and_consequence.json is kept on disk as the object these corrections apply to, not as a result.",
+  "repaired_by": "m61b_readout_and_consequence.py -> m61b_readout_and_consequence.json",
+
+  "defects": {
+    "F1_h_not_cell_centred": {
+      "where": "M61 _prop4",
+      "what": "h was estimated from raw within-bin means pooled across design cells. Assumption (7) is a WITHIN-stratum statement, so h must be the cell-centred conditional mean, which is what M60b's h_and_tv computes. Pooling raw means lets between-design variation enter osc(h).",
+      "consequence": "D2's tight bound came out at 406.5% where M60c's published value at the same binning is 53.1%. The bootstrap interval built on it is meaningless.",
+      "fix": "D2 calls m60b/m60c's own functions rather than a reimplementation, so the point estimate reproduces 53.1% by construction and only the resampling is new."
+    },
+    "F2_retention_estimator_mismatch": {
+      "where": "M61 D3",
+      "what": "Retention was computed as Delta_cde / Delta_tot under M60's cell weighting. The published eRet = 101.9% and the placebo band 93.2-107.0% come from M21's estimator, which weights differently.",
+      "consequence": "The whole-corpus arm returned 144.2% where the published figure on the same records is 101.9%, so the subset comparison against the placebo band was not a comparison at all and K5 fired on an invalid contrast.",
+      "fix": "D3 uses M21's own retention path, so the two subsets are read on the scale the band is defined on."
+    },
+    "F3_split_half_is_mechanically_anticorrelated": {
+      "where": "M61 B3",
+      "what": "The two halves of a split are complementary and the pooled contrast is nearly fixed, so the two half-estimates are anti-correlated by arithmetic. The observed -0.9875 measures that arithmetic, not the outcome's reliability.",
+      "consequence": "S4 was mis-specified when it was written. It is graded failed in the declaration's own wording and the number is not evidence of anything.",
+      "fix": "Report the half-sample SD of the contrast and the fraction of splits in which BOTH halves are positive, which is the reliability statement that has content."
+    },
+    "F4_bound_direction_inverted_in_S6": {
+      "where": "M61 S6, and D1",
+      "what": "Proposition 4's plug-in bound HOLDS when the estimated right-hand side is at least the left-hand side, i.e. at 100% or above. S6 staked the opposite. Separately, the depth mediator has four levels, which m60_declaration_erratum.json already recorded as degenerate binning for this purpose.",
+      "consequence": "S6 is graded 'held' in the declaration's wording and that grade carries no information. Proposition 4 says nothing about the depth channel at this resolution, in either direction.",
+      "fix": "D1 is reported for the Proposition 3 identity, which is what it can support, and the Proposition 4 line is dropped from the depth channel."
+    },
+    "F5_A3_conditions_on_a_downstream_quantity": {
+      "where": "M61 A3, and K1",
+      "what": "The denominator D = sqrt(rho_i^2 + rho_j^2) is the disruption caused by breaking the pair. If the pair really forms, breaking it disrupts more, so D is downstream of the very thing the exposure is supposed to affect. Conditioning on it removes the structural signal along with any chemistry.",
+      "consequence": "A3's 21.3% retention and the K1 it fires cannot distinguish a chemistry artifact from over-adjustment. K1 is recorded as fired and as uninformative in this form.",
+      "fix": "A6 replaces it. A composition artifact acts at the two mutated bases; a structural effect is distributed over the profile. Recomputing all three RMSDs with the mutated positions and a neighbourhood EXCLUDED separates them, and the excluded radius is swept rather than chosen."
+    },
+    "F6_C1_corpus_wording": {
+      "where": "M61 C1",
+      "what": "The declaration asks for the nine design methods ranked by benchmark score with placement binned on a depth gap. The nine named methods live in the rescue corpus, which releases no benchmark score; the released benchmark score lives in the panel corpus, which carries a different method set and no pairing map.",
+      "consequence": "None to the reading. The arm was run once per corpus with the outcome each corpus actually releases.",
+      "fix": "Reported as two rankings, labelled by corpus, rather than as one."
+    }
+  },
+
+  "defect_found_in_an_earlier_run": {
+    "M16_single_mutant_index_half_blind": {
+      "what": "M16 indexed single mutants by mutA only. The corpus releases the two sides of each pair as (mutA set, mutB empty) and (mutA empty, mutB set), 4752 of each, so every record's second single-mutant RMSD was None.",
+      "consequence": "M16's declared denominator diagnostic -- which its own declaration required to be reported, and which the manuscript never reported -- was computed on one side of every pair: CG 0.3261, AU 0.2881, GU 0.3076.",
+      "superseded_by": "M61 A5, both sides: CG 0.3211 (n=6122), AU 0.2877 (n=2232), GU 0.3047 (n=280). The one-sided values were close, so the direction M16 recorded is unchanged.",
+      "second_defect": "M16's declaration read a larger G-C denominator as making the arm conservative. R = 1 - rho_ij/D rises when D rises, so a larger G-C denominator inflates the G-C rescue factor. The sign in that reading is inverted and the manuscript must not repeat it."
+    }
+  },
+
+  "stakes_are_NOT_reissued": true,
+  "written_at": "2026-09-01, after m61_readout_and_consequence.json and before m61b existed"
+}

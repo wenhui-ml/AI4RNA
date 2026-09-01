@@ -1,0 +1,194 @@
+{
+ "seed": 20260901,
+ "repairs": "m61_declaration_erratum.json",
+ "baseline": {
+  "effect": 0.05393,
+  "ci": [
+   0.0216,
+   0.0879
+  ]
+ },
+ "A6_off_mutation_cut": {
+  "None": {
+   "radius": null,
+   "n": 4453,
+   "median_sites_used": 100,
+   "effect": 0.0407,
+   "ci": [
+    0.0124,
+    0.0684
+   ],
+   "p": 0.0005,
+   "weight": 902.0,
+   "retention_vs_recomputed": 1.0,
+   "retention_vs_released": 0.7546,
+   "ci_excludes_zero": true
+  },
+  "0": {
+   "radius": 0,
+   "n": 4453,
+   "median_sites_used": 98,
+   "effect": 0.02739,
+   "ci": [
+    0.0012,
+    0.0525
+   ],
+   "p": 0.0015,
+   "weight": 902.0,
+   "retention_vs_recomputed": 0.673,
+   "retention_vs_released": 0.5079,
+   "ci_excludes_zero": true
+  },
+  "1": {
+   "radius": 1,
+   "n": 4453,
+   "median_sites_used": 94,
+   "effect": 0.02598,
+   "ci": [
+    -0.0014,
+    0.0514
+   ],
+   "p": 0.003,
+   "weight": 902.0,
+   "retention_vs_recomputed": 0.6384,
+   "retention_vs_released": 0.4818,
+   "ci_excludes_zero": false
+  },
+  "2": {
+   "radius": 2,
+   "n": 4453,
+   "median_sites_used": 90,
+   "effect": 0.02292,
+   "ci": [
+    -0.0036,
+    0.0477
+   ],
+   "p": 0.01049,
+   "weight": 902.0,
+   "retention_vs_recomputed": 0.5631,
+   "retention_vs_released": 0.425,
+   "ci_excludes_zero": false
+  },
+  "3": {
+   "radius": 3,
+   "n": 4453,
+   "median_sites_used": 86,
+   "effect": 0.01945,
+   "ci": [
+    -0.0094,
+    0.0451
+   ],
+   "p": 0.03048,
+   "weight": 902.0,
+   "retention_vs_recomputed": 0.4779,
+   "retention_vs_released": 0.3607,
+   "ci_excludes_zero": false
+  },
+  "only_2": {
+   "radius": 2,
+   "n": 4235,
+   "effect": 0.04815,
+   "ci": [
+    0.0139,
+    0.0855
+   ],
+   "p": 0.0005,
+   "share_of_baseline": 1.183,
+   "caveat": "a few positions only, and the structural disruption is largest here too; this is not a chemistry-only readout"
+  },
+  "recomputed_baseline": 0.0407,
+  "released_column_baseline": 0.05393
+ },
+ "B3_repaired": {
+  "n_splits": 200,
+  "half_sd": 0.01888,
+  "half_mean": 0.05457,
+  "both_halves_positive": 1.0,
+  "either_half_negative": 0.0,
+  "note": "complementary halves are anti-correlated by arithmetic; the correlation is not reported"
+ },
+ "D2_repaired": {
+  "bins": 13,
+  "point_tight_pct": 68.4,
+  "point_crude_pct": 133.3,
+  "tight_holds": true,
+  "nboot": 400,
+  "ci": [
+   49.1,
+   154.3
+  ],
+  "median": 71.0,
+  "frac_ge_100": 0.1275
+ },
+ "D3_repaired": {
+  "all": {
+   "n": 4453,
+   "cde": 0.08201,
+   "base_same_population": 0.0805,
+   "retention_pct": 101.9,
+   "weight": 363.0,
+   "n_strata": 285,
+   "in_placebo_band": true
+  },
+  "thermodynamic": {
+   "n": 1122,
+   "cde": 0.0563,
+   "base_same_population": 0.05145,
+   "retention_pct": 109.4,
+   "weight": 70.0,
+   "n_strata": 65,
+   "in_placebo_band": false
+  },
+  "neural": {
+   "n": 2753,
+   "cde": 0.13083,
+   "base_same_population": 0.12835,
+   "retention_pct": 101.9,
+   "weight": 199.0,
+   "n_strata": 149,
+   "in_placebo_band": true
+  },
+  "published_all": 101.9,
+  "band": [
+   93.2,
+   107.0
+  ],
+  "both_hold": false
+ },
+ "A7_prop3_identity": {
+  "delta_tot": 0.03238,
+  "delta_cde": 0.05712,
+  "attenuation": -0.02474,
+  "beta": 0.05324,
+  "g": -0.2885,
+  "beta_g": -0.01536,
+  "residual_computed_directly": -0.00163,
+  "residual_by_subtraction": -0.00938,
+  "agreement": 0.007747,
+  "linear_share_pct": 62.1,
+  "h": [
+   -0.08316,
+   0.01628,
+   0.05973,
+   0.06397
+  ],
+  "levels": [
+   0.0,
+   1.0,
+   2.0,
+   3.0
+  ],
+  "pA": [
+   0.3675,
+   0.3054,
+   0.2048,
+   0.1223
+  ],
+  "pB": [
+   0.2485,
+   0.3112,
+   0.2617,
+   0.1786
+  ]
+ }
+}
