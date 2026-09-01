@@ -1,0 +1,67 @@
+{
+  "id": "m64_multiplicity_and_shape",
+  "date_declared": "2026-09-01",
+  "status": "frozen before the code that produces it exists",
+  "offline": true,
+  "api_cost_usd": 0.0,
+  "why": [
+    "Limitation (vii) of R1 says: 'a reader assembling a family from these tables should apply",
+    "their own correction; we have not applied one on their behalf.' That sentence hands the",
+    "reader a job the authors are better placed to do, and every referee so far has marked it.",
+    "It is also, on inspection, not a statistics problem but a RESOLUTION problem: ten of the",
+    "family's p-values sit exactly at 0.0005, which is 1/(2000+1) -- the smallest number a",
+    "2000-permutation null can print. Holm at 0.005 over 42 tests needs 1.19e-4. The published",
+    "numbers cannot clear that bar no matter how strong the evidence is, because the null was",
+    "never run finely enough to say. So this run does two things: it applies the corrections,",
+    "and it BUYS the resolution the corrections need, by re-running the same permutation null",
+    "with 10^6 draws through a vectorised engine that must first be shown equivalent to the",
+    "original at the original draw count.",
+    "The second half of the run answers a distributional question no referee has asked but every",
+    "one could: R is a ratio of RMSDs, bounded above by 1 and unbounded below, so a difference of",
+    "means could in principle be carried by a tail. And the free-energy-stratified estimate runs",
+    "only on records whose stratum holds both pair types, which is a subset chosen by the data.",
+    "Neither has been characterised anywhere in the manuscript."
+  ],
+  "family_membership_rule": {
+    "_rule": "frozen here BEFORE any correction is computed, so the family cannot be chosen to make a claim survive",
+    "text": "every \\jdg{} macro that (a) is used in the body of R1_placement.tex, (b) has a value in figs/rna_numbers.tex that parses as a probability, and (c) is a p-value either by its use site (appearing in a 'p =', 'p <', 'p \\le' position) or by its macro name (ending in P or Binom). Null results, failed arms and supporting per-population rows are all IN; nothing is excluded for being inconvenient.",
+    "size": 42,
+    "members": ["cpop0P","cpop0SmdP","cpop1P","cpop1SmdP","cpop2P","cpop2SmdP","cpop3P","cpop3SmdP","cpop4P","cpop4SmdP","cpop5P","cpop5SmdP","cxP0","cxP3","dDgP","dOutP","dPmP","dgLooseP","dgTightP","eDOneP","eDTwoP","eDZeroP","eP","gP","gSlopeP","legRhoP","legSlopeP","m15pop0P","m15pop1P","m15pop2P","m15pop3P","m15pop4P","m15pop5P","rescueAUP","rescueGUP","rlDropP","rlLowP","rlSdContrastP","sBinom","sNegP","xdMargP","xrSignP"],
+    "at_the_permutation_floor_0p0005": ["cpop0P","cpop1P","cpop2P","eDTwoP","eDZeroP","eP","m15pop0P","m15pop1P","m15pop2P","m15pop4P","rescueAUP","rescueGUP"],
+    "note_on_floor_list": "cpop2SmdP prints 0.000 at three decimals and dDgP/dOutP print '<0.001'; those three are read at their printed upper bound, which is the conservative direction."
+  },
+  "arms": {
+    "A_correct": "apply Holm-Bonferroni at alpha=0.005 and Benjamini-Hochberg at q=0.005 to the 42 published values exactly as printed, and report which survive",
+    "B_resolve": "re-run the permutation null at NPERM=1e6 for the load-bearing floor members -- the two headline pair-type contrasts (rescueAUP, rescueGUP), the free-energy-conditioned contrast (eP), and the two depth-resolved contrasts (eDZeroP, eDTwoP) -- through a vectorised engine, and redo Holm with the resolved values",
+    "C_shape": "characterise the distribution of the outcome R and re-run the headline contrast on within-stratum ranks and on trimmed values",
+    "D_support": "characterise the records the free-energy-stratified estimator actually runs on, against the records it drops"
+  },
+  "scope_limit": {
+    "text": "Arm B buys resolution only for the five load-bearing floor members. The seven per-population floor members (cpop0/1/2, m15pop0/1/2/4) are supporting table rows, not claims the paper rests on; they are reported as floor-limited and are NOT re-run. This is a scope decision made before the code exists, not after seeing which way the correction went."
+  },
+  "predictions": [
+    {"id": "S1", "text": "the frozen family has exactly 42 members and every one of them is found in the manuscript at run time", "gate": "assertion"},
+    {"id": "S2", "text": "under Benjamini-Hochberg at q=0.005 on the values AS PUBLISHED, both headline pair-type contrasts are rejected", "gate": "both rejected"},
+    {"id": "S3", "text": "under Holm at alpha=0.005 on the values AS PUBLISHED, at least one headline contrast is NOT rejected, and its p equals the permutation floor exactly -- i.e. the failure is resolution, not evidence", "gate": "not rejected AND p == 1/2001 to 4 decimals"},
+    {"id": "S4", "text": "EQUIVALENCE. At NPERM=2000 the vectorised engine reproduces the published observed statistic to 1e-6 and its null SD to within 10 percent, for every arm it will later be used on", "gate": "|d_vec - d_pub| <= 1e-6 and 0.90 <= sd_vec/sd_pub <= 1.10"},
+    {"id": "S5", "text": "after purchase at NPERM=1e6, both headline pair-type contrasts have p < 0.005/42 = 1.19e-4 and survive Holm over the full 42", "gate": "both survive Holm"},
+    {"id": "S6", "text": "after purchase, the free-energy-conditioned identity contrast also survives Holm over the full 42", "gate": "survives Holm"},
+    {"id": "S7", "text": "the headline contrast keeps its sign and clears 0.005 when R is replaced by its within-stratum rank", "gate": "same sign and p <= 0.005"},
+    {"id": "S8", "text": "symmetrically trimming the most extreme 5 percent of R at each end retains at least half the published contrast", "gate": ">= 50 percent"},
+    {"id": "S9", "text": "the free-energy-stratified estimator runs on at least 25 percent of the base population, and the records it uses differ from the records it drops by no more than 0.20 standardised mean difference on helix depth, on crossing, and on R itself", "gate": ">= 25 percent and max |SMD| <= 0.20"}
+  ],
+  "kill_conditions": {
+    "K0": "if S4 fails, Arm B is void: no purchased p-value is reported anywhere, and the manuscript keeps Limitation (vii) unchanged",
+    "K1": "if a headline contrast does not survive Holm after purchase, Limitation (vii) STAYS and the manuscript states in Section 5 that the headline does not survive family-wise correction over its own family",
+    "K2": "if the rank-based re-analysis flips the sign of the headline contrast, the Section 5 headline is rewritten as a statement about means of a skewed outcome rather than about pair identity",
+    "K3": "if the retained subset falls below 25 percent or exceeds 0.20 SMD on any of the three variables, the free-energy-stratified estimate is labelled in Section 5 and in Limitations as holding on a subset the data chose",
+    "K4": "if the family found at run time is not the 42 frozen here, the run halts and the discrepancy is recorded in an erratum rather than the list being edited"
+  },
+  "what_this_experiment_may_NOT_do": [
+    "It may not change the family after seeing the corrections. The 42 names above are frozen.",
+    "It may not report a purchased p-value for any member outside the five named in Arm B.",
+    "It may not claim that surviving a correction makes a result true; it removes one specific objection and nothing else.",
+    "It may not treat the 42 tests as independent. Holm is valid under arbitrary dependence; BH at q=0.005 is reported beside it and is NOT valid under arbitrary dependence, which is why Holm is the one the manuscript will quote.",
+    "It cannot address multiplicity across the analyses that were run and not reported; the preregistration record is the only control on that, and it is a weaker one."
+  ]
+}
