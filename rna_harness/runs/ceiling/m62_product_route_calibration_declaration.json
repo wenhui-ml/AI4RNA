@@ -1,0 +1,85 @@
+{
+  "id": "M62",
+  "title": "The injection calibration, applied to the route the paper kept",
+  "frozen_before_code": true,
+  "cost": "$0. Offline. CPU only, OMP_NUM_THREADS=8. No API call, no GPU, no network.",
+
+  "why_this_exists": [
+    "Section 5.5 calibrated the CONDITIONING route by injecting a known mediated fraction into the",
+    "real mediator and reading back what the estimator reports. It covered 12.9% and 28.7% of the",
+    "range the truth covered, and on that basis every retention figure and mediated fraction this",
+    "pipeline produced was withdrawn.",
+    "",
+    "One product-route number survived that withdrawal and is still a headline: the 71.2% of",
+    "Section 6.1. Section 6.1 now argues that it is a different object -- the LINEAR share of an",
+    "attenuation rather than an estimated mediated share -- and that argument is sound as far as it",
+    "goes. It is still an argument about an estimator that has never been put through the same test",
+    "that condemned its sibling. A reader is entitled to say so, and the fix is to run the test.",
+    "",
+    "The estimator is m20's mediation(): marginal minus matched gives the attenuation, beta_depth",
+    "times g gives the predicted attenuation, and the ratio is the number. Nothing about it is",
+    "re-implemented here; the synthetic outcome is fed to that function unchanged."
+  ],
+
+  "construction": {
+    "records": "M16.build(), real depth, real pair types, real design cells, real target clusters",
+    "outcome": "Ysyn = h_true(depth) + delta * 1[CG] + N(0, sigma), everything else real",
+    "h_true": "a*m + c*r0(m), where r0 is m^2 residualised on m under the pooled depth law, so r0 is orthogonal to m and the least-squares slope of h_true on m is exactly a",
+    "sigma": "the corpus's own within-stratum residual SD of the rescue factor, measured in-run and not chosen",
+    "total": "the corpus's own matched contrast, so the synthetic effect is the size the real one is"
+  },
+
+  "arms": {
+    "V": "Reproduce the published decomposition on the real outcome: marginal, matched, g, beta, predicted attenuation, and the 71.2%. Nothing below is read if V fails.",
+
+    "A_fraction_sweep": {
+      "what": "c = 0, so h_true is linear and the truth is known twice over. Sweep the injected mediated fraction f over (0, 0.10, 0.25, 0.50, 0.75, 1.00), 40 noise draws per rung.",
+      "truth_1": "beta*g / total should read f, because f of the total was routed through depth by construction",
+      "truth_2": "the printed ratio beta*g / attenuation should read 1, because h_true is affine so the whole attenuation is linear",
+      "reported": "median and interquartile range at each rung, the readback span over the true span, and the conditioning route's retention on the SAME draws so the two can be read side by side"
+    },
+
+    "B_linearity_sweep": {
+      "what": "Hold the injected mediated fraction at the corpus's own level and sweep c so that the TRUE linear share lambda of the mediated part runs from 1 downwards, 40 noise draws per rung.",
+      "truth": "lambda = a*g / (a*g + c*Delta_r0), where Delta_r0 is the arm gap in r0 under the marginal stratification, all three known before the outcome is drawn",
+      "reported": "median readback of the printed ratio against lambda, their Spearman correlation, and the absolute error at each rung"
+    }
+  },
+
+  "staked_predictions": [
+    {"id": "S1", "arm": "A", "claim": "At f = 0 the median readback of beta*g/total is below 0.10.", "stake": "< 0.10"},
+    {"id": "S2", "arm": "A", "claim": "At f = 1 the median readback of beta*g/total is above 0.80.", "stake": "> 0.80"},
+    {"id": "S3", "arm": "A", "claim": "The readback span covers at least 60% of the true span, against the 12.9% and 28.7% the conditioning route managed in Section 5.5.", "stake": ">= 0.60"},
+    {"id": "S4", "arm": "A", "claim": "With a linear h_true, the printed ratio reads above 0.85 at every rung with f >= 0.25.", "stake": "> 0.85 at all such rungs"},
+    {"id": "S5", "arm": "B", "claim": "The printed ratio tracks the true linear share.", "stake": "Spearman >= 0.80"},
+    {"id": "S6", "arm": "B", "claim": "At a true linear share of 1 the printed ratio is within 0.20 of it.", "stake": "|error| <= 0.20"},
+    {"id": "S7", "arm": "V", "claim": "The published decomposition reproduces.", "stake": "|mediated_fraction - 0.7121| <= 0.005"}
+  ],
+
+  "kill_conditions": {
+    "K0_verification_failed": "V does not reproduce the published decomposition. Nothing below is read.",
+    "K1_product_route_unreadable": "S3 fails and at least one of S1, S2 fails. Then the product route is unreadable on this corpus in the same way the conditioning route is, and 71.2% is withdrawn with the rest rather than reframed. Section 6.1 loses its headline and says why.",
+    "K2_linear_share_not_recoverable": "S4 fails, or S6 fails. Then the printed ratio does not recover a linear share even when the truth is handed to it, Section 6.1's reframing does not survive its own test, and the number is withdrawn.",
+    "K3_only_the_fraction_survives": "S1, S2 and S3 hold but S5 or S6 fails. Then the quantity is readable as a mediated fraction of the total and not as a linear share, and Section 6.1 is rewritten to whichever reading survives rather than keeping both.",
+    "K4_neither_route_moves": "Both routes' readback spans are below 0.30. Then the arm has calibrated nothing and is reported as void rather than as evidence for either side."
+  },
+
+  "what_this_experiment_may_NOT_do": [
+    "It may not rehabilitate the retention figures withdrawn in Section 5.5. Those were withdrawn on",
+    "their own calibration and this arm does not touch it.",
+    "It may not license adding the two channels together. The covariate ledger stays unaddable for",
+    "the reason already stated: the common scale is the withdrawn quantity.",
+    "It may not be read as validating the product route in general. It is one mediator, on one",
+    "corpus, at one effect size, with a synthetic outcome whose form we chose.",
+    "It may not be used to argue that assumption (7) holds on the depth channel. The synthetic",
+    "outcome satisfies (7) by construction; the real one does not, by 31% of the attenuation as",
+    "already measured. A calibration that assumes the premise cannot test it, and this one does not.",
+    "The stakes above are graded once, in this wording. If the implementation is found defective the",
+    "defect is recorded in m62_declaration_erratum.json and this file is not edited."
+  ],
+
+  "seed": 20260901,
+  "draws_per_rung": 40,
+  "estimator": "m20_designer_confounding.mediation(), called unchanged",
+  "written_at": "2026-09-01, before m62_product_route_calibration.py existed"
+}
