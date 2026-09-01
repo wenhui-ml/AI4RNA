@@ -1,0 +1,51 @@
+{
+  "id": "m56_bca",
+  "title": "Every headline interval in this paper is a percentile bootstrap over 20 clusters, which is known to be optimistic at that few. Put a second interval on the three that carry claims.",
+  "frozen_before_code": true,
+  "cost": "offline, $0 -- no API, no GPU, no download. Reads the published records and re-runs three estimators that already exist.",
+
+  "why": [
+    "Section 3.6 says it plainly: 'a percentile interval built on that few clusters is known to be optimistic. No correction is applied: we report the cluster count beside every interval instead, and every interval here should be read as at least as wide as printed.' That is honest and it is not a computation.",
+    "Three intervals carry claims and one of them is the sharpest number in the paper: the sign of the budgeted gap at the tightest budget, which is what Reading 2 rests on. If a second interval method moves it across zero, the manuscript has to say so.",
+    "A second interval is cheap. BCa costs one jackknife over the same 20 clusters, and the jackknife is a leave-one-target-out this paper already runs for other purposes."
+  ],
+
+  "quantities": {
+    "Q1": "the matched C-G minus A-U contrast on the measured outcome, +0.0539, which Claim 1 rests on",
+    "Q2": "the paired standardised difference between the interventional and agreement readouts, +0.1552, which Claim 2 rests on",
+    "Q3": "the budgeted recovery gap between the two implementations at the tightest budget, -0.0159, whose SIGN is what Reading 2 rests on"
+  },
+
+  "arms": {
+    "A1": "reproduce each published percentile interval exactly, from the same estimator, the same cluster unit, the same draw count and the same seed",
+    "A2": "BCa for each: bias correction z0 from the fraction of bootstrap draws below the observed value, acceleration from the leave-one-cluster-out jackknife over the same clusters",
+    "A3": "the basic (reverse-percentile) interval for each, as a third method that fails differently from both",
+    "A4": "the width of each interval under all three methods, reported as a ratio to the percentile width, so the direction and size of the correction is visible rather than only its endpoints"
+  },
+
+  "verification_before_any_arm_is_read": {
+    "V1_degenerate_case": "with z0 = 0 and acceleration = 0, the BCa endpoints must equal the percentile endpoints to 1e-12. This is the identity that makes BCa a generalisation of the percentile interval and it fails loudly on a sign error in the z-transform.",
+    "V2_point_estimates": "each quantity's point estimate must reproduce its published value to its printed precision before any interval is read",
+    "V3_percentile_reproduces": "each published percentile interval must reproduce exactly, which is what shows the resampling here is the published resampling and not a similar one",
+    "V4_jackknife_completeness": "the jackknife must have exactly one replicate per cluster and every replicate must be finite; a dropped cluster silently changes the acceleration"
+  },
+
+  "kill_conditions": {
+    "K1": "if V2 or V3 fails for a quantity, that quantity is reported as VOID and no second interval is quoted for it",
+    "K2": "if V1 or V4 fails, VOID",
+    "K3": "if the acceleration exceeds 0.25 in absolute value for any quantity, the BCa interval is reported WITH that number stated, because at 20 clusters a large acceleration is itself the finding and not a detail"
+  },
+
+  "staked_predictions": [
+    {"id": "S1", "text": "Q1's BCa interval still excludes zero"},
+    {"id": "S2", "text": "Q2's BCa interval still excludes zero"},
+    {"id": "S3", "text": "Q3's BCa interval still excludes zero, so the sign reversal Reading 2 rests on survives a second interval method"},
+    {"id": "S4", "text": "the BCa intervals are WIDER than the percentile intervals for at least two of the three quantities, which is the direction Section 3.6 asserts without computing"}
+  ],
+
+  "wording_rules_binding_on_the_manuscript": {
+    "W1": "the percentile interval remains the reported one, fixed here before the numbers exist, because it is what every other interval in the paper is. The second interval is reported beside the three that carry claims. Switching to whichever is narrower would be the fitting this paper refuses.",
+    "W2": "Section 3.6's sentence -- that every interval should be read as at least as wide as printed -- is replaced by the measured widths if S4 holds, and withdrawn if it does not. An assertion about a direction is not allowed to stand once the direction has been measured.",
+    "W3": "if S3 fails, Reading 2's headline is restated as unresolved under a second interval method, in the body and in the abstract, not in a footnote."
+  }
+}
