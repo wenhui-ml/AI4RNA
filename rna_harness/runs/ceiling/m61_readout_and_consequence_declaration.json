@@ -1,0 +1,103 @@
+{
+  "id": "M61",
+  "title": "The readout's chemistry, the readout's reliability, and the consequence for a leaderboard",
+  "frozen_before_code": true,
+  "cost": "$0. Offline. CPU only, OMP_NUM_THREADS=8. No API call, no GPU, no network.",
+
+  "why_this_exists": [
+    "A review of R1 raised four objections that, if they stand, remove the paper's headline rather",
+    "than qualify it. Three of them are answerable from data already on disk and are answered here.",
+    "The fourth (venue fit) is answerable by an experiment this paper's own thesis implies and has",
+    "never run. Everything else the review raised is a matter of wording and is not an experiment.",
+    "",
+    "W4 (chemistry). R = 1 - rho_ij / sqrt(rho_i^2 + rho_j^2). The objection is that mutating a G-C",
+    "pair and mutating an A-U pair change base composition differently, so the probing readout's",
+    "baseline could differ by pair type for reasons that have nothing to do with whether the pair",
+    "forms. The objection has a sharp structure the review did not state: the COMPENSATORY DOUBLE",
+    "mutant preserves base composition exactly (G-C -> C-G, A-U -> U-A), so the numerator rho_ij",
+    "carries no composition change at all. Every composition change in R lives in the denominator.",
+    "That makes the denominator the whole test.",
+    "",
+    "W3 (reliability). The paper reports a reproducibility ceiling for the DESIGN SCORE and none for",
+    "R, and every causal claim in the paper is about R. The corpus releases per-nucleotide",
+    "reactivity errors; R's own noise is therefore computable and has never been computed.",
+    "",
+    "W9 (consequence). The paper asserts that a placement channel matters for how design models are",
+    "evaluated and never measures it. The corpus has a method label and a wet-lab benchmark score",
+    "for every design. Whether the leaderboard moves when placement is held fixed is a one-run",
+    "question and it is the paper's own claim turned into a measurement.",
+    "",
+    "W5/W2 (internal consistency). The paper withdraws every mediated fraction its pipeline produced",
+    "and then prints one as a headline. Prop. 4 gives an estimator-free bound that the depth channel",
+    "has never been put through. Separately, Def. 3's prose says every program in the corpus",
+    "optimises a nearest-neighbour objective; the corpus has nine methods and most are neural."
+  ],
+
+  "arms": {
+    "V": "Reproduce the published matched rescue contrast +0.05393 and the published dG contrast -1.72454 from the same builders. Nothing below is read if V fails.",
+
+    "A_chemistry": {
+      "A0": "Report the corpus's experiment_type census. A base-specific reagent and a base-agnostic reagent do not license the same objection.",
+      "A1": "The matched G-C minus A-U contrast, same strata as the headline (design x min(depth,3) x crossed), with the outcome replaced by D = sqrt(rho_i^2 + rho_j^2), the single-mutant disruption baseline. Puzzle-clustered interval.",
+      "A2": "The same with the outcome replaced by rho_ij, the compensatory-mutant disruption.",
+      "A3": "The headline contrast on R, re-run with a caliper on log D added to the stratification (quintiles of log D within the existing cells). Retention against the unconditioned +0.05393.",
+      "A4": "A2 minus A1 read as a decomposition: how much of the R contrast is the numerator moving and how much is the denominator moving."
+    },
+
+    "B_reliability": {
+      "B1": "Parametric bootstrap of R through the released per-nucleotide reactivity_error columns, 200 draws per record, giving a per-pair SD(R). Report the median and the quartiles, and express the headline +0.05393 in units of that SD and in units of the between-pair SD of R.",
+      "B2": "Census of the denominator: quantiles of D, and the headline contrast re-run after dropping the bottom decile of D.",
+      "B3": "Split-half reliability of the contrast itself: 200 random halves of the target clusters, correlation of the two halves' matched contrasts."
+    },
+
+    "C_leaderboard": {
+      "C1": "Rank the nine design methods by their mean benchmark score. Re-rank after post-stratifying every method's designs onto one common placement distribution (bins of the design's G-C-minus-A-U depth gap). Report Kendall tau between the two rankings and the largest rank movement.",
+      "C2": "The share of the between-method score spread that survives the reweighting."
+    },
+
+    "D_consistency": {
+      "D1": "The depth channel through Prop. 4: bin-wise h on depth, its oscillation, d_TV between the two exposure arms, the crude bound and the tight bound, against the printed product-route reading 71.2%.",
+      "D2": "A target-clustered bootstrap interval on the tight bound of the primary channel, 400 resamples, at the binning the paper reports.",
+      "D3": "The dG null re-run on two subsets of methods: the ones that consume a thermodynamic objective (Eterna, Rosetta) and the neural ones (MPNN-fixbb, MPNN-RFdiff, gRNAde, gRNAde-no3d, Shujun_struct2seq, Shujun_shape_struct2seq)."
+    }
+  },
+
+  "staked_predictions": [
+    {"id": "S1", "arm": "A1", "claim": "The disruption baseline D differs between the two pair types: A1's 95% interval excludes zero.", "stake": "excludes zero"},
+    {"id": "S2", "arm": "A3", "claim": "The rescue contrast survives conditioning on the disruption baseline at no worse than 60% of its unconditioned value, with an interval excluding zero.", "stake": "retention >= 0.60 and CI excludes 0"},
+    {"id": "S3", "arm": "B2", "claim": "Dropping the bottom decile of the denominator retains at least 70% of the contrast.", "stake": "retention >= 0.70"},
+    {"id": "S4", "arm": "B3", "claim": "Split-half contrasts correlate at least 0.30.", "stake": "r >= 0.30"},
+    {"id": "S5", "arm": "C1", "claim": "Holding placement fixed moves the leaderboard: Kendall tau < 1.0 and at least one method changes rank.", "stake": "tau < 1.0 and max_move >= 1"},
+    {"id": "S6", "arm": "D1", "claim": "The depth channel's tight Prop.-4 bound is below 100% of the total contrast, so the channel is bounded rather than vacuous.", "stake": "tight < 1.00"},
+    {"id": "S7", "arm": "D3", "claim": "The dG null holds on both method subsets: neither subset's retention leaves the placebo band reported in Section 5.3.", "stake": "both inside the placebo band"}
+  ],
+
+  "kill_conditions": {
+    "K0_verification_failed": "V does not reproduce the published contrasts. Nothing below is read.",
+    "K1_readout_is_chemistry": "A3's retention falls below 0.40 or its interval covers zero. Then the headline rescue contrast is not separated from the disruption baseline, and Section 5.2's claim must be re-scoped to a statement about the released column rather than about pair formation.",
+    "K2_outcome_too_noisy": "B2's retention falls below 0.40, or B3's split-half correlation is below 0.10. Then the outcome cannot carry the decomposition and Sections 6.1-6.2 must say so.",
+    "K3_no_leaderboard_consequence": "C1 returns Kendall tau = 1.0 with no rank movement. Then the paper's evaluation claim is null on this corpus and Section 6.3 must be written as a null, not as an implication.",
+    "K4_depth_channel_vacuous": "D1's tight bound exceeds 100%. Then the depth channel is in the same position as the crude bound on the energy channel and the 71.2% must be withdrawn rather than qualified.",
+    "K5_null_is_method_dependent": "D3 shows the dG null on one subset and not the other. Then Section 5.3's conclusion is a statement about a subset of the corpus and must be labelled as one."
+  },
+
+  "what_this_experiment_may_NOT_do": [
+    "It may not decide whether a G-C pair is more likely to form than an A-U pair in general. It is",
+    "one corpus, one reagent, one released column.",
+    "It may not turn a leaderboard movement into a claim about which design method is better. C1",
+    "measures whether the ranking is sensitive to a covariate the designers chose, not which ranking",
+    "is right.",
+    "It may not rehabilitate any withdrawn mediated fraction. D1 and D2 bound; they do not estimate.",
+    "It may not be read as a chemistry experiment. A1 and A3 test whether the composition change in",
+    "the single mutants can account for the contrast; they do not measure reagent selectivity, and no",
+    "wet-lab control is run here.",
+    "It may not extend to a second corpus. Nothing here is run outside the OK7a M2R release except",
+    "where a run already exists.",
+    "The stakes above are graded once, in this wording. If the implementation is found defective the",
+    "defect is recorded in m61_declaration_erratum.json and this file is not edited."
+  ],
+
+  "seed": 20260901,
+  "data": "/data/wenhui/openknot_data/Data/OK7a_M2R_data.v4.5.1.csv (rescue arm); panel_f1_*.json (leaderboard arm)",
+  "written_at": "2026-09-01, before m61_readout_and_consequence.py existed"
+}
