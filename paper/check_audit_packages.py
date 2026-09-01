@@ -102,6 +102,24 @@ for tag, folder, pdir, texname in PKGS:
         bad(tag, "F2", f"unexpanded macro left in a quote: {leaks}")
     print(f"  F  quotes: {len(quoted)}/{len(cl['claims'])} claims quoted")
 
+    # F3. verify_gate.json must cover every claim and must carry NO verdicts. A gate file with a
+    # filled-in ok field is an answer sheet wearing a checklist's clothes.
+    vg_path = os.path.join(out, "verify_gate.json")
+    if os.path.exists(vg_path):
+        vg = json.load(open(vg_path))
+        seen = {r["claim_id"] for r in vg["per_claim"]}
+        missing = [r["id"] for r in cl["claims"] if r["id"] not in seen]
+        if missing:
+            bad(tag, "F3", f"verify_gate.json does not cover {missing}")
+        filled = [r["claim_id"] for r in vg["per_claim"]
+                  if r.get("evidence_sufficient") is not None
+                  or any(i.get("ok") is not None for i in r["items"])]
+        if filled:
+            bad(tag, "F4", f"verify_gate.json carries pre-filled verdicts for {filled[:5]} -- "
+                            "those fields belong to the auditor")
+        nart = sum(len(r["checked_artifacts"]) for r in vg["per_claim"])
+        print(f"  F3 verify_gate: {len(seen)} claims, {nart} artifact refs, 0 pre-filled verdicts")
+
     # G. ANSWER LEAKAGE. The specification files must not carry our results.
     for fn in ("criterion.md", "estimator.md", "sanity_checks.md", "README.md"):
         txt = open(os.path.join(out, fn)).read()

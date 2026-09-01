@@ -1,48 +1,204 @@
 {
  "request_id": "R1-manuscript-audit",
  "audited_object": "a finished manuscript plus the committed run artifacts behind it",
- "recommended_schema": "Sample A (manuscript / proof audit): decompose into atomic claims, per claim a logic pass (T) with quoted evidence and a deterministic recomputation pass (D); result track = verify_gate + reproducibility by an independent route.",
+ "route": {
+  "sample": "A",
+  "why": "the audited object is a finished document making discrete claims, not a live agent trajectory. Per the schema's own decision path: decompose into atomic steps, per step a T pass (logic/semantics, qualitative band + verbatim quote, score by fixed code mapping) and a D pass (deterministic recomputation); the result track is verify_gate + reproducibility by an independent route.",
+  "what_is_NOT_here": "no supervision plan, and no per-step decomposition. Both are the auditor's to derive. What is supplied is the submission, the evidence a verify_gate needs, and a specification sufficient to recompute independently.",
+  "D_pass_is_available_for_every_claim": "each claim in claims.json carries an independent_route stated as a specification. Unlike a mathematical submission, the deterministic pass here runs against two public CSVs rather than exact arithmetic, so a D result will be a numeric agreement within a stated tolerance rather than an exact identity."
+ },
  "title": "The estimator companion: when a share of a benchmark number is estimable, and why here it is not",
  "one_line": "An estimator paper. It gives the exact condition under which two standard routes to a mediated fraction agree, shows by calibration against an injected known truth that here neither is readable, withdraws every mediated fraction it previously reported, and prices two covariate channels directly instead.",
  "abstract_as_printed": "On a corpus written by design programs, a benchmark number is carried by a covariate somebody chose, and the work is to price each choice. This paper supplies what pricing needs and cannot assume: the condition under which a share of that number is estimable at all, and a calibration showing that here it is not -- so channels must be priced one at a time and never added up. Pre-registration protects against choosing a statistic after seeing the data, not against choosing one that cannot be read; we report two such, from one frozen pipeline of 4317 controlled interventions. The first is a mediated fraction, whose two estimators are treated as interchangeable. They differ by exactly $E[r(M) | A]-E[r(M) | B]$, for $r$ the residual of the conditional mean after its linear projection, bounded by $osc(r)d_{TV}$, and agree for every pair of exposure laws iff that conditional mean is affine (Prop. [prop:routes]) -- so they disagree most where the product route is the only one computable. Here they disagree by 75.0 points and our frozen verdict had silently picked one. Which is readable is settled empirically: injecting a known mediated fraction into the real mediator, the estimator's reading covers 12.9% and 28.7% of the range the truth covers and returns +131.4% and -842.5% at total mediation. Published guidance clears us on both its thresholds and the quantity that governs is not in it. Put at risk on 416 designed protein binders the bound does not merely hold, it tracks: overlap differs across the two corpora by 2.72 and the route gap by 2.66. The two channels we can price directly go opposite ways -- the designers' placement carries the effect (+0.0250 marginal against +0.0539 matched) and the free energy their programs optimised carries none (-1.9%, [-10.6%,+6.8%]) -- and what survives is stated as the bounds 58.6% and 6.8%. Every mediated fraction this work previously reported is withdrawn.",
  "canonical_estimand_as_printed": null,
- "claim_quotes_as_printed": [
+ "original_submission": [
   {
-   "claim_id": "R1-C1",
+   "who": "The estimator companion -- Method / two routes to a mediated fraction, and when they disagree",
+   "quote": "Let $T in {A,B}$ be the exposure and $M$ an observed mediator supported in a bounded set, with conditional laws $P_{M | A}$ and $P_{M | B}$ both absolutely continuous with respect to a fixed reference law $P_M$ -- in the application, the pooled within-stratum law, which is what the slope below is fitted on and which does not move when the exposure mix does. Suppose that within a stratum",
    "verbatim_as_printed": "Let $T in {A,B}$ be the exposure and $M$ an observed mediator supported in a bounded set, with conditional laws $P_{M | A}$ and $P_{M | B}$ both absolutely continuous with respect to a fixed reference law $P_M$ -- in the application, the pooled within-stratum law, which is what the slope below is fitted on and which does not move when the exposure mix does. Suppose that within a stratum",
-   "where": "Method / two routes to a mediated fraction, and when they disagree"
+   "maps_to": "R1-C1",
+   "claim_id": "R1-C1",
+   "where": "Method / two routes to a mediated fraction, and when they disagree",
+   "claimed_evidence": {
+    "matched_strong": [
+     "does not"
+    ],
+    "matched_hedge": [
+     "bounded"
+    ]
+   },
+   "claimed_level": "hedged"
   },
   {
-   "claim_id": "R1-C2",
+   "who": "The estimator companion -- Results / which route is readable is a question for calibration",
+   "quote": "Proposition [prop:routes] says the two routes may disagree and says when. It does not say whether either is reporting anything. That is an empirical question about this corpus at this signal-to-noise, and it has an experiment: hold the estimator's machinery fixed and vary a truth it is supposed to recover.",
    "verbatim_as_printed": "Proposition [prop:routes] says the two routes may disagree and says when. It does not say whether either is reporting anything. That is an empirical question about this corpus at this signal-to-noise, and it has an experiment: hold the estimator's machinery fixed and vary a truth it is supposed to recover.",
-   "where": "Results / which route is readable is a question for calibration"
+   "maps_to": "R1-C2",
+   "claim_id": "R1-C2",
+   "where": "Results / which route is readable is a question for calibration",
+   "claimed_evidence": {
+    "matched_strong": [
+     "does not"
+    ],
+    "matched_hedge": []
+   },
+   "claimed_level": "strong assertion"
   },
   {
-   "claim_id": "R1-C3",
+   "who": "The estimator companion -- Results / the placement gap and the depth slope",
+   "quote": "Two quantities enter eq:med, each estimated without the other. Within $(design,crossed)$, regressing $R$ on depth gives $_{depth}=0.0541$ per depth unit; pooled over designs, G--C pairs sit $-0.3815$ depth units shallower than A--U pairs.",
    "verbatim_as_printed": "Two quantities enter eq:med, each estimated without the other. Within $(design,crossed)$, regressing $R$ on depth gives $_{depth}=0.0541$ per depth unit; pooled over designs, G--C pairs sit $-0.3815$ depth units shallower than A--U pairs.",
-   "where": "Results / the placement gap and the depth slope"
+   "maps_to": "R1-C3",
+   "claim_id": "R1-C3",
+   "where": "Results / the placement gap and the depth slope",
+   "claimed_evidence": {
+    "matched_strong": [],
+    "matched_hedge": []
+   },
+   "claimed_level": "neutral"
   },
   {
-   "claim_id": "R1-C4",
+   "who": "The estimator companion -- Results / the energy the designs were optimised for",
+   "quote": "The ordering in section [sec:pairtype] is the one nearest-neighbour thermodynamics predicts. This subsection asks whether it is that prediction. The mediator is Definition [def:dg]: the free energy the model itself assigns to the individual pair. Every program in the corpus optimises a sum of such terms, so holding this quantity fixed holds fixed what the design loop was told about the pair. Stratification, and the overlap it needs. $Delta G_{loc}$ is cut at fixed quantiles of the pooled distribution -- $5$ bins, edges fixed once, before any contrast -- and the bin index joins $(design,depth,crossed)$ in the stratum. Because the edges do not depend on the labels, permuting labels cannot rebuild the matched set, which is what Prop. [prop:null] requires. Overlap is real but not free (Fig. [fig:energy], left): G--C pairs average $-4.592$kcal/mol against $-3.002$ for A--U and $-1.859$ for G--U, and the most stable bin holds $776/871/392/584/438$ G--C pairs against $0/73/436/258/349$ A--U ones by bin. The",
    "verbatim_as_printed": "The ordering in section [sec:pairtype] is the one nearest-neighbour thermodynamics predicts. This subsection asks whether it is that prediction. The mediator is Definition [def:dg]: the free energy the model itself assigns to the individual pair. Every program in the corpus optimises a sum of such terms, so holding this quantity fixed holds fixed what the design loop was told about the pair. Stratification, and the overlap it needs. $Delta G_{loc}$ is cut at fixed quantiles of the pooled distribution -- $5$ bins, edges fixed once, before any contrast -- and the bin index joins $(design,depth,crossed)$ in the stratum. Because the edges do not depend on the labels, permuting labels cannot rebuild the matched set, which is what Prop. [prop:null] requires. Overlap is real but not free (Fig. [fig:energy], left): G--C pairs average $-4.592$kcal/mol against $-3.002$ for A--U and $-1.859$ for G--U, and the most stable bin holds $776/871/392/584/438$ G--C pairs against $0/73/436/258/349$ A--U ones by bin. The",
-   "where": "Results / the energy the designs were optimised for"
+   "maps_to": "R1-C4",
+   "claim_id": "R1-C4",
+   "where": "Results / the energy the designs were optimised for",
+   "claimed_evidence": {
+    "matched_strong": [
+     "cannot",
+     "every "
+    ],
+    "matched_hedge": []
+   },
+   "claimed_level": "strong assertion"
   },
   {
-   "claim_id": "R1-C5",
+   "who": "The estimator companion -- Results / the proposition, tested where none of this paper's machinery applies",
+   "quote": "",
    "verbatim_as_printed": "",
-   "where": "Results / the proposition, tested where none of this paper's machinery applies"
+   "maps_to": "R1-C5",
+   "claim_id": "R1-C5",
+   "where": "Results / the proposition, tested where none of this paper's machinery applies",
+   "claimed_evidence": {
+    "matched_strong": [],
+    "matched_hedge": []
+   },
+   "claimed_level": "neutral"
   },
   {
-   "claim_id": "R1-C6",
+   "who": "The estimator companion -- Results / the measurement frame: what a point is worth",
+   "quote": "Two facts about the corpus set the scale for everything below, and neither is a test. Where the variance is. Decomposing the design score gives $28.8%$ between targets, $24.1%$ between methods within target, and $47.1%$ within cell, of which $15.1%$ is measurement noise. This is an identity, not a hypothesis, and it is why every estimator in this paper is computed after centring within $(target,method)$: the first two layers are removed by construction rather than adjusted for. How much of the within-cell variance is reproducible at all. The release contains $557$ groups of repeated measurements covering $1983$ rows. This is the one interval in the paper that resamples something other than targets: its unit of replication is the repeated measurement group, as section [sec:preregprotocol] notes. Pooling within groups gives a measurement SD of $3.7716$, $[3.4585,4.0891]$ on $1426$ degrees of freedom, so against a within-cell SD of $6.8362$ the reproducible f",
    "verbatim_as_printed": "Two facts about the corpus set the scale for everything below, and neither is a test. Where the variance is. Decomposing the design score gives $28.8%$ between targets, $24.1%$ between methods within target, and $47.1%$ within cell, of which $15.1%$ is measurement noise. This is an identity, not a hypothesis, and it is why every estimator in this paper is computed after centring within $(target,method)$: the first two layers are removed by construction rather than adjusted for. How much of the within-cell variance is reproducible at all. The release contains $557$ groups of repeated measurements covering $1983$ rows. This is the one interval in the paper that resamples something other than targets: its unit of replication is the repeated measurement group, as section [sec:preregprotocol] notes. Pooling within groups gives a measurement SD of $3.7716$, $[3.4585,4.0891]$ on $1426$ degrees of freedom, so against a within-cell SD of $6.8362$ the reproducible f",
-   "where": "Results / the measurement frame: what a point is worth"
+   "maps_to": "R1-C6",
+   "claim_id": "R1-C6",
+   "where": "Results / the measurement frame: what a point is worth",
+   "claimed_evidence": {
+    "matched_strong": [
+     "every "
+    ],
+    "matched_hedge": []
+   },
+   "claimed_level": "strong assertion"
   }
  ],
+ "claim_quotes_as_printed": [
+  {
+   "who": "The estimator companion -- Method / two routes to a mediated fraction, and when they disagree",
+   "quote": "Let $T in {A,B}$ be the exposure and $M$ an observed mediator supported in a bounded set, with conditional laws $P_{M | A}$ and $P_{M | B}$ both absolutely continuous with respect to a fixed reference law $P_M$ -- in the application, the pooled within-stratum law, which is what the slope below is fitted on and which does not move when the exposure mix does. Suppose that within a stratum",
+   "verbatim_as_printed": "Let $T in {A,B}$ be the exposure and $M$ an observed mediator supported in a bounded set, with conditional laws $P_{M | A}$ and $P_{M | B}$ both absolutely continuous with respect to a fixed reference law $P_M$ -- in the application, the pooled within-stratum law, which is what the slope below is fitted on and which does not move when the exposure mix does. Suppose that within a stratum",
+   "maps_to": "R1-C1",
+   "claim_id": "R1-C1",
+   "where": "Method / two routes to a mediated fraction, and when they disagree",
+   "claimed_evidence": {
+    "matched_strong": [
+     "does not"
+    ],
+    "matched_hedge": [
+     "bounded"
+    ]
+   },
+   "claimed_level": "hedged"
+  },
+  {
+   "who": "The estimator companion -- Results / which route is readable is a question for calibration",
+   "quote": "Proposition [prop:routes] says the two routes may disagree and says when. It does not say whether either is reporting anything. That is an empirical question about this corpus at this signal-to-noise, and it has an experiment: hold the estimator's machinery fixed and vary a truth it is supposed to recover.",
+   "verbatim_as_printed": "Proposition [prop:routes] says the two routes may disagree and says when. It does not say whether either is reporting anything. That is an empirical question about this corpus at this signal-to-noise, and it has an experiment: hold the estimator's machinery fixed and vary a truth it is supposed to recover.",
+   "maps_to": "R1-C2",
+   "claim_id": "R1-C2",
+   "where": "Results / which route is readable is a question for calibration",
+   "claimed_evidence": {
+    "matched_strong": [
+     "does not"
+    ],
+    "matched_hedge": []
+   },
+   "claimed_level": "strong assertion"
+  },
+  {
+   "who": "The estimator companion -- Results / the placement gap and the depth slope",
+   "quote": "Two quantities enter eq:med, each estimated without the other. Within $(design,crossed)$, regressing $R$ on depth gives $_{depth}=0.0541$ per depth unit; pooled over designs, G--C pairs sit $-0.3815$ depth units shallower than A--U pairs.",
+   "verbatim_as_printed": "Two quantities enter eq:med, each estimated without the other. Within $(design,crossed)$, regressing $R$ on depth gives $_{depth}=0.0541$ per depth unit; pooled over designs, G--C pairs sit $-0.3815$ depth units shallower than A--U pairs.",
+   "maps_to": "R1-C3",
+   "claim_id": "R1-C3",
+   "where": "Results / the placement gap and the depth slope",
+   "claimed_evidence": {
+    "matched_strong": [],
+    "matched_hedge": []
+   },
+   "claimed_level": "neutral"
+  },
+  {
+   "who": "The estimator companion -- Results / the energy the designs were optimised for",
+   "quote": "The ordering in section [sec:pairtype] is the one nearest-neighbour thermodynamics predicts. This subsection asks whether it is that prediction. The mediator is Definition [def:dg]: the free energy the model itself assigns to the individual pair. Every program in the corpus optimises a sum of such terms, so holding this quantity fixed holds fixed what the design loop was told about the pair. Stratification, and the overlap it needs. $Delta G_{loc}$ is cut at fixed quantiles of the pooled distribution -- $5$ bins, edges fixed once, before any contrast -- and the bin index joins $(design,depth,crossed)$ in the stratum. Because the edges do not depend on the labels, permuting labels cannot rebuild the matched set, which is what Prop. [prop:null] requires. Overlap is real but not free (Fig. [fig:energy], left): G--C pairs average $-4.592$kcal/mol against $-3.002$ for A--U and $-1.859$ for G--U, and the most stable bin holds $776/871/392/584/438$ G--C pairs against $0/73/436/258/349$ A--U ones by bin. The",
+   "verbatim_as_printed": "The ordering in section [sec:pairtype] is the one nearest-neighbour thermodynamics predicts. This subsection asks whether it is that prediction. The mediator is Definition [def:dg]: the free energy the model itself assigns to the individual pair. Every program in the corpus optimises a sum of such terms, so holding this quantity fixed holds fixed what the design loop was told about the pair. Stratification, and the overlap it needs. $Delta G_{loc}$ is cut at fixed quantiles of the pooled distribution -- $5$ bins, edges fixed once, before any contrast -- and the bin index joins $(design,depth,crossed)$ in the stratum. Because the edges do not depend on the labels, permuting labels cannot rebuild the matched set, which is what Prop. [prop:null] requires. Overlap is real but not free (Fig. [fig:energy], left): G--C pairs average $-4.592$kcal/mol against $-3.002$ for A--U and $-1.859$ for G--U, and the most stable bin holds $776/871/392/584/438$ G--C pairs against $0/73/436/258/349$ A--U ones by bin. The",
+   "maps_to": "R1-C4",
+   "claim_id": "R1-C4",
+   "where": "Results / the energy the designs were optimised for",
+   "claimed_evidence": {
+    "matched_strong": [
+     "cannot",
+     "every "
+    ],
+    "matched_hedge": []
+   },
+   "claimed_level": "strong assertion"
+  },
+  {
+   "who": "The estimator companion -- Results / the proposition, tested where none of this paper's machinery applies",
+   "quote": "",
+   "verbatim_as_printed": "",
+   "maps_to": "R1-C5",
+   "claim_id": "R1-C5",
+   "where": "Results / the proposition, tested where none of this paper's machinery applies",
+   "claimed_evidence": {
+    "matched_strong": [],
+    "matched_hedge": []
+   },
+   "claimed_level": "neutral"
+  },
+  {
+   "who": "The estimator companion -- Results / the measurement frame: what a point is worth",
+   "quote": "Two facts about the corpus set the scale for everything below, and neither is a test. Where the variance is. Decomposing the design score gives $28.8%$ between targets, $24.1%$ between methods within target, and $47.1%$ within cell, of which $15.1%$ is measurement noise. This is an identity, not a hypothesis, and it is why every estimator in this paper is computed after centring within $(target,method)$: the first two layers are removed by construction rather than adjusted for. How much of the within-cell variance is reproducible at all. The release contains $557$ groups of repeated measurements covering $1983$ rows. This is the one interval in the paper that resamples something other than targets: its unit of replication is the repeated measurement group, as section [sec:preregprotocol] notes. Pooling within groups gives a measurement SD of $3.7716$, $[3.4585,4.0891]$ on $1426$ degrees of freedom, so against a within-cell SD of $6.8362$ the reproducible f",
+   "verbatim_as_printed": "Two facts about the corpus set the scale for everything below, and neither is a test. Where the variance is. Decomposing the design score gives $28.8%$ between targets, $24.1%$ between methods within target, and $47.1%$ within cell, of which $15.1%$ is measurement noise. This is an identity, not a hypothesis, and it is why every estimator in this paper is computed after centring within $(target,method)$: the first two layers are removed by construction rather than adjusted for. How much of the within-cell variance is reproducible at all. The release contains $557$ groups of repeated measurements covering $1983$ rows. This is the one interval in the paper that resamples something other than targets: its unit of replication is the repeated measurement group, as section [sec:preregprotocol] notes. Pooling within groups gives a measurement SD of $3.7716$, $[3.4585,4.0891]$ on $1426$ degrees of freedom, so against a within-cell SD of $6.8362$ the reproducible f",
+   "maps_to": "R1-C6",
+   "claim_id": "R1-C6",
+   "where": "Results / the measurement frame: what a point is worth",
+   "claimed_evidence": {
+    "matched_strong": [
+     "every "
+    ],
+    "matched_hedge": []
+   },
+   "claimed_level": "strong assertion"
+  }
+ ],
+ "U_calibration_note": "claimed_level above is computed by token match on the printed sentence, not declared by us. The realised level is the auditor's to determine from the two track verdicts. We state one thing about it in advance so it can be held against us: the manuscript deliberately hedges where an interval covers zero and asserts where one does not, and any place it asserts across a covering interval is a calibration finding.",
  "independence_conditions": [
   "Do not import, call or execute any module under rna_harness/. The result track must not run the audited party's implementation.",
   "Do not take any number in claims.json:printed_value as an input. Those are the claims under audit, supplied so you know what to disagree with.",
   "The two public CSVs in artifacts.json:input_data are the substrate. Everything else in this repository is OUR output and is evidence about our process, not evidence for a number.",
   "Derive your own supervision plan. sanity_checks.md lists first-principles invariants this manuscript asserts; they are claims to be checked, not a plan to be adopted."
  ],
- "_schema": "manuscript-audit-input/v1"
+ "_schema": "manuscript-audit-input / Sample A family v2"
 }

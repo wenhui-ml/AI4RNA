@@ -1,16 +1,42 @@
 # What changed since the last package
 
-Previous package **2026-08-31 02:30**. Rebuilt twice on **2026-09-01**: once after a round of new
-experiments, and again after a review round that found a factual error in our own wording.
+Rebuilt **2026-09-01**, third build of the day. The first two added experiments and corrected a
+factual error; this one **realigns the package to the audit system's actual schema**, which we had
+only a verbal description of before.
+
 Regenerate with `python paper/build_audit_packages.py`, validate with
 `python paper/check_audit_packages.py`.
 
-The independence rules in `README.md` are unchanged: do not run our code, do not accept our
-numbers as input, the substrate is the two public CSVs.
-
 ---
 
-## 0. Read this first: a sentence in our abstract was false, and this package repeated it
+## 0. Schema alignment (this build)
+
+The package now speaks the schema's vocabulary instead of an invented one.
+
+| added | what it does |
+|---|---|
+| `submission.json:route` | declares **Sample A** and says why: a finished document making discrete claims, not a live agent trajectory |
+| `submission.json:original_submission[]` | `who` / `quote` / `maps_to`, so our printed sentences can be attached to whatever atomic-step decomposition the auditor builds |
+| `submission.json` U-calibration | `claimed_level` + `matched_strong` / `matched_hedge` per claim, **extracted by token match on the printed sentence**, not declared by us. An auditor can re-run the same match |
+| `verify_gate.json` | new file. Per claim: the artifacts holding the number with sha256, the verbatim printed sentence, and the items a gate must check. **Every `ok` and `evidence_sufficient` is null** |
+| `process_claims.json` axes | each process claim tagged `integrity` or `validity`, matching the `deep_audit` split, so a finding routes without the auditor re-deriving that |
+| `process_claims.json` forbidden shortcuts | six shortcuts we declare forbidden **against ourselves**, in the schema's own `forbidden_shortcuts` sense |
+| checker `F3`/`F4` | the package's own validator now refuses a `verify_gate.json` with a pre-filled verdict. A gate file with `ok` already set is an answer sheet wearing a checklist's clothes |
+
+**Two differences from the mathematical Sample A** that change how this should be graded:
+
+1. The `D` pass here is **not exact arithmetic**. It runs against two public CSVs, so a
+   deterministic check returns numeric agreement within a stated tolerance rather than an
+   identity. Where an exact identity *is* available --- a closed-form maximum, a bias-correction
+   degenerate case, a partition count --- `claims.json` says so and it should be checked as one.
+2. There is **no single answer to reproduce**. Twelve claims are supplied and several are negative
+   or unresolved by construction; reproducing one of those means reproducing an interval that
+   covers zero, not a point.
+
+Still deliberately absent, because they are the auditor's: **the supervision plan**, **the atomic
+step decomposition**, and **every verdict**.
+
+## 1. Read this next: a sentence in our abstract was false, and this package repeated it
 
 The previous package's specification for `NM-C9` described the probing-derived reference the way
 the manuscript did --- as a structure built from probing data with **no model at all**.
@@ -29,7 +55,7 @@ statement than a reference being model-free.
 An auditor should treat this as a live check rather than a closed one: verify the correction
 reached **every** place the column is described, not only the abstract.
 
-## 1. A second wording claim was also too strong
+## 2. A second wording claim was also too strong
 
 The manuscript said the identity comparison is made "with no reference structure in the
 comparison." The declared target does enter --- it says which pair is the target, and it keys the
@@ -38,7 +64,7 @@ structure of these molecules** enters the measured outcome. `sanity_checks.md` n
 places the declared target does enter, so an auditor can check the manuscript against the list
 rather than against a vague claim.
 
-## 2. The estimand is now stated canonically, and shipped in this package
+## 3. The estimand is now stated canonically, and shipped in this package
 
 `submission.json` gained `canonical_estimand_as_printed`, sliced from the manuscript:
 
@@ -50,7 +76,7 @@ rather than against a vague claim.
 This is the first thing the result track has to agree with us about. A recomputation that scores a
 structure-level quantity has audited something else. Process claim `P14` is the check.
 
-## 3. Three scoping choices are now declared as choices
+## 4. Three scoping choices are now declared as choices
 
 | choice | what the manuscript now says |
 |---|---|
@@ -60,7 +86,7 @@ structure-level quantity has audited something else. Process claim `P14` is the 
 
 Process claim `P15` asks whether each is presented as a choice or as a fact.
 
-## 4. Ledger and package size
+## 5. Ledger and package size
 
 |  | 2026-08-31 | now |
 |---|---|---|
@@ -70,7 +96,7 @@ Process claim `P15` asks whether each is presented as a choice or as a fact.
 | printed values quarantined | 57 | **150** |
 | our run artifacts inventoried | 31 | **53** |
 
-## 5. The six claims added earlier today, still the substance of this update
+## 6. The six claims added earlier today, still the substance of this update
 
 | id | axis | why it exists |
 |---|---|---|
@@ -81,7 +107,7 @@ Process claim `P15` asks whether each is presented as a choice or as a fact.
 | `NM-C11` | interval method dependence | the three claim-carrying intervals under a second method |
 | `NM-C12` | how strong a violation would have to be | the closed-form sensitivity bound on the one identification assumption |
 
-## 6. Three existing claims changed meaning, not just numbers
+## 7. Three existing claims changed meaning, not just numbers
 
 - **`NM-C2` is narrower.** A second transformer does not reproduce the architecture axis, and a
   pseudoknot-capable thermodynamic implementation does not resolve the identity separation. The
@@ -93,7 +119,7 @@ Process claim `P15` asks whether each is presented as a choice or as a fact.
 - **`NM-C1` is made against five agreement columns**, and the shipped one --- the smallest of the
   five gaps --- is the one whose interval is method-dependent.
 
-## 7. Where we already know we are weak
+## 8. Where we already know we are weak
 
 - **Eight preregistered stakes failed**, graded as failed in the declaration's own wording.
   Checking that each declared consequence was actually applied to the text is `P11`, and it is the
@@ -107,7 +133,7 @@ Process claim `P15` asks whether each is presented as a choice or as a fact.
 - **The predictor panel spans four families and is not a field**, which the manuscript states.
   Adding a genuinely orthogonal contemporary predictor is open work, not a completed control.
 
-## 8. State of the manuscript
+## 9. State of the manuscript
 
 ```
 72 pages   build exit 0   0 overfull boxes   make_check clean

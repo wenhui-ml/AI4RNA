@@ -1,0 +1,277 @@
+{
+ "_note": "material for the result track's evidence-sufficiency gate. Verdict fields are deliberately null -- they belong to the auditor.",
+ "per_claim": [
+  {
+   "claim_id": "R1-C1",
+   "checked_artifacts": [
+    "m21_thermo_mediator.json"
+   ],
+   "artifact_checksums": [
+    {
+     "artifact": "m21_thermo_mediator.json",
+     "exists": true,
+     "sha256": "cf2677de9a5a4ea66f7d4a4ed4110058483f888bf98244bedd3732c4ba615f83",
+     "bytes": 3805,
+     "tracked_by_git": true
+    }
+   ],
+   "source_quote": "Let $T in {A,B}$ be the exposure and $M$ an observed mediator supported in a bounded set, with conditional laws $P_{M | A}$ and $P_{M | B}$ both absolutely continuous with respect to a fixed reference law $P_M$ -- in the application, the pooled within-stratum law, which is what the slope below is fitted on and which does not move when the exposure mix does. Suppose that within a stratum",
+   "items": [
+    {
+     "item": "the printed value reaches LaTeX through a generated macro",
+     "how": "every number in source_quote appears in figs/*_numbers.tex; make_check.py fails the build on a hand-typed measurement. Run it and see whether it actually refuses one.",
+     "ok": null
+    },
+    {
+     "item": "the backing artifact exists, is tracked, and matches its checksum here",
+     "how": "artifact_checksums above; recompute sha256 on the repository copy",
+     "ok": null
+    },
+    {
+     "item": "the artifact was produced by code committed AFTER its frozen declaration",
+     "how": "git log --diff-filter=A on the declaration and on the script",
+     "ok": null
+    },
+    {
+     "item": "the substrate is obtainable independently",
+     "how": "artifacts.json:input_data carries the release channel and sha256 of the two public CSVs. A different release is a reportable fact, not a failure.",
+     "ok": null
+    }
+   ],
+   "evidence_sufficient": null,
+   "note": "ok/evidence_sufficient are left null on purpose. They are the auditor's fields; pre-filling them would make this an answer sheet."
+  },
+  {
+   "claim_id": "R1-C2",
+   "checked_artifacts": [
+    "m26r3_realistic_calibration.json",
+    "m26r4_calibration_symmetry.json"
+   ],
+   "artifact_checksums": [
+    {
+     "artifact": "m26r3_realistic_calibration.json",
+     "exists": true,
+     "sha256": "f6d5f4d38597987e1eb86b75fa94ffec6e993855238d27758efef80e70cd793c",
+     "bytes": 1921,
+     "tracked_by_git": true
+    },
+    {
+     "artifact": "m26r4_calibration_symmetry.json",
+     "exists": true,
+     "sha256": "dc5465448f807368b0cd9c7dbc9861edd8d6235919ef1f869e01413da6fc44e8",
+     "bytes": 3166,
+     "tracked_by_git": true
+    }
+   ],
+   "source_quote": "Proposition [prop:routes] says the two routes may disagree and says when. It does not say whether either is reporting anything. That is an empirical question about this corpus at this signal-to-noise, and it has an experiment: hold the estimator's machinery fixed and vary a truth it is supposed to recover.",
+   "items": [
+    {
+     "item": "the printed value reaches LaTeX through a generated macro",
+     "how": "every number in source_quote appears in figs/*_numbers.tex; make_check.py fails the build on a hand-typed measurement. Run it and see whether it actually refuses one.",
+     "ok": null
+    },
+    {
+     "item": "the backing artifact exists, is tracked, and matches its checksum here",
+     "how": "artifact_checksums above; recompute sha256 on the repository copy",
+     "ok": null
+    },
+    {
+     "item": "the artifact was produced by code committed AFTER its frozen declaration",
+     "how": "git log --diff-filter=A on the declaration and on the script",
+     "ok": null
+    },
+    {
+     "item": "the substrate is obtainable independently",
+     "how": "artifacts.json:input_data carries the release channel and sha256 of the two public CSVs. A different release is a reportable fact, not a failure.",
+     "ok": null
+    }
+   ],
+   "evidence_sufficient": null,
+   "note": "ok/evidence_sufficient are left null on purpose. They are the auditor's fields; pre-filling them would make this an answer sheet."
+  },
+  {
+   "claim_id": "R1-C3",
+   "checked_artifacts": [
+    "m20_designer_confounding.json"
+   ],
+   "artifact_checksums": [
+    {
+     "artifact": "m20_designer_confounding.json",
+     "exists": true,
+     "sha256": "cad24119ab263acfe1dddc745c42e359b679b4ae40778142338b996885b35960",
+     "bytes": 3694,
+     "tracked_by_git": true
+    }
+   ],
+   "source_quote": "Two quantities enter eq:med, each estimated without the other. Within $(design,crossed)$, regressing $R$ on depth gives $_{depth}=0.0541$ per depth unit; pooled over designs, G--C pairs sit $-0.3815$ depth units shallower than A--U pairs.",
+   "items": [
+    {
+     "item": "the printed value reaches LaTeX through a generated macro",
+     "how": "every number in source_quote appears in figs/*_numbers.tex; make_check.py fails the build on a hand-typed measurement. Run it and see whether it actually refuses one.",
+     "ok": null
+    },
+    {
+     "item": "the backing artifact exists, is tracked, and matches its checksum here",
+     "how": "artifact_checksums above; recompute sha256 on the repository copy",
+     "ok": null
+    },
+    {
+     "item": "the artifact was produced by code committed AFTER its frozen declaration",
+     "how": "git log --diff-filter=A on the declaration and on the script",
+     "ok": null
+    },
+    {
+     "item": "the substrate is obtainable independently",
+     "how": "artifacts.json:input_data carries the release channel and sha256 of the two public CSVs. A different release is a reportable fact, not a failure.",
+     "ok": null
+    }
+   ],
+   "evidence_sufficient": null,
+   "note": "ok/evidence_sufficient are left null on purpose. They are the auditor's fields; pre-filling them would make this an answer sheet."
+  },
+  {
+   "claim_id": "R1-C4",
+   "checked_artifacts": [
+    "m21_thermo_mediator.json",
+    "m21v_verify.json",
+    "m22_review_arms.json"
+   ],
+   "artifact_checksums": [
+    {
+     "artifact": "m21_thermo_mediator.json",
+     "exists": true,
+     "sha256": "cf2677de9a5a4ea66f7d4a4ed4110058483f888bf98244bedd3732c4ba615f83",
+     "bytes": 3805,
+     "tracked_by_git": true
+    },
+    {
+     "artifact": "m21v_verify.json",
+     "exists": true,
+     "sha256": "0bf9df6857dc3fb645bb017a47a7b4f82805f49c0f0858984bcebcead2b58760",
+     "bytes": 1199,
+     "tracked_by_git": true
+    },
+    {
+     "artifact": "m22_review_arms.json",
+     "exists": true,
+     "sha256": "b8d553b4076add425187b918ed8f53c502498cd5f5032e200a5e8c279dda7701",
+     "bytes": 2012,
+     "tracked_by_git": true
+    }
+   ],
+   "source_quote": "The ordering in section [sec:pairtype] is the one nearest-neighbour thermodynamics predicts. This subsection asks whether it is that prediction. The mediator is Definition [def:dg]: the free energy the model itself assigns to the individual pair. Every program in the corpus optimises a sum of such terms, so holding this quantity fixed holds fixed what the design loop was told about the pair. Stratification, and the overlap it needs. $Delta G_{loc}$ is cut at fixed quantiles of the pooled distribution -- $5$ bins, edges fixed once, before any contrast -- and the bin index joins $(design,depth,crossed)$ in the stratum. Because the edges do not depend on the labels, permuting labels cannot rebuild the matched set, which is what Prop. [prop:null] requires. Overlap is real but not free (Fig. [fig:energy], left): G--C pairs average $-4.592$kcal/mol against $-3.002$ for A--U and $-1.859$ for G--U, and the most stable bin holds $776/871/392/584/438$ G--C pairs against $0/73/436/258/349$ A--U ones by bin. The",
+   "items": [
+    {
+     "item": "the printed value reaches LaTeX through a generated macro",
+     "how": "every number in source_quote appears in figs/*_numbers.tex; make_check.py fails the build on a hand-typed measurement. Run it and see whether it actually refuses one.",
+     "ok": null
+    },
+    {
+     "item": "the backing artifact exists, is tracked, and matches its checksum here",
+     "how": "artifact_checksums above; recompute sha256 on the repository copy",
+     "ok": null
+    },
+    {
+     "item": "the artifact was produced by code committed AFTER its frozen declaration",
+     "how": "git log --diff-filter=A on the declaration and on the script",
+     "ok": null
+    },
+    {
+     "item": "the substrate is obtainable independently",
+     "how": "artifacts.json:input_data carries the release channel and sha256 of the two public CSVs. A different release is a reportable fact, not a failure.",
+     "ok": null
+    }
+   ],
+   "evidence_sufficient": null,
+   "note": "ok/evidence_sufficient are left null on purpose. They are the auditor's fields; pre-filling them would make this an answer sheet."
+  },
+  {
+   "claim_id": "R1-C5",
+   "checked_artifacts": [
+    "m29_binder_crossdomain.json",
+    "m29r_review.json"
+   ],
+   "artifact_checksums": [
+    {
+     "artifact": "m29_binder_crossdomain.json",
+     "exists": true,
+     "sha256": "ad08c5ba8ebc53c520257582bca0f6c370e16fc4bf595e8496bc5624ec8be104",
+     "bytes": 2815,
+     "tracked_by_git": true
+    },
+    {
+     "artifact": "m29r_review.json",
+     "exists": true,
+     "sha256": "d29ce61d838049c2cfdb9ed2cfe3d38cb1382de1c362ffc306e69887229f3402",
+     "bytes": 7384,
+     "tracked_by_git": true
+    }
+   ],
+   "source_quote": "",
+   "items": [
+    {
+     "item": "the printed value reaches LaTeX through a generated macro",
+     "how": "every number in source_quote appears in figs/*_numbers.tex; make_check.py fails the build on a hand-typed measurement. Run it and see whether it actually refuses one.",
+     "ok": null
+    },
+    {
+     "item": "the backing artifact exists, is tracked, and matches its checksum here",
+     "how": "artifact_checksums above; recompute sha256 on the repository copy",
+     "ok": null
+    },
+    {
+     "item": "the artifact was produced by code committed AFTER its frozen declaration",
+     "how": "git log --diff-filter=A on the declaration and on the script",
+     "ok": null
+    },
+    {
+     "item": "the substrate is obtainable independently",
+     "how": "artifacts.json:input_data carries the release channel and sha256 of the two public CSVs. A different release is a reportable fact, not a failure.",
+     "ok": null
+    }
+   ],
+   "evidence_sufficient": null,
+   "note": "ok/evidence_sufficient are left null on purpose. They are the auditor's fields; pre-filling them would make this an answer sheet."
+  },
+  {
+   "claim_id": "R1-C6",
+   "checked_artifacts": [
+    "r1b_ceiling_interval.json"
+   ],
+   "artifact_checksums": [
+    {
+     "artifact": "r1b_ceiling_interval.json",
+     "exists": true,
+     "sha256": "aef4377bd8474ef5fc8c8388e3af360523899ecb3aa774ba9f4461c7ff27cc6a",
+     "bytes": 1355,
+     "tracked_by_git": true
+    }
+   ],
+   "source_quote": "Two facts about the corpus set the scale for everything below, and neither is a test. Where the variance is. Decomposing the design score gives $28.8%$ between targets, $24.1%$ between methods within target, and $47.1%$ within cell, of which $15.1%$ is measurement noise. This is an identity, not a hypothesis, and it is why every estimator in this paper is computed after centring within $(target,method)$: the first two layers are removed by construction rather than adjusted for. How much of the within-cell variance is reproducible at all. The release contains $557$ groups of repeated measurements covering $1983$ rows. This is the one interval in the paper that resamples something other than targets: its unit of replication is the repeated measurement group, as section [sec:preregprotocol] notes. Pooling within groups gives a measurement SD of $3.7716$, $[3.4585,4.0891]$ on $1426$ degrees of freedom, so against a within-cell SD of $6.8362$ the reproducible f",
+   "items": [
+    {
+     "item": "the printed value reaches LaTeX through a generated macro",
+     "how": "every number in source_quote appears in figs/*_numbers.tex; make_check.py fails the build on a hand-typed measurement. Run it and see whether it actually refuses one.",
+     "ok": null
+    },
+    {
+     "item": "the backing artifact exists, is tracked, and matches its checksum here",
+     "how": "artifact_checksums above; recompute sha256 on the repository copy",
+     "ok": null
+    },
+    {
+     "item": "the artifact was produced by code committed AFTER its frozen declaration",
+     "how": "git log --diff-filter=A on the declaration and on the script",
+     "ok": null
+    },
+    {
+     "item": "the substrate is obtainable independently",
+     "how": "artifacts.json:input_data carries the release channel and sha256 of the two public CSVs. A different release is a reportable fact, not a failure.",
+     "ok": null
+    }
+   ],
+   "evidence_sufficient": null,
+   "note": "ok/evidence_sufficient are left null on purpose. They are the auditor's fields; pre-filling them would make this an answer sheet."
+  }
+ ]
+}

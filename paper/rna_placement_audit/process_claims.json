@@ -1,95 +1,119 @@
 {
  "_note": "claims the manuscript makes ABOUT ITS OWN PROCESS. Each is falsifiable from the repository without any answer key, which is what makes them the process track's natural material.",
+ "_axis_note": "axis is where a violation lands under the schema's deep_audit split: integrity = the work was not done as specified (shortcut, off-spec, fabrication); validity = the result is self-invalidating on its own terms. The fairness rule applies to the second: judge self-invalidation, never disagreement with a target value you were not given.",
+ "_forbidden_shortcuts_we_declare_against_ourselves": [
+  "editing a frozen declaration after seeing the result instead of recording an erratum",
+  "reporting an interval that covers zero as evidence of no effect",
+  "comparing two magnitudes by two separate intervals instead of one interval on the difference -- an error this manuscript retracts one instance of",
+  "pricing a channel as a ratio of two contrasts, the estimator this work withdraws",
+  "choosing between two references, two cell sets or two quantile conventions after seeing which is kinder",
+  "scoring a panel member on input that includes the outcome's own experiment"
+ ],
  "claims": [
   {
    "id": "P1",
    "claim": "Every measured number printed in the manuscript reaches LaTeX through a generated macro, so a printed figure cannot drift from the run that produced it.",
    "falsify_by": "find a decimal literal in the .tex body that is a measurement. make_check.py is the gate; run it and see whether it actually refuses one.",
-   "check_command": "python make_check.py   # in the manuscript directory"
+   "check_command": "python make_check.py   # in the manuscript directory",
+   "axis": "integrity"
   },
   {
    "id": "P2",
    "claim": "Every experiment classed 'preregistered' has a declaration that was frozen, committed and PUSHED before the code that produced it existed.",
    "falsify_by": "for each declaration in provenance.json, compare `git log --diff-filter=A` for the declaration and for its script. If the script was added first, the claim is false for that experiment.",
-   "check_command": "git log --diff-filter=A --format='%aI %H' -- <declaration> <script>"
+   "check_command": "git log --diff-filter=A --format='%aI %H' -- <declaration> <script>",
+   "axis": "integrity"
   },
   {
    "id": "P3",
    "claim": "Staked predictions are graded in the declaration's own wording, including where the prediction failed, and failures are printed in the manuscript.",
    "falsify_by": "read each declaration's `staked` block and find the corresponding row in the manuscript's preregistration appendix. A stake with no row, or a row whose wording differs from the declaration, is a finding.",
-   "check_command": null
+   "check_command": null,
+   "axis": "integrity"
   },
   {
    "id": "P4",
    "claim": "No claim in the manuscript rests on the withdrawn estimator (a mediated fraction / a ratio of two contrasts).",
    "falsify_by": "search the results and conclusion for any quantity that is a ratio of two contrasts or is described as a share, fraction or percentage OF an effect.",
-   "check_command": null
+   "check_command": null,
+   "axis": "validity"
   },
   {
    "id": "P5",
    "claim": "Where two magnitudes are compared, an interval on their DIFFERENCE is reported -- not two separate intervals.",
    "falsify_by": "find a comparison of two point estimates with no interval on the difference. The paper retracts one such comparison itself; a second one that is not flagged is a finding.",
-   "check_command": null
+   "check_command": null,
+   "axis": "validity"
   },
   {
    "id": "P6",
    "claim": "Every artifact a generator reads exists and is tracked by git, and every artifact tracked is classified in provenance.json.",
    "falsify_by": "run the repository's own audit tool and read checks [D] and [H].",
-   "check_command": "python paper/audit_manuscript.py <manuscript-dir>"
+   "check_command": "python paper/audit_manuscript.py <manuscript-dir>",
+   "axis": "integrity"
   },
   {
    "id": "P7",
    "claim": "Every key cited in the body exists in refs.bib, so no citation typesets as a question mark.",
    "falsify_by": "check [J] of the audit tool, or diff the cited keys against the bib keys. This check exists because two such keys once reached a committed PDF.",
-   "check_command": "python paper/audit_manuscript.py <manuscript-dir>   # check [J]"
+   "check_command": "python paper/audit_manuscript.py <manuscript-dir>   # check [J]",
+   "axis": "integrity"
   },
   {
    "id": "P8",
    "claim": "Bibliographic entries are real: every author list, volume and DOI was fetched rather than recalled.",
    "falsify_by": "resolve every DOI and arXiv id in refs.bib and compare the author lists. A placeholder author field, or a DOI that does not resolve, is a finding. Two placeholder author fields were present in an earlier commit.",
-   "check_command": null
+   "check_command": null,
+   "axis": "integrity"
   },
   {
    "id": "P9",
    "claim": "Boundary and unexpected results were put through a four-step verification before any conclusion was changed: (1) an independent reimplementation recomputing the same number, (2) a mathematically equivalent alternative form, (3) a reverse control reproducing the OLD number with the OLD code, (4) a zero/identity self-check.",
    "falsify_by": "for each result the manuscript calls a boundary or a failed stake, locate all four steps in the committed artifacts. A missing step is a finding even when the conclusion is right.",
-   "check_command": null
+   "check_command": null,
+   "axis": "validity"
   },
   {
    "id": "P10",
    "claim": "Negative results are reported bounded: an interval containing zero is reported as unresolved, never as a refutation.",
    "falsify_by": "find a sentence that reads an interval containing zero as evidence of absence.",
-   "check_command": null
+   "check_command": null,
+   "axis": "validity"
   },
   {
    "id": "P11",
    "claim": "Each declaration names the consequence a failed stake will have on the manuscript BEFORE the number exists, and where a stake failed that consequence was actually applied to the text.",
    "falsify_by": "for each declaration with a failed stake, read its declared_consequences block and then read the manuscript at the place it names. A declared narrowing that was not applied is the most serious finding available here, because the declaration is what makes the stake meaningful. Eight stakes across five experiments failed; each should be traceable to a specific change.",
-   "check_command": null
+   "check_command": null,
+   "axis": "integrity"
   },
   {
    "id": "P12",
    "claim": "Where a declaration itself was wrong, the error is RECORDED as an erratum and the declaration is not edited after the fact.",
    "falsify_by": "compare each declaration's git blob at its first commit against its current blob. Any difference is a finding. Then check that every erratum described in the manuscript's preregistration appendix corresponds to something real -- three are recorded: a stake written on a point estimate where an interval was needed, a verification identity that does not exist, and a verification wording that named the wrong count.",
-   "check_command": "git log --format='%H' -- <declaration> | tail -1  # then diff that blob"
+   "check_command": "git log --format='%H' -- <declaration> | tail -1  # then diff that blob",
+   "axis": "integrity"
   },
   {
    "id": "P14",
    "claim": "The manuscript's central quantity is defined once, canonically, and every later use is an application of that definition rather than a re-definition.",
    "falsify_by": "read submission.json:canonical_estimand_as_printed, then find a place in the manuscript that scores something else and calls it the same thing. The obvious candidates are the agreement sections, where a structure-level quantity sits beside a pair-level one; check the paper never differences them without a common scale.",
-   "check_command": null
+   "check_command": null,
+   "axis": "validity"
   },
   {
    "id": "P15",
    "claim": "Where the manuscript makes a scoping choice -- an equivalence margin, a decision utility, a reference column -- it declares the choice as a choice and supplies what a reader needs to substitute their own.",
    "falsify_by": "for the equivalence margin, check delta-star is reported per comparison. For the decision utility, check the manuscript says budgeted recovery is one operational decision and not the definition of experimental utility. For the reference column, check all five columns are reported and not only the flattering one. A scoping choice presented as a fact is a finding.",
-   "check_command": null
+   "check_command": null,
+   "axis": "validity"
   },
   {
    "id": "P13",
    "claim": "A quantity computed and not reported is not hidden: the repository's own audit tool lists every generated macro the manuscript never prints, and the count is disclosed rather than minimised.",
    "falsify_by": "run the audit tool and read check [B]. Then ask, for each unprinted quantity, whether it would have weakened a claim. A quantity computed, unprinted and unfavourable is the finding this check exists for.",
-   "check_command": "python paper/audit_manuscript.py <manuscript-dir>   # check [B]"
+   "check_command": "python paper/audit_manuscript.py <manuscript-dir>   # check [B]",
+   "axis": "integrity"
   }
  ]
 }

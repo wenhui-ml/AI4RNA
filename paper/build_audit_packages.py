@@ -747,6 +747,15 @@ SANITY = [
 ]
 
 
+# Token lists for U-calibration. Extracted mechanically so an auditor can re-run the match
+# rather than take our word for how strongly we phrased something.
+STRONG = ("no ", "none", "never", "cannot", "must ", "proves", "establishes", "refutes",
+          "does not", "is not", "excludes zero", "not beaten", "every ", "all ")
+HEDGE = ("unresolved", "covers zero", "covering zero", "we do not claim", "may be", "might",
+         "consistent with", "we cannot", "does not resolve", "not tested", "we make no claim",
+         "bounded", "we prefer", "suggests")
+
+
 def build(tag, folder, paper_dir, texname, numname, claims, title, one_line):
     print(f"\n=== {tag}")
     out = os.path.join(HERE, folder)
@@ -777,15 +786,52 @@ def build(tag, folder, paper_dir, texname, numname, claims, title, one_line):
                     src = tex[lm.end():lm.end() + 1100]
                     src = src.split("\\begin{")[0]
         if src:
-            quotes.append({"claim_id": c["id"], "verbatim_as_printed": expand(src, mac)[:1400],
-                           "where": c["section"]})
+            txt = expand(src, mac)[:1400]
+            quotes.append({
+              "who": f"{title.split(':')[0][:40]} -- {c['section']}",
+              "quote": txt,
+              # kept under the old key as well: the package's own checker and any earlier
+              # consumer reads verbatim_as_printed, and renaming a field silently is how a
+              # downstream check stops running without anyone noticing.
+              "verbatim_as_printed": txt,
+              "maps_to": c["id"],
+              "claim_id": c["id"],
+              "where": c["section"],
+              # U-calibration material. The audit schema grades asserted strength against
+              # realised strength, so the tokens are extracted mechanically from the printed
+              # sentence rather than asserted by us -- an auditor can re-run the same match.
+              "claimed_evidence": {
+                "matched_strong": sorted({t for t in STRONG if t in txt.lower()}),
+                "matched_hedge": sorted({t for t in HEDGE if t in txt.lower()}),
+              },
+              "claimed_level": ("strong assertion"
+                                if len({t for t in STRONG if t in txt.lower()})
+                                > len({t for t in HEDGE if t in txt.lower()})
+                                else ("hedged" if any(t in txt.lower() for t in HEDGE)
+                                      else "neutral")),
+            })
     sub = {
       "request_id": f"{tag}-manuscript-audit",
       "audited_object": "a finished manuscript plus the committed run artifacts behind it",
-      "recommended_schema": "Sample A (manuscript / proof audit): decompose into atomic claims, "
-                            "per claim a logic pass (T) with quoted evidence and a deterministic "
-                            "recomputation pass (D); result track = verify_gate + reproducibility "
-                            "by an independent route.",
+      "route": {
+        "sample": "A",
+        "why": "the audited object is a finished document making discrete claims, not a live "
+               "agent trajectory. Per the schema's own decision path: decompose into atomic "
+               "steps, per step a T pass (logic/semantics, qualitative band + verbatim quote, "
+               "score by fixed code mapping) and a D pass (deterministic recomputation); the "
+               "result track is verify_gate + reproducibility by an independent route.",
+        "what_is_NOT_here": "no supervision plan, and no per-step decomposition. Both are the "
+                            "auditor's to derive. What is supplied is the submission, the "
+                            "evidence a verify_gate needs, and a specification sufficient to "
+                            "recompute independently.",
+        "D_pass_is_available_for_every_claim": "each claim in claims.json carries an "
+                                               "independent_route stated as a specification. "
+                                               "Unlike a mathematical submission, the "
+                                               "deterministic pass here runs against two public "
+                                               "CSVs rather than exact arithmetic, so a D result "
+                                               "will be a numeric agreement within a stated "
+                                               "tolerance rather than an exact identity.",
+      },
       "title": title,
       "one_line": one_line,
       "abstract_as_printed": abstract,
@@ -796,7 +842,14 @@ def build(tag, folder, paper_dir, texname, numname, claims, title, one_line):
         expand(slice_between(tex, "\\paragraph{What this instrument measures, stated once.}",
                              "\\paragraph{The two readings.}"), mac)
         if "What this instrument measures, stated once." in tex else None),
+      "original_submission": quotes,
       "claim_quotes_as_printed": quotes,
+      "U_calibration_note":
+        "claimed_level above is computed by token match on the printed sentence, not declared by "
+        "us. The realised level is the auditor's to determine from the two track verdicts. We "
+        "state one thing about it in advance so it can be held against us: the manuscript "
+        "deliberately hedges where an interval covers zero and asserts where one does not, and "
+        "any place it asserts across a covering interval is a calibration finding.",
       "independence_conditions": [
         "Do not import, call or execute any module under rna_harness/. The result track must not "
         "run the audited party's implementation.",
@@ -807,7 +860,7 @@ def build(tag, folder, paper_dir, texname, numname, claims, title, one_line):
         "number.",
         "Derive your own supervision plan. sanity_checks.md lists first-principles invariants "
         "this manuscript asserts; they are claims to be checked, not a plan to be adopted."],
-      "_schema": "manuscript-audit-input/v1"}
+      "_schema": "manuscript-audit-input / Sample A family v2"}
     write(out, "submission.json", sub)
 
     # ---- claims.json : the ledger, with our numbers quarantined
@@ -832,6 +885,49 @@ def build(tag, folder, paper_dir, texname, numname, claims, title, one_line):
         "disclosed because it makes one claim's comparator another claim's subject, and an "
         "auditor who does not know it will mis-scope both.",
       "claims": rows})
+
+    # ---- verify_gate.json : the evidence-sufficiency gate's material, per claim
+    # The schema's result track opens with a gate: is the evidence even sufficient to adjudicate,
+    # before any recomputation. For a manuscript that means, per claim: which committed artifact
+    # holds the number, what the manuscript prints verbatim, and what an auditor must be able to
+    # obtain. Nothing here is a result; it is what makes a result checkable.
+    vg = []
+    for c in claims:
+        arts = []
+        for k in c["artifacts"]:
+            st = stat(os.path.join(CEIL, k))
+            arts.append({"artifact": k, "exists": st.get("exists"),
+                         "sha256": st.get("sha256"), "bytes": st.get("bytes"),
+                         "tracked_by_git": tracked(os.path.join(CEIL, k))})
+        q = next((x for x in quotes if x["claim_id"] == c["id"]), None)
+        vg.append({
+          "claim_id": c["id"],
+          "checked_artifacts": [a["artifact"] for a in arts],
+          "artifact_checksums": arts,
+          "source_quote": (q or {}).get("quote"),
+          "items": [
+            {"item": "the printed value reaches LaTeX through a generated macro",
+             "how": "every number in source_quote appears in figs/*_numbers.tex; make_check.py "
+                    "fails the build on a hand-typed measurement. Run it and see whether it "
+                    "actually refuses one.",
+             "ok": None},
+            {"item": "the backing artifact exists, is tracked, and matches its checksum here",
+             "how": "artifact_checksums above; recompute sha256 on the repository copy",
+             "ok": None},
+            {"item": "the artifact was produced by code committed AFTER its frozen declaration",
+             "how": "git log --diff-filter=A on the declaration and on the script",
+             "ok": None},
+            {"item": "the substrate is obtainable independently",
+             "how": "artifacts.json:input_data carries the release channel and sha256 of the two "
+                    "public CSVs. A different release is a reportable fact, not a failure.",
+             "ok": None}],
+          "evidence_sufficient": None,
+          "note": "ok/evidence_sufficient are left null on purpose. They are the auditor's "
+                  "fields; pre-filling them would make this an answer sheet."})
+    write(out, "verify_gate.json", {
+      "_note": "material for the result track's evidence-sufficiency gate. Verdict fields are "
+               "deliberately null -- they belong to the auditor.",
+      "per_claim": vg})
 
     # ---- artifacts.json : the inventory, with trust classes and checksums
     # C1: a package that only works on the machine that built it is not a package. The substrate
@@ -894,11 +990,33 @@ def build(tag, folder, paper_dir, texname, numname, claims, title, one_line):
                  "companion": len(comp)}})
 
     # ---- process_claims.json
+    # The schema's deep_audit splits process findings on two axes: INTEGRITY (the work was not
+    # done as specified -- shortcut, off-spec, fabrication) and VALIDITY (the result is
+    # self-invalidating on its own terms). Each claim below is tagged with the axis a violation
+    # of it would land on, so a finding can be routed without the auditor re-deriving that.
+    AXIS = {"P1": "integrity", "P2": "integrity", "P3": "integrity", "P4": "validity",
+            "P5": "validity", "P6": "integrity", "P7": "integrity", "P8": "integrity",
+            "P9": "validity", "P10": "validity", "P11": "integrity", "P12": "integrity",
+            "P13": "integrity", "P14": "validity", "P15": "validity"}
     write(out, "process_claims.json", {
       "_note": "claims the manuscript makes ABOUT ITS OWN PROCESS. Each is falsifiable from the "
                "repository without any answer key, which is what makes them the process track's "
                "natural material.",
-      "claims": PROCESS_CLAIMS})
+      "_axis_note": "axis is where a violation lands under the schema's deep_audit split: "
+                    "integrity = the work was not done as specified (shortcut, off-spec, "
+                    "fabrication); validity = the result is self-invalidating on its own terms. "
+                    "The fairness rule applies to the second: judge self-invalidation, never "
+                    "disagreement with a target value you were not given.",
+      "_forbidden_shortcuts_we_declare_against_ourselves": [
+        "editing a frozen declaration after seeing the result instead of recording an erratum",
+        "reporting an interval that covers zero as evidence of no effect",
+        "comparing two magnitudes by two separate intervals instead of one interval on the "
+        "difference -- an error this manuscript retracts one instance of",
+        "pricing a channel as a ratio of two contrasts, the estimator this work withdraws",
+        "choosing between two references, two cell sets or two quantile conventions after seeing "
+        "which is kinder",
+        "scoring a panel member on input that includes the outcome's own experiment"],
+      "claims": [{**c, "axis": AXIS.get(c["id"], "integrity")} for c in PROCESS_CLAIMS]})
 
     # ---- sanity_checks.md
     write(out, "sanity_checks.md",
@@ -915,27 +1033,53 @@ README = """# Audit input package -- {title}
 Generated by `paper/build_audit_packages.py`. Do not hand-edit: rerun the generator instead, so
 every checksum here matches the repository state it describes.
 
-## What is being audited
+## What is being audited, and how it routes
 
 {one_line}
 
-The audited object is a **finished manuscript plus the committed run artifacts behind it**. By the
-audit system's own routing note, that is a **Sample A** job: decompose the submission into atomic
-claims, run a logic pass (`T`) with quoted evidence per claim, run a deterministic recomputation
-pass (`D`), and settle the result track with `verify_gate` + `reproducibility` **by an independent
-route**.
+The audited object is a **finished manuscript plus the committed run artifacts behind it** --- a
+document making discrete claims, not a live agent trajectory. That routes to **Sample A**:
+
+| track | what it settles here |
+|---|---|
+| **process track** | was the work done the way it says it was --- declarations frozen before code, failed stakes graded as failed, no forbidden shortcut, no self-invalidating inference |
+| **result track** | `verify_gate` (is the evidence even sufficient to adjudicate) then `reproducibility` --- recompute the load-bearing claims **by an independent route**, from the two public CSVs, without our code |
+
+Both tracks emit a `verdict`; `attestation` combines them (**any FAIL -> disqualified; any WARN ->
+qualified; both PASS -> unqualified**).
+
+**Two differences from the mathematical Sample A** that will change how you grade:
+
+1. The `D` pass is **not exact arithmetic**. It runs against two public CSVs, so a deterministic
+   check returns numeric agreement within a stated tolerance, not an identity. Where an exact
+   identity *is* available --- a closed-form maximum, a bias-correction degenerate case, a
+   partition count --- `claims.json` says so and it should be checked as an identity.
+2. There is no single answer to reproduce. Twelve claims are supplied; several are **negative or
+   unresolved by construction**, and reproducing one of those means reproducing an interval that
+   covers zero, not a point.
 
 ## Files
 
 | file | track | what it is |
 |---|---|---|
-| `submission.json` | both | the abstract and every claim box **as printed**, with macros expanded, plus the independence conditions |
+| `submission.json` | both | routing, the abstract and every claim box **as printed**, the canonical estimand, `original_submission` (`who`/`quote`/`maps_to`), and U-calibration material |
 | `claims.json` | result | one row per load-bearing claim: the estimand written out, what would falsify it, an **independent route stated as a specification**, and -- quarantined -- the number we print |
+| `verify_gate.json` | result | per claim: which committed artifact holds the number, its sha256, the verbatim printed sentence, and the items a gate must check. **Verdict fields are null on purpose** |
 | `artifacts.json` | both | the full inventory with sha256: two public input CSVs, the manuscript files, and every one of our run outputs, each tagged with its trust class |
-| `process_claims.json` | process | thirteen claims the manuscript makes **about its own process**, each with the command or comparison that would falsify it |
+| `process_claims.json` | process | fifteen claims the manuscript makes **about its own process**, each tagged `integrity` or `validity`, each with the command or comparison that would falsify it, plus the shortcuts we declare forbidden against ourselves |
 | `sanity_checks.md` | process | first-principles invariants the manuscript relies on. Not a plan, not target values |
 | `criterion.md` | result | the eligibility criterion in prose, sufficient to rebuild the admitted set from the public CSV without our code |
 | `estimator.md` | result | the estimators in prose and symbols: the matched stratified difference, the clustering, the permutation, the depth integer |
+| `CHANGELOG.md` | both | what changed since the previous package, including an error this package itself used to repeat |
+
+## What is deliberately NOT here
+
+- **No supervision plan.** Deriving it is yours. `sanity_checks.md` is a list of things we assert,
+  not a list of things to adopt.
+- **No per-step decomposition.** Sample A's atomic steps are the auditor's construction; we supply
+  the submission and the evidence, and `original_submission[].maps_to` lets you attach our
+  sentences to whatever decomposition you build.
+- **No verdicts.** Every `ok` and `evidence_sufficient` field in `verify_gate.json` is null.
 
 ## The independence rules, restated because they are the point
 
@@ -1093,17 +1237,43 @@ either manuscript including a table caption, is a finding.**
 
 NM_CHANGELOG = """# What changed since the last package
 
-Previous package **2026-08-31 02:30**. Rebuilt twice on **2026-09-01**: once after a round of new
-experiments, and again after a review round that found a factual error in our own wording.
+Rebuilt **2026-09-01**, third build of the day. The first two added experiments and corrected a
+factual error; this one **realigns the package to the audit system's actual schema**, which we had
+only a verbal description of before.
+
 Regenerate with `python paper/build_audit_packages.py`, validate with
 `python paper/check_audit_packages.py`.
 
-The independence rules in `README.md` are unchanged: do not run our code, do not accept our
-numbers as input, the substrate is the two public CSVs.
-
 ---
 
-## 0. Read this first: a sentence in our abstract was false, and this package repeated it
+## 0. Schema alignment (this build)
+
+The package now speaks the schema's vocabulary instead of an invented one.
+
+| added | what it does |
+|---|---|
+| `submission.json:route` | declares **Sample A** and says why: a finished document making discrete claims, not a live agent trajectory |
+| `submission.json:original_submission[]` | `who` / `quote` / `maps_to`, so our printed sentences can be attached to whatever atomic-step decomposition the auditor builds |
+| `submission.json` U-calibration | `claimed_level` + `matched_strong` / `matched_hedge` per claim, **extracted by token match on the printed sentence**, not declared by us. An auditor can re-run the same match |
+| `verify_gate.json` | new file. Per claim: the artifacts holding the number with sha256, the verbatim printed sentence, and the items a gate must check. **Every `ok` and `evidence_sufficient` is null** |
+| `process_claims.json` axes | each process claim tagged `integrity` or `validity`, matching the `deep_audit` split, so a finding routes without the auditor re-deriving that |
+| `process_claims.json` forbidden shortcuts | six shortcuts we declare forbidden **against ourselves**, in the schema's own `forbidden_shortcuts` sense |
+| checker `F3`/`F4` | the package's own validator now refuses a `verify_gate.json` with a pre-filled verdict. A gate file with `ok` already set is an answer sheet wearing a checklist's clothes |
+
+**Two differences from the mathematical Sample A** that change how this should be graded:
+
+1. The `D` pass here is **not exact arithmetic**. It runs against two public CSVs, so a
+   deterministic check returns numeric agreement within a stated tolerance rather than an
+   identity. Where an exact identity *is* available --- a closed-form maximum, a bias-correction
+   degenerate case, a partition count --- `claims.json` says so and it should be checked as one.
+2. There is **no single answer to reproduce**. Twelve claims are supplied and several are negative
+   or unresolved by construction; reproducing one of those means reproducing an interval that
+   covers zero, not a point.
+
+Still deliberately absent, because they are the auditor's: **the supervision plan**, **the atomic
+step decomposition**, and **every verdict**.
+
+## 1. Read this next: a sentence in our abstract was false, and this package repeated it
 
 The previous package's specification for `NM-C9` described the probing-derived reference the way
 the manuscript did --- as a structure built from probing data with **no model at all**.
@@ -1122,7 +1292,7 @@ statement than a reference being model-free.
 An auditor should treat this as a live check rather than a closed one: verify the correction
 reached **every** place the column is described, not only the abstract.
 
-## 1. A second wording claim was also too strong
+## 2. A second wording claim was also too strong
 
 The manuscript said the identity comparison is made "with no reference structure in the
 comparison." The declared target does enter --- it says which pair is the target, and it keys the
@@ -1131,7 +1301,7 @@ structure of these molecules** enters the measured outcome. `sanity_checks.md` n
 places the declared target does enter, so an auditor can check the manuscript against the list
 rather than against a vague claim.
 
-## 2. The estimand is now stated canonically, and shipped in this package
+## 3. The estimand is now stated canonically, and shipped in this package
 
 `submission.json` gained `canonical_estimand_as_printed`, sliced from the manuscript:
 
@@ -1143,7 +1313,7 @@ rather than against a vague claim.
 This is the first thing the result track has to agree with us about. A recomputation that scores a
 structure-level quantity has audited something else. Process claim `P14` is the check.
 
-## 3. Three scoping choices are now declared as choices
+## 4. Three scoping choices are now declared as choices
 
 | choice | what the manuscript now says |
 |---|---|
@@ -1153,7 +1323,7 @@ structure-level quantity has audited something else. Process claim `P14` is the 
 
 Process claim `P15` asks whether each is presented as a choice or as a fact.
 
-## 4. Ledger and package size
+## 5. Ledger and package size
 
 |  | 2026-08-31 | now |
 |---|---|---|
@@ -1163,7 +1333,7 @@ Process claim `P15` asks whether each is presented as a choice or as a fact.
 | printed values quarantined | 57 | **150** |
 | our run artifacts inventoried | 31 | **53** |
 
-## 5. The six claims added earlier today, still the substance of this update
+## 6. The six claims added earlier today, still the substance of this update
 
 | id | axis | why it exists |
 |---|---|---|
@@ -1174,7 +1344,7 @@ Process claim `P15` asks whether each is presented as a choice or as a fact.
 | `NM-C11` | interval method dependence | the three claim-carrying intervals under a second method |
 | `NM-C12` | how strong a violation would have to be | the closed-form sensitivity bound on the one identification assumption |
 
-## 6. Three existing claims changed meaning, not just numbers
+## 7. Three existing claims changed meaning, not just numbers
 
 - **`NM-C2` is narrower.** A second transformer does not reproduce the architecture axis, and a
   pseudoknot-capable thermodynamic implementation does not resolve the identity separation. The
@@ -1186,7 +1356,7 @@ Process claim `P15` asks whether each is presented as a choice or as a fact.
 - **`NM-C1` is made against five agreement columns**, and the shipped one --- the smallest of the
   five gaps --- is the one whose interval is method-dependent.
 
-## 7. Where we already know we are weak
+## 8. Where we already know we are weak
 
 - **Eight preregistered stakes failed**, graded as failed in the declaration's own wording.
   Checking that each declared consequence was actually applied to the text is `P11`, and it is the
@@ -1200,7 +1370,7 @@ Process claim `P15` asks whether each is presented as a choice or as a fact.
 - **The predictor panel spans four families and is not a field**, which the manuscript states.
   Adding a genuinely orthogonal contemporary predictor is open work, not a completed control.
 
-## 8. State of the manuscript
+## 9. State of the manuscript
 
 ```
 72 pages   build exit 0   0 overfull boxes   make_check clean

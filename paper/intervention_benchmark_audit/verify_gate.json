@@ -1,0 +1,669 @@
+{
+ "_note": "material for the result track's evidence-sufficiency gate. Verdict fields are deliberately null -- they belong to the auditor.",
+ "per_claim": [
+  {
+   "claim_id": "NM-C1",
+   "checked_artifacts": [
+    "m36_readout_scale.json",
+    "m25_estimator_benchmark.json",
+    "m54_probing_reference.json",
+    "m56_bca.json"
+   ],
+   "artifact_checksums": [
+    {
+     "artifact": "m36_readout_scale.json",
+     "exists": true,
+     "sha256": "b2f64794209533d82b71f1f9af89ac7d91de7a8e1ef89f90f3cdb76eacc5da1c",
+     "bytes": 2756,
+     "tracked_by_git": true
+    },
+    {
+     "artifact": "m25_estimator_benchmark.json",
+     "exists": true,
+     "sha256": "c01d18ef0a610dad583e547c04781580e7dc01f4ebffbba7414776e64a7e0963",
+     "bytes": 5950,
+     "tracked_by_git": true
+    },
+    {
+     "artifact": "m54_probing_reference.json",
+     "exists": true,
+     "sha256": "1872bd3ba89825b2563f3c393bad212f83436de88f5a48ae8dc7f4cd23388b47",
+     "bytes": 10790,
+     "tracked_by_git": true
+    },
+    {
+     "artifact": "m56_bca.json",
+     "exists": true,
+     "sha256": "22a043cb2815be4b40d28426af953975689a3c1622846049d9882261c4ce29ee",
+     "bytes": 4463,
+     "tracked_by_git": true
+    }
+   ],
+   "source_quote": "On this corpus the conventional structure-agreement readout is near saturation for the pairs compared, and its answer moves by 4.50x with a defensible change in which pairs are admitted. The interventional readout, on the same molecules and strata, returns a contrast +0.1552 standard deviations larger ([+0.0153, +0.3019]) -- the only scale on which the two may be differenced -- and admits no such choice.",
+   "items": [
+    {
+     "item": "the printed value reaches LaTeX through a generated macro",
+     "how": "every number in source_quote appears in figs/*_numbers.tex; make_check.py fails the build on a hand-typed measurement. Run it and see whether it actually refuses one.",
+     "ok": null
+    },
+    {
+     "item": "the backing artifact exists, is tracked, and matches its checksum here",
+     "how": "artifact_checksums above; recompute sha256 on the repository copy",
+     "ok": null
+    },
+    {
+     "item": "the artifact was produced by code committed AFTER its frozen declaration",
+     "how": "git log --diff-filter=A on the declaration and on the script",
+     "ok": null
+    },
+    {
+     "item": "the substrate is obtainable independently",
+     "how": "artifacts.json:input_data carries the release channel and sha256 of the two public CSVs. A different release is a reportable fact, not a failure.",
+     "ok": null
+    }
+   ],
+   "evidence_sufficient": null,
+   "note": "ok/evidence_sufficient are left null on purpose. They are the auditor's fields; pre-filling them would make this an answer sheet."
+  },
+  {
+   "claim_id": "NM-C2",
+   "checked_artifacts": [
+    "m35_paired_predictor_differences.json",
+    "m26_model_scored.json",
+    "m55_second_transformer.json",
+    "m58_pk_member.json",
+    "m52_sensitivity.json"
+   ],
+   "artifact_checksums": [
+    {
+     "artifact": "m35_paired_predictor_differences.json",
+     "exists": true,
+     "sha256": "78d89bc97f218008d33ceb465864112e58967d8197a2692111d64cb47d64b221",
+     "bytes": 5082,
+     "tracked_by_git": true
+    },
+    {
+     "artifact": "m26_model_scored.json",
+     "exists": true,
+     "sha256": "5301e33e25658a3afd3bdef4c36d65ac669bae101cb3a203947acfa6885d854a",
+     "bytes": 2217,
+     "tracked_by_git": true
+    },
+    {
+     "artifact": "m55_second_transformer.json",
+     "exists": true,
+     "sha256": "e1496de1f979b4ada05bdf0c40beea364255d652386aaba88649c31e33769aaf",
+     "bytes": 6893,
+     "tracked_by_git": true
+    },
+    {
+     "artifact": "m58_pk_member.json",
+     "exists": true,
+     "sha256": "1fc2112626dfb788c66a16f97f409f808a5c57e2efc907fab88c00d77c614865",
+     "bytes": 5430,
+     "tracked_by_git": true
+    },
+    {
+     "artifact": "m52_sensitivity.json",
+     "exists": true,
+     "sha256": "9ecc2854ef2605433fcdebd0c91206ffbb6217408a650055f6eeea527bc3ede9",
+     "bytes": 8509,
+     "tracked_by_git": true
+    }
+   ],
+   "source_quote": "On 4317 executed two-nucleotide interventions, a neural predictor's own output distinguishes G--C from A--U targets in matched contexts by +0.0605 ([+0.0329, +0.0956]), tracking the measurement's +0.0539 ([+0.0220, +0.0911]) -- a correspondence that holds in each column's own units (+0.0474SD, [-0.0950, +0.2066]) and not as a share of the measured effect, of which at most 23.2% can run through the model. Neither a thermodynamic predictor nor a second predictor on that same decomposition fitted to chemical mapping resolves such a separation (-0.0304, [-0.0628, +0.0105]; -0.00569, [-0.0306, +0.0232]). The instrument distinguishes something one structural decomposition represents and the other does not, with no predicted structure of these molecules in the comparison -- the declared target enters only by saying which pair is the target and by keying the strata, never as the thing agreement is scored against. Paired over the same resample the transformer exceeds both by [+0.0528, +0.1318] and [+0.0347, +0.1012] and they differ from each other by [-0.0428, -0.0042], so the effect decomposes rather than dichotomises: moving from EternaFold to this transformer is worth +0.06624 ([+0.0347, +0.1012]) and moving the parameters from optical melting to chemical mapping +0.02470 ([+0.0044, +0.0428]). A second transformer does not reproduce the first of those ([-0.03682, +0.00769]), so it is",
+   "items": [
+    {
+     "item": "the printed value reaches LaTeX through a generated macro",
+     "how": "every number in source_quote appears in figs/*_numbers.tex; make_check.py fails the build on a hand-typed measurement. Run it and see whether it actually refuses one.",
+     "ok": null
+    },
+    {
+     "item": "the backing artifact exists, is tracked, and matches its checksum here",
+     "how": "artifact_checksums above; recompute sha256 on the repository copy",
+     "ok": null
+    },
+    {
+     "item": "the artifact was produced by code committed AFTER its frozen declaration",
+     "how": "git log --diff-filter=A on the declaration and on the script",
+     "ok": null
+    },
+    {
+     "item": "the substrate is obtainable independently",
+     "how": "artifacts.json:input_data carries the release channel and sha256 of the two public CSVs. A different release is a reportable fact, not a failure.",
+     "ok": null
+    }
+   ],
+   "evidence_sufficient": null,
+   "note": "ok/evidence_sufficient are left null on purpose. They are the auditor's fields; pre-filling them would make this an answer sheet."
+  },
+  {
+   "claim_id": "NM-C3",
+   "checked_artifacts": [
+    "m31_which_flips_rescue.json",
+    "m31r_review.json",
+    "m38_ribosnitch_baseline.json",
+    "m40v_verify_m38_m39.json",
+    "m57_criterion_validity.json",
+    "m55_second_transformer.json",
+    "m58_pk_member.json"
+   ],
+   "artifact_checksums": [
+    {
+     "artifact": "m31_which_flips_rescue.json",
+     "exists": true,
+     "sha256": "1fb671ed56e14d2728c9186df81131879c04a313c375ed859291acf123816094",
+     "bytes": 7949,
+     "tracked_by_git": true
+    },
+    {
+     "artifact": "m31r_review.json",
+     "exists": true,
+     "sha256": "4384add2fff761f9b875de7ab5167f9a0efbf57f4a2a8fb575f84ceb4e2fb4c5",
+     "bytes": 1577,
+     "tracked_by_git": true
+    },
+    {
+     "artifact": "m38_ribosnitch_baseline.json",
+     "exists": true,
+     "sha256": "7278d9f43ee3ee6c4864859375153e4ffd6baa23449b3a5f30b525ba485830e4",
+     "bytes": 2939,
+     "tracked_by_git": true
+    },
+    {
+     "artifact": "m40v_verify_m38_m39.json",
+     "exists": true,
+     "sha256": "ce6c09489f90f7d4e0d974e23e219300a31cc0e40712e799a82d35a68c4718aa",
+     "bytes": 3637,
+     "tracked_by_git": true
+    },
+    {
+     "artifact": "m57_criterion_validity.json",
+     "exists": true,
+     "sha256": "90549cf1e068c13dc80ed014fb94a34aa88979f58c05c71e8f19dcb629ac7f1c",
+     "bytes": 5731,
+     "tracked_by_git": true
+    },
+    {
+     "artifact": "m55_second_transformer.json",
+     "exists": true,
+     "sha256": "e1496de1f979b4ada05bdf0c40beea364255d652386aaba88649c31e33769aaf",
+     "bytes": 6893,
+     "tracked_by_git": true
+    },
+    {
+     "artifact": "m58_pk_member.json",
+     "exists": true,
+     "sha256": "1fc2112626dfb788c66a16f97f409f808a5c57e2efc907fab88c00d77c614865",
+     "bytes": 5430,
+     "tracked_by_git": true
+    }
+   ],
+   "source_quote": "On this task an integer read off the declared target structure -- free wherever a target is declared, and undefined where one is not -- matches a transformer trained on roughly two million chemical-mapping profiles (+0.3225 against +0.3295, difference [-0.0737, +0.0866]). Holding it fixed, both predictors retain a real but modest ordering ability (+0.2380 and +0.1820, both $p<0.001$), worth 1.96 points of recovery when used to break the baseline's ties. The advantage has a measured domain: it is +0.3339 on the 3{,}406 interventions whose pair the probing data confirms and +0.1115 on the 635 it does not, where no interval separates any predictor from it. Any claim that a structure predictor knows which mutations rescue must be stated as an increment over helix depth, and to our knowledge none has been.",
+   "items": [
+    {
+     "item": "the printed value reaches LaTeX through a generated macro",
+     "how": "every number in source_quote appears in figs/*_numbers.tex; make_check.py fails the build on a hand-typed measurement. Run it and see whether it actually refuses one.",
+     "ok": null
+    },
+    {
+     "item": "the backing artifact exists, is tracked, and matches its checksum here",
+     "how": "artifact_checksums above; recompute sha256 on the repository copy",
+     "ok": null
+    },
+    {
+     "item": "the artifact was produced by code committed AFTER its frozen declaration",
+     "how": "git log --diff-filter=A on the declaration and on the script",
+     "ok": null
+    },
+    {
+     "item": "the substrate is obtainable independently",
+     "how": "artifacts.json:input_data carries the release channel and sha256 of the two public CSVs. A different release is a reportable fact, not a failure.",
+     "ok": null
+    }
+   ],
+   "evidence_sufficient": null,
+   "note": "ok/evidence_sufficient are left null on purpose. They are the auditor's fields; pre-filling them would make this an answer sheet."
+  },
+  {
+   "claim_id": "NM-C4",
+   "checked_artifacts": [
+    "m37_channel_ledger.json"
+   ],
+   "artifact_checksums": [
+    {
+     "artifact": "m37_channel_ledger.json",
+     "exists": true,
+     "sha256": "463fbd007f2e732c379da730c6d2b320c866931aa4961c3acefe8c242928f8f9",
+     "bytes": 8713,
+     "tracked_by_git": true
+    }
+   ],
+   "source_quote": "Every result above answers the same question asked of a different covariate. The corpus was not sampled: design programs wrote the molecules, a rule chose which were made, experimenters chose which pairs to mutate, and the reference against which agreement is scored is itself a model's output. In that setting a benchmark number is carried by a covariate somebody chose, and an instrument's work is to name each chooser and price the channel. Table [tab:channels] is this paper's ledger; it introduces no new estimate, every price being reported and defended in the section named beside it and read back from its own run artifact against the value this manuscript prints (0 disagreements). What this table is, stated so it cannot be over-read. It is a channel attribution ledger: a list of the covariates somebody chose, each priced by a direct contrast in its own units. It is not a causal decomposition and not a variance decomposition. The channels are not orthogonal -- they share structure, they are correlated, the design is hierarchical, an",
+   "items": [
+    {
+     "item": "the printed value reaches LaTeX through a generated macro",
+     "how": "every number in source_quote appears in figs/*_numbers.tex; make_check.py fails the build on a hand-typed measurement. Run it and see whether it actually refuses one.",
+     "ok": null
+    },
+    {
+     "item": "the backing artifact exists, is tracked, and matches its checksum here",
+     "how": "artifact_checksums above; recompute sha256 on the repository copy",
+     "ok": null
+    },
+    {
+     "item": "the artifact was produced by code committed AFTER its frozen declaration",
+     "how": "git log --diff-filter=A on the declaration and on the script",
+     "ok": null
+    },
+    {
+     "item": "the substrate is obtainable independently",
+     "how": "artifacts.json:input_data carries the release channel and sha256 of the two public CSVs. A different release is a reportable fact, not a failure.",
+     "ok": null
+    }
+   ],
+   "evidence_sufficient": null,
+   "note": "ok/evidence_sufficient are left null on purpose. They are the auditor's fields; pre-filling them would make this an answer sheet."
+  },
+  {
+   "claim_id": "NM-C5",
+   "checked_artifacts": [
+    "m39_exposure_tiers.json",
+    "m26d_clean_subset.json",
+    "m26c_leakage.json"
+   ],
+   "artifact_checksums": [
+    {
+     "artifact": "m39_exposure_tiers.json",
+     "exists": true,
+     "sha256": "59a278083263adb452b6cb52c23eb78468d93998dcd00cbf60c0f47d87a9102e",
+     "bytes": 14571,
+     "tracked_by_git": true
+    },
+    {
+     "artifact": "m26d_clean_subset.json",
+     "exists": true,
+     "sha256": "a7fc4fee3f3fbd39b4adc62e7e803f2f2ea82c9024bf7b98a0c191c25b0ff9b6",
+     "bytes": 1727,
+     "tracked_by_git": true
+    },
+    {
+     "artifact": "m26c_leakage.json",
+     "exists": true,
+     "sha256": "5a8e19719623d8b6849af9efb407821daae494cade807f020656db36cad91f95",
+     "bytes": 731,
+     "tracked_by_git": true
+    }
+   ],
+   "source_quote": "RibonanzaNet was trained on Eterna's OpenKnot campaigns and this corpus is an OpenKnot round, so overlap is the first thing a reader should demand. The mutants cannot be implicated -- the mutate-map-rescue library postdates the released weights -- but the wild types can, and a memorised wild type would give the model a prior on the molecule. We assembled 861{,}916 unique sequences from 14 of the model's own source libraries and ran four levels. Exact whole-construct overlap with our 14416 sequences is 0. At the design window, 6.37% of our sequences reach $0.8$ identity to some training window, 3.84% reach $0.9$, and 264 appear verbatim -- players reuse their own designs across rounds, which is neither surprising nor benign. Excising every design cell above the 0.80 threshold removes 14 of 158 cells (8.9%) and 324 of 4317 interventions. On the remaining 3993:",
+   "items": [
+    {
+     "item": "the printed value reaches LaTeX through a generated macro",
+     "how": "every number in source_quote appears in figs/*_numbers.tex; make_check.py fails the build on a hand-typed measurement. Run it and see whether it actually refuses one.",
+     "ok": null
+    },
+    {
+     "item": "the backing artifact exists, is tracked, and matches its checksum here",
+     "how": "artifact_checksums above; recompute sha256 on the repository copy",
+     "ok": null
+    },
+    {
+     "item": "the artifact was produced by code committed AFTER its frozen declaration",
+     "how": "git log --diff-filter=A on the declaration and on the script",
+     "ok": null
+    },
+    {
+     "item": "the substrate is obtainable independently",
+     "how": "artifacts.json:input_data carries the release channel and sha256 of the two public CSVs. A different release is a reportable fact, not a failure.",
+     "ok": null
+    }
+   ],
+   "evidence_sufficient": null,
+   "note": "ok/evidence_sufficient are left null on purpose. They are the auditor's fields; pre-filling them would make this an answer sheet."
+  },
+  {
+   "claim_id": "NM-C6",
+   "checked_artifacts": [
+    "m26r3_realistic_calibration.json",
+    "m26r4_calibration_symmetry.json"
+   ],
+   "artifact_checksums": [
+    {
+     "artifact": "m26r3_realistic_calibration.json",
+     "exists": true,
+     "sha256": "f6d5f4d38597987e1eb86b75fa94ffec6e993855238d27758efef80e70cd793c",
+     "bytes": 1921,
+     "tracked_by_git": true
+    },
+    {
+     "artifact": "m26r4_calibration_symmetry.json",
+     "exists": true,
+     "sha256": "dc5465448f807368b0cd9c7dbc9861edd8d6235919ef1f869e01413da6fc44e8",
+     "bytes": 3166,
+     "tracked_by_git": true
+    }
+   ],
+   "source_quote": "",
+   "items": [
+    {
+     "item": "the printed value reaches LaTeX through a generated macro",
+     "how": "every number in source_quote appears in figs/*_numbers.tex; make_check.py fails the build on a hand-typed measurement. Run it and see whether it actually refuses one.",
+     "ok": null
+    },
+    {
+     "item": "the backing artifact exists, is tracked, and matches its checksum here",
+     "how": "artifact_checksums above; recompute sha256 on the repository copy",
+     "ok": null
+    },
+    {
+     "item": "the artifact was produced by code committed AFTER its frozen declaration",
+     "how": "git log --diff-filter=A on the declaration and on the script",
+     "ok": null
+    },
+    {
+     "item": "the substrate is obtainable independently",
+     "how": "artifacts.json:input_data carries the release channel and sha256 of the two public CSVs. A different release is a reportable fact, not a failure.",
+     "ok": null
+    }
+   ],
+   "evidence_sufficient": null,
+   "note": "ok/evidence_sufficient are left null on purpose. They are the auditor's fields; pre-filling them would make this an answer sheet."
+  },
+  {
+   "claim_id": "NM-C7",
+   "checked_artifacts": [
+    "m44_decision.json",
+    "m44v_verify.json",
+    "m47_equivalence.json",
+    "m58_pk_member.json"
+   ],
+   "artifact_checksums": [
+    {
+     "artifact": "m44_decision.json",
+     "exists": true,
+     "sha256": "2690c66faebff2e3a29ac028a21e79bf67f7eca3ba96b18a91de275fae26537a",
+     "bytes": 15532,
+     "tracked_by_git": true
+    },
+    {
+     "artifact": "m44v_verify.json",
+     "exists": true,
+     "sha256": "c796c3ad242196315d7a130b3bc6668459f3f5bda43b0a087871fcf277435a97",
+     "bytes": 12895,
+     "tracked_by_git": true
+    },
+    {
+     "artifact": "m47_equivalence.json",
+     "exists": true,
+     "sha256": "7b07512a4a3abbcc7d2642a5248c061210e8c4627e40d5e94f00e74982f96b15",
+     "bytes": 10371,
+     "tracked_by_git": true
+    },
+    {
+     "artifact": "m58_pk_member.json",
+     "exists": true,
+     "sha256": "1fc2112626dfb788c66a16f97f409f808a5c57e2efc907fab88c00d77c614865",
+     "bytes": 5430,
+     "tracked_by_git": true
+    }
+   ],
+   "source_quote": "Across 4 independent implementations and three budgets -- and a fifth, the only pseudoknot-capable one, added because this corpus is a pseudoknot round and losing at every budget (+0.1321 against +0.1613 at the tightest) -- no model outperforms a free integer as a standalone ranker of which interventions to build: none of 12 intervals excludes zero, and against a margin fixed as the gain one extra construct buys ($delta=+0.0473$), 9 are equivalent to free depth while the remaining 3 fail on the side of being worse. The panel's largest structure-agreement margin, +0.260, converts to 1.0% of this corpus's rescuing interventions, and at the tightest budget its sign inverts (-0.0159 [-0.0278, -0.0036]) -- a measured crossing rather than three points: swept over 19 budgets the gap changes sign exactly 1 time, at 15.0%--17.5% of a design built, surviving any dropped target, 4 of 5 rescue thresholds, and 5 of 6 predictor pairs -- the only pair that does not invert being two implementations of one model family. A structure-benchmark margin is an average, and the better a model ranks on that average the further from the top of its own list its advantage lies. A budgeted experimenter only ever sees the top.",
+   "items": [
+    {
+     "item": "the printed value reaches LaTeX through a generated macro",
+     "how": "every number in source_quote appears in figs/*_numbers.tex; make_check.py fails the build on a hand-typed measurement. Run it and see whether it actually refuses one.",
+     "ok": null
+    },
+    {
+     "item": "the backing artifact exists, is tracked, and matches its checksum here",
+     "how": "artifact_checksums above; recompute sha256 on the repository copy",
+     "ok": null
+    },
+    {
+     "item": "the artifact was produced by code committed AFTER its frozen declaration",
+     "how": "git log --diff-filter=A on the declaration and on the script",
+     "ok": null
+    },
+    {
+     "item": "the substrate is obtainable independently",
+     "how": "artifacts.json:input_data carries the release channel and sha256 of the two public CSVs. A different release is a reportable fact, not a failure.",
+     "ok": null
+    }
+   ],
+   "evidence_sufficient": null,
+   "note": "ok/evidence_sufficient are left null on purpose. They are the auditor's fields; pre-filling them would make this an answer sheet."
+  },
+  {
+   "claim_id": "NM-C8",
+   "checked_artifacts": [
+    "m57_criterion_validity.json",
+    "m53_probing_reference.json",
+    "m54_probing_reference.json"
+   ],
+   "artifact_checksums": [
+    {
+     "artifact": "m57_criterion_validity.json",
+     "exists": true,
+     "sha256": "90549cf1e068c13dc80ed014fb94a34aa88979f58c05c71e8f19dcb629ac7f1c",
+     "bytes": 5731,
+     "tracked_by_git": true
+    },
+    {
+     "artifact": "m53_probing_reference.json",
+     "exists": true,
+     "sha256": "5ec5eb6470fec5d88df56ea0afb026f2b881607c895bbc7ebab4038171db5e77",
+     "bytes": 2639,
+     "tracked_by_git": true
+    },
+    {
+     "artifact": "m54_probing_reference.json",
+     "exists": true,
+     "sha256": "1872bd3ba89825b2563f3c393bad212f83436de88f5a48ae8dc7f4cd23388b47",
+     "bytes": 10790,
+     "tracked_by_git": true
+    }
+   ],
+   "source_quote": "A declared target is an intention, and clause (iii) admits an intervention on the strength of it. That makes the fraction of declared pairs the molecule actually forms a ceiling on the criterion's validity, and it is measurable without leaving this corpus: the probing-derived reference of section [app:probing] -- built from the deposit's own reactivities by a program none of the scored implementations is deigan2009accurate -- confirms 3{,}645 of the 4{,}752 declared pairs lying inside the design windows, +0.767 pooled and +0.787 averaged over designs ([+0.723, +0.842]), with a median of +0.847 and 1 of 160 designs at zero. Roughly a fifth of what these design programs declared is not what the molecule did, and every agreement number scored against a declared target in this literature inherits that. The pairs this paper intervenes on are confirmed slightly more often than the declared pairs at large, +0.7948, so the interventions are not sitting on the corpus's least reliable pairs -- which is a fact about where expe",
+   "items": [
+    {
+     "item": "the printed value reaches LaTeX through a generated macro",
+     "how": "every number in source_quote appears in figs/*_numbers.tex; make_check.py fails the build on a hand-typed measurement. Run it and see whether it actually refuses one.",
+     "ok": null
+    },
+    {
+     "item": "the backing artifact exists, is tracked, and matches its checksum here",
+     "how": "artifact_checksums above; recompute sha256 on the repository copy",
+     "ok": null
+    },
+    {
+     "item": "the artifact was produced by code committed AFTER its frozen declaration",
+     "how": "git log --diff-filter=A on the declaration and on the script",
+     "ok": null
+    },
+    {
+     "item": "the substrate is obtainable independently",
+     "how": "artifacts.json:input_data carries the release channel and sha256 of the two public CSVs. A different release is a reportable fact, not a failure.",
+     "ok": null
+    }
+   ],
+   "evidence_sufficient": null,
+   "note": "ok/evidence_sufficient are left null on purpose. They are the auditor's fields; pre-filling them would make this an answer sheet."
+  },
+  {
+   "claim_id": "NM-C9",
+   "checked_artifacts": [
+    "m54_probing_reference.json",
+    "m53_probing_reference.json"
+   ],
+   "artifact_checksums": [
+    {
+     "artifact": "m54_probing_reference.json",
+     "exists": true,
+     "sha256": "1872bd3ba89825b2563f3c393bad212f83436de88f5a48ae8dc7f4cd23388b47",
+     "bytes": 10790,
+     "tracked_by_git": true
+    },
+    {
+     "artifact": "m53_probing_reference.json",
+     "exists": true,
+     "sha256": "5ec5eb6470fec5d88df56ea0afb026f2b881607c895bbc7ebab4038171db5e77",
+     "bytes": 2639,
+     "tracked_by_git": true
+    }
+   ],
+   "source_quote": "Every agreement number in this paper is scored against something written down rather than measured: section [sec:conventional]'s column is the benchmark's shipped RNet\\_structure, and section [sec:reorder]'s is the declared target, which is the designer's intention. This appendix reports a third reference, built from the probing data, and what it costs to use. What was built. ShapeKnots -- the same RNAstructure distribution the panel already contains -- was run on each wild-type construct with that deposit's own 2A3 reactivity as SHAPE pseudoenergy restraints at the published defaults, no parameter tuned, and positions without data marked as such. All 160 folded, none failed, and pairs were then restricted to the design window every other agreement number here uses. Four checks ran before any number was read: the F1 machinery reproduces the benchmark file's own RNet\\_structure column to $4x10^{-16}$ on every construct; every built structure is well formed, inside the construct, and canonically paired; a run with the restraints remo",
+   "items": [
+    {
+     "item": "the printed value reaches LaTeX through a generated macro",
+     "how": "every number in source_quote appears in figs/*_numbers.tex; make_check.py fails the build on a hand-typed measurement. Run it and see whether it actually refuses one.",
+     "ok": null
+    },
+    {
+     "item": "the backing artifact exists, is tracked, and matches its checksum here",
+     "how": "artifact_checksums above; recompute sha256 on the repository copy",
+     "ok": null
+    },
+    {
+     "item": "the artifact was produced by code committed AFTER its frozen declaration",
+     "how": "git log --diff-filter=A on the declaration and on the script",
+     "ok": null
+    },
+    {
+     "item": "the substrate is obtainable independently",
+     "how": "artifacts.json:input_data carries the release channel and sha256 of the two public CSVs. A different release is a reportable fact, not a failure.",
+     "ok": null
+    }
+   ],
+   "evidence_sufficient": null,
+   "note": "ok/evidence_sufficient are left null on purpose. They are the auditor's fields; pre-filling them would make this an answer sheet."
+  },
+  {
+   "claim_id": "NM-C10",
+   "checked_artifacts": [
+    "m55_second_transformer.json",
+    "m58_pk_member.json"
+   ],
+   "artifact_checksums": [
+    {
+     "artifact": "m55_second_transformer.json",
+     "exists": true,
+     "sha256": "e1496de1f979b4ada05bdf0c40beea364255d652386aaba88649c31e33769aaf",
+     "bytes": 6893,
+     "tracked_by_git": true
+    },
+    {
+     "artifact": "m58_pk_member.json",
+     "exists": true,
+     "sha256": "1fc2112626dfb788c66a16f97f409f808a5c57e2efc907fab88c00d77c614865",
+     "bytes": 5430,
+     "tracked_by_git": true
+    }
+   ],
+   "source_quote": "Three families produce the pairing probabilities this paper scores, and the boundary between the first two is where its result falls. Thermodynamic models minimise or sum a free energy over a nearest-neighbour decomposition of the structure zuker1981optimal,mccaskill1990equilibrium, hofacker1994fast,lorenz2011vienna, with parameters measured by optical melting on short duplexes, coaxial stacks and helix ends freier1986improved,walter1994coaxial,serra1995predicting, xia1998thermodynamic,mathews1999expanded,turner2010nndb. Learned-parameter models keep that decomposition, or a close relative, and fit its weights discriminatively to structural data instead do2006contrafold,andronescu2007efficient,waymentsteele2022rna; the statistical basis for doing so on probing data is developed separately waymentsteele2021theoretical. Neural models drop the decomposition and predict pairing from sequence with a learned architecture and no explicit energy singh2019spotrna,sato2021rna,fu2022ufold, ribonanzanet2024. A fourth axis cuts across",
+   "items": [
+    {
+     "item": "the printed value reaches LaTeX through a generated macro",
+     "how": "every number in source_quote appears in figs/*_numbers.tex; make_check.py fails the build on a hand-typed measurement. Run it and see whether it actually refuses one.",
+     "ok": null
+    },
+    {
+     "item": "the backing artifact exists, is tracked, and matches its checksum here",
+     "how": "artifact_checksums above; recompute sha256 on the repository copy",
+     "ok": null
+    },
+    {
+     "item": "the artifact was produced by code committed AFTER its frozen declaration",
+     "how": "git log --diff-filter=A on the declaration and on the script",
+     "ok": null
+    },
+    {
+     "item": "the substrate is obtainable independently",
+     "how": "artifacts.json:input_data carries the release channel and sha256 of the two public CSVs. A different release is a reportable fact, not a failure.",
+     "ok": null
+    }
+   ],
+   "evidence_sufficient": null,
+   "note": "ok/evidence_sufficient are left null on purpose. They are the auditor's fields; pre-filling them would make this an answer sheet."
+  },
+  {
+   "claim_id": "NM-C11",
+   "checked_artifacts": [
+    "m56_bca.json"
+   ],
+   "artifact_checksums": [
+    {
+     "artifact": "m56_bca.json",
+     "exists": true,
+     "sha256": "22a043cb2815be4b40d28426af953975689a3c1622846049d9882261c4ce29ee",
+     "bytes": 4463,
+     "tracked_by_git": true
+    }
+   ],
+   "source_quote": "Two devices carry every interval and every $p$-value below. How much of the corpus each cluster and each stratum holds is counted in Appendix [app:strata], because an interval over 20 clusters is only as honest as the balance of what it resamples. Permutation, inside the stratification. The null is that the pair type carries no information about the outcome once placement is held. It is tested by permuting the treatment labels within each stratum and recomputing eq:est, which by construction leaves the stratification, the weights and the covariate distribution untouched fisher1935design,ernst2004permutation,good2005permutation. Permuting the outcome instead, or permuting labels across strata, rebuilds the matched sets the estimator is defined on and makes the null distribution too narrow. A gate of $0.005$ rather than $0.05$ is used throughout benjamin2018redefine, stated in each declaration before the run rather than chosen afterwards, and nothing here treats a threshold as a substitute for an interval {gelman2014s",
+   "items": [
+    {
+     "item": "the printed value reaches LaTeX through a generated macro",
+     "how": "every number in source_quote appears in figs/*_numbers.tex; make_check.py fails the build on a hand-typed measurement. Run it and see whether it actually refuses one.",
+     "ok": null
+    },
+    {
+     "item": "the backing artifact exists, is tracked, and matches its checksum here",
+     "how": "artifact_checksums above; recompute sha256 on the repository copy",
+     "ok": null
+    },
+    {
+     "item": "the artifact was produced by code committed AFTER its frozen declaration",
+     "how": "git log --diff-filter=A on the declaration and on the script",
+     "ok": null
+    },
+    {
+     "item": "the substrate is obtainable independently",
+     "how": "artifacts.json:input_data carries the release channel and sha256 of the two public CSVs. A different release is a reportable fact, not a failure.",
+     "ok": null
+    }
+   ],
+   "evidence_sufficient": null,
+   "note": "ok/evidence_sufficient are left null on purpose. They are the auditor's fields; pre-filling them would make this an answer sheet."
+  },
+  {
+   "claim_id": "NM-C12",
+   "checked_artifacts": [
+    "m52_sensitivity.json"
+   ],
+   "artifact_checksums": [
+    {
+     "artifact": "m52_sensitivity.json",
+     "exists": true,
+     "sha256": "9ecc2854ef2605433fcdebd0c91206ffbb6217408a650055f6eeea527bc3ede9",
+     "bytes": 8509,
+     "tracked_by_git": true
+    }
+   ],
+   "source_quote": "Conditional on the design cell, helix depth and crossing, the pair type is as good as randomly assigned with respect to the outcome. assumption Assumption [ass:placement] cannot be tested from this data, and the conventional response -- asking how strong an unmeasured confounder would have to be to overturn the estimate rosenbaum1987sensitivity,rosenbaum2010design -- bounds rather than removes the concern, and we report that bound below. It is needed because the molecules were not randomised: design programs choose both what a pair is and where it goes, and the two choices are correlated. A controlled-truth benchmark quantifies the price of ignoring it. On synthetic data matched to this corpus's own depth response $beta = +0.06759$ and pair-type depth gap $g = -0.3487$, an estimator that ignores placement is biased by $beta g = -0.0236$, with measured bias across cases running -0.0239 to -0.0206. Regression adjustment and matching both remove it (worst-case absolute bias 0.0021 and 0.0021), so the require",
+   "items": [
+    {
+     "item": "the printed value reaches LaTeX through a generated macro",
+     "how": "every number in source_quote appears in figs/*_numbers.tex; make_check.py fails the build on a hand-typed measurement. Run it and see whether it actually refuses one.",
+     "ok": null
+    },
+    {
+     "item": "the backing artifact exists, is tracked, and matches its checksum here",
+     "how": "artifact_checksums above; recompute sha256 on the repository copy",
+     "ok": null
+    },
+    {
+     "item": "the artifact was produced by code committed AFTER its frozen declaration",
+     "how": "git log --diff-filter=A on the declaration and on the script",
+     "ok": null
+    },
+    {
+     "item": "the substrate is obtainable independently",
+     "how": "artifacts.json:input_data carries the release channel and sha256 of the two public CSVs. A different release is a reportable fact, not a failure.",
+     "ok": null
+    }
+   ],
+   "evidence_sufficient": null,
+   "note": "ok/evidence_sufficient are left null on purpose. They are the auditor's fields; pre-filling them would make this an answer sheet."
+  }
+ ]
+}
