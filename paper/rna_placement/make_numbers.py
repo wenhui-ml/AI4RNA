@@ -560,6 +560,9 @@ m61b_neural = ("MPNN-fixbb", "MPNN-RFdiff", "gRNAde", "gRNAde-no3d",
 m61 = J("m61_readout_and_consequence.json")
 m61b = J("m61b_readout_and_consequence.json")
 
+_r3 = [r for r in m24["rounds"] if r["round"] == "3"][0]
+put("ncRoundMeth", f"{_r3['methods']}")
+
 _cen = m61b["census"]
 put("ncRaw", f"{_cen['records']}")
 put("ncNonCanon", f"{_cen['non_canonical']}")
@@ -621,6 +624,24 @@ put("rlDropRet", f"{100*_b2['retention']:.0f}\\%")
 put("stA3Ret", f"{100*m61['A3_conditioned']['retention']:.0f}\\%")
 put("stSplitCorr", f"{m61['B3_splithalf']['corr']:+.2f}")
 put("stDepthTight", f"{m61['D']['D1_depth']['tight_pct']:.0f}\\%")
+m61c = J("m61c_error_by_type.json")
+_ebt = m61c["sd_by_pair_type"]
+put("rlSdCg", f"{_ebt['CG']['median']:.4f}")
+put("rlSdAu", f"{_ebt['AU']['median']:.4f}")
+put("rlSdRatio", f"{m61c['median_ratio_CG_over_AU']:.3f}")
+put("rlSdContrast", f"{m61c['contrast_in_measurement_sd']['effect']:+.4f}".replace("-", "\\ensuremath{-}"))
+put("rlSdContrastCi", "[$%+.4f$, $%+.4f$]" % tuple(m61c["contrast_in_measurement_sd"]["ci"]))
+put("rlSdContrastP", f"{m61c['contrast_in_measurement_sd']['p']:.4f}")
+put("rlLowN", f"{m61c['low_error_half']['n']}")
+put("rlLowEff", f"{m61c['low_error_half']['effect']:+.4f}".replace("-", "\\ensuremath{-}"))
+put("rlLowRet", f"{100*m61c['low_error_half']['retention']:.0f}\\%")
+put("rlLowP", f"{m61c['low_error_half']['p']:.4f}")
+
+# --- the depth channel's conditional mean, level by level, so the linearity is visible
+_p3h = m61b["A7_prop3_identity"]
+put("p3H", ",\\;".join(f"{x:+.4f}".replace("-", "\\ensuremath{-}") for x in _p3h["h"]))
+put("p3Levels", ", ".join(f"{int(x)}" for x in _p3h["levels"]))
+
 _b3 = m61b["B3_repaired"]
 put("rlSplits", f"{_b3['n_splits']}")
 put("rlHalfSd", f"{_b3['half_sd']:.4f}")

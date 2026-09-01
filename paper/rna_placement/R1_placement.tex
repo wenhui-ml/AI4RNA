@@ -576,9 +576,12 @@ and we state that plainly because an earlier draft of this paper said it was. Of
 learned function of structure and never touch a stacking table.
 \S\ref{sec:energy} therefore tests a thermodynamic explanation, not a designer's loss, and
 \S\ref{sec:subsets} runs it separately on the two halves.
-It is \emph{local}: coaxial stacking, dangling ends and tertiary contacts are outside it, which
-bounds the conclusion to the local term and not to thermodynamics
-\citep{walter1994coaxial,serra1995predicting}. And it is \emph{undefined at a non-canonical
+It is \emph{local} in two senses that both bound the conclusion. Coaxial stacking, dangling ends
+and tertiary contacts are outside it, so the conclusion is about the local term and not about
+thermodynamics \citep{walter1994coaxial,serra1995predicting}. And it is a \emph{per-pair marginal},
+whereas a folding program's objective is a global minimum free energy or ensemble quantity over the
+whole molecule, so conditioning on the marginal is not conditioning on that objective even for a
+program that computes one. And it is \emph{undefined at a non-canonical
 partner} (the parameter tables have no entry, and the library returns a finite but meaningless
 value there) so the indicators above require canonicity on both sides and a non-canonical
 neighbour is treated as a helix end, which is also what the model does with it
@@ -879,7 +882,10 @@ signal-to-noise filter and name a pair that is in the target structure; \jdg{nPa
 have a canonical pair at that position, $\jdg{nCG}$ G--C, $\jdg{nAU}$ A--U and $\jdg{nGU}$ G--U,
 and the remaining \jdg{ncNonCanon} name a non-canonical partner and are not a pair type; and
 \jdg{ncCGAU} is the G--C-against-A--U subset, which is what the two-arm analyses of
-\S\ref{sec:carry} and \S\ref{sec:crossdomain} are computed on. Ensemble quantities used only as
+\S\ref{sec:carry} and \S\ref{sec:crossdomain} are computed on. One further count differs across
+arms and the difference is not an error: the design-score side of this round carries \jdg{ncRoundMeth} methods
+(Table~\ref{tab:rounds}) and the compensatory arm carries \jdg{gNMethods} of them, because one
+method that submitted designs has no compensatory records in the release. Ensemble quantities used only as
 balancing covariates in \S\ref{sec:score} are computed with ViennaRNA \citep{lorenz2011vienna},
 which is also the source of the per-pair nearest-neighbour energies of Definition~\ref{def:dg};
 those enter as a \emph{mediator} in \S\ref{sec:energy}, never as an outcome.
@@ -981,7 +987,8 @@ every estimator in this paper is computed after centring within $(\text{target},
 the first two layers are removed by construction rather than adjusted for.
 
 \textbf{How much of the within-cell variance is reproducible at all.} The release contains
-$\jdg{ceilGroups}$ groups of repeated measurements covering $\jdg{ceilRows}$ rows. \emph{This
+$\jdg{ceilGroups}$ groups of repeated measurements covering $\jdg{ceilRows}$ rows, which is where
+the $\jdg{ceilDf}$ degrees of freedom below come from: one is lost to each group's own mean. \emph{This
 is the one interval in the paper that resamples something other than targets}: its unit of
 replication is the repeated measurement group, as \S\ref{sec:preregprotocol} notes. Pooling within
 groups gives a measurement SD of $\jdg{ceilSigB}$, $\jdg{ceilSigBCi}$ on $\jdg{ceilDf}$ degrees
@@ -991,7 +998,7 @@ of freedom, so against a within-cell SD of $\jdg{ceilWithinSd}$ the reproducible
 \label{eq:ceiling}
 \end{equation}
 
-\noindent The pooled-variance route is the right one for \eqref{eq:ceiling}, which is a ratio of \emph{second} moments: the paired differences are heavy-tailed (mean-to-median $\jdg{ceilHeavyTail}$ against $\jdg{ceilNormalTail}$ under normality), so a median route on the same $\jdg{ceilPairs}$ groups reports $\jdg{ceilSigA}$
+\noindent The pooled-variance route is the right one for \eqref{eq:ceiling}, which is a ratio of \emph{second} moments: the paired differences are heavy-tailed (mean-to-median $\jdg{ceilHeavyTail}$ against $\jdg{ceilNormalTail}$ under normality), so a median route on the $\jdg{ceilPairs}$ of those groups that are exact duplicate pairs reports $\jdg{ceilSigA}$
 ($\jdg{ceilSigACi}$) where the RMS is $\jdg{ceilRms454}$. That choice is worth stating with its
 consequence rather than only its justification: carried through \eqref{eq:ceiling}, the median
 route would report a reproducible fraction of $\jdg{ceilA}$ $\jdg{ceilACi}$ against the
@@ -1023,6 +1030,14 @@ return a positive contrast \jdg{rlBothPos} of the time, with a half-sample SD of
 We report the both-positive rate rather than a split-half correlation because complementary halves
 of a fixed pooled contrast are anti-correlated by arithmetic and the correlation would measure that
 rather than the outcome.
+
+Finally, unequal precision between the arms. The median measurement SD is $\jdg{rlSdCg}$ for G--C
+records and $\jdg{rlSdAu}$ for A--U ones, a ratio of \jdg{rlSdRatio}, and the same matched contrast
+run with that SD as its \emph{outcome} gives $\jdg{rlSdContrast}$ (\jdg{rlSdContrastCi},
+$p=\jdg{rlSdContrastP}$), which does not resolve from zero. Restricted to the more precisely
+measured half of the records (\jdg{rlLowN}), the identity contrast is $\jdg{rlLowEff}$,
+\jdg{rlLowRet} of its value ($p=\jdg{rlLowP}$). Outcome noise does not bias a difference of means
+in any case; what these say is that it is also not concentrated on one arm.
 
 \subsection{Pair identity decides whether the pair forms}
 \label{sec:pairtype}
@@ -1859,7 +1874,9 @@ attenuation, and that difference is a measurement of how far \eqref{eq:nointerac
 on this channel.} It holds tightly on $\Delta G_{\mathrm{loc}}$ (\S\ref{sec:routes}, ratio
 \jdg{a7Ratio}) and only loosely on depth, so the decomposition of \eqref{eq:med} is an
 approximation on the depth channel and $\jdg{medFrac}$ inherits that. We report the gap rather
-than the fraction alone for that reason.
+than the fraction alone for that reason. The shape is visible in $h$ itself: across depth levels
+\jdg{p3Levels} the within-cell conditional mean of rescue is \jdg{p3H}, which rises steeply and
+then flattens, so a straight line through it under-reads the first step and over-reads the last.
 
 The residual has a
 visible sign: every method in Fig.~\ref{fig:mediation} lies below the diagonal, so the attenuation
