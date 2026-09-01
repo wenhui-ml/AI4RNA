@@ -496,6 +496,24 @@ depended on the orientation. Clause (ii) is what makes it two nucleotides rather
 number, since constructs in these libraries carry adapters, padding and barcodes outside the design
 window and can differ at a dozen positions there.
 
+\paragraph{How often clause (iii) is telling the truth.} A declared target is an intention, and
+clause (iii) admits an intervention on the strength of it. That makes the fraction of declared
+pairs the molecule actually forms a ceiling on the criterion's validity, and it is measurable
+without leaving this corpus: the probing-derived reference of \S\ref{app:probing} --- built
+from the deposit's own reactivities by a program none of the scored implementations is
+\citep{deigan2009accurate} --- confirms \jdg{vaHit} of the \jdg{vaAll} declared pairs lying inside
+the design windows, \jdg{vaPooled} pooled and \jdg{vaMean} averaged over designs
+(\jdg{vaMeanCi}), with a median of \jdg{vaMed} and \jdg{vaNone} of \jdg{vaNdes} designs at zero.
+\textbf{Roughly a fifth of what these design programs declared is not what the molecule did}, and
+every agreement number scored against a declared target in this literature inherits that.
+The pairs this paper intervenes on are confirmed slightly more often than the declared pairs at
+large, \jdg{vaIntv}, so the interventions are not sitting on the corpus's least reliable pairs
+--- which is a fact about where experimenters put mutations and is priced as such in
+\S\ref{sec:ledger}. A different figure, \jdg{vaReleased}, is obtainable from the structure column
+the deposit ships; we do not use it, because \S\ref{app:probing} shows that column is
+malformed on \jdg{relUnbal} of \jdg{relN} of its rows, and a fraction computed against it is a
+fraction against a defect.
+
 Everything else is refused under a named reason and counted. A mutant admitting more than one wild
 type, or whose two changed positions are explained by more than one declared pair, is excluded as
 \emph{ambiguous} rather than resolved by a rule --- resolving it would let the corpus choose which
@@ -1502,6 +1520,18 @@ identity axis reversed: the puzzle-clustered interval covers zero, and cells sha
 not independent, so a sign test over them overstates its own evidence. The pattern is reported
 once, with its interval, and no conclusion rests on it.
 
+\paragraph{What would have to be true for this to be confounding.} The claim above is an
+identified contrast only under Assumption~\ref{ass:placement}, and \S\ref{sec:estimation} prices
+the violation in closed form rather than assuming it away: an omitted covariate large enough to
+explain this contrast would have to be \jdg{senK} times as strong as the placement bias the
+estimator already conditions on, and the interval on that multiplier is \jdg{senKCi}.
+\textbf{It reaches below one.} At the point estimate a confounder no stronger than placement is
+excluded; at the bottom of the interval it is not, and we say so here rather than only in the
+preregistration record. No covariate we did measure comes close --- the largest single one moves
+the estimate by \jdg{senMaxOne} and the worst linear combination of all \jdg{senNcov} by
+\jdg{senMaxAll} --- but that is evidence about the covariates we have, not about the one we do
+not.
+
 \paragraph{An upper bound on what could run through each model.}\label{sec:bound} Multiplying each
 predictor's matched contrast by its within-stratum slope on the outcome (\jdg{gmVienna} and
 \jdg{gmNeural}) and dividing by the measured contrast bounds the share of the identity effect that
@@ -1716,9 +1746,27 @@ wherever a target is declared, and undefined where one is not --- matches a tran
 roughly two million chemical-mapping profiles (\jdg{rkRhoD} against \jdg{rkRhoN}, difference \jdg{rkDiffNCi}). Holding
 it fixed, both predictors retain a real but modest ordering ability (\jdg{rkPartN} and
 \jdg{rkPartV}, both $p\jdg{rkPartNP}$), worth \jdg{rkGainN} points of recovery when used to
-break the baseline's ties. \textbf{Any claim that a structure predictor knows which mutations
+break the baseline's ties. The advantage has a measured domain: it is \jdg{vaDepConf} on the
+\jdg{vaNconf} interventions whose pair the probing data confirms and \jdg{vaDepUnc} on the
+\jdg{vaNunc} it does not, where no interval separates any predictor from it.
+\textbf{Any claim that a structure predictor knows which mutations
 rescue must be stated as an increment over helix depth}, and to our knowledge none has been.
 \end{claimbox}
+
+\paragraph{Where the free integer wins, and where nothing is resolved.} Helix depth is read off
+the declared target, and the paragraph above says the declared target is right about
+\jdg{vaPooled} of the time. Splitting the comparison on that --- the probing-derived reference
+either confirms the intervened pair or it does not --- is the sharpest test this baseline has
+faced, and it separates the result rather than repeating it. Where the pair is confirmed
+(\jdg{vaNconf} interventions over \jdg{vaCellsConf} design cells) free depth reaches
+\jdg{vaDepConf}, beats ViennaRNA and EternaFold by intervals excluding zero
+(\jdg{vaDVCCi} and \jdg{vaDECCi}) and ties the transformer as it does overall
+(\jdg{vaDNC}, \jdg{vaDNCCi}). Where it is not (\jdg{vaNunc} interventions, \jdg{vaCellsUnc}
+cells) depth falls to \jdg{vaDepUnc}, a drop of \jdg{vaDepGap}, and \textbf{nothing is resolved
+there at all}: all \jdg{vaNresUnc} of the three intervals cover zero, and the transformer's point
+estimate is the larger one. We report that as a domain and not as a defeat. The free integer is
+not a general-purpose ranker of rescue; it is a good one exactly where the design program's
+declared structure is the structure the molecule made, and the corpus says how often that is.
 
 \paragraph{A fourth predictor loses to it as well.} The second transformer of
 \S\ref{sec:result} was scored on this comparison too, and it does not change the picture:
@@ -2259,6 +2307,22 @@ a claim made here; each is the next experiment for a claim we have deliberately 
 
 The limits below are stated with numbers wherever a number exists, and each is placed beside the
 claim it bounds rather than collected as a closing disclaimer.
+
+\paragraph{The free integer has two edges we cannot see past.} Helix depth is defined only where
+a design program declared a target, so the baseline that beats these predictors is
+\emph{undefined} on natural RNA --- the deposits surveyed in Appendix~\ref{app:survey} declare no
+target structure, and no amount of further analysis of this corpus will change that. Claim
+\ref{claim:depth} is therefore a statement about corpora written by design programs, which is the
+population this instrument reads on at all, and not about RNA structure prediction in general.
+The second edge is sharper because we did test it and it did not resolve: if depth wins only by
+encoding whether the declared pair is real, it is a much more mechanical result, and the
+confirmation indicator scored as its own ranker reaches \jdg{vaConfLvl} against depth's
+\jdg{rkRhoD} --- a difference of \jdg{vaDepVsConf} whose interval, \jdg{vaDepVsConfCi}, covers
+zero. \textbf{We cannot separate helix depth from ``the declared pair is really there'' on this
+corpus}, and a reader who prefers the mechanical reading is not contradicted by anything we
+measured. What the split in \S\ref{sec:ranking} does establish is the direction: depth's advantage
+lives in the confirmed stratum, which is what both readings predict, and neither is favoured by
+it.
 
 \paragraph{\jdg{reNimpl} predictors are not a field.} Contemporaneous benchmarks score tens of
 predictors \citep{rnagym2025,chanrg2026,nabench2025}; this paper scores \jdg{reNimpl}, chosen to

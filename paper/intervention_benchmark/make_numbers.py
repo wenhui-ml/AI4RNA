@@ -1068,6 +1068,7 @@ assert all(v for k, v in _m54["V"].items() if isinstance(v, bool)), (
     "M54 verification did not pass")
 _df = _m53["defect_in_the_released_column"]
 put("relBal", f"{_df['balanced']}"); put("relUnbal", f"{_df['unbalanced']}")
+put("relN", f"{_df['balanced'] + _df['unbalanced']}")
 put("relReproBal", f"{_df['reproduce_M2_F1_among_balanced']}")
 put("relReproUnbal", f"{_df['reproduce_M2_F1_among_unbalanced']}")
 _sel = _df["selection_if_the_balanced_subset_were_used"]
@@ -1556,6 +1557,57 @@ _mm = _re.search(r"between ([\d.]+) and ([\d.]+)", _d47["staked"]["4"])
 put("eqStakeLo", _mm.group(1)); put("eqStakeHi", _mm.group(2))
 _m2 = _re.search(r"below ([\d.]+)", _d47["staked"]["2"])
 put("eqStakeSelf", _m2.group(1))
+
+
+# ---------------------------------------------------------------- M57: clause (iii), and Claim 3's domain
+_m57 = J("m57_criterion_validity.json")
+assert _m57["V"]["V2_reproduces_m54"] and _m57["V"]["V3_reverse_control"], \
+    "M57 does not reproduce M54's confirmation rate or the published level arms"
+assert _m57["V"]["V4_partition"], "M57's two strata are not a partition of the interventions"
+_c3 = _m57["A1_clause_iii"]
+put("vaPooled", sig(_c3["pooled_over_declared_pairs"], 3))
+put("vaHit", f"{_c3['n_confirmed']:,}".replace(",", "{,}"))
+put("vaAll", f"{_c3['n_declared_pairs']:,}".replace(",", "{,}"))
+put("vaMean", sig(_c3["per_design_mean"], 3))
+put("vaMeanCi", ci(_c3["per_design_mean_ci"], 3))
+put("vaMed", sig(_c3["per_design_median"], 3))
+put("vaNone", f"{_c3['n_designs_with_none_confirmed']}")
+put("vaNdes", f"{_c3['n_designs']}")
+put("vaIntv", sig(_c3["over_intervened_pairs_only"], 4))
+put("vaReleased", sig(_c3["released_column_figure_do_not_use"]["value"], 3))
+# The 0.623 a reviewer quoted is measured against the column M53 voided. Both are printed, and
+# this assertion is what keeps the manuscript from ever quoting the released one as the answer.
+assert _c3["pooled_over_declared_pairs"] > _c3["released_column_figure_do_not_use"]["value"], \
+    "the built reference no longer confirms more than the released column did; the sentence in " \
+    "Section 3.2 that contrasts them is stale"
+_s3 = _m57["A2_claim3_stratified"]
+put("vaNconf", f"{_s3['n_interventions_confirmed']:,}".replace(",", "{,}"))
+put("vaNunc", f"{_s3['n_interventions_unconfirmed']:,}".replace(",", "{,}"))
+put("vaCellsConf", f"{_s3['n_cells_confirmed']}")
+put("vaCellsUnc", f"{_s3['n_cells_unconfirmed']}")
+put("vaDepConf", sig(_s3["strata"]["confirmed"]["depth"], 4))
+put("vaDepUnc", sig(_s3["strata"]["unconfirmed"]["depth"], 4))
+put("vaDepGap", sig(_s3["depth_confirmed_minus_unconfirmed"], 4))
+for _nm, _tag in (("RibonanzaNet", "N"), ("ViennaRNA", "V"), ("EternaFold", "E")):
+    for _st, _sf in (("confirmed", "C"), ("unconfirmed", "U")):
+        _r = _s3["strata"][_st]["predictors"][_nm]
+        put(f"vaD{_tag}{_sf}", sig(_r["depth_minus"], 4))
+        put(f"vaD{_tag}{_sf}Ci", ci(_r["ci95"], 4))
+put("vaNresConf", f"{sum(1 for v in _s3['strata']['confirmed']['predictors'].values() if not v['ci_contains_zero'])}")
+put("vaNresUnc", f"{sum(1 for v in _s3['strata']['unconfirmed']['predictors'].values() if not v['ci_contains_zero'])}")
+# S3 failed as declared: the unconfirmed stratum resolves nothing. If a later run ever makes one
+# of those intervals exclude zero, the sentence that says nothing is resolved there must change.
+assert all(v["ci_contains_zero"] for v in _s3["strata"]["unconfirmed"]["predictors"].values()), \
+    "an interval in the unconfirmed stratum now excludes zero; Section 5.6's domain sentence is stale"
+_a3 = _m57["A3_depth_vs_confirmation"]
+put("vaConfLvl", sig(_a3["confirmation_level"], 4))
+put("vaDepVsConf", sig(_a3["difference"], 4))
+put("vaDepVsConfCi", ci(_a3["ci95"], 4))
+# S4 was staked on a point estimate, which was too weak a test. The interval covers zero, so the
+# manuscript must not say depth is more than the confirmation indicator.
+assert _a3["ci_contains_zero"], \
+    "depth now separates from the confirmation indicator; the Limitations sentence that says it " \
+    "does not is stale and the erratum in the preregistration record must be revisited"
 
 # ================================================================ write
 out = [
