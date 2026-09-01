@@ -275,6 +275,62 @@ written into a library on purpose. All of it is packaged as \texttt{designaudit}
 reproduces this paper's headline numbers from the public data.
 \end{enumerate}
 
+\paragraph{What carries what.} This paper reports many numbers and four claims, and the two lists
+are not the same length. Table~\ref{tab:guide} is the map: each claim, the small set of quantities
+that actually carries it, and where the argument for it is made. Everything not in the first
+column of that table is context, control or bound. The second half of the table is the list of
+quantities this work has \emph{withdrawn} --- three of them from earlier versions of this paper ---
+and the entry to read there is the last column, which is empty in every row on purpose: no claim
+here rests on any of them.
+
+\begin{table}[!htbp]
+\centering
+\small
+\caption{\textbf{Which numbers carry which claim, and which numbers carry nothing.} Intervals are
+puzzle-clustered throughout. The withdrawn quantities are kept in the manuscript because deleting a
+retraction is not the same as making one.}
+\label{tab:guide}
+\begin{tabular}{@{}p{0.30\textwidth}p{0.44\textwidth}l@{}}
+\toprule
+\textbf{Claim} & \textbf{Carried by} & \textbf{Argued in} \\
+\midrule
+\ref{claim:readout}: the agreement readout is near saturation and admits a choice; the
+interventional one does not
+& \jdg{cvIntvSd}\,SD against \jdg{cvConvSd}\,SD on the same molecules (\jdg{cvPairedSdCi}); the
+agreement answer moves \jdg{cvSwing}$\times$ with a defensible change of admitted pairs
+& \S\ref{sec:conventional} \\[4pt]
+\ref{claim:identity}: one model's output distinguishes pair identity in matched contexts, and the
+others do not
+& \jdg{resNeural} (\jdg{resNeuralCi}) tracking the measurement's \jdg{resOut} (\jdg{resOutCi}), or
+\jdg{stdMN}\,SD (\jdg{stdMNCi}) in each column's own units; the architecture axis \jdg{axArch}
+(\jdg{axArchCi}), which a second transformer does not reproduce (\jdg{fmContrastCi})
+& \S\ref{sec:result} \\[4pt]
+\ref{claim:depth}: a free integer read off the declared target matches a transformer trained on
+two million profiles
+& \jdg{rkRhoD} against \jdg{rkRhoN} (difference \jdg{rkDiffNCi}); its domain, \jdg{vaDepConf}
+where the probing data confirms the pair and \jdg{vaDepUnc} where it does not
+& \S\ref{sec:ranking} \\[4pt]
+\ref{claim:budget}: no implementation outperforms that integer once the margin is spent as
+experiments
+& \jdg{eqNeq} of \jdg{eqNcomp} comparisons equivalent to it and \jdg{eqNfail} worse; the panel's
+largest agreement margin \jdg{dcTransF1} converting to \jdg{dcTransPct} of rescuing interventions;
+the sign inverting at the tightest budget (\jdg{tvGapTen}, \jdg{tvGapCiTen})
+& \S\ref{sec:reorder} \\
+\midrule
+\textbf{Withdrawn quantity} & \textbf{What it was read as} & \textbf{Now carries} \\
+\midrule
+Retention shares of the identity contrast after conditioning on a predictor
+& that the model explains almost none of the effect & --- \\[3pt]
+The measurement against the transformer, \jdg{pdMN}
+& a licence to call the two indistinguishable, across columns with no common scale & --- \\[3pt]
+Raw transfer slopes across probe chemistries (\jdg{xnSlopeVDms} against \jdg{xnSlopeVTwoA})
+& that the scoring step transfers on one chemistry and not the other & --- \\[3pt]
+``The split follows the decomposition and not the training data''
+& a dichotomy between model families & --- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 % =====================================================================
 % =====================================================================
 
@@ -1028,6 +1084,19 @@ correlating with one another only \jdg{panCorrLo} to \jdg{panCorrHi} --- tests w
 rather than model class drive the reading \citep{andronescu2007efficient,mathews1999expanded}. And
 the dynamic-range column above is reported before any contrast: a predictor pinned to its ceiling
 cannot express one, and its null would say more about its range than about the molecule.
+
+\paragraph{A member that can represent what this corpus is made of.} The four implementations
+above are pseudoknot-blind in their released configurations, and this corpus is an OpenKnot round.
+That is a gap between the panel and the material, and until it is closed every panel-level sentence
+in this paper is a statement about pseudoknot-blind predictors applied to pseudoknotted molecules.
+A fifth implementation closes it: \texttt{ShapeKnots} \citep{hajdin2013accurate}, run on sequence
+alone. It is deliberately \emph{not} an independent fifth opinion --- it is the same
+\texttt{RNAstructure} energy model already in the panel with the pseudoknot search switched on ---
+and that is what makes it the right control, because it moves the one capability in question and
+holds the thermodynamics fixed. Appendix~\ref{app:probing} uses the same program with the
+deposit's reactivities as restraints to build a reference; the member scored here is given no
+probing data at all, since a scored predictor that sees the outcome's own experiment is not a
+predictor.
 
 \subsection{Preregistration protocol}
 \label{sec:protocol}
@@ -1785,6 +1854,28 @@ break the baseline's ties. The advantage has a measured domain: it is \jdg{vaDep
 rescue must be stated as an increment over helix depth}, and to our knowledge none has been.
 \end{claimbox}
 
+\paragraph{Pseudoknot capability buys agreement here and buys nothing on response.} The fifth
+implementation is the one member of the panel built for what this corpus contains, and the two
+readouts disagree about it more sharply than about anything else in this paper. On agreement it is
+strong: \jdg{pkBuilt} against the probing-built reference, placing it \jdg{pkRank} of
+\jdg{pkNimpl} and ahead of every thermodynamic member, and \jdg{pkDecl} against the declared
+target. It does not displace the incumbent (\jdg{pkLeadBuilt}), which was staked before the run.
+On response it is last: a level arm of \jdg{pkLevel} against free depth's \jdg{rkRhoD}, a
+difference of \jdg{pkVsDepth} (\jdg{pkVsDepthCi}) excluding zero; a matched identity contrast of
+\jdg{pkContrast} (\jdg{pkContrastCi}) covering zero as both other thermodynamic members' do; and
+a loss to free depth at all \jdg{pkNbud} budgets, \jdg{pkRecPk} against \jdg{pkRecDepth} at the
+tightest.
+
+\textbf{One pair inverts across the two readouts.} Against EternaFold, \texttt{ShapeKnots} is
+better on agreement by \jdg{pkVsEtfAgree} on the built reference and \jdg{pkVsEtfDecl} on the
+declared target, and worse on the level arm, \jdg{pkLevel} against \jdg{efRho}. A benchmark
+scored on agreement and a benchmark scored on response would order these two implementations
+oppositely. We report the inversion without an interval and make no claim on it: the pair was
+chosen after seeing the point estimates, which is exactly the shape of the withdrawal in
+\S\ref{sec:withdrawal}, and the preregistered stakes for this member were the four above. It is
+recorded because it is the sharpest instance of this paper's thesis that the paper did not go
+looking for.
+
 \paragraph{Where the free integer wins, and where nothing is resolved.} Helix depth is read off
 the declared target, and the paragraph above says the declared target is right about
 \jdg{vaPooled} of the time. Splitting the comparison on that --- the probing-derived reference
@@ -2249,7 +2340,9 @@ crossing pair the large budget favours whichever model ranks higher on structure
 \end{figure}
 
 \begin{claimbox}
-\claimhead{claim:budget} Across \jdg{reNimpl} independent implementations and three budgets, no
+\claimhead{claim:budget} Across \jdg{reNimpl} independent implementations and three budgets ---
+and a fifth, the only pseudoknot-capable one, added because this corpus is a pseudoknot round and
+losing at every budget (\jdg{pkRecPk} against \jdg{pkRecDepth} at the tightest) --- no
 model outperforms a free integer as a standalone ranker of which interventions to build: none of
 \jdg{eqNcomp} intervals excludes zero, and against a margin fixed as the gain one extra construct
 buys ($\delta=\jdg{eqDelta}$), \jdg{eqNeq} are equivalent to free depth while the remaining
@@ -3066,6 +3159,55 @@ Helix depth read off that reference still exceeds every predictor's level arm
   one the four scores reproduce to $0$. Verified before any reference was swapped: the shipped
   column reproduces to $4\times10^{-16}$, removing the restraints changes \jdg{prRestraintN} of
   \jdg{nWildTypes} structures, and this file's estimator equals the original's exactly.}}\\
+\midrule
+\multicolumn{2}{@{}l@{}}{\emph{frozen before the criterion's own validity was measured (\S\ref{sec:mining}, \S\ref{sec:ranking})}}\\
+A probing-derived reference confirms at least half the pairs the design programs declared
+  \quad(\jdg{vaPooled}, \jdg{vaHit} of \jdg{vaAll}) & correct \\
+Free depth beats every predictor's level arm where that reference confirms the intervened pair
+  \quad(\jdg{vaNconf} interventions; closest \jdg{vaDNC}, \jdg{vaDNCCi}) & correct \\
+\textbf{And where it does not} --- \emph{it does not: on \jdg{vaNunc} interventions depth falls
+  to \jdg{vaDepUnc} from \jdg{vaDepConf}, and all \jdg{vaNresUnc} of the three intervals cover
+  zero, the transformer's point estimate being the larger. Claim~\ref{claim:depth} is stated with
+  that domain rather than without it} & \textbf{failed} \\
+Depth's level arm exceeds that of the bare indicator of whether the declared pair is confirmed
+  \quad(\jdg{rkRhoD} against \jdg{vaConfLvl}) & correct \\
+\multicolumn{2}{@{}p{0.95\textwidth}@{}}{\footnotesize\emph{Erratum on the last stake, recorded
+  rather than repaired: it was written on point estimates, and that was too weak a test to have
+  staked. The difference is \jdg{vaDepVsConf} with interval \jdg{vaDepVsConfCi}, which covers
+  zero, so the stake is graded correct as written while the manuscript says in
+  \S\ref{sec:limitations} that the two cannot be separated here. A second erratum: the declaration
+  named a pooling identity --- the two strata recombining to the unstratified level arm --- that
+  does not exist, because each stratum is re-celled under the same minimum-flips rule and their
+  cell sets are therefore not a partition of the unstratified one. The count identity stands in
+  its place and holds at \jdg{nAdmitted} of \jdg{nAdmitted}. Verified before either stratum was
+  read: the confirmation rate reproduces the run that first measured it to $4\times10^{-5}$ and
+  the four published level arms reproduce to better than $5\times10^{-4}$. A figure of
+  \jdg{vaReleased} for the same quantity is obtainable from the structure column the deposit
+  ships and is not used, that column being the one voided above.}}\\
+\midrule
+\multicolumn{2}{@{}l@{}}{\emph{frozen before the panel contained anything that can represent a pseudoknot (\S\ref{sec:models}, \S\ref{sec:conventional})}}\\
+A pseudoknot-capable member does not displace the incumbent on the built reference
+  \quad(\jdg{pkBuilt} against \jdg{pkLeadBuilt}) & correct \\
+It does not beat free depth on the level arm \quad(\jdg{pkVsDepth}, \jdg{pkVsDepthCi}) & correct \\
+Its identity contrast covers zero, as both other thermodynamic members' do
+  \quad(\jdg{pkContrast}, \jdg{pkContrastCi}) & correct \\
+It does not outperform free depth at the tightest budget \quad(\jdg{pkRecPk} against
+  \jdg{pkRecDepth}) & correct \\
+\multicolumn{2}{@{}p{0.95\textwidth}@{}}{\footnotesize\emph{This block exists because a reviewer
+  observed that every implementation scored here is pseudoknot-blind while the corpus is a
+  pseudoknot round, and did not verify it. It was correct: the program in question appeared once
+  in this manuscript, in the appendix where it builds a reference, and never as a scored member.
+  It is not an independent fifth opinion --- it is the panel's own energy model with the
+  pseudoknot search on --- which is why it isolates the capability rather than adding an opinion.
+  It is given no probing data, because a scored predictor that sees the outcome's own experiment
+  is not a predictor. The finding the stakes did not anticipate is reported in
+  \S\ref{sec:conventional} without an interval, the pair having been chosen after the point
+  estimates were seen. Verified before any of its columns were read: its sequence-only structures
+  reproduce the earlier run's control on all \jdg{ccCells} wild types with zero differences, which
+  is what licenses one panel holding both; no structure has a base paired twice or a pair outside
+  the construct; twenty refolds are identical; and on the \jdg{pkNsingle} sequences returning a
+  single structure the ensemble frequency equals the indicator exactly, which is the zero point of
+  the score this member is read on.}}\\
 \midrule
 \multicolumn{2}{@{}l@{}}{\emph{frozen before Assumption~\ref{ass:placement} had a bound (\S\ref{sec:estimation})}}\\
 An unmeasured confounder must exceed, in the $\beta_u g_u$ product, the placement confounder the
