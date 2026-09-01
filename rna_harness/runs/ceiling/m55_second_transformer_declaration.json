@@ -1,0 +1,58 @@
+{
+  "id": "m55_second_transformer",
+  "title": "The architecture axis is one transformer minus one CONTRAfold model. Add a second transformer that shares neither RibonanzaNet's backbone nor its training corpus, and see whether the axis is a class statement or a single model.",
+  "frozen_before_code": true,
+  "cost": "offline after one download, $0 -- no API and no external inference service. RNA-FM weights (Apache-2.0, cuhkaih/rnafm) fetched once to /mnt/beegfs/weights/wenhui/rnafm; inference on local hardware.",
+
+  "why": [
+    "m35 computes architecture_axis = neural minus eterna. That is literally RibonanzaNet minus EternaFold: one transformer against one CONTRAfold-family model. The manuscript describes it as what the decomposition is worth, which is a statement about a class of models, and the data cannot separate it from a statement about RibonanzaNet.",
+    "The panel has four implementations in two families, and the non-nearest-neighbour family has one member. Adding a fifth member of the nearest-neighbour family would not touch this; a second transformer is the one addition that turns the axis from a point into a class.",
+    "The addition is only worth making if it introduces no fitting of ours. RNA-FM ships a secondary-structure head its own authors trained -- SS/RNA-FM-ResNet_{bpRNA,RNAStralign,PDB-All,PDB-TR1}.pth -- so nothing here is trained by us on this corpus.",
+    "It also breaks a confound the current axis carries. RibonanzaNet is pretrained on chemical-probing data of exactly this kind; EternaFold is fitted to chemical mapping too. RNA-FM is pretrained on RNAcentral sequence and its SS head on bpRNA / RNAStralign / PDB. If the axis is architecture rather than probing exposure, RNA-FM should show it."
+  ],
+
+  "the_second_model": {
+    "what": "RNA-FM, a 12-layer BERT-style transformer pretrained on RNAcentral non-coding RNA sequence, with the released pairwise ResNet head that emits an L x L base-pair probability map",
+    "column": "fmut -- the probability RNA-FM assigns to the named pair in the mutant, the exact analogue of nmut (RibonanzaNet), pmut (ViennaRNA) and emut (EternaFold). The estimator is unchanged.",
+    "head_fixed_in_advance": "SS/RNA-FM-ResNet_bpRNA.pth is the primary head, chosen here before any number exists because bpRNA is the largest and most commonly quoted of the four. The other three released heads are run as a declared sensitivity and all four are reported. Choosing a head after seeing the contrasts would be the fitting this paper refuses.",
+    "leakage": "RNAcentral, bpRNA, RNAStralign and PDB all predate the OK7a release, and the designs are de novo Eterna submissions, so the prior on this corpus being in RNA-FM's training data is zero for the same reason the manuscript already gives for RibonanzaNet's weights. This run asserts that from release dates and does not measure it; the manuscript may not claim more."
+  },
+
+  "arms": {
+    "A1": "RNA-FM's matched C-G minus A-U contrast on the same 4317 interventions, the same strata, the same estimator, with a target-clustered interval and a within-stratum permutation p, plus its pooled within-stratum SD and the standardised contrast",
+    "A2": "the architecture axis with the second transformer in place of the first: RNA-FM minus EternaFold, paired against RibonanzaNet minus EternaFold inside the same resample, and the difference between the two axes with an interval",
+    "A3": "RNA-FM's level arm -- its within-design rank agreement with the measured outcome -- against the free depth baseline and against the three predictors already reported",
+    "A4": "RNA-FM's structure on the 158 wild types scored against the declared target and against M54's built probing reference, extending the agreement panel from four implementations to five",
+    "A5": "the three non-primary SS heads, reported beside the primary one, as the declared sensitivity"
+  },
+
+  "verification_before_any_arm_is_read": {
+    "V1_zero_point_and_symmetry": "the emitted map is symmetric to 1e-6 after the model's own symmetrisation, its diagonal band is near zero, and probabilities lie in [0,1]",
+    "V2_determinism_and_batching": "the same sequence scored twice returns identical values, and a sequence scored alone equals the same sequence scored inside a batch, to 1e-6",
+    "V3_reverse_control": "before RNA-FM's column is read, reproduce with the estimator written here the published contrasts for the three existing predictors (+0.0605 neural, -0.0304 vienna, -0.00569 eterna), the measured contrast (+0.0539), and the published within-design rank agreements (+0.32947, +0.25570, +0.27649, depth +0.32252)",
+    "V4_index_convention": "this is the check that has caught every wiring error in this project. Decode the top L/2 pairs of RNA-FM's map on the 158 wild types and require at least 0.90 of them to be canonical (A-U, G-C, G-U). An off-by-one or a transposed index destroys that fraction while leaving every other number looking plausible.",
+    "V5_the_head_is_actually_loaded": "loading the checkpoint must report zero unexpected keys and no missing key in the pairwise head, and a randomly initialised head must give a materially different canonical fraction than the loaded one -- otherwise the weights are not reaching the model"
+  },
+
+  "kill_conditions": {
+    "K1": "if V3 fails to reproduce any published number to its printed precision, VOID",
+    "K2": "if V1, V2, V4 or V5 fails, VOID",
+    "K3": "if RNA-FM fails to score more than 5 percent of the interventions, VOID -- a predictor scored on a selected subset is not comparable to the others",
+    "K4": "if the four released heads disagree in the SIGN of A1's contrast, the primary head's number is still the reported one, but the manuscript must say in the same paragraph that the sign is head-dependent"
+  },
+
+  "staked_predictions": [
+    {"id": "S1", "text": "RNA-FM's matched contrast EXCLUDES zero, so a second transformer sharing neither backbone nor training corpus with RibonanzaNet also resolves the identity axis"},
+    {"id": "S2", "text": "the architecture axis computed with RNA-FM in place of RibonanzaNet, RNA-FM minus EternaFold, is POSITIVE"},
+    {"id": "S3", "text": "RNA-FM's level arm does NOT exceed the free depth baseline, so the fourth predictor fails the same comparison the first three failed"},
+    {"id": "S4", "text": "RNA-FM's contrast is SMALLER than RibonanzaNet's, because RibonanzaNet is pretrained on chemical probing of exactly this kind and RNA-FM is not"}
+  ],
+
+  "wording_rules_binding_on_the_manuscript": {
+    "W1": "if S1 fails -- if the second transformer does not resolve the axis -- the manuscript stops calling the axis a decomposition result and states it as a property of RibonanzaNet. That is the whole point of running this, and it is written down before the number exists.",
+    "W2": "if S1 holds, the claim becomes a two-member class statement and not a general one. Two transformers are not a class either, and the manuscript says how many members it has.",
+    "W3": "the primary head is fixed above. A5's other heads are reported whatever they show, and the primary is not re-chosen.",
+    "W4": "the leakage argument for RNA-FM is a date argument, not a measurement, and the manuscript says so in the same sentence that makes it.",
+    "W5": "a failed stake is recorded as failed in the preregistration table and the affected claim is narrowed in the body."
+  }
+}
