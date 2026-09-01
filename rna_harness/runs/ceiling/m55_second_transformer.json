@@ -1,0 +1,195 @@
+{
+ "declaration": "m55_second_transformer_declaration.json",
+ "primary_head": "bpRNA",
+ "cost": "offline after one weights download, $0 -- no API, no external inference",
+ "V": {
+  "V1_range": true,
+  "V2_determinism": true,
+  "V4_canonical_fraction": true,
+  "V5_weights_loaded": true,
+  "canonical_frac": 0.9218,
+  "canonical_frac_random_head": 0.3163,
+  "n_unscored": 0,
+  "V3_reverse_control": true
+ },
+ "A1_contrast": {
+  "contrast": -0.01477,
+  "ci95": [
+   -0.03682,
+   0.00769
+  ],
+  "ci_contains_zero": true,
+  "within_sd": 0.30428,
+  "contrast_in_sd": -0.04853,
+  "weight": 902.0,
+  "strata": 553,
+  "vs_ribonanzanet": {
+   "point": -0.07532,
+   "ci95": [
+    -0.11055,
+    -0.04424
+   ],
+   "smaller": true
+  }
+ },
+ "A2_architecture_axis": {
+  "ribonanzanet_minus_eterna": {
+   "point": 0.21607,
+   "ci95": [
+    0.12085,
+    0.3492
+   ]
+  },
+  "rnafm_minus_eterna": {
+   "point": -0.03136,
+   "ci95": [
+    -0.11929,
+    0.04487
+   ],
+   "ci_contains_zero": true,
+   "positive": false
+  },
+  "difference_between_axes": {
+   "point": -0.24743,
+   "ci95": [
+    -0.40097,
+    -0.15068
+   ],
+   "ci_contains_zero": false
+  }
+ },
+ "A3_level_vs_depth": {
+  "rnafm": 0.23782,
+  "depth": 0.32252,
+  "difference": -0.0847,
+  "ci95": [
+   -0.17145,
+   -0.00136
+  ],
+  "beats_depth": false
+ },
+ "A5_head_sensitivity": {
+  "heads": {
+   "bpRNA": {
+    "contrast": -0.01477,
+    "within_sd": 0.30428,
+    "contrast_in_sd": -0.04853,
+    "primary": true
+   },
+   "RNAStralign": {
+    "contrast": 0.00467,
+    "within_sd": 0.32031,
+    "contrast_in_sd": 0.01457,
+    "primary": false
+   },
+   "PDB-All": {
+    "contrast": 0.00306,
+    "within_sd": 0.36993,
+    "contrast_in_sd": 0.00827,
+    "primary": false
+   },
+   "PDB-TR1": {
+    "contrast": -0.01916,
+    "within_sd": 0.39378,
+    "contrast_in_sd": -0.04866,
+    "primary": false
+   }
+  },
+  "signs_disagree": true
+ },
+ "staked": {
+  "S1": {
+   "text": "RNA-FM's matched contrast EXCLUDES zero, so a second transformer sharing neither backbone nor training corpus with RibonanzaNet also resolves the identity axis",
+   "pass": false,
+   "detail": "RNA-FM 对比 -0.01477 [-0.03682, 0.00769]"
+  },
+  "S2": {
+   "text": "the architecture axis computed with RNA-FM in place of RibonanzaNet, RNA-FM minus EternaFold, is POSITIVE",
+   "pass": false,
+   "detail": "RNA-FM − EternaFold -0.03136 [-0.11929, 0.04487]"
+  },
+  "S3": {
+   "text": "RNA-FM's level arm does NOT exceed the free depth baseline, so the fourth predictor fails the same comparison the first three failed",
+   "pass": true,
+   "detail": "RNA-FM − depth -0.08470 [-0.17145, -0.00136]"
+  },
+  "S4": {
+   "text": "RNA-FM's contrast is SMALLER than RibonanzaNet's, because RibonanzaNet is pretrained on chemical probing of exactly this kind and RNA-FM is not",
+   "pass": true,
+   "detail": "|-0.01477| vs RibonanzaNet |+0.06055|"
+  }
+ },
+ "verdict": "architecture_axis_is_a_property_of_ribonanzanet",
+ "log": [
+  "=== M55:第二个 transformer,让架构轴不再只是一个模型 ===",
+  "  声明已冻结并推送于本文件存在之前。无 API,无外部推理服务,$0。",
+  "  主头在声明里定死:bpRNA;另外三个作为已声明的敏感性一起跑",
+  "  记录缓存命中(4317 条)",
+  "  干预 4317  (0s)",
+  "  需要打分的唯一序列 4475,其中野生型 158",
+  "  RNA-FM 推理,头 = bpRNA",
+  "    bpRNA 1000/4475  59s",
+  "    bpRNA 2000/4475  89s",
+  "    bpRNA 3000/4475  123s",
+  "    bpRNA 4000/4475  158s",
+  "    bpRNA 完成 4475,用时 175s",
+  "  RNA-FM 推理,头 = RNAStralign",
+  "    RNAStralign 1000/4475  55s",
+  "    RNAStralign 2000/4475  85s",
+  "    RNAStralign 3000/4475  119s",
+  "    RNAStralign 4000/4475  154s",
+  "    RNAStralign 完成 4475,用时 170s",
+  "  RNA-FM 推理,头 = PDB-All",
+  "    PDB-All 1000/4475  53s",
+  "    PDB-All 2000/4475  86s",
+  "    PDB-All 3000/4475  125s",
+  "    PDB-All 4000/4475  154s",
+  "    PDB-All 完成 4475,用时 170s",
+  "  RNA-FM 推理,头 = PDB-TR1",
+  "    PDB-TR1 1000/4475  51s",
+  "    PDB-TR1 2000/4475  85s",
+  "    PDB-TR1 3000/4475  124s",
+  "    PDB-TR1 4000/4475  153s",
+  "    PDB-TR1 完成 4475,用时 169s",
+  "  RNA-FM 推理,随机头(V5 对照)",
+  "    bpRNA (random head) 完成 158,用时 19s",
+  "\n=== V 验证(先于任何 arm)===",
+  "  K3 未能打分的干预 0/4317",
+  "  V1 概率范围 [0.00000, 0.99541]  -> 通过",
+  "  V4 载入头的 top-L/2 配对里典型配对占比 0.9218(阈 0.90);随机头 0.3163",
+  "  V5 权重确实进了模型:载入 0.9218 vs 随机 0.3163  -> 通过",
+  "  V2 同序列两次 max|Δ| 0.00e+00;与缓存 max|Δ| 0.00e+00",
+  "  V3 rf     我 +0.05393  论文 +0.05390  |Δ| 2.84e-05",
+  "  V3 nmut   我 +0.06055  论文 +0.06050  |Δ| 5.27e-05",
+  "  V3 pmut   我 -0.03039  论文 -0.03040  |Δ| 1.29e-05",
+  "  V3 emut   我 -0.00569  论文 -0.00569  |Δ| 3.86e-07",
+  "  V3 rank RibonanzaNet   我 +0.32947  论文 +0.3295",
+  "  V3 rank ViennaRNA      我 +0.25570  论文 +0.2557",
+  "  V3 rank EternaFold     我 +0.27649  论文 +0.2765",
+  "  V3 rank depth          我 +0.32252  论文 +0.3225",
+  "  V 全部通过 —— 现在才读 RNA-FM 的列",
+  "\n=== A1 RNA-FM 在同一批干预、同一套分层上的身份对比 ===",
+  "  对比 -0.01477  权重 902  层 553  层内 SD 0.3043  标准化 -0.04853",
+  "  A1 RNA-FM 对比 -0.01477  95% [-0.03682, 0.00769]  含 0",
+  "  RibonanzaNet 对比 +0.06055;RNA-FM − RibonanzaNet -0.07532 [-0.11055, -0.04424]",
+  "\n=== A2 架构轴用第二个 transformer 重算(都在自己的单位里)===",
+  "  RibonanzaNet − EternaFold  +0.21607  [0.12085, 0.3492]",
+  "  RNA-FM       − EternaFold  -0.03136  [-0.11929, 0.04487]  含 0",
+  "  两条轴之差                 -0.24743  [-0.40097, -0.15068]  不含 0",
+  "\n=== A3 RNA-FM 的 level 臂对免费深度基线 ===",
+  "  RNA-FM 格内秩一致 +0.23782;depth +0.32252;三个已发表 RibonanzaNet +0.3295, ViennaRNA +0.2557, EternaFold +0.2765",
+  "  RNA-FM − depth -0.08470  [-0.17145, -0.00136]  不含 0",
+  "\n=== A5 另外三个已发布的头(已声明的敏感性,主头不改)===",
+  "  bpRNA        对比 -0.01477  层内 SD 0.3043  标准化 -0.04853   <- 主头",
+  "  RNAStralign  对比 +0.00467  层内 SD 0.3203  标准化 +0.01457",
+  "  PDB-All      对比 +0.00306  层内 SD 0.3699  标准化 +0.00827",
+  "  PDB-TR1      对比 -0.01916  层内 SD 0.3938  标准化 -0.04866",
+  "  四个头的符号不一致 —— K4 触发,正文必须写明符号依赖于头",
+  "\n=== 预注册记分 ===",
+  "  S1  **失败**   RNA-FM 对比 -0.01477 [-0.03682, 0.00769]",
+  "  S2  **失败**   RNA-FM − EternaFold -0.03136 [-0.11929, 0.04487]",
+  "  S3  成立   RNA-FM − depth -0.08470 [-0.17145, -0.00136]",
+  "  S4  成立   |-0.01477| vs RibonanzaNet |+0.06055|",
+  "\n  裁定:architecture_axis_is_a_property_of_ribonanzanet   2/4 成立   用时 785s"
+ ]
+}

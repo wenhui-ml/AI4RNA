@@ -1,0 +1,272 @@
+=== M55:第二个 transformer,让架构轴不再只是一个模型 ===
+  声明已冻结并推送于本文件存在之前。无 API,无外部推理服务,$0。
+  主头在声明里定死:bpRNA;另外三个作为已声明的敏感性一起跑
+  记录缓存命中(4317 条)
+  干预 4317  (0s)
+  需要打分的唯一序列 4475,其中野生型 158
+  RNA-FM 推理,头 = bpRNA
+    bpRNA 1000/4475  59s
+    bpRNA 2000/4475  89s
+    bpRNA 3000/4475  123s
+    bpRNA 4000/4475  158s
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+    bpRNA 完成 4475,用时 175s
+  RNA-FM 推理,头 = RNAStralign
+    RNAStralign 1000/4475  55s
+    RNAStralign 2000/4475  85s
+    RNAStralign 3000/4475  119s
+    RNAStralign 4000/4475  154s
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+    RNAStralign 完成 4475,用时 170s
+  RNA-FM 推理,头 = PDB-All
+    PDB-All 1000/4475  53s
+    PDB-All 2000/4475  86s
+    PDB-All 3000/4475  125s
+    PDB-All 4000/4475  154s
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+    PDB-All 完成 4475,用时 170s
+  RNA-FM 推理,头 = PDB-TR1
+    PDB-TR1 1000/4475  51s
+    PDB-TR1 2000/4475  85s
+    PDB-TR1 3000/4475  124s
+    PDB-TR1 4000/4475  153s
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+Complete Load Weight
+    PDB-TR1 完成 4475,用时 169s
+  RNA-FM 推理,随机头(V5 对照)
+    bpRNA (random head) 完成 158,用时 19s
+
+=== V 验证(先于任何 arm)===
+  K3 未能打分的干预 0/4317
+  V1 概率范围 [0.00000, 0.99541]  -> 通过
+  V4 载入头的 top-L/2 配对里典型配对占比 0.9218(阈 0.90);随机头 0.3163
+  V5 权重确实进了模型:载入 0.9218 vs 随机 0.3163  -> 通过
+Complete Load Weight
+  V2 同序列两次 max|Δ| 0.00e+00;与缓存 max|Δ| 0.00e+00
+  V3 rf     我 +0.05393  论文 +0.05390  |Δ| 2.84e-05
+  V3 nmut   我 +0.06055  论文 +0.06050  |Δ| 5.27e-05
+  V3 pmut   我 -0.03039  论文 -0.03040  |Δ| 1.29e-05
+  V3 emut   我 -0.00569  论文 -0.00569  |Δ| 3.86e-07
+  V3 rank RibonanzaNet   我 +0.32947  论文 +0.3295
+  V3 rank ViennaRNA      我 +0.25570  论文 +0.2557
+  V3 rank EternaFold     我 +0.27649  论文 +0.2765
+  V3 rank depth          我 +0.32252  论文 +0.3225
+  V 全部通过 —— 现在才读 RNA-FM 的列
+
+=== A1 RNA-FM 在同一批干预、同一套分层上的身份对比 ===
+  对比 -0.01477  权重 902  层 553  层内 SD 0.3043  标准化 -0.04853
+  A1 RNA-FM 对比 -0.01477  95% [-0.03682, 0.00769]  含 0
+  RibonanzaNet 对比 +0.06055;RNA-FM − RibonanzaNet -0.07532 [-0.11055, -0.04424]
+
+=== A2 架构轴用第二个 transformer 重算(都在自己的单位里)===
+  RibonanzaNet − EternaFold  +0.21607  [0.12085, 0.3492]
+  RNA-FM       − EternaFold  -0.03136  [-0.11929, 0.04487]  含 0
+  两条轴之差                 -0.24743  [-0.40097, -0.15068]  不含 0
+
+=== A3 RNA-FM 的 level 臂对免费深度基线 ===
+  RNA-FM 格内秩一致 +0.23782;depth +0.32252;三个已发表 RibonanzaNet +0.3295, ViennaRNA +0.2557, EternaFold +0.2765
+  RNA-FM − depth -0.08470  [-0.17145, -0.00136]  不含 0
+
+=== A5 另外三个已发布的头(已声明的敏感性,主头不改)===
+  bpRNA        对比 -0.01477  层内 SD 0.3043  标准化 -0.04853   <- 主头
+  RNAStralign  对比 +0.00467  层内 SD 0.3203  标准化 +0.01457
+  PDB-All      对比 +0.00306  层内 SD 0.3699  标准化 +0.00827
+  PDB-TR1      对比 -0.01916  层内 SD 0.3938  标准化 -0.04866
+  四个头的符号不一致 —— K4 触发,正文必须写明符号依赖于头
+
+=== 预注册记分 ===
+  S1  **失败**   RNA-FM 对比 -0.01477 [-0.03682, 0.00769]
+  S2  **失败**   RNA-FM − EternaFold -0.03136 [-0.11929, 0.04487]
+  S3  成立   RNA-FM − depth -0.08470 [-0.17145, -0.00136]
+  S4  成立   |-0.01477| vs RibonanzaNet |+0.06055|
+
+  裁定:architecture_axis_is_a_property_of_ribonanzanet   2/4 成立   用时 785s
+
+写出 /data/wenhui/openclaude_rna/rna_harness/runs/ceiling/m55_second_transformer.json
