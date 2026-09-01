@@ -1,0 +1,29 @@
+=== M63:没有设计者的语料,带不带 placement 结构 ===
+  声明冻结在代码之前。Rfam 下载一次,其余全离线,$0。
+
+【V】设计语料,按分子重算,使下面每个数都可比
+  OK7a designed              n=   160  簇=   20  g=-0.9169  [-1.0085, -0.8223]  中位 -0.9351  为负的分子占 97.5%
+    (论文按格算的是 -0.3815;逐方法 -0.127 到 -0.712)
+
+【A】没有设计者的语料
+  Rfam seed                  n= 11842  簇= 3263  g=-0.1055  [-0.1230, -0.0880]  中位 -0.1000  为负的分子占 58.8%
+  Pseudobase++               n=   164  簇=  164  g=-0.1177  [-0.1889, -0.0459]  中位 -0.1276  为负的分子占 59.2%
+
+【C】同一批目标结构上的纯热力学反折叠(匹配对照)
+  RNAinverse (same targets)  无合格分子
+
+【B】把长度与 GC 限制到设计语料自己的范围之后
+    设计语料的配对数范围 [30, 59],GC 范围 [0.364, 0.623]
+  Rfam, matched              n=  2946  簇=  993  g=-0.1301  [-0.1602, -0.1000]  中位 -0.1198  为负的分子占 60.9%
+  Pseudobase++, matched      n=    15  簇=   15  g=-0.1146  [-0.3119, +0.0651]  中位 -0.0150  为负的分子占 53.3%
+
+=== 预注册记分(按冻结声明原文)===
+Traceback (most recent call last):
+  File "/data/wenhui/openclaude_rna/rna_harness/runs/ceiling/m63_undesigned_placement.py", line 334, in <module>
+    open(os.path.join(HERE, "m63_undesigned_placement.log"), "w").write("\n".join(LOG) + "\n")
+  File "/data/wenhui/openclaude_rna/rna_harness/runs/ceiling/m63_undesigned_placement.py", line 303, in main
+    f"Rfam {gr:+.4f} / Pseudobase {gp:+.4f}")
+TypeError: bad operand type for abs(): 'NoneType'
+ered[Pseudobase++]']   5/7 成立
+
+写出 m63_undesigned_placement.json

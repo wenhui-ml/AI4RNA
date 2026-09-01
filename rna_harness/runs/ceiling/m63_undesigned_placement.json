@@ -1,0 +1,147 @@
+{
+ "seed": 20260901,
+ "V_designed": {
+  "name": "OK7a designed",
+  "n": 160,
+  "n_clusters": 20,
+  "gap": -0.9169,
+  "median": -0.9351,
+  "sd": 0.4272,
+  "ci": [
+   -1.0085,
+   -0.8223
+  ],
+  "frac_negative": 0.975
+ },
+ "A1_rfam": {
+  "name": "Rfam seed",
+  "n": 11842,
+  "n_clusters": 3263,
+  "gap": -0.1055,
+  "median": -0.1,
+  "sd": 0.5596,
+  "ci": [
+   -0.123,
+   -0.088
+  ],
+  "frac_negative": 0.5876
+ },
+ "A2_pseudobase": {
+  "name": "Pseudobase++",
+  "n": 164,
+  "n_clusters": 164,
+  "gap": -0.1177,
+  "median": -0.1276,
+  "sd": 0.4705,
+  "ci": [
+   -0.1889,
+   -0.0459
+  ],
+  "frac_negative": 0.5915
+ },
+ "C_inverse_fold": {
+  "name": "RNAinverse (same targets)",
+  "n": 0
+ },
+ "B1_rfam_matched": {
+  "name": "Rfam, matched",
+  "n": 1218,
+  "n_clusters": 407,
+  "gap": -0.1125,
+  "median": -0.1097,
+  "sd": 0.4731,
+  "ci": [
+   -0.1541,
+   -0.0698
+  ],
+  "frac_negative": 0.6076
+ },
+ "B2_pkb_matched": {
+  "name": "Pseudobase++, matched",
+  "n": 6,
+  "n_clusters": 6,
+  "gap": -0.0493,
+  "median": 0.072,
+  "sd": 0.3677,
+  "ci": [
+   -0.352,
+   0.1672
+  ],
+  "frac_negative": 0.5
+ },
+ "matching_window": {
+  "pairs": [
+   36,
+   64
+  ],
+  "gc": [
+   0.4259,
+   0.8125
+  ]
+ },
+ "scoring": {
+  "S1": {
+   "pass": true,
+   "note": "设计语料 g=-0.9169"
+  },
+  "S2": {
+   "pass": true,
+   "note": "|Rfam| 0.1055 vs |设计| 0.9169"
+  },
+  "S3": {
+   "pass": true,
+   "note": "比值 8.69"
+  },
+  "S4": {
+   "pass": true,
+   "note": "Rfam -0.1055 / Pseudobase -0.1177"
+  },
+  "S5": {
+   "pass": true,
+   "note": "匹配后 |Rfam| 0.1125 vs |设计| 0.9169"
+  },
+  "S6": {
+   "pass": false,
+   "note": "反折叠臂为空,按失败计"
+  },
+  "S7": {
+   "pass": false,
+   "note": "反折叠臂为空,按失败计"
+  }
+ },
+ "kill_conditions_fired": [
+  "K3_the_prediction_holds",
+  "K4_underpowered[Pseudobase++]"
+ ],
+ "n_pass": 5,
+ "Cprime_repaired_control": {
+  "designed_core": {
+   "name": "designed, nested core",
+   "n": 104,
+   "n_clusters": 20,
+   "gap": -0.4288,
+   "median": -0.4149,
+   "sd": 0.6133,
+   "ci": [
+    -0.5771,
+    -0.3009
+   ],
+   "frac_negative": 0.7596
+  },
+  "inverse_core": {
+   "name": "RNAinverse, nested core",
+   "n": 75,
+   "n_clusters": 18,
+   "gap": -0.0375,
+   "median": -0.0095,
+   "sd": 0.4508,
+   "ci": [
+    -0.1144,
+    0.0521
+   ],
+   "frac_negative": 0.5067
+  },
+  "share_reproduced": 0.0875
+ },
+ "Cprime_note": "F4 of the erratum: arm C as declared cannot run, because every target in this corpus is pseudoknotted. C' runs it on the nested core with the designed sequences scored on the same pairs. S6 and S7 stay FAILED on the empty arm; they are not regraded."
+}

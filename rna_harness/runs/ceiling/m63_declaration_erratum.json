@@ -1,0 +1,32 @@
+{
+ "_rule": "m63_undesigned_placement_declaration.json is frozen and is NOT edited. Defects found after the code was written are recorded here, the repair is named, and the stakes are graded once on the repaired implementation because the defective run was stopped before any stake was scored.",
+ "defects": {
+  "F1_spurious_offset_on_the_designed_arm": {
+   "where": "M63 designed_rows(), first implementation",
+   "what": "The released target_structure is the SAME LENGTH as the sequence (177 and 177 on every row checked), so its pairing map is already in sequence coordinates. The first implementation applied an offset of sub_start minus 2, copying M16's mapping for the MUTATION INDICES, which are given in design-window coordinates and do need it. The structure does not.",
+   "consequence": "The designed arm returned g = +0.0663 on 41 molecules against a published -0.3815 on the same records: wrong sign and a fifth of the data, because the shift moved most pairs onto non-canonical partners and they were dropped. No stake was scored: the run was stopped at this line and the arm-C control never finished.",
+   "fix": "The offset is removed and the map is used as released. V is required to reproduce the published sign and rough magnitude before anything else is read, which is what caught this."
+  },
+  "F2_arm_C_cost_not_bounded_in_the_declaration": {
+   "where": "M63 inverse_rows()",
+   "what": "The declaration fixed 8 restarts per target but not a time bound, and ViennaRNA's inverse_fold has no iteration cap, so the arm ran long enough to matter on a shared machine.",
+   "consequence": "None to any number. Recorded because the declaration should have bounded it.",
+   "fix": "First attempt set RNA.cvar.give_up = 1, which is the wrong knob: it makes inverse_fold return at the first local minimum, and 0 of 160 attempts reached the target, so arm C returned nothing. Corrected: give_up is left off, the search is bounded by a per-target wall-clock budget in Python instead, and the arm is run on the DESIGN WINDOW (sub_start..sub_end) rather than on the full construct, which is both the region the design programs actually wrote and small enough to fold reliably. The hit rate is reported beside the arm."
+  },
+  "F3_arm_C_ran_on_the_wrong_region": {
+   "where": "M63 inverse_rows(), first two implementations",
+   "what": "The control was run on the span of all paired positions of the full 177-nt construct, which includes fixed flanking adapters nobody designed.",
+   "consequence": "None scored; arm C never produced a molecule.",
+   "fix": "The control is run on sub_start..sub_end, the region the design programs were given."
+  },
+  "F4_arm_C_cannot_target_a_pseudoknot": {
+   "where": "M63 inverse_rows()",
+   "what": "All 20 target structures in this corpus carry crossings; it is the OpenKnot benchmark. The control flattened crossing pairs into round brackets, producing a string that is balanced but is not the structure, and ViennaRNA's inverse_fold, which cannot represent a pseudoknot, failed on 158 of 158 attempts.",
+   "consequence": "Arm C returned nothing twice, and S6 and S7 are graded FAILED on an empty arm in the declaration's own wording. They are not regraded.",
+   "fix": "The control is restricted to the NESTED CORE of each target, the pairs written in the primary bracket family, which is a structure a nested folder can be asked for. To keep it matched, the designed sequences' gap is recomputed on exactly the same nested-core pair set, so the two numbers differ only in who wrote the sequence. This is reported as arm C' and is a repair of a defective arm, not a reissue of its stakes."
+  }
+ },
+ "stakes_status": "graded once, on the repaired implementation, in the declaration's own wording. The defective run produced no scored stake.",
+ "written_at": "2026-09-01, after the first run was stopped and before it was repeated",
+ "scoring_guard": "S6 and S7 crashed on an empty arm C in the first repaired run. The scoring now treats an empty arm as a failed stake with the reason printed, rather than as an exception."
+}
