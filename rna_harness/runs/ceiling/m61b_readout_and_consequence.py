@@ -186,9 +186,13 @@ def main():
         rr = C60.row(cl, t, y, m, nb)
         return rr
 
-    base13 = tightpct(np.arange(len(keep)), 13)
-    log(f"  点估计(13 箱):紧界 {100*base13['tight_frac']:.1f}%  "
-        f"粗界 {100*base13['loose_frac']:.1f}%   (M60c 发表值 53.1% / 101.9%)")
+    # M60c's grid REQUESTS 15 and qbins ACHIEVES 13 after duplicate quantile edges collapse;
+    # its table prints the achieved count. Requesting 13 achieves 12 and is a different row.
+    REQ = 15
+    base13 = tightpct(np.arange(len(keep)), REQ)
+    log(f"  点估计(请求 {REQ} 箱,实得 {base13['nbins']},用上 {base13['used']}):"
+        f"紧界 {100*base13['tight_frac']:.1f}%  粗界 {100*base13['loose_frac']:.1f}%"
+        f"   (M60c 发表值 53.1% / 101.9%)")
     bycl = {p: np.where(puz == p)[0] for p in sorted(set(puz))}
     pzl = sorted(bycl)
     bs = []
@@ -196,13 +200,14 @@ def main():
         pick = [pzl[i] for i in rng.integers(0, len(pzl), len(pzl))]
         idx = np.concatenate([bycl[p] for p in pick])
         try:
-            rr = tightpct(idx, 13)
+            rr = tightpct(idx, REQ)
         except Exception:
             continue
         if rr:
             bs.append(100 * rr["tight_frac"])
     bs = np.array(bs)
-    OUT["D2_repaired"] = {"bins": 13, "point_tight_pct": round(100 * base13["tight_frac"], 1),
+    OUT["D2_repaired"] = {"bins_requested": REQ, "bins_achieved": int(base13["nbins"]),
+                          "bins_used": int(base13["used"]), "point_tight_pct": round(100 * base13["tight_frac"], 1),
                           "point_crude_pct": round(100 * base13["loose_frac"], 1),
                           "tight_holds": bool(base13["tight_holds"]),
                           "nboot": int(len(bs)),
