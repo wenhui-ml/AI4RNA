@@ -1,0 +1,149 @@
+{
+ "declaration": "m58_pk_member_declaration.json",
+ "V": {
+  "V1_zero_point": true,
+  "V2_reproduces_m54": true,
+  "V4_well_formed": true,
+  "V4_noncanonical_fraction": 0.0,
+  "V5_deterministic": true,
+  "V6_frequency_zero_point": true,
+  "V3_reverse_control": true,
+  "n_unscored": 0,
+  "n_single_structure_sequences": 578
+ },
+ "cost": "offline, $0 -- local binary, no API, no probing data passed",
+ "what_shapeknots_is_here": "the panel's own RNAstructure energy model with the pseudoknot search on; declared as dependent, not independent",
+ "A1_agreement": {
+  "built": {
+   "ViennaRNA": 0.70977,
+   "RNAstructure": 0.70726,
+   "EternaFold": 0.77047,
+   "RibonanzaNet": 0.8633,
+   "ShapeKnots": 0.81868
+  },
+  "declared": {
+   "ViennaRNA": 0.61916,
+   "RNAstructure": 0.60834,
+   "EternaFold": 0.67583,
+   "RibonanzaNet": 0.87916,
+   "ShapeKnots": 0.71994
+  },
+  "leader_built": "RibonanzaNet",
+  "leader_declared": "RibonanzaNet",
+  "n_cells": 158,
+  "shapeknots_exceeds_ribonanzanet_built": false
+ },
+ "A2_level": {
+  "shapeknots": 0.1855,
+  "depth": 0.32252,
+  "depth_minus": 0.13702,
+  "ci95": [
+   0.04226,
+   0.22064
+  ],
+  "ci_contains_zero": false,
+  "depth_wins": true
+ },
+ "A3_identity": {
+  "contrast": 0.00637,
+  "within_sd": 0.2979,
+  "contrast_in_sd": 0.02139,
+  "ci95": [
+   -0.01551,
+   0.02895
+  ],
+  "ci_contains_zero": true,
+  "weight": 902.0,
+  "strata": 553
+ },
+ "A4_budget": {
+  "budgets": {
+   "0.1": {
+    "depth": 0.161273,
+    "ShapeKnots": 0.132095,
+    "RibonanzaNet": 0.156499,
+    "ViennaRNA": 0.172414,
+    "EternaFold": 0.171883,
+    "RNAstructure": 0.173475,
+    "shapeknots_minus_depth": -0.029178,
+    "shapeknots_beats_depth": false
+   },
+   "0.25": {
+    "depth": 0.348541,
+    "ShapeKnots": 0.301857,
+    "RibonanzaNet": 0.357029,
+    "ViennaRNA": 0.34695,
+    "EternaFold": 0.348011,
+    "RNAstructure": 0.351194,
+    "shapeknots_minus_depth": -0.046684,
+    "shapeknots_beats_depth": false
+   },
+   "0.5": {
+    "depth": 0.634483,
+    "ShapeKnots": 0.581432,
+    "RibonanzaNet": 0.638727,
+    "ViennaRNA": 0.604775,
+    "EternaFold": 0.615385,
+    "RNAstructure": 0.606897,
+    "shapeknots_minus_depth": -0.053051,
+    "shapeknots_beats_depth": false
+   }
+  },
+  "tightest": "0.1"
+ },
+ "stakes": {
+  "S1": true,
+  "S2": true,
+  "S3": true,
+  "S4": true
+ },
+ "n_met": 4,
+ "verdict": "panel_conclusions_survive_a_pseudoknot_capable_member",
+ "log": [
+  "=== M58:面板里放进一个能算假结的最近邻实现 ===",
+  "  声明已冻结并推送于本文件存在之前。全离线,$0,不传探测数据。",
+  "  折叠缓存 4475 条序列,失败 0;干预 4317",
+  "\n=== V 验证(先于任何 arm)===",
+  "  V1 自身 F1 1.0  对空 0.0  -> 通过",
+  "  V2 与 M54 的无数据对照逐条比较 158 条,不同 0 条  -> 通过",
+  "  V4 越界配对 0  一个碱基配两次的分子 0  非典型配对占比 0.00000(报告而非过滤)  -> 通过",
+  "  V5 重跑 20 条,最大差异 0  -> 通过",
+  "  V6 只返回一个结构的序列 578 条;频率与指示的最大偏差 0.0e+00  -> 通过",
+  "  未能打分的干预 0/4317",
+  "  V3 rf     我 +0.05393  论文 +0.05390  |Δ| 2.84e-05",
+  "  V3 nmut   我 +0.06055  论文 +0.06050  |Δ| 5.27e-05",
+  "  V3 pmut   我 -0.03039  论文 -0.03040  |Δ| 1.29e-05",
+  "  V3 emut   我 -0.00569  论文 -0.00569  |Δ| 3.86e-07",
+  "  V3 rank RibonanzaNet   我 +0.32947  论文 +0.3295",
+  "  V3 rank ViennaRNA      我 +0.25570  论文 +0.2557",
+  "  V3 rank EternaFold     我 +0.27649  论文 +0.2765",
+  "  V3 rank depth          我 +0.32252  论文 +0.3225",
+  "  一致性用 M26 纳入的设计格 158",
+  "  V3 built 参考下四个一致性 最大偏差 3.29e-06",
+  "  V 全部通过 —— 现在才读 ShapeKnots 的列",
+  "\n=== A1 一致性:把 ShapeKnots 放进面板,对两个参考各算一次 ===",
+  "  RibonanzaNet   built 参考 0.86330   声明靶标 0.87916",
+  "  ShapeKnots     built 参考 0.81868   声明靶标 0.71994",
+  "  EternaFold     built 参考 0.77047   声明靶标 0.67583",
+  "  ViennaRNA      built 参考 0.70977   声明靶标 0.61916",
+  "  RNAstructure   built 参考 0.70726   声明靶标 0.60834",
+  "  built 参考下的第一名 RibonanzaNet;声明靶标下的第一名 RibonanzaNet",
+  "\n=== A2 level 臂:ShapeKnots 的集合频率 vs 免费的整数 ===",
+  "  ShapeKnots level +0.18550;depth +0.32252;三个已发表 RibonanzaNet +0.3295, ViennaRNA +0.2557, EternaFold +0.2765",
+  "  depth − ShapeKnots  +0.13702  [0.04226, 0.22064]  不含 0",
+  "\n=== A3 身份对比:同一批干预,同一套分层 ===",
+  "  对比 +0.00637  权重 902  层 553  层内 SD 0.2979  标准化 +0.02139",
+  "  A3 ShapeKnots 对比 +0.00637  95% [-0.01551, 0.02895]  含 0",
+  "\n=== A4 预算臂:用 M44v 自己的 recover() ===",
+  "  M44v 的格 158;depth 方向 +1",
+  "  预算 0.1: depth 0.1613  ShapeKnots 0.1321  差 -0.0292  depth 不输",
+  "  预算 0.25: depth 0.3485  ShapeKnots 0.3019  差 -0.0467  depth 不输",
+  "  预算 0.5: depth 0.6345  ShapeKnots 0.5814  差 -0.0531  depth 不输",
+  "\n=== 预注册记分 ===",
+  "  S1  成立   ShapeKnots 0.81868 vs RibonanzaNet 0.86330(built 参考)",
+  "  S2  成立   depth − ShapeKnots +0.13702 [0.04226, 0.22064]",
+  "  S3  成立   身份对比 +0.00637 [-0.01551, 0.02895]",
+  "  S4  成立   最紧预算 0.1",
+  "\n  裁定:panel_conclusions_survive_a_pseudoknot_capable_member   4/4 成立   用时 349s"
+ ]
+}
