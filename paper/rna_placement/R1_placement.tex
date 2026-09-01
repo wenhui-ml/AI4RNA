@@ -983,8 +983,9 @@ replication; it is the only such interval and it is marked where it appears.
 \section{Results}
 \label{sec:results}
 
-\paragraph{Order of the arms.} \S\ref{sec:frame} fixes the two scales a point is read on, the
-design score's and the rescue factor's. \S\ref{sec:pairtype} estimates the effect and
+\paragraph{Order of the arms.} Every quantity named below is the one defined in
+\S\ref{sec:quantities}, estimated on the corpus of \S\ref{sec:corpus}. \S\ref{sec:frame} fixes
+the two scales a point is read on, the design score's and the rescue factor's. \S\ref{sec:pairtype} estimates the effect and
 \S\ref{sec:chem} tests whether the readout that produced it is measuring the probing chemistry
 instead. \S\ref{sec:energy} puts the folding model's own energy to the effect,
 \S\ref{sec:subsets} checks that answer on the halves of the corpus that do and do not consume a
@@ -1673,7 +1674,9 @@ happened to track was chosen after the fact.
 
 \emph{The sweep that was supposed to make this a curve did not reach far enough.} A synthetic
 sweep was run to make the relation a curve: the arms are resampled toward and away from the pooled
-law on the mediator, over \jdg{swRungs} rungs, with everything else left real. It reached
+law on the mediator, over \jdg{swRungs} rungs, with everything else left real and the injected
+noise held at the corpus's own within-cell residual SD of the rescue factor, \jdg{swSigma}, which
+is measured and not chosen. It reached
 $d_{\mathrm{TV}}$ from \jdg{swDtvLo} to \jdg{swDtvHi} and no lower, because reweighting within
 a design cell cannot remove the arms' differing composition \emph{across} cells, and over that
 restricted range the two sides move together only at Spearman \jdg{swRho}. \textbf{The sweep
@@ -1905,9 +1908,10 @@ placement structure should be weaker or absent where no designer chose, is teste
 \subsection{Is the covariate anyone's choice? The undesigned control}
 \label{sec:undesigned}
 
-Everything above says a covariate carries the number. The paper's title says the covariate is one
-the \emph{generators chose}, and until now the whole evidence for that word was that
-\jdg{gNMethods} methods in one corpus all do it. There is an obvious competing account: RNA helices
+Everything above says a covariate carries the number. \S\ref{sec:twoproducers} says that
+covariate's distribution has two producers, a design algorithm and a selection rule, and the
+paper's title says the first of them \emph{chose}; until now the whole evidence for that word was
+that \jdg{gNMethods} methods in one corpus all do it. There is an obvious competing account: RNA helices
 are more stable with G--C at their ends, the nearest-neighbour model charges a terminal A--U
 penalty, and any molecule selected for stability might show the same gradient with nobody choosing
 anything. Two earlier versions of this manuscript stated this test and did not run it.
@@ -2109,10 +2113,16 @@ the corrections were computed; the other floor members are reported at the resol
 \section{Analysis}
 \label{sec:analysis}
 
+Four questions are separated here rather than run together: what the headline ratio is as an
+object, what the two mediators do and do not say, what either means for a corpus of designed
+molecules (\S\ref{sec:implications}), and what would carry any of it past this one corpus
+(\S\ref{sec:beyond}).
+
 \subsection{Quantitative: what the $\jdg{medFrac}$ is, and what it is not}
 \label{sec:quant}
 
-Substituting \S\ref{sec:mediation}'s two estimates into \eqref{eq:med} gives a predicted
+Substituting \S\ref{sec:mediation}'s two estimates into \S\ref{sec:decomp}'s \eqref{eq:med}
+gives a predicted
 attenuation of $\jdg{medPred}$ against an observed $\jdg{medObs}$ (Table~\ref{tab:med}), a ratio of
 $\jdg{medFrac}$. That figure is one of the two staked predictions this paper lost: $\jdg{medFrac}$
 against a declared $40$--$60\%$, graded \textbf{failed} in Appendix~\ref{app:prereg} and reported
@@ -2275,10 +2285,14 @@ matched pairs rather than to mine them, and it needs synthesis rather than analy
 \section{Limitations}
 \label{sec:limits}
 
+Eight are stated, each naming what a reader of \S\ref{sec:conclusion} would have to discount
+and, where one exists, the experiment that would remove it.
+
 
 \paragraph{(i) One corpus, \jdg{xrRounds} rounds.} The placement structure is now measured on
 $\jdg{xrRounds}$ rounds with disjoint targets (\S\ref{sec:rounds}) and the formation results on
-one. All \jdg{xrRounds} rounds come from the same laboratory, platform and player community, so what
+one. All \jdg{xrRounds} rounds come from the same laboratory, platform and player community
+(\S\ref{sec:setup}), so what
 replicates is the target set and the method mix, not the ecology. The test that mechanism implies
 is no longer untried: \S\ref{sec:undesigned} runs it on two undesigned corpora and on a
 thermodynamic optimiser given the same targets, and the placement structure is \jdg{unRatio} times
