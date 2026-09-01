@@ -1,0 +1,107 @@
+{
+  "id": "M63",
+  "title": "The test the paper says it did not run: does an undesigned corpus carry the placement structure",
+  "frozen_before_code": true,
+  "cost": "$0. One public file downloaded (Rfam.seed.gz, 5.9 MB, EBI). Everything after that is offline, CPU only, OMP_NUM_THREADS=8. No API call, no GPU.",
+
+  "why_this_exists": [
+    "The manuscript states this test twice and does not run it. Section 5.13: 'It does not extend",
+    "the claim beyond designed corpora ... the prediction the mechanism makes about natural RNA,",
+    "that the placement structure should be weaker or absent where no designer chose, is stated in",
+    "Section 7 as the test we did not run.' Section 7(i): 'a corpus nobody designed should not carry",
+    "the placement structure.'",
+    "",
+    "The paper's title says the covariate is one its generators CHOSE. The entire evidence for the",
+    "word 'chose' is that nine methods in one corpus all do it. A reader is entitled to answer: RNA",
+    "helices are more stable with G-C at their ends, the nearest-neighbour model charges a terminal",
+    "A-U penalty, and any molecule selected for stability will show the same gradient without anyone",
+    "choosing anything. That answer has never been tested here and it is the cheapest way to remove",
+    "the paper's framing.",
+    "",
+    "Two corrections to how the manuscript states the test, both of which make it EASIER and are",
+    "recorded here before the run. It does not need a probing readout: placement is a design-side",
+    "statistic and needs only sequences with structures. And the sharpest control is not a natural",
+    "corpus at all, because natural corpora differ from the puzzle set in length, class and",
+    "composition. It is to run a plain thermodynamic inverse folder on THE SAME target structures.",
+    "That control is perfectly matched by construction and separates 'the designers chose it' from",
+    "'optimising a folding model implies it', which a natural corpus cannot."
+  ],
+
+  "statistic": {
+    "name": "per-molecule placement gap g",
+    "definition": "Within one molecule, the mean helix depth of its G-C target pairs minus the mean helix depth of its A-U target pairs. Depth is Definition 2 of the manuscript, min(outward run, inward run), computed from the pairing map alone.",
+    "admission": "a molecule contributes only if it holds at least 4 G-C pairs and at least 4 A-U pairs",
+    "aggregation": "unweighted mean over molecules, with a molecule-clustered percentile bootstrap; for Rfam, the family is the cluster, not the sequence"
+  },
+
+  "arms": {
+    "V": "Recompute the designed corpus's placement gap PER MOLECULE with the same function, so it is commensurate with everything below. The published per-cell value is -0.3815 and the per-method values run -0.127 to -0.712; V is not required to equal them, only to reproduce their sign and rough size.",
+
+    "A_natural": {
+      "A1": "Rfam seed alignments, all families. The consensus structure is projected onto each individual sequence: a consensus pair survives if both columns are non-gap in that sequence and the two bases are canonical. At most 5 sequences per family, taken in sorted order, so no family dominates.",
+      "A2": "Pseudobase++, 305 natural pseudoknotted RNAs already on disk, full sequences and structures, an independent source with a different class mix.",
+      "A3": "The two natural corpora are compared with each other before either is compared with the designed one."
+    },
+
+    "B_matched": "Restrict both sides to molecules whose paired-position count and GC fraction fall in the designed corpus's own range, and recompute. Reported whether or not it changes the reading.",
+
+    "C_thermodynamic_control": {
+      "what": "ViennaRNA inverse_fold on the corpus's OWN target structures, several independent restarts per target, no design program and no human involved.",
+      "why": "Perfectly matched to the designed arm: identical target structures, identical depth distribution, the only difference is who wrote the sequence.",
+      "reading": "If a plain MFE inverse folder reproduces the gap, the gap is implied by optimising a folding model rather than chosen by a designer, and the manuscript's attribution changes even if every natural corpus is null."
+    }
+  },
+
+  "staked_predictions": [
+    {"id": "S1", "arm": "V", "claim": "The designed corpus's per-molecule gap is negative, G-C shallower.", "stake": "g < 0"},
+    {"id": "S2", "arm": "A1", "claim": "Rfam's gap is closer to zero than the designed corpus's.", "stake": "|g_rfam| < |g_designed|"},
+    {"id": "S3", "arm": "A1", "claim": "The designed corpus exaggerates whatever natural RNA does by at least half again.", "stake": "|g_designed| / |g_rfam| >= 1.5"},
+    {"id": "S4", "arm": "A3", "claim": "The two natural corpora agree in sign.", "stake": "same sign"},
+    {"id": "S5", "arm": "B", "claim": "The length- and composition-matched comparison does not reverse the reading of S2.", "stake": "|g_nat| < |g_des| still"},
+    {"id": "S6", "arm": "C", "claim": "A plain inverse folder reproduces less of the gap than the design programs do.", "stake": "|g_inverse| < |g_designed|"},
+    {"id": "S7", "arm": "C", "claim": "A plain inverse folder nonetheless produces a negative gap, because the terminal A-U penalty is in its objective.", "stake": "g_inverse < 0"}
+  ],
+
+  "kill_conditions_and_the_edits_they_force": {
+    "K1_placement_is_not_a_designer_choice": {
+      "fires_when": "The Rfam gap has the same sign as the designed one, is at least half its magnitude, and its family-clustered interval excludes zero.",
+      "then": "The word CHOSE is not supported and comes out of the paper. The title loses 'Its Generators Chose'. The abstract, Section 1's opening, Section 5.12 and Section 7(i) are rewritten to say that the covariate is a general property of folded RNA which the design programs reproduce. NOTHING MEASURED CHANGES: the contrast, the chemistry cut, the attenuation and the leaderboard result all stand, because none of them depends on who chose the placement. The benchmark problem is unchanged and becomes more general, not less: a covariate no one chose is still a covariate a split cannot remove."
+    },
+    "K2_thermodynamics_not_designers": {
+      "fires_when": "Arm C's inverse-folded sequences reproduce at least half of the designed gap.",
+      "then": "The attribution changes from 'the designers chose it' to 'optimising a folding model implies it', in the same places K1 names, whatever the natural corpora say. This is a weaker claim than the current one and the paper makes it instead of the current one."
+    },
+    "K3_the_prediction_holds": {
+      "fires_when": "The natural gaps are near zero or of the opposite sign while the designed gap is not.",
+      "then": "Section 7(i) stops listing this as the test we did not run, and the result is reported as a positive control in the Results rather than as a limitation."
+    },
+    "K4_underpowered": {
+      "fires_when": "Fewer than 200 molecules in either natural corpus meet the admission rule.",
+      "then": "That corpus is reported as underpowered and no verdict rests on it. An interval covering zero on fewer than 200 molecules is not read as an absence."
+    }
+  },
+
+  "what_this_experiment_may_NOT_do": [
+    "It may not explain WHY natural RNA places pairs where it does. Selection for stability, kinetics",
+    "and function are not separated here and we do not separate them.",
+    "It may not be read as evidence about pair FORMATION. It touches no probing data. The formation",
+    "results of Sections 5.2 and 5.3 are untouched by every outcome above.",
+    "It may not be used to revive or revise any withdrawn estimate.",
+    "It may not treat a database's deposited structure as ground truth. Rfam consensus structures are",
+    "covariation models and Pseudobase entries are curated from primary literature; both are",
+    "annotations, and the arms are reported separately rather than pooled so a reader can discount",
+    "either.",
+    "The stakes above are graded once, in this wording. If the implementation is found defective the",
+    "defect is recorded in m63_declaration_erratum.json and this file is not edited."
+  ],
+
+  "seed": 20260901,
+  "max_seqs_per_family": 5,
+  "inverse_fold_restarts_per_target": 8,
+  "data": [
+    "https://ftp.ebi.ac.uk/pub/databases/Rfam/CURRENT/Rfam.seed.gz (downloaded 2026-09-01, 5928432 bytes, Last-Modified 2026-01-03)",
+    "/data/wenhui/RNAInvBench/rna_design_algorithms/antaRNA/Constraints/Pseudobase++ (305 records, already on disk)",
+    "/data/wenhui/openknot_data/Data/OK7a_M2R_data.v4.5.1.csv (the designed corpus)"
+  ],
+  "written_at": "2026-09-01, before m63_undesigned_placement.py existed"
+}
