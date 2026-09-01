@@ -734,6 +734,13 @@ def build(tag, folder, paper_dir, texname, numname, claims, title, one_line):
       "title": title,
       "one_line": one_line,
       "abstract_as_printed": abstract,
+      # The estimand is the first thing an auditor has to agree with us about, and leaving it to
+      # be assembled from context is how a result track ends up auditing a different quantity.
+      # Sliced from the manuscript so it cannot drift from what the paper says.
+      "canonical_estimand_as_printed": (
+        expand(slice_between(tex, "\\paragraph{What this instrument measures, stated once.}",
+                             "\\paragraph{The two readings.}"), mac)
+        if "What this instrument measures, stated once." in tex else None),
       "claim_quotes_as_printed": quotes,
       "independence_conditions": [
         "Do not import, call or execute any module under rna_harness/. The result track must not "
