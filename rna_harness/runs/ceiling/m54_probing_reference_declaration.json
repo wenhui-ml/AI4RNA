@@ -1,0 +1,58 @@
+{
+  "id": "m54_probing_reference",
+  "title": "M53 asked whether the agreement axis survives a reference no model in the panel wrote, and voided because the released probing-derived column is malformed on 74 of 160 rows. Build the reference instead of reading it.",
+  "frozen_before_code": true,
+  "cost": "offline, $0 -- no API, no download, no GPU. ShapeKnots on 160 wild types at 18s each, 32 workers, well inside the 160-core cap; the four panel structures are already cached by M53.",
+
+  "why": [
+    "M53's V2 compared our F1 of the released M2_structure against the file's own M2_F1 column and found a maximum deviation of 0.867. The same parser, the same coordinate shift and the same window reproduce the file's RNet_F1 column to 0.00000 on all 160 rows, so the fault is in the released column: M2_structure is not a balanced dot-bracket string on 74 of 160 wild types, and 0 of those 74 reproduce M2_F1 while 80 of the 86 well-formed ones do.",
+    "The well-formed subset is not a safe fallback. The malformed rows are the more pseudoknotted ones -- target pseudoknot-character fraction 0.1194 against 0.0844 -- so restricting to rows that parse would select on structure class in a pseudoknot benchmark.",
+    "The question is unchanged. Every agreement number in this paper is scored against something written down rather than measured: Section 5.1's column is RibonanzaNet's own structure, which that section says; Section 5.10's is the designer's declared target, which is an intention. A reference derived from the probing data answers both, and we can build one."
+  ],
+
+  "the_reference": {
+    "how": "ShapeKnots (the RNAstructure distribution already used in the panel) on the full construct, with the deposit's own 2A3 reactivity as SHAPE pseudoenergy restraints at the published defaults -- slope 1.8, intercept -0.6, no tuning -- and positions without data set to -999. Pairs are then restricted to the design window, the same window every other agreement number in this paper uses.",
+    "what_it_is_not": "it is not the mutate-and-map contact map the released column claims to come from. It is a 1D SHAPE-directed fold. It is probing-derived and contains no sequence-to-structure prediction from any model whose contrast this paper reports.",
+    "the_kinship_that_must_be_declared": "ShapeKnots shares its nearest-neighbour energy model with two panel members, ViennaRNA and RNAstructure. That is not a defect of the design, it is a property to be measured, and A4 measures it. It does not weaken the answer to the charge actually made, which is that the reference is the model being evaluated: this reference is not RibonanzaNet under any reading."
+  },
+
+  "arms": {
+    "A1": "the agreement ranking recomputed against the built reference: each implementation's own native structure for the wild type, F1 over pairs inside the design window. Reports the four scores, the incumbent margin RibonanzaNet minus ViennaRNA with a target-clustered interval, the change in that margin with an interval, and the resulting order.",
+    "A2": "Section 5.1's agreement readout with the column swapped. On m25's own key set, five agreement columns -- RibonanzaNet's shipped structure frequency (the published one), ViennaRNA's MFE, RNAstructure's MFE, EternaFold's MEA, and the built reference. For each: the matched C-G minus A-U contrast, its pooled within-stratum SD, and the paired difference against the intervention readout in SD units on one design-clustered resample.",
+    "A3": "helix depth read from the built reference instead of from the declared target. The free baseline's within-design rank agreement is recomputed on it, paired against the declared version and against every predictor's level arm.",
+    "A4": "the reference's distance from every panel member: mean F1 between it and each of the four implementations' structures on the same wild types.",
+    "A5": "secondary and selected, reported as such: the same A1 restricted to the 86 rows whose released M2_structure is well-formed, scored against that released column, so the release's own reference is not simply discarded. The pseudoknot-content difference between the kept and dropped rows is printed beside it."
+  },
+
+  "verification_before_any_arm_is_read": {
+    "V1_zero_point": "F1 of a structure against itself is exactly 1.0 and against the empty structure exactly 0.0",
+    "V2_the_built_reference_is_well_formed": "every built structure parses to a balanced pair set on all 160 wild types, is the length of the construct, and contains no pair the sequence cannot form",
+    "V3_reverse_control": "before any reference is swapped, reproduce m43's four agreement scores against the declared target (0.61916, 0.67583, 0.60834, 0.87916), m25's B block (4293 pairs, 549 strata, 892 weight, rescue +0.0527, inferred +0.0198), m36's standardisation (within-SDs 0.2195 and 0.2335, contrasts +0.2400 and +0.0848, paired +0.1552) and the four published rank agreements (+0.32947, +0.25570, +0.27649, depth +0.32252)",
+    "V4_external_column_still_reproduces": "our F1 of RibonanzaNet's shipped structure against the declared target still reproduces the file's RNet_F1 column to 1e-3, so the coordinate handling has not drifted since M53",
+    "V5_equivalent_form": "the matched contrast from the estimator written in this file equals m25's E4_matched on the same records to 1e-12",
+    "V6_restraints_reach_the_program": "folding the same sequences with the restraint file replaced by one containing no data must change the output for a majority of the wild types. A reference that ignores its own probing data is not a probing-derived reference, and this check is what would catch that."
+  },
+
+  "kill_conditions": {
+    "K1": "if V3 fails to reproduce any published number to its printed precision, VOID",
+    "K2": "if V1, V2, V4, V5 or V6 fails, VOID",
+    "K3": "if ShapeKnots fails on more than 10 of the 160 wild types, VOID -- a reference defined on a selected subset is the thing this run exists to avoid",
+    "K4": "if A4 shows the built reference agreeing with any panel member above F1 0.90, A1 is reported as NOT independent of that member, by name, in the same paragraph, and its ranking is never described as neutral"
+  },
+
+  "staked_predictions": [
+    {"id": "S1", "text": "the incumbent margin, RibonanzaNet minus ViennaRNA, is SMALLER against the built probing-derived reference than the 0.260 it has against the declared target"},
+    {"id": "S2", "text": "RibonanzaNet still ranks first of the four against the built reference"},
+    {"id": "S3", "text": "Section 5.1's paired difference -- the intervention readout minus the agreement readout, in SD units -- still EXCLUDES zero when the agreement column is the built reference rather than RibonanzaNet's own, so Claim 2 does not depend on which model wrote the column"},
+    {"id": "S4", "text": "helix depth read from the built reference still exceeds every predictor's level arm, so the free baseline is not an artifact of the declared target"}
+  ],
+
+  "wording_rules_binding_on_the_manuscript": {
+    "W1": "whatever this run returns, the abstract's sentence comparing the interventional and agreement readouts names the source of the agreement column, and Claim 3 says the integer is read from the declared target structure rather than only that it is free.",
+    "W2": "the DECLARED target remains the primary reference for Reading 2. Decided here, before the result, because Reading 2 is a statement about the margin the incumbent benchmark actually distributes, and that margin is scored against the declared target. The built reference is a robustness axis. Re-choosing the primary after seeing which one flatters the paper would be the fitting this paper refuses elsewhere.",
+    "W3": "A4's number is reported wherever A1 is, and if K4 fires the kinship is named in the same paragraph and not in a footnote.",
+    "W4": "this run does not change the stratification. Helix depth inside the strata stays as read from the declared target; A3 changes the BASELINE only.",
+    "W5": "the defect M53 found in the released M2_structure column is reported in the manuscript whatever this run returns, with the counts and with the pseudoknot-content difference that makes the well-formed subset a selected one. It is a fact about the corpus a reader of this benchmark needs.",
+    "W6": "a failed stake is reported in the preregistration table as failed and the affected claim is narrowed in the body. If S1 fails -- if the margin is larger against the built reference -- that is reported as the stake failing and not rewritten as a strengthening."
+  }
+}
