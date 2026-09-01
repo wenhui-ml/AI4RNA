@@ -137,47 +137,46 @@ recovered from a public chemical-probing corpus}
 \begin{abstract}
 \noindent
 Chemical-probing benchmarks score RNA structure predictors by how far a predicted structure agrees
-with a reference. We argue, and measure, that such a number is not self-interpreting, and that it
-fails in two separate ways. It can be \emph{carried by a covariate somebody chose} --- these
-corpora are written by design programs, filtered by a rule, mutated at pairs an experimenter
-picked, and scored against a column that is itself a model's output. And it can be entirely real
-and still \emph{buy nothing}, because agreement is not the quantity an experimenter acts on.
+with a reference. We argue, and measure, that such a number is not self-interpreting. It fails in
+two separate ways. It can be \emph{carried by a covariate somebody chose}, since these corpora are
+written by design programs, filtered by a rule, mutated at pairs an experimenter picked, and scored
+against a column that is itself a model's output. And it can be entirely real and still \emph{buy
+nothing}, because agreement is not the quantity an experimenter acts on.
 
-We build an instrument that makes both readable on the same molecules. Compensatory orientation
-flips already executed in a public corpus are recovered by a stated criterion --- \jdg{nAdmitted}
-two-nucleotide interventions whose outcome is measured and contains no folding model --- and
+We build an instrument that makes both readable on the same molecules. A stated criterion recovers
+compensatory orientation flips already executed in a public corpus, yielding \jdg{nAdmitted}
+two-nucleotide interventions whose outcome is measured and contains no folding model, and
 \jdg{reNimpl} independent predictor implementations are scored by their \emph{response} to them
-rather than by their agreement with a reference. The corpus supplies its own null: constructs
-whose designed substitution is null were synthesised and probed anyway, and \jdg{noopFP} of them
-cross the threshold at which this paper calls an intervention rescued. \textbf{That is a measured
+rather than by their agreement with a reference. The corpus supplies its own null: constructs whose
+designed substitution is null were synthesised and probed anyway, and \jdg{noopFP} of them cross
+the threshold at which this paper calls an intervention rescued. \textbf{That is a measured
 false-positive rate for the outcome, and we are aware of no benchmark in this neighbourhood that
 reports one.}
 
-Read this way, the incumbent benchmark's margin does not survive translation into an experiment.
-At a fixed budget no implementation outperforms helix depth --- an integer read off the declared
-target structure, free wherever a target is declared --- and \jdg{eqNeq} of \jdg{eqNcomp}
-comparisons are formally equivalent to it within the gain one extra construct buys; the panel's
-largest agreement margin, \jdg{dcTransF1}, is worth \jdg{dcTransPct} of this corpus's rescuing
-interventions; and the gap changes sign exactly \jdg{ivNcross} time as budget is swept, at
+Read this way, the incumbent benchmark's margin does not survive translation into an experiment. At
+a fixed budget no implementation outperforms helix depth, an integer read off the declared target
+structure and free wherever a target is declared; \jdg{eqNeq} of \jdg{eqNcomp} comparisons are
+formally equivalent to it within the gain one extra construct buys; the panel's largest agreement
+margin, \jdg{dcTransF1}, is worth \jdg{dcTransPct} of this corpus's rescuing interventions; and the
+gap changes sign exactly \jdg{ivNcross} time as budget is swept, at
 \jdg{ivCrossA}--\jdg{ivCrossB} of a design built. \textbf{A model's agreement advantage is an
 average, and the better it ranks on that average the further from the top of its own ranked list
-the advantage lies --- while a budgeted experimenter only ever sees the top.} The same molecules
-also price \jdg{chPriced} covariate-choice channels --- \jdg{chCarry} carry the number,
-\jdg{chEmpty} bounded and empty, \jdg{chUnres} unresolved. Every agreement number here is
-labelled by the reference it is scored against, because the structure column this benchmark ships
-is a model's own output: the interventional reading separates from the agreement reading by
-\jdg{prReadout}\,SD (\jdg{prReadoutCi}) even when the agreement column is a reference
-reconstructed from this deposit's own probing data rather than predicted from sequence by any
-scored model, and against that reconstructed reference the incumbent's largest margin loses
-\jdg{prMarginPct} of its size. Prices are reported as direct contrasts and never as
-shares, because the estimator for a share is uninformative here, which we show and withdraw a
-metric of our own for.
+the advantage lies, while a budgeted experimenter only ever sees the top.} The same molecules also
+price \jdg{chPriced} covariate-choice channels: \jdg{chCarry} carry the number, \jdg{chEmpty}
+bounded and empty, \jdg{chUnres} unresolved. Because the structure column this benchmark ships is a
+model's own output, every agreement number here is labelled by the reference it is scored against.
+The interventional reading separates from the agreement reading by \jdg{prReadout}\,SD
+(\jdg{prReadoutCi}) even against a reference reconstructed from this deposit's own probing data
+rather than predicted from sequence by any scored model, and against that reference the incumbent's
+largest margin loses \jdg{prMarginPct} of its size. Prices are reported as direct contrasts and
+never as shares, because the estimator for a share is uninformative here, which we show and
+withdraw a metric of our own for.
 
 \textbf{This instrument's domain cannot be found; it has to be built, and we specify it.} The
 largest public probing corpus, \jdg{dmSeq} sequences over \jdg{dmLib} libraries, holds
 \jdg{dmCand} candidate orientation-flip \emph{sequence pairs} in total, because diversity and
 intervention are in direct tension: a design library spends every slot on a new molecule and an
-intervention needs four spent on one. The specification that follows is four measured lines ---
+intervention needs four spent on one. The specification that follows is four measured lines: 
 $4n$ slots per $n$ interventions, reference signal-to-noise above \jdg{qcCross07}, per-construct
 design windows and declared targets, and enough probing to check those targets, since a
 probing-derived reference confirms only \jdg{vaPooledPct} of the pairs these design programs
@@ -191,25 +190,25 @@ declared.
 
 Every benchmark that scores an RNA secondary-structure predictor asks a version of the same
 question: does the structure the model produced match a structure someone else believes to be
-right \citep{mathews2004incorporating,hajdin2013accurate,waymentsteele2022rna}. The question is
-natural, it has organised the field for thirty years, and on any corpus where models have become
-good it eventually runs out of room. Two things go wrong at once. The first is saturation: when
-the pairs being compared are already recovered nine times out of ten, the remaining variation is
-mostly noise about which structure a degenerate profile happened to select. The second is a
-degree of freedom that is rarely reported --- \emph{which} pairs enter the comparison. Restricting
-to the designed target pairs, or admitting every pair a predictor emits, are both defensible
-choices that benchmarking practice leaves open \citep{mathews2019benchmark}, and on the corpus
-below they move the same measurement by a factor of \jdg{cvSwing}.
+right \citep{mathews2004incorporating,hajdin2013accurate,waymentsteele2022rna}. The question has
+organised the field for thirty years, and on any corpus where models have become good it runs out
+of room in two ways at once. The first is saturation: when the pairs being compared are already
+recovered nine times out of ten, the remaining variation is mostly noise about which structure a
+degenerate profile happened to select. The second is a rarely reported degree of freedom,
+\emph{which} pairs enter the comparison. Restricting to the designed target pairs and admitting
+every pair a predictor emits are both defensible choices that benchmarking practice leaves open
+\citep{mathews2019benchmark}, and on the corpus below they move the same measurement by a factor
+of \jdg{cvSwing}.
 
-There is a different question available, and the data to ask it already exists. Chemical-probing
-campaigns that include mutant libraries have, for more than a decade, synthesised and measured
-molecules that differ from a wild type at a small number of positions
-\citep{kladwang2011two,cordero2015rich,tian2014correcting}. Among those mutants is a class with an
-unusual property. A \emph{compensatory} double mutant of a target base pair exchanges the two
-bases: a G--C becomes a C--G, an A--U becomes a U--A. Outside those two positions the molecule is
-unchanged and the unordered pair type is unchanged; what changes is the nearest-neighbour context
-and whatever else the exchange disturbs. That is a controlled two-nucleotide experiment with its
-own internal control, it has been performed, and its result has been recorded.
+A different question is available, and the data to ask it already exists. For more than a decade,
+chemical-probing campaigns with mutant libraries have synthesised and measured molecules differing
+from a wild type at a few positions \citep{kladwang2011two,cordero2015rich,tian2014correcting}.
+One class of those mutants has an unusual property. A \emph{compensatory} double mutant of a
+target base pair exchanges the two bases: a G--C becomes a C--G, an A--U becomes a U--A. Outside
+those two positions the molecule is unchanged and the unordered pair type is unchanged; what
+changes is the nearest-neighbour context and whatever else the exchange disturbs. That is a
+controlled two-nucleotide experiment with its own internal control, already performed and
+recorded.
 
 We use those interventions to score models rather than to infer structures, and that is where our
 use departs from the technique's own literature. Mutate-and-map and mutate-map-rescue use
@@ -217,9 +216,9 @@ mutations to \emph{establish} which nucleotides pair \citep{kladwang2011two,tian
 cheng2017rna}; the mutation is an instrument aimed at the molecule. We aim it at the model
 instead: given a mutant that was actually made, what did the model predict would happen to the
 target pair, and did the measurement agree? \textbf{No \emph{inferred} structure enters the
-outcome of that comparison} --- the declared target does enter, and says which pair is the target,
-how deep it sits and whether it crosses (\S\ref{sec:mining}), but nothing on the measured side is
-a structure anybody inferred or any model produced. That removes the degeneracy that makes
+outcome of that comparison.} The declared target does enter, saying which pair is the target, how
+deep it sits and whether it crosses (\S\ref{sec:mining}), but nothing on the measured side is a
+structure anybody inferred or any model produced. That removes the degeneracy that makes
 profile-based scoring awkward, and saturation does not arise either, because the quantity being
 predicted is a change rather than a state.
 
@@ -228,13 +227,13 @@ auditing benchmark scores}: a method that takes a probing corpus and a set of pr
 returns, for a benchmark number computed on them, whether it measures the construct it is named
 after and whether its margin survives translation into an experimental decision. It does not
 replace structure-agreement benchmarks and it is not a predictor; it interrogates what their
-scores mean. It has three stages and the paper is organised as them. \textbf{Recover}: a stated
-criterion mines controlled two-nucleotide interventions that somebody already executed
-(\S\ref{sec:mining}). \textbf{Measure}: predictors are scored by their response, on an outcome
-into which no folding model enters (\S\ref{sec:outcome}); because resolution must be established
-before anything is read off it, and because the predictors are not innocent of the corpus, the
-reliability ceiling (\S\ref{sec:ceiling}) and the leakage audit (\S\ref{sec:leakage}) are both in
-the main text. \textbf{Translate}: the margin is converted into experiments at a fixed budget
+scores mean. Its three stages organise the paper. \textbf{Recover}: a stated criterion mines
+controlled two-nucleotide interventions somebody already executed (\S\ref{sec:mining}).
+\textbf{Measure}: predictors are scored by their response, on an outcome into which no folding
+model enters (\S\ref{sec:outcome}). Resolution must be established before anything is read off it,
+and the predictors are not innocent of the corpus, so the reliability ceiling
+(\S\ref{sec:ceiling}) and the leakage audit (\S\ref{sec:leakage}) are both in the main text.
+\textbf{Translate}: the margin is converted into experiments at a fixed budget
 (\S\ref{sec:reorder}).
 
 \paragraph{What this instrument measures, stated once.} Because the rest of the paper depends on
@@ -242,20 +241,20 @@ it, the estimand is written here rather than assembled from context. \textbf{Thi
 not measure whether a predicted structure is globally correct. It measures whether a predictor's
 probability for a \emph{named} base pair anticipates the measured consequence of a \emph{specific}
 compensatory intervention on that pair, in a molecule whose own wild type is the internal
-control.} Everything that follows is an application of that one quantity: Reading~1 asks who chose
-the covariates it varies over, Reading~2 asks what a margin in it is worth as an experiment, and
-the domain analysis asks which corpora can supply it at all. A benchmark scored on global
-agreement answers a different question, and this paper does not claim that question is the wrong
-one --- only that its answer does not transfer to this one by default.
+control.} Everything that follows applies that one quantity: Reading~1 asks who chose the
+covariates it varies over, Reading~2 asks what a margin in it is worth as an experiment, and the
+domain analysis asks which corpora can supply it at all. A benchmark scored on global agreement
+answers a different question. We do not claim that question is the wrong one, only that its answer
+does not transfer to this one by default.
 
 \paragraph{The two readings.} Stages two and three exist because a benchmark number fails to be
 self-interpreting in two separate ways, and both must be checked before it licenses anything. It
-can be \emph{carried by a covariate somebody chose} rather than by the property it names --- these
-molecules were written by design programs, filtered by a selection rule, mutated at pairs somebody
-picked, and scored against a reference column that is itself a model's output --- and it can be
-entirely real and still \emph{buy nothing}, because the quantity it reports is not the quantity an
-experimenter acts on. The first failure is invisible because the number looks the same either way;
-the second because nobody converts. Section~\ref{sec:ledger} is the ledger that results:
+can be \emph{carried by a covariate somebody chose} rather than by the property it names, these
+molecules having been written by design programs, filtered by a selection rule, mutated at pairs
+somebody picked, and scored against a reference column that is itself a model's output. And it can
+be entirely real and still \emph{buy nothing}, because the quantity it reports is not the quantity
+an experimenter acts on. The first failure is invisible because the number looks the same either
+way; the second because nobody converts. Section~\ref{sec:ledger} is the ledger that results:
 \jdg{chPriced} channels, each named by its chooser and priced by a direct contrast, of which
 \jdg{chCarry} carrying the number, \jdg{chEmpty} empty and \jdg{chUnres} unresolved. The one
 this paper is entitled to call empty is \emph{the folding model's own free energy}, the objective
@@ -274,7 +273,7 @@ named by who chose it and priced by a direct contrast with an interval, plus the
 choosers we can name and cannot price. The incumbent readout is one row of it: exhausted on this
 corpus, carrying a researcher degree of freedom worth \jdg{cvSwing}$\times$, and worth
 \jdg{cvConvSd} against the interventional readout's \jdg{cvIntvSd} standard deviations on the same
-molecules, pairs and strata --- a row that carries a separation the conventional readout cannot
+molecules, pairs and strata, a row that carries a separation the conventional readout cannot
 express (Claim~\ref{claim:identity}).
 \item \textbf{The conversion of a benchmark margin into experiments} (\S\ref{sec:reorder}), which
 no benchmark performs on itself: no implementation outperforms a free integer as a standalone
@@ -284,7 +283,7 @@ budget the margin's sign \emph{inverts} (Claim~\ref{claim:budget}).
 \item \textbf{The instrument's domain, as a specification a laboratory can act on}
 (\S\ref{sec:ceiling}): a resolution ceiling, a signal-to-noise gate, and the measured fact that
 the largest public probing corpus holds \jdg{dmCand} candidate orientation-flip sequence pairs in
-total --- so this instrument's reach cannot be enlarged by finding a bigger corpus and has to be
+total, so this instrument's reach cannot be enlarged by finding a bigger corpus and has to be
 written into a library on purpose. All of it is packaged as \texttt{designaudit}, whose selftest
 reproduces this paper's headline numbers from the public data.
 \end{enumerate}
@@ -293,7 +292,7 @@ reproduces this paper's headline numbers from the public data.
 are not the same length. Table~\ref{tab:guide} is the map: each claim, the small set of quantities
 that actually carries it, and where the argument for it is made. Everything not in the first
 column of that table is context, control or bound. The second half of the table is the list of
-quantities this work has \emph{withdrawn} --- three of them from earlier versions of this paper ---
+quantities this work has \emph{withdrawn}, three of them from earlier versions of this paper, 
 and the entry to read there is the last column, which is empty in every row on purpose: no claim
 here rests on any of them.
 
@@ -404,9 +403,8 @@ decomposition, or a close relative, and fit its weights discriminatively to stru
 doing so on probing data is developed separately \citep{waymentsteele2021theoretical}.
 \emph{Neural} models drop the decomposition and predict pairing from sequence with a learned
 architecture and no explicit energy \citep{singh2019spotrna,sato2021rna,fu2022ufold,
-ribonanzanet2024}. A fourth axis cuts across all three --- whether a model can represent a
-pseudoknot at all \citep{rivas1999dynamic,reeder2004design,bellaousov2010probknot,janssen2015pkiss}
---- and it matters here only because the corpus is a pseudoknot round, so crossing is carried as a
+ribonanzanet2024}. A fourth axis cuts across all three  (whether a model can represent a
+pseudoknot at all \citep{rivas1999dynamic,reeder2004design,bellaousov2010probknot,janssen2015pkiss}) and it matters here only because the corpus is a pseudoknot round, so crossing is carried as a
 covariate and never as a selection rule.
 
 The distinction that usually organises this list is thermodynamic versus neural; the one that
@@ -429,8 +427,8 @@ agree we read that as corroboration and not as evidence from either.
 Scoring a model by the effect of a mutation is established outside this field, and the separation
 is one of quantities rather than ambition: ProteinGym \citep{proteingym2023} and NABench
 \citep{nabench2025} compare a model's sequence-level likelihood or fitness score with a
-\emph{functional} measurement, whereas here a model's \emph{structural} prediction --- the
-probability it assigns to one named base pair --- is compared with a \emph{structural} measurement
+\emph{functional} measurement, whereas here a model's \emph{structural} prediction, the
+probability it assigns to one named base pair, is compared with a \emph{structural} measurement
 of that same pair, on a mutant whose own wild type is the internal control. The mutation is the
 same kind of object in both cases; what sits on either side of the comparison is not, and that is
 why a structure predictor can be scored here at all. The mutate-and-map literature owns the
@@ -441,23 +439,23 @@ with a control for who chose the pairs.
 \paragraph{Scoring a folding algorithm by its response to a mutation, inside this field.}
 riboSNitch prediction asks whether a single-nucleotide variant reorganises a transcript's
 structure, and \citet{corley2015ribosnitch} turned it into a genome-wide benchmark of folding
-algorithms --- including remuRNA, RNAsnp and SNPfold, built for that task --- graded against
+algorithms  (including remuRNA, RNAsnp and SNPfold, built for that task) graded against
 structural change detected by parallel probing, a line still being built on
 \citep{kirven2025variantfold}. Three things differ here: the intervention is a compensatory
 \emph{pair} rather than a single substitution, so the unordered pair type is held fixed and the
 molecule's own wild type is the internal control; the estimand is one \emph{named} base pair rather
 than a whole-transcript ensemble distance; and the grading column contains no folding model, a
-riboSNitch label being a structural change inferred by comparing two probing profiles --- exactly
-the one-to-many map of \S\ref{sec:probing} --- whereas the outcome used here is arithmetic on
+riboSNitch label being a structural change inferred by comparing two probing profiles, exactly
+the one-to-many map of \S\ref{sec:probing}, whereas the outcome used here is arithmetic on
 reactivities (\S\ref{sec:outcome}). What the two lines share is the premise that a prediction about
 a \emph{change} tests a folding model more sharply than a prediction about a state, which we read
 as corroboration of that premise and not as evidence for any number below. The separation is
 measured rather than asserted: \S\ref{sec:ranking} scores the standard riboSNitch quantities on
 these interventions, beside the predictors and the free baseline.
 
-\paragraph{An average advantage, and a budget.} The observation Reading~2 rests on --- that an
+\paragraph{An average advantage, and a budget.} The observation Reading~2 rests on  (that an
 average metric advantage need not survive a budget, and that a ranking can invert once only the
-top of the list is acted on --- has a long prior life outside this field. Virtual screening
+top of the list is acted on) has a long prior life outside this field. Virtual screening
 introduced enrichment factors and early-recognition metrics for exactly this reason: a global
 figure of merit does not say how many actives appear in the first few percent of a ranked list,
 and two methods with the same global score can differ sharply there
@@ -466,13 +464,13 @@ not transfer to a prospective campaign is the same literature's central negative
 \citep{wallach2018most}. We claim no novelty for the shape of that argument, and saying so makes
 clear what is new here: it is done for RNA structure prediction, the conversion is into
 experiments somebody has already executed rather than into a simulated screen, and the mechanism
-is stated sharply enough to be attacked --- \emph{the larger a model's average agreement
+is stated sharply enough to be attacked: \emph{the larger a model's average agreement
 advantage, the further from the top of its own ranked list that advantage lies}, while a budgeted
 experimenter only ever sees the top.
 
 \paragraph{A free baseline, and the calibration of the metric it is compared on.}
-Claim~\ref{claim:depth}'s genre --- a deep model failing to beat a simple baseline on a benchmark
-task --- has an immediate precedent in perturbation prediction, where deep models were found not
+Claim~\ref{claim:depth}'s genre, a deep model failing to beat a simple baseline on a benchmark
+task, has an immediate precedent in perturbation prediction, where deep models were found not
 to outperform linear global baselines \citep{ahlmanneltze2025deep}. The standing objection to
 results of that shape is that they turn on how the metric is calibrated rather than on what the
 models know, and we take that objection seriously rather than answering it: it is why the baseline
@@ -489,23 +487,22 @@ natural sequences. It is not a test of whether a predictor anticipates \emph{mea
 \emph{single} pair on sequences a design program wrote, which is what a benchmark has to answer.
 
 \subsection{Corpora made by design programs}
-The molecules here were produced by design methods competing on shared targets --- energy-directed
+The molecules here were produced by design methods competing on shared targets  (energy-directed
 search \citep{andronescu2004new,busch2006info,zadeh2011nupack}, sampling and learning agents
 \citep{kleinkauf2015antarna,runge2019learna}, human players and the models trained on them
 \citep{lee2014eterna,andersonlee2016eterna100,koodli2021eternabrain}, and pipelines assembled from
-several \citep{yesselman2019computational} --- and such a corpus carries its producers' preferences
+several \citep{yesselman2019computational}) and such a corpus carries its producers' preferences
 as covariates. Inside this field the hazard has been demonstrated once already, in a form close enough that the
 present thesis should be read as its generalisation: a deep model's benchmark score is carried by
 family membership and by sequence similarity to its training set rather than by an ability to
 predict structure \citep{szikszai2022generalize,flamm2022caveats,qiu2023sequence}, a finding
 restated on rebuilt splits and curated held-out structures four years later
-\citep{chanrg2026,szikszai2026gauging}. Those studies name \emph{one} channel --- homology --- and
+\citep{chanrg2026,szikszai2026gauging}. Those studies name \emph{one} channel, homology, and
 close it by changing the split. \S\ref{sec:ledger} asks the question after that one: on a corpus
 nobody sampled, how many such channels are there, who chose each, and how much does each carry.
-The same hazard is recognised qualitatively elsewhere --- feedback in recommender systems
+The same hazard is recognised qualitatively elsewhere  (feedback in recommender systems
 \citep{chaney2018algorithmic}, generator--judge contamination in language-model evaluation
-\citep{li2025preference}, characteristic biases of protein design programs \citep{protdbench2026}
---- and the correction it demands here is quantitative, so we state it as an assumption in
+\citep{li2025preference}, characteristic biases of protein design programs \citep{protdbench2026}) and the correction it demands here is quantitative, so we state it as an assumption in
 Section~\ref{sec:method} and estimate its size in Section~\ref{sec:conventional}.
 
 % =====================================================================
@@ -533,7 +530,7 @@ window, at exactly the two positions of one target pair, and differing there by 
 bases (Definition~\ref{def:flip}). Each admitted intervention carries a treatment label
 $t\in\{\mathrm{C\!-\!G},\mathrm{A\!-\!U},\mathrm{G\!-\!U}\}$, the unordered type of the flipped
 pair; an outcome $R\in\mathbb{R}$, the corpus's measured rescue factor; and two covariates read off
-the declared target alone --- the helix depth $d$ of the flipped pair, and an indicator $k$ for
+the declared target alone, the helix depth $d$ of the flipped pair, and an indicator $k$ for
 whether another declared pair crosses it.
 
 A \emph{predictor} is any map $f$ from a sequence and two positions to a number in $[0,1]$ it
@@ -558,7 +555,7 @@ A construct is an \emph{admissible intervention} on the pair $(i,j)\in P$ when a
 following hold:
 \begin{enumerate}[leftmargin=2.4em,itemsep=1pt,label=(\roman*)]
 \item $|w| = |m|$;
-\item $\{k \in [\ell,u) : w_k \neq m_k\} = \{i,j\}$ exactly --- two positions, both inside the
+\item $\{k \in [\ell,u) : w_k \neq m_k\} = \{i,j\}$ exactly, two positions, both inside the
 design window, and no others;
 \item $(i,j) \in P$;
 \item $\{w_i, w_j\} \in \{\mathrm{A\!-\!U}, \mathrm{C\!-\!G}, \mathrm{G\!-\!U}\}$;
@@ -576,16 +573,15 @@ window and can differ at a dozen positions there.
 \paragraph{How often clause (iii) is telling the truth.}\label{sec:clauseiii} A declared target is an intention, and
 clause (iii) admits an intervention on the strength of it. That makes the fraction of declared
 pairs the molecule actually forms a ceiling on the criterion's validity, and it is measurable
-without leaving this corpus: the probing-derived reference of \S\ref{app:probing} --- built
+without leaving this corpus: the probing-derived reference of \S\ref{app:probing}, built
 from the deposit's own reactivities by a program none of the scored implementations is
-\citep{deigan2009accurate} --- confirms \jdg{vaHit} of the \jdg{vaAll} declared pairs lying inside
+\citep{deigan2009accurate}, confirms \jdg{vaHit} of the \jdg{vaAll} declared pairs lying inside
 the design windows, \jdg{vaPooled} pooled and \jdg{vaMean} averaged over designs
 (\jdg{vaMeanCi}), with a median of \jdg{vaMed} and \jdg{vaNone} of \jdg{vaNdes} designs at zero.
 \textbf{Roughly a fifth of what these design programs declared is not what the molecule did}, and
 every agreement number scored against a declared target in this literature inherits that.
 The pairs this paper intervenes on are confirmed slightly more often than the declared pairs at
-large, \jdg{vaIntv}, so the interventions are not sitting on the corpus's least reliable pairs
---- which is a fact about where experimenters put mutations and is priced as such in
+large, \jdg{vaIntv}, so the interventions are not sitting on the corpus's least reliable pairs, which is a fact about where experimenters put mutations and is priced as such in
 \S\ref{sec:ledger}. A different figure, \jdg{vaReleased}, is obtainable from the structure column
 the deposit ships; we do not use it, because \S\ref{app:probing} shows that column is
 malformed on \jdg{relUnbal} of \jdg{relN} of its rows, and a fraction computed against it is a
@@ -593,7 +589,7 @@ fraction against a defect.
 
 Everything else is refused under a named reason and counted. A mutant admitting more than one wild
 type, or whose two changed positions are explained by more than one declared pair, is excluded as
-\emph{ambiguous} rather than resolved by a rule --- resolving it would let the corpus choose which
+\emph{ambiguous} rather than resolved by a rule: resolving it would let the corpus choose which
 intervention it supplies. Corpus quality fields (signal-to-noise, read depth) are carried on each
 admitted intervention and reported, and never enter the criterion.
 
@@ -601,20 +597,20 @@ admitted intervention and reported, and never enter the criterion.
 deposition we could enumerate in the RMDB: \jdg{scDeposits} records. \jdg{scSkipped} of them
 (\jdg{scSkippedPct}) could not be evaluated at all, because they publish neither construct naming
 nor per-row sequence annotation, and without one of the two there is no way to decide which
-constructs belong to the same design cell --- the criterion never gets as far as clause (ii). On
+constructs belong to the same design cell, the criterion never gets as far as clause (ii). On
 the \jdg{scEval} that could be evaluated, \jdg{scHits} deposition records carry at least one
 admissible orientation flip.
 
 Counting the libraries behind those records takes one step that is easy to get wrong, and we got it
 wrong first: a repository deposits a library once per chemical probe and also deposits the
 \emph{same design set} under more than one name. Keyed on the deposit name the \jdg{scHits} records
-are \jdg{scLibsDeposit} libraries; keyed on the design set --- construct names compared after
+are \jdg{scLibsDeposit} libraries; keyed on the design set  (construct names compared after
 normalising a deposit-specific formatting convention, within-set agreement \jdg{scLinIn} against
-between-set \jdg{scLinOut} --- they are \jdg{scLibs}, and the flip counts move with the unit (\jdg{scFlipsRec} per deposited record against \jdg{scFlips} per design
+between-set \jdg{scLinOut}) they are \jdg{scLibs}, and the flip counts move with the unit (\jdg{scFlipsRec} per deposited record against \jdg{scFlips} per design
 set). We report design-set numbers throughout; Appendix~\ref{app:survey} carries the comparison.
 
 Two things follow, in opposite directions. The binding constraint on applying this instrument to
-public data is not that compensatory flips are rare inside libraries --- they are not --- but that
+public data is not that compensatory flips are rare inside libraries (they are not) but that
 most depositions do not publish enough annotation to tell whether they contain any: neither of the
 \jdg{scNewLibs} libraries here that we do not already analyse can be run through the criterion as
 deposited, one publishing no construct names and the other's barcode falling \emph{inside} the
@@ -639,8 +635,8 @@ second quantity.
 \caption{\textbf{The intervention, and the two questions it can answer.} \textbf{Top}, an
 admissible orientation flip: exactly two positions change, both inside the design window, they are
 the two members of one declared pair, and the substitution exchanges them so the unordered pair
-type is preserved. Outside the window the constructs differ freely --- these libraries carry
-adapters, padding and barcodes there --- which is why clause~(ii) is stated on the window and not
+type is preserved. Outside the window the constructs differ freely  (these libraries carry
+adapters, padding and barcodes there) which is why clause~(ii) is stated on the window and not
 on the construct. \textbf{Bottom}, the two conditioning sets used here: helix depth is a
 confounder in one and information the experimenter already holds in the other.}
 \label{fig:flip}
@@ -667,8 +663,8 @@ printed elsewhere.
 
 Recomputing \eqref{eq:rescue} from the raw per-nucleotide reactivity columns for all \jdg{rpN}
 double mutants whose two single mutants and wild type are present reproduces the corpus's own value
-at Pearson $\jdg{rpPearson}$ and Spearman $\jdg{rpSpearman}$ --- same mean \jdg{rpCorpusMean} and
-standard deviation \jdg{rpCorpusSd} --- with maximum absolute deviation \jdg{rpMaxDiff} and median
+at Pearson $\jdg{rpPearson}$ and Spearman $\jdg{rpSpearman}$, same mean \jdg{rpCorpusMean} and
+standard deviation \jdg{rpCorpusSd}, with maximum absolute deviation \jdg{rpMaxDiff} and median
 \jdg{rpMedDiff}. \textbf{The outcome is measurement-derived end to end; no folding model appears
 anywhere in it}, so nothing here is circular in the way a profile-constrained structure comparison
 would be.
@@ -694,8 +690,8 @@ ranking on this corpus, not that the outcome is local.
 \textbf{An empirical null for the outcome, from constructs we did not know were there.} The check
 that the window is centred on the intervention failed on \jdg{noopN} constructs, and diagnosing it
 rather than relaxing it produced a control this benchmark did not have. Those constructs carry
-mutation tags whose substitution is null --- an \texttt{A} at position 40 replaced by an
-\texttt{A} --- so their design-region sequence is identical to the wild type's, and they were
+mutation tags whose substitution is null, an \texttt{A} at position 40 replaced by an
+\texttt{A}, so their design-region sequence is identical to the wild type's, and they were
 nonetheless synthesised, probed and given a rescue factor independently. \textbf{They are the
 outcome measured when nothing was changed.} Definition~\ref{def:flip} had already refused all
 \jdg{noopN} under its two-positions clause, which is the criterion behaving correctly on a
@@ -705,8 +701,8 @@ Their rescue factor has mean \jdg{noopMean}, median \jdg{noopMed}, standard devi
 and runs from \jdg{noopLo} to \jdg{noopHi}, and \textbf{\jdg{noopFP} of them cross the
 \jdg{noopThr} threshold at which this paper calls an intervention rescued.} That is a measured
 false-positive rate for the binary outcome, and we are aware of no benchmark in this neighbourhood
-that reports one. It biases no comparison here --- every ranker is scored against the same labels,
-so a shared false-positive rate attenuates them together --- but it is most of the reason the
+that reports one. It biases no comparison here  (every ranker is scored against the same labels,
+so a shared false-positive rate attenuates them together) but it is most of the reason the
 attainable ceiling of \S\ref{sec:ceiling} sits at \jdg{qcCeilLo}--\jdg{qcCeilHi} rather than near
 one.
 \end{scopebox}
@@ -718,7 +714,7 @@ An outcome that contains no model can still contain too much noise to score one,
 measurement can resolve is computable from the corpus itself without a second experiment: split
 the reactivity columns that enter \eqref{eq:rescue} into two halves and recompute the outcome on
 each. The two halves are two measurements of the same intervention, so their agreement is the
-outcome's internal consistency --- a property of the measurement rather than of anything a model
+outcome's internal consistency, a property of the measurement rather than of anything a model
 does.
 
 How the columns are split changes the answer, and reporting one rule as though it were the answer
@@ -732,8 +728,8 @@ measurement and square-rooted, those are ceilings of \jdg{qcCeilOe}, \jdg{qcCeil
 
 \textbf{The instrument's resolution is therefore a range, \jdg{qcCeilLo} to \jdg{qcCeilHi}, and
 every claim below rests on the conservative end.} The two quantities Section~\ref{sec:ranking} puts
-side by side --- \jdg{rkRhoD} for a covariate that needs no model and \jdg{rkRhoN} for the neural
-predictor --- sit at about four tenths of \jdg{qcCeilLo}, so their near-equality is not the
+side by side, \jdg{rkRhoD} for a covariate that needs no model and \jdg{rkRhoN} for the neural
+predictor, sit at about four tenths of \jdg{qcCeilLo}, so their near-equality is not the
 measurement saturating: corrected for attenuation they are \jdg{rkRhoDAtt} and \jdg{rkRhoNAtt},
 still indistinguishable and still far from what this outcome would permit.
 
@@ -746,7 +742,7 @@ to happen. It crosses \jdg{qcThrA} only above reference signal-to-noise \jdg{qcC
 \jdg{qcThrB} in no bin.
 
 The admission cutoff used for the second corpus (\S\ref{sec:second}) is \jdg{qcAsserted}, and it
-was never estimated from anything --- the deposit it rejects reaches \jdg{xnFseSnHi} and the one
+was never estimated from anything, the deposit it rejects reaches \jdg{xnFseSnHi} and the one
 it accepts starts at \jdg{xnSl5SnLo}, so nothing was ever observed on either side of it. We leave
 it where it is, because moving a cutoff after seeing which corpora it admits is the tuning this
 paper refuses elsewhere, and state instead what the curve says: at \jdg{qcAsserted} the outcome is
@@ -757,7 +753,7 @@ is the transferable part.
 \paragraph{The other half of the domain: whether a library contains interventions at all.} A
 signal gate is useless on a corpus that holds nothing to gate. The natural way to enlarge this
 instrument's reach is to point it at a bigger corpus, so we pointed it at the largest public one:
-\jdg{dmSeq} unique sequences in \jdg{dmRows} rows across \jdg{dmLib} libraries --- four synthesis
+\jdg{dmSeq} unique sequences in \jdg{dmRows} rows across \jdg{dmLib} libraries: four synthesis
 platforms, two probing chemistries, RFAM windows, coronavirus genomes, player-designed molecules,
 algorithmically generated insert and delete panels. Searching all of them exhaustively for
 sequence pairs that \emph{could} be compensatory orientation flips returns \textbf{\jdg{dmCand}
@@ -771,13 +767,13 @@ in that corpus is not measured by anything here and the number of \emph{scorable
 What can be said is an extrapolation, and is labelled as one: on this paper's own \jdg{dmOwnReg}
 design regions the same search returns \jdg{dmOwnCand} candidates against \jdg{nAdmitted} admitted,
 a conversion of \jdg{dmConv}, and transporting that rate gives roughly \jdg{dmExpected}.
-\textbf{That is a transport from one corpus, not a conversion probability} --- the libraries differ
-in composition, design mechanism and annotation --- and even at face value it leaves this paper's
+\textbf{That is a transport from one corpus, not a conversion probability}  (the libraries differ
+in composition, design mechanism and annotation) and even at face value it leaves this paper's
 \jdg{nAdmitted} admitted interventions more than two orders of magnitude above it.
 
 \textbf{That is not a sampling accident, and it is the most useful thing this section reports.}
 These are \emph{design} libraries, built to maximise the diversity of molecules assayed, so every
-construct is a different molecule and none is a controlled perturbation of another --- a library
+construct is a different molecule and none is a controlled perturbation of another, a library
 named for single-nucleotide mutants contributes \jdg{dmCandZero} candidates, because single mutants
 of \emph{different} parents are not near neighbours. Diversity and intervention are in direct
 tension: an intervention needs two constructs differing in exactly the intended way, which costs a
@@ -788,7 +784,7 @@ not produce interventions; this instrument's domain has to be written into a lib
 section, and it is cheap. A library that wants to be readable by this instrument has to supply,
 \emph{for $n$ interventions}:
 \begin{enumerate}[leftmargin=2.4em,itemsep=1pt,label=(\arabic*)]
-\item \textbf{$4n$ slots} --- wild type, both single mutants, double. This is the whole cost, and
+\item \textbf{$4n$ slots}: wild type, both single mutants, double. This is the whole cost, and
 against libraries of \jdg{dmSeq} constructs it is a rounding error in synthesis. What it is not is
 free of \emph{design} effort, which is the tension this section measured: those four slots buy one
 controlled comparison where a diversity-maximising library would have bought four molecules.
@@ -798,8 +794,8 @@ the bottom of its reliability range, which is where the cutoff this paper inheri
 (\jdg{qcAsserted}) sits. This number is estimated, not asserted, and it is the one line here that
 a laboratory can check before synthesising anything.
 \item \textbf{Per-construct design windows and declared targets, published.} These are exactly the
-fields Definition~\ref{def:flip} quantifies over, and their absence --- not a shortage of
-molecules --- is what makes \jdg{dmCand} of \jdg{dmSeq} sequences the reachable number. A library
+fields Definition~\ref{def:flip} quantifies over, and their absence, not a shortage of
+molecules, is what makes \jdg{dmCand} of \jdg{dmSeq} sequences the reachable number. A library
 that publishes a barcode and a sequence has made itself unreadable here for the price of a column.
 \item \textbf{Enough probing to check those targets.} A declared target is an intention, and on
 this corpus a probing-derived reference confirms \jdg{vaPooledPct} of the pairs the design programs
@@ -823,7 +819,7 @@ of magnitude; the dashed line is this paper's corpus, counted the same way, and 
 contributing none are drawn at the axis floor. \textbf{b}, split-half reliability against
 reference signal-to-noise within sextiles; the crossing at \jdg{qcCross07} is the gate below which
 the outcome is not worth reading at full resolution. \textbf{c}, the two axes together.
-\textbf{The admissible corner is the top right, and it is nearly empty} --- which is the
+\textbf{The admissible corner is the top right, and it is nearly empty}  (which is the
 specification, not a complaint.}
 \label{fig:domain}
 \end{figure}
@@ -831,7 +827,7 @@ specification, not a complaint.}
 Two facts underwrite the search rather than being assumed by it: every one of the \jdg{dmLib}
 libraries carries exactly a \jdg{dmPre}-nucleotide constant prefix and a \jdg{dmSuf}-nucleotide
 constant suffix, measured, and searching the design region returns the identical count to searching
-the whole construct in every library --- the check that no per-construct barcode hides inside the
+the whole construct in every library) the check that no per-construct barcode hides inside the
 variable region. The detector's standing is established before it is pointed anywhere new: on this
 paper's corpus it recovers \jdg{dmRecall} of the \jdg{dmKnown} wild-type/double-mutant pairs
 already published here, its transposition count equals that published count exactly, and its misses
@@ -882,7 +878,7 @@ what puts the measurement and the prediction on one scale.
 \paragraph{What the intervals rest on.} Intervals resample targets rather than interventions
 (\S\ref{sec:inference}), so the number of targets is what a reader needs. There are
 \jdg{ccPuzzles} behind the \jdg{nAdmitted} interventions and \jdg{ccCells} design cells, and they
-are not lopsided --- smallest \jdg{ccPerMin} interventions, median \jdg{ccPerMed}, largest
+are not lopsided: smallest \jdg{ccPerMin} interventions, median \jdg{ccPerMed}, largest
 \jdg{ccPerMax}, so no single target contributes more than \jdg{ccLargest} of the corpus. That is
 not many, and every interval here should be read as resting on it rather than on the intervention
 count.
@@ -893,9 +889,8 @@ Conditional on the design cell, helix depth and crossing, the pair type is as go
 assigned with respect to the outcome.
 \end{assumption}
 
-Assumption~\ref{ass:placement} cannot be tested from this data, and the conventional response ---
-asking how strong an unmeasured confounder would have to be to overturn the estimate
-\citep{rosenbaum1987sensitivity,rosenbaum2010design} --- bounds rather than removes the concern,
+Assumption~\ref{ass:placement} cannot be tested from this data, and the conventional response  (asking how strong an unmeasured confounder would have to be to overturn the estimate
+\citep{rosenbaum1987sensitivity,rosenbaum2010design}) bounds rather than removes the concern,
 and we report that bound below. It is needed because the molecules were not randomised: design programs choose both what a pair is and
 where it goes, and the two choices are correlated. A controlled-truth benchmark quantifies the
 price of ignoring it. On synthetic data matched to this corpus's own depth response $\beta =
@@ -903,14 +898,14 @@ price of ignoring it. On synthetic data matched to this corpus's own depth respo
 biased by $\beta g = \jdg{biasPredicted}$, with measured bias across cases running \jdg{biasLo} to
 \jdg{biasHi}. Regression adjustment and matching both remove it (worst-case absolute bias
 \jdg{biasRegMax} and \jdg{biasMatchMax}), so the requirement is to \emph{condition on placement},
-not to use any particular estimator --- the natural overstatement being that matching is required,
+not to use any particular estimator, the natural overstatement being that matching is required,
 which on this design it is not. A vectorised and a readable implementation of all four estimators
 agree to \jdg{biasCrosscheck}.
 
 \textbf{What that benchmark licenses.} It shows the adjustment machinery recovers the truth when
 the confounding is placement of the kind we simulated, at this corpus's own $\beta$ and $g$. It
 does \textbf{not} show that real placement confounding is adequately captured by cell, depth and
-crossing --- no benchmark built from a confounder we chose could. Assumption~\ref{ass:placement}
+crossing: no benchmark built from a confounder we chose could. Assumption~\ref{ass:placement}
 is therefore an assumption in the strict sense: the machinery conditioned on it is validated, the
 identification resting on it is asserted.
 
@@ -927,16 +922,16 @@ contrast is explained away only by a $U$ with $\beta_u g_u = \jdg{resOut}$, whic
 times the bias placement itself would have caused had the estimator not conditioned on it
 (\jdg{senBench}); on the diagonal $\beta_u = g_u$ that is \jdg{senDiag}, or \jdg{senDiagSd} of
 the outcome's own within-stratum dispersion. The interval on that multiplier, \jdg{senKCi},
-reaches below one --- the lower end of the contrast's own interval is about the size of the
-benchmark bias --- so a confounder no stronger than placement is excluded at the point estimate
+reaches below one, the lower end of the contrast's own interval is about the size of the
+benchmark bias, so a confounder no stronger than placement is excluded at the point estimate
 and not at the bottom of the interval. \emph{Third}, one can ask what the covariates we did
 measure would have done had they been left out. \jdg{senNdeg} of \jdg{senNcov} have no
 within-stratum variance to speak of and contribute nothing by the first point, which is arithmetic
 rather than evidence; of the remainder, only helix depth beyond the stratification's cap is even
 partly conditioned on. Omitting any single one of them moves the estimate by at most
 \jdg{senMaxOne} (the \jdg{senArgOne}), and the contrast exceeds even that largest one by an
-interval excluding zero (\jdg{senMarginCi}); the best linear combination of all of them --- the
-index maximising $|\beta_u g_u|$, obtained in closed form --- reaches at most \jdg{senMaxAll},
+interval excluding zero (\jdg{senMarginCi}); the best linear combination of all of them  (the
+index maximising $|\beta_u g_u|$, obtained in closed form) reaches at most \jdg{senMaxAll},
 \jdg{senMaxAllPct} of the contrast. None of this tests Assumption~\ref{ass:placement}. It says
 how large a violation would have to be, and that no covariate on this corpus is that large.
 
@@ -973,8 +968,8 @@ primary run), so no number here rests on a seed that is not in the repository.
 
 \paragraph{Two things the intervals cannot fix.} The cluster bootstrap resamples \jdg{ccPuzzles}
 units for most estimates, and a percentile interval built on that few clusters is known to be
-optimistic. The percentile interval remains the reported one throughout --- fixed before the
-alternative was computed --- and the cluster count is reported beside every one. How optimistic it
+optimistic. The percentile interval remains the reported one throughout, fixed before the
+alternative was computed, and the cluster count is reported beside every one. How optimistic it
 is was measured rather than asserted, on the \jdg{bcNq} intervals that carry claims: a
 bias-corrected and accelerated interval is wider than the percentile one in every case, by at most
 \jdg{bcWidthMax}, and \jdg{bcNsurvive} of \jdg{bcNq} still exclude zero
@@ -983,7 +978,7 @@ this paragraph said only that every interval should be read as at least as wide 
 direction was right and the size is now printed instead of implied. The second is multiplicity. This
 paper reports of order thirty contrasts and rank statistics and applies no family-wise or
 false-discovery correction; what it does instead is fix the gate at $0.005$ in advance, declare
-each arm's predictions before the run, and rest no claim on a $p$-value alone --- every claim
+each arm's predictions before the run, and rest no claim on a $p$-value alone: every claim
 carries an interval, and the ones that matter carry an interval \emph{on a difference}.
 
 \textbf{A reader who wants a corrected threshold cannot get one from these $p$-values, and the
@@ -1015,15 +1010,15 @@ All primary results are computed on one released file, the mutate-and-map-rescue
 Eterna OpenKnot round \citep{townley2026pseudoknots}. That release is a designed-RNA study in its
 own right, and its object of inference is the designs; we cite it as the provenance of the
 molecules and of the outcome column, not as a competitor. It contains \jdg{nConstructs} constructs across \jdg{ccCells} design cells and \jdg{ccPuzzles}
-targets. Applying Definition~\ref{def:flip} admits \jdg{nAdmitted} interventions --- \jdg{nCG} on
-C--G pairs, \jdg{nAU} on A--U and \jdg{nGU} on G--U --- and refuses \jdg{nExclTwoPos} constructs
+targets. Applying Definition~\ref{def:flip} admits \jdg{nAdmitted} interventions  (\jdg{nCG} on
+C--G pairs, \jdg{nAU} on A--U and \jdg{nGU} on G--U) and refuses \jdg{nExclTwoPos} constructs
 for changing other than exactly two positions inside the design window, \jdg{nExclNonCanon} for a
 non-canonical wild-type pair, and \jdg{nExclNoOutcome} for having no measured outcome. The ledger
 closes: admitted plus \jdg{nExclTotal} refused plus the \jdg{nWildTypes} wild types each
 intervention is defined against account for all \jdg{nConstructs} constructs. These counts are the
 packaged criterion's, whose unit is the construct; the script that produced this paper's estimates
 walks the released table's \jdg{nRowsRaw} rows and applies the same clauses in a different order,
-so its intermediate tallies differ and its admitted set does not --- the two agree on
+so its intermediate tallies differ and its admitted set does not, the two agree on
 \jdg{nAdmitted} exactly, asserted before either ledger is reported and both printed in
 Appendix~\ref{app:ledger}. Helix depth is concentrated at the ends of helices
 (Fig.~\ref{fig:corpus}a), which is what makes it a usable covariate and, later, an uncomfortable
@@ -1042,7 +1037,7 @@ libraries and nowhere else (Appendix~\ref{app:survey}).
 reading a different file. The distinction is measurable rather than pedantic: across the
 \jdg{reNimpl} implementations the intervention readout spans \jdg{reSpanImpl}, and across
 \jdg{reNvar} parameter sets inside one of them (\jdg{reVarNames}) it spans \jdg{reSpanParam},
-\jdg{reSpanRatio} narrower (\S\ref{sec:reorder}) --- so a panel assembled without the distinction
+\jdg{reSpanRatio} narrower (\S\ref{sec:reorder}), so a panel assembled without the distinction
 can report a wide sweep while scoring one program repeatedly. The \jdg{reNimpl} here were chosen to
 differ along the two axes that could plausibly explain a result, the structural decomposition and
 where the parameters came from, rather than to sample the field.
@@ -1058,7 +1053,7 @@ ViennaRNA      & nearest-neighbour & optical melting
 EternaFold     & nearest-neighbour & chemical mapping
                & \jdg{efHi} / \jdg{efLo} / \jdg{efMed} \\
 RNAstructure   & nearest-neighbour & optical melting
-               & --- \\
+               &: \\
 RibonanzaNet   & transformer       & chemical mapping
                & \jdg{dynNHi} / \jdg{dynNLo} / \jdg{dynNMed} \\
 \bottomrule
@@ -1084,7 +1079,7 @@ ViennaRNA; if it belongs to having been fitted to probing data, like RibonanzaNe
 \citep{reuter2010rnastructure}, written by a different group against substantially the same
 thermodynamics. It makes the implementation/variant distinction testable rather than asserted: it
 and ViennaRNA should agree, and their MFE structures on these wild types agree at \jdg{reMfeAgree}
-median $F_1$ --- also the wiring check a low value would have failed.
+median $F_1$: also the wiring check a low value would have failed.
 
 \textbf{RibonanzaNet} is a transformer \citep{ribonanzanet2024} whose head emits a pairing score
 directly from pairwise features, with no thermodynamic model in the path. Its released labelled
@@ -1093,8 +1088,8 @@ unique sequences (\S\ref{sec:leakage}); its final pre-training stage additionall
 pseudo-labels, which no count from a released file can reach.
 
 Two further controls address the obvious alternatives. A panel of \jdg{panN} parameter sets within
-one implementation --- \jdg{panNames}, two fitted to data rather than derived from melting, and
-correlating with one another only \jdg{panCorrLo} to \jdg{panCorrHi} --- tests whether parameters
+one implementation  (\jdg{panNames}, two fitted to data rather than derived from melting, and
+correlating with one another only \jdg{panCorrLo} to \jdg{panCorrHi}) tests whether parameters
 rather than model class drive the reading \citep{andronescu2007efficient,mathews1999expanded}. And
 the dynamic-range column above is reported before any contrast: a predictor pinned to its ceiling
 cannot express one, and its null would say more about its range than about the molecule.
@@ -1104,8 +1099,8 @@ above are pseudoknot-blind in their released configurations, and this corpus is 
 That is a gap between the panel and the material, and until it is closed every panel-level sentence
 in this paper is a statement about pseudoknot-blind predictors applied to pseudoknotted molecules.
 A fifth implementation closes it: \texttt{ShapeKnots} \citep{hajdin2013accurate}, run on sequence
-alone. It is deliberately \emph{not} an independent fifth opinion --- it is the same
-\texttt{RNAstructure} energy model already in the panel with the pseudoknot search switched on ---
+alone. It is deliberately \emph{not} an independent fifth opinion: it is the same
+\texttt{RNAstructure} energy model already in the panel with the pseudoknot search switched on, 
 and that is what makes it the right control, because it moves the one capability in question and
 holds the thermodynamics fixed. Appendix~\ref{app:probing} uses the same program with the
 deposit's reactivities as restraints to build a reference; the member scored here is given no
@@ -1154,8 +1149,8 @@ assumed. \textbf{It does not reproduce.} Over the \jdg{selNCells} non-control ce
 rule recovers the tested design \jdg{selRepro} times (\jdg{selAgree}); the same argmax with the F1
 filter not applied recovers \jdg{selReproB} (\jdg{selAgreeB}), and \jdg{selRankOne} of the tested
 designs are rank one on OpenKnot score in their own cell. In \jdg{selPassedOver} of the
-disagreements eligible designs existed --- as many as \jdg{selMaxElig} of the candidates passed the
-cutoff --- and the top-scoring design was tested regardless. \textbf{The variable that selected
+disagreements eligible designs existed, as many as \jdg{selMaxElig} of the candidates passed the
+cutoff, and the top-scoring design was tested regardless. \textbf{The variable that selected
 this corpus is the experimental OpenKnot score, not the neural model's prediction.} We fit no third
 rule to close the residual \jdg{selResid} cells; that would be fitting the audit. Three
 consequences are measurable.
@@ -1166,8 +1161,8 @@ which is a component of the stratum, so selection status is constant inside \jdg
 conditioned out by construction, not by argument.
 
 \emph{Second, the effect is present where the published filter would not have bound.} The cutoff is
-loose --- \jdg{selPoolPass} of the round's \jdg{selNPoolRound} designs clear it, \jdg{selPoolPassAll}
-pooled over all rounds --- and \jdg{selNFallback} of the \jdg{selCells} tested designs fail it,
+loose  (\jdg{selPoolPass} of the round's \jdg{selNPoolRound} designs clear it, \jdg{selPoolPassAll}
+pooled over all rounds) and \jdg{selNFallback} of the \jdg{selCells} tested designs fail it,
 carrying \jdg{selNCgauFb} of the \jdg{selNCgau} interventions the identity contrast uses. Inside
 those cells the contrast is \jdg{selFbArm} (\jdg{selFbCi}), the same sign as the full-corpus
 \jdg{selFull}, and the passing-minus-failing difference is \jdg{selDiff} (\jdg{selDiffCi}). Nor are
@@ -1180,7 +1175,7 @@ cells at the median tested OpenKnot score \jdg{selMedScore}, the identity contra
 skill slope is \jdg{selSlopeHi} in the favoured cells against \jdg{selSlopeLo} in the rest, and
 across \jdg{selNCellSkill} cells the rank correlation between a cell's skill and the score that
 selected it is \jdg{selRhoRank} (\jdg{selRhoRankCi}), excluding zero. Selection ran against what
-we report. Against the neural model's F1 --- the quantity the published rule names --- skill shows
+we report. Against the neural model's F1, the quantity the published rule names, skill shows
 nothing: \jdg{selRhoFOne} (\jdg{selRhoFOneCi}) on ranks, and \jdg{selRhoFOneSlope}
 (\jdg{selRhoFOneSlopeCi}) on slopes. Both intervals contain zero. The corpus was selected along
 an axis our skill runs against, and not along the axis the published rule names.
@@ -1206,8 +1201,8 @@ re-ranks a generative model. It is a property of how this corpus was built.
 \emph{Part~I} establishes the instrument: what the conventional readout can still resolve here,
 which sets what an alternative has to beat; the interventions the corpus already contains; what
 scoring predictors on them separates; and whether any of it survives on molecules nobody designed.
-\emph{Part~II} is \textbf{Reading~1 --- who carries the number}, ending in the ledger of
-\S\ref{sec:ledger}. \emph{Part~III} is \textbf{Reading~2 --- what the number buys}, converting the
+\emph{Part~II} is \textbf{Reading~1: who carries the number}, ending in the ledger of
+\S\ref{sec:ledger}. \emph{Part~III} is \textbf{Reading~2: what the number buys}, converting the
 incumbent margin into experiments and finding that its sign does not survive the conversion at
 every budget.
 
@@ -1225,13 +1220,13 @@ both analyses receive byte-identical stratum weights (\jdg{cvWeight} pair-weight
 \paragraph{What the incumbent readout is here, exactly.} It is the agreement readout the benchmark
 itself ships, and naming its source changes how the comparison should be read. The released file
 \jdg{cvSourceFile} carries two structure columns and no others: the declared target, and
-\jdg{cvSourceCol} --- \emph{RibonanzaNet's own sequence-to-structure prediction}. There is no
+\jdg{cvSourceCol}: \emph{RibonanzaNet's own sequence-to-structure prediction}. There is no
 probing-derived structure column at all. Two consequences follow. First, the degeneracy of
 profile-constrained folding described in \S\ref{sec:background} is a property of that literature
 and \emph{is not what this subsection measures}; what it measures is the readout this benchmark
 actually distributes. Second, that readout is produced by the same model whose contrast is
 Claim~\ref{claim:identity}'s subject, so the two are not independent: read the comparison as one
-model's output examined two ways --- collapsed into a structure, and left as a probability ---
+model's output examined two ways  (collapsed into a structure, and left as a probability) 
 rather than as a neutral incumbent against a challenger.
 
 \paragraph{The comparison does not depend on which model wrote the column.} That disclosure
@@ -1239,7 +1234,7 @@ invites the obvious test, and it was run rather than argued. The agreement reado
 on the same pairs and the same strata with each of the other three implementations' own
 structures, and with a fourth column that is not a prediction from sequence at all: a structure
 folded from this deposit's own chemical probing (Appendix~\ref{app:probing}). That column is not
-model-free and we do not claim it is --- it is a nearest-neighbour fold restrained by the measured
+model-free and we do not claim it is. It is a nearest-neighbour fold restrained by the measured
 reactivities, and it therefore shares an energy model with one implementation in the panel. What
 it does not contain is a prediction of \emph{these molecules} made from sequence, which is the
 only property this comparison needs. All
@@ -1249,7 +1244,7 @@ the \emph{smallest} of the \jdg{prNcol} gaps (\jdg{prReadoutN}, \jdg{prReadoutNC
 comparison this subsection reports is the most conservative of those available, which was not a
 choice we made. It is also the one that does not survive a second interval method: the
 bias-corrected and accelerated interval on it is \jdg{bcTwo}, which covers zero, not because it is
-wider --- it is \jdg{bcTwoWidth} times the percentile width --- but because the bias correction
+wider (it is \jdg{bcTwoWidth} times the percentile width) but because the bias correction
 shifts it down. The basic interval, \jdg{bcTwoBasic}, excludes zero. We report the percentile
 interval, as everywhere else, and state here that on this column alone the separation is
 method-dependent. It is not method-dependent on the four columns above, whose gaps are larger, and
@@ -1269,26 +1264,26 @@ Claim~\ref{claim:readout} unless the scales are made explicit. The columns' pool
 standard deviations are \jdg{cvSdRescue} and \jdg{cvSdRnet}, so in units of each column's own
 dispersion the contrasts are \jdg{cvIntvSd} and \jdg{cvConvSd}. Because both readouts are defined
 on the same molecules and pairs, the difference can be tested directly on one design-clustered
-resample: \jdg{cvPairedSd} standard deviations (\jdg{cvPairedSdCi}), excluding zero --- a factor
+resample: \jdg{cvPairedSd} standard deviations (\jdg{cvPairedSdCi}), excluding zero, a factor
 of \jdg{cvRatioSd} between the two readouts on their own scales. In raw units that difference is
 \jdg{cvPaired} (\jdg{cvPairedCi}), reported only so the two can be compared and not relied on.
 The readouts measure different things, and it is not a matter of one being noisier.
 
-\paragraph{It has a knob.} Scoring instead every target pair of the same designs --- a choice
+\paragraph{It has a knob.} Scoring instead every target pair of the same designs  (a choice
 routinely made, though not one we would make here, since it breaks the matched-pair-set constraint
-this comparison rests on --- returns \jdg{cvAlt} on \jdg{cvAltWeight} pair-weights, a factor of
+this comparison rests on) returns \jdg{cvAlt} on \jdg{cvAltWeight} pair-weights, a factor of
 \jdg{cvSwing} away from \jdg{cvConv}. Hit rates on that larger set are \jdg{cvAltHitCG} and
 \jdg{cvAltHitAU}: the enlargement is not benign, since it adds pairs the inferred structure mostly
 does not contain. The interventional readout has no corresponding freedom, being defined only
-where a compensatory mutant was made --- a fact about the corpus rather than a choice by the
+where a compensatory mutant was made, a fact about the corpus rather than a choice by the
 analyst.
 
 \begin{claimbox}
 \claimhead{claim:readout} On this corpus the conventional structure-agreement readout is near
 saturation for the pairs compared, and its answer moves by \jdg{cvSwing}$\times$ with a defensible
 change in which pairs are admitted. The interventional readout, on the same molecules and strata,
-returns a contrast \jdg{cvPairedSd} standard deviations larger (\jdg{cvPairedSdCi}) --- the only
-scale on which the two may be differenced --- and admits no such choice.
+returns a contrast \jdg{cvPairedSd} standard deviations larger (\jdg{cvPairedSdCi}), the only
+scale on which the two may be differenced, and admits no such choice.
 \end{claimbox}
 
 % =====================================================================
@@ -1319,7 +1314,7 @@ while the model pairs a smaller share of them.}
 \centering
 \input{figs/fig6_scale}
 \caption{\textbf{Two readouts cannot be compared until they are on one scale.} \textbf{a}, The two
-contrasts in raw units. \textbf{b}, Each column's own within-stratum standard deviation --- the
+contrasts in raw units. \textbf{b}, Each column's own within-stratum standard deviation: the
 units those raw numbers are denominated in, and the reason a difference between them was
 meaningless as printed. \textbf{c}, The same contrasts after each is divided by its own SD, and the
 difference that survives, \jdg{cvPairedSd}\,SD (\jdg{cvPairedSdCi}).}
@@ -1368,7 +1363,7 @@ is a linear map on symmetrised pairwise features of a transformer trained on rou
 chemical-mapping profiles, with no nearest-neighbour parameter table, partition function or
 thermodynamic ensemble anywhere in it. Its within-stratum slope is \jdg{skNeural}
 ($p=\jdg{skNeuralP}$) on the mutant sequence and \jdg{skNeuralWt} on the wild type the mutant was
-derived from --- so most of what it knows about a flip it knows before the flip is made. The
+derived from, so most of what it knows about a flip it knows before the flip is made. The
 mutant-sequence slope exceeds the thermodynamic model's, and the two predictors agree with each
 other only at Pearson \jdg{nnCorrP} and Spearman \jdg{nnCorrS}, so they are not two versions of one
 prediction. Its head scores the target pairs \jdg{nnRatio}$\times$ above randomly chosen position
@@ -1404,14 +1399,14 @@ interchangeable, and the reading still barely moves.}
 \label{sec:leakage}
 
 RibonanzaNet was trained on Eterna's OpenKnot campaigns and this corpus is an OpenKnot round, so
-overlap is the first thing a reader should demand. The mutants cannot be implicated --- the
-mutate-map-rescue library postdates the released weights --- but the wild types can, and a
+overlap is the first thing a reader should demand. The mutants cannot be implicated, the
+mutate-map-rescue library postdates the released weights, but the wild types can, and a
 memorised wild type would give the model a prior on the molecule.
 
 We assembled \jdg{lkTrain} unique sequences from \jdg{lkDeposits} of the model's own source
 libraries and ran four levels. Exact whole-construct overlap with our \jdg{lkOurs} sequences is
 \jdg{lkExact}. At the design window, \jdg{lkGt08} of our sequences reach $\ge0.8$ identity to some
-training window, \jdg{lkGt09} reach $\ge0.9$, and \jdg{lkVerbatim} appear verbatim --- players
+training window, \jdg{lkGt09} reach $\ge0.9$, and \jdg{lkVerbatim} appear verbatim: players
 reuse their own designs across rounds, which is neither surprising nor benign. Excising every
 design cell above the \jdg{clThr} threshold removes \jdg{clLeaked} of \jdg{clDesigns} cells
 (\jdg{clLeakedPct}) and \jdg{clDirty} of \jdg{nAdmitted} interventions. On the remaining
@@ -1434,7 +1429,7 @@ readable: it was trained on nothing, and it behaves the same way.
 \begin{scopebox}
 \textbf{What the audit bounds, and the audit it owed.} The deposits above are the model's source
 libraries, not a manifest of the released checkpoint's training set, so exposure was also graded
-against the competition's own training file --- \jdg{lkTrainReal} unique sequences across
+against the competition's own training file: \jdg{lkTrainReal} unique sequences across
 \jdg{lkLibReal} named libraries. \jdg{lkExpDesigns} of \jdg{clDesigns} design cells are exposed at
 the same \jdg{clThr} threshold (\jdg{lkExpFrac}) against \jdg{lkProxyDesigns} (\jdg{lkProxyFrac})
 from the deposits, itself conservative because that scan examined only the strongest candidates and
@@ -1448,8 +1443,8 @@ cannot have memorised anything, falls on the exposed subset too, \jdg{lkViennaCl
 (\jdg{lkViennaDiffCi}).
 
 \textbf{We previously read that pair as \emph{exposed designs are harder, not remembered}, and it
-does not license that.} The two models do not fall by the same amount --- \jdg{didVienna} against
-\jdg{didNeural} --- and a reading in which the model that could have memorised keeps skill the
+does not license that.} The two models do not fall by the same amount, \jdg{didVienna} against
+\jdg{didNeural}, and a reading in which the model that could have memorised keeps skill the
 control loses fits those two numbers as well as ours does. Separating them requires an interval on
 the \emph{difference of the drops}, which this paper demands of every other pair of point estimates
 and had not computed here. It is \jdg{didPoint} (\jdg{didCi}) and it covers zero; permuting the
@@ -1461,8 +1456,7 @@ and that this corpus cannot say whether it changes them differently.
 That file was the competition's high-quality slice, so this manuscript previously called every
 count above a lower bound and predicted in print that searching the whole released corpus would
 raise exposure. \textbf{We have now searched it, and the prediction is wrong.} Against all
-\jdg{lkFullTrain} unique sequences in \jdg{lkFullRows} rows across \jdg{lkFullLib} libraries ---
-\jdg{lkFullGrow} the sequences and every library the earlier file omitted --- exposure is
+\jdg{lkFullTrain} unique sequences in \jdg{lkFullRows} rows across \jdg{lkFullLib} libraries, \jdg{lkFullGrow} the sequences and every library the earlier file omitted, exposure is
 \jdg{lkFullExp} of \jdg{clDesigns} design cells (\jdg{lkFullFrac}), the same cells and the same
 split (\jdg{lkFullExpN} exposed, \jdg{lkFullCleanN} unexposed), and both skill slopes reproduce to
 every printed digit (\jdg{lkFullNeuralClean}, \jdg{lkFullViennaClean}). \jdg{lkFullMoved} design
@@ -1475,7 +1469,7 @@ exactly.
 \textbf{The counts are therefore exact on the released \emph{labelled} corpus, and are still not a
 statement about the training set}: the licensed statement remains \emph{not found in the portion of
 the training corpus we could obtain}, never \emph{no leakage}, because one tier stays outside any
-audit built from released measurements --- this model's final pre-training stage consumed
+audit built from released measurements, this model's final pre-training stage consumed
 pseudo-labels covering its own test sequences, so a sequence can have been seen without its label
 having been seen. That tier is priced as unpriceable in \S\ref{sec:ledger}, not argued away. The
 tiers, the libraries the exposed cells trace to, the shuffle control and the declaration's own
@@ -1500,7 +1494,7 @@ measurement and not of the axis. Neither curve involves a reference structure.}
 
 Four contrasts, on the same \jdg{nAdmitted} interventions, stratification and \jdg{resWeight}
 matched pair-weights. The first is the measurement; the others are what each model predicts about
-the same pairs --- not agreement with a reference, but the difference its own output makes between
+the same pairs, not agreement with a reference, but the difference its own output makes between
 G--C and A--U targets in matched contexts. Every row is \eqref{eq:est} with only the column
 changed.
 
@@ -1526,7 +1520,7 @@ chemical-mapping data the transformer was trained on.
 
 \paragraph{The differences, with intervals, because the point estimates do not license the claim.}
 Three contrasts with three intervals say nothing about the differences between them, and a
-covering interval is not evidence of no effect --- a fault this paper records against itself
+covering interval is not evidence of no effect, a fault this paper records against itself
 twice (Appendix~\ref{app:prereg}, \S\ref{sec:second}). Every difference below
 is therefore computed on \emph{one} resample of the \jdg{ccPuzzles} puzzles per draw, with all
 four columns evaluated on that draw, so the differences are paired. All three resolve: the
@@ -1537,23 +1531,23 @@ $p=\jdg{pdVEP}$). Those three are between predictors, in one unit system, and no
 changes them.
 
 \textbf{That last difference is what we predicted would cover zero, and it does not.} We staked
-before the run that the two nearest-neighbour models would be indistinguishable --- the earlier
+before the run that the two nearest-neighbour models would be indistinguishable, the earlier
 phrasing of this result, \emph{the split follows the decomposition and not the training data}. They
 are not, so that phrasing is withdrawn, and what replaces it is a decomposition rather than a
 dichotomy: the three predictors differ pairwise along one axis each. Holding the training data at
 chemical mapping and changing the decomposition is worth \jdg{axArch} (\jdg{axArchCi}); holding
 the decomposition and moving the parameters from optical melting to chemical mapping is worth
 \jdg{axData} (\jdg{axDataCi}). \textbf{Both axes move the contrast toward the measurement, and the
-decomposition moves it \jdg{axRatio}$\times$ further --- a gap of \jdg{axGap} (\jdg{axGapCi}) that
+decomposition moves it \jdg{axRatio}$\times$ further, a gap of \jdg{axGap} (\jdg{axGapCi}) that
 itself excludes zero.} The training data is not irrelevant; it is the smaller of two effects
 pointing the same way. This quantity was not staked and is reported as post hoc.
 
 \textbf{A second transformer does not reproduce that axis, so it is stated as one model's
 property and not as the decomposition's.} The axis above is one transformer minus one
 CONTRAfold-family model, and nothing in it separates \emph{what the decomposition is worth} from
-\emph{what RibonanzaNet is}. RNA-FM --- a transformer sharing neither backbone nor training
+\emph{what RibonanzaNet is}. RNA-FM  (a transformer sharing neither backbone nor training
 corpus with RibonanzaNet, scored through its own authors' released pairing head so that nothing
-here is fitted by us (Appendix~\ref{app:secondtransformer}) --- returns \jdg{fmContrast}
+here is fitted by us (Appendix~\ref{app:secondtransformer})) returns \jdg{fmContrast}
 (\jdg{fmContrastCi}) on the same interventions and the same strata. That covers zero: it does not
 resolve the identity axis at all. The architecture axis recomputed with it is \jdg{fmAxis}
 (\jdg{fmAxisCi}), also covering zero, and the difference between the two axes is
@@ -1575,13 +1569,12 @@ them anyway, reporting the measurement as indistinguishable from the transformer
 \textbf{That number is withdrawn as a licensing quantity}; it is kept in the sentence above only
 as the thing being corrected.
 
-Two scales are available. Dividing each column by its own pooled within-stratum SD --- \jdg{sdMeas}
+Two scales are available. Dividing each column by its own pooled within-stratum SD  (\jdg{sdMeas}
 for the measurement against \jdg{sdNeural}, \jdg{sdEtf} and \jdg{sdVienna} for the predictors,
-computed on the admitted set rather than on the intersected subset \S\ref{sec:conventional} uses
---- asks whether a predictor separates the pair types as sharply, in its own units, as the
+computed on the admitted set rather than on the intersected subset \S\ref{sec:conventional} uses) asks whether a predictor separates the pair types as sharply, in its own units, as the
 measurement does in its. Multiplying a predictor's contrast by its within-stratum slope on the
 outcome, which is the conversion this section performs below to bound what runs through each
-model, asks how much of the measured effect could travel through that predictor. The two are related exactly: since
+model, asks how much of the measured effect could travel through that predictor. The two are related exactly, since
 $g=\rho\,\mathrm{SD}_R/\mathrm{SD}_p$, \textbf{the slope route is the SD route attenuated by
 $\rho$}, the predictor's own within-stratum correlation with the outcome (\jdg{rhoNeural} for the
 transformer, \jdg{rhoVienna} for the thermodynamic model). Neither route corrects the other. The
@@ -1604,9 +1597,8 @@ stake is graded as failed in Appendix~\ref{app:prereg}.
 
 \paragraph{The third predictor has the most room to move, and uses least of it.} A null contrast
 from a saturated predictor would say nothing, so the dynamic ranges of \S\ref{sec:predictors} are
-the first thing to check against this table. EternaFold is the least saturated of the three ---
-\jdg{efHi} of its values above \jdg{dynThrHi} and \jdg{efLo} below \jdg{dynThrLo}, median
-\jdg{efMed}, against \jdg{dynNHi}/\jdg{dynNLo} for the transformer --- and it returns the smallest
+the first thing to check against this table. EternaFold is the least saturated of the three  (\jdg{efHi} of its values above \jdg{dynThrHi} and \jdg{efLo} below \jdg{dynThrLo}, median
+\jdg{efMed}, against \jdg{dynNHi}/\jdg{dynNLo} for the transformer) and it returns the smallest
 contrast. The comparison is licensed rather than assumed: the thermodynamic predictor's identity
 contrast recomputed end to end through the third model's scoring path differs from the original by
 \jdg{efEquiv}, so the three columns are one estimator applied to three predictors. Its posterior
@@ -1617,14 +1609,14 @@ and dropping every censored record moves the estimate to \jdg{efClean} (\jdg{efC
 \begin{claimbox}
 \claimhead{claim:identity} On \jdg{nAdmitted} executed two-nucleotide interventions, a neural
 predictor's own output distinguishes G--C from A--U targets in matched contexts by \jdg{resNeural}
-(\jdg{resNeuralCi}), tracking the measurement's \jdg{resOut} (\jdg{resOutCi}) --- a correspondence
+(\jdg{resNeuralCi}), tracking the measurement's \jdg{resOut} (\jdg{resOutCi}), a correspondence
 that holds in each column's own units (\jdg{stdMN}\,SD, \jdg{stdMNCi}) and \emph{not} as a share
 of the measured effect, of which at most \jdg{bdNeural} can run through the model. Neither a
 thermodynamic predictor nor a second predictor on that same decomposition fitted to chemical
 mapping resolves such a separation (\jdg{resVienna}, \jdg{resViennaCi}; \jdg{efContrast},
 \jdg{efContrastCi}). The instrument distinguishes something one structural decomposition
 represents and the other does not, with no predicted structure of these molecules in the
-comparison --- the declared target enters only by saying which pair is the target and by keying
+comparison, the declared target enters only by saying which pair is the target and by keying
 the strata, never as the thing agreement is scored against. Paired over the
 same resample the transformer exceeds both by \jdg{pdNVCi} and \jdg{pdNECi} and they differ from
 each other by \jdg{pdVECi}, so the effect decomposes rather than dichotomises: moving from
@@ -1648,9 +1640,9 @@ explain this contrast would have to be \jdg{senK} times as strong as the placeme
 estimator already conditions on, and the interval on that multiplier is \jdg{senKCi}.
 \textbf{It reaches below one.} At the point estimate a confounder no stronger than placement is
 excluded; at the bottom of the interval it is not, and we say so here rather than only in the
-preregistration record. No covariate we did measure comes close --- the largest single one moves
+preregistration record. No covariate we did measure comes close, the largest single one moves
 the estimate by \jdg{senMaxOne} and the worst linear combination of all \jdg{senNcov} by
-\jdg{senMaxAll} --- but that is evidence about the covariates we have, not about the one we do
+\jdg{senMaxAll}, but that is evidence about the covariates we have, not about the one we do
 not.
 
 \paragraph{An upper bound on what could run through each model.}\label{sec:bound} Multiplying each
@@ -1670,7 +1662,7 @@ measurement, RNet RibonanzaNet, EF EternaFold, VRNA ViennaRNA; colour marks whet
 covers zero and does not carry over from panel~a). All four columns are resampled over the same
 \jdg{ccPuzzles} targets within each draw, so each difference has an interval of its own rather
 than being read off two overlapping ones. Grey marks the only difference whose interval covers
-zero --- the measurement against the transformer, which is the agreement the paper claims.
+zero, the measurement against the transformer, which is the agreement the paper claims.
 \textbf{c}, The two axes the columns span. Both move the contrast toward the measurement and
 differ by \jdg{axGap} (\jdg{axGapCi}).}
 \label{fig:contrasts}
@@ -1693,7 +1685,7 @@ against a cutoff of \jdg{xnSnCut}, while the same library's deposit under the ot
 \jdg{xnFseAdmitTwoA} at the same cutoff. The zero is a property of one deposit and not of the
 library; an earlier version of this section read it as the second, reporting the zero alone and
 concluding that a poorly measured corpus yields nothing. What the two deposits together show is
-narrower and more useful --- the gate acts on the measurement rather than on the molecules, so the
+narrower and more useful, the gate acts on the measurement rather than on the molecules, so the
 same designs pass or fail according to how well that deposit was read. The deposit we do use
 clears the gate comfortably, its lowest reference signal-to-noise being \jdg{xnSl5SnLo}.
 
@@ -1736,7 +1728,7 @@ under the other. The paired difference between chemistries covers zero for both 
 \label{fig:transfer}
 \end{figure}
 
-\subsection*{Part II. Reading 1 --- who carries the number}
+\subsection*{Part II. Reading 1: who carries the number}
 
 \noindent Each subsection here asks the same question of a different chooser, and the ledger at the
 end collects the answers. A channel is reported as carrying the number, as bounded, or as
@@ -1749,8 +1741,8 @@ Both quantities below are attenuated by the outcome's own reliability, bounded a
 in Section~\ref{sec:ceiling}; they are reported uncorrected, and the corrected pair is given there.
 
 The contrast above is causal and conditions on helix depth, because design programs choose both
-what a pair is and where it goes. An experimenter asks a different question --- given this design
-and a budget, which flips should be built? --- where depth must \emph{not} be removed, being
+what a pair is and where it goes. An experimenter asks a different question  (given this design
+and a budget, which flips should be built?) where depth must \emph{not} be removed, being
 information they already hold. Same corpus, two questions, two conditioning sets: under the causal
 set, on the \jdg{rkCausalCells} cells and \jdg{rkCausalRecs} interventions where holding cell,
 depth and crossing still leaves flips to rank, the same two predictors agree with rescue at
@@ -1793,18 +1785,18 @@ task.}
 \paragraph{A score that \emph{was} built for a mutation loses by more.} None of the three
 predictors was built to answer a question about a mutation. One family was: riboSNitch prediction
 scores a folding calculation by how much a variant reorganises the structure
-\citep{corley2015ribosnitch,kirven2025variantfold}, and its standard quantities --- the distance
+\citep{corley2015ribosnitch,kirven2025variantfold}, and its standard quantities  (the distance
 between the wild-type and mutant base-pair probability matrices, the base-pair distance between
-the two MFE structures, and the change in ensemble free energy --- are computable from the same
+the two MFE structures, and the change in ensemble free energy) are computable from the same
 thermodynamic model already in the table. Those quantities are what is scored here, not remuRNA,
 RNAsnp or SNPfold, about which we make no claim. The direction was declared before the code
-existed --- a flip that rescues \emph{preserves} the structure, so a change score should be small
-where rescue is large --- and all three resolve from zero on the declared side, so the instrument
+existed  (a flip that rescues \emph{preserves} the structure, so a change score should be small
+where rescue is large) and all three resolve from zero on the declared side, so the instrument
 reads them. \textbf{None beats the free integer, and unlike the three predictors above, none ties
 it}: every paired difference excludes zero on the losing side (\jdg{rsBppmVs}, \jdg{rsBppmVsCi};
 \jdg{rsMfeVs}, \jdg{rsMfeVsCi}; \jdg{rsEnsVs}, \jdg{rsEnsVsCi}). A localised variant, staked in
 advance to rule out dilution by the rest of the molecule, does not rank better (\jdg{rsLocal},
-\jdg{rsLocalCi}, against \jdg{rsBppm}, \jdg{rsBppmCi}) --- a failed stake whose failure removes the
+\jdg{rsLocalCi}, against \jdg{rsBppm}, \jdg{rsBppmCi}), a failed stake whose failure removes the
 explanation rather than supplying one. The scores, their cell-level agreement, the paired
 differences and the checks run before any of it was read are in Appendices~\ref{app:ribosnitch}
 and~\ref{app:verify}.
@@ -1820,8 +1812,8 @@ negative.
 
 \textbf{The table reports the level arm, and an earlier version of this paragraph justified that
 by saying it was the larger of the two and declined to put an interval on the difference.} That is
-a choice between two arms made on two point estimates --- the shape of \S\ref{sec:withdrawal}'s
-withdrawal --- so the interval is now computed. Paired on one resample the
+a choice between two arms made on two point estimates, the shape of \S\ref{sec:withdrawal}'s
+withdrawal, so the interval is now computed. Paired on one resample the
 level arm exceeds the change arm by \jdg{lvcNeural} (\jdg{lvcNeuralCi}) for the neural predictor,
 \jdg{lvcVienna} (\jdg{lvcViennaCi}) for the thermodynamic one and \jdg{lvcEtf} (\jdg{lvcEtfCi})
 for EternaFold: \jdg{lvcNres} of \jdg{lvcNarms} exclude zero, so the choice is not close. It was
@@ -1837,7 +1829,7 @@ a predictor can offer here beats an integer read off the declared target.
 \paragraph{What each predictor knows is close to what depth knows.} Within the same cells, the
 neural predictor's rank agreement with depth is \jdg{rkDepN} against \jdg{rkRhoN} with the
 outcome, the thermodynamic predictor's is \jdg{rkDepV} against \jdg{rkRhoV}, and EternaFold's is
-\jdg{efDepthRho} against \jdg{efRho} --- differences of \jdg{rkDepGapN}, \jdg{rkDepGapV} and
+\jdg{efDepthRho} against \jdg{efRho}: differences of \jdg{rkDepGapN}, \jdg{rkDepGapV} and
 \jdg{efDepthGap}. To three decimals, what each predictor knows about which flips rescue is what it
 knows about how deep the pair sits. The same holds under a decision framing: at a rescue threshold
 of \jdg{rkThresh}, with a base rate of \jdg{rkBase}, depth alone separates rescued from unrescued
@@ -1854,16 +1846,15 @@ are not reducible to depth; they are merely not better than it.
 
 \paragraph{The increment, in constructs.} Building the top \jdg{rkTopFrac} of a design's flips
 ranked by depth alone recovers \jdg{rkRecDepth} of the rescuing ones against \jdg{rkRecRandom} at
-random; using a predictor \emph{only to break depth's ties} --- no weights, no fitting --- raises
+random; using a predictor \emph{only to break depth's ties}  (no weights, no fitting) raises
 that to \jdg{rkRecTieN} (a gain of \jdg{rkGainN} points, \jdg{rkGainNCi}) and \jdg{rkRecTieV}
-(\jdg{rkGainV} points, \jdg{rkGainVCi}). Depth is concentrated at its low values ---
-\jdg{rkDepLeTwo} of interventions sit at depth two or less --- so \jdg{rkTied} of within-cell pairs
+(\jdg{rkGainV} points, \jdg{rkGainVCi}). Depth is concentrated at its low values, \jdg{rkDepLeTwo} of interventions sit at depth two or less, so \jdg{rkTied} of within-cell pairs
 are tied on it, and that is the room a tie-break has to work in. This is the whole of the practical
 claim, and it is small.
 
 \begin{claimbox}
-\claimhead{claim:depth} On this task an integer read off the declared target structure --- free
-wherever a target is declared, and undefined where one is not --- matches a transformer trained on
+\claimhead{claim:depth} On this task an integer read off the declared target structure  (free
+wherever a target is declared, and undefined where one is not) matches a transformer trained on
 roughly two million chemical-mapping profiles (\jdg{rkRhoD} against \jdg{rkRhoN}, difference \jdg{rkDiffNCi}). Holding
 it fixed, both predictors retain a real but modest ordering ability (\jdg{rkPartN} and
 \jdg{rkPartV}, both $p\jdg{rkPartNP}$), worth \jdg{rkGainN} points of recovery when used to
@@ -1899,16 +1890,16 @@ looking for.
 \paragraph{What this claim is and is not about.} Claim~\ref{claim:depth} is a statement about a
 \emph{baseline}, not an explanation of why that baseline works. Helix depth may be carrying real
 structural depth, the accuracy of the designer's declaration, or both, and the split below
-establishes that it is not purely a declaration artefact --- depth read off the probing-derived
+establishes that it is not purely a declaration artefact, depth read off the probing-derived
 reference is \emph{larger} than depth read off the declaration (\jdg{prDepthBuilt} against
-\jdg{rkRhoD}) --- without separating the first two. \textbf{The claim is that a benchmark which
+\jdg{rkRhoD}), without separating the first two. \textbf{The claim is that a benchmark which
 does not report this integer will credit a model for recovering it, whatever it turns out to
 encode.} A mechanistic account of helix depth is a different paper and we do not attempt one.
 
 \paragraph{Where the free integer wins, and where nothing is resolved.} Helix depth is read off
 the declared target, and the paragraph above says the declared target is right about
-\jdg{vaPooled} of the time. Splitting the comparison on that --- the probing-derived reference
-either confirms the intervened pair or it does not --- is the sharpest test this baseline has
+\jdg{vaPooled} of the time. Splitting the comparison on that, the probing-derived reference
+either confirms the intervened pair or it does not, is the sharpest test this baseline has
 faced, and it separates the result rather than repeating it. Where the pair is confirmed
 (\jdg{vaNconf} interventions over \jdg{vaCellsConf} design cells) free depth reaches
 \jdg{vaDepConf}, beats ViennaRNA and EternaFold by intervals excluding zero
@@ -1931,7 +1922,7 @@ covering one.
 one.} Helix depth is read off the declared target, so a reader may reasonably ask whether it wins
 because the designer wrote it down. Read instead off the structure folded from this deposit's own
 probing (Appendix~\ref{app:probing}), the same baseline scores \jdg{prDepthBuilt} against
-\jdg{rkRhoD} --- \emph{better}, by \jdg{prDepthGain} (\jdg{prDepthGainCi}) --- and still
+\jdg{rkRhoD}  (\emph{better}, by \jdg{prDepthGain} (\jdg{prDepthGainCi})) and still
 exceeds all three predictors' level arms, the closest at \jdg{prDepthWorstCi}. The flipped pair
 is present in that structure for \jdg{prDepthPresent} of interventions. Two things follow, and
 they point opposite ways. The result does not depend on the declaration. And a depth read from
@@ -1940,7 +1931,7 @@ probing is not free: it costs the probing experiment and a fold, which is exactl
 
 \paragraph{A prediction we staked and lost, and what it cost.} We staked in advance that a
 predictor would beat the depth baseline, and wrote that stake's kill condition as a comparison of
-two point estimates with no interval on their difference --- again \S\ref{sec:withdrawal}'s
+two point estimates with no interval on their difference: again \S\ref{sec:withdrawal}'s
 error. The run returned every staked prediction satisfied; the interval that
 should have been there was computed afterwards, and is the one reported above. The declaration,
 the run, the fault and the repair are in Appendix~\ref{app:prereg}.
@@ -1975,7 +1966,7 @@ machinery fixed, make the mediator the \emph{real} predictor with its real distr
 binning, synthesise only the outcome so that a known fraction $f$ of the contrast runs through the
 mediator, and read back what the estimator says. Swept over $f$ up to \jdg{mcSpanTop}, the truth
 moves \jdg{mcSpanTrue} while the measured retention moves \jdg{mcNeuralSpan} on the neural arm and
-\jdg{mcViennaSpan} on the thermodynamic one --- \jdg{mcNeuralSpanFrac} and \jdg{mcViennaSpanFrac}
+\jdg{mcViennaSpan} on the thermodynamic one: \jdg{mcNeuralSpanFrac} and \jdg{mcViennaSpanFrac}
 of the range it is supposed to report. The neural arm fails without ever leaving a range that looks
 reasonable: at $f=0$, no mediation at all, it reads \jdg{mcNeuralZero}; at $f=1$, where every bit
 of the contrast has been routed through the mediator and the answer is zero, it reads
@@ -1993,7 +1984,7 @@ disagree about whether the estimator works (mean absolute errors \jdg{mcNeuralMa
 them to \jdg{mcNeuralLoo} and \jdg{mcViennaLoo}, and the rank correlations, which one point cannot
 dominate the same way, are \jdg{mcNeuralRho} and \jdg{mcViennaRho}. A six-point correlation
 carried by one point is evidence in neither direction, which is why the retraction is stated on
-the span --- a statistic that never touches the degenerate endpoint.
+the span, a statistic that never touches the degenerate endpoint.
 
 The quantity being withdrawn is a mediated fraction, and the literature defining such quantities is
 explicit that they require assumptions this design cannot supply
@@ -2001,7 +1992,7 @@ explicit that they require assumptions this design cannot supply
 computed within strata can also reverse under aggregation in ways the strata hide
 \citep{simpson1951interpretation,vanderweele2009conceptual}. That failure is general rather than
 particular to this corpus, and a companion study develops it. \textbf{None of that is needed
-here.} This instrument reports direct contrasts and bounds and never a ratio of two contrasts ---
+here.} This instrument reports direct contrasts and bounds and never a ratio of two contrasts, 
 a design decision taken because of the number above: the quantities in Section~\ref{sec:results}
 are differences of matched contrasts, each with its own interval, and none divides one small noisy
 quantity by another.
@@ -2031,7 +2022,7 @@ effect is routed through the real mediator and the metric is asked to report it 
 \textbf{a}, What each arm read against what was injected; the dashed line is a working metric's
 answer. At total mediation the thermodynamic arm reads \jdg{mcViennaFull}, marked by the triangle
 on the axis floor, since an axis wide enough to hold it makes every other point unreadable.
-\textbf{b}, The share of the truth's readable range each arm's reading spans ---
+\textbf{b}, The share of the truth's readable range each arm's reading spans: 
 \jdg{mcNeuralSpanFrac} and \jdg{mcViennaSpanFrac}, against the 100\% a working metric would span.
 \textbf{c}, The correlation with the truth under leave-one-out ($\bullet$ all points, $\times$
 endpoint removed). The thermodynamic arm's positive correlation comes from a single sweep point
@@ -2054,8 +2045,8 @@ prints (\jdg{chDrift} disagreements).
 \textbf{What this table is, stated so it cannot be over-read.} It is a \emph{channel attribution
 ledger}: a list of the covariates somebody chose, each priced by a direct contrast in its own
 units. It is \textbf{not} a causal decomposition and not a variance decomposition. The channels are
-not orthogonal --- they share structure, they are correlated, the design is hierarchical, and
-selection induces dependence among them --- so no row's price is a portion of a total and no set of
+not orthogonal  (they share structure, they are correlated, the design is hierarchical, and
+selection induces dependence among them) so no row's price is a portion of a total and no set of
 rows partitions anything. The prohibition is not stylistic caution: the common scale a
 decomposition would need is the mediated fraction, and \S\ref{sec:withdrawal} withdraws our own
 estimator for it.
@@ -2064,7 +2055,7 @@ estimator for it.
 \centering\small
 \caption{\textbf{The eight channels this instrument priced.} A channel is a covariate somebody
 chose; its price is what the identity readout is worth with that covariate free against held.
-\jdg{chCarry} carrying, \jdg{chEmpty} empty, \jdg{chUnres} unresolved --- an interval covering
+\jdg{chCarry} carrying, \jdg{chEmpty} empty, \jdg{chUnres} unresolved, an interval covering
 zero is not an empty channel, and the row says which it is. Prices are in each channel's own units
 and are \emph{not} commensurable, so the table is read down the last column, never across it.}
 \label{tab:channels}
@@ -2075,21 +2066,21 @@ and are \emph{not} commensurable, so the table is read down the last column, nev
 one of those (C4) carries it \emph{against} the effect we report rather than with it. Only one row
 is a decomposition and so only one has a residual: C2's attenuation is predicted to within
 \jdg{chEps} by the product of a depth slope and a depth gap estimated on disjoint arms. The
-channels that do \emph{not} carry are worth as much as those that do, because of which they are ---
+channels that do \emph{not} carry are worth as much as those that do, because of which they are, 
 and they are not all of a kind. \textbf{Two are unresolved rather than empty, and one of those was
 reclassified by applying to it the criterion the other had already been given.} C8's paired
 difference between probe chemistries covers zero (\jdg{xnDiffV}) while its interval reaches
 \jdg{chReachEight} of the quantity being measured, so it excludes nothing and may not be read as a
-null. C7 --- the leakage every reader demands first --- has an interval that covers zero and
+null. C7, the leakage every reader demands first, has an interval that covers zero and
 reaches \jdg{chReachSeven} of its own quantity, \emph{further} than the one that moved C8, and the
 asymmetry its earlier reading rested on does not resolve either (\jdg{didPoint}, \jdg{didCi}). A
 criterion stated for one channel binds the other, so C7 is now marked unresolved; that is the
 ledger being made self-consistent, not a finding about leakage. \textbf{What is left is C6, the
-folding model's own free energy --- the covariate every one of these design programs was
+folding model's own free energy  (the covariate every one of these design programs was
 optimising, the first explanation anyone would offer for the identity effect, and now the only
 channel this paper calls empty} (\jdg{resVienna},
 \jdg{resViennaCi}; at most \jdg{bdViennaAbs} of the contrast can run through it, in the contrast's
-own units rather than as a share of it --- \S\ref{sec:bound} keeps the share form with the
+own units rather than as a share of it) \S\ref{sec:bound} keeps the share form with the
 qualification it needs).
 
 \paragraph{What a fairer split would close, and what it would leave.} When a benchmark number turns
@@ -2108,7 +2099,7 @@ read off a target somebody declared; the selection rule decided which molecules 
 at all. \textbf{The one channel a split closes here is the one that turned out to be empty, and
 none of the channels that carry the number is of that type.} This is not an argument against fairer
 splits, which we take to be settled and necessary, but a statement about what is left standing
-after one --- and the reason an instrument that prices choices is not made redundant by a better
+after one, and the reason an instrument that prices choices is not made redundant by a better
 partition.
 
 \paragraph{Why the last column cannot be added up.} The natural way to present a ledger like this
@@ -2127,11 +2118,11 @@ Mining them faithfully does not make them representative, and no arm here prices
 exhaustive natural-RNA scan of \S\ref{sec:second} is attractive for exactly this reason and is too
 small to carry it. \emph{Second}, this model's final pre-training stage consumed pseudo-labels
 covering its own test sequences, so a sequence can have been seen without its experimental label
-having been seen, and C7's audit --- built from deposited measurements --- cannot separate that
+having been seen, and C7's audit, built from deposited measurements, cannot separate that
 case from the unseen one. Both are stated once, here, and not repeated in
 \S\ref{sec:limitations}.
 
-\subsection*{Part III. Reading 2 --- what the number buys, and the translate stage}
+\subsection*{Part III. Reading 2: what the number buys, and the translate stage}
 
 \noindent Reading~1 asks whether a benchmark number is carried by the property it names. Even when
 it is, a second question remains and is almost never asked: what does the margin \emph{do}?
@@ -2141,14 +2132,14 @@ it is, a second question remains and is almost never asked: what does the margin
 
 A benchmark margin is a claim about a decision only if it survives being converted into one, and
 the conversion is available here because the outcome is an experiment somebody already ran. The
-decision converted to is stated rather than assumed: \textbf{recovery of a design's rescuing
-interventions under a fixed synthesis budget, one operational experimental utility and not a
-universal definition of one.} An experimenter optimising information gain, cost per synthesis,
-downstream phenotype or an active-learning schedule is making a different decision, and this
-section says nothing about those; what it does say is that the decision a probing library most
-obviously supports --- which constructs to build next --- is not ordered by the agreement margin.
-This section makes the conversion twice: first asking whether the intervention readout \emph{reorders} the panel
-relative to the conventional one, then what the conventional margin is worth at a fixed budget.
+decision is stated rather than assumed: \textbf{recovery of a design's rescuing interventions under
+a fixed synthesis budget, one operational experimental utility and not a universal definition of
+one.} An experimenter optimising information gain, cost per synthesis, downstream phenotype or an
+active-learning schedule is making a different decision, and this section says nothing about those.
+What it does say is that the decision a probing library most obviously supports, which constructs
+to build next, is not ordered by the agreement margin. The conversion is made twice: whether the
+intervention readout \emph{reorders} the panel, then what the conventional margin is worth at a
+fixed budget.
 
 \paragraph{The readout does not reorder the panel; it flattens it.} Scoring
 \jdg{reNimpl} independent implementations on the same \jdg{reNcells} design cells under both
@@ -2167,24 +2158,24 @@ RNAstructure & \jdg{reAgreeRst}  & \jdg{reRespRst}~\jdg{reRespCiRst} \\
 \end{tabular}
 \end{center}
 
-\noindent Kendall's $\tau$ between the two orderings is \jdg{reTau}: \jdg{reNswap} adjacent pair
-changes places --- \jdg{reSwapA} leads \jdg{reSwapB} by \jdg{reSwapAgree} on agreement and trails
-it by \jdg{reSwapResp} on response --- and the difference of those two differences \jdg{reSwapCi}
+\noindent Kendall's $\tau$ between the two orderings is \jdg{reTau}. \jdg{reNswap} adjacent pair
+changes places, \jdg{reSwapA} leading \jdg{reSwapB} by \jdg{reSwapAgree} on agreement and trailing
+it by \jdg{reSwapResp} on response, and the difference of those two differences \jdg{reSwapCi}
 covers zero, so \jdg{reNresolved} swaps are resolved. \textbf{We report no reorder.} The
-interesting number is the scale, not the order: best-to-worst spans \jdg{reIncMarginWorst} on
-structure agreement and \jdg{reSpanImpl} on intervention response, so the panel is nearly four
-times narrower on the readout that corresponds to an experiment. Inside one implementation,
-\jdg{reNvar} parameter sets span \jdg{reSpanParam}, \jdg{reSpanRatio} narrower still --- the
-measurement licensing the implementation/variant distinction of \S\ref{sec:predictors}.
+interesting number is the scale: best-to-worst spans \jdg{reIncMarginWorst} on structure agreement
+and \jdg{reSpanImpl} on intervention response, so the panel is nearly four times narrower on the
+readout that corresponds to an experiment. Inside one implementation, \jdg{reNvar} parameter sets
+span \jdg{reSpanParam}, \jdg{reSpanRatio} narrower still, which is the measurement licensing the
+implementation/variant distinction of \S\ref{sec:predictors}.
 
-That distinction is visible in structure space too, which is what tells us the panel is not four
+The distinction is visible in structure space too, which is what tells us the panel is not four
 interchangeable programs. Folding the same \jdg{reNcells} wild types and comparing the
 implementations to \emph{each other} rather than to a reference, the two nearest-neighbour
 implementations agree at \jdg{pwNN} median $F_1$ and each agrees with the transformer at only
 \jdg{pwNNvsNeuralLo}--\jdg{pwNNvsNeuralHi}. EternaFold lands between them, as the panel's design
-predicts it must, at \jdg{pwEtfNN} with the thermodynamic pair against \jdg{pwEtfNeural} with the
-neural model. The architecture and training-data axes separate here as \emph{measured geometry},
-not as an assertion about how the panel was assembled.
+predicts, at \jdg{pwEtfNN} with the thermodynamic pair against \jdg{pwEtfNeural} with the neural
+model. The architecture and training-data axes separate here as \emph{measured geometry}, not as
+an assertion about how the panel was assembled.
 
 \begin{center}\footnotesize\setlength{\tabcolsep}{5pt}
 \begin{tabular}{@{}lcccc@{}}
@@ -2234,7 +2225,7 @@ oracle \jdg{dcOracleQtr}.
 
 \paragraph{An interval covering zero is not equivalence, and this paper says so elsewhere.} A
 confidence interval containing zero is a failure to resolve a difference, not evidence that there
-is none --- the reason C8's channel is marked \emph{unresolved} rather than empty in
+is none, the reason C8's channel is marked \emph{unresolved} rather than empty in
 \S\ref{sec:ledger}, and applying the weaker standard here would leave the paper holding two
 standards. An equivalence claim needs a margin, so we fix one by a rule touching only the free
 baseline and the geometry of the corpus, which therefore cannot have been chosen to suit the
@@ -2242,11 +2233,11 @@ differences it judges: \textbf{a ranker difference is negligible if building one
 would have gained more.} Free depth gains \jdg{eqSlope} of recovery per unit of budget and the
 median design cell holds \jdg{eqMedCell} candidates, so one construct is \jdg{eqOneTube} of a
 budget and $\delta = \jdg{eqDelta}$. Each comparison reports $\delta^\star$, the smallest margin at
-which two one-sided tests would declare equivalence at $\alpha=0.05$ --- the larger absolute
-endpoint of its 90\% target-clustered interval --- so a reader who rejects our $\delta$ can apply
+which two one-sided tests would declare equivalence at $\alpha=0.05$, the larger absolute
+endpoint of its 90\% target-clustered interval, so a reader who rejects our $\delta$ can apply
 their own. Depth against itself returns $\delta^\star = \jdg{eqSelfDs}$. \textbf{We do not assert
 $\delta$ as a scientific equivalence margin for this comparison in general.} It is a declared
-operational tolerance --- one additional construct in the median design of this corpus --- and a
+operational tolerance, one additional construct in the median design of this corpus, and a
 laboratory whose construct costs, cell sizes or budget granularity differ should read
 $\delta^\star$ against its own. Reporting $\delta^\star$ rather than a verdict alone is what makes
 that substitution possible without rerunning anything.
@@ -2259,25 +2250,25 @@ what the data cannot rule out is that the three implementations sharing the near
 decomposition are \emph{worse} than a free integer by more than one construct's worth. At the 10\%
 and 25\% budgets all \jdg{reNimpl} are equivalent within $\delta$.
 
-\textbf{The same margin disciplines our own positive result.} Composition --- depth with a model
-breaking its ties --- is statistically resolved (\jdg{eqBestPt}, 90\% interval \jdg{eqBestCi} at
+\textbf{The same margin disciplines our own positive result.} Composition, depth with a model
+breaking its ties, is statistically resolved (\jdg{eqBestPt}, 90\% interval \jdg{eqBestCi} at
 the 25\% budget), recovering \jdg{dcStackVsQtr}~\jdg{dcStackVsCiQtr} more there and
 \jdg{dcStackVsHalf}~\jdg{dcStackVsCiHalf} at 50\%; it is also equivalent to plain depth within one
 construct, $\delta^\star = \jdg{eqBestDs}$, as is every other stacked arm (largest
 \jdg{eqStackMaxDs}). \emph{The composition gain is resolvable and worth less than one extra tube},
 and both halves are reported. At every budget everything in this panel, including the best ranker
-we can compose from it, sits within one construct of free helix depth --- except where it sits
+we can compose from it, sits within one construct of free helix depth: except where it sits
 worse. This is the shape of Claim~\ref{claim:depth}, now priced.
 
 \paragraph{That margin is a property of the reference, not only of the molecules.} The
-agreement scored here is against the \emph{declared target} --- what the design programs were
-aiming at --- for every implementation alike, so no model is being scored against its own output.
+agreement scored here is against the \emph{declared target}, what the design programs were
+aiming at, for every implementation alike, so no model is being scored against its own output.
 It is still an intention rather than a measurement. Scored instead against a structure folded from
 the probing data (Appendix~\ref{app:probing}), all three nearest-neighbour implementations rise
 and the transformer falls (\jdg{prBuiltV}, \jdg{prBuiltR}, \jdg{prBuiltE},
 \jdg{prBuiltN}); the order is \jdg{prOrderSame} and the margin goes \jdg{prMarginDecl} to
 \jdg{prMarginBuilt} (\jdg{prMarginBuiltCi}), a change of \jdg{prMarginChange}
-(\jdg{prMarginChangeCi}) that excludes zero --- \jdg{prMarginPct} of its size. The declared
+(\jdg{prMarginChangeCi}) that excludes zero: \jdg{prMarginPct} of its size. The declared
 target remains the primary reference below, fixed before that number existed, because Reading~2 is
 a statement about the margin the incumbent benchmark distributes. What the built reference
 establishes is that the margin's \emph{size} is not a property of the molecules. Reported
@@ -2285,7 +2276,7 @@ against us: the built reference's closest panel member is \jdg{prClosest} at
 \jdg{prClosestF1}, not either of the two that share its energy model.
 
 \paragraph{The incumbent margin, converted.} RibonanzaNet leads ViennaRNA by \jdg{dcTransF1} on
-structure agreement --- the largest margin in the panel, and the kind a methods paper is written
+structure agreement, the largest margin in the panel, and the kind a methods paper is written
 around. At a 25\% budget it converts to \jdg{dcTransRec} of recovery: \textbf{about \jdg{dcTransN}
 additional rescuing interventions out of \jdg{dcNrescue}, or \jdg{dcTransPct} of them.} Of the
 \jdg{dcNpair} ordered pairs, \jdg{dcNflip} change sign between the two scales, the model leading on
@@ -2296,7 +2287,7 @@ and loses \jdg{dcHoldShrink} to shrinkage (\jdg{dcHoldIn} in sample, \jdg{dcHold
 
 \begin{scopebox}
 \textbf{The review this table needed before it could be printed.} Helix depth is an \emph{integer},
-so it ties constantly, and the ranking above resolves ties with a stable sort --- which breaks them
+so it ties constantly, and the ranking above resolves ties with a stable sort, which breaks them
 on the order rows were written to disk. Construct order is position order, and position is not
 obviously independent of rescue; had it carried anything, the free baseline's standing would have
 been partly a fact about file layout, and no summary statistic in the table could have shown it.
@@ -2304,7 +2295,7 @@ The check was built rather than argued: an implementation that does not import t
 reproduces \jdg{tvBackN} of its published quantities to \jdg{tvBack} (its rounding), recovery at a
 100\% budget is exactly $1$ for every rule including a constant score, the random rule matches its
 closed form, and a constant score with randomised ties equals the random rule. Only then was one
-thing changed --- ties broken at random and averaged.
+thing changed: ties broken at random and averaged.
 
 \textbf{Depth is the rule that moves, and it moves in the direction that acquits it.}
 \jdg{tvNzero} of the \jdg{tvNother} non-depth rule-by-budget cells shift by exactly zero, so ties
@@ -2319,11 +2310,11 @@ the best implementation's gain over random that the free integer already deliver
 \textbf{budget-dependent and must be quoted with its budget}: \jdg{tvShareQtr} at 25\% but
 \jdg{tvShareTen} at 10\% and \jdg{tvShareHalf} at 50\%, running \jdg{tvShareLo} to \jdg{tvShareHi}
 across budgets and both tie rules (under random ties \jdg{tvShareRTen}, \jdg{tvShareRQtr},
-\jdg{tvShareRHalf}) --- and the best implementation is not the same model at every budget
+\jdg{tvShareRHalf}), and the best implementation is not the same model at every budget
 (\jdg{tvBestTen} at 10\%, \jdg{tvBestQtr} above it). A single headline percentage would be a choice
 of budget presented as a property of the models. \emph{Second}, our staked criterion for ``the
 incumbent margin does not predict the decision'' compared two point estimates with no interval on
-their difference --- the error this paper retracts in \S\ref{sec:withdrawal}. It is graded as
+their difference, the error this paper retracts in \S\ref{sec:withdrawal}. It is graded as
 written and stays \textbf{failed}; the interval it needed is reported here and does not regrade it.
 \end{scopebox}
 
@@ -2331,7 +2322,7 @@ written and stays \textbf{failed}; the interval it needed is reported here and d
 \jdg{tvGapTen} \jdg{tvGapCiTen} at the 10\% budget, \jdg{tvGapQtr} \jdg{tvGapCiQtr} at 25\% and
 \jdg{tvGapHalf} \jdg{tvGapCiHalf} at 50\%; \jdg{tvGapNres} exclude zero, and \textbf{they exclude
 it on opposite sides.} A \jdg{dcTransF1} structure-agreement margin does not merely fail to
-transfer to the decision --- \textbf{at the tightest budget it points the wrong way}, with an
+transfer to the decision: \textbf{at the tightest budget it points the wrong way}, with an
 interval excluding zero.
 
 \paragraph{It is a curve with one crossing, not three points.} A sign read off three budgets, one
@@ -2339,8 +2330,7 @@ rescue threshold, one predictor pair and \jdg{ccPuzzles} targets should be attac
 those choices before it is believed. Swept over \jdg{ivSweepN} budgets from \jdg{ivSweepLo} to
 \jdg{ivSweepHi} of a design built, the gap runs from \jdg{ivGapLo} to \jdg{ivGapHi} and changes
 sign \textbf{exactly \jdg{ivNcross} time}, between \jdg{ivCrossA} and \jdg{ivCrossB}. Dropping each
-target in turn leaves the sign unchanged at all \jdg{ivNbudget} budgets and \jdg{ivLooN} drops ---
-at the tightest budget the gap ranges \jdg{ivLooLo} to \jdg{ivLooHi}, never approaching zero ---
+target in turn leaves the sign unchanged at all \jdg{ivNbudget} budgets and \jdg{ivLooN} drops  (at the tightest budget the gap ranges \jdg{ivLooLo} to \jdg{ivLooHi}, never approaching zero) 
 and taken one target at a time, \jdg{ivTgtNeg} of \jdg{ivTgtN} individually show the inversion,
 \jdg{ivTgtTie} tie and \jdg{ivTgtPos} run the other way. \jdg{ivThrInv} of \jdg{ivThrN} rescue
 thresholds preserve it, the one that does not leaving only \jdg{ivThrFailN} scorable cells.
@@ -2349,12 +2339,12 @@ is a measured crossing.} What it is not is a replication: this is one corpus, an
 \S\ref{sec:ceiling} reports why a second of comparable size is not to be had.
 
 \paragraph{And one ordering explains every pair.} Of the \jdg{dcNpair} ordered pairs,
-\jdg{ivCrossFam} invert between the smallest and largest budget and \jdg{ivSameFam} does not ---
+\jdg{ivCrossFam} invert between the smallest and largest budget and \jdg{ivSameFam} does not, 
 and which is which is fully determined. The one that does not invert is \emph{the two
 nearest-neighbour implementations against each other}, the pair agreeing at \jdg{pwNN} in structure
 space and therefore one family. Every pair that crosses families inverts, and \textbf{in every case
 the large budget favours the model that ranks higher on structure agreement, while the small budget
-favours the one that ranks lower.} A single ordering --- the incumbent benchmark's own --- predicts
+favours the one that ranks lower.} A single ordering, the incumbent benchmark's own, predicts
 all six outcomes.
 
 That mechanism is worth more than the sign. \textbf{A model's structure-agreement advantage is an
@@ -2380,19 +2370,18 @@ crossing pair the large budget favours whichever model ranks higher on structure
 \end{figure}
 
 \begin{claimbox}
-\claimhead{claim:budget} Across \jdg{reNimpl} independent implementations and three budgets ---
-and a fifth, the only pseudoknot-capable one, added because this corpus is a pseudoknot round and
-losing at every budget (\jdg{pkRecPk} against \jdg{pkRecDepth} at the tightest) --- no
+\claimhead{claim:budget} Across \jdg{reNimpl} independent implementations and three budgets  (and a fifth, the only pseudoknot-capable one, added because this corpus is a pseudoknot round and
+losing at every budget (\jdg{pkRecPk} against \jdg{pkRecDepth} at the tightest)) no
 model outperforms a free integer as a standalone ranker of which interventions to build: none of
 \jdg{eqNcomp} intervals excludes zero, and against a margin fixed as the gain one extra construct
 buys ($\delta=\jdg{eqDelta}$), \jdg{eqNeq} are equivalent to free depth while the remaining
 \jdg{eqNfail} fail on the side of being \emph{worse}. The panel's largest structure-agreement
 margin, \jdg{dcTransF1}, converts to \jdg{dcTransPct} of this corpus's rescuing interventions, and
-at the tightest budget its sign inverts (\jdg{tvGapTen}~\jdg{tvGapCiTen}) --- a measured crossing
+at the tightest budget its sign inverts (\jdg{tvGapTen}~\jdg{tvGapCiTen})  (a measured crossing
 rather than three points: swept over \jdg{ivSweepN} budgets the gap changes sign exactly
 \jdg{ivNcross} time, at \jdg{ivCrossA}--\jdg{ivCrossB} of a design built, surviving any dropped
 target, \jdg{ivThrInv} of \jdg{ivThrN} rescue thresholds, and \jdg{ivCrossFam} of \jdg{dcNpair}
-predictor pairs --- the only pair that does not invert being two implementations of one model
+predictor pairs) the only pair that does not invert being two implementations of one model
 family. \textbf{A structure-benchmark margin is an average, and the better a model ranks on that
 average the further from the top of its own list its advantage lies. A budgeted experimenter only
 ever sees the top.}
@@ -2411,26 +2400,24 @@ a measured contrast can be carried by a covariate somebody chose, is a question 
 correct about the quantity it computes and silent about the quantity the reader will act on, and in
 both the silence is invisible from inside the benchmark. That is why the instrument has to be a
 separate object: a score cannot audit the conditions of its own interpretation, and neither reading
-can be recovered from a leaderboard. The practical consequence is a rule rather than a result ---
-\emph{a benchmark number is carried by a covariate somebody chose until it is shown otherwise, and
-licenses no decision until it has been converted into one} --- and both halves are cheap to check
-when the corpus contains interventions. This paper's last measurement is how rarely it does.
+can be recovered from a leaderboard. The practical consequence is a rule rather than a result.
+\emph{A benchmark number is carried by a covariate somebody chose until it is shown otherwise, and
+licenses no decision until it has been converted into one.} Both halves are cheap to check when the
+corpus contains interventions, and this paper's last measurement is how rarely a corpus lets them
+be.
 
 \paragraph{The interventions are not ours, and that is the point.}
-We did not choose these mutants and we did not make them. The method's value is that it makes a
-completed experiment yield an answer it was not designed to give, at no experimental cost, and the
-corresponding limitation is exact: the corpus decides what can be asked (\S\ref{sec:mining}). A
-field that stops depositing mutant libraries stops supplying this instrument. Nor does mining them
-faithfully make them representative, which is why the exhaustive scan of \S\ref{sec:second} is
-scientifically more attractive than its size suggests: a scan that enumerates every pair has no
-chooser left to price.
+We did not choose these mutants and did not make them. The method makes a completed experiment
+yield an answer it was not designed to give, at no experimental cost, and the corresponding
+limitation is exact: the corpus decides what can be asked (\S\ref{sec:mining}). A field that stops
+depositing mutant libraries stops supplying this instrument. Mining them faithfully does not make
+them representative either, which is why the exhaustive scan of \S\ref{sec:second} is more
+attractive than its size suggests: a scan that enumerates every pair has no chooser left to price.
 
-\paragraph{Beyond RNA.}
-The primitive --- recover interventions a corpus already contains, score a model on its predicted
-response, condition on whoever chose the interventions --- is not specific to base pairs, and
-corpora produced by design programs are becoming common in other fields. We have not tested it
-elsewhere and make no claim about it; the estimator theory the conditioning step needs is developed
-in a companion study that this paper cites and does not depend on.
+\paragraph{Beyond RNA.} The primitive is not specific to base pairs, and corpora produced by design
+programs are becoming common in other fields. We have not tested it elsewhere and make no claim
+about it; the estimator theory the conditioning step needs is developed in a companion study that
+this paper cites and does not depend on.
 
 \paragraph{Code and data availability.} Every number in this manuscript is generated from a
 committed run artifact by a single script; no measured value is typed by hand, and the build fails
@@ -2444,26 +2431,21 @@ analysed file is the versioned release \texttt{OK7a\_M2R\_data.v4.5.1.csv}; a di
 it is a different corpus.
 
 \paragraph{What we are deliberately not doing, and why each is bounded rather than open.} Four
-questions raised by the results above are answered here by saying what would settle them, because
-running them would lengthen the chain without changing what the paper claims. \emph{First},
-whether the crossing of \S\ref{sec:reorder} generalises. It is a statement about benchmarks rather
-than about RNA --- an average advantage living away from the top of a ranked list will not transfer
-to a budgeted decision in any field --- so testing it means repeating the conversion in a domain
-with its own executed interventions, not finding more RNA; we state the mechanism precisely enough
-to be attacked and do not claim the generalisation. \emph{Second}, whether a prospectively designed
-library behaves as \S\ref{sec:ceiling} predicts: nothing short of synthesising it will confirm the
-$4n$-slot specification, and we prefer to state a falsifiable design than to simulate one.
-\emph{Third}, whether real placement confounding is captured by design cell, depth and crossing.
-Assumption~\ref{ass:placement} cannot be tested from observational data at all, and what
-\S\ref{sec:estimation} reports instead is a bound on how strong a violation would have to be:
-no design-level covariate can bias this estimator, and nothing we did measure comes near what
-would be needed.
-\emph{Fourth}, whether a contemporary foundation model orthogonal to all \jdg{reNimpl} of these
-would change the picture. It would extend the panel but not the argument: the panel already spans
-two model families with measured geometry (\S\ref{sec:reorder}), and a fifth member of either
-family would move the response readout by less than \jdg{reSpanImpl}. A genuinely orthogonal
-architecture is worth adding and we have not added one. None of the four is a missing control for
-a claim made here; each is the next experiment for a claim we have deliberately not made.
+questions raised above are answered by saying what would settle them, because running them would
+lengthen the chain without changing what the paper claims. \emph{First}, whether the crossing of
+\S\ref{sec:reorder} generalises. It is a statement about benchmarks rather than about RNA, so
+testing it means repeating the conversion in a domain with its own executed interventions, not
+finding more RNA. \emph{Second}, whether a prospectively designed library behaves as
+\S\ref{sec:ceiling} predicts: nothing short of synthesising it will confirm the $4n$-slot
+specification, and we prefer to state a falsifiable design than to simulate one. \emph{Third},
+whether real placement confounding is captured by design cell, depth and crossing.
+Assumption~\ref{ass:placement} cannot be tested from observational data at all;
+\S\ref{sec:estimation} reports instead how strong a violation would have to be. \emph{Fourth},
+whether a foundation model orthogonal to all \jdg{reNimpl} of these would change the picture. It
+would extend the panel but not the argument, since a fifth member of either family present would
+move the response readout by less than \jdg{reSpanImpl}. A genuinely orthogonal architecture is
+worth adding and we have not added one. None of the four is a missing control for a claim made
+here; each is the next experiment for a claim we have deliberately not made.
 
 % =====================================================================
 
@@ -2475,14 +2457,14 @@ claim it bounds rather than collected as a closing disclaimer.
 
 \paragraph{The free integer has two edges we cannot see past.} Helix depth is defined only where
 a design program declared a target, so the baseline that beats these predictors is
-\emph{undefined} on natural RNA --- the deposits surveyed in Appendix~\ref{app:survey} declare no
+\emph{undefined} on natural RNA, the deposits surveyed in Appendix~\ref{app:survey} declare no
 target structure, and no amount of further analysis of this corpus will change that. Claim
 \ref{claim:depth} is therefore a statement about corpora written by design programs, which is the
 population this instrument reads on at all, and not about RNA structure prediction in general.
 The second edge is sharper because we did test it and it did not resolve: if depth wins only by
 encoding whether the declared pair is real, it is a much more mechanical result, and the
 confirmation indicator scored as its own ranker reaches \jdg{vaConfLvl} against depth's
-\jdg{rkRhoD} --- a difference of \jdg{vaDepVsConf} whose interval, \jdg{vaDepVsConfCi}, covers
+\jdg{rkRhoD}, a difference of \jdg{vaDepVsConf} whose interval, \jdg{vaDepVsConfCi}, covers
 zero. \textbf{We cannot separate helix depth from ``the declared pair is really there'' on this
 corpus}, and a reader who prefers the mechanical reading is not contradicted by anything we
 measured. What the split in \S\ref{sec:ranking} does establish is the direction: depth's advantage
@@ -2496,8 +2478,8 @@ survey, and the instrument is offered so that others can add rows. What partly o
 that the panel's geometry is measured rather than claimed (\S\ref{sec:reorder}): it spans two model
 families rather than sampling one four times, and a fifth implementation of an existing family
 would move the response readout by less than the \jdg{reSpanImpl} the families already span. No
-claim here is about the field --- the declaration governing these runs forbade that phrasing in
-advance --- and the class-level statement that survives is narrow: two predictors sharing the
+claim here is about the field, the declaration governing these runs forbade that phrasing in
+advance, and the class-level statement that survives is narrow: two predictors sharing the
 nearest-neighbour decomposition, one fitted to probing data, do not reproduce the identity
 separation the transformer does.
 
@@ -2510,8 +2492,8 @@ an effect size across corpora, and none is carried. The obvious repair is a seco
 comparable size, and \S\ref{sec:ceiling} reports the search for one rather than the wish for one:
 the largest public probing corpus has a ceiling of \jdg{dmCand} candidate orientation-flip
 sequence pairs in total. \textbf{This limitation is therefore not one more experiment away.} It is
-a property of how probing libraries are built --- design libraries spend every slot on a new
-molecule, an intervention needs four slots spent on one --- which is why \S\ref{sec:ceiling}
+a property of how probing libraries are built  (design libraries spend every slot on a new
+molecule, an intervention needs four slots spent on one) which is why \S\ref{sec:ceiling}
 states the cost of the alternative rather than appealing to future work.
 
 \paragraph{The instrument's reach is bounded by disclosure, not by biology.} Of \jdg{scDeposits}
@@ -2521,7 +2503,7 @@ because they publish neither construct naming nor per-row sequence annotation
 
 \paragraph{The leakage audit reaches the whole released corpus, and one tier past it.} Exposure is
 graded against all of the model's own training file (\S\ref{sec:leakage}), so \jdg{lkFullFrac} is
-exact on the released labelled corpus rather than a bound on it --- but the pseudo-label
+exact on the released labelled corpus rather than a bound on it, but the pseudo-label
 pre-training tier stays outside any audit built from released measurements, since a sequence can
 have been seen without its label having been seen. It is priced as unpriceable in
 \S\ref{sec:ledger}. \textbf{What the audit does not do is exclude a leakage effect}: the exposed
@@ -2544,8 +2526,7 @@ pair type, so it measures whether a model's prediction of the consequences of th
 was borne out, not the effect of \emph{being} a C--G rather than an A--U (\S\ref{sec:mining}).
 
 \paragraph{Placement is an assumption, not a randomisation.} Assumption~\ref{ass:placement}
-licenses reading \eqref{eq:est} causally and is not testable from this data. What is measurable ---
-the price of ignoring placement, and the residual imbalance after conditioning --- is reported in
+licenses reading \eqref{eq:est} causally and is not testable from this data. What is measurable  (the price of ignoring placement, and the residual imbalance after conditioning) is reported in
 \S\ref{sec:estimation}.
 
 \paragraph{One negative result is not resolved.} The nearest-neighbour implementation's own
@@ -2570,30 +2551,30 @@ result about what this kind of estimator can and cannot report.
 \label{sec:conclusion}
 
 Chemical-probing benchmarks ask whether a predicted structure agrees with a reference, and on
-corpora where models have become good that question runs out of resolution and carries a choice
---- which pairs enter the comparison --- worth \jdg{cvSwing}$\times$ on the same molecules. This
+corpora where models have become good that question runs out of resolution and carries a choice, which pairs enter the comparison, worth \jdg{cvSwing}$\times$ on the same molecules. This
 paper takes a different question from data that already exists. Compensatory mutagenesis has been
 performed at scale for a decade, and among its products is a class of two-nucleotide interventions
 whose outcome is measured, whose internal control is the molecule it was made from, and into which
 no folding model enters. Recovering them by a stated rule turns a probing corpus into a benchmark
 of \emph{response} rather than of agreement.
 
-What the instrument reads is not what we expected to report. On the identity axis --- throughout
-this paper a contrast between C--G and A--U \emph{targets} in matched contexts, never the causal
-effect of being one rather than the other (\S\ref{sec:mining}) --- it separates the predictors: a
+What the instrument reads is not what we expected to report. The identity axis is throughout this
+paper a contrast between C--G and A--U \emph{targets} in matched contexts, never the causal effect
+of being one rather than the other (\S\ref{sec:mining}), and on it the predictors separate. A
 transformer's own pairing probability distinguishes them by \jdg{resNeural} (\jdg{resNeuralCi})
-where the measurement puts them \jdg{resOut} (\jdg{resOutCi}) apart --- indistinguishable once each
-column is put on its own scale (\jdg{stdMN}\,SD, \jdg{stdMNCi}), which is the only sense in which
-the two may be compared --- and neither predictor built on the nearest-neighbour decomposition does
-so (\jdg{resVienna}, \jdg{resViennaCi}; \jdg{efContrast}, \jdg{efContrastCi}). The separation decomposes into an axis worth \jdg{axArch}
+where the measurement puts them \jdg{resOut} (\jdg{resOutCi}) apart, the two being
+indistinguishable once each column is put on its own scale (\jdg{stdMN}\,SD, \jdg{stdMNCi}), which
+is the only sense in which they may be compared. Neither predictor built on the nearest-neighbour
+decomposition separates them (\jdg{resVienna}, \jdg{resViennaCi}; \jdg{efContrast},
+\jdg{efContrastCi}). The separation decomposes into an axis worth \jdg{axArch}
 (\jdg{axArchCi}) between that transformer and EternaFold and a training-data axis worth
 \jdg{axData} (\jdg{axDataCi}); we had written that the second was absent, and the interval said
 otherwise, and we had read the first as a property of the decomposition until a second transformer
 declined to reproduce it (\jdg{fmContrastCi}). On the axis an experimenter would actually
-use --- which flips to build inside one design --- all of them are matched or beaten by helix
+use, which flips to build inside one design, all of them are matched or beaten by helix
 depth, an integer read off the declared target that costs nothing (differences \jdg{rkDiffNCi},
 \jdg{rkDiffVCi}, \jdg{efVsDepthCi}, all covering zero). \textbf{What is new is not that helix
-position carries information} --- pairs at helix ends are well known to pair less often ---
+position carries information}, pairs at helix ends are well known to pair less often, 
 \textbf{but that it is not used as a scored baseline a model must show an increment over}, which we
 state as a bounded search: it appears in none of the benchmarks surveyed in \S\ref{sec:background}
 nor in the mutate-and-map work this corpus comes from. What survives with depth held fixed is real
@@ -2607,22 +2588,18 @@ them; and at the tightest budget the margin's sign inverts, \jdg{tvGapTen}~\jdg{
 \textbf{A structure-benchmark margin is not a decision margin, and the gap between them is
 budget-structured rather than noise.}
 
-What organises those results is the axis they all lie on. On a corpus this one's shape --- written
-by design programs, filtered by a rule, mutated at pairs somebody picked, scored against a column
-that is a model's own output --- a benchmark number is carried by a covariate somebody chose until
-it is shown otherwise, and an instrument's job is to name each chooser and price the channel.
-Section~\ref{sec:ledger} does that for \jdg{chPriced} of them: \jdg{chCarry} carry the number,
-\jdg{chEmpty} is empty, \jdg{chUnres} are unresolved and labelled so rather than counted as empty,
-and \jdg{chUnpriced} choosers we can name and cannot price. The channels that do not carry are the
-ones a reader demands first, and the emptiest is the free energy every one of these programs was
-written to minimise.
+Section~\ref{sec:ledger} prices \jdg{chPriced} of the channels through which such a number can be
+carried: \jdg{chCarry} carry it, \jdg{chEmpty} is empty, \jdg{chUnres} are unresolved and labelled
+so rather than counted as empty, and \jdg{chUnpriced} choosers we can name and cannot price. The
+channels that do not carry are the ones a reader demands first, and the emptiest is the free energy
+every one of these programs was written to minimise.
 
 The result that matters most for how the instrument will be used is Claim~\ref{claim:depth}, one
 row of that ledger: a benchmark that does not report the free baseline will credit a model for
 knowing where a pair sits in its helix. We report ours, and it is not beaten.
 
 \textbf{None of this says the incumbent benchmark is wrong.} It answers the question it asks, and
-that question --- does a predicted structure agree with a reference --- is a real one. What the
+that question, does a predicted structure agree with a reference, is a real one. What the
 two readings show is that its answer is \emph{incomplete} in two specific, separately measurable
 ways: it does not establish \emph{construct validity}, because the number can be carried by a
 covariate somebody chose and this paper prices \jdg{chPriced} such channels; and it does not
@@ -2663,8 +2640,8 @@ criterion, on the same release.}
 \end{table}
 
 The wild-type row is worth a sentence, because a reader checking the arithmetic will otherwise
-find it short. The mining loop skips wild types before any exclusion counter runs --- a wild type
-is the control a comparison is defined against, not a candidate for admission --- while the input
+find it short. The mining loop skips wild types before any exclusion counter runs  (a wild type
+is the control a comparison is defined against, not a candidate for admission) while the input
 count is every construct in the release, so the difference is exactly the \jdg{nWildTypes} wild
 types. The identity in the table's footnote is asserted in \texttt{m34} before the table is
 written, so a release on which it stopped holding would fail the build rather than print an
@@ -2676,8 +2653,7 @@ unexplained remainder.
 \centering
 \input{figs/figA1_admission}
 \caption{\textbf{The ledger, as a subtraction that has to close.} \textbf{a}, Every construct in
-the release and what became of it under the packaged criterion. The wild types are not a refusal
---- they are the controls each comparison is defined against --- and are drawn because without
+the release and what became of it under the packaged criterion. The wild types are not a refusal: they are the controls each comparison is defined against, and are drawn because without
 them the arithmetic appears short by \jdg{nWildTypes}. \textbf{b}, Admitted interventions by
 wild-type pair type. The three refusal reasons are named clauses of Definition~\ref{def:flip}, not
 thresholds that could be moved to raise the yield.}
@@ -2703,15 +2679,15 @@ With \jdg{ccPuzzles} clusters, a bootstrap interval is honest only if no single 
 the resample: the largest target carries \jdg{stShare} of the corpus and the smallest
 \jdg{stPuzMin} interventions against a median of \jdg{stPuzMed}, so no target can move an interval
 on its own and none is so small that dropping it changes the matched set. Design cells are smaller
---- \jdg{stCellMin} to \jdg{stCellMax}, median \jdg{stCellMed} --- which is why the estimator
+ (\jdg{stCellMin} to \jdg{stCellMax}, median \jdg{stCellMed}) which is why the estimator
 matches within them and weights by $\min(n_A, n_B)$ rather than by cell size: a cell supplying one
 arm and not the other contributes nothing, and the weight makes that explicit instead of letting an
 unbalanced cell contribute a difference it cannot support.
 
 Not every analysis runs on all \jdg{nAdmitted} interventions, and a reader who cannot follow the
 restrictions cannot check the paper. Table~\ref{tab:naccount} states each one and its reason. Two
-of them are arithmetic --- G--U is a third pair type and is not in a two-arm contrast; a stratum
-holding one arm contributes nothing --- and the rest are stated where they are applied.
+of them are arithmetic  (G--U is a third pair type and is not in a two-arm contrast; a stratum
+holding one arm contributes nothing) and the rest are stated where they are applied.
 
 \begin{table}[!htbp]
 \centering\small
@@ -2777,8 +2753,8 @@ measured: \S\ref{sec:conventional}'s column is the benchmark's shipped
 intention. This appendix reports a third reference, built from the probing data, and what it
 costs to use.
 
-\paragraph{What was built.} \texttt{ShapeKnots} --- the same \texttt{RNAstructure} distribution
-the panel already contains --- was run on each wild-type construct with that deposit's own 2A3
+\paragraph{What was built.} \texttt{ShapeKnots}, the same \texttt{RNAstructure} distribution
+the panel already contains, was run on each wild-type construct with that deposit's own 2A3
 reactivity as SHAPE pseudoenergy restraints at the published defaults, no parameter tuned, and
 positions without data marked as such. All \jdg{nWildTypes} folded, none failed, and pairs were
 then restricted to the design window every other agreement number here uses. Four checks ran
@@ -2802,8 +2778,8 @@ bracket string for \jdg{relUnbal} of \jdg{nWildTypes} released wild-type rows: o
 and of the \jdg{relUnbal} malformed ones, \jdg{relReproUnbal} do. The same parser, coordinate
 shift and window reproduce the file's other structure column exactly, which is what locates the
 fault. Restricting to the rows that parse is not a fallback: the malformed rows are the more
-pseudoknotted ones --- target pseudoknot-character fraction \jdg{relPkUnbal} against
-\jdg{relPkBal} --- so that subset selects on structure class in a pseudoknot benchmark. It is
+pseudoknotted ones, target pseudoknot-character fraction \jdg{relPkUnbal} against
+\jdg{relPkBal}, so that subset selects on structure class in a pseudoknot benchmark. It is
 reported once as a bounded secondary (\jdg{prA5N} cells, margin \jdg{prA5Margin}) and carries
 no claim. We report this because a reader of this benchmark needs it, not as a criticism of a
 release we depend on.
@@ -2865,8 +2841,7 @@ does not.}
 Channel C7 of Table~\ref{tab:channels} asks whether the neural predictor has seen these molecules
 before; \S\ref{sec:leakage} answers it in a paragraph, and this is the grading behind it.
 
-Every design window in the corpus is compared against the model's own released training file ---
-\jdg{exTrainN} unique sequences across \jdg{exLibs} libraries --- and graded by the identity of its
+Every design window in the corpus is compared against the model's own released training file, \jdg{exTrainN} unique sequences across \jdg{exLibs} libraries, and graded by the identity of its
 best match. The comparison is exhaustive rather than indexed, so a match cannot be missed for being
 short, and the tiers are fixed by the frozen declaration and reported verbatim.
 
@@ -2901,7 +2876,7 @@ mononucleotide and dinucleotide composition. Shuffled queries reach a median ide
 
 One erratum belongs here. The frozen declaration recorded a length note assuming a
 \jdg{exDeclLen}\,nt design window; the windows in this release run \jdg{exLenRange}\,nt. The
-declaration was not edited --- a frozen declaration never is --- so the error is recorded in the
+declaration was not edited, a frozen declaration never is, so the error is recorded in the
 artifact as \texttt{declaration\_erratum} and the eligible comparison set was recomputed per query
 length. The mistake runs in our favour: the shorter the query, the more of the training file is
 eligible to match it, so correcting it can only raise a count already reported as a bound.
@@ -2915,7 +2890,7 @@ eligible to match it, so correcting it can only raise a count already reported a
 Design cells by exposure tier against the released training file. \textbf{b}, Identity of each
 design cell's window to its nearest training sequence, with the \jdg{clThr} threshold marked.
 Triangles are the dinucleotide-shuffle control, whose median and maximum both fall below the
-threshold --- so a design that clears it is not clearing it on composition alone.}
+threshold, so a design that clears it is not clearing it on composition alone.}
 \label{fig:exposurefig}
 \end{figure}
 
@@ -2950,8 +2925,7 @@ experiment could be declared, counted what each contains. It estimates no effect
 \input{figs/figA5_survey}
 \caption{\textbf{Executed orientation flips are rare in the public record.} \textbf{a}, The survey
 funnel on a logarithmic count axis: deposits scanned, those carrying the fields the criterion
-needs, those containing at least one orientation flip, and the distinct libraries those represent
---- a deposit is one library under one probe chemistry. \textbf{b}, How many positions each
+needs, those containing at least one orientation flip, and the distinct libraries those represent (a deposit is one library under one probe chemistry). \textbf{b}, How many positions each
 construct differs from its family's wild type at, across every deposit. Constructs differing at
 exactly two positions are a small fraction of the record, and only some of those are orientation
 flips on a declared pair.}
@@ -2973,7 +2947,7 @@ The manuscript reads \jdg{pvTotal} run artifacts, not all licensed the same way.
 are \emph{experiments}: each declared in a frozen JSON file committed and pushed before the code
 that produced it existed, naming the arms, the kill conditions, the probes that must fire, and a
 list of staked predictions. Every claim in Section~\ref{sec:results} rests on these, and the table
-below records the outcome of each stake --- predictions that failed are marked as failed, and the
+below records the outcome of each stake: predictions that failed are marked as failed, and the
 accompanying text does not re-describe them as successes.
 
 The remaining \jdg{pvSurveyReviewSupport} were not preregistered, and saying so is part of the
@@ -3034,7 +3008,7 @@ Some predictor ranks flips within a design, interval excluding zero & correct \\
 Within-design ranking exceeds the same statistic under causal conditioning & correct \\
 The neural predictor ranks at least as well as the thermodynamic one & correct \\
 Top-quartile recovery beats random by $\ge5$ points & correct \\
-\textbf{A predictor beats the free depth baseline} --- \emph{satisfied as the kill condition was
+\textbf{A predictor beats the free depth baseline}: \emph{satisfied as the kill condition was
   written, and the kill condition was written wrong: it compared two point estimates with no
   interval. Reissued against the paired interval \jdg{rkDiffNCi}} & \textbf{failed} \\
 The base rate of rescue lies in $[0.2,0.8]$ \quad(\jdg{rkBase}) & correct \\
@@ -3048,10 +3022,10 @@ The transformer exceeds the thermodynamic model, interval on the difference excl
 The transformer exceeds the learned-parameter model, interval excluding zero
   \quad(\jdg{pdNECi}) & correct \\
 \textbf{The two nearest-neighbour models are indistinguishable from each other, interval covering
-  zero} --- \emph{it does not: \jdg{pdVE} (\jdg{pdVECi}). This is the prediction whose failure
+  zero}: \emph{it does not: \jdg{pdVE} (\jdg{pdVECi}). This is the prediction whose failure
   removed \emph{and not the training data} from the abstract, Claim~\ref{claim:identity} and the
   Conclusion} & \textbf{failed} \\
-The measurement and the transformer are indistinguishable --- \emph{graded as written, on a raw
+The measurement and the transformer are indistinguishable: \emph{graded as written, on a raw
   difference across two scales that \S\ref{sec:result} now withdraws as a licensing quantity. The
   verdict is unchanged when the comparison is redone on the scale it needed (\jdg{stdMN}\,SD,
   \jdg{stdMNCi}), which is luck rather than design and is recorded as such} & correct \\
@@ -3067,7 +3041,7 @@ At least one riboSNitch-style score resolves from zero \emph{in the declared neg
   \quad(\jdg{rsBppmCi}, \jdg{rsMfeCi}, \jdg{rsEnsCi}) & correct \\
 The staked direction holds and none of the three beats the free depth baseline
   \quad(\jdg{rsNbeat} of \jdg{rsNarms}) & correct \\
-\textbf{The local variant ranks at least as well as the global one} --- \emph{it does not:
+\textbf{The local variant ranks at least as well as the global one}: \emph{it does not:
   \jdg{rsLocal} (\jdg{rsLocalCi}) against \jdg{rsBppm} (\jdg{rsBppmCi}), and against depth
   \jdg{rsLocalVs} (\jdg{rsLocalVsCi}). The stake was written as a point-for-point comparison and
   is graded as one; the intervals overlap, so the licensed reading is that localisation does not
@@ -3076,7 +3050,7 @@ The matrix distance and the MFE distance agree in sign \quad(\jdg{rsBppm}, \jdg{
 \multicolumn{2}{@{}p{0.95\textwidth}@{}}{\footnotesize\emph{Verified before reading, and after:
   every score is exactly \jdg{rsIdent} against its own sequence and the matrix distance agrees with
   an independently written accumulation to \jdg{rsObw}; a later review added the two steps this arm
-  had not taken --- rerunning the earlier arm's own columns reproduces its published values to
+  had not taken  (rerunning the earlier arm's own columns reproduces its published values to
   \jdg{vBackMax}, and the verdict survives a different rank statistic entirely (Kendall
   \jdg{vKendallD} against depth's \jdg{vKendallDep}).}}\\
 \midrule
@@ -3089,7 +3063,7 @@ The unexposed subset's neural slope stays in $[\jdg{lkStakeLo},\jdg{lkStakeHi}]$
 \midrule
 \multicolumn{2}{@{}l@{}}{\emph{frozen before the full-corpus regrading existed (\S\ref{sec:leakage})}}\\
 \textbf{Exposure exceeds the earlier file's \jdg{lkExpDesigns} designs, because the searched
-  corpus is \jdg{lkFullGrow} larger} --- \emph{it does not: \jdg{lkFullExp} of \jdg{clDesigns},
+  corpus is \jdg{lkFullGrow} larger}) \emph{it does not: \jdg{lkFullExp} of \jdg{clDesigns},
   the same cells, and both skill slopes reproduce to every printed digit. The stake was written
   as a prediction that a larger haystack holds more needles, and it is graded as one. What the
   enlargement licenses is a smaller claim held more firmly, not a larger count} & \textbf{failed} \\
@@ -3098,13 +3072,12 @@ Skill still does not rise monotonically with exposure tier & correct \\
 At least one design moves up a tier \quad(\jdg{lkFullMoved}) & correct \\
 \midrule
 \multicolumn{2}{@{}l@{}}{\emph{frozen before the equivalence test existed (\S\ref{sec:reorder})}}\\
-\textbf{Every implementation is equivalent to free depth at the one-construct margin} ---
+\textbf{Every implementation is equivalent to free depth at the one-construct margin}: 
   \emph{\jdg{eqNfail} of \jdg{eqNcomp} are not, all at the \jdg{eqFailBudget} budget
   (\jdg{eqFailNames}), and they fail on the side of being worse. The manuscript sentence claiming
   none is distinguishable has been rewritten arm by arm rather than softened} & \textbf{failed} \\
 Depth against itself returns $\delta^\star$ below \jdg{eqStakeSelf} \quad(\jdg{eqSelfDs}) & correct \\
-\textbf{At least one depth-then-model arm is NOT equivalent, so the margin can separate something}
-  --- \emph{none is: the largest is \jdg{eqStackMaxDs} against a margin of \jdg{eqDelta}. Our own
+\textbf{At least one depth-then-model arm is NOT equivalent, so the margin can separate something}: \emph{none is: the largest is \jdg{eqStackMaxDs} against a margin of \jdg{eqDelta}. Our own
   composition gain is statistically resolved and worth less than one extra construct, and the paper
   now says both} & \textbf{failed} \\
 The margin lies in $[\jdg{eqStakeLo},\jdg{eqStakeHi}]$ \quad(\jdg{eqDelta}) & correct \\
@@ -3123,7 +3096,7 @@ The small-budget inversion keeps its sign at every window \quad(\jdg{lcGapMax} a
 The two nearest-neighbour implementations agree more with each other than either does with the
   transformer \quad(\jdg{pwNN} against \jdg{pwNNvsNeuralLo}--\jdg{pwNNvsNeuralHi}) & correct \\
 The two rankings are not identical \quad(Kendall \jdg{reTau}) & correct \\
-\textbf{At least one order change survives its interval} --- \emph{it does not: the single swap is
+\textbf{At least one order change survives its interval}: \emph{it does not: the single swap is
   \jdg{reSwapCi}, which covers zero. The paper reports no reorder, which is this stake failing and
   not a result we set out to find} & \textbf{failed} \\
 Parameter variants span less of the response range than implementations \quad(\jdg{reSpanParam}
@@ -3133,18 +3106,18 @@ Parameter variants span less of the response range than implementations \quad(\j
   scorecard; three were gradable from it and the fourth needed an agreement matrix of which the run
   had computed one cell. Scoring it afterwards is reported as what it is. Verified before grading:
   every implementation against itself is exactly $1$, the matrix equals its transpose to $0$, and
-  the one cell the run did publish reproduces to $10^{-9}$ --- after a first attempt compared it
+  the one cell the run did publish reproduces to $10^{-9}$  (after a first attempt compared it
   against a window-restricted value (\jdg{pwV2Win} against \jdg{pwV2Full}) that differs from it by
   \jdg{pwV2Gap}, close enough to have passed a loose tolerance as a reproduction of a quantity it
   is not.}}\\
 \midrule
 \multicolumn{2}{@{}l@{}}{\emph{frozen before a second transformer was scored (\S\ref{sec:result})}}\\
 \textbf{A second transformer sharing neither backbone nor training corpus also resolves the
-  identity axis} --- \emph{it does not: \jdg{fmContrast} (\jdg{fmContrastCi}), covering zero.
+  identity axis}) \emph{it does not: \jdg{fmContrast} (\jdg{fmContrastCi}), covering zero.
   This was the point of the run and the declaration said in advance what a failure would cost: the
   architecture axis stops being reported as what the decomposition is worth and is stated as what
   changing from EternaFold to RibonanzaNet is worth. \S\ref{sec:result} states it that way} & \textbf{failed} \\
-\textbf{The architecture axis recomputed with it is positive} --- \emph{it is \jdg{fmAxis}
+\textbf{The architecture axis recomputed with it is positive}: \emph{it is \jdg{fmAxis}
   (\jdg{fmAxisCi}), covering zero, and the difference between the two axes is
   \jdg{fmAxisDiffCi}. Unresolved rather than reversed, and reported as unresolved} & \textbf{failed} \\
 Its level arm does not exceed the free integer \quad(\jdg{fmVsDepth}, \jdg{fmVsDepthCi}) & correct \\
@@ -3154,15 +3127,15 @@ Its contrast is smaller than the first transformer's \quad(\jdg{fmContrast} agai
   chosen between; across all \jdg{fmNhead} the contrast spans \jdg{fmHeadLo} to \jdg{fmHeadHi}
   and does not keep a sign, which triggered the declaration's condition that a head-dependent sign
   be stated wherever the number is. Verified before the new column was read: the loaded head's top
-  pairs are \jdg{fmCanon} canonical against \jdg{fmCanonRand} for a randomly initialised one ---
-  the one check that catches an index convention error while every other number still looks
-  plausible --- the same sequence scored twice agrees exactly, and all four published contrasts
+  pairs are \jdg{fmCanon} canonical against \jdg{fmCanonRand} for a randomly initialised one,
+  which is the one check that catches an index convention error while every other number still
+  looks plausible; the same sequence scored twice agrees exactly; and all four published contrasts
   and all four published rank agreements reproduce.}}\\
 \midrule
 \multicolumn{2}{@{}l@{}}{\emph{frozen before the claim intervals had a second method (\S\ref{sec:inference})}}\\
 The matched contrast's BCa interval still excludes zero \quad(\jdg{bcOne}) & correct \\
-\textbf{The paired standardised difference's BCa interval still excludes zero} --- \emph{it does
-  not: \jdg{bcTwo}. Not through width, which grows \jdg{bcTwoWidth}-fold, but through a bias
+\textbf{The paired standardised difference's BCa interval still excludes zero}: \emph{it does
+  not, \jdg{bcTwo}. Not through width, which grows \jdg{bcTwoWidth}-fold, but through a bias
   correction that shifts the interval down; the basic interval \jdg{bcTwoBasic} excludes zero.
   The percentile interval remains the reported one, fixed before this was computed, and
   \S\ref{sec:conventional} states that on that column alone the separation is method-dependent} & \textbf{failed} \\
@@ -3170,17 +3143,17 @@ The budgeted gap's BCa interval still excludes zero, so Reading~2's sign reversa
   second method \quad(\jdg{bcThree}) & correct \\
 BCa is wider than percentile for at least two of the three \quad(all three; at most \jdg{bcWidthMax}) & correct \\
 \multicolumn{2}{@{}p{0.95\textwidth}@{}}{\footnotesize\emph{The quantity that fails is computed
-  on the column the benchmark ships, which \S\ref{sec:conventional} had already found --- before
-  this run --- to be the smallest of \jdg{prNcol} such gaps; the four larger ones are not close to
-  zero. It also clusters on \jdg{bcTwoClusters} designs rather than the \jdg{bcOneClusters}
-  targets the other two use, so the small-cluster concern that motivated this run is not what moves
-  it. Verified before any second interval was read: with the bias correction and acceleration set
-  to zero the BCa endpoints equal the percentile endpoints exactly, and every point estimate and
-  every published percentile interval reproduces. That last check refused a quantity three times.
-  Twice for real reasons --- the published estimator draws its permutations and its bootstrap from
-  one generator, so the bootstrap stream starts a thousand permutations in, and one of the three
-  runs uses interpolated quantiles where the others take the floor-indexed order statistic. Once
-  for ours: the target had been typed from this manuscript's four-decimal print, which carries
+  on the column the benchmark ships, which \S\ref{sec:conventional} had already found, before this
+  run, to be the smallest of \jdg{prNcol} such gaps; the four larger ones are not close to zero. It
+  also clusters on \jdg{bcTwoClusters} designs rather than the \jdg{bcOneClusters} targets the
+  other two use, so the small-cluster concern that motivated this run is not what moves it.
+  Verified before any second interval was read: with bias correction and acceleration set to zero
+  the BCa endpoints equal the percentile endpoints exactly, and every point estimate and published
+  percentile interval reproduces. That check refused a quantity three times, twice for real
+  reasons. The published estimator draws permutations and bootstrap from one generator, so the
+  bootstrap stream starts a thousand permutations in; and one of the three runs uses interpolated
+  quantiles where the others take the floor-indexed order statistic. The third refusal was ours:
+  the target had been typed from this manuscript's four-decimal print, which carries
   $\pm5\times10^{-5}$ of rounding and therefore cannot be reproduced to $5\times10^{-5}$ at all.
   Targets are now read from the artifacts that produced them.}}\\
 \midrule
@@ -3200,7 +3173,7 @@ Helix depth read off that reference still exceeds every predictor's level arm
   the well-formed ones). The same parser reproduces the file's other structure column exactly, which
   is what says the fault is not ours, and the well-formed subset is not a fallback because the
   malformed rows are the more pseudoknotted ones. The successor builds the reference instead, and
-  its primary reference for Reading~2 --- the declared target --- was fixed in the declaration
+  its primary reference for Reading~2, the declared target, was fixed in the declaration
   before any of these numbers existed, so the one that flatters the paper was not chosen after the
   fact. Erratum on the successor's first execution: it reproduced the four published agreement
   scores to $9\times10^{-4}$ against a $5\times10^{-4}$ tolerance and voided, because it scored
@@ -3215,7 +3188,7 @@ A probing-derived reference confirms at least half the pairs the design programs
   \quad(\jdg{vaPooled}, \jdg{vaHit} of \jdg{vaAll}) & correct \\
 Free depth beats every predictor's level arm where that reference confirms the intervened pair
   \quad(\jdg{vaNconf} interventions; closest \jdg{vaDNC}, \jdg{vaDNCCi}) & correct \\
-\textbf{And where it does not} --- \emph{it does not: on \jdg{vaNunc} interventions depth falls
+\textbf{And where it does not}: \emph{it does not: on \jdg{vaNunc} interventions depth falls
   to \jdg{vaDepUnc} from \jdg{vaDepConf}, and all \jdg{vaNresUnc} of the three intervals cover
   zero, the transformer's point estimate being the larger. Claim~\ref{claim:depth} is stated with
   that domain rather than without it} & \textbf{failed} \\
@@ -3226,7 +3199,7 @@ Depth's level arm exceeds that of the bare indicator of whether the declared pai
   staked. The difference is \jdg{vaDepVsConf} with interval \jdg{vaDepVsConfCi}, which covers
   zero, so the stake is graded correct as written while the manuscript says in
   \S\ref{sec:limitations} that the two cannot be separated here. A second erratum: the declaration
-  named a pooling identity --- the two strata recombining to the unstratified level arm --- that
+  named a pooling identity, the two strata recombining to the unstratified level arm, which
   does not exist, because each stratum is re-celled under the same minimum-flips rule and their
   cell sets are therefore not a partition of the unstratified one. The count identity stands in
   its place and holds at \jdg{nAdmitted} of \jdg{nAdmitted}. Verified before either stratum was
@@ -3243,26 +3216,24 @@ Its identity contrast covers zero, as both other thermodynamic members' do
   \quad(\jdg{pkContrast}, \jdg{pkContrastCi}) & correct \\
 It does not outperform free depth at the tightest budget \quad(\jdg{pkRecPk} against
   \jdg{pkRecDepth}) & correct \\
-\multicolumn{2}{@{}p{0.95\textwidth}@{}}{\footnotesize\emph{This block exists because a reviewer
-  observed that every implementation scored here is pseudoknot-blind while the corpus is a
-  pseudoknot round, and did not verify it. It was correct: the program in question appeared once
-  in this manuscript, in the appendix where it builds a reference, and never as a scored member.
-  It is not an independent fifth opinion --- it is the panel's own energy model with the
-  pseudoknot search on --- which is why it isolates the capability rather than adding an opinion.
-  It is given no probing data, because a scored predictor that sees the outcome's own experiment
-  is not a predictor. The finding the stakes did not anticipate is reported in
+\multicolumn{2}{@{}p{0.95\textwidth}@{}}{\footnotesize\emph{This block exists because a reviewer observed, without verifying it, that
+  every implementation scored here is pseudoknot-blind while the corpus is a pseudoknot round. It
+  was correct. The member added is not an independent fifth opinion but the panel's own energy
+  model with the pseudoknot search on, which is why it isolates the capability rather than adding
+  an opinion, and it is given no probing data, because a scored predictor that sees the outcome's
+  own experiment is not a predictor. The finding the stakes did not anticipate is reported in
   \S\ref{sec:conventional} without an interval, the pair having been chosen after the point
-  estimates were seen. Verified before any of its columns were read: its sequence-only structures
-  reproduce the earlier run's control on all \jdg{ccCells} wild types with zero differences, which
-  is what licenses one panel holding both; no structure has a base paired twice or a pair outside
-  the construct; twenty refolds are identical; and on the \jdg{pkNsingle} sequences returning a
-  single structure the ensemble frequency equals the indicator exactly, which is the zero point of
-  the score this member is read on.}}\\
+  estimates were seen. Verified before any column was read: its sequence-only structures reproduce
+  the earlier run's control on all \jdg{ccCells} wild types with zero differences, which licenses
+  one panel holding both; no structure has a base paired twice or a pair outside the construct;
+  twenty refolds are identical; and on the \jdg{pkNsingle} sequences returning a single structure
+  the ensemble frequency equals the indicator exactly, the zero point of the score this member is
+  read on.}}\\
 \midrule
 \multicolumn{2}{@{}l@{}}{\emph{frozen before Assumption~\ref{ass:placement} had a bound (\S\ref{sec:estimation})}}\\
 An unmeasured confounder must exceed, in the $\beta_u g_u$ product, the placement confounder the
   design conditions on \quad(\jdg{senK}$\times$) & correct \\
-\textbf{The interval on that multiplier excludes one} --- \emph{it does not: \jdg{senKCi}. The
+\textbf{The interval on that multiplier excludes one}: \emph{it does not: \jdg{senKCi}. The
   lower end of the contrast's own interval is about the size of the benchmark bias, so a
   confounder no stronger than placement is excluded at the point estimate and not across the
   interval. The bound is reported with that reach stated, not rounded away} & \textbf{failed} \\
@@ -3270,29 +3241,27 @@ No single covariate measured on these molecules, if omitted, reaches the observe
   \quad(at most \jdg{senMaxOne}, the \jdg{senArgOne}) & correct \\
 Nor does the best linear combination of all of them \quad(\jdg{senMaxAll}, \jdg{senMaxAllPct} of
   the contrast) & correct \\
-\multicolumn{2}{@{}p{0.95\textwidth}@{}}{\footnotesize\emph{This block exists because the
-  Discussion cited a sensitivity analysis this paper did not contain, pointing at the
-  controlled-truth benchmark that \S\ref{sec:estimation} distinguishes from one in its own text.
-  The declaration bound the manuscript before the number existed: the sentence goes whatever the
-  run returns, and either it names this run or it states the assumption as unbounded. Erratum on
-  the verification wording: it named ``cell count \jdg{resCells}'' among the numbers to reproduce,
-  and \jdg{resCells} is the count of design cells in the per-cell sign test, not of the strata the
-  estimator sums over. The first run voided for comparing the two. The declaration is not edited;
-  the check now reproduces the contrast and the matched weight, both published, and cross-checks
-  the stratum count against \jdg{naStrataBoth}, which a different run computes independently over
-  the same stratification --- a number this run could not have tuned to. Verified before any bound
-  was read: a design-level covariate's arm gap is zero to $10^{-18}$ and injecting one at any
-  strength leaves the estimate unmoved to $10^{-17}$; solving for the confounder that nulls the
-  estimate and injecting it returns $2\times10^{-17}$; the induced bias is exactly linear in the
-  coefficient and odd under $U\to-U$; and the closed-form maximum is approached and never exceeded
-  by \jdg{senNrand} random unit directions. A first attempt at the last of these disagreed with
-  itself by a factor of thirty under two column scalings of a quantity that is scale-invariant,
-  which is the check finding a sign error in the code rather than in the data.}}\\
+\multicolumn{2}{@{}p{0.95\textwidth}@{}}{\footnotesize\emph{This block exists because the Discussion cited a sensitivity analysis this
+  paper did not contain. The declaration bound the manuscript before the number existed: either
+  the sentence names this run or it states the assumption as unbounded. Erratum on the
+  verification wording: it named ``cell count \jdg{resCells}'' among the numbers to reproduce, and
+  \jdg{resCells} counts design cells in the per-cell sign test, not the strata the estimator sums
+  over. The first run voided for comparing the two. The declaration is not edited; the check now
+  reproduces the contrast and the matched weight, both published, and cross-checks the stratum
+  count against \jdg{naStrataBoth}, which a different run computes independently and this run
+  could not have tuned to. Verified before any bound was read: a design-level covariate's arm gap
+  is zero to $10^{-18}$ and injecting one at any strength leaves the estimate unmoved to
+  $10^{-17}$; solving for the confounder that nulls the estimate and injecting it returns
+  $2\times10^{-17}$; the induced bias is exactly linear in the coefficient and odd under
+  $U\to-U$; and the closed-form maximum is approached and never exceeded by \jdg{senNrand} random
+  unit directions. A first attempt at the last disagreed with itself by a factor of thirty under
+  two column scalings of a scale-invariant quantity, which is the check finding a sign error in
+  our code rather than in the data.}}\\
 \midrule
 \multicolumn{2}{@{}l@{}}{\emph{frozen before the budgeted decision experiment existed (\S\ref{sec:reorder})}}\\
 No implementation's recovery advantage over free depth excludes zero at any budget & correct \\
 \textbf{The incumbent margin does not predict the decision margin: above \jdg{dcStakeAgree} in
-  agreement and below \jdg{dcStakeRec} recovery points at every budget} --- \emph{the agreement gap is \jdg{reIncMargin} but
+  agreement and below \jdg{dcStakeRec} recovery points at every budget}: \emph{the agreement gap is \jdg{reIncMargin} but
   the recovery gap reaches \jdg{tvGapHalf} at the 50\% budget, over the threshold we set. Graded as
   written. The interval the stake should have carried, \jdg{tvGapCiHalf} there and
   \jdg{tvGapCiTen} at 10\%, is reported in \S\ref{sec:reorder} and does not regrade it} & \textbf{failed} \\
@@ -3321,7 +3290,7 @@ All three differences are positive \quad(\jdg{lvcNres} of \jdg{lvcNarms} resolve
 \midrule
 \multicolumn{2}{@{}l@{}}{\emph{frozen before the four columns were put on one scale (\S\ref{sec:result})}}\\
 \textbf{Standardising each column by its own within-stratum SD removes the word
-  \emph{indistinguishable} from the measurement-against-transformer comparison} --- \emph{it does
+  \emph{indistinguishable} from the measurement-against-transformer comparison}: \emph{it does
   not: \jdg{stdMN}\,SD (\jdg{stdMNCi}). The comparison survives the correction it needed. What the
   correction changes is what the word is allowed to mean, and Claim~\ref{claim:identity} now says
   so} & \textbf{failed} \\
@@ -3340,12 +3309,12 @@ The bridge identity holds, so the two routes are one relation and not two answer
   independently of the slope rather than rearranged out of it.}}\\
 \midrule
 \multicolumn{2}{@{}l@{}}{\emph{frozen before the leakage channel was re-examined (\S\ref{sec:leakage})}}\\
-\textbf{The difference between the two models' drops on the exposed subset excludes zero} ---
+\textbf{The difference between the two models' drops on the exposed subset excludes zero}: 
   \emph{it does not: \jdg{didPoint} (\jdg{didCi}). The reading this manuscript had printed, that
   exposed designs are harder rather than remembered, and the reading that they are partly
   remembered, are both left standing by that interval. The channel is marked unresolved and
   neither reading is asserted} & \textbf{failed} \\
-\textbf{The exposure-label permutation puts the observed asymmetry above its 95th percentile} ---
+\textbf{The exposure-label permutation puts the observed asymmetry above its 95th percentile}: 
   \emph{it does not: $p=\jdg{didPermP}$ over \jdg{didPermN} draws against a null centred on
   \jdg{didPermCentre}. The null being centred is the check passing; the observed value not
   clearing it is the stake failing, and the two are separate facts} & \textbf{failed} \\
@@ -3357,8 +3326,8 @@ C7's interval reaches at least half the quantity it is a difference in, so the c
   was frozen as ``the neural model's exposed-subset interval excludes zero, i.e.\ it demonstrably
   retains skill where the thermodynamic control does not''. The first clause is what the row is
   graded on and it passed; the second clause is a comparison between two arms, which is exactly
-  what the first row's interval refuses to resolve. The declaration is not edited --- a frozen
-  declaration never is --- and the gloss is withdrawn here rather than carried into the main text.
+  what the first row's interval refuses to resolve. The declaration is not edited, a frozen
+  declaration never is, and the gloss is withdrawn here rather than carried into the main text.
   Verified before any of it was read: an estimator importing nothing from the earlier run
   reproduces its four arm slopes to $4\times10^{-6}$ and both of its published intervals exactly,
   the demeaned and Frisch--Waugh--Lovell routes agree to $10^{-15}$, the two algebraic forms of the
@@ -3368,9 +3337,8 @@ C7's interval reaches at least half the quantity it is a difference in, so the c
 
 \noindent The fifth row of the ranking block is the one worth reading. Its run returned every staked
 prediction satisfied and emitted the verdict \texttt{\jdg{rkVerdict}}; the verdict was not read,
-because the condition that was supposed to be able to refuse it could not have. The repair --- the paired
-interval, the partial rank correlation given depth, and a tie-breaking ranker that fits nothing
---- is a separate review artifact, and \S\ref{sec:ranking} reports its numbers rather than the
+because the condition that was supposed to be able to refuse it could not have. The repair  (the paired
+interval, the partial rank correlation given depth, and a tie-breaking ranker that fits nothing) is a separate review artifact, and \S\ref{sec:ranking} reports its numbers rather than the
 original run's verdict.
 
 \section{The criterion as code}
