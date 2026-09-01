@@ -29,3 +29,11 @@ These are **not target values** and **not a supervision plan**. They are propert
 13. A permutation-plus-bootstrap routine that draws both from one generator does not give the bootstrap a fresh stream. Reproducing such an interval requires advancing the generator by the permutation count first.
 
 14. An interval that covers zero after a second method, where the first excluded it, has not refuted anything. Check whether the shift came from extra width or from a bias correction; those are different findings and the manuscript distinguishes them.
+
+15. NOTHING in this work is model-free. A structure folded from probing data is a thermodynamic model restrained by an experiment, not an observation; the outcome the predictors are scored against is arithmetic on reactivities and contains no folding model, which is a different and much narrower statement. Any sentence conflating the two is a finding -- one such sentence reached a committed draft of the abstract and was corrected only after review.
+
+16. The declared target enters this work in four places that must be named rather than waved at: it says which pair is the target, it supplies helix depth, it supplies the crossing indicator, and it gates eligibility. What it never does is serve as the reference the measured outcome is scored against. A claim of the form 'no reference structure enters' is too strong; the supportable form is 'no inferred or model-generated structure of these molecules enters the measured outcome'.
+
+17. An equivalence margin is a choice. Check whether the manuscript defends its delta as universal or declares it as an operational tolerance and reports the statistic that lets you substitute your own. The second is defensible; the first is not.
+
+18. A decision utility is also a choice. Recovery under a fixed synthesis budget is not the only experimental utility, and a paper that converts a benchmark margin into ONE decision has said nothing about information gain, cost per synthesis or active-learning efficiency.

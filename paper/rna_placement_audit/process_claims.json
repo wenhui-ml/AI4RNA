@@ -74,6 +74,18 @@
    "check_command": "git log --format='%H' -- <declaration> | tail -1  # then diff that blob"
   },
   {
+   "id": "P14",
+   "claim": "The manuscript's central quantity is defined once, canonically, and every later use is an application of that definition rather than a re-definition.",
+   "falsify_by": "read submission.json:canonical_estimand_as_printed, then find a place in the manuscript that scores something else and calls it the same thing. The obvious candidates are the agreement sections, where a structure-level quantity sits beside a pair-level one; check the paper never differences them without a common scale.",
+   "check_command": null
+  },
+  {
+   "id": "P15",
+   "claim": "Where the manuscript makes a scoping choice -- an equivalence margin, a decision utility, a reference column -- it declares the choice as a choice and supplies what a reader needs to substitute their own.",
+   "falsify_by": "for the equivalence margin, check delta-star is reported per comparison. For the decision utility, check the manuscript says budgeted recovery is one operational decision and not the definition of experimental utility. For the reference column, check all five columns are reported and not only the flattering one. A scoping choice presented as a fact is a finding.",
+   "check_command": null
+  },
+  {
    "id": "P13",
    "claim": "A quantity computed and not reported is not hidden: the repository's own audit tool lists every generated macro the manuscript never prints, and the count is disclosed rather than minimised.",
    "falsify_by": "run the audit tool and read check [B]. Then ask, for each unprinted quantity, whether it would have weakened a claim. A quantity computed, unprinted and unfavourable is the finding this check exists for.",
