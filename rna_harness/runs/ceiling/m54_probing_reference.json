@@ -1,0 +1,317 @@
+{
+ "declaration": "m54_probing_reference_declaration.json",
+ "cost": "offline, $0 -- no API, no GPU, no download.",
+ "why_m53_voided": "released M2_structure is unbalanced on 74/160 rows; see m53",
+ "V": {
+  "V1_zero_point": true,
+  "V2_well_formed": true,
+  "V4_rnet_column": true,
+  "V6_restraints_bind": true,
+  "V6_n_changed": 117,
+  "n_reference": 160,
+  "n_failed": 0,
+  "V3a_agreement": true,
+  "V3b_m25": true,
+  "V3c_m36": true,
+  "V5_equivalent_form": true,
+  "V3d_rank_reverse_control": true
+ },
+ "reverse_control": {
+  "agreement_declared": {
+   "ViennaRNA": 0.61916,
+   "RNAstructure": 0.60834,
+   "EternaFold": 0.67583,
+   "RibonanzaNet": 0.87916
+  },
+  "n_pairs": 4293,
+  "weight": 892.0,
+  "strata": 549,
+  "intervention": 0.05267,
+  "agreement_rnet": 0.01981,
+  "sd_rescue": 0.21949,
+  "sd_rnet": 0.23352
+ },
+ "A4_independence": {
+  "f1_vs_panel": {
+   "ViennaRNA": 0.70977,
+   "RNAstructure": 0.70726,
+   "EternaFold": 0.77047,
+   "RibonanzaNet": 0.8633
+  },
+  "closest": "RibonanzaNet",
+  "max": 0.8633,
+  "independent": true
+ },
+ "A1_ranking": {
+  "agreement_declared": {
+   "ViennaRNA": 0.61916,
+   "RNAstructure": 0.60834,
+   "EternaFold": 0.67583,
+   "RibonanzaNet": 0.87916
+  },
+  "agreement_built": {
+   "ViennaRNA": 0.70977,
+   "RNAstructure": 0.70726,
+   "EternaFold": 0.77047,
+   "RibonanzaNet": 0.8633
+  },
+  "order_declared": [
+   "RibonanzaNet",
+   "EternaFold",
+   "ViennaRNA",
+   "RNAstructure"
+  ],
+  "order_built": [
+   "RibonanzaNet",
+   "EternaFold",
+   "ViennaRNA",
+   "RNAstructure"
+  ],
+  "margin_declared": 0.26,
+  "margin_declared_ci": [
+   0.21651,
+   0.30905
+  ],
+  "margin_built": 0.15353,
+  "margin_built_ci": [
+   0.09743,
+   0.21074
+  ],
+  "margin_change": -0.10647,
+  "margin_change_ci": [
+   -0.1534,
+   -0.06536
+  ],
+  "n_cells": 158
+ },
+ "A2_readout": {
+  "n_pairs": 4293,
+  "intervention_in_sd": 0.23997,
+  "columns": {
+   "RibonanzaNet": {
+    "desc": "shipped structure frequency (the published column)",
+    "contrast": 0.01981,
+    "within_sd": 0.23352,
+    "contrast_in_sd": 0.08481,
+    "hit_rate": 0.894,
+    "paired_diff_in_sd": 0.15516,
+    "ci95": [
+     0.01702,
+     0.30047
+    ],
+    "ci_contains_zero": false
+   },
+   "ViennaRNA": {
+    "desc": "its own MFE structure",
+    "contrast": -0.03527,
+    "within_sd": 0.4213,
+    "contrast_in_sd": -0.08371,
+    "hit_rate": 0.5963,
+    "paired_diff_in_sd": 0.32368,
+    "ci95": [
+     0.20488,
+     0.48184
+    ],
+    "ci_contains_zero": false
+   },
+   "RNAstructure": {
+    "desc": "its own MFE structure",
+    "contrast": -0.0023,
+    "within_sd": 0.42115,
+    "contrast_in_sd": -0.00546,
+    "hit_rate": 0.5765,
+    "paired_diff_in_sd": 0.24543,
+    "ci95": [
+     0.12079,
+     0.39638
+    ],
+    "ci_contains_zero": false
+   },
+   "EternaFold": {
+    "desc": "its own MEA structure",
+    "contrast": -0.04274,
+    "within_sd": 0.43147,
+    "contrast_in_sd": -0.09905,
+    "hit_rate": 0.6445,
+    "paired_diff_in_sd": 0.33902,
+    "ci95": [
+     0.22231,
+     0.4942
+    ],
+    "ci_contains_zero": false
+   },
+   "probing": {
+    "desc": "the built reference -- not a sequence-to-structure model",
+    "contrast": 0.00113,
+    "within_sd": 0.34444,
+    "contrast_in_sd": 0.00329,
+    "hit_rate": 0.7964,
+    "paired_diff_in_sd": 0.23668,
+    "ci95": [
+     0.1151,
+     0.37552
+    ],
+    "ci_contains_zero": false
+   }
+  }
+ },
+ "A3_depth": {
+  "frac_pair_present": 0.7948,
+  "n_cells": 158,
+  "depth_declared": 0.32252,
+  "depth_built": 0.39625,
+  "difference": 0.07373,
+  "difference_ci": [
+   0.02184,
+   0.13854
+  ],
+  "vs_level_arms": {
+   "RibonanzaNet": {
+    "point": 0.06679,
+    "ci95": [
+     0.01986,
+     0.11543
+    ],
+    "ci_contains_zero": false,
+    "built_depth_wins": true
+   },
+   "ViennaRNA": {
+    "point": 0.14055,
+    "ci95": [
+     0.08696,
+     0.20111
+    ],
+    "ci_contains_zero": false,
+    "built_depth_wins": true
+   },
+   "EternaFold": {
+    "point": 0.11976,
+    "ci95": [
+     0.06811,
+     0.17587
+    ],
+    "ci_contains_zero": false,
+    "built_depth_wins": true
+   }
+  }
+ },
+ "A5_released_subset": {
+  "n": 84,
+  "agreement": {
+   "ViennaRNA": 0.71421,
+   "RNAstructure": 0.70896,
+   "EternaFold": 0.73945,
+   "RibonanzaNet": 0.90824
+  },
+  "margin": 0.19403,
+  "order": [
+   "RibonanzaNet",
+   "EternaFold",
+   "ViennaRNA",
+   "RNAstructure"
+  ],
+  "pk_kept": 0.0849,
+  "pk_dropped": 0.1194,
+  "selected_on_structure_class": true
+ },
+ "staked": {
+  "S1": {
+   "text": "the incumbent margin, RibonanzaNet minus ViennaRNA, is SMALLER against the built probing-derived reference than the 0.260 it has against the declared target",
+   "pass": true,
+   "detail": "margin 声明 +0.26000 -> built +0.15353"
+  },
+  "S2": {
+   "text": "RibonanzaNet still ranks first of the four against the built reference",
+   "pass": true,
+   "detail": "built 参考下的排序 ['RibonanzaNet', 'EternaFold', 'ViennaRNA', 'RNAstructure']"
+  },
+  "S3": {
+   "text": "Section 5.1's paired difference -- the intervention readout minus the agreement readout, in SD units -- still EXCLUDES zero when the agreement column is the built reference rather than RibonanzaNet's own, so Claim 2 does not depend on which model wrote the column",
+   "pass": true,
+   "detail": "介入 − built 一致列 +0.23668 [0.1151, 0.37552]"
+  },
+  "S4": {
+   "text": "helix depth read from the built reference still exceeds every predictor's level arm, so the free baseline is not an artifact of the declared target",
+   "pass": true,
+   "detail": "built depth 对三个 level 臂 RibonanzaNet +0.0668, ViennaRNA +0.1406, EternaFold +0.1198"
+  }
+ },
+ "verdict": "agreement_axis_survives_a_built_probing_reference",
+ "log": [
+  "=== M54:自己造探测衍生参考,因为发布的那一列解析不了 ===",
+  "  声明已冻结并推送于本文件存在之前。全离线,$0。",
+  "  野生型 160  有 2A3 反应性 160  (3s)",
+  "  ShapeKnots 缓存命中(160 条 + 160 条无数据对照)",
+  "\n=== V 验证(先于任何 arm)===",
+  "  V1 自身 F1 1.0  对空 0.0  -> 通过",
+  "  V2 越界配对 0  一个碱基配两次的分子 0  非典型配对 0",
+  "  V4 RNet_F1 列复现 最大偏差 0.00000",
+  "  V6 加约束与不加约束给出不同结构的分子 117/160",
+  "  一致性轴用 M26 纳入的设计格 158;§5.1 的键集用 m25 的共同配对 4293(其设计格 157)",
+  "  V3a ViennaRNA      我 0.61916  m43 0.61916  |Δ| 0.00000",
+  "  V3a RNAstructure   我 0.60834  m43 0.60834  |Δ| 0.00000",
+  "  V3a EternaFold     我 0.67583  m43 0.67583  |Δ| 0.00000",
+  "  V3a RibonanzaNet   我 0.87916  m43 0.87916  |Δ| 0.00000",
+  "  V3b 配对 4293(4293)  权重 892(892)  层 549(549)  介入 +0.05267(+0.0527)  一致 +0.01981(+0.0198)",
+  "  V3c 层内 SD 0.2195(0.2195) / 0.2335(0.2335)  标准化 +0.2400(0.24) / +0.0848(0.0848)",
+  "  V5 本文件的估计量 vs m25 的 E4_matched  max|Δ| 0.000e+00",
+  "  V1-V6 全部通过 —— 现在才换参考",
+  "\n=== A4 built 参考与面板四个实现的距离(ShapeKnots 与两个成员共用能量模型)===",
+  "  ViennaRNA      与 built 参考的平均 F1 0.70977",
+  "  RNAstructure   与 built 参考的平均 F1 0.70726",
+  "  EternaFold     与 built 参考的平均 F1 0.77047",
+  "  RibonanzaNet   与 built 参考的平均 F1 0.86330",
+  "  最近的是 RibonanzaNet 0.86330  -> 独立于面板",
+  "\n=== A1 一致性排名换成 built 参考 ===",
+  "  ViennaRNA      声明靶标 0.61916  ->  built 参考 0.70977",
+  "  RNAstructure   声明靶标 0.60834  ->  built 参考 0.70726",
+  "  EternaFold     声明靶标 0.67583  ->  built 参考 0.77047",
+  "  RibonanzaNet   声明靶标 0.87916  ->  built 参考 0.86330",
+  "  incumbent margin  声明 +0.26000  ->  built +0.15353",
+  "  排序  声明 ['RibonanzaNet', 'EternaFold', 'ViennaRNA', 'RNAstructure']",
+  "        built ['RibonanzaNet', 'EternaFold', 'ViennaRNA', 'RNAstructure']",
+  "  margin 声明 +0.26000 [0.21651, 0.30905]   built +0.15353 [0.09743, 0.21074]",
+  "  之差(built − 声明) -0.10647 [-0.1534, -0.06536]  不含 0",
+  "\n=== A2 §5.1 的一致性列换掉:五个列,同一批配对、同一套分层 ===",
+  "  五列齐备的配对 4293/4293",
+  "  RibonanzaNet   对比 +0.01981  层内 SD 0.2335  标准化 +0.08481  命中率 0.8940",
+  "  ViennaRNA      对比 -0.03527  层内 SD 0.4213  标准化 -0.08371  命中率 0.5963",
+  "  RNAstructure   对比 -0.00230  层内 SD 0.4212  标准化 -0.00546  命中率 0.5765",
+  "  EternaFold     对比 -0.04274  层内 SD 0.4315  标准化 -0.09905  命中率 0.6445",
+  "  probing        对比 +0.00113  层内 SD 0.3444  标准化 +0.00329  命中率 0.7964",
+  "  intervention   对比 +0.05267  层内 SD 0.2195  标准化 +0.23997",
+  "\n  介入读数 − 一致读数(各自单位的 SD,配对同一次抽样):",
+  "    vs RibonanzaNet   +0.15516  [0.01702, 0.30047]  不含 0",
+  "    vs ViennaRNA      +0.32368  [0.20488, 0.48184]  不含 0",
+  "    vs RNAstructure   +0.24543  [0.12079, 0.39638]  不含 0",
+  "    vs EternaFold     +0.33902  [0.22231, 0.4942]  不含 0",
+  "    vs probing        +0.23668  [0.1151, 0.37552]  不含 0",
+  "\n=== A3 helix depth 从 built 参考读 vs 从声明靶标读 ===",
+  "  两个记录缓存逐行一致(4317 条),按索引合并",
+  "  干预 4317;该配对在 built 参考里也成对的比例 0.7948",
+  "  至少 8 个翻转的设计格 158,覆盖 4317 次干预",
+  "  V3d RibonanzaNet   我 +0.32947  论文 +0.3295",
+  "  V3d ViennaRNA      我 +0.25570  论文 +0.2557",
+  "  V3d EternaFold     我 +0.27649  论文 +0.2765",
+  "  V3d depth(声明)  我 +0.32252  论文 +0.3225",
+  "  depth(built 参考)  +0.39625",
+  "  built depth − 声明 depth  +0.07373  [0.02184, 0.13854]",
+  "  built depth − 各预测器的 level 臂:",
+  "    vs RibonanzaNet   +0.06679  [0.01986, 0.11543]  不含 0",
+  "    vs ViennaRNA      +0.14055  [0.08696, 0.20111]  不含 0",
+  "    vs EternaFold     +0.11976  [0.06811, 0.17587]  不含 0",
+  "\n=== A5 次要且被选择过:发布列里配平的那 86 行 ===",
+  "  可用行 84/158",
+  "  ViennaRNA      0.71421",
+  "  RNAstructure   0.70896",
+  "  EternaFold     0.73945",
+  "  RibonanzaNet   0.90824",
+  "  margin +0.19403;保留行的靶标假结字符占比 0.0849,丢弃行 0.1194 —— 这是按结构类别做的选择,只能当有界的次要对照",
+  "\n=== 预注册记分 ===",
+  "  S1  成立   margin 声明 +0.26000 -> built +0.15353",
+  "  S2  成立   built 参考下的排序 ['RibonanzaNet', 'EternaFold', 'ViennaRNA', 'RNAstructure']",
+  "  S3  成立   介入 − built 一致列 +0.23668 [0.1151, 0.37552]",
+  "  S4  成立   built depth 对三个 level 臂 RibonanzaNet +0.0668, ViennaRNA +0.1406, EternaFold +0.1198",
+  "\n  裁定:agreement_axis_survives_a_built_probing_reference   4/4 成立   用时 231s"
+ ]
+}
