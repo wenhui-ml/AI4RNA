@@ -1110,6 +1110,62 @@ assert min(_cols, key=lambda k: _cols[k]["paired_diff_in_sd"]) == "RibonanzaNet"
 assert all(v["built_depth_wins"] and not v["ci_contains_zero"]
            for v in _a3["vs_level_arms"].values()), "the built-reference depth no longer wins"
 
+# ---- M55: a second transformer, and it does not resolve the axis. m35's architecture axis is
+# literally RibonanzaNet minus EternaFold; the manuscript read it as what the decomposition is
+# worth. RNA-FM, sharing neither backbone nor training corpus and using its authors' own head,
+# returns a contrast covering zero, so the axis is stated as one model's property from here on.
+_m55 = J("m55_second_transformer.json")
+assert all(v for k, v in _m55["V"].items() if isinstance(v, bool)), "M55 verification did not pass"
+_f1, _f2, _f3, _f5 = (_m55["A1_contrast"], _m55["A2_architecture_axis"],
+                      _m55["A3_level_vs_depth"], _m55["A5_head_sensitivity"])
+put("fmContrast", sig(_f1["contrast"], 5)); put("fmContrastCi", ci(_f1["ci95"], 5))
+put("fmSd", f(_f1["within_sd"], 4)); put("fmContrastSd", sig(_f1["contrast_in_sd"], 4))
+put("fmAxis", sig(_f2["rnafm_minus_eterna"]["point"], 5))
+put("fmAxisCi", ci(_f2["rnafm_minus_eterna"]["ci95"], 5))
+put("fmAxisDiffCi", ci(_f2["difference_between_axes"]["ci95"], 5))
+put("fmLevel", sig(_f3["rnafm"], 4))
+put("fmVsDepth", sig(_f3["difference"], 4)); put("fmVsDepthCi", ci(_f3["ci95"], 4))
+put("fmNhead", f"{len(_f5['heads'])}")
+put("fmHeadLo", sig(min(v["contrast"] for v in _f5["heads"].values()), 4))
+put("fmHeadHi", sig(max(v["contrast"] for v in _f5["heads"].values()), 4))
+put("fmCanon", f(_m55["V"]["canonical_frac"], 3))
+put("fmCanonRand", f(_m55["V"]["canonical_frac_random_head"], 3))
+put("fmVerdict", _m55["verdict"].replace("_", " "))
+# predictors now losing to the free integer: the level arms M51 scored, plus this one
+_lvarms = len([k for k in J("m51_level_vs_change.json")["A3_vs_depth"] if k.endswith("_level")])
+put("fmNlose", f"{_lvarms + 1}")
+# The axis sentence is only allowed to be narrow while this stays true. If a later run makes the
+# second transformer resolve the axis, the narrowing is stale and the build says so.
+assert _f1["ci_contains_zero"], (
+    "the second transformer now resolves the identity axis; the sentence narrowing the "
+    "architecture axis to one model is stale")
+assert _f2["rnafm_minus_eterna"]["ci_contains_zero"], "the second architecture axis now resolves"
+assert _f5["signs_disagree"], "the four heads no longer disagree in sign; K4's sentence is stale"
+assert not _f3["beats_depth"], "RNA-FM now beats the free baseline; Claim 3 must be restated"
+
+# ---- M56: a second interval on the three that carry claims. Section 3.6 asserted a direction and
+# did not compute it; these are the measured widths, and one interval does not survive.
+_m56 = J("m56_bca.json")
+assert _m56["V"]["V1_degenerate_equals_percentile"], "M56's BCa identity check failed"
+_qq = _m56["quantities"]
+for _t, _tag in (("Q1", "One"), ("Q2", "Two"), ("Q3", "Three")):
+    _r = _qq[_t]
+    put(f"bc{_tag}", ci(_r["bca"], 4))
+    put(f"bc{_tag}Basic", ci(_r["basic"], 4))
+    put(f"bc{_tag}Width", f"{_r['width_ratio_bca']:.3f}")
+    put(f"bc{_tag}Clusters", f"{_r['n_clusters']}")
+put("bcWidthMax", f"{max(_qq[t]['width_ratio_bca'] for t in _qq):.1%}".replace("%", "\\%"))
+put("bcNsurvive", f"{sum(1 for t in _qq if _qq[t]['bca_excludes_zero'])}")
+put("bcNq", f"{len(_qq)}")
+assert _qq["Q1"]["bca_excludes_zero"] and _qq["Q3"]["bca_excludes_zero"], (
+    "a claim interval that survived BCa no longer does")
+assert not _qq["Q2"]["bca_excludes_zero"], (
+    "Q2's BCa interval now excludes zero; the sentence saying the shipped column is the fragile "
+    "one is stale")
+assert all(_qq[t]["width_ratio_bca"] > 1.0 for t in _qq), (
+    "a BCa interval is now narrower than its percentile interval; Section 3.6's replacement "
+    "sentence asserts the wrong direction")
+
 _rs = J("m38_ribosnitch_baseline.json")
 _ra, _rb, _rv = _rs["A_within_design"], _rs["B_vs_free_depth"], _rs["D_verification"]
 put("rsIdentMax", f"{_rv['identity_max']:.0f}")

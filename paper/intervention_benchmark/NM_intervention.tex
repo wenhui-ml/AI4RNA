@@ -378,6 +378,31 @@ as corroboration of that premise and not as evidence for any number below. The s
 measured rather than asserted: \S\ref{sec:ranking} scores the standard riboSNitch quantities on
 these interventions, beside the predictors and the free baseline.
 
+\paragraph{An average advantage, and a budget.} The observation Reading~2 rests on --- that an
+average metric advantage need not survive a budget, and that a ranking can invert once only the
+top of the list is acted on --- has a long prior life outside this field. Virtual screening
+introduced enrichment factors and early-recognition metrics for exactly this reason: a global
+figure of merit does not say how many actives appear in the first few percent of a ranked list,
+and two methods with the same global score can differ sharply there
+\citep{sheridan2001protocols,truchon2007evaluating}. That a method's standing on a benchmark need
+not transfer to a prospective campaign is the same literature's central negative result
+\citep{wallach2018most}. We claim no novelty for the shape of that argument, and saying so makes
+clear what is new here: it is done for RNA structure prediction, the conversion is into
+experiments somebody has already executed rather than into a simulated screen, and the mechanism
+is stated sharply enough to be attacked --- \emph{the larger a model's average agreement
+advantage, the further from the top of its own ranked list that advantage lies}, while a budgeted
+experimenter only ever sees the top.
+
+\paragraph{A free baseline, and the calibration of the metric it is compared on.}
+Claim~\ref{claim:depth}'s genre --- a deep model failing to beat a simple baseline on a benchmark
+task --- has an immediate precedent in perturbation prediction, where deep models were found not
+to outperform linear global baselines \citep{ahlmanneltze2025deep}. The standing objection to
+results of that shape is that they turn on how the metric is calibrated rather than on what the
+models know, and we take that objection seriously rather than answering it: it is why the baseline
+here is defended with a measured split-half reliability, a dynamic range, and an empirical null
+distribution (\S\ref{sec:ceiling}) instead of with a single number, and why
+\S\ref{sec:ranking} reports the comparison across a swept threshold rather than at one.
+
 \paragraph{The closest prior analysis of this outcome.} \citet{tian2018allosteric} validated the
 rescue factor as a readout by showing that rescue factors from \emph{simulated} mutate-map-rescue
 experiments track helix frequencies across Rfam families, averaged over the helix. That result is
@@ -827,9 +852,15 @@ its generator seed as an integer literal in its own released script (\jdg{seedPr
 primary run), so no number here rests on a seed that is not in the repository.
 
 \paragraph{Two things the intervals cannot fix.} The cluster bootstrap resamples \jdg{ccPuzzles}
-units, and a percentile interval built on that few clusters is known to be optimistic. No
-correction is applied: we report the cluster count beside every interval instead, and every
-interval here should be read as at least as wide as printed. The second is multiplicity. This
+units for most estimates, and a percentile interval built on that few clusters is known to be
+optimistic. The percentile interval remains the reported one throughout --- fixed before the
+alternative was computed --- and the cluster count is reported beside every one. How optimistic it
+is was measured rather than asserted, on the \jdg{bcNq} intervals that carry claims: a
+bias-corrected and accelerated interval is wider than the percentile one in every case, by at most
+\jdg{bcWidthMax}, and \jdg{bcNsurvive} of \jdg{bcNq} still exclude zero
+(\S\ref{sec:conventional}, \S\ref{sec:result}, \S\ref{sec:reorder}). An earlier version of
+this paragraph said only that every interval should be read as at least as wide as printed; the
+direction was right and the size is now printed instead of implied. The second is multiplicity. This
 paper reports of order thirty contrasts and rank statistics and applies no family-wise or
 false-discovery correction; what it does instead is fix the gate at $0.005$ in advance, declare
 each arm's predictions before the run, and rest no claim on a $p$-value alone --- every claim
@@ -1079,7 +1110,13 @@ folded from this deposit's own chemical probing (Appendix~\ref{app:probing}). Al
 built one by \jdg{prReadout} standard deviations (\jdg{prReadoutCi}). The published column is
 the \emph{smallest} of the \jdg{prNcol} gaps (\jdg{prReadoutN}, \jdg{prReadoutNCi}), so the
 comparison this subsection reports is the most conservative of those available, which was not a
-choice we made.
+choice we made. It is also the one that does not survive a second interval method: the
+bias-corrected and accelerated interval on it is \jdg{bcTwo}, which covers zero, not because it is
+wider --- it is \jdg{bcTwoWidth} times the percentile width --- but because the bias correction
+shifts it down. The basic interval, \jdg{bcTwoBasic}, excludes zero. We report the percentile
+interval, as everywhere else, and state here that on this column alone the separation is
+method-dependent. It is not method-dependent on the four columns above, whose gaps are larger, and
+that is the reason to read \jdg{prNcol} columns rather than one.
 
 \paragraph{It is saturated.} Averaged over that model's sampled structures, the target pair is
 present with frequency \jdg{cvHitCG} for G--C targets, \jdg{cvHitAU} for A--U targets and
@@ -1372,7 +1409,23 @@ the decomposition and moving the parameters from optical melting to chemical map
 \jdg{axData} (\jdg{axDataCi}). \textbf{Both axes move the contrast toward the measurement, and the
 decomposition moves it \jdg{axRatio}$\times$ further --- a gap of \jdg{axGap} (\jdg{axGapCi}) that
 itself excludes zero.} The training data is not irrelevant; it is the smaller of two effects
-pointing the same way. This quantity was not staked and is reported as post hoc. The measurement
+pointing the same way. This quantity was not staked and is reported as post hoc.
+
+\textbf{A second transformer does not reproduce that axis, so it is stated as one model's
+property and not as the decomposition's.} The axis above is one transformer minus one
+CONTRAfold-family model, and nothing in it separates \emph{what the decomposition is worth} from
+\emph{what RibonanzaNet is}. RNA-FM --- a transformer sharing neither backbone nor training
+corpus with RibonanzaNet, scored through its own authors' released pairing head so that nothing
+here is fitted by us (Appendix~\ref{app:secondtransformer}) --- returns \jdg{fmContrast}
+(\jdg{fmContrastCi}) on the same interventions and the same strata. That covers zero: it does not
+resolve the identity axis at all. The architecture axis recomputed with it is \jdg{fmAxis}
+(\jdg{fmAxisCi}), also covering zero, and the difference between the two axes is
+\jdg{fmAxisDiffCi}. Across the \jdg{fmNhead} released heads the contrast ranges
+\jdg{fmHeadLo} to \jdg{fmHeadHi} and does not keep a sign, which is the cleanest reading of the
+arm: this transformer's column does not separate the pair types under any head. \textbf{The axis
+is therefore reported as what changing from EternaFold to RibonanzaNet is worth, not as what the
+decomposition is worth}; the run was declared with that consequence written down before the number
+existed. It is a two-member comparison and two models are not a class. The measurement
 figures are computed twice, by \texttt{designaudit}'s bincount estimator and by an independently
 written dictionary implementation, agreeing to \jdg{resAgree}; the EternaFold row is computed
 through a third script whose reproduction of the ViennaRNA row agrees with the published value
@@ -1435,8 +1488,11 @@ mapping resolves such a separation (\jdg{resVienna}, \jdg{resViennaCi}; \jdg{efC
 \jdg{efContrastCi}). The instrument distinguishes something one structural decomposition
 represents and the other does not, with no reference structure in the comparison. Paired over the
 same resample the transformer exceeds both by \jdg{pdNVCi} and \jdg{pdNECi} and they differ from
-each other by \jdg{pdVECi}, so the effect decomposes rather than dichotomises: the decomposition is
-worth \jdg{axArch} (\jdg{axArchCi}) and the training data \jdg{axData} (\jdg{axDataCi}).
+each other by \jdg{pdVECi}, so the effect decomposes rather than dichotomises: moving from
+EternaFold to this transformer is worth \jdg{axArch} (\jdg{axArchCi}) and moving the parameters
+from optical melting to chemical mapping \jdg{axData} (\jdg{axDataCi}). A second transformer does
+not reproduce the first of those (\jdg{fmContrastCi}), so it is a statement about this model and
+not about its architecture class.
 \end{claimbox}
 
 \paragraph{What we are not claiming.} The thermodynamic point estimate is negative, and that sign
@@ -1663,6 +1719,13 @@ it fixed, both predictors retain a real but modest ordering ability (\jdg{rkPart
 break the baseline's ties. \textbf{Any claim that a structure predictor knows which mutations
 rescue must be stated as an increment over helix depth}, and to our knowledge none has been.
 \end{claimbox}
+
+\paragraph{A fourth predictor loses to it as well.} The second transformer of
+\S\ref{sec:result} was scored on this comparison too, and it does not change the picture:
+\jdg{fmLevel} against the free integer's \jdg{rkRhoD}, a difference of \jdg{fmVsDepth}
+(\jdg{fmVsDepthCi}) that excludes zero on the losing side. \jdg{fmNlose} predictors across two
+model families now fail the same comparison, and this one fails it with an interval rather than a
+covering one.
 
 \paragraph{The baseline is not an artefact of the declaration, and it stops being free without
 one.} Helix depth is read off the declared target, so a reader may reasonably ask whether it wins
@@ -2293,9 +2356,11 @@ transformer's own pairing probability distinguishes them by \jdg{resNeural} (\jd
 where the measurement puts them \jdg{resOut} (\jdg{resOutCi}) apart --- indistinguishable once each
 column is put on its own scale (\jdg{stdMN}\,SD, \jdg{stdMNCi}), which is the only sense in which
 the two may be compared --- and neither predictor built on the nearest-neighbour decomposition does
-so (\jdg{resVienna}, \jdg{resViennaCi}; \jdg{efContrast}, \jdg{efContrastCi}). The separation decomposes into a decomposition axis worth \jdg{axArch}
-(\jdg{axArchCi}) and a training-data axis worth \jdg{axData} (\jdg{axDataCi}); we had written that
-the second was absent, and the interval said otherwise. On the axis an experimenter would actually
+so (\jdg{resVienna}, \jdg{resViennaCi}; \jdg{efContrast}, \jdg{efContrastCi}). The separation decomposes into an axis worth \jdg{axArch}
+(\jdg{axArchCi}) between that transformer and EternaFold and a training-data axis worth
+\jdg{axData} (\jdg{axDataCi}); we had written that the second was absent, and the interval said
+otherwise, and we had read the first as a property of the decomposition until a second transformer
+declined to reproduce it (\jdg{fmContrastCi}). On the axis an experimenter would actually
 use --- which flips to build inside one design --- all of them are matched or beaten by helix
 depth, an integer read off the declared target that costs nothing (differences \jdg{rkDiffNCi},
 \jdg{rkDiffVCi}, \jdg{efVsDepthCi}, all covering zero). \textbf{What is new is not that helix
@@ -2429,6 +2494,40 @@ target carries \jdg{stShare} of the corpus, so no single target can move an inte
 and the smallest carries \jdg{stPuzMin} interventions, so none is too small to drop.}
 \label{fig:strata}
 \end{figure}
+
+\section{The second transformer}
+\label{app:secondtransformer}
+
+The architecture axis of \S\ref{sec:result} is one transformer minus one CONTRAfold-family
+model. Whether it is a statement about a decomposition or about RibonanzaNet cannot be settled by
+adding a fifth nearest-neighbour implementation; it needs a second transformer, and one that
+shares neither the backbone nor the training corpus.
+
+\paragraph{What was added.} RNA-FM is a twelve-layer transformer pretrained on RNAcentral
+sequence, with a pairwise head its own authors trained on curated secondary-structure data and
+released. Nothing here is fitted by us: the released head emits a base-pair probability map and
+that map supplies one more column of exactly the kind the estimator already consumes. The primary
+head was fixed in the frozen declaration before any contrast existed, and the other
+\jdg{fmNhead}\,$-$\,1 released heads are reported beside it rather than chosen between. Its
+training data predates this corpus, which is an argument from release dates and not a measurement,
+and we state it as such.
+
+\paragraph{Two checks worth naming.} A pairing model wired to the wrong index convention returns
+numbers that all look plausible, so the top pairs of every wild type were decoded and counted:
+\jdg{fmCanon} of them are canonical against \jdg{fmCanonRand} for the same architecture with a
+randomly initialised head. That single comparison establishes both that the coordinates are right
+and that the released weights reached the model. Before the new column was read, the estimator
+here reproduced all four published contrasts and all four published within-design rank
+agreements.
+
+\paragraph{What it returned.} \jdg{fmContrast} (\jdg{fmContrastCi}), covering zero, across
+\jdg{fmNhead} heads spanning \jdg{fmHeadLo} to \jdg{fmHeadHi} without keeping a sign. The
+declaration's binding rule was that a second transformer failing to resolve the axis would narrow
+the axis to one model, and \S\ref{sec:result} narrows it. The verdict recorded by the run is
+\texttt{\jdg{fmVerdict}}.
+
+\FloatBarrier
+% =====================================================================
 
 \section{A reference nobody in the panel wrote}
 \label{app:probing}
@@ -2799,6 +2898,52 @@ Parameter variants span less of the response range than implementations \quad(\j
   against a window-restricted value (\jdg{pwV2Win} against \jdg{pwV2Full}) that differs from it by
   \jdg{pwV2Gap}, close enough to have passed a loose tolerance as a reproduction of a quantity it
   is not.}}\\
+\midrule
+\multicolumn{2}{@{}l@{}}{\emph{frozen before a second transformer was scored (\S\ref{sec:result})}}\\
+\textbf{A second transformer sharing neither backbone nor training corpus also resolves the
+  identity axis} --- \emph{it does not: \jdg{fmContrast} (\jdg{fmContrastCi}), covering zero.
+  This was the point of the run and the declaration said in advance what a failure would cost: the
+  architecture axis stops being reported as what the decomposition is worth and is stated as what
+  changing from EternaFold to RibonanzaNet is worth. \S\ref{sec:result} states it that way} & \textbf{failed} \\
+\textbf{The architecture axis recomputed with it is positive} --- \emph{it is \jdg{fmAxis}
+  (\jdg{fmAxisCi}), covering zero, and the difference between the two axes is
+  \jdg{fmAxisDiffCi}. Unresolved rather than reversed, and reported as unresolved} & \textbf{failed} \\
+Its level arm does not exceed the free integer \quad(\jdg{fmVsDepth}, \jdg{fmVsDepthCi}) & correct \\
+Its contrast is smaller than the first transformer's \quad(\jdg{fmContrast} against \jdg{resNeural}) & correct \\
+\multicolumn{2}{@{}p{0.95\textwidth}@{}}{\footnotesize\emph{The primary head was fixed in the
+  declaration before any contrast existed and the other released heads are reported beside it, not
+  chosen between; across all \jdg{fmNhead} the contrast spans \jdg{fmHeadLo} to \jdg{fmHeadHi}
+  and does not keep a sign, which triggered the declaration's condition that a head-dependent sign
+  be stated wherever the number is. Verified before the new column was read: the loaded head's top
+  pairs are \jdg{fmCanon} canonical against \jdg{fmCanonRand} for a randomly initialised one ---
+  the one check that catches an index convention error while every other number still looks
+  plausible --- the same sequence scored twice agrees exactly, and all four published contrasts
+  and all four published rank agreements reproduce.}}\\
+\midrule
+\multicolumn{2}{@{}l@{}}{\emph{frozen before the claim intervals had a second method (\S\ref{sec:inference})}}\\
+The matched contrast's BCa interval still excludes zero \quad(\jdg{bcOne}) & correct \\
+\textbf{The paired standardised difference's BCa interval still excludes zero} --- \emph{it does
+  not: \jdg{bcTwo}. Not through width, which grows \jdg{bcTwoWidth}-fold, but through a bias
+  correction that shifts the interval down; the basic interval \jdg{bcTwoBasic} excludes zero.
+  The percentile interval remains the reported one, fixed before this was computed, and
+  \S\ref{sec:conventional} states that on that column alone the separation is method-dependent} & \textbf{failed} \\
+The budgeted gap's BCa interval still excludes zero, so Reading~2's sign reversal survives a
+  second method \quad(\jdg{bcThree}) & correct \\
+BCa is wider than percentile for at least two of the three \quad(all three; at most \jdg{bcWidthMax}) & correct \\
+\multicolumn{2}{@{}p{0.95\textwidth}@{}}{\footnotesize\emph{The quantity that fails is computed
+  on the column the benchmark ships, which \S\ref{sec:conventional} had already found --- before
+  this run --- to be the smallest of \jdg{prNcol} such gaps; the four larger ones are not close to
+  zero. It also clusters on \jdg{bcTwoClusters} designs rather than the \jdg{bcOneClusters}
+  targets the other two use, so the small-cluster concern that motivated this run is not what moves
+  it. Verified before any second interval was read: with the bias correction and acceleration set
+  to zero the BCa endpoints equal the percentile endpoints exactly, and every point estimate and
+  every published percentile interval reproduces. That last check refused a quantity three times.
+  Twice for real reasons --- the published estimator draws its permutations and its bootstrap from
+  one generator, so the bootstrap stream starts a thousand permutations in, and one of the three
+  runs uses interpolated quantiles where the others take the floor-indexed order statistic. Once
+  for ours: the target had been typed from this manuscript's four-decimal print, which carries
+  $\pm5\times10^{-5}$ of rounding and therefore cannot be reproduced to $5\times10^{-5}$ at all.
+  Targets are now read from the artifacts that produced them.}}\\
 \midrule
 \multicolumn{2}{@{}l@{}}{\emph{frozen before the agreement axis had a reference nobody in the panel wrote (\S\ref{sec:conventional}, \S\ref{sec:reorder})}}\\
 The incumbent margin is smaller against a probing-derived reference than the \jdg{dcTransF1} it
