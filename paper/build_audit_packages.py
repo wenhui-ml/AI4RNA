@@ -1248,8 +1248,15 @@ def main():
           "package": folder, "schema": "manuscript-audit-input/v1",
           "built_by": "paper/build_audit_packages.py",
           "regenerate_with": "python paper/build_audit_packages.py",
-          "git_head": subprocess.run(["git", "rev-parse", "HEAD"], cwd=REPO,
-                                     capture_output=True, text=True).stdout.strip(),
+          "git_head_at_build": subprocess.run(["git", "rev-parse", "HEAD"], cwd=REPO,
+                                              capture_output=True, text=True).stdout.strip(),
+          # The package is committed AFTER it is built, so the hash above is the parent of the
+          # commit that contains this file. Recipients should check out the commit that CONTAINS
+          # this MANIFEST, not the one it names; the field is here to identify the manuscript
+          # state the package was generated from, which is that parent.
+          "_git_head_note": "this is the commit the package was generated FROM; the package "
+                            "itself lives in that commit's child. Check out the commit "
+                            "containing this MANIFEST.",
           "files": [{"name": f, "bytes": os.path.getsize(os.path.join(out, f)),
                      "sha256": sha(os.path.join(out, f))} for f in files]})
         made.append(out)
