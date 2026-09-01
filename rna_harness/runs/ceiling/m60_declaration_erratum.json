@@ -1,0 +1,23 @@
+{
+ "erratum_for": "m60_carrying_bound",
+ "written_utc": "2026-09-01",
+ "rule": "冻结声明不得事后编辑。第一次运行的实现有缺陷,结果不得作为发现报告。此文件记录缺陷、诊断与修复,原始运行 m60_carrying_bound.json 保留在库里作为被更正的对象。",
+ "first_run_verdict_not_to_be_read": "K1_corollary_violated (4/7)。这个裁定来自下面四处实现缺陷,不是来自定理。",
+ "defects_found_in_the_first_implementation": {
+  "D1_incommensurate_partitions": "界的两侧算在不同的划分上。Delta_cde 用 (格 x 箱) 的 min(n_A,n_B) 加权,而 Delta_tot 用 (格) 的 min(n_A,n_B) 加权;h 与 d_TV 又是跨格汇总的。证据:rna:dG 在 5 箱时 d_tot=+0.05393 而 d_cde=+0.10721 —— CDE 是总量的两倍,这是重加权的痕迹,不是中介物携带了 -100%。因此第一次运行的 |Delta_tot - Delta_cde| 不是定理的左边。",
+  "D2_separation_knob_did_not_move": "A2 的重加权在格内朝格内混合律做,而 d_TV 在全局测。s 从 0 扫到 3,d_TV 只从 0.5398 走到 0.6381,s=0 本应趋近 0。所以 A2a 从未扫过分离度,它的 Spearman +0.5952 测的是噪声,不是 tracking。S4 的失败不可读。",
+  "D3_depth_binning_degenerate": "depth 只有 4 个取值,分位分箱到 5~40 箱后可用箱恒为 4,osc(h) 与 d_TV 从 8 箱起完全不动。该行不可读,且它的格键被改成 (design, crossed) 后 d_tot 已不是论文里的那个量。",
+  "D4_binder_violates_assumption_7": "A3 在蛋白语料上测到 no T x M interaction 不成立:逐箱对比 +0.0109 / -0.0799 / +0.1451 / +0.0243 / +0.0090,变号,spread/|mean| = 10.29。推论的前提是假设 (7),因此蛋白侧的『界 8/8 成立』不构成对推论的证据,必须先报前提再报界。"
+ },
+ "what_the_first_run_does_establish_and_is_kept": {
+  "A3_rna": "RNA 侧假设 (7) 的检验是干净的且是正向的:ΔG 箱内 identity 对比 +0.10867 与 +0.10675,同号,spread/|mean| = 0.02。这条与上面四处缺陷无关,保留。",
+  "A3_binder": "蛋白侧 (7) 不成立,同样保留 —— 它限定了 Prop. routes 在跨领域臂上的适用范围,是论文欠着的一条。"
+ },
+ "fixes_to_be_implemented_in_m60b": [
+  "F1: Delta_tot 与 Delta_cde 用同一套格权重 w_c = min(n_Ac, n_Bc);Delta_cde 在格内先按该格自己的 M 分布标准化,再用同样的格权重汇总。h 与 d_TV 用同一套格权重。",
+  "F2: 分离度旋钮改为对准全局分箱律:q_arm = p_pooled + s*(p_arm - p_pooled) 用全局 p 与全局 p_arm,并在扫描后回报实际达到的 d_TV,不假设它达到了目标。",
+  "F3: depth 改用它自己的 4 个整数取值作为箱,不做分位分箱;若可用箱 < 3 则按 K5 剔除并计数。",
+  "F4: 先报假设 (7) 的检验,再报界;(7) 不成立的 (语料,中介物) 上,推论界标注为不受许可,不计入记分。"
+ ],
+ "stakes_are_NOT_reissued": "七条押注按原文重判一次,不改写、不新增。S1..S7 的判定以 m60b 为准,第一次运行的判定作废并如实记录为实现缺陷所致。"
+}
