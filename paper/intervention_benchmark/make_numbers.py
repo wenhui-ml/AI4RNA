@@ -232,7 +232,9 @@ sw = r3["RibonanzaNet"]["sweep"]
 put("mcNeuralZero", pct(sw[0]["measured_retention"], 1))
 put("mcNeuralFull", pct(sw[-1]["measured_retention"], 1))
 sv = r3["ViennaRNA"]["sweep"]
-put("mcViennaFull", pct(sv[-1]["measured_retention"], 1))
+# a retention of minus eight hundred percent does not have a tenth-of-a-percent; the sweep
+# endpoint is printed at the precision the number can carry.
+put("mcViennaFull", pct(sv[-1]["measured_retention"], 0))
 put("mcSep", f(0.053, 3))
 put("mcViennaZero", pct(sv[0]["measured_retention"], 1))
 
@@ -709,6 +711,17 @@ put("chReachSeven", f"{_m49['A6_reach']['C7']['ratio']:.2f}")
 _src26 = open(os.path.join(CEIL, "m26_model_scored.py")).read()
 _B = int(_re.search(r"NBINS,\s*NPERM,\s*NPLACEBO\s*=\s*\d+,\s*(\d+)", _src26).group(1))
 _gate, _ntests = 0.005, 30
+# W10 asked for B and the seed in the Methods body rather than only inside the code. B is not one
+# number: the permutation count and the bootstrap count differ, and the review runs raised the
+# bootstrap count. All three are read out of source for the same reason the floor is.
+_Bboot26 = int(_re.search(r"def cluster_ci\([^)]*nb=(\d+)", _src26).group(1))
+_src51 = open(os.path.join(CEIL, "m51_level_vs_change.py")).read()
+_Bboot51 = int(_re.search(r"NMIN,\s*NBOOT,\s*SEED\s*=\s*\d+,\s*(\d+)", _src51).group(1))
+_seed26 = int(_re.search(r'add_argument\("--seed",\s*type=int,\s*default=(\d+)\)', _src26).group(1))
+put("permB", f"{_B:,}".replace(",", "{,}"))
+put("bootBprimary", f"{_Bboot26}")
+put("bootBreview", f"{_Bboot51:,}".replace(",", "{,}"))
+put("seedPrimary", f"{_seed26}")
 put("permFloor", f"{1/(1+_B):.5f}")
 put("permBonf", f"{_gate/_ntests:.6f}")
 put("permBneed", f"{math.ceil(_ntests/_gate)-1:,}".replace(",", ","))
@@ -717,6 +730,40 @@ assert 1/(1+_B) > _gate/_ntests, (
     "corrected p-value is unattainable here is stale")
 
 put("chReachEight", f"{_m49['A6_reach']['C8']['ratio']:.2f}")
+
+# ---- M52: the Discussion said the honest bound on Assumption 1 was "the sensitivity analysis
+# already reported". There was none: Section 5.2 reports a controlled-truth benchmark and says in
+# the same subsection that a benchmark built from a confounder we chose is not one. This is the
+# bound. It is closed-form because eq:est is linear in the outcome, so an omitted U shifts the
+# estimate by exactly beta_u * g_u, a product invariant to rescaling U.
+_m52 = J("m52_sensitivity.json")
+assert all(_m52["V"].values()), "M52 verification did not pass"
+_s1, _s3, _s4 = _m52["A1_multiplier"], _m52["A3_observed_covariates"], _m52["A4"]
+put("senK", f"{_s1['K1']:.2f}")
+put("senKCi", ci(_s1["ci95"], 2))
+put("senBench", sig(abs(_s1["benchmark_bias"]), 4))
+put("senDiag", sig(_m52["A2_diagonal"]["required_beta_eq_g"], 3))
+put("senDiagSd", f"{_m52['A2_diagonal']['in_outcome_within_sd']:.2f}")
+put("senNcov", f"{len(_m52['covariates'])}")
+put("senMaxOne", sig(_s3["max_abs_bias"], 4))
+put("senArgOne", _s3["argmax"])
+put("senMarginCi", ci(_s3["paired_margin"]["ci95"], 4))
+put("senMaxAll", sig(_s4["max_abs_bias"], 4))
+put("senMaxAllPct", pct(_s4["max_abs_bias"] / _s3["alpha"], 0))
+put("senNdeg", f"{len(_s4['dropped_no_within_variance'])}")
+_srcM52 = open(os.path.join(CEIL, "m52_sensitivity.py")).read()
+_nrand = int(_re.search(r"SEED, NBOOT, NRAND = \d+, \d+, (\d+)", _srcM52).group(1))
+put("senNrand", f"{_nrand:,}".replace(",", "{,}"))
+# S2 failed and the manuscript has to say so: the multiplier's interval reaches below one, because
+# the lower end of the contrast's OWN interval is about the size of the bias placement would have
+# caused. That sentence is only true while this stays true.
+assert not _s1["ci_excludes_one"], (
+    "M52's multiplier interval now excludes 1; the sentence saying a confounder no stronger than "
+    "placement cannot be ruled out at the lower end is stale")
+assert _s3["max_abs_bias"] < _s3["alpha"] and _s4["max_abs_bias"] < _s3["alpha"], (
+    "an observed covariate now reaches the contrast; W3 of the M52 declaration binds")
+
+
 
 # ---- M50: section 5.4 differenced four columns that are not on one scale. Two scales exist and
 # they answer different questions; the bridge between them is g = rho * SD_R/SD_p, so the slope
@@ -951,6 +998,63 @@ _tab("tab_strata.tex", r"@{}lr@{}", [r"what the intervals resample & count"],
       f"largest target's share of the corpus & {pct(_pp['largest_share'])}",
       f"interventions per design cell, min / median / max & {_pc['min']} / {_pc['median']} / {_pc['max']}"])
 
+# ---- W9: one table saying what every number is computed on. The counts differ across analyses
+# for stated reasons, and a reader who cannot track them cannot check anything. Every cell here
+# comes from the artifact of the run that used it, so a restriction that changes fails the build
+# rather than going unnoticed.
+_m52n = J("m52_sensitivity.json")
+_m51n = J("m51_level_vs_change.json")
+_m44n = J("m44_decision.json")
+_m31n = J("m31_which_flips_rescue.json")
+_m31rn = J("m31r_review.json")
+_m30n = J("m30_selection_audit.json")
+_m25B = J("m25_estimator_benchmark.json")["B"]
+_m39n = J("m39_exposure_tiers.json")
+_vv = J("m26v_alpha_verify.json")
+_ap31 = _m31n["Aprime_causal_conditioning"]["P_neural"]
+_lk31 = _m31rn["R4_controls"]["leakage_clean"]
+assert _m39n["n_clean"] + _m39n["n_dirty"] == _cc["n_interventions"], "the leakage split is not exhaustive"
+assert _da["by_pair_type"]["CG"] + _da["by_pair_type"]["AU"] == _m30n["corpus"]["n_cgau"], (
+    "the C-G plus A-U count no longer equals the two-arm corpus")
+put("naStrataBoth", f"{_m52n['n_strata_both_arms']}")
+_NMIN51 = int(_re.search(r"NMIN,\s*NBOOT,\s*SEED\s*=\s*(\d+)",
+                        open(os.path.join(CEIL, "m51_level_vs_change.py")).read()).group(1))
+_tab("tab_naccount.tex",
+     r"@{}p{0.30\textwidth}lr p{0.36\textwidth}@{}",
+     [r"& & count & why it is not \jdg{nAdmitted}"],
+     [f"constructs in the released file & \\S\\ref{{sec:corpus}} & {_da['n_constructs']:,} & ---".replace(",", "{,}"),
+      f"\\textbf{{admitted interventions}} & \\S\\ref{{sec:mining}} & \\textbf{{{_da['n_admitted']}}} "
+      f"& the criterion",
+      f"\\quad design cells & & {_cc['n_design_cells']} & ---",
+      f"\\quad targets, the bootstrap unit & & {_cc['n_puzzles']} & ---",
+      "-",
+      f"entering the C--G vs A--U contrast & \\S\\ref{{sec:estimation}} & {_m30n['corpus']['n_cgau']} "
+      f"& G--U ({_da['by_pair_type']['GU']}) is a third arm, not compared",
+      f"strata supplying both arms & \\S\\ref{{sec:estimation}} & {_m52n['n_strata_both_arms']} "
+      f"& a stratum with one arm contributes nothing",
+      f"matched weight $\\sum_s \\min(n_A,n_B)$ & \\S\\ref{{sec:estimation}} & {_vv['rf']['weight']:.0f} "
+      f"& the effective size of the contrast",
+      f"design cells in the per-cell sign test & \\S\\ref{{sec:result}} & {_vv['per_cell']['n']} "
+      f"& cells holding both arms",
+      "-",
+      f"both readouts defined & \\S\\ref{{sec:conventional}} & {_m25B['n_pairs']} "
+      f"& designs with no called structure",
+      f"\\quad its strata & & {_m25B['strata']} & ---",
+      f"selection audit & \\S\\ref{{sec:selection}} & {_m30n['corpus']['n_cgau']} & the same two arms",
+      f"leakage split, unexposed & \\S\\ref{{sec:leakage}} & {_m39n['n_clean']} & exhaustive with the next row",
+      f"leakage split, exposed & \\S\\ref{{sec:leakage}} & {_m39n['n_dirty']} & ---",
+      "-",
+      f"design cells with $\\ge$\\,{_NMIN51} flips & \\S\\ref{{sec:ranking}} & {_m51n['n_cells']} "
+      f"& covering all {_m51n['n_covered']} interventions",
+      f"\\quad surviving the leakage cut & & {_lk31['n_cells']} & {_lk31['n_leaked']} cells matched training structures",
+      f"\\quad under the causal conditioning set & & {_ap31['n_cells']} "
+      f"& a finer partition, so fewer reach the flip floor; {_ap31['n_records']} interventions",
+      f"cells with both outcomes present & \\S\\ref{{sec:reorder}} & {_m44n['n_cells_scored']} "
+      f"& a cell all-rescue or all-not cannot be scored"],
+     note=r"Every count is read from the artifact of the run that used it. The three "
+          r"restrictions that are not arithmetic --- the two-arm corpus, the flip floor and the "
+          r"leakage cut --- are stated where they are applied.")
+
 _rs = J("m38_ribosnitch_baseline.json")
 _ra, _rb, _rv = _rs["A_within_design"], _rs["B_vs_free_depth"], _rs["D_verification"]
 put("rsIdentMax", f"{_rv['identity_max']:.0f}")
@@ -1053,7 +1157,7 @@ put("reVarNames", ", ".join(sorted(_m43["E3_parameter_variants"])))
 put("reMfeAgree", f"{_m43['V']['V2_mfe_agreement_vienna_vs_rnastructure']:.4f}")
 put("reNcells", f"{_m43['n_cells']}")
 # the incumbent margin this paper keeps quoting, computed once here so no two places can disagree
-put("reIncMargin", sig(_ag["RibonanzaNet"] - _ag["ViennaRNA"], 5))
+put("reIncMargin", sig(_ag["RibonanzaNet"] - _ag["ViennaRNA"], 3))
 put("reIncMarginWorst", sig(_ag["RibonanzaNet"] - _ag["RNAstructure"], 5))
 assert all(_m43["coverage"][c]["missing"] == 0 for c in _m43["coverage"]), "M43 coverage gap"
 
@@ -1109,7 +1213,11 @@ for _f, _k in (("0.1", "Ten"), ("0.25", "Qtr"), ("0.5", "Half")):
 # the headline translation: the incumbent's biggest margin, in tubes
 _pair = [r for r in _m44["E2"]["pairs"]
          if r["leader"] == "RibonanzaNet" and r["trailing"] == "ViennaRNA" and r["budget"] == 0.25][0]
-put("dcTransF1", sig(_pair["incumbent_margin_f1"], 5))
+# M43 and M44 arrive at this margin from different artifacts; they must agree, and printing it
+# to five places advertised a precision neither carries.
+assert abs(_pair["incumbent_margin_f1"] - (_ag["RibonanzaNet"] - _ag["ViennaRNA"])) < 5e-6, (
+    "M43 and M44 disagree about the incumbent margin")
+put("dcTransF1", sig(_pair["incumbent_margin_f1"], 3))
 put("dcTransRec", sig(_pair["decision_margin_recovery"], 5))
 put("dcTransN", f"{abs(_pair['extra_rescuing_interventions']):.0f}")
 put("dcTransPct", f"{100*_pair['extra_rescuing_interventions']/_m44['E2']['n_rescuing_interventions_total']:.1f}\\%")

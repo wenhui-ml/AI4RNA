@@ -745,8 +745,8 @@ assigned with respect to the outcome.
 
 Assumption~\ref{ass:placement} cannot be tested from this data, and the conventional response ---
 asking how strong an unmeasured confounder would have to be to overturn the estimate
-\citep{rosenbaum1987sensitivity,rosenbaum2010design} --- bounds rather than removes the concern. It
-is needed because the molecules were not randomised: design programs choose both what a pair is and
+\citep{rosenbaum1987sensitivity,rosenbaum2010design} --- bounds rather than removes the concern,
+and we report that bound below. It is needed because the molecules were not randomised: design programs choose both what a pair is and
 where it goes, and the two choices are correlated. A controlled-truth benchmark quantifies the
 price of ignoring it. On synthetic data matched to this corpus's own depth response $\beta =
 \jdg{biasBeta}$ and pair-type depth gap $g = \jdg{biasGap}$, an estimator that ignores placement is
@@ -763,6 +763,32 @@ does \textbf{not} show that real placement confounding is adequately captured by
 crossing --- no benchmark built from a confounder we chose could. Assumption~\ref{ass:placement}
 is therefore an assumption in the strict sense: the machinery conditioned on it is validated, the
 identification resting on it is asserted.
+
+\paragraph{How strong a violation would have to be.} A bound is available where a test is not, and
+it follows from the estimator rather than from a model of the confounder. Equation~\eqref{eq:est}
+is linear in the outcome, so an omitted covariate $U$ entering the outcome with within-stratum
+response $\beta_u$ shifts the estimate by exactly $\beta_u g_u$, where $g_u$ is the same weighted
+arm gap applied to $U$. That product is invariant to rescaling $U$, so covariates need no common
+unit to be compared here. Three things follow. \emph{First}, the strata are keyed on the design
+cell, so a covariate constant within a design has $g_u = 0$ identically: \textbf{no design-level
+confounder, measured or not, can bias this estimate}, and Assumption~\ref{ass:placement} only ever
+had to cover covariates that vary between pairs inside one design. \emph{Second}, the observed
+contrast is explained away only by a $U$ with $\beta_u g_u = \jdg{resOut}$, which is \jdg{senK}
+times the bias placement itself would have caused had the estimator not conditioned on it
+(\jdg{senBench}); on the diagonal $\beta_u = g_u$ that is \jdg{senDiag}, or \jdg{senDiagSd} of
+the outcome's own within-stratum dispersion. The interval on that multiplier, \jdg{senKCi},
+reaches below one --- the lower end of the contrast's own interval is about the size of the
+benchmark bias --- so a confounder no stronger than placement is excluded at the point estimate
+and not at the bottom of the interval. \emph{Third}, one can ask what the covariates we did
+measure would have done had they been left out. \jdg{senNdeg} of \jdg{senNcov} have no
+within-stratum variance to speak of and contribute nothing by the first point, which is arithmetic
+rather than evidence; of the remainder, only helix depth beyond the stratification's cap is even
+partly conditioned on. Omitting any single one of them moves the estimate by at most
+\jdg{senMaxOne} (the \jdg{senArgOne}), and the contrast exceeds even that largest one by an
+interval excluding zero (\jdg{senMarginCi}); the best linear combination of all of them --- the
+index maximising $|\beta_u g_u|$, obtained in closed form --- reaches at most \jdg{senMaxAll},
+\jdg{senMaxAllPct} of the contrast. None of this tests Assumption~\ref{ass:placement}. It says
+how large a violation would have to be, and that no covariate on this corpus is that large.
 
 \subsection{Inference}
 \label{sec:inference}
@@ -783,13 +809,17 @@ chosen afterwards, and nothing here treats a threshold as a substitute for an in
 \citep{gelman2014statistical}. Reported $p$-values are
 $(1+\#\{|\hat\alpha^{\pi}|\ge|\hat\alpha|\})/(1+B)$ over $B$ permutations, so the smallest
 attainable value is $1/(1+B)$ and is reported as such rather than as zero
-\citep{anderson2001permutation,winkler2014permutation}.
+\citep{anderson2001permutation,winkler2014permutation}. Here $B=\jdg{permB}$ everywhere.
 
 \paragraph{Clustering, for the interval.}
 Intervals come from a nonparametric bootstrap resampling \emph{targets}, not interventions
 \citep{efron1993introduction}. Two designs written for one target share its difficulty, its length
 and whatever the design programs found easy about it, so interventions are exchangeable within a
-target and not across.
+target and not across. Intervals on the primary contrasts use \jdg{bootBprimary} resamples and
+every interval added in a review round uses \jdg{bootBreview}; the difference is that the later
+runs were written after the count mattered, and no interval is quoted from both. Each run fixes
+its generator seed as an integer literal in its own released script (\jdg{seedPrimary} for the
+primary run), so no number here rests on a seed that is not in the repository.
 
 \paragraph{Two things the intervals cannot fix.} The cluster bootstrap resamples \jdg{ccPuzzles}
 units, and a percentile interval built on that few clusters is known to be optimistic. No
@@ -1044,7 +1074,7 @@ is resolving in the last tenth of the range.
 standard deviations.} The identity contrast read interventionally is \jdg{cvIntv}
 ($p=\jdg{cvIntvP}$); read as agreement, from how often the predicted structure contains the pair,
 it is \jdg{cvConv} ($p=\jdg{cvConvP}$). Those two numbers are not on one scale and may not simply
-be subtracted --- the fault this paper retracts in \S\ref{sec:second}, which applies to its own
+be subtracted (\S\ref{sec:second}), and the fault applies to this paper's own
 Claim~\ref{claim:readout} unless the scales are made explicit. The columns' pooled within-stratum
 standard deviations are \jdg{cvSdRescue} and \jdg{cvSdRnet}, so in units of each column's own
 dispersion the contrasts are \jdg{cvIntvSd} and \jdg{cvConvSd}. Because both readouts are defined
@@ -1306,8 +1336,8 @@ chemical-mapping data the transformer was trained on.
 
 \paragraph{The differences, with intervals, because the point estimates do not license the claim.}
 Three contrasts with three intervals say nothing about the differences between them, and a
-covering interval is not evidence of no effect --- the fault this paper records as a failed kill
-condition in Appendix~\ref{app:prereg} and retracts in \S\ref{sec:second}. Every difference below
+covering interval is not evidence of no effect --- a fault this paper records against itself
+twice (Appendix~\ref{app:prereg}, \S\ref{sec:second}). Every difference below
 is therefore computed on \emph{one} resample of the \jdg{ccPuzzles} puzzles per draw, with all
 four columns evaluated on that draw, so the differences are paired. All three resolve: the
 transformer exceeds the thermodynamic model by \jdg{pdNV} (\jdg{pdNVCi}, $p\jdg{pdNVP}$) and the
@@ -1567,8 +1597,8 @@ negative.
 
 \textbf{The table reports the level arm, and an earlier version of this paragraph justified that
 by saying it was the larger of the two and declined to put an interval on the difference.} That is
-a choice between two arms made on two point estimates, which is the shape this paper withdraws a
-metric for in \S\ref{sec:withdrawal}, so the interval is now computed. Paired on one resample the
+a choice between two arms made on two point estimates --- the shape of \S\ref{sec:withdrawal}'s
+withdrawal --- so the interval is now computed. Paired on one resample the
 level arm exceeds the change arm by \jdg{lvcNeural} (\jdg{lvcNeuralCi}) for the neural predictor,
 \jdg{lvcVienna} (\jdg{lvcViennaCi}) for the thermodynamic one and \jdg{lvcEtf} (\jdg{lvcEtfCi})
 for EternaFold: \jdg{lvcNres} of \jdg{lvcNarms} exclude zero, so the choice is not close. It was
@@ -1619,8 +1649,8 @@ rescue must be stated as an increment over helix depth}, and to our knowledge no
 
 \paragraph{A prediction we staked and lost, and what it cost.} We staked in advance that a
 predictor would beat the depth baseline, and wrote that stake's kill condition as a comparison of
-two point estimates with no interval on their difference --- the error this paper retracts in
-\S\ref{sec:withdrawal}. The run returned every staked prediction satisfied; the interval that
+two point estimates with no interval on their difference --- again \S\ref{sec:withdrawal}'s
+error. The run returned every staked prediction satisfied; the interval that
 should have been there was computed afterwards, and is the one reported above. The declaration,
 the run, the fault and the repair are in Appendix~\ref{app:prereg}.
 
@@ -2105,8 +2135,10 @@ to be attacked and do not claim the generalisation. \emph{Second}, whether a pro
 library behaves as \S\ref{sec:ceiling} predicts: nothing short of synthesising it will confirm the
 $4n$-slot specification, and we prefer to state a falsifiable design than to simulate one.
 \emph{Third}, whether real placement confounding is captured by design cell, depth and crossing.
-Assumption~\ref{ass:placement} cannot be tested from observational data at all
-(\S\ref{sec:estimation}), and the honest bound is the sensitivity analysis already reported.
+Assumption~\ref{ass:placement} cannot be tested from observational data at all, and what
+\S\ref{sec:estimation} reports instead is a bound on how strong a violation would have to be:
+no design-level covariate can bias this estimator, and nothing we did measure comes near what
+would be needed.
 \emph{Fourth}, whether a contemporary foundation model orthogonal to all \jdg{reNimpl} of these
 would change the picture. It would extend the panel but not the argument: the panel already spans
 two model families with measured geometry (\S\ref{sec:reorder}), and a fifth member of either
@@ -2328,6 +2360,19 @@ on its own and none is so small that dropping it changes the matched set. Design
 matches within them and weights by $\min(n_A, n_B)$ rather than by cell size: a cell supplying one
 arm and not the other contributes nothing, and the weight makes that explicit instead of letting an
 unbalanced cell contribute a difference it cannot support.
+
+Not every analysis runs on all \jdg{nAdmitted} interventions, and a reader who cannot follow the
+restrictions cannot check the paper. Table~\ref{tab:naccount} states each one and its reason. Two
+of them are arithmetic --- G--U is a third pair type and is not in a two-arm contrast; a stratum
+holding one arm contributes nothing --- and the rest are stated where they are applied.
+
+\begin{table}[!htbp]
+\centering\small
+\caption{\textbf{What each number is computed on.} Every count is read from the artifact of the
+run that used it, so a restriction that changes fails the build. No effect is estimated here.}
+\label{tab:naccount}
+\input{figs/tab_naccount.tex}
+\end{table}
 
 \FloatBarrier
 % =====================================================================
@@ -2668,6 +2713,36 @@ Parameter variants span less of the response range than implementations \quad(\j
   against a window-restricted value (\jdg{pwV2Win} against \jdg{pwV2Full}) that differs from it by
   \jdg{pwV2Gap}, close enough to have passed a loose tolerance as a reproduction of a quantity it
   is not.}}\\
+\midrule
+\multicolumn{2}{@{}l@{}}{\emph{frozen before Assumption~\ref{ass:placement} had a bound (\S\ref{sec:estimation})}}\\
+An unmeasured confounder must exceed, in the $\beta_u g_u$ product, the placement confounder the
+  design conditions on \quad(\jdg{senK}$\times$) & correct \\
+\textbf{The interval on that multiplier excludes one} --- \emph{it does not: \jdg{senKCi}. The
+  lower end of the contrast's own interval is about the size of the benchmark bias, so a
+  confounder no stronger than placement is excluded at the point estimate and not across the
+  interval. The bound is reported with that reach stated, not rounded away} & \textbf{failed} \\
+No single covariate measured on these molecules, if omitted, reaches the observed contrast
+  \quad(at most \jdg{senMaxOne}, the \jdg{senArgOne}) & correct \\
+Nor does the best linear combination of all of them \quad(\jdg{senMaxAll}, \jdg{senMaxAllPct} of
+  the contrast) & correct \\
+\multicolumn{2}{@{}p{0.95\textwidth}@{}}{\footnotesize\emph{This block exists because the
+  Discussion cited a sensitivity analysis this paper did not contain, pointing at the
+  controlled-truth benchmark that \S\ref{sec:estimation} distinguishes from one in its own text.
+  The declaration bound the manuscript before the number existed: the sentence goes whatever the
+  run returns, and either it names this run or it states the assumption as unbounded. Erratum on
+  the verification wording: it named ``cell count \jdg{resCells}'' among the numbers to reproduce,
+  and \jdg{resCells} is the count of design cells in the per-cell sign test, not of the strata the
+  estimator sums over. The first run voided for comparing the two. The declaration is not edited;
+  the check now reproduces the contrast and the matched weight, both published, and cross-checks
+  the stratum count against \jdg{naStrataBoth}, which a different run computes independently over
+  the same stratification --- a number this run could not have tuned to. Verified before any bound
+  was read: a design-level covariate's arm gap is zero to $10^{-18}$ and injecting one at any
+  strength leaves the estimate unmoved to $10^{-17}$; solving for the confounder that nulls the
+  estimate and injecting it returns $2\times10^{-17}$; the induced bias is exactly linear in the
+  coefficient and odd under $U\to-U$; and the closed-form maximum is approached and never exceeded
+  by \jdg{senNrand} random unit directions. A first attempt at the last of these disagreed with
+  itself by a factor of thirty under two column scalings of a quantity that is scale-invariant,
+  which is the check finding a sign error in the code rather than in the data.}}\\
 \midrule
 \multicolumn{2}{@{}l@{}}{\emph{frozen before the budgeted decision experiment existed (\S\ref{sec:reorder})}}\\
 No implementation's recovery advantage over free depth excludes zero at any budget & correct \\

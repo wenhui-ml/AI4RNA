@@ -1,0 +1,48 @@
+=== M52:给 Assumption 1 一个界,因为讨论章节声称已经有一个 ===
+  声明已冻结并推送于本文件存在之前。全离线,$0。
+  记录缓存命中(4317 条),源文件未变
+  干预 4317  (0s)
+
+=== V 验证(先于任何 arm)===
+  V3 对比 +0.05393(论文 +0.0539)  权重 902(论文 902)
+  V3 供两臂的层 553(M30 独立算得 553;论文的 144 是设计格,不是层 —— 声明的 V3 措辞有误,已记录 declaration_erratum)
+  V3 基准 beta +0.06759 x gap -0.3487 = -0.02357(论文 -0.0236)
+  V1 设计级协变量的臂间差  长度 0.000e+00  GC 1.354e-18   (层键含 design,故应恒为 0)
+  V2 注入:g_u +0.064666  解出 lambda -0.833954  注入后对比 +1.945e-17
+  V1 零臂间差注入:g 3.551e-18  注入后 +0.053928429 vs 原 +0.053928429  |Δ| 2.776e-17
+  V4 线性残差 5.551e-17   取负 -0.064666 vs -0.064666  |Δ| 0.000e+00
+  V1-V4 通过 —— V5 在 A4 之后,现在开始读 arm
+
+=== A3 每个实测协变量:若被遗漏会引入多大偏差 ===
+  helix depth (raw, uncapped)                g -0.00520  beta +0.02302  bias -0.000120
+  crossing                                   g +0.00000  beta   ---     bias  0 (层内无方差,恒为 0)
+  design length                              g +0.00000  beta   ---     bias  0 (层内无方差,恒为 0)
+  GC fraction of the design                  g +0.00000  beta -0.02200  bias -0.000000
+  fractional position of the pair            g +0.00781  beta -0.02450  bias -0.000191
+  span of the pair (b - a)                   g +0.61122  beta +0.00030  bias +0.000181
+  local GC fraction, +/-10 nt window         g +0.01986  beta +0.04494  bias +0.000893
+  wild-type pair probability                 g -0.01378  beta +0.13245  bias -0.001825
+  最大 |bias| = 0.001825(wild-type pair probability),观测对比 0.053928
+
+=== A4 所有实测协变量的最佳线性组合(闭式)===
+  层内方差恒为 0 的列(设计级或已在层键里),不构成方向,剔除:['cvCrossed', 'cvLen', 'cvGC']
+  标度归一后特征值 3.4429e+03 .. 5.5447e+03  条件数 1.610e+00
+  闭式  max +0.010202   min -0.010944   max|bias| 0.010944
+  V6 未归一标度重算  max +0.010202  min -0.010944  -> 通过
+  V5 随机 20000 个单位方向  max +0.010094 <= +0.010202   min -0.010782 >= -0.010944  -> 通过
+
+=== A1/A2 一个未观测混杂需要多强 ===
+  A1 K1 = 0.05393 / |-0.02357| = 2.2881   (置换掉的那个混杂如果不被条件化,会带来 0.0236 的偏差)
+  A2 对角要求 beta_u = g_u = sqrt(0.05393) = 0.23222   折成结局层内 SD:1.0604 SD
+  A1 K1 自助 2000 次  2.2881  95% [0.97224, 3.72403]
+  A3 配对余量 alpha - max|bias_c| = +0.052103  95% [0.01782, 0.08546]  不含 0
+
+=== 预注册记分 ===
+  S1  成立   K1 = 2.2881
+  S2  **失败**   K1 95% [0.97224, 3.72403]
+  S3  成立   max|bias_c| 0.001825 vs alpha 0.053928(wild-type pair probability)
+  S4  成立   最佳线性组合 0.010944 vs alpha 0.053928
+
+  裁定:bound_does_not_resolve   3/4 成立   用时 195s
+
+写出 /data/wenhui/openclaude_rna/rna_harness/runs/ceiling/m52_sensitivity.json

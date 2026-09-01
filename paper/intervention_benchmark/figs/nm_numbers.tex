@@ -19,6 +19,8 @@
 \expandafter\def\csname jdg@biasMatchMax\endcsname{0.0021}
 \expandafter\def\csname jdg@biasPredicted\endcsname{\ensuremath{-}0.0236}
 \expandafter\def\csname jdg@biasRegMax\endcsname{0.0021}
+\expandafter\def\csname jdg@bootBprimary\endcsname{500}
+\expandafter\def\csname jdg@bootBreview\endcsname{2{,}000}
 \expandafter\def\csname jdg@calHi\endcsname{+0.5038}
 \expandafter\def\csname jdg@calLo\endcsname{+0.2994}
 \expandafter\def\csname jdg@calNBins\endcsname{5}
@@ -146,7 +148,7 @@
 \expandafter\def\csname jdg@dcStackVsTen\endcsname{+0.0069}
 \expandafter\def\csname jdg@dcStakeAgree\endcsname{0.20}
 \expandafter\def\csname jdg@dcStakeRec\endcsname{3}
-\expandafter\def\csname jdg@dcTransF1\endcsname{+0.26000}
+\expandafter\def\csname jdg@dcTransF1\endcsname{+0.260}
 \expandafter\def\csname jdg@dcTransN\endcsname{19}
 \expandafter\def\csname jdg@dcTransPct\endcsname{1.0\%}
 \expandafter\def\csname jdg@dcTransRec\endcsname{+0.01008}
@@ -361,7 +363,7 @@
 \expandafter\def\csname jdg@mcSpanTop\endcsname{75\%}
 \expandafter\def\csname jdg@mcSpanTrue\endcsname{0.75}
 \expandafter\def\csname jdg@mcViennaCorr\endcsname{+0.7026}
-\expandafter\def\csname jdg@mcViennaFull\endcsname{-842.5\%}
+\expandafter\def\csname jdg@mcViennaFull\endcsname{-843\%}
 \expandafter\def\csname jdg@mcViennaLoo\endcsname{\ensuremath{-}0.7613}
 \expandafter\def\csname jdg@mcViennaMae\endcsname{1.7358}
 \expandafter\def\csname jdg@mcViennaRho\endcsname{+0.0286}
@@ -383,6 +385,7 @@
 \expandafter\def\csname jdg@nRowsRaw\endcsname{14{,}416}
 \expandafter\def\csname jdg@nUniqueSeq\endcsname{4475}
 \expandafter\def\csname jdg@nWildTypes\endcsname{160}
+\expandafter\def\csname jdg@naStrataBoth\endcsname{553}
 \expandafter\def\csname jdg@nnAsym\endcsname{\ensuremath{0}}
 \expandafter\def\csname jdg@nnCorrP\endcsname{+0.4879}
 \expandafter\def\csname jdg@nnCorrS\endcsname{+0.5752}
@@ -415,15 +418,16 @@
 \expandafter\def\csname jdg@pdVE\endcsname{\ensuremath{-}0.02470}
 \expandafter\def\csname jdg@pdVECi\endcsname{[\ensuremath{-}0.0428,\,\allowbreak \ensuremath{-}0.0042]}
 \expandafter\def\csname jdg@pdVEP\endcsname{0.0025}
+\expandafter\def\csname jdg@permB\endcsname{2{,}000}
 \expandafter\def\csname jdg@permBneed\endcsname{5,999}
 \expandafter\def\csname jdg@permBonf\endcsname{0.000167}
 \expandafter\def\csname jdg@permFloor\endcsname{0.00050}
-\expandafter\def\csname jdg@pvPreReg\endcsname{26}
+\expandafter\def\csname jdg@pvPreReg\endcsname{27}
 \expandafter\def\csname jdg@pvReview\endcsname{10}
 \expandafter\def\csname jdg@pvSupport\endcsname{4}
 \expandafter\def\csname jdg@pvSurvey\endcsname{3}
 \expandafter\def\csname jdg@pvSurveyReviewSupport\endcsname{17}
-\expandafter\def\csname jdg@pvTotal\endcsname{46}
+\expandafter\def\csname jdg@pvTotal\endcsname{47}
 \expandafter\def\csname jdg@pwEtfNN\endcsname{0.9000}
 \expandafter\def\csname jdg@pwEtfNeural\endcsname{0.7740}
 \expandafter\def\csname jdg@pwEtfRnet\endcsname{0.7740}
@@ -467,7 +471,7 @@
 \expandafter\def\csname jdg@reAgreeRnet\endcsname{0.8792}
 \expandafter\def\csname jdg@reAgreeRst\endcsname{0.6083}
 \expandafter\def\csname jdg@reAgreeVie\endcsname{0.6192}
-\expandafter\def\csname jdg@reIncMargin\endcsname{+0.26000}
+\expandafter\def\csname jdg@reIncMargin\endcsname{+0.260}
 \expandafter\def\csname jdg@reIncMarginWorst\endcsname{+0.27082}
 \expandafter\def\csname jdg@reMfeAgree\endcsname{0.9709}
 \expandafter\def\csname jdg@reNcells\endcsname{158}
@@ -633,6 +637,7 @@
 \expandafter\def\csname jdg@sdMeas\endcsname{0.2190}
 \expandafter\def\csname jdg@sdNeural\endcsname{0.3044}
 \expandafter\def\csname jdg@sdVienna\endcsname{0.3866}
+\expandafter\def\csname jdg@seedPrimary\endcsname{0}
 \expandafter\def\csname jdg@selAgree\endcsname{0.8643}
 \expandafter\def\csname jdg@selAgreeB\endcsname{0.9643}
 \expandafter\def\csname jdg@selCells\endcsname{160}
@@ -681,6 +686,19 @@
 \expandafter\def\csname jdg@selSlopeLo\endcsname{+0.17393}
 \expandafter\def\csname jdg@selStrataMixed\endcsname{0}
 \expandafter\def\csname jdg@selVerdict\endcsname{selection real disclosed and conditioned out}
+\expandafter\def\csname jdg@senArgOne\endcsname{wild-type pair probability}
+\expandafter\def\csname jdg@senBench\endcsname{+0.0236}
+\expandafter\def\csname jdg@senDiag\endcsname{+0.232}
+\expandafter\def\csname jdg@senDiagSd\endcsname{1.06}
+\expandafter\def\csname jdg@senK\endcsname{2.29}
+\expandafter\def\csname jdg@senKCi\endcsname{[+0.97,\,\allowbreak +3.72]}
+\expandafter\def\csname jdg@senMarginCi\endcsname{[+0.0178,\,\allowbreak +0.0855]}
+\expandafter\def\csname jdg@senMaxAll\endcsname{+0.0109}
+\expandafter\def\csname jdg@senMaxAllPct\endcsname{20\%}
+\expandafter\def\csname jdg@senMaxOne\endcsname{+0.0018}
+\expandafter\def\csname jdg@senNcov\endcsname{8}
+\expandafter\def\csname jdg@senNdeg\endcsname{3}
+\expandafter\def\csname jdg@senNrand\endcsname{20{,}000}
 \expandafter\def\csname jdg@skNeural\endcsname{+0.20692}
 \expandafter\def\csname jdg@skNeuralP\endcsname{0.002}
 \expandafter\def\csname jdg@skNeuralWt\endcsname{+0.24929}
