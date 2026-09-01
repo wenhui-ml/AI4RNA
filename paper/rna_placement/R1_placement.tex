@@ -130,16 +130,30 @@ and a calibration in which neither recovers a known truth}
 
 \begin{abstract}
 \noindent
-On a corpus written by design programs, a benchmark number is carried by a covariate somebody
-chose, and the work is to price each choice. Pricing wants a \emph{share}. This paper gives the
-condition under which a share is estimable at all, and a calibration showing that here it is not,
-so channels must be priced one at a time and never added up.
+When a benchmark's items were written by the systems it ranks, a number on it can be carried by a
+covariate the generators chose. Re-splitting cannot remove such a covariate, because it is a
+property of the item and follows the item into whichever split it lands in. This paper measures one
+such covariate end to end on a deployed benchmark of designed RNA, from the molecules to the
+leaderboard, using \jdg{dN} controlled interventions with a readout that calls no folding model.
 
-Pre-registration protects against choosing a statistic after seeing the data. It does not protect
-against choosing one that cannot be read. We report two such statistics, from one frozen pipeline
-of \jdg{dN} controlled interventions.
+\emph{The property.} Matched on where the designer put the pair, a target G--C pair is recovered
+$\jdg{rescueAU}$ more often than an A--U pair ($p=\jdg{rescueAUP}$). The readout is a ratio of
+probing-profile distances, so we cut it rather than argue about it: recomputing every distance with
+the mutated bases and three nucleotides either side removed, leaving only positions whose base is
+identical across the wild type and all three mutants, retains \jdg{cxRet3} of the effect
+($p=\jdg{cxP3}$).
 
-The first is a mediated fraction, whose two estimators are treated as interchangeable. They are
+\emph{What explains it, and what does not.} The local nearest-neighbour free energy accounts for
+none of it (\jdg{eRet} retained against a placebo's \jdg{ePlaceboMean}$\pm$\jdg{ePlaceboSd}), on the
+neural half of the corpus as on the whole. Where the designer put the pair accounts for most of what
+a naive contrast misses.
+
+\emph{The consequence.} Holding that covariate fixed reorders the released leaderboard:
+\jdg{lbBMoved} of \jdg{lbBNMeth} methods move, by up to \jdg{lbBMaxMove} places, Kendall
+$\tau=\jdg{lbBTau}$ (\jdg{lbBTauCi}), where holding the target fixed alone moves none.
+
+\emph{Pricing the channels.} Pricing wants a \emph{share}, and a share is not always estimable.
+The mediated fraction has two estimators that are treated as interchangeable. They are
 not. They differ by exactly $\mathbb E[r(M)\mid A]-\mathbb E[r(M)\mid B]$, for $r$ the residual of
 the conditional mean after its linear projection, and they agree for every pair of exposure laws
 \emph{iff} that conditional mean is affine (Prop.~\ref{prop:routes}). The gap is bounded by
@@ -157,15 +171,14 @@ Every mediated fraction this pipeline produced is withdrawn, by named field in t
 artifacts. What replaces them needs no estimator at all: the same proof step, applied to the
 conditional mean rather than to its residual, bounds what a mediator can carry
 (Prop.~\ref{prop:carry}). On this corpus its crude form is vacuous, for exactly the reason the
-proposition predicts, and its tight form gives \jdg{cbTight}. At most about half of the effect can
-run through the free energy those design programs were optimising.
+proposition predicts, and its tight form gives \jdg{cbTight} at the point estimate, with a
+target-clustered interval of \jdg{cbCiLo} to \jdg{cbCiHi} that does not exclude a vacuous bound.
+About half of the effect, and no more at the point estimate, can run through the local free energy
+a nearest-neighbour model assigns the pair.
 
-The two channels we can price directly go opposite ways. The designers' placement carries the
-effect (\jdg{medMarginal} marginal against \jdg{medMatched} matched); the free energy carries none
-(\jdg{eMed}, \jdg{eMedCi}). Put at risk on \jdg{xdN} designed protein binders, a corpus sharing no
-machinery with this one, the bound holds there too, and the two corpora's overlap and route gap
-differ by comparable factors (\jdg{xdDtvRatio} and \jdg{xdGapRatio}). With two corpora that is
-consistent with the mechanism the proposition names and does not establish it.
+Put at risk on \jdg{xdN} designed protein binders, a corpus sharing no machinery with this one, the
+bound holds there too. It holds; we do not claim it governs the size of the gap it bounds, and
+\S\ref{sec:crossdomain} says why the two-corpus comparison cannot decide that.
 \end{abstract}
 
 % =====================================================================
@@ -233,9 +246,9 @@ matched A--U pair and $\jdg{rescueGU}$ above a matched G--U pair.
 
 That ordering, on its own, is not news: it is what nearest-neighbour thermodynamics predicts. A
 terminal A--U carries a penalty a terminal G--C does not \citep{freier1986improved,
-xia1998thermodynamic,turner2010nndb}, G--C stacks are the stronger ones, and every program that
-produced these sequences was optimising a function built from exactly those terms. A measurement
-that merely recovers the ordering has measured the model. So the central experiment of this paper
+xia1998thermodynamic,turner2010nndb}, G--C stacks are the stronger ones, and a folding model
+scores the two pair types differently for exactly those reasons. A measurement that merely recovers
+the ordering has measured the model. So the central experiment of this paper
 is aimed at the model rather than at the ordering. For each target pair we take the quantity the
 nearest-neighbour model itself assigns to it (its inner stack, its outer stack and the terminal
 penalty on whichever side is a helix end, read from ViennaRNA's parameter tables rather than
@@ -285,8 +298,9 @@ and position rather than identity. This is non-collapsibility with an observed m
 cautionary: the marginal contrast is attenuated by $\jdg{medObs}$, and the product of two
 quantities estimated on disjoint arms predicts $\jdg{medPred}$ of that attenuation, $\jdg{medFrac}$
 of it. The two mediators make an instructive pair. The covariate the designers chose accounts for
-most of what a naive contrast misses; the energy function they were optimising accounts for none of
-what the contrast finds.
+most of what a naive contrast misses; the thermodynamic explanation accounts for none of what the
+contrast finds, on the neural half of the corpus and on the whole of it alike
+(\S\ref{sec:subsets}).
 
 Everything below was preregistered: each criterion, threshold and predicted sign was frozen in a
 committed declaration before the code that would test it existed \citep{simmons2011falsepositive,
@@ -335,11 +349,20 @@ and section pointers only.}
   (\S\ref{sec:pairtype}): matched within design on helix depth and crossing, a G--C target pair is
   rescued $\jdg{rescueAU}$ above a matched A--U pair and $\jdg{rescueGU}$ above a matched G--U
   pair, on a readout that is neither a design score nor degeneracy-sensitive, and positive in
-  $\jdg{sNPos}$ of $\jdg{sNMeth}$ design methods.
+  $\jdg{sNPos}$ of $\jdg{sNMeth}$ design methods. It is not the probing chemistry
+  (\S\ref{sec:chem}): recomputing the readout with the mutated bases and three nucleotides either
+  side deleted, so that every position entering it carries the same base in the wild type and in
+  all three mutants, retains \jdg{cxRet3} of the effect ($p=\jdg{cxP3}$).
 \item \textbf{Placement is the mediator, and it is a decomposition rather than a caveat}
   (\S\ref{sec:mediation}, \S\ref{sec:quant}): the attenuation of the marginal contrast is
   $\jdg{medObs}$ and the product of two independently estimated quantities predicts $\jdg{medPred}$
-  of it, \textbf{$\jdg{medFrac}$}.
+  of it, \textbf{$\jdg{medFrac}$}, which is a linear share of that attenuation and not an estimated
+  mediated fraction.
+\item \textbf{Holding the covariate fixed reorders the released leaderboard}
+  (\S\ref{sec:leaderboard}): \jdg{lbBMoved} of \jdg{lbBNMeth} methods move by up to
+  \jdg{lbBMaxMove} places (Kendall $\tau=\jdg{lbBTau}$, \jdg{lbBTauCi}) where holding the target
+  fixed alone moves none. A re-split cannot recover the released ordering, because the covariate
+  travels with the molecule.
 \item \textbf{The property is worth $\jdg{cEffLo}$ to $\jdg{cEffHi}$ points on the design score}
   (\S\ref{sec:score}), in matched pairs of real molecules, with three cuts against a
   probing-chemistry explanation.
@@ -544,8 +567,15 @@ rather than transcribed.
 \end{definition}
 
 \noindent Three properties of \eqref{eq:dg} matter for what \S\ref{sec:energy} does with it. It is
-\emph{the model's own accounting}: every program that produced these sequences optimises a function
-assembled from these terms, so conditioning on it conditions on what the design loop was told.
+\emph{the model's own accounting}: it is the quantity a nearest-neighbour folding model charges for
+the pair, and it is the first explanation the field would reach for if asked why one pair type
+forms more reliably than another. It is \emph{not} the objective the corpus was designed against,
+and we state that plainly because an earlier draft of this paper said it was. Of the
+\jdg{gNMethods} programs here, \jdg{subNThermoMeth} consume a thermodynamic objective at all
+(\jdg{subThermoMeth}) and \jdg{subNNeuralMeth} are neural (\jdg{subNeuralMeth}), which optimise a
+learned function of structure and never touch a stacking table.
+\S\ref{sec:energy} therefore tests a thermodynamic explanation, not a designer's loss, and
+\S\ref{sec:subsets} runs it separately on the two halves.
 It is \emph{local}: coaxial stacking, dangling ends and tertiary contacts are outside it, which
 bounds the conclusion to the local term and not to thermodynamics
 \citep{walter1994coaxial,serra1995predicting}. And it is \emph{undefined at a non-canonical
@@ -843,8 +873,13 @@ in the declaration's own wording including where the prediction failed
 mutagenesis arm covering \jdg{ccPuzzlesR} targets and \jdg{gNMethods} design methods, and a
 design-score arm covering \jdg{c5N} populations across three context sizes. The compensatory arm's
 \jdg{nPairsTotal} pairs sit in \jdg{ccCellsR} (target,\,method) design cells over the
-\jdg{ccPuzzlesR} targets that every interval below resamples. The analysable pair set is $\jdg{nPairsTotal}$ target
-pairs: $\jdg{nCG}$ G--C, $\jdg{nAU}$ A--U and $\jdg{nGU}$ G--U. Ensemble quantities used only as
+\jdg{ccPuzzlesR} targets that every interval below resamples. Three counts appear in this paper and
+they are nested, so we give all three here once: \jdg{ncRaw} records pass the release's own
+signal-to-noise filter and name a pair that is in the target structure; \jdg{nPairsTotal} of those
+have a canonical pair at that position, $\jdg{nCG}$ G--C, $\jdg{nAU}$ A--U and $\jdg{nGU}$ G--U,
+and the remaining \jdg{ncNonCanon} name a non-canonical partner and are not a pair type; and
+\jdg{ncCGAU} is the G--C-against-A--U subset, which is what the two-arm analyses of
+\S\ref{sec:carry} and \S\ref{sec:crossdomain} are computed on. Ensemble quantities used only as
 balancing covariates in \S\ref{sec:score} are computed with ViennaRNA \citep{lorenz2011vienna},
 which is also the source of the per-pair nearest-neighbour energies of Definition~\ref{def:dg};
 those enter as a \emph{mediator} in \S\ref{sec:energy}, never as an outcome.
@@ -924,11 +959,15 @@ replication; it is the only such interval and it is marked where it appears.
 \section{Results}
 \label{sec:results}
 
-\paragraph{Order of the arms.} \S\ref{sec:frame} fixes the scale a point is read on.
-\S\ref{sec:pairtype} estimates the effect. \S\ref{sec:energy} puts the folding model's own energy
-to it and \S\ref{sec:mediation} puts the designers' placement to it; the two mediators are the heart of
-the paper and they answer differently. \S\ref{sec:score} asks what the property is worth on the
-benchmark's own currency and \S\ref{sec:gradient} asks whose rule the placement is.
+\paragraph{Order of the arms.} \S\ref{sec:frame} fixes the two scales a point is read on, the
+design score's and the rescue factor's. \S\ref{sec:pairtype} estimates the effect and
+\S\ref{sec:chem} tests whether the readout that produced it is measuring the probing chemistry
+instead. \S\ref{sec:energy} puts the folding model's own energy to the effect,
+\S\ref{sec:subsets} checks that answer on the halves of the corpus that do and do not consume a
+thermodynamic objective, and \S\ref{sec:mediation} puts the designers' placement to it; the two
+mediators are the heart of the paper and they answer differently. \S\ref{sec:score} asks what the
+property is worth on the benchmark's own currency, \S\ref{sec:gradient} asks whose rule the
+placement is, and \S\ref{sec:leaderboard} asks whether holding it fixed moves the ranking.
 
 \subsection{The measurement frame: what a point is worth}
 \label{sec:frame}
@@ -963,6 +1002,28 @@ before this measurement, $\jdg{ceilDeclared}$, falls between the two routes' SDs
 outside them. \emph{A design-score point is therefore worth $1/\jdg{ceilWithinSd}$ of a within-cell SD, and $\jdg{ceilB}$ of that SD is reproducible signal}, which is the scale against which \S\ref{sec:score}'s effect should be read.
 Both routes, per population and with their intervals, are in Appendix~\ref{app:ceiling}.
 
+
+\paragraph{And what a rescue point is worth, which is a different question.} The ceiling above is
+the design score's. Every causal claim in this paper is about the rescue factor instead, and that
+quantity's own reliability is computable from the same release, which supplies a per-nucleotide
+error beside every reactivity. Propagating those errors through Definition~\ref{def:rf} by
+parametric bootstrap (\jdg{rlDraws} draws per record, each of the four profiles perturbed by its own
+reported error) gives a median measurement SD of $\jdg{rlSd}$ per pair, quartiles $\jdg{rlSdQ1}$ and
+$\jdg{rlSdQ3}$. The between-pair SD of $R$ is $\jdg{rlBetween}$, so \jdg{rlSignal} of the observed
+variance is not measurement noise. \emph{The matched identity contrast of \S\ref{sec:pairtype} is
+\jdg{rlInMeas} times one pair's measurement SD and \jdg{rlInBetween} of the between-pair SD}, and
+those are the two scales it should be read on.
+
+Two further properties of the outcome, both of which a ratio invites a reader to worry about. The
+denominator is not near zero anywhere: its first percentile is $\jdg{rlQlo}$ and its ninety-fifth
+$\jdg{rlQhi}$, and dropping the smallest decile outright leaves the contrast at \jdg{rlDropRet}
+of its value ($\jdg{rlDropEff}$, $p=\jdg{rlDropP}$, interval $\jdg{rlDropCi}$). And the contrast
+does not rest on a few targets: over \jdg{rlSplits} random halves of the target set, both halves
+return a positive contrast \jdg{rlBothPos} of the time, with a half-sample SD of $\jdg{rlHalfSd}$.
+We report the both-positive rate rather than a split-half correlation because complementary halves
+of a fixed pooled contrast are anti-correlated by arithmetic and the correlation would measure that
+rather than the outcome.
+
 \subsection{Pair identity decides whether the pair forms}
 \label{sec:pairtype}
 
@@ -989,14 +1050,92 @@ $\mathcal{S}_0$, and the gap between the two is what \S\ref{sec:quant} decompose
 \label{fig:rescue}
 \end{figure}
 
-\subsection{The energy the designs were optimised for}
+
+\subsection{The readout is not the probing chemistry, and the test is a cut rather than an argument}
+\label{sec:chem}
+
+The rescue factor is a ratio of profile distances, and a reader is entitled to ask whether its
+contrast is about pair formation at all. Write the ratio out. The denominator
+$\sqrt{\rho_i^2+\rho_j^2}$ is built from the two single mutants, which change the base at one
+position each; the numerator $\rho_{ij}$ is built from the compensatory double mutant, which
+replaces the pair by its complement and therefore leaves the multiset of bases at the two positions
+exactly as it was. So the whole of any base-composition effect on $R$ sits in the denominator, and
+it does sit there. Matched, the denominator is $\jdg{dnD}$ larger for G--C pairs than for A--U ones
+($\jdg{dnDCi}$) while the numerator is $\jdg{dnNum}$ larger ($\jdg{dnNumCi}$), and a first-order
+decomposition of the rescue contrast attributes $\jdg{dnFromDen}$ to the denominator against
+$\jdg{dnFromNum}$ to the numerator: \jdg{dnDenShare} of the movement is denominator, and the
+numerator pushes the other way.
+
+That is a fact about the readout and it is not by itself a verdict, because the denominator is
+\emph{how much breaking the pair disturbs the molecule}, which is downstream of whether the pair was
+there. Conditioning on it would remove the signal along with the artifact, which is why we do not
+adjudicate that way.
+
+\paragraph{The cut.} A composition effect has an address: the two positions whose base changed. A
+structural effect does not, because a pair that forms holds a helix together and losing it moves the
+profile elsewhere. So recompute all three distances with those two positions, and a neighbourhood
+around them, \emph{excluded}, and sweep the radius rather than choosing one. At radius $1$ and
+beyond, every position entering any of the three distances carries the same base in the wild type,
+in both single mutants and in the double: the mutations are only at $i$ and $j$. A composition
+artifact has nowhere to act.
+
+\begin{table}[!htbp]
+\centering\small
+\caption{\textbf{The identity contrast with the mutated positions cut out.} Distances recomputed
+from the released per-nucleotide reactivities on the surviving positions only. Retention is against
+this recomputation's own no-exclusion baseline (\jdg{cxBase}), not against the released column
+(\jdg{cxReleased}), so the cut is compared with itself. Intervals are the percentile cluster
+bootstrap on \jdg{ccPuzzlesR} targets, which \S\ref{sec:limits}(vi) notes is wide; the permutation
+$p$ is the registered test.}
+\label{tab:chem}
+\begin{tabular}{@{}lrrlrr@{}}
+\toprule
+positions removed & sites used & contrast & 95\% CI & $p$ & retained \\
+\midrule
+none & all probed & \jdg{cxBase} & --- & --- & baseline \\
+the two mutated bases & \jdg{cxSites0} & \jdg{cxE0} & \jdg{cxCi0} & \jdg{cxP0} & \jdg{cxRet0} \\
+those $\pm1$ & \jdg{cxSites1} & \jdg{cxE1} & \jdg{cxCi1} & \jdg{cxP1} & \jdg{cxRet1} \\
+those $\pm2$ & \jdg{cxSites2} & \jdg{cxE2} & \jdg{cxCi2} & \jdg{cxP2} & \jdg{cxRet2} \\
+those $\pm3$ & \jdg{cxSites3} & \jdg{cxE3} & \jdg{cxCi3} & \jdg{cxP3} & \jdg{cxRet3} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{claimbox}
+\textbf{The contrast is not the mutated bases' own chemistry.} Deleting both mutated positions
+retains \jdg{cxRet0} of the effect ($\jdg{cxE0}$, $p=\jdg{cxP0}$); deleting them with three
+nucleotides on either side, so that nothing within four nucleotides of a changed base enters any
+distance, still retains \jdg{cxRet3} ($\jdg{cxE3}$, $p=\jdg{cxP3}$).
+\end{claimbox}
+
+\paragraph{What the cut does not show, stated because the complement was also run.} Restricted to
+the small neighbourhood alone ($\pm2$, \jdg{cxOnlyN} records) the contrast is $\jdg{cxOnlyE}$,
+\jdg{cxOnlyShare} of the baseline. That is not evidence for the chemistry account and we do not
+read it as evidence against it either: the structural disturbance from losing a pair is also
+largest next to the pair, so the two hypotheses make the same prediction there. The neighbourhood
+does not separate them; the complement of the neighbourhood does, and that is the arm above.
+
+\paragraph{A diagnostic this paper owed its reader.} M16's frozen declaration required the
+single-mutant distance to be reported by pair type, ungated, precisely against this objection, and
+no version of this manuscript printed it. It is $\jdg{dgmCg}$ for G--C ($n=\jdg{dgmNCg}$),
+$\jdg{dgmAu}$ for A--U ($n=\jdg{dgmNAu}$) and $\jdg{dgmGu}$ for G--U ($n=\jdg{dgmNGu}$). Two
+corrections come with it. That run indexed single mutants from one side of the pair only, so its
+published values ($\jdg{dgmOldCg}$, $\jdg{dgmOldAu}$, $\jdg{dgmOldGu}$) rested on half the data;
+they are close, and the direction is unchanged. And the declaration read a larger G--C denominator
+as making the arm conservative, which is the wrong sign: $R=1-\rho_{ij}/D$ rises with $D$, so a
+larger denominator inflates the G--C rescue factor rather than deflating it. The arm is
+anti-conservative in that respect, which is why the cut above is the answer and the diagnostic
+alone is not.
+
+\subsection{The thermodynamic explanation, and what it accounts for}
 \label{sec:energy}
 
 The ordering in \S\ref{sec:pairtype} is the one nearest-neighbour thermodynamics predicts. This
 subsection asks whether it \emph{is} that prediction. The mediator is
-Definition~\ref{def:dg}: the free energy the model itself assigns to the individual pair. Every
-program in the corpus optimises a sum of such terms, so holding this quantity fixed holds fixed
-what the design loop was told about the pair.
+Definition~\ref{def:dg}: the free energy the model itself assigns to the individual pair. Holding
+it fixed holds fixed the standard local-stability account of why one pair type should form more
+reliably than another. It does not hold fixed a design objective: most of these programs do not
+have one of this form (\S\ref{sec:subsets}).
 
 \paragraph{Stratification, and the overlap it needs.} $\Delta G_{\mathrm{loc}}$ is cut at fixed
 quantiles of the pooled distribution ($\jdg{eNBins}$ bins, edges fixed once, before any contrast) and the bin index joins $(\text{design},\text{depth},\text{crossed})$ in the stratum. Because
@@ -1106,9 +1245,17 @@ Product of coefficients through the energy gives $\beta_{\Delta G}=\jdg{eBeta}$ 
 against a within-stratum gap of $\jdg{eGap}$\,kcal/mol, hence $\jdg{eLinearMed}$ mediated: $\jdg{eLinearGapPts}$ percentage points from the stratified estimate. Proposition~\ref{prop:routes}
 locates the disagreement in $h$, and $h$ is measurable here. Across bins running from
 $\jdg{eBinwiseDg}$\,kcal/mol, the within-stratum centred mean of rescue is $\jdg{eBinwise}$: it
-rises and then falls, so $h$ is not affine, $r$ is not constant, and the product route is
-inadmissible. We report both and use the stratified one. A mediation analysis run without this
-check would have concluded that the model's energy explains most of the effect.
+rises and then falls, so $h$ is not affine and $r$ is not constant.
+
+Being careful about what that licenses: the \emph{iff} of Prop.~\ref{prop:routes} quantifies over
+exposure laws, so non-affinity says the two routes must disagree for \emph{some} pair of laws, not
+that they disagree for the pair this corpus realises. For a fixed pair, affinity is sufficient and
+not necessary. The reason to prefer the stratified route here is therefore not the failed
+affinity test but the measured gap: on the pair of laws that is actually in front of us the two
+routes differ by \jdg{eLinearGapPts} points and disagree in sign, and \eqref{eq:routes} says
+exactly what that difference is a contrast of. We report both and use the stratified one. A
+mediation analysis run without this check would have concluded that the local free energy explains
+most of the effect.
 
 \paragraph{Not an artifact of which designs a program can build.} The compensatory arm holds, for
 each (target, method) cell, the design that scored best, so the corpus is pre-filtered by the
@@ -1141,6 +1288,24 @@ description and no claim rests on it.
 % mutants, and the four-parameter-set panel that followed it, are not in this paper. They
 % belong to the companion instrument paper, which owns the scoring step. What is left here is
 % the estimator question, which is what this paper is about.
+
+
+\subsection{The null does not depend on which half of the corpus consumes a thermodynamic objective}
+\label{sec:subsets}
+
+Definition~\ref{def:dg} is a nearest-neighbour quantity and \jdg{subNNeuralMeth} of the
+\jdg{gNMethods} programs here are neural. If the null of \S\ref{sec:energy} were an artifact of
+pooling programs that do and do not reason about stacking energies, splitting the corpus would show
+it. It does not. Re-running the same estimator, with its own bin edges and its own
+same-population denominator, on the \jdg{subNNeuralMeth} neural methods
+(\jdg{subNeuralMeth}; $n=\jdg{subNNeural}$) retains \jdg{subNeural}, the same value as the whole
+corpus (\jdg{subAll}) and inside the placebo band $\jdg{ePlaceboLo}$--$\jdg{ePlaceboHi}$. On the
+\jdg{subNThermoMeth} methods that do consume a thermodynamic objective (\jdg{subThermoMeth};
+$n=\jdg{subNThermo}$) it retains \jdg{subThermo}, which is outside that band on the side of
+\emph{more} retention: conditioning removed even less than nothing there. The band was
+calibrated on the full corpus and this subset is a quarter of it, so we read the excursion as noise
+about a null rather than as a reversal of one, and we report the number rather than widening the
+band to fit it.
 
 \subsection{What the channel can carry, without an estimator}
 \label{sec:carry}
@@ -1256,7 +1421,7 @@ $f\in[0,\jdg{calSpanTop}]$ the truth moves $\jdg{calSpanTrue}$ while the measure
 $\jdg{calNSpan}$ for the first mediator and $\jdg{calVSpan}$ for the second: $\jdg{calNSpanFrac}$
 and $\jdg{calVSpanFrac}$ of the range it is supposed to cover. Mean absolute error is
 $\jdg{calNMae}$ and $\jdg{calVMae}$. At $f=0$ it returns $\jdg{calNZero}$ and $\jdg{calVZero}$ and
-at $f=100\%$ it returns $\jdg{calNFull}$ and $\jdg{calVFull}$, so it is not biased by a constant:
+at $f=1$, total mediation, it returns $\jdg{calNFull}$ and $\jdg{calVFull}$, so it is not biased by a constant:
 it is uninformative about $f$ over the whole range. \textbf{Every retention figure and mediated
 fraction this pipeline produced is withdrawn}, by named field in the released run artifacts
 (\S\ref{sec:cal}).
@@ -1266,7 +1431,7 @@ fraction this pipeline produced is withdrawn}, by named field in the released ru
 calibration sweep is the correlation between truth and measurement, and we report it, but it
 cannot carry the claim and we say so rather than quoting whichever arm is convenient. The two
 mediators give $\jdg{calNCorr}$ and $\jdg{calVCorr}$: the first has the wrong sign, the second the
-right one. Both are artefacts of a single sweep point. Dropping $f=100\%$ (the one place where
+right one. Both are artefacts of a single sweep point. Dropping $f=1$ (the one place where
 the estimator degenerates, returning $\jdg{calVFull}$) moves them to $\jdg{calNLoo}$ and
 $\jdg{calVLoo}$, so the second changes sign; across all six leave-one-out fits the first ranges
 over $[\jdg{calNLooLo},\,\jdg{calNLooHi}]$ and the second over
@@ -1281,7 +1446,7 @@ extra stratifying dimension produces, but a placebo has no relation to the outco
 calibrate the bias that arises precisely \emph{because} the mediator does predict the outcome.
 Having a placebo is not having a calibration. Second, the real mediator separates the arms by
 $\jdg{posSepReal}$ pooled standard deviations, so there was never much for the conditioning to
-remove, and a retention near $100\%$ was close to being forced by the design rather than found in
+remove, and a retention near total was close to being forced by the design rather than found in
 the data.
 
 \paragraph{The published guidance would not have stopped us.} The instability of ratio-form
@@ -1374,23 +1539,33 @@ RNA designs     & \jdg{xdRN} & \jdg{xdRDtv} & \jdg{xdROsc} & \jdg{xdRRhs} & \jdg
 \end{center}
 
 \begin{claimbox}
-\textbf{The bound holds on both, and the two ratios agree.} The two corpora differ in overlap by
-a factor of \jdg{xdDtvRatio} and in route gap by a factor of \jdg{xdGapRatio}.
-Proposition~\ref{prop:routes} bounds the second by the first, and across two domains sharing no
-measurement, no model and no units the ratio it bounds and the ratio it is bounded by agree to
-within the second decimal.
+\textbf{The bound holds on both corpora. It does not govern the size of the gap, and an earlier
+version of this paper said it did.} The result that transfers is the bound itself: across two
+domains sharing no measurement, no model and no units, the estimated right-hand side of
+\eqref{eq:routebound} exceeds the observed route gap on each.
+\end{claimbox}
 
-\emph{Two corpora are two points, and we do not read them as a characterisation.} A synthetic
+\paragraph{Why the ratios were the wrong thing to read, written out.} The two corpora differ in
+overlap by a factor of \jdg{xdDtvRatio} and in route gap by \jdg{xdGapRatio}, and those two numbers
+do agree. But $d_{\mathrm{TV}}$ is one of the bound's \emph{two} factors and the other moves the
+opposite way: $\mathrm{osc}(r)$ is \jdg{xdOscRatio} times larger on the binder corpus than on the
+RNA one, so the bound itself differs by only \jdg{xdBoundRatio}. If the bound governed the gap, the
+gap would scale like \jdg{xdBoundRatio} and not like \jdg{xdGapRatio}. The quantity that records
+the discrepancy is the tightness $|\mathrm{gap}|/\mathrm{bound}$, which moves from \jdg{xdTightB} to
+\jdg{xdTightR}, a factor of \jdg{xdTightRatio}, and we reported that number in this section
+before while reading the agreement of the other two as support. It is not support. Two points
+cannot separate a bound that governs from a bound that merely holds, and the one factor that
+happened to track was chosen after the fact.
+
+\emph{The sweep that was supposed to make this a curve did not reach far enough.} A synthetic
 sweep was run to make the relation a curve: the arms are resampled toward and away from the pooled
 law on the mediator, over \jdg{swRungs} rungs, with everything else left real. It reached
 $d_{\mathrm{TV}}$ from \jdg{swDtvLo} to \jdg{swDtvHi} and no lower, because reweighting within
 a design cell cannot remove the arms' differing composition \emph{across} cells, and over that
 restricted range the two sides move together only at Spearman \jdg{swRho}. \textbf{The sweep
 therefore does not establish that the bound tracks overlap; it establishes that this corpus cannot
-be pushed into the low-overlap regime where the question would be answered.} The agreement of the
-two ratios above is reported as consistent with the mechanism the proposition names, and as
-nothing stronger.
-\end{claimbox}
+be pushed into the low-overlap regime where the question would be answered.} What the arm delivers
+is a bound that holds out of domain, and no claim about what sets its size.
 
 \paragraph{The one thing this comparison had to survive.} $\mathrm{osc}(r)$ is a supremum over the
 support, and estimating it from binned means shrinks it, which shrinks the bound's right-hand
@@ -1431,7 +1606,9 @@ $\jdg{medGap}$ depth units shallower than A--U pairs.
 \begin{table}[!htbp]
 \centering\small
 \caption{The decomposition of Prop.~\ref{prop:med}, on the $\jdg{medNmarg}$ marginal and
-$\jdg{medNmatched}$ matched pair-weights of the G--C against A--U contrast.}
+$\jdg{medNmatched}$ matched pair-weights of the G--C against A--U contrast. The last row is the
+fraction of the attenuation a linear depth term reproduces, not an estimated mediated share;
+\S\ref{sec:quant} draws the distinction and measures the remainder.}
 \label{tab:med}
 \begin{tabular}{@{}llr@{}}
 \toprule
@@ -1605,25 +1782,86 @@ mechanism makes about natural RNA, that the placement structure should be weaker
 no designer chose: is stated in \S\ref{sec:limits} as the test we did not run.
 
 % =====================================================================
+
+\subsection{Holding the covariate fixed reorders the benchmark}
+\label{sec:leaderboard}
+
+Everything above is a statement about molecules. The reason to care is that the same corpus is a
+leaderboard, and the question a leaderboard raises is whether the ranking survives holding the
+covariate fixed. It is worth being exact about which covariate can be held fixed where. The
+compensatory arm carries helix depth and no released benchmark score; the design-score corpus
+carries the released score and no pairing map, so what can be held fixed there is
+\S\ref{sec:score}'s own exposure, the G--C fraction of the target's paired positions. We run the
+comparison once on each, with the outcome each corpus actually releases, and neither is a
+reweighting of the other.
+
+The estimator is the plainest one available: subtract each stratum's mean over all methods and
+average what is left, so a method is compared only with the methods it shares a stratum with. The
+strata are the target, and then the target crossed with the covariate.
+
+\begin{claimbox}
+\textbf{On the released benchmark score, holding the target fixed changes nothing and holding the
+covariate fixed changes the ranking.} Across \jdg{lbBN} designs and \jdg{lbBNMeth} methods,
+adjusting for target alone returns Kendall $\tau=\jdg{lbBTauTarget}$ against the released order:
+\jdg{lbBMovedTarget} methods move. Adding the G--C fraction of paired positions gives
+$\tau=\jdg{lbBTau}$ (\jdg{lbStrata} strata, target-clustered bootstrap \jdg{lbBTauCi}),
+\jdg{lbBMoved} of \jdg{lbBNMeth} methods move, and the largest movement is \jdg{lbBMaxMove} places:
+the top-ranked method \jdg{lbBTop} falls to \jdg{lbBTopNew}, and \jdg{lbBNewTop}, released
+\jdg{lbBNewTopOld}rd, takes first place.
+\end{claimbox}
+
+On the compensatory arm the same procedure is much weaker, and we say so rather than reporting the
+stronger arm alone. Adjusting for target alone already moves \jdg{lbMovedTarget} of
+\jdg{lbNMeth} methods ($\tau=\jdg{lbTauTarget}$); adding depth and crossing gives
+$\tau=\jdg{lbTau}$ (bootstrap \jdg{lbTauCi}, which touches $1$), with \jdg{lbMoved} methods moving
+by at most \jdg{lbMaxMove} place. A pair-level readout has less to say about a method-level ranking
+than a design-level score does, which is what one would expect.
+
+\paragraph{What this is and is not.} It is a sensitivity statement: the released ordering is not
+invariant to a covariate the designers chose, and the size of that sensitivity is measurable from
+the corpus. It is not a claim that the reweighted ordering is the correct one. Which ordering a
+benchmark should report depends on what it means to ask, and that question is not settled by
+anything here; what is settled is that the two orderings differ, so the choice is not free.
+Nothing about a \emph{split} addresses it, for the reason in \S\ref{sec:intro}: the covariate is a
+property of the molecule and follows it into whichever split it is placed in.
+
+
 \section{Analysis}
 \label{sec:analysis}
 
-\subsection{Quantitative: the decomposition puts placement at $\jdg{medFrac}$}
+\subsection{Quantitative: what the $\jdg{medFrac}$ is, and what it is not}
 \label{sec:quant}
 
 Substituting \S\ref{sec:mediation}'s two estimates into \eqref{eq:med} gives a predicted
-attenuation of $\jdg{medPred}$ against an observed $\jdg{medObs}$ (Table~\ref{tab:med}), so
-placement accounts for $\jdg{medFrac}$ and $\varepsilon$ carries the rest. That figure is one of
-the two staked predictions this paper lost: $\jdg{medFrac}$ against a declared $40$--$60\%$,
-graded \textbf{failed} in Appendix~\ref{app:prereg} and reported here at the value it took rather
-than at the value we expected. It is a product-route reading like the two in
-\S\ref{sec:energy}, and the same caution applies to it (\S\ref{sec:carry}): we write
-\emph{accounts for} rather than \emph{at most}, because the direction of a projection's error is
-not fixed by anything we have shown.
-\textbf{At most}, and not exactly: \eqref{eq:med} is the product route, which
-Proposition~\ref{prop:routes} licenses as an equality only where the conditional mean is affine,
-and \S\ref{sec:cal} is the reason we no longer report the conditioning route beside it as though
-the two were estimates of one thing. The residual has a
+attenuation of $\jdg{medPred}$ against an observed $\jdg{medObs}$ (Table~\ref{tab:med}), a ratio of
+$\jdg{medFrac}$. That figure is one of the two staked predictions this paper lost: $\jdg{medFrac}$
+against a declared $40$--$60\%$, graded \textbf{failed} in Appendix~\ref{app:prereg} and reported
+here at the value it took rather than at the value we expected.
+
+\paragraph{It is not a mediated fraction, and calling it one was the source of a real
+contradiction.} \S\ref{sec:cal} withdraws every mediated fraction this pipeline produced, and a
+reader is right to ask why a headline percentage survives that. The answer is that this ratio is a
+different object and the manuscript previously obscured it. The denominator $\jdg{medObs}$ is the
+attenuation, which is the difference between the contrast without depth in the stratification and
+the contrast with it; under \eqref{eq:nointeract} that difference \emph{is} the part carried by
+depth, by construction rather than by estimation. What $\jdg{medFrac}$ measures is how much of that
+attenuation a \emph{linear} depth term reproduces. It is a linearity diagnostic on a channel whose
+size is not in question, not an estimate of a share whose size is.
+
+\paragraph{Proposition~\ref{prop:routes} names its complement exactly, and we computed it rather
+than subtracting it.} On the depth channel, $\beta=\jdg{p3Beta}$ per depth unit and
+$g=\jdg{p3G}$ depth units, so $\beta g=\jdg{p3BetaG}$ against an attenuation of $\jdg{p3Att}$:
+\jdg{p3Share} linear. \eqref{eq:routes} says the remainder is
+$\mathbb E[r(M)\mid A]-\mathbb E[r(M)\mid B]$, and evaluating that sum over the depth levels
+directly gives $\jdg{p3Direct}$ where subtracting gives $\jdg{p3Sub}$. Under \eqref{eq:nointeract}
+those two are the same number. \textbf{They differ by $\jdg{p3Gap}$, which is \jdg{p3GapPct} of the
+attenuation, and that difference is a measurement of how far \eqref{eq:nointeract} is from holding
+on this channel.} It holds tightly on $\Delta G_{\mathrm{loc}}$ (\S\ref{sec:routes}, ratio
+\jdg{a7Ratio}) and only loosely on depth, so the decomposition of \eqref{eq:med} is an
+approximation on the depth channel and $\jdg{medFrac}$ inherits that. We report the gap rather
+than the fraction alone for that reason.
+
+The residual has a
 visible sign: every method in Fig.~\ref{fig:mediation} lies below the diagonal, so the attenuation
 exceeds what a linear depth term predicts, consistently rather than randomly. That is what a
 mediator measured with error, or a second mediator correlated with depth, would produce; we do not
@@ -1641,15 +1879,18 @@ its own effects.
 Two mediators were put to the same effect and they answered differently. It is worth being precise
 about what each answer licenses.
 
-\paragraph{The energy the designs were optimised for accounts for none of it.} Conditioning on
+\paragraph{The thermodynamic explanation accounts for none of it.} Conditioning on
 $\Delta G_{\mathrm{loc}}$ leaves the identity contrast at $\jdg{eRet}$ of its same-population
-baseline, indistinguishable from a placebo mediator's $\jdg{ePlaceboMean}\pm\jdg{ePlaceboSd}$. Taken alone, the scope of that statement would be set by Definition~\ref{def:dg}:
+baseline, indistinguishable from a placebo mediator's $\jdg{ePlaceboMean}\pm\jdg{ePlaceboSd}$. The
+scope of that statement is set by Definition~\ref{def:dg}:
 $\Delta G_{\mathrm{loc}}$ is the \emph{local} nearest-neighbour term, two stacks and a terminal
 penalty, while coaxial stacking, dangling ends and tertiary contacts sit outside it
-\citep{walter1994coaxial,serra1995predicting}. What makes even that narrow statement worth making
-is that the narrow term is the one the design programs consume: a sum over exactly these stacks and
-penalties is the objective, so a property of formation orthogonal to it is a property the design
-loop cannot be optimising towards.
+\citep{walter1994coaxial,serra1995predicting}. What makes the narrow statement worth making is that
+the narrow term is the one the standard account of pair stability is built from, so a property of
+formation orthogonal to it is not the property that account describes. It is \emph{not} that the
+narrow term is the corpus's design objective: \jdg{subNNeuralMeth} of these \jdg{gNMethods}
+programs are neural and optimise no such thing, and \S\ref{sec:subsets} shows the null holds on
+that half by itself.
 
 What replaces the retention reading is a comparison of two bounds, and it needs no mediation
 estimator at all. Between the two pair types the local nearest-neighbour energy differs by
@@ -1757,6 +1998,14 @@ present in this release.
 performed at the bench, and that is what licenses a formation claim about an individual pair.
 We did not choose which pairs were mutated, and the exposure whose effect we estimate, the identity
 of the target pair, was assigned by a designer. \S\ref{sec:gradient} does not randomise methods.
+There is a further gap between the estimand and the potential-outcome template, and naming it is
+more useful than the phrase \emph{observational at the property}: changing a pair's identity changes
+the sequence, so the version of the exposure is not unique and consistency in the usual sense does
+not hold. The estimand this paper actually supports is a contrast between molecules that differ in
+that pair and are matched on the covariates named, not the effect of an intervention that sets a
+pair's identity while holding the molecule otherwise fixed. An interventional or separable-effects
+framework \citep{vanderweele2015explanation} is the right vocabulary for that estimand; we do not
+adopt its estimators here and do not claim their identification conditions.
 
 \paragraph{(iii) No sequence was synthesised to any rule proposed here.} The experiment that would
 close the loop is specific and we state it rather than gesture at it: build matched sequence pairs
@@ -1778,6 +2027,11 @@ channel, because \eqref{eq:nointeract} holds for $\Delta G_{\mathrm{loc}}$ and f
 $P_{\mathrm{model}}$ (\S\ref{sec:routes}). So the energy channel is bounded at \jdg{cbTight} and
 the ensemble-probability channel is bounded by nothing here; for the second, what survives is the
 direct contrast \jdg{dPm} (\jdg{dPmCi}) and the statement that it does not resolve from zero.
+The bound on the first channel is itself a plug-in estimate with sampling error, and we report it
+as one: resampling the \jdg{ccPuzzlesR} targets \jdg{cbCiBoot} times moves it over
+\jdg{cbCiLo}--\jdg{cbCiHi} with a median of \jdg{cbCiMed}, and \jdg{cbCiVac} of resamples put it
+above the level at which it says nothing. The point estimate puts the channel below half; the
+interval does not exclude a vacuous bound.
 
 \paragraph{(vi) Every interval rests on \jdg{ccPuzzlesR} clusters.} A percentile bootstrap on
 that few clusters is optimistic and no correction is applied (\S\ref{sec:preregprotocol}), so
@@ -1787,7 +2041,15 @@ say so where they are reported: the method component of \S\ref{sec:gradient}, wh
 clear the $0.005$ gate, and the G--U contrast, which clears its ladder rung by a factor of
 \jdg{rescueGUMargin} (\S\ref{sec:pairtype}).
 
-\paragraph{(vii) Prior art.} GC placement as a design heuristic predates this work
+\paragraph{(vii) No multiplicity correction.} Freezing every criterion before the code exists
+controls which analyses get run and reported; it does not control the family-wise error rate across
+the analyses that were run. This paper reports on the order of fifty contrasts, slopes and rank
+statistics, and applies no correction to any of them. The $0.005$ gate is a stricter threshold than
+convention and the headline arms clear it by margins reported beside them, but a reader assembling
+a family from these tables should apply their own correction; we have not applied one on their
+behalf.
+
+\paragraph{(viii) Prior art.} GC placement as a design heuristic predates this work
 \citep{lee2014eterna}; what is measured here is its effect on pair formation and on the
 measurement itself.
 
@@ -1797,10 +2059,11 @@ measurement itself.
 Whether a designed base pair forms depends on what the pair is, measurably
 and by intervention rather than by a predictor's opinion: matched on placement, a G--C target pair
 is recovered $\jdg{rescueAU}$ more than an A--U pair and $\jdg{rescueGU}$ more than a G--U pair.
-How much of that runs through the free energy the designs were optimised for is a question we can
-bound and cannot answer. The energy differs between the pair types by $\jdg{dDg}$\,kcal/mol
-($\jdg{dDgCi}$) and the model's ensemble probability by $\jdg{dPm}$ ($\jdg{dPmCi}$, covering
-zero), and at most \jdg{cbTight} of the effect can run through the first of those
+How much of that runs through the local free energy a nearest-neighbour model assigns the pair is a
+question we can bound and cannot answer. The energy differs between the pair types by
+$\jdg{dDg}$\,kcal/mol ($\jdg{dDgCi}$) and the model's ensemble probability by $\jdg{dPm}$
+($\jdg{dPmCi}$, covering zero), and \jdg{cbTight} of the effect can run through the first of those
+at the point estimate, \jdg{cbCiLo} to \jdg{cbCiHi} across resampled targets
 (Prop.~\ref{prop:carry}). This pipeline's own artifacts
 reported a mediated fraction instead, and that number is withdrawn: on this corpus, at these
 effect sizes, the estimator that produced it tracks a known truth at $\jdg{calNCorr}$. The
@@ -1812,8 +2075,10 @@ contrasts, it recurs on $\jdg{xrRounds}$ rounds with disjoint targets ($\jdg{xrS
 (round,\,method) cells, $p=\jdg{xrSignP}$), and the same property is worth $\jdg{cEffLo}$ to $\jdg{cEffHi}$ points on the
 benchmark's own score between two real molecules matched on everything else we could match. A
 designed corpus, then, understates a property of its molecules through a covariate its authors
-chose, at a rate it can be made to report, while the model those authors were optimising has
-nothing to say about the property at all.
+chose, at a rate it can be made to report, while the thermodynamic account that would otherwise
+explain the property has nothing to say about it. Holding that same covariate fixed reorders the
+benchmark's own leaderboard, \jdg{lbBMoved} of \jdg{lbBNMeth} methods and up to \jdg{lbBMaxMove}
+places (\S\ref{sec:leaderboard}).
 
 \paragraph{Code and data availability.} Every number in this manuscript is generated from a
 committed run artifact by a single script; no measured value is typed into the source, and a check
@@ -2074,7 +2339,7 @@ the circular shift never indexes a sequence & assertion & source-checked & held 
 \multicolumn{4}{@{}l@{}}{\emph{frozen before \S\ref{sec:rounds} existed}}\\
 treatment-side randomisation over-rejects & $>0.010$ & $\jdg{m23nT}$ & held \\
 $y$-permutation conservative when $y$ tracks the calipers & vs.\ bound &
-  ---  & \textbf{void} \\
+  --- & \textbf{void} \\
 all \jdg{xrRounds} rounds' pooled depth gaps negative & $<0$ & $\jdg{xrGapLo}$ \dots $\jdg{xrGapHi}$ & held \\
 at least two thirds of methods negative in every round & $\ge 2/3$ &
   $\jdg{xrSign}$ pooled & \textbf{failed on round 1} \\
@@ -2119,6 +2384,45 @@ the route gap tracks its bound across a separation sweep & $\rho\ge0.8$ & \jdg{s
 the readable span falls with separation & monotone & sweep & held \\
 the identity contrast keeps its sign in every mediator bin & same sign & \jdg{a7Bins} & held \\
 spread of the within-bin contrast against its mean & $<2$ & \jdg{a7Ratio} & held \\
+\midrule
+\multicolumn{4}{@{}p{0.97\linewidth}@{}}{\emph{frozen before the readout-and-consequence arm
+  existed (\S\ref{sec:chem}, \S\ref{sec:subsets}, \S\ref{sec:leaderboard}). Six defects of ours
+  were found afterwards and are recorded in the run directory as an erratum; the declaration was
+  not edited and the seven stakes below are graded once, in its own wording, on the first run,
+  including the three whose form we now think was wrong. The repaired quantities are reported in
+  the main text and are labelled there.}}\\
+the single-mutant disruption differs by pair type & CI excludes $0$ & \jdg{dnD} \jdg{dnDCi} &
+  held \\
+the contrast survives conditioning on that disruption & $\ge60\%$, CI excludes $0$ &
+  \jdg{stA3Ret}, covers $0$ & \textbf{failed} \\
+\multicolumn{4}{@{}p{0.97\linewidth}@{}}{\footnotesize\emph{The stake was the wrong test and we say
+  so rather than reading its failure. The disruption is how much breaking the pair disturbs the
+  molecule, which is downstream of the pair forming, so conditioning on it removes the signal with
+  the artifact. \S\ref{sec:chem} replaces it with a cut that has no such defect and reports both.}}\\[2pt]
+the contrast survives dropping the smallest denominator decile & $\ge70\%$ & \jdg{rlDropRet} &
+  \textbf{failed} \\
+split-half correlation of the contrast & $\ge0.30$ & \jdg{stSplitCorr} & \textbf{failed} \\
+\multicolumn{4}{@{}p{0.97\linewidth}@{}}{\footnotesize\emph{Mis-specified when it was written:
+  complementary halves of a nearly fixed pooled contrast are anti-correlated by arithmetic, so the
+  number measures the arithmetic. \S\ref{sec:frame} reports the both-halves-positive rate
+  (\jdg{rlBothPos}) and the half-sample SD ($\jdg{rlHalfSd}$) instead.}}\\[2pt]
+holding placement fixed moves the leaderboard & $\tau<1$, some move & \jdg{lbTau}, \jdg{lbMoved}
+  move & held \\
+the depth channel's tight bound is below the total contrast & below & \jdg{stDepthTight} &
+  held, uninformative \\
+\multicolumn{4}{@{}p{0.97\linewidth}@{}}{\footnotesize\emph{The direction was inverted when the
+  stake was written: Prop.~\ref{prop:carry}'s plug-in bound \emph{holds} when the estimated
+  right-hand side is at least the left-hand side, which is at or above the level this column
+  compares against, not below it. The
+  depth mediator has four levels, which is the degenerate binning the earlier erratum already
+  recorded, so the proposition says nothing here either way. What the depth channel does support is
+  the Prop.~\ref{prop:routes} identity, reported in \S\ref{sec:quant}.}}\\[2pt]
+the energy null holds on both method subsets & both in band & \jdg{subNeural},
+  \jdg{subThermo} & \textbf{failed} \\
+\multicolumn{4}{@{}p{0.97\linewidth}@{}}{\footnotesize\emph{The neural subset is in band; the
+  thermodynamic subset is above it, which is the direction of no mediation rather than of
+  mediation, on a quarter of the records. \S\ref{sec:subsets} reports both and does not widen the
+  band.}}\\[2pt]
 \end{longtable}
 \endgroup
 
@@ -2161,7 +2465,7 @@ $\jdg{eNBins}$ fixed quantiles of the pooled distribution. The edges are compute
 contrast, from the pooled values and not within exposure arm; consequently the bin membership of
 every pair is invariant to a permutation of the labels, which is what
 Prop.~\ref{prop:null} requires of a matched design. The invariance was checked rather than argued:
-over $200$ permutations the (pair-weight, stratum-count) pair took exactly one value.
+over the permutations of that check the (pair-weight, stratum-count) pair took exactly one value.
 
 \begin{figure}[!htbp]
 \centering
@@ -2242,7 +2546,7 @@ $\jdg{eSel}$, which is larger than any mediation the arm could have found.
 mechanical shrinkage from stratification is a property of the design, not of the mediator, and its
 size is not predictable from the number of strata alone. Only the difference between the real and
 placebo shrinkages is interpretable. In this arm the placebo shrinkage is
-$100\% - \jdg{ePlaceboMean}$ with a spread of $\jdg{ePlaceboSd}$ points, and the real mediator adds
+the complement of $\jdg{ePlaceboMean}$ with a spread of $\jdg{ePlaceboSd}$ points, and the real mediator adds
 nothing to it.
 
 \textbf{And a product-of-coefficients route must have its assumption tested.} By

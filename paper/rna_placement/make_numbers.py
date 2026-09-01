@@ -463,6 +463,14 @@ for tag, k in (("B", "binder"), ("R", "rna")):
     put(f"xd{tag}Tight", f"{v['tightness']:.3f}")
 put("xdDtvRatio", f"{_cmp['dtv_ratio']:.2f}")
 put("xdGapRatio", f"{_cmp['gap_ratio']:.2f}")
+# the bound has TWO factors and only one of them moves with the gap. Both ratios, so a reader
+# can see that the product of the two does not scale the way the gap does.
+_bB, _bR = _cmp["binder"], _cmp["rna"]
+put("xdOscRatio", f"{_bB['osc_r']/_bR['osc_r']:.2f}")
+put("xdBoundRatio", f"{_bR['rhs']/_bB['rhs']:.2f}")
+put("xdTightB", f"{_bB['tightness']:.3f}")
+put("xdTightR", f"{_bR['tightness']:.3f}")
+put("xdTightRatio", f"{_bR['tightness']/_bB['tightness']:.2f}")
 _bs, _rs = m29r["R1_binder_binsweep"], m29r["R2_rna_binsweep"]
 put("xdSweepN", f"{len(_bs)}")
 put("xdSweepLo", f"{min(r['nbins'] for r in _bs)}")
@@ -541,6 +549,146 @@ put("swDtvLo", f"{_sw2['d_TV_swept'][0]:.3f}")
 put("swDtvHi", f"{_sw2['d_TV_swept'][1]:.3f}")
 put("swRho", f"{_sw2['spearman_lhs_rhs']:+.3f}")
 put("swSigma", f"{_sw2['sigma_measured']:.4f}")
+
+# ---------------------------------------------------------------- the readout, and the consequence
+# (M61 / M61b). Three things the manuscript was asked for and did not have: whether the rescue
+# factor's contrast is the probing chemistry rather than pair formation, what the outcome's own
+# reliability is, and whether any of this moves a leaderboard.
+m61b_thermo = ("Eterna", "Rosetta")
+m61b_neural = ("MPNN-fixbb", "MPNN-RFdiff", "gRNAde", "gRNAde-no3d",
+               "Shujun_struct2seq", "Shujun_shape_struct2seq")
+m61 = J("m61_readout_and_consequence.json")
+m61b = J("m61b_readout_and_consequence.json")
+
+_cen = m61b["census"]
+put("ncRaw", f"{_cen['records']}")
+put("ncNonCanon", f"{_cen['non_canonical']}")
+put("ncCGAU", f"{_cen['CG_plus_AU']}")
+
+# --- the cut that separates a composition artifact from a structural effect
+_a6 = m61b["A6_off_mutation_cut"]
+put("cxBase", f"{_a6['recomputed_baseline']:+.4f}".replace("-", "\\ensuremath{-}"))
+put("cxReleased", f"{_a6['released_column_baseline']:+.4f}".replace("-", "\\ensuremath{-}"))
+for _r in (0, 1, 2, 3):
+    _v = _a6[str(_r)]
+    put(f"cxE{_r}", f"{_v['effect']:+.4f}".replace("-", "\\ensuremath{-}"))
+    put(f"cxCi{_r}", "[$%+.4f$, $%+.4f$]" % tuple(_v["ci"]))
+    put(f"cxP{_r}", f"{_v['p']:.4f}")
+    put(f"cxRet{_r}", f"{100*_v['retention_vs_recomputed']:.0f}\\%")
+    put(f"cxSites{_r}", f"{_v['median_sites_used']}")
+_only = _a6.get("only_2")
+if _only:
+    put("cxOnlyE", f"{_only['effect']:+.4f}".replace("-", "\\ensuremath{-}"))
+    put("cxOnlyShare", f"{100*_only['share_of_baseline']:.0f}\\%")
+    put("cxOnlyN", f"{_only['n']}")
+
+# --- what the contrast is made of: numerator, denominator, and which one carries it
+put("dnD", f"{m61['A1_denominator']['effect']:+.4f}".replace("-", "\\ensuremath{-}"))
+put("dnDCi", "[$%+.4f$, $%+.4f$]" % tuple(m61["A1_denominator"]["ci"]))
+put("dnNum", f"{m61['A2_numerator']['effect']:+.4f}".replace("-", "\\ensuremath{-}"))
+put("dnNumCi", "[$%+.4f$, $%+.4f$]" % tuple(m61["A2_numerator"]["ci"]))
+_a4 = m61["A4_decomposition"]
+put("dnFromNum", f"{_a4['from_numerator']:+.4f}".replace("-", "\\ensuremath{-}"))
+put("dnFromDen", f"{_a4['from_denominator']:+.4f}".replace("-", "\\ensuremath{-}"))
+put("dnDenShare", f"{100*_a4['denominator_share']:.0f}\\%")
+
+# --- M16's declared-but-never-printed diagnostic, recomputed on both sides of every pair
+_a5 = m61["A5_m16_diagnostic_superseded"]
+for _k, _n in (("CG", "Cg"), ("AU", "Au"), ("GU", "Gu")):
+    put(f"dgm{_n}", f"{_a5['recomputed_both_sides'][_k]['mean']:.4f}")
+    put(f"dgmN{_n}", f"{_a5['recomputed_both_sides'][_k]['n']}")
+    put(f"dgmOld{_n}", f"{_a5['m16_published_one_side'][_k]:.4f}")
+
+# --- the outcome's own reliability
+_b1 = m61["B1_reliability"]
+put("rlSd", f"{_b1['sd_R_median']:.4f}")
+put("rlSdQ1", f"{_b1['sd_R_q25']:.4f}")
+put("rlSdQ3", f"{_b1['sd_R_q75']:.4f}")
+put("rlBetween", f"{_b1['between_pair_sd_R']:.4f}")
+put("rlInMeas", f"{_b1['effect_in_measurement_sd']:.1f}")
+put("rlInBetween", f"{_b1['effect_in_between_sd']:.2f}")
+put("rlSignal", f"{100*_b1['icc_like']:.0f}\\%")
+put("rlDraws", f"{_b1['draws']}")
+_b2 = m61["B2_denominator"]
+put("rlQlo", f"{_b2['quantiles']['q01']:.3f}")
+put("rlQhi", f"{_b2['quantiles']['q95']:.3f}")
+put("rlDropEff", f"{_b2['dropped_decile']['effect']:+.4f}".replace("-", "\\ensuremath{-}"))
+put("rlDropCi", "[$%+.4f$, $%+.4f$]" % tuple(_b2["dropped_decile"]["ci"]))
+put("rlDropP", f"{_b2['dropped_decile']['p']:.4f}")
+put("rlDropRet", f"{100*_b2['retention']:.0f}\\%")
+# the three stakes the erratum records as mis-specified. Their values are still measured numbers
+# and still reach the preregistration table through a macro rather than by hand.
+put("stA3Ret", f"{100*m61['A3_conditioned']['retention']:.0f}\\%")
+put("stSplitCorr", f"{m61['B3_splithalf']['corr']:+.2f}")
+put("stDepthTight", f"{m61['D']['D1_depth']['tight_pct']:.0f}\\%")
+_b3 = m61b["B3_repaired"]
+put("rlSplits", f"{_b3['n_splits']}")
+put("rlHalfSd", f"{_b3['half_sd']:.4f}")
+put("rlBothPos", f"{100*_b3['both_halves_positive']:.0f}\\%")
+
+# --- the leaderboard
+_c1 = m61["C"]["rescue"]
+put("lbNMeth", f"{_c1['methods']}")
+put("lbTau", f"{_c1['target_plus_placement']['tau_vs_raw']:+.3f}")
+put("lbMoved", f"{_c1['target_plus_placement']['moved']}")
+put("lbMaxMove", f"{_c1['target_plus_placement']['max_move']}")
+_ci1 = _c1["target_plus_placement"].get("tau_boot_ci")
+if _ci1:
+    put("lbTauCi", "[$%+.3f$, $%+.3f$]" % tuple(_ci1))
+_c2 = m61["C"]["benchmark_score"]
+if "skipped" not in _c2:
+    _t2 = _c2["target_plus_gc"]
+    put("lbBN", f"{_c2['n']}")
+    put("lbBNMeth", f"{_c2['methods']}")
+    put("lbBTau", f"{_t2['tau_vs_raw']:+.3f}")
+    put("lbBMoved", f"{_t2['moved']}")
+    put("lbBMaxMove", f"{_t2['max_move']}")
+    _ci2 = _t2.get("tau_boot_ci")
+    if _ci2:
+        put("lbBTauCi", "[$%+.3f$, $%+.3f$]" % tuple(_ci2))
+    put("lbBTauTarget", f"{_c2['target_only']['tau_vs_raw']:+.3f}")
+    put("lbBMovedTarget", f"{_c2['target_only']['moved']}")
+    put("lbStrata", f"{_t2['strata_used']}")
+    put("lbTauTarget", f"{_c1['target_only']['tau_vs_raw']:+.3f}")
+    put("lbMovedTarget", f"{_c1['target_only']['moved']}")
+    _top = min(_c2["raw_rank"], key=lambda k: _c2["raw_rank"][k])
+    put("lbBTop", _top.replace("_", "\\_"))
+    put("lbBTopNew", f"{_t2['rank'][_top]}")
+    _new1 = min(_t2["rank"], key=lambda k: _t2["rank"][k])
+    put("lbBNewTop", _new1.replace("_", "\\_"))
+    put("lbBNewTopOld", f"{_c2['raw_rank'][_new1]}")
+
+# --- an interval on the tight bound, which the manuscript reported as a point
+_d2 = m61b["D2_repaired"]
+put("cbCiLo", f"{_d2['ci'][0]:.1f}\\%")
+put("cbCiHi", f"{_d2['ci'][1]:.1f}\\%")
+put("cbCiMed", f"{_d2['median']:.1f}\\%")
+put("cbCiVac", f"{100*_d2['frac_ge_100']:.1f}\\%")
+put("cbCiBoot", f"{_d2['nboot']}")
+
+# --- the energy null, on the two halves of the corpus that consume different objectives
+_d3 = m61b["D3_repaired"]
+put("subAll", f"{_d3['all']['retention_pct']:.1f}\\%")
+put("subThermo", f"{_d3['thermodynamic']['retention_pct']:.1f}\\%")
+put("subNeural", f"{_d3['neural']['retention_pct']:.1f}\\%")
+put("subNThermo", f"{_d3['thermodynamic']['n']}")
+put("subNNeural", f"{_d3['neural']['n']}")
+put("subNThermoMeth", f"{len(m61b_thermo)}")
+put("subNNeuralMeth", f"{len(m61b_neural)}")
+put("subThermoMeth", ", ".join(x.replace("_", "\\_") for x in m61b_thermo))
+put("subNeuralMeth", ", ".join(x.replace("_", "\\_") for x in m61b_neural))
+
+# --- Proposition 3's residual on the depth channel, computed rather than subtracted
+_p3 = m61b["A7_prop3_identity"]
+put("p3Att", f"{_p3['attenuation']:+.4f}".replace("-", "\\ensuremath{-}"))
+put("p3Beta", f"{_p3['beta']:+.4f}".replace("-", "\\ensuremath{-}"))
+put("p3G", f"{_p3['g']:+.3f}".replace("-", "\\ensuremath{-}"))
+put("p3BetaG", f"{_p3['beta_g']:+.4f}".replace("-", "\\ensuremath{-}"))
+put("p3Share", f"{_p3['linear_share_pct']:.1f}\\%")
+put("p3Direct", f"{_p3['residual_computed_directly']:+.4f}".replace("-", "\\ensuremath{-}"))
+put("p3Sub", f"{_p3['residual_by_subtraction']:+.4f}".replace("-", "\\ensuremath{-}"))
+put("p3Gap", f"{_p3['agreement']:.4f}")
+put("p3GapPct", f"{100*_p3['agreement']/abs(_p3['attenuation']):.0f}\\%")
 
 # ---------------------------------------------------------------- how the corpus was selected
 # (M30). R1's premise is that the covariate distribution was produced by a design algorithm; it

@@ -53,6 +53,15 @@ def main():
     recs, et = M61.build()
     log(f"记录 {len(recs)}  设计格 {len({r['design'] for r in recs})}  靶标 {len({r['puzzle'] for r in recs})}")
     rows = M61.flat(recs)
+    cen = collections.Counter(r["pt"] for r in recs)
+    OUT["census"] = {"records": len(recs), "by_pair_type": dict(cen.most_common()),
+                     "canonical_three": cen["CG"] + cen["AU"] + cen["GU"],
+                     "CG_plus_AU": cen["CG"] + cen["AU"],
+                     "non_canonical": len(recs) - (cen["CG"] + cen["AU"] + cen["GU"]),
+                     "designs": len({r["design"] for r in recs}),
+                     "targets": len({r["puzzle"] for r in recs})}
+    log(f"  普查:{len(recs)} 条 = 三种规范配对 {OUT['census']['canonical_three']}"
+        f"(其中 G-C 与 A-U 共 {OUT['census']['CG_plus_AU']})+ 非规范 {OUT['census']['non_canonical']}")
     ev = M61.ctr(rows, "rf")
     log(f"  基线 rescue 对比 {ev.effect:+.5f}  [{ev.ci[0]:+.4f}, {ev.ci[1]:+.4f}]  (已发表 +0.05393)")
     OUT["baseline"] = {"effect": round(ev.effect, 5), "ci": [round(x, 4) for x in ev.ci]}
