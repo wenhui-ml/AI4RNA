@@ -1,0 +1,58 @@
+{
+  "id": "m52_sensitivity",
+  "title": "The Discussion says the honest bound on Assumption 1 is 'the sensitivity analysis already reported'. No sensitivity analysis is reported anywhere in the paper. Report one.",
+  "frozen_before_code": true,
+  "cost": "offline, $0 -- no API, no GPU, no download. Rebuilds M26's records (ViennaRNA partition function, cached) and reads nothing else.",
+
+  "why": [
+    "Section 5.2 states Assumption 1 (conditional on design cell, helix depth and crossing, the pair type is as good as randomly assigned), says it cannot be tested from this data, and names the conventional response -- asking how strong an unmeasured confounder would have to be -- only to say it bounds rather than removes the concern. It then reports a controlled-truth benchmark instead. That benchmark validates the adjustment machinery against a confounder WE chose; it is not a sensitivity analysis and the paper says so in the same subsection.",
+    "The Discussion then writes: 'the honest bound is the sensitivity analysis already reported.' There is no such analysis. The sentence points at the controlled-truth benchmark, which the Methods explicitly distinguishes from one. The claim is false as printed, and it is false in the direction that flatters the paper.",
+    "The repair is cheap and closed-form. The paper's own controlled-truth model already establishes that an omitted covariate U biases eq:est by beta_u * g_u, where beta_u is U's within-stratum response on the outcome and g_u is U's within-stratum arm gap. Solving that for the observed contrast gives the strength an unmeasured confounder needs. Nothing about this requires a new corpus, a new model, or an API call.",
+    "The sentence gets fixed either way. If this run does not produce a bound the paper can stand behind, the sentence is deleted and the Discussion says the assumption is unbounded."
+  ],
+
+  "quantity": {
+    "bias_model": "bias(alpha_hat) = beta_u * g_u, with beta_u = within-stratum pooled slope of the outcome on U and g_u = weighted within-stratum arm gap of U (CG minus AU), under the same strata and the same min(n_A,n_B) weights as eq:est",
+    "nulling_condition": "the observed contrast alpha_hat is explained away when beta_u * g_u = alpha_hat",
+    "two_denominators_and_they_answer_different_questions": {
+      "D1_benchmark": "|beta * g| from the controlled-truth benchmark -- how much bias placement WOULD have caused had the estimator not conditioned on it. K1 = alpha_hat / |beta*g| answers 'must an unmeasured confounder be stronger than the one we condition on?'",
+      "D2_residual": "the bias each covariate we DID measure would induce if it were omitted, computed within the strata actually used. These should be near zero for the covariates already in the stratification, and that near-zero is the point: it answers 'how much room is left inside the strata?'"
+    }
+  },
+
+  "arms": {
+    "A1": "K1 = alpha_hat / |beta*g| from the controlled-truth benchmark, with a target-clustered bootstrap in which alpha_hat is recomputed in every draw",
+    "A2": "the diagonal requirement beta_u = g_u = sqrt(alpha_hat), reported in the outcome's own units and divided by the outcome's pooled within-stratum SD (M50's 0.219) so it can be read as an effect size",
+    "A3": "the observed-covariate benchmark: for every covariate measured on these molecules -- helix depth, crossing, helix length, design length, GC fraction of the design, fractional position of the pair along the design, and the wild-type pair probability -- compute its own within-stratum (beta_c, g_c) and hence the bias it would induce if omitted. Report each and the largest.",
+    "A4": "the best linear combination: over all unit-within-stratum-variance indices u = w'x built from the A3 covariates, the maximum attainable |beta_u * g_u|, in closed form, so the answer is not limited to the covariates one at a time"
+  },
+
+  "verification_before_any_arm_is_read": {
+    "V1_zero_point": "a covariate with zero within-stratum arm gap induces exactly zero bias, and injecting U into the outcome with g_u = 0 leaves the estimate unchanged to 1e-12",
+    "V2_equivalent_form": "the analytic bias beta_u * g_u must be confirmed by INJECTION: add lambda*U to the outcome at the solved strength and recompute eq:est with the estimator written here; the contrast must move to zero to 1e-9. The analytic route and the injection route share no code path.",
+    "V3_reverse_control": "reproduce the published contrast +0.0539, weight 902 and cell count 144, and the published benchmark beta +0.06759, gap -0.3487 and product -0.0236, before any sensitivity number is read",
+    "V4_linearity_and_oddness": "the injected bias is exactly linear in lambda (residual of a two-point extrapolation < 1e-12) and changes sign under U -> -U",
+    "V5_closed_form_check": "A4's closed-form maximum (||a||*||b|| + a'b)/2 must be matched, and never exceeded, by 20000 random unit indices"
+  },
+
+  "kill_conditions": {
+    "K1": "if V3 fails to reproduce any published number to its printed precision, VOID",
+    "K2": "if V1, V2, V4 or V5 fails, VOID",
+    "K3": "if the within-stratum covariance matrix of the A3 covariates is singular to working precision, A4 is reported as refused rather than regularised into an answer",
+    "K4": "if fewer than 100 strata contribute both arms, the whole run is reported as underpowered and no bound is printed"
+  },
+
+  "staked_predictions": [
+    {"id": "S1", "text": "K1 > 1: an unmeasured confounder must exceed, in the beta*g product, the placement confounder the design conditions on"},
+    {"id": "S2", "text": "the target-clustered bootstrap interval on K1 EXCLUDES 1"},
+    {"id": "S3", "text": "no single observed covariate, if omitted, would induce a bias reaching the observed contrast: max |beta_c * g_c| over A3 is below alpha_hat"},
+    {"id": "S4", "text": "nor would the best linear combination of all of them: A4's closed-form maximum is below alpha_hat"}
+  ],
+
+  "wording_rules_binding_on_the_manuscript": {
+    "W1": "the sentence 'the honest bound is the sensitivity analysis already reported' is removed whatever this run returns. Either it names this run, or it says the assumption is unbounded.",
+    "W2": "this run does not test Assumption 1 and the manuscript may not say it does. It bounds how strong a violation would have to be. The distinction is the one Section 5.2 already draws about the controlled-truth benchmark, and it applies here with equal force.",
+    "W3": "if S3 or S4 fails -- if some covariate or combination we measured would have been enough -- that is reported in the Limitations as a named weakness, not softened, and the covariate is named.",
+    "W4": "A3's near-zero values may not be reported as evidence that Assumption 1 holds. Those covariates are inside the stratification; their residual bias being small is arithmetic, not evidence. Only the covariates NOT in the stratification (helix length, design length, GC fraction, fractional position, wild-type pair probability) carry any information here, and the manuscript must say which is which."
+  }
+}
