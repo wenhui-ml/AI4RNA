@@ -1,0 +1,34 @@
+{
+ "id": "m60_carrying_bound",
+ "frozen_utc": "2026-09-01",
+ "cost": "离线 $0(只读 m21/m26/m29 已提交的缓存;无模型推理;无 API;无 GPU)",
+ "why_this_exists": "R1 撤回了全部 mediated fraction,交出的替代物是 dDgBound=58.6% 与 dPmBound=6.8%,论文四处称其为 bound / at most。但它们的算式是 |effect_M · slope / effect_total|,即**乘积路线**,而 R1 自己的 Prop.routes 说:h 非仿射时 β 是投影,**可以带上真中介部分没有的符号与量级**。『可能任一方向错』推不出『是上界』。因此论文当前唯一的正向替代物是一个**未经证明的方向性断言**。本实验用 R1 自己那条定理的证明步骤,给出一个**真正的上界**,并测量它。",
+ "the_corollary_fixed_before_running": {
+  "statement": "在 Prop.routes 的假设 (7)(层内 E[Y|T,M]=alpha_T + h(M),h 有界)下,中介部分恰为 Delta_tot - Delta_cde = E[h(M)|A] - E[h(M)|B],故 |Delta_tot - Delta_cde| <= osc(h) · d_TV(P_{M|A}, P_{M|B})。中介分数因此满足 |MF| <= osc(h)·d_TV / |Delta_tot|。",
+  "proof_is_one_line": "与 Prop.routes 式(9)的证明同一步:减去常数 c=(sup h+inf h)/2 后用 Hölder。把 r 换成 h 即可。**不需要仿射,不需要任何中介估计器。**",
+  "why_it_is_the_right_replacement": "它是 estimator-free 的:两个因子(条件均值的振幅、两臂在中介物上的总变差距离)都直接从语料估,不经过 beta,因此不受 §cal 撤回的那个估计量的影响。"
+ },
+ "reuses_only": "m29r_review.route_bound 已经算出 hs(逐箱居中条件均值)与 d_TV;osc(h)=max(hs)-min(hs) 是一行。RNA 侧中介物由 m21_thermo_mediator.build_with_dg() 提供,P_model 由 m26 提供。**不重新折叠任何序列,不重新调用任何预测器。**",
+ "arms": {
+  "V_before_anything": "先复算并比对已发表的数:rescueAU/rescueGU 的对比、dDg、dPm、dDgBound、dPmBound、eLinearGapPts、m29r 的 comparison 四个数。任一不符即停,报差值,不读新列。",
+  "A1_corollary_bound": "对每个(语料, 中介物)算 osc(h)、d_TV、推论界 = osc(h)·d_TV/|Delta_tot|,并与当前印在论文里的乘积路线读数并排。中介物:RNA 的 dG_loc、RNA 的 P_model、RNA 的 depth、蛋白的 A_length。**箱数扫描 {3,5,8,10,15,20,30,40},报每一档,主报最大档(最保守)与全档区间,不挑档。**",
+  "A2_separation_sweep": "把 n=2 的『tracking』变成一条曲线。在 RNA 语料上,只合成 outcome(中介物用真的),注入已知中介分数 f,并通过**按中介物分箱重加权两臂**把 d_TV 扫过一个网格(目标 >=8 档,覆盖当前语料自身的 d_TV)。每档记录:(i) 推论界是否成立;(ii) |条件-乘积| 与 osc(r)·d_TV;(iii) 条件估计量读回的 f 相对真 f 的跨度比。",
+  "A3_interaction": "假设 (7) 的 no T×M interaction 从未单独报告过。逐 M 箱算 T 的对比,报每箱的对比、箱内 n、跨箱 spread 与 mean。RNA 与蛋白两侧都算。**这是对我们自己假设的检验,结果无论正负都进正文。**"
+ },
+ "rule_61_staked_predictions_written_BEFORE_running": "押注(先写后跑,逐条判对错):\n(1) **A1:dG_loc 的推论界 < 58.6%**,即诚实的界比我们印出来的乘积读数**更紧**。若 >= 58.6%,则乘积读数从来就不是上界,必须照报并改写摘要。\n(2) **A1:P_model 的推论界 < 6.8%**。同上。\n(3) **A1:界在全部 8 档箱数、全部 4 个中介物上成立(32/32)**。任一不成立即为实现 bug 或定理被证否,先复核实现再复核证明。\n(4) **A2:>=8 档分离度上,|条件-乘积| 与 osc(r)·d_TV 的 Spearman 秩相关 >= 0.8**。这是把 n=2 升级为刻画的那一条。\n(5) **A2:条件估计量读回的跨度比随分离度单调下降,且在本语料自身的分离度处 < 50%**(与 §cal 的 12.9%/28.7% 一致)。\n(6) **A3:RNA 侧逐箱 T 对比在每个 n>=NMIN 的箱里同号**(正)。若变号,则假设 (7) 在本语料上不成立,Prop.routes 的适用性必须在正文降级。\n(7) **A3:跨箱 spread < 2 倍的 mean**。",
+ "kill_conditions": {
+  "K0": "V 臂任一已发表数复算不上 ⇒ 停,报差值,不读任何新列。",
+  "K1": "**A1 的界在任一档不成立** ⇒ `corollary_violated` ⇒ 先查实现;若实现无误则是证明有误,**必须写进正文并撤回推论**,不许放附录。",
+  "K2": "**A1 显示乘积读数 < 推论界**(即押注 1 或 2 失败)⇒ `product_reading_was_not_a_bound` ⇒ **论文四处的 bound / at most 措辞全部改为 product-route reading,并以推论界替代**。这是 reviewer 指出的那条,照改。",
+  "K3": "A2 的秩相关 < 0.8 ⇒ `tracking_unresolved` ⇒ 跨领域那句从 `tracks / governs` 降为 `is consistent with, on two corpora`,不许保留刻画性措辞。",
+  "K4": "A3 逐箱变号 ⇒ `assumption_7_fails` ⇒ Prop.routes 的结论在正文标注为条件性的,推论界同样降级。",
+  "K5": "任一臂的可用箱数 < 3 ⇒ 该(语料,中介物)不出数,计数并剔除,不外推。"
+ },
+ "what_this_experiment_may_NOT_do": [
+  "不得改动 m21b 已发表的乘积读数本身(它是被更正的对象,必须保留在正文里)。",
+  "不得在看到结果后更换中介物、箱数网格或分离度网格。四个中介物与两个网格写死在本文件。",
+  "不得把 A2 的合成扫描说成第三个语料。它是合成的,只用来刻画界的行为,不承载任何领域结论。",
+  "不得因为推论界更宽就不报它。界更宽是关于真相的事实,不是关于呈现的选择。"
+ ],
+ "verdict_field": "由脚本按上面七条押注自动填,不得手写。"
+}
