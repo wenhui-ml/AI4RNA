@@ -1,0 +1,40 @@
+=== M56:给三个承载主张的区间加第二个算法 ===
+  声明已冻结并推送于本文件存在之前。全离线,$0。
+  V1 z0=a=0 时 BCa 与百分位 max|Δ| 0.00e+00  -> 通过
+
+=== Q1: matched C-G minus A-U contrast on the measured outcome ===
+  点估计 +0.05393(论文 +0.0539)  |Δ| 1.57e-06
+  百分位 [+0.02196, +0.09114](论文 [0.022, 0.0911])  max|Δ| 3.95e-05
+  聚类单元 puzzle,共 20 个;自助 300/300 次;jackknife 20 个
+  BCa    [+0.02352, +0.09731]  z0 +0.0753  a -0.0133  宽度比 1.067
+  basic  [+0.01672, +0.08589]  宽度比 1.000
+    BCa 不含 0
+    basic 不含 0
+
+=== Q2: paired standardised interventional-minus-agreement difference ===
+  点估计 +0.15516(论文 +0.1552)  |Δ| 4.02e-05
+  百分位 [+0.01533, +0.30193](论文 [0.01533, 0.30193])  max|Δ| 4.56e-06
+  聚类单元 design,共 157 个;自助 2000/2000 次;jackknife 157 个
+  BCa    [-0.01457, +0.27745]  z0 -0.1522  a -0.0169  宽度比 1.019
+  basic  [+0.00839, +0.29499]  宽度比 1.000
+    BCa 含 0
+    basic 不含 0
+
+=== Q3: budgeted recovery gap at the tightest budget ===
+  点估计 -0.01592(论文 -0.0159)  |Δ| 4.88e-06
+  百分位 [-0.02785, -0.00358](论文 [-0.02785, -0.00358])  max|Δ| 4.61e-06
+  聚类单元 puzzle,共 20 个;自助 500/500 次;jackknife 20 个
+  BCa    [-0.02870, -0.00427]  z0 -0.0502  a -0.0050  宽度比 1.007
+  basic  [-0.02825, -0.00398]  宽度比 1.000
+    BCa 不含 0
+    basic 不含 0
+
+=== 预注册记分 ===
+  S1  成立   Q1 BCa [0.02352, 0.09731]
+  S2  **失败**   Q2 BCa [-0.01457, 0.27745]
+  S3  成立   Q3 BCa [-0.0287, -0.00427]
+  S4  成立   宽度比 Q1 1.067, Q2 1.019, Q3 1.007
+
+  裁定:a_claim_interval_does_not_survive   3/4 成立   用时 67s
+
+写出 /data/wenhui/openclaude_rna/rna_harness/runs/ceiling/m56_bca.json

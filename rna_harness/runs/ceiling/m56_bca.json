@@ -1,0 +1,148 @@
+{
+ "declaration": "m56_bca_declaration.json",
+ "cost": "offline, $0",
+ "quantities": {
+  "Q1": {
+   "name": "matched C-G minus A-U contrast on the measured outcome",
+   "point": 0.05393,
+   "cluster": "puzzle",
+   "n_clusters": 20,
+   "n_draws": 300,
+   "percentile": [
+    0.02196,
+    0.09114
+   ],
+   "bca": [
+    0.02352,
+    0.09731
+   ],
+   "basic": [
+    0.01672,
+    0.08589
+   ],
+   "z0": 0.0753,
+   "acceleration": -0.0133,
+   "acceleration_large": false,
+   "width_ratio_bca": 1.0668,
+   "width_ratio_basic": 1.0,
+   "bca_excludes_zero": true,
+   "basic_excludes_zero": true,
+   "percentile_excludes_zero": true
+  },
+  "Q2": {
+   "name": "paired standardised interventional-minus-agreement difference",
+   "point": 0.15516,
+   "cluster": "design",
+   "n_clusters": 157,
+   "n_draws": 2000,
+   "percentile": [
+    0.01533,
+    0.30193
+   ],
+   "bca": [
+    -0.01457,
+    0.27745
+   ],
+   "basic": [
+    0.00839,
+    0.29499
+   ],
+   "z0": -0.1522,
+   "acceleration": -0.0169,
+   "acceleration_large": false,
+   "width_ratio_bca": 1.0189,
+   "width_ratio_basic": 1.0,
+   "bca_excludes_zero": false,
+   "basic_excludes_zero": true,
+   "percentile_excludes_zero": true
+  },
+  "Q3": {
+   "name": "budgeted recovery gap at the tightest budget",
+   "point": -0.01592,
+   "cluster": "puzzle",
+   "n_clusters": 20,
+   "n_draws": 500,
+   "percentile": [
+    -0.02785,
+    -0.00358
+   ],
+   "bca": [
+    -0.0287,
+    -0.00427
+   ],
+   "basic": [
+    -0.02825,
+    -0.00398
+   ],
+   "z0": -0.0502,
+   "acceleration": -0.005,
+   "acceleration_large": false,
+   "width_ratio_bca": 1.0066,
+   "width_ratio_basic": 1.0,
+   "bca_excludes_zero": true,
+   "basic_excludes_zero": true,
+   "percentile_excludes_zero": true
+  }
+ },
+ "V": {
+  "V1_degenerate_equals_percentile": true
+ },
+ "staked": {
+  "S1": {
+   "text": "Q1's BCa interval still excludes zero",
+   "pass": true,
+   "detail": "Q1 BCa [0.02352, 0.09731]"
+  },
+  "S2": {
+   "text": "Q2's BCa interval still excludes zero",
+   "pass": false,
+   "detail": "Q2 BCa [-0.01457, 0.27745]"
+  },
+  "S3": {
+   "text": "Q3's BCa interval still excludes zero, so the sign reversal Reading 2 rests on survives a second interval method",
+   "pass": true,
+   "detail": "Q3 BCa [-0.0287, -0.00427]"
+  },
+  "S4": {
+   "text": "the BCa intervals are WIDER than the percentile intervals for at least two of the three quantities, which is the direction Section 3.6 asserts without computing",
+   "pass": true,
+   "detail": "宽度比 Q1 1.067, Q2 1.019, Q3 1.007"
+  }
+ },
+ "verdict": "a_claim_interval_does_not_survive",
+ "log": [
+  "=== M56:给三个承载主张的区间加第二个算法 ===",
+  "  声明已冻结并推送于本文件存在之前。全离线,$0。",
+  "  V1 z0=a=0 时 BCa 与百分位 max|Δ| 0.00e+00  -> 通过",
+  "\n=== Q1: matched C-G minus A-U contrast on the measured outcome ===",
+  "  点估计 +0.05393(论文 +0.0539)  |Δ| 1.57e-06",
+  "  百分位 [+0.02196, +0.09114](论文 [0.022, 0.0911])  max|Δ| 3.95e-05",
+  "  聚类单元 puzzle,共 20 个;自助 300/300 次;jackknife 20 个",
+  "  BCa    [+0.02352, +0.09731]  z0 +0.0753  a -0.0133  宽度比 1.067",
+  "  basic  [+0.01672, +0.08589]  宽度比 1.000",
+  "    BCa 不含 0",
+  "    basic 不含 0",
+  "\n=== Q2: paired standardised interventional-minus-agreement difference ===",
+  "  点估计 +0.15516(论文 +0.1552)  |Δ| 4.02e-05",
+  "  百分位 [+0.01533, +0.30193](论文 [0.01533, 0.30193])  max|Δ| 4.56e-06",
+  "  聚类单元 design,共 157 个;自助 2000/2000 次;jackknife 157 个",
+  "  BCa    [-0.01457, +0.27745]  z0 -0.1522  a -0.0169  宽度比 1.019",
+  "  basic  [+0.00839, +0.29499]  宽度比 1.000",
+  "    BCa 含 0",
+  "    basic 不含 0",
+  "\n=== Q3: budgeted recovery gap at the tightest budget ===",
+  "  点估计 -0.01592(论文 -0.0159)  |Δ| 4.88e-06",
+  "  百分位 [-0.02785, -0.00358](论文 [-0.02785, -0.00358])  max|Δ| 4.61e-06",
+  "  聚类单元 puzzle,共 20 个;自助 500/500 次;jackknife 20 个",
+  "  BCa    [-0.02870, -0.00427]  z0 -0.0502  a -0.0050  宽度比 1.007",
+  "  basic  [-0.02825, -0.00398]  宽度比 1.000",
+  "    BCa 不含 0",
+  "    basic 不含 0",
+  "\n=== 预注册记分 ===",
+  "  S1  成立   Q1 BCa [0.02352, 0.09731]",
+  "  S2  **失败**   Q2 BCa [-0.01457, 0.27745]",
+  "  S3  成立   Q3 BCa [-0.0287, -0.00427]",
+  "  S4  成立   宽度比 Q1 1.067, Q2 1.019, Q3 1.007",
+  "\n  裁定:a_claim_interval_does_not_survive   3/4 成立   用时 67s"
+ ]
+}
