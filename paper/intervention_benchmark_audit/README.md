@@ -20,7 +20,7 @@ route**.
 | `submission.json` | both | the abstract and every claim box **as printed**, with macros expanded, plus the independence conditions |
 | `claims.json` | result | one row per load-bearing claim: the estimand written out, what would falsify it, an **independent route stated as a specification**, and -- quarantined -- the number we print |
 | `artifacts.json` | both | the full inventory with sha256: two public input CSVs, the manuscript files, and every one of our run outputs, each tagged with its trust class |
-| `process_claims.json` | process | ten claims the manuscript makes **about its own process**, each with the command or comparison that would falsify it |
+| `process_claims.json` | process | thirteen claims the manuscript makes **about its own process**, each with the command or comparison that would falsify it |
 | `sanity_checks.md` | process | first-principles invariants the manuscript relies on. Not a plan, not target values |
 | `criterion.md` | result | the eligibility criterion in prose, sufficient to rebuild the admitted set from the public CSV without our code |
 | `estimator.md` | result | the estimators in prose and symbols: the matched stratified difference, the clustering, the permutation, the depth integer |
@@ -54,6 +54,19 @@ Stated up front so that finding them is not mistaken for the whole audit:
   compensatory mutant, and the released checkpoint's pseudo-label stage.
 - Exposure counts are **lower bounds**, because the training file we obtained is a subset.
 - Two load-bearing review analyses have **no frozen declaration** (disclosed in the manuscript).
+- **Eight preregistered stakes failed** across five experiments. Each failure has a declared
+  consequence that was written before the number existed, and each consequence should be traceable
+  to a specific change in the text. Checking that trace is process claim `P11`, and it is the most
+  informative single thing an auditor can do with this package.
+- **The free integer cannot be separated from "the declared pair is really there."** Its rank
+  agreement exceeds that of the bare confirmation indicator, but the interval on the difference
+  covers zero. The manuscript states this in the limitations; a reader who prefers the mechanical
+  reading of the baseline is not contradicted by anything measured here.
+- **One claim's interval is method-dependent.** The readout comparison against the shipped
+  agreement column excludes zero under the percentile method and covers it under BCa. That column
+  is also the smallest of the five gaps; the four others are not method-dependent.
+- **The pseudoknot-capable member is not an independent opinion.** It is the panel's own energy
+  model with the pseudoknot search on. It isolates a capability; it does not widen the panel.
 
 A finding that lands on one of these is still a finding; it is not a surprise, and the manuscript
 should be checked for whether it discloses the limitation where the number appears, not merely in

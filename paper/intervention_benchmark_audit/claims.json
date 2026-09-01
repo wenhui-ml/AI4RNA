@@ -11,11 +11,15 @@
    "independent_route_SPECIFICATION_NOT_IMPLEMENTATION": [
     "From OK7a_M2R_data.v4.5.1.csv alone, rebuild the admitted set with the criterion in criterion.md, then compute the matched stratified difference in means with weight w_s = min(n_A(s), n_B(s)) over strata s = (design cell, min(depth,3), crossing).",
     "From OpenKnotBench_data.v4.5.1.csv, take the agreement column the paper names in claims.json:reference_column_disclosure and repeat on identical weights and strata.",
-    "Standardise each by the pooled within-stratum SD of ITS OWN outcome column before comparing magnitudes. Comparing the raw contrasts is the error this claim exists to correct; a recomputation that compares them raw has not reproduced the claim."
+    "Standardise each by the pooled within-stratum SD of ITS OWN outcome column before comparing magnitudes. Comparing the raw contrasts is the error this claim exists to correct; a recomputation that compares them raw has not reproduced the claim.",
+    "The claim is now made against FIVE agreement columns, not one. Four are the panel implementations' own structures; the fifth is folded from this deposit's own chemical probing and contains no sequence-to-structure model. Reproducing the claim on the shipped column alone reproduces the WEAKEST of the five gaps, which is the one the manuscript reports; check that the four others are larger, since that ordering is the reason the shipped column is not a flattering choice.",
+    "One of the five does not survive a second interval method, and the manuscript says so. The percentile interval on the shipped column excludes zero; its bias-corrected and accelerated interval covers zero, and NOT because it is wider -- the width ratio is near one and the bias correction shifts it down. An audit that recomputes only the percentile interval has not tested this sentence."
    ],
    "backing_artifacts": [
     "m36_readout_scale.json",
-    "m25_estimator_benchmark.json"
+    "m25_estimator_benchmark.json",
+    "m54_probing_reference.json",
+    "m56_bca.json"
    ],
    "companion_paper_artifacts": [],
    "printed_value": {
@@ -25,7 +29,15 @@
      "cvConvSd": "+0.0848",
      "cvPairedSd": "+0.1552",
      "cvPairedSdCi": "[+0.0153,\\,\\allowbreak +0.3019]",
-     "cvSwing": "4.50"
+     "cvSwing": "4.50",
+     "prNcol": "5",
+     "prReadout": "+0.2367",
+     "prReadoutCi": "[+0.1151,\\,\\allowbreak +0.3755]",
+     "prReadoutN": "+0.1552",
+     "prReadoutNCi": "[+0.0170,\\,\\allowbreak +0.3005]",
+     "bcTwo": "[\\ensuremath{-}0.0146,\\,\\allowbreak +0.2774]",
+     "bcTwoWidth": "1.019",
+     "bcTwoBasic": "[+0.0084,\\,\\allowbreak +0.2950]"
     }
    }
   },
@@ -33,8 +45,8 @@
    "id": "NM-C2",
    "axis": "pair identity",
    "section": "Results / what the instrument reads out",
-   "estimand": "For each of three predictors, the matched stratified difference in the predictor's OWN output for the mutant target pair, between G-C-target and A-U-target interventions, on the same strata as the measured outcome; plus the same difference on the measured rescue factor. Claim: the neural predictor's output separates the two identities, the two nearest-neighbour predictors differ from each other, and the separation decomposes into an architecture axis and a training-data axis whose difference has an interval.",
-   "what_would_falsify_it": "any pair of predictors is compared without an interval on the DIFFERENCE; or the three predictor columns are not read on the same records; or the 1-based vs 0-based indexing of the two prediction sources is crossed",
+   "estimand": "For each of three predictors, the matched stratified difference in the predictor's OWN output for the mutant target pair, between G-C-target and A-U-target interventions, on the same strata as the measured outcome; plus the same difference on the measured rescue factor. Claim: the neural predictor's output separates the two identities, the two nearest-neighbour predictors differ from each other, and the separation decomposes into an architecture axis and a training-data axis whose difference has an interval. NARROWED SINCE THE LAST PACKAGE: a second transformer sharing neither backbone nor training corpus does NOT reproduce the architecture axis, and a pseudoknot-capable thermodynamic implementation does not resolve the identity separation either, so the axis is stated as a property of one model and not of its architecture class.",
+   "what_would_falsify_it": "any pair of predictors is compared without an interval on the DIFFERENCE; or the three predictor columns are not read on the same records; or the 1-based vs 0-based indexing of the two prediction sources is crossed; or the manuscript anywhere states the architecture axis as a fact about transformers rather than about this transformer, which the second-transformer result forbids",
    "independent_route_SPECIFICATION_NOT_IMPLEMENTATION": [
     "Recompute each predictor's pair probability for the named (i,j) in the mutant sequence from a partition function of your own choosing for the thermodynamic arm; for the neural and learned-parameter arms use the released weights named in artifacts.json.",
     "Take differences of contrasts PAIRED ON THE SAME BOOTSTRAP RESAMPLE, clustering on the 20 puzzles. A recomputation that reports two separate intervals and no interval on their difference has not reproduced the claim.",
@@ -42,7 +54,10 @@
    ],
    "backing_artifacts": [
     "m35_paired_predictor_differences.json",
-    "m26_model_scored.json"
+    "m26_model_scored.json",
+    "m55_second_transformer.json",
+    "m58_pk_member.json",
+    "m52_sensitivity.json"
    ],
    "companion_paper_artifacts": [],
    "printed_value": {
@@ -62,7 +77,15 @@
      "axData": "+0.02470",
      "axDataCi": "[+0.0044,\\,\\allowbreak +0.0428]",
      "axGap": "+0.04155",
-     "axGapCi": "[+0.0058,\\,\\allowbreak +0.0809]"
+     "axGapCi": "[+0.0058,\\,\\allowbreak +0.0809]",
+     "fmContrast": "\\ensuremath{-}0.01477",
+     "fmContrastCi": "[\\ensuremath{-}0.03682,\\,\\allowbreak +0.00769]",
+     "pkContrast": "+0.0064",
+     "pkContrastCi": "[\\ensuremath{-}0.0155,\\,\\allowbreak +0.0290]",
+     "senK": "2.29",
+     "senKCi": "[+0.97,\\,\\allowbreak +3.72]",
+     "senMaxOne": "+0.0018",
+     "senMaxAll": "+0.0109"
     }
    }
   },
@@ -70,8 +93,8 @@
    "id": "NM-C3",
    "axis": "free baseline",
    "section": "Results / which flips rescue, and the free baseline nobody reports",
-   "estimand": "Within each design cell of at least 8 admitted interventions, the Spearman rank correlation between a score and the measured rescue factor, averaged across cells weighted by cell size, with a cluster bootstrap over the 20 puzzles. Scores: each predictor's pair probability, and HELIX DEPTH -- an integer read off the declared target structure, requiring no model. Claim: the paired difference (predictor minus depth) has an interval covering zero for every predictor, so no predictor beats the free integer; and three purpose-built mutation-effect scores lose to it with intervals that EXCLUDE zero on the losing side.",
-   "what_would_falsify_it": "the difference is read as two point estimates rather than as one interval on the difference -- which is the error the paper itself retracts here; or depth is computed from a predicted structure rather than from the declared target; or the bootstrap resamples interventions rather than puzzles",
+   "estimand": "Within each design cell of at least 8 admitted interventions, the Spearman rank correlation between a score and the measured rescue factor, averaged across cells weighted by cell size, with a cluster bootstrap over the 20 puzzles. Scores: each predictor's pair probability, and HELIX DEPTH -- an integer read off the declared target structure, requiring no model. Claim: the paired difference (predictor minus depth) has an interval covering zero for every predictor, so no predictor beats the free integer; and three purpose-built mutation-effect scores lose to it with intervals that EXCLUDE zero on the losing side. NEW SINCE THE LAST PACKAGE: the claim now carries a measured DOMAIN. Split the interventions on whether a probing-derived reference confirms the intervened pair. Depth's rank agreement is much larger in the confirmed stratum than in the unconfirmed one, and in the unconfirmed stratum NOTHING is resolved -- every interval covers zero and the transformer's point estimate is the larger. Two further implementations, a second transformer and a pseudoknot-capable thermodynamic one, also lose to the integer, the latter by an interval excluding zero.",
+   "what_would_falsify_it": "the difference is read as two point estimates rather than as one interval on the difference -- which is the error the paper itself retracts here; or depth is computed from a predicted structure rather than from the declared target; or the bootstrap resamples interventions rather than puzzles; or the domain split is read as depth failing in the unconfirmed stratum rather than as nothing being resolved there, which is the paper's own bounded-negative rule",
    "independent_route_SPECIFICATION_NOT_IMPLEMENTATION": [
     "Depth of a pair (a,b) in the declared target structure = the number of consecutive nested pairs stacked outside it, capped by the number stacked inside it; formally min(dep, up) where dep counts k with (a-k-1, b+k+1) paired and up counts k with (a+k+1, b-k-1) paired. No model, no folding, no training data.",
     "Compute the difference INSIDE each bootstrap resample and take the interval of the differences. Two separately-resampled intervals do not answer this claim.",
@@ -81,7 +104,10 @@
     "m31_which_flips_rescue.json",
     "m31r_review.json",
     "m38_ribosnitch_baseline.json",
-    "m40v_verify_m38_m39.json"
+    "m40v_verify_m38_m39.json",
+    "m57_criterion_validity.json",
+    "m55_second_transformer.json",
+    "m58_pk_member.json"
    ],
    "companion_paper_artifacts": [],
    "printed_value": {
@@ -102,7 +128,24 @@
      "rsMfeVs": "\\ensuremath{-}0.1766",
      "rsMfeVsCi": "[\\ensuremath{-}0.2521,\\,\\allowbreak \\ensuremath{-}0.0824]",
      "rsEnsVs": "\\ensuremath{-}0.2315",
-     "rsEnsVsCi": "[\\ensuremath{-}0.3011,\\,\\allowbreak \\ensuremath{-}0.1523]"
+     "rsEnsVsCi": "[\\ensuremath{-}0.3011,\\,\\allowbreak \\ensuremath{-}0.1523]",
+     "vaDepConf": "+0.3339",
+     "vaDepUnc": "+0.1115",
+     "vaDepGap": "+0.2224",
+     "vaNconf": "3{,}406",
+     "vaNunc": "635",
+     "vaDNC": "+0.0613",
+     "vaDNCCi": "[\\ensuremath{-}0.0118,\\,\\allowbreak +0.1330]",
+     "vaNresUnc": "0",
+     "vaConfLvl": "+0.2482",
+     "vaDepVsConf": "+0.0743",
+     "vaDepVsConfCi": "[\\ensuremath{-}0.0279,\\,\\allowbreak +0.1623]",
+     "fmLevel": "+0.2378",
+     "fmVsDepth": "\\ensuremath{-}0.0847",
+     "fmVsDepthCi": "[\\ensuremath{-}0.1714,\\,\\allowbreak \\ensuremath{-}0.0014]",
+     "pkLevel": "+0.1855",
+     "pkVsDepth": "+0.1370",
+     "pkVsDepthCi": "[+0.0423,\\,\\allowbreak +0.2206]"
     }
    }
   },
@@ -125,7 +168,7 @@
     "macros": {
      "chPriced": "8",
      "chCarry": "5",
-     "chEmpty": "3",
+     "chEmpty": "1",
      "chUnpriced": "2",
      "chEps": "\\ensuremath{-}0.0083",
      "chSplit": "1",
@@ -186,6 +229,197 @@
     "macros": {
      "mcNeuralSpanFrac": "12.9\\%",
      "mcViennaSpanFrac": "28.7\\%"
+    }
+   }
+  },
+  {
+   "id": "NM-C7",
+   "axis": "the budgeted decision",
+   "section": "Results / what the benchmark's margin buys, in tubes",
+   "estimand": "Convert a structure-agreement margin into an experimental decision. Within each design cell, rank the admitted interventions by a score, take the top k = ceil(frac * n) with k >= 2, and record the fraction of that cell's RESCUING interventions recovered, pooled over cells weighted by the number of rescuing interventions. Scores compared: each implementation's pair probability, and free helix depth. Claim: at every budget no implementation's recovery advantage over free depth excludes zero; against a margin fixed as the gain one extra construct buys, most comparisons are formally EQUIVALENT to free depth and the rest fail on the side of being worse; the panel's largest agreement margin converts to a small percentage of rescuing interventions; and the gap changes sign exactly once as the budget is swept.",
+   "what_would_falsify_it": "the equivalence test is run without a pre-fixed margin delta, or with a delta chosen after seeing the recoveries; or 'no interval excludes zero' is reported as 'the scores are equal', which is the bounded-negative rule this paper states for itself; or the sign change is asserted from three budget points rather than measured over a sweep; or ties inside a cell are broken in an order correlated with the outcome",
+   "independent_route_SPECIFICATION_NOT_IMPLEMENTATION": [
+    "Rebuild the admitted set from criterion.md, then implement recovery-at-budget exactly as the estimand states. The budget must be a FRACTION of each cell's size, floored at two constructs, not a fixed count -- a fixed count changes which cells can contribute.",
+    "Tie handling is the trap. Most within-design pairs are tied on depth, so a stable sort makes the result depend on CSV row order. Average over random within-cell orders and report both; if the two disagree, that disagreement is the finding.",
+    "Equivalence is a TOST-shaped statement, not a failure to reject. Fix delta first, from the gain one extra construct buys, and grade each comparison against it.",
+    "Sweep the budget rather than testing three points, and count sign changes over the sweep. A crossing asserted from three points is not measured."
+   ],
+   "backing_artifacts": [
+    "m44_decision.json",
+    "m44v_verify.json",
+    "m47_equivalence.json",
+    "m58_pk_member.json"
+   ],
+   "companion_paper_artifacts": [],
+   "printed_value": {
+    "trust": "DO_NOT_TRUST_RECOMPUTE_INDEPENDENTLY",
+    "macros": {
+     "eqNeq": "9",
+     "eqNcomp": "12",
+     "eqNfail": "3",
+     "eqDelta": "+0.0473",
+     "dcTransF1": "+0.260",
+     "dcTransPct": "1.0\\%",
+     "tvGapTen": "\\ensuremath{-}0.0159",
+     "tvGapCiTen": "[\\ensuremath{-}0.0278,\\,\\allowbreak \\ensuremath{-}0.0036]",
+     "ivNcross": "1",
+     "ivCrossA": "15.0\\%",
+     "ivCrossB": "17.5\\%",
+     "pkRecPk": "+0.1321",
+     "pkRecDepth": "+0.1613"
+    }
+   }
+  },
+  {
+   "id": "NM-C8",
+   "axis": "the criterion's own validity",
+   "section": "Method / the eligibility criterion",
+   "estimand": "Clause (iii) of the admission criterion requires the intervened pair to be a pair of the DECLARED target structure. The validity of that clause is the fraction of declared-target pairs, inside the design windows of admitted design cells, that a probing-derived reference also calls paired. Claim: that fraction is well above a half but well below one, so roughly a fifth of what the design programs declared is not what the molecules did, and every agreement number scored against a declared target inherits that ceiling.",
+   "what_would_falsify_it": "the fraction is computed over intervened pairs only and quoted as if it were over all declared pairs -- those are different populations and the manuscript reports both; or the reference used is the structure column the deposit ships, which is malformed on a large minority of rows and must not be used for this",
+   "independent_route_SPECIFICATION_NOT_IMPLEMENTATION": [
+    "Fold each wild type with a pseudoknot-capable program restrained by that construct's own reactivities, restrict both the declared target and the folded structure to the design window, and take the fraction of declared pairs present in the fold. Pool over pairs AND report the per-design distribution; a pooled fraction alone hides that some designs confirm nothing.",
+    "Do NOT use the deposit's own M2_structure column for this. A large minority of its strings are not balanced dot-bracket, and a fraction computed against it is a fraction against a defect. The manuscript reports the figure obtainable that way and does not use it; check that no claim rests on it."
+   ],
+   "backing_artifacts": [
+    "m57_criterion_validity.json",
+    "m53_probing_reference.json",
+    "m54_probing_reference.json"
+   ],
+   "companion_paper_artifacts": [],
+   "printed_value": {
+    "trust": "DO_NOT_TRUST_RECOMPUTE_INDEPENDENTLY",
+    "macros": {
+     "vaPooled": "+0.767",
+     "vaHit": "3{,}645",
+     "vaAll": "4{,}752",
+     "vaMean": "+0.787",
+     "vaMeanCi": "[+0.723,\\,\\allowbreak +0.842]",
+     "vaMed": "+0.847",
+     "vaNone": "1",
+     "vaNdes": "160",
+     "vaIntv": "+0.7948",
+     "vaReleased": "+0.623"
+    }
+   }
+  },
+  {
+   "id": "NM-C9",
+   "axis": "a reference nobody in the panel wrote",
+   "section": "Appendix / a reference nobody in the panel wrote",
+   "estimand": "Replace the agreement axis's reference -- the designer's declared target -- with a structure folded from this deposit's own chemical probing by a program that is not one of the scored implementations. Claim: the incumbent still ranks first and the order of the panel is unchanged, but its largest margin loses a large fraction of its size, with an interval on the CHANGE that excludes zero.",
+   "what_would_falsify_it": "the change is read off two separately-resampled margins rather than from an interval on the difference; or the two references are scored on different cell sets -- the agreement axis and the readout comparison are defined on cell sets that differ by one design, and conflating them is a real error this run made once and caught with a reverse control",
+   "independent_route_SPECIFICATION_NOT_IMPLEMENTATION": [
+    "Build the reference yourself from the deposit's reactivities. Take only the lowest-free-energy structure; these programs emit a set and a later member is not it.",
+    "Resample the two margins on the SAME draw and take the interval of the difference.",
+    "Check which cell set each quantity is defined on before comparing anything."
+   ],
+   "backing_artifacts": [
+    "m54_probing_reference.json",
+    "m53_probing_reference.json"
+   ],
+   "companion_paper_artifacts": [],
+   "printed_value": {
+    "trust": "DO_NOT_TRUST_RECOMPUTE_INDEPENDENTLY",
+    "macros": {
+     "prMarginBuilt": "+0.154",
+     "prMarginBuiltCi": "[+0.097,\\,\\allowbreak +0.211]",
+     "prMarginPct": "41\\%",
+     "prOrderSame": "unchanged",
+     "prDepthWorstCi": "[+0.0199,\\,\\allowbreak +0.1154]",
+     "prRestraintN": "117"
+    }
+   }
+  },
+  {
+   "id": "NM-C10",
+   "axis": "what the panel can represent",
+   "section": "Experimental setup / the predictors",
+   "estimand": "Two controls on panel composition, both added after review. (a) A second transformer sharing neither backbone nor training corpus with the first, scored on the same interventions and strata. (b) A pseudoknot-capable nearest-neighbour implementation -- the panel's own energy model with the pseudoknot search on, given no probing data -- added because the corpus is a pseudoknot round while every previously scored implementation is pseudoknot-blind. Claim: neither resolves the identity separation, neither beats free helix depth, and the pseudoknot-capable one reaches second place on agreement while placing last on response.",
+   "what_would_falsify_it": "the pseudoknot-capable member is given the construct's own probing data on the input side, which would put the outcome's own experiment on both sides of the comparison; or the second transformer's index convention is not checked, since an off-by-one in the pair map would produce a null for free; or the agreement-versus-response inversion is reported with an interval, which it must not be, the pair having been chosen after the point estimates were seen",
+   "independent_route_SPECIFICATION_NOT_IMPLEMENTATION": [
+    "Score both from sequence alone. For the pseudoknot-capable member, verify the sequence-only structures match the unrestrained control of the reference build exactly; if they do not, the two runs may not be placed in one panel.",
+    "For any neural member, verify the index convention before reading any column: decode the top L/2 pairs and check the fraction that are canonical. A correctly loaded head is far above chance; a randomly initialised head is far below. The manuscript reports both."
+   ],
+   "backing_artifacts": [
+    "m55_second_transformer.json",
+    "m58_pk_member.json"
+   ],
+   "companion_paper_artifacts": [],
+   "printed_value": {
+    "trust": "DO_NOT_TRUST_RECOMPUTE_INDEPENDENTLY",
+    "macros": {
+     "fmContrast": "\\ensuremath{-}0.01477",
+     "fmContrastCi": "[\\ensuremath{-}0.03682,\\,\\allowbreak +0.00769]",
+     "fmLevel": "+0.2378",
+     "fmVsDepth": "\\ensuremath{-}0.0847",
+     "fmVsDepthCi": "[\\ensuremath{-}0.1714,\\,\\allowbreak \\ensuremath{-}0.0014]",
+     "pkBuilt": "+0.8187",
+     "pkDecl": "+0.7199",
+     "pkLeadBuilt": "+0.8633",
+     "pkRank": "2",
+     "pkLevel": "+0.1855",
+     "pkContrast": "+0.0064",
+     "pkContrastCi": "[\\ensuremath{-}0.0155,\\,\\allowbreak +0.0290]",
+     "pkVsEtfAgree": "+0.0482",
+     "pkVsEtfDecl": "+0.0441"
+    }
+   }
+  },
+  {
+   "id": "NM-C11",
+   "axis": "interval method dependence",
+   "section": "Method / inference",
+   "estimand": "Recompute the three intervals that carry claims with a second method -- bias-corrected and accelerated, with the jackknife taken over the same clusters the bootstrap resamples. Claim: two of the three still exclude zero, and the third does not; the third is the readout comparison against the shipped agreement column, and the shift is caused by the bias correction rather than by extra width.",
+   "what_would_falsify_it": "the BCa endpoints are computed with the jackknife over records rather than over clusters; or the degenerate case is not checked -- with bias correction and acceleration set to zero, BCa must equal the percentile interval EXACTLY; or the manuscript reports the second method only where it agrees",
+   "independent_route_SPECIFICATION_NOT_IMPLEMENTATION": [
+    "Implement BCa from the definition: z0 = Phi^-1(fraction of bootstrap draws below the observed), acceleration from the jackknife third moment, endpoints at Phi(z0 + (z0 + z_q)/(1 - a(z0 + z_q))).",
+    "Check the degenerate identity first. If z0 = a = 0 does not return the percentile interval to the last bit, the implementation is wrong and nothing after it counts.",
+    "Reproduce each published percentile interval before reading its BCa counterpart. Two traps are documented: the published estimator draws its permutations and its bootstrap from ONE generator, so the bootstrap stream starts after the permutations; and the three runs do not share a quantile convention."
+   ],
+   "backing_artifacts": [
+    "m56_bca.json"
+   ],
+   "companion_paper_artifacts": [],
+   "printed_value": {
+    "trust": "DO_NOT_TRUST_RECOMPUTE_INDEPENDENTLY",
+    "macros": {
+     "bcOne": "[+0.0235,\\,\\allowbreak +0.0973]",
+     "bcTwo": "[\\ensuremath{-}0.0146,\\,\\allowbreak +0.2774]",
+     "bcThree": "[\\ensuremath{-}0.0287,\\,\\allowbreak \\ensuremath{-}0.0043]",
+     "bcTwoBasic": "[+0.0084,\\,\\allowbreak +0.2950]",
+     "bcTwoWidth": "1.019"
+    }
+   }
+  },
+  {
+   "id": "NM-C12",
+   "axis": "how strong a violation would have to be",
+   "section": "Method / estimation, and the one assumption it needs",
+   "estimand": "A closed-form sensitivity bound. The matched estimator is linear in the outcome, so an omitted covariate U entering with within-stratum response beta_u shifts the estimate by exactly beta_u * g_u, where g_u is the same weighted arm gap applied to U -- a product invariant to rescaling U. Claim: strata are keyed on the design cell, so any covariate constant within a design has g_u = 0 exactly and no design-level confounder can bias the estimate; the confounder that would explain the contrast away is a stated multiple of the placement bias the estimator already conditions on; and no measured covariate, nor the worst linear combination of all of them, comes near it.",
+   "what_would_falsify_it": "the multiplier's interval is reported as excluding one -- IT DOES NOT, and the manuscript grades that stake as failed; or the maximum over covariate indices is obtained by search rather than in closed form; or a covariate with no within-stratum variance is included, which makes the covariance matrix singular",
+   "independent_route_SPECIFICATION_NOT_IMPLEMENTATION": [
+    "Verify the identity by injection rather than by algebra alone: add a synthetic covariate at a known coefficient and check the estimate moves by exactly beta_u * g_u, that it is odd under U -> -U, and that a design-level covariate moves it by zero.",
+    "The maximum of (w'c)(w'd) over unit-within-variance indices has a closed form: with v = Sigma^{1/2} w, a = Sigma^{-1/2} c and b = Sigma^{-1/2} d, the maximum is (||a|| ||b|| + a'b)/2. Random directions must approach and never exceed it."
+   ],
+   "backing_artifacts": [
+    "m52_sensitivity.json"
+   ],
+   "companion_paper_artifacts": [],
+   "printed_value": {
+    "trust": "DO_NOT_TRUST_RECOMPUTE_INDEPENDENTLY",
+    "macros": {
+     "senK": "2.29",
+     "senKCi": "[+0.97,\\,\\allowbreak +3.72]",
+     "senBench": "+0.0236",
+     "senDiag": "+0.232",
+     "senDiagSd": "1.06",
+     "senMaxOne": "+0.0018",
+     "senArgOne": "wild-type pair probability",
+     "senMarginCi": "[+0.0178,\\,\\allowbreak +0.0855]",
+     "senMaxAll": "+0.0109",
+     "senMaxAllPct": "20\\%",
+     "senNcov": "8",
+     "senNdeg": "3"
     }
    }
   }

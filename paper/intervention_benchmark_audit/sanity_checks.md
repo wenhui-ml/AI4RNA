@@ -15,3 +15,17 @@ These are **not target values** and **not a supervision plan**. They are propert
 6. Every exposure count computed against a subset of a training corpus is a LOWER bound. A sentence of the form 'not in the training set' is unsupportable from a subset.
 
 7. A ratio of two contrasts is the estimator this work withdraws. Any number of that form anywhere in either manuscript is a finding, including in a table caption.
+
+8. A predictor scored as a panel member must see SEQUENCE ONLY. One program appears in this work twice, once restrained by the construct's own probing data to build a reference and once unrestrained as a scored member. If the restrained form were scored, the outcome's own experiment would sit on both sides of the comparison.
+
+9. The deposit's own probing-derived structure column is malformed on a large minority of rows -- the strings are not balanced dot-bracket. Any quantity computed against that column is computed against a defect. The well-formed subset is not a fallback either: it is a structure-class selection, the malformed rows being the more pseudoknotted ones.
+
+10. A dot-bracket parser for this corpus must keep ONE STACK PER BRACKET TYPE. It is a pseudoknot benchmark and the strings use several bracket families; a single-stack parser silently mis-pairs and every downstream number inherits it.
+
+11. The agreement axis and the readout comparison are defined on cell sets that DIFFER. Scoring one on the other's set reproduces published numbers to about 1e-3 and no better, which looks like a tolerance problem and is not.
+
+12. A number printed to four decimals carries +/-5e-5 of rounding. A reproduction tolerance of 5e-5 against a printed value is arithmetically unreachable; targets must be read from artifacts.
+
+13. A permutation-plus-bootstrap routine that draws both from one generator does not give the bootstrap a fresh stream. Reproducing such an interval requires advancing the generator by the permutation count first.
+
+14. An interval that covers zero after a second method, where the first excluded it, has not refuted anything. Check whether the shift came from extra width or from a bias correction; those are different findings and the manuscript distinguishes them.

@@ -133,9 +133,23 @@ NM_CLAIMS = [
         "claims.json:reference_column_disclosure and repeat on identical weights and strata.",
         "Standardise each by the pooled within-stratum SD of ITS OWN outcome column before "
         "comparing magnitudes. Comparing the raw contrasts is the error this claim exists to "
-        "correct; a recomputation that compares them raw has not reproduced the claim."],
-      artifacts=["m36_readout_scale.json", "m25_estimator_benchmark.json"],
-      printed=["cvIntvSd", "cvConvSd", "cvPairedSd", "cvPairedSdCi", "cvSwing"]),
+        "correct; a recomputation that compares them raw has not reproduced the claim.",
+        "The claim is now made against FIVE agreement columns, not one. Four are the panel "
+        "implementations' own structures; the fifth is folded from this deposit's own chemical "
+        "probing and contains no sequence-to-structure model. Reproducing the claim on the "
+        "shipped column alone reproduces the WEAKEST of the five gaps, which is the one the "
+        "manuscript reports; check that the four others are larger, since that ordering is the "
+        "reason the shipped column is not a flattering choice.",
+        "One of the five does not survive a second interval method, and the manuscript says so. "
+        "The percentile interval on the shipped column excludes zero; its bias-corrected and "
+        "accelerated interval covers zero, and NOT because it is wider -- the width ratio is "
+        "near one and the bias correction shifts it down. An audit that recomputes only the "
+        "percentile interval has not tested this sentence."],
+      artifacts=["m36_readout_scale.json", "m25_estimator_benchmark.json",
+                 "m54_probing_reference.json", "m56_bca.json"],
+      printed=["cvIntvSd", "cvConvSd", "cvPairedSd", "cvPairedSdCi", "cvSwing",
+               "prNcol", "prReadout", "prReadoutCi", "prReadoutN", "prReadoutNCi",
+               "bcTwo", "bcTwoWidth", "bcTwoBasic"]),
  dict(id="NM-C2", label="claim:identity", axis="pair identity",
       section="Results / what the instrument reads out",
       estimand="For each of three predictors, the matched stratified difference in the predictor's "
@@ -144,10 +158,16 @@ NM_CLAIMS = [
                "difference on the measured rescue factor. Claim: the neural predictor's output "
                "separates the two identities, the two nearest-neighbour predictors differ from "
                "each other, and the separation decomposes into an architecture axis and a "
-               "training-data axis whose difference has an interval.",
+               "training-data axis whose difference has an interval. NARROWED SINCE THE LAST "
+               "PACKAGE: a second transformer sharing neither backbone nor training corpus does "
+               "NOT reproduce the architecture axis, and a pseudoknot-capable thermodynamic "
+               "implementation does not resolve the identity separation either, so the axis is "
+               "stated as a property of one model and not of its architecture class.",
       falsifier="any pair of predictors is compared without an interval on the DIFFERENCE; or the "
                 "three predictor columns are not read on the same records; or the 1-based vs "
-                "0-based indexing of the two prediction sources is crossed",
+                "0-based indexing of the two prediction sources is crossed; or the manuscript "
+                "anywhere states the architecture axis as a fact about transformers rather than "
+                "about this transformer, which the second-transformer result forbids",
       independent_route=[
         "Recompute each predictor's pair probability for the named (i,j) in the mutant sequence "
         "from a partition function of your own choosing for the thermodynamic arm; for the neural "
@@ -158,10 +178,12 @@ NM_CLAIMS = [
         "Indexing is the trap: one prediction source is 0-based and the other is 1-based. A "
         "recomputation that gets the identity contrast right but the pairwise differences wrong "
         "should check this first."],
-      artifacts=["m35_paired_predictor_differences.json", "m26_model_scored.json"],
+      artifacts=["m35_paired_predictor_differences.json", "m26_model_scored.json",
+                 "m55_second_transformer.json", "m58_pk_member.json", "m52_sensitivity.json"],
       printed=["resNeural", "resNeuralCi", "resVienna", "resViennaCi", "efContrast",
                "efContrastCi", "pdNVCi", "pdNECi", "pdVECi", "axArch", "axArchCi", "axData",
-               "axDataCi", "axGap", "axGapCi"]),
+               "axDataCi", "axGap", "axGapCi", "fmContrast", "fmContrastCi", "pkContrast",
+               "pkContrastCi", "senK", "senKCi", "senMaxOne", "senMaxAll"]),
  dict(id="NM-C3", label="claim:depth", axis="free baseline",
       section="Results / which flips rescue, and the free baseline nobody reports",
       estimand="Within each design cell of at least 8 admitted interventions, the Spearman rank "
@@ -171,11 +193,20 @@ NM_CLAIMS = [
                "target structure, requiring no model. Claim: the paired difference (predictor "
                "minus depth) has an interval covering zero for every predictor, so no predictor "
                "beats the free integer; and three purpose-built mutation-effect scores lose to it "
-               "with intervals that EXCLUDE zero on the losing side.",
+               "with intervals that EXCLUDE zero on the losing side. NEW SINCE THE LAST PACKAGE: "
+               "the claim now carries a measured DOMAIN. Split the interventions on whether a "
+               "probing-derived reference confirms the intervened pair. Depth's rank agreement is "
+               "much larger in the confirmed stratum than in the unconfirmed one, and in the "
+               "unconfirmed stratum NOTHING is resolved -- every interval covers zero and the "
+               "transformer's point estimate is the larger. Two further implementations, a second "
+               "transformer and a pseudoknot-capable thermodynamic one, also lose to the integer, "
+               "the latter by an interval excluding zero.",
       falsifier="the difference is read as two point estimates rather than as one interval on the "
                 "difference -- which is the error the paper itself retracts here; or depth is "
                 "computed from a predicted structure rather than from the declared target; or the "
-                "bootstrap resamples interventions rather than puzzles",
+                "bootstrap resamples interventions rather than puzzles; or the domain split is "
+                "read as depth failing in the unconfirmed stratum rather than as nothing being "
+                "resolved there, which is the paper's own bounded-negative rule",
       independent_route=[
         "Depth of a pair (a,b) in the declared target structure = the number of consecutive "
         "nested pairs stacked outside it, capped by the number stacked inside it; formally "
@@ -188,10 +219,15 @@ NM_CLAIMS = [
         "|dG_ensemble(mut) - dG_ensemble(wt)|. Their declared sign is NEGATIVE (a rescuing flip "
         "preserves structure), so negate before ranking."],
       artifacts=["m31_which_flips_rescue.json", "m31r_review.json",
-                 "m38_ribosnitch_baseline.json", "m40v_verify_m38_m39.json"],
+                 "m38_ribosnitch_baseline.json", "m40v_verify_m38_m39.json",
+                 "m57_criterion_validity.json", "m55_second_transformer.json",
+                 "m58_pk_member.json"],
       printed=["rkRhoD", "rkRhoDCi", "rkRhoN", "rkDiffNCi", "rkDiffVCi", "efVsDepthCi",
                "rkPartN", "rkPartNCi", "rsBppm", "rsBppmCi", "rsBppmVs", "rsBppmVsCi",
-               "rsMfeVs", "rsMfeVsCi", "rsEnsVs", "rsEnsVsCi"]),
+               "rsMfeVs", "rsMfeVsCi", "rsEnsVs", "rsEnsVsCi",
+               "vaDepConf", "vaDepUnc", "vaDepGap", "vaNconf", "vaNunc", "vaDNC", "vaDNCCi",
+               "vaNresUnc", "vaConfLvl", "vaDepVsConf", "vaDepVsConfCi",
+               "fmLevel", "fmVsDepth", "fmVsDepthCi", "pkLevel", "pkVsDepth", "pkVsDepthCi"]),
  dict(id="NM-C4", label="sec:ledger", axis="the ledger",
       section="Results / the ledger: who chose the covariate that carries each number",
       estimand="Eight covariate-choice channels, each priced by a direct contrast in its own "
@@ -253,6 +289,171 @@ NM_CLAIMS = [
         "leave-one-out the endpoint and see whether the sign survives."],
       artifacts=["m26r3_realistic_calibration.json", "m26r4_calibration_symmetry.json"],
       printed=["mcNeuralSpanFrac", "mcViennaSpanFrac"]),
+ # -------------------------------------------------------------------------------------------
+ # C7 was missing from every package built before 2026-09-01. It is the manuscript's Reading-2
+ # headline -- the claim the whole second half of the paper exists to support -- and the auditor
+ # was never given it. Recorded here rather than quietly added, because a claim ledger that
+ # omitted the paper's most consequential claim is itself a process finding.
+ # -------------------------------------------------------------------------------------------
+ dict(id="NM-C7", label="claim:budget", axis="the budgeted decision",
+      section="Results / what the benchmark's margin buys, in tubes",
+      estimand="Convert a structure-agreement margin into an experimental decision. Within each "
+               "design cell, rank the admitted interventions by a score, take the top k = "
+               "ceil(frac * n) with k >= 2, and record the fraction of that cell's RESCUING "
+               "interventions recovered, pooled over cells weighted by the number of rescuing "
+               "interventions. Scores compared: each implementation's pair probability, and free "
+               "helix depth. Claim: at every budget no implementation's recovery advantage over "
+               "free depth excludes zero; against a margin fixed as the gain one extra construct "
+               "buys, most comparisons are formally EQUIVALENT to free depth and the rest fail on "
+               "the side of being worse; the panel's largest agreement margin converts to a small "
+               "percentage of rescuing interventions; and the gap changes sign exactly once as "
+               "the budget is swept.",
+      falsifier="the equivalence test is run without a pre-fixed margin delta, or with a delta "
+                "chosen after seeing the recoveries; or 'no interval excludes zero' is reported "
+                "as 'the scores are equal', which is the bounded-negative rule this paper states "
+                "for itself; or the sign change is asserted from three budget points rather than "
+                "measured over a sweep; or ties inside a cell are broken in an order correlated "
+                "with the outcome",
+      independent_route=[
+        "Rebuild the admitted set from criterion.md, then implement recovery-at-budget exactly as "
+        "the estimand states. The budget must be a FRACTION of each cell's size, floored at two "
+        "constructs, not a fixed count -- a fixed count changes which cells can contribute.",
+        "Tie handling is the trap. Most within-design pairs are tied on depth, so a stable sort "
+        "makes the result depend on CSV row order. Average over random within-cell orders and "
+        "report both; if the two disagree, that disagreement is the finding.",
+        "Equivalence is a TOST-shaped statement, not a failure to reject. Fix delta first, from "
+        "the gain one extra construct buys, and grade each comparison against it.",
+        "Sweep the budget rather than testing three points, and count sign changes over the "
+        "sweep. A crossing asserted from three points is not measured."],
+      artifacts=["m44_decision.json", "m44v_verify.json", "m47_equivalence.json",
+                 "m58_pk_member.json"],
+      printed=["eqNeq", "eqNcomp", "eqNfail", "eqDelta", "dcTransF1", "dcTransPct",
+               "tvGapTen", "tvGapCiTen", "ivNcross", "ivCrossA", "ivCrossB",
+               "pkRecPk", "pkRecDepth"]),
+ dict(id="NM-C8", label="sec:clauseiii", axis="the criterion's own validity",
+      section="Method / the eligibility criterion",
+      estimand="Clause (iii) of the admission criterion requires the intervened pair to be a pair "
+               "of the DECLARED target structure. The validity of that clause is the fraction of "
+               "declared-target pairs, inside the design windows of admitted design cells, that a "
+               "probing-derived reference also calls paired. Claim: that fraction is well above a "
+               "half but well below one, so roughly a fifth of what the design programs declared "
+               "is not what the molecules did, and every agreement number scored against a "
+               "declared target inherits that ceiling.",
+      falsifier="the fraction is computed over intervened pairs only and quoted as if it were "
+                "over all declared pairs -- those are different populations and the manuscript "
+                "reports both; or the reference used is the structure column the deposit ships, "
+                "which is malformed on a large minority of rows and must not be used for this",
+      independent_route=[
+        "Fold each wild type with a pseudoknot-capable program restrained by that construct's own "
+        "reactivities, restrict both the declared target and the folded structure to the design "
+        "window, and take the fraction of declared pairs present in the fold. Pool over pairs AND "
+        "report the per-design distribution; a pooled fraction alone hides that some designs "
+        "confirm nothing.",
+        "Do NOT use the deposit's own M2_structure column for this. A large minority of its "
+        "strings are not balanced dot-bracket, and a fraction computed against it is a fraction "
+        "against a defect. The manuscript reports the figure obtainable that way and does not "
+        "use it; check that no claim rests on it."],
+      artifacts=["m57_criterion_validity.json", "m53_probing_reference.json",
+                 "m54_probing_reference.json"],
+      printed=["vaPooled", "vaHit", "vaAll", "vaMean", "vaMeanCi", "vaMed", "vaNone", "vaNdes",
+               "vaIntv", "vaReleased"]),
+ dict(id="NM-C9", label="app:probing", axis="a reference nobody in the panel wrote",
+      section="Appendix / a reference nobody in the panel wrote",
+      estimand="Replace the agreement axis's reference -- the designer's declared target -- with a "
+               "structure folded from this deposit's own chemical probing by a program that is "
+               "not one of the scored implementations. Claim: the incumbent still ranks first and "
+               "the order of the panel is unchanged, but its largest margin loses a large "
+               "fraction of its size, with an interval on the CHANGE that excludes zero.",
+      falsifier="the change is read off two separately-resampled margins rather than from an "
+                "interval on the difference; or the two references are scored on different cell "
+                "sets -- the agreement axis and the readout comparison are defined on cell sets "
+                "that differ by one design, and conflating them is a real error this run made "
+                "once and caught with a reverse control",
+      independent_route=[
+        "Build the reference yourself from the deposit's reactivities. Take only the "
+        "lowest-free-energy structure; these programs emit a set and a later member is not it.",
+        "Resample the two margins on the SAME draw and take the interval of the difference.",
+        "Check which cell set each quantity is defined on before comparing anything."],
+      artifacts=["m54_probing_reference.json", "m53_probing_reference.json"],
+      printed=["prMarginBuilt", "prMarginBuiltCi", "prMarginPct", "prOrderSame",
+               "prDepthWorstCi", "prRestraintN"]),
+ dict(id="NM-C10", label="sec:models", axis="what the panel can represent",
+      section="Experimental setup / the predictors",
+      estimand="Two controls on panel composition, both added after review. (a) A second "
+               "transformer sharing neither backbone nor training corpus with the first, scored "
+               "on the same interventions and strata. (b) A pseudoknot-capable nearest-neighbour "
+               "implementation -- the panel's own energy model with the pseudoknot search on, "
+               "given no probing data -- added because the corpus is a pseudoknot round while "
+               "every previously scored implementation is pseudoknot-blind. Claim: neither "
+               "resolves the identity separation, neither beats free helix depth, and the "
+               "pseudoknot-capable one reaches second place on agreement while placing last on "
+               "response.",
+      falsifier="the pseudoknot-capable member is given the construct's own probing data on the "
+                "input side, which would put the outcome's own experiment on both sides of the "
+                "comparison; or the second transformer's index convention is not checked, since "
+                "an off-by-one in the pair map would produce a null for free; or the "
+                "agreement-versus-response inversion is reported with an interval, which it must "
+                "not be, the pair having been chosen after the point estimates were seen",
+      independent_route=[
+        "Score both from sequence alone. For the pseudoknot-capable member, verify the "
+        "sequence-only structures match the unrestrained control of the reference build exactly; "
+        "if they do not, the two runs may not be placed in one panel.",
+        "For any neural member, verify the index convention before reading any column: decode the "
+        "top L/2 pairs and check the fraction that are canonical. A correctly loaded head is far "
+        "above chance; a randomly initialised head is far below. The manuscript reports both."],
+      artifacts=["m55_second_transformer.json", "m58_pk_member.json"],
+      printed=["fmContrast", "fmContrastCi", "fmLevel", "fmVsDepth", "fmVsDepthCi",
+               "pkBuilt", "pkDecl", "pkLeadBuilt", "pkRank", "pkLevel", "pkContrast",
+               "pkContrastCi", "pkVsEtfAgree", "pkVsEtfDecl"]),
+ dict(id="NM-C11", label="sec:inference", axis="interval method dependence",
+      section="Method / inference",
+      estimand="Recompute the three intervals that carry claims with a second method -- "
+               "bias-corrected and accelerated, with the jackknife taken over the same clusters "
+               "the bootstrap resamples. Claim: two of the three still exclude zero, and the "
+               "third does not; the third is the readout comparison against the shipped agreement "
+               "column, and the shift is caused by the bias correction rather than by extra "
+               "width.",
+      falsifier="the BCa endpoints are computed with the jackknife over records rather than over "
+                "clusters; or the degenerate case is not checked -- with bias correction and "
+                "acceleration set to zero, BCa must equal the percentile interval EXACTLY; or the "
+                "manuscript reports the second method only where it agrees",
+      independent_route=[
+        "Implement BCa from the definition: z0 = Phi^-1(fraction of bootstrap draws below the "
+        "observed), acceleration from the jackknife third moment, endpoints at "
+        "Phi(z0 + (z0 + z_q)/(1 - a(z0 + z_q))).",
+        "Check the degenerate identity first. If z0 = a = 0 does not return the percentile "
+        "interval to the last bit, the implementation is wrong and nothing after it counts.",
+        "Reproduce each published percentile interval before reading its BCa counterpart. Two "
+        "traps are documented: the published estimator draws its permutations and its bootstrap "
+        "from ONE generator, so the bootstrap stream starts after the permutations; and the three "
+        "runs do not share a quantile convention."],
+      artifacts=["m56_bca.json"],
+      printed=["bcOne", "bcTwo", "bcThree", "bcTwoBasic", "bcTwoWidth"]),
+ dict(id="NM-C12", label="ass:placement", axis="how strong a violation would have to be",
+      section="Method / estimation, and the one assumption it needs",
+      estimand="A closed-form sensitivity bound. The matched estimator is linear in the outcome, "
+               "so an omitted covariate U entering with within-stratum response beta_u shifts the "
+               "estimate by exactly beta_u * g_u, where g_u is the same weighted arm gap applied "
+               "to U -- a product invariant to rescaling U. Claim: strata are keyed on the design "
+               "cell, so any covariate constant within a design has g_u = 0 exactly and no "
+               "design-level confounder can bias the estimate; the confounder that would explain "
+               "the contrast away is a stated multiple of the placement bias the estimator "
+               "already conditions on; and no measured covariate, nor the worst linear "
+               "combination of all of them, comes near it.",
+      falsifier="the multiplier's interval is reported as excluding one -- IT DOES NOT, and the "
+                "manuscript grades that stake as failed; or the maximum over covariate indices is "
+                "obtained by search rather than in closed form; or a covariate with no "
+                "within-stratum variance is included, which makes the covariance matrix singular",
+      independent_route=[
+        "Verify the identity by injection rather than by algebra alone: add a synthetic covariate "
+        "at a known coefficient and check the estimate moves by exactly beta_u * g_u, that it is "
+        "odd under U -> -U, and that a design-level covariate moves it by zero.",
+        "The maximum of (w'c)(w'd) over unit-within-variance indices has a closed form: with "
+        "v = Sigma^{1/2} w, a = Sigma^{-1/2} c and b = Sigma^{-1/2} d, the maximum is "
+        "(||a|| ||b|| + a'b)/2. Random directions must approach and never exceed it."],
+      artifacts=["m52_sensitivity.json"],
+      printed=["senK", "senKCi", "senBench", "senDiag", "senDiagSd", "senMaxOne", "senArgOne",
+               "senMarginCi", "senMaxAll", "senMaxAllPct", "senNcov", "senNdeg"]),
 ]
 
 
@@ -421,6 +622,31 @@ PROCESS_CLAIMS = [
       "reported as unresolved, never as a refutation.",
       falsify_by="find a sentence that reads an interval containing zero as evidence of absence.",
       check_command=None),
+ dict(id="P11", claim="Each declaration names the consequence a failed stake will have on the "
+      "manuscript BEFORE the number exists, and where a stake failed that consequence was "
+      "actually applied to the text.",
+      falsify_by="for each declaration with a failed stake, read its declared_consequences block "
+                 "and then read the manuscript at the place it names. A declared narrowing that "
+                 "was not applied is the most serious finding available here, because the "
+                 "declaration is what makes the stake meaningful. Eight stakes across five "
+                 "experiments failed; each should be traceable to a specific change.",
+      check_command=None),
+ dict(id="P12", claim="Where a declaration itself was wrong, the error is RECORDED as an erratum "
+      "and the declaration is not edited after the fact.",
+      falsify_by="compare each declaration's git blob at its first commit against its current "
+                 "blob. Any difference is a finding. Then check that every erratum described in "
+                 "the manuscript's preregistration appendix corresponds to something real -- "
+                 "three are recorded: a stake written on a point estimate where an interval was "
+                 "needed, a verification identity that does not exist, and a verification wording "
+                 "that named the wrong count.",
+      check_command="git log --format='%H' -- <declaration> | tail -1  # then diff that blob"),
+ dict(id="P13", claim="A quantity computed and not reported is not hidden: the repository's own "
+      "audit tool lists every generated macro the manuscript never prints, and the count is "
+      "disclosed rather than minimised.",
+      falsify_by="run the audit tool and read check [B]. Then ask, for each unprinted quantity, "
+                 "whether it would have weakened a claim. A quantity computed, unprinted and "
+                 "unfavourable is the finding this check exists for.",
+      check_command="python paper/audit_manuscript.py <manuscript-dir>   # check [B]"),
 ]
 
 
@@ -441,6 +667,28 @@ SANITY = [
  "sentence of the form 'not in the training set' is unsupportable from a subset.",
  "A ratio of two contrasts is the estimator this work withdraws. Any number of that form anywhere "
  "in either manuscript is a finding, including in a table caption.",
+ "A predictor scored as a panel member must see SEQUENCE ONLY. One program appears in this work "
+ "twice, once restrained by the construct's own probing data to build a reference and once "
+ "unrestrained as a scored member. If the restrained form were scored, the outcome's own "
+ "experiment would sit on both sides of the comparison.",
+ "The deposit's own probing-derived structure column is malformed on a large minority of rows -- "
+ "the strings are not balanced dot-bracket. Any quantity computed against that column is computed "
+ "against a defect. The well-formed subset is not a fallback either: it is a structure-class "
+ "selection, the malformed rows being the more pseudoknotted ones.",
+ "A dot-bracket parser for this corpus must keep ONE STACK PER BRACKET TYPE. It is a pseudoknot "
+ "benchmark and the strings use several bracket families; a single-stack parser silently "
+ "mis-pairs and every downstream number inherits it.",
+ "The agreement axis and the readout comparison are defined on cell sets that DIFFER. Scoring one "
+ "on the other's set reproduces published numbers to about 1e-3 and no better, which looks like a "
+ "tolerance problem and is not.",
+ "A number printed to four decimals carries +/-5e-5 of rounding. A reproduction tolerance of 5e-5 "
+ "against a printed value is arithmetically unreachable; targets must be read from artifacts.",
+ "A permutation-plus-bootstrap routine that draws both from one generator does not give the "
+ "bootstrap a fresh stream. Reproducing such an interval requires advancing the generator by the "
+ "permutation count first.",
+ "An interval that covers zero after a second method, where the first excluded it, has not "
+ "refuted anything. Check whether the shift came from extra width or from a bias correction; "
+ "those are different findings and the manuscript distinguishes them.",
 ]
 
 
@@ -622,7 +870,7 @@ route**.
 | `submission.json` | both | the abstract and every claim box **as printed**, with macros expanded, plus the independence conditions |
 | `claims.json` | result | one row per load-bearing claim: the estimand written out, what would falsify it, an **independent route stated as a specification**, and -- quarantined -- the number we print |
 | `artifacts.json` | both | the full inventory with sha256: two public input CSVs, the manuscript files, and every one of our run outputs, each tagged with its trust class |
-| `process_claims.json` | process | ten claims the manuscript makes **about its own process**, each with the command or comparison that would falsify it |
+| `process_claims.json` | process | thirteen claims the manuscript makes **about its own process**, each with the command or comparison that would falsify it |
 | `sanity_checks.md` | process | first-principles invariants the manuscript relies on. Not a plan, not target values |
 | `criterion.md` | result | the eligibility criterion in prose, sufficient to rebuild the admitted set from the public CSV without our code |
 | `estimator.md` | result | the estimators in prose and symbols: the matched stratified difference, the clustering, the permutation, the depth integer |
@@ -656,6 +904,19 @@ Stated up front so that finding them is not mistaken for the whole audit:
   compensatory mutant, and the released checkpoint's pseudo-label stage.
 - Exposure counts are **lower bounds**, because the training file we obtained is a subset.
 - Two load-bearing review analyses have **no frozen declaration** (disclosed in the manuscript).
+- **Eight preregistered stakes failed** across five experiments. Each failure has a declared
+  consequence that was written before the number existed, and each consequence should be traceable
+  to a specific change in the text. Checking that trace is process claim `P11`, and it is the most
+  informative single thing an auditor can do with this package.
+- **The free integer cannot be separated from "the declared pair is really there."** Its rank
+  agreement exceeds that of the bare confirmation indicator, but the interval on the difference
+  covers zero. The manuscript states this in the limitations; a reader who prefers the mechanical
+  reading of the baseline is not contradicted by anything measured here.
+- **One claim's interval is method-dependent.** The readout comparison against the shipped
+  agreement column excludes zero under the percentile method and covers it under BCa. That column
+  is also the smallest of the five gaps; the four others are not method-dependent.
+- **The pseudoknot-capable member is not an independent opinion.** It is the panel's own energy
+  model with the pseudoknot search on. It isolates a capability; it does not widen the panel.
 
 A finding that lands on one of these is still a finding; it is not a surprise, and the manuscript
 should be checked for whether it discloses the limitation where the number appears, not merely in
@@ -768,6 +1029,121 @@ either manuscript including a table caption, is a finding.**
 """
 
 
+NM_CHANGELOG = """# What changed since the last package
+
+Previous package built **2026-08-31 02:30**. This one **2026-09-01**. Regenerate with
+`python paper/build_audit_packages.py`, validate with `python paper/check_audit_packages.py`.
+
+Everything below is a change to **what is being audited**, not to how. The independence rules in
+`README.md` are unchanged: do not run our code, do not accept our numbers as input, the substrate
+is the two public CSVs.
+
+---
+
+## 1. A gap in the previous package, stated first because it is ours
+
+**The manuscript's Reading-2 headline claim was not in the claim ledger.** `claim:budget` --- that
+no implementation outperforms a free integer once an agreement margin is spent as experiments ---
+had no row in `claims.json` in any package built before today. The auditor was given five claims
+and a retraction, and was never handed the claim the entire second half of the paper exists to
+support.
+
+It is now **`NM-C7`**, with its estimand, its falsifiers and an independent route. We record the
+omission here rather than adding the row quietly, because a claim ledger that dropped the paper's
+most consequential claim is itself a process finding, and `process_claims.json:P11` invites you to
+look for others of the same kind.
+
+## 2. Ledger size
+
+|  | before | now |
+|---|---|---|
+| claims | 6 | **12** |
+| printed values quarantined | 57 | **150** |
+| our run artifacts inventoried | 31 | **53** |
+
+## 3. The six new claims
+
+| id | axis | why it exists |
+|---|---|---|
+| `NM-C7` | the budgeted decision | the omission above |
+| `NM-C8` | the criterion's own validity | clause (iii) admits an intervention because a design program *declared* the pair. We now measure how often the molecule agrees, and it is not always |
+| `NM-C9` | a reference nobody in the panel wrote | the agreement axis re-scored against a structure folded from this deposit's own probing rather than against a designer's intention |
+| `NM-C10` | what the panel can represent | two panel-composition controls added after review: a second transformer, and a pseudoknot-capable implementation on a corpus that is a pseudoknot round |
+| `NM-C11` | interval method dependence | the three claim-carrying intervals recomputed by a second method |
+| `NM-C12` | how strong a violation would have to be | the closed-form sensitivity bound on the paper's one identification assumption |
+
+## 4. Three existing claims changed meaning, not just numbers
+
+- **`NM-C2` (pair identity) is narrower than it was.** A second transformer sharing neither
+  backbone nor training corpus does **not** reproduce the architecture axis, and a
+  pseudoknot-capable thermodynamic implementation does not resolve the identity separation either.
+  The axis is now stated as a property of **one model**, not of an architecture class. If you find
+  any sentence in the manuscript still stating it as a class fact, that is a finding.
+- **`NM-C3` (the free baseline) gained a measured domain.** Split on whether a probing-derived
+  reference confirms the intervened pair, the free integer's advantage lives almost entirely in
+  the confirmed stratum; in the unconfirmed stratum **nothing is resolved** and the transformer's
+  point estimate is the larger. Check that the manuscript reports that as a domain and never as a
+  defeat, and equally that it does not report the unconfirmed stratum as a win.
+- **`NM-C1` (readout scale) is now made against five agreement columns, not one**, and one of the
+  five is method-dependent. See §6.
+
+## 5. Three new process claims
+
+- **`P11` --- declared consequences were actually applied.** Eight preregistered stakes failed
+  across five experiments. Each declaration names, *before the number existed*, what a failure
+  would do to the manuscript. **This is the highest-value single check in the package**: a declared
+  narrowing that was not applied to the text is the most serious finding available here, because
+  the declaration is the only thing that makes a stake mean anything.
+- **`P12` --- declarations were not edited after the fact.** Where a declaration was itself wrong,
+  the error is recorded as an erratum and the file is left alone. Three errata are claimed. Diff
+  each declaration's first git blob against its current one; any difference is a finding.
+- **`P13` --- quantities computed and not printed are disclosed.** Run our audit tool and read
+  check `[B]`. Then ask, for each unprinted quantity, whether printing it would have weakened a
+  claim.
+
+## 6. Where we already know we are weak (added to `README.md`)
+
+- **Eight stakes failed.** They are graded as failed in the manuscript's preregistration appendix,
+  in the declaration's own wording.
+- **The free integer cannot be separated from "the declared pair is really there."** Its rank
+  agreement exceeds the bare confirmation indicator's, but the interval on the difference covers
+  zero. A reader who prefers the mechanical reading of the baseline is not contradicted by anything
+  we measured, and the limitations say so.
+- **One claim's interval is method-dependent.** The readout comparison against the shipped
+  agreement column excludes zero under the percentile method and covers zero under BCa --- and not
+  because BCa is wider here, but because the bias correction shifts it. That same column is the
+  *smallest* of the five gaps; the four others are not method-dependent.
+- **The pseudoknot-capable member is not an independent fifth opinion.** It is the panel's own
+  energy model with the pseudoknot search switched on. It isolates a capability. It does not widen
+  the panel, and the paper does not claim it does.
+
+## 7. Eight new first-principles traps in `sanity_checks.md`
+
+Two are worth reading before you write any code:
+
+- **A dot-bracket parser for this corpus must keep one stack per bracket type.** It is a pseudoknot
+  benchmark; the strings use several bracket families. A single-stack parser silently mis-pairs and
+  every downstream number inherits it.
+- **A number printed to four decimals carries ±5e-5 of rounding.** A reproduction tolerance of 5e-5
+  against a printed value is arithmetically unreachable. Read targets from the artifacts.
+
+The rest cover the malformed structure column shipped with the deposit, the two cell sets that are
+not the same set, the one-generator permutation-then-bootstrap stream, and the rule that a scored
+panel member must see sequence only.
+
+## 8. State of the manuscript itself
+
+```
+71 pages   build exit 0   0 overfull boxes   make_check clean
+audit: 1 blocking finding
+```
+
+The single blocking finding is two placeholders in the code-and-data-availability paragraph: the
+public repository URL and the Zenodo DOI. Both are deliberately deferred until the manuscript is
+accepted, by decision. Nothing else in the audit is blocking.
+"""
+
+
 def main():
     specs = [
       ("NM", "intervention_benchmark_audit", os.path.join(HERE, "intervention_benchmark"),
@@ -792,6 +1168,10 @@ def main():
         write(out, "README.md", README.format(title=title, one_line=one), raw=True)
         write(out, "criterion.md", CRITERION, raw=True)
         write(out, "estimator.md", ESTIMATOR, raw=True)
+        if tag == "NM":
+            # what changed since the previous package, so the recipient does not
+            # have to diff two folders to find out what is new to audit
+            write(out, "CHANGELOG.md", NM_CHANGELOG, raw=True)
         # the package checksums itself last, so the recipient can verify what they received
         files = sorted(f for f in os.listdir(out) if f != "MANIFEST.json")
         write(out, "MANIFEST.json", {

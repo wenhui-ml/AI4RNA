@@ -60,6 +60,24 @@
    "claim": "Negative results are reported bounded: an interval containing zero is reported as unresolved, never as a refutation.",
    "falsify_by": "find a sentence that reads an interval containing zero as evidence of absence.",
    "check_command": null
+  },
+  {
+   "id": "P11",
+   "claim": "Each declaration names the consequence a failed stake will have on the manuscript BEFORE the number exists, and where a stake failed that consequence was actually applied to the text.",
+   "falsify_by": "for each declaration with a failed stake, read its declared_consequences block and then read the manuscript at the place it names. A declared narrowing that was not applied is the most serious finding available here, because the declaration is what makes the stake meaningful. Eight stakes across five experiments failed; each should be traceable to a specific change.",
+   "check_command": null
+  },
+  {
+   "id": "P12",
+   "claim": "Where a declaration itself was wrong, the error is RECORDED as an erratum and the declaration is not edited after the fact.",
+   "falsify_by": "compare each declaration's git blob at its first commit against its current blob. Any difference is a finding. Then check that every erratum described in the manuscript's preregistration appendix corresponds to something real -- three are recorded: a stake written on a point estimate where an interval was needed, a verification identity that does not exist, and a verification wording that named the wrong count.",
+   "check_command": "git log --format='%H' -- <declaration> | tail -1  # then diff that blob"
+  },
+  {
+   "id": "P13",
+   "claim": "A quantity computed and not reported is not hidden: the repository's own audit tool lists every generated macro the manuscript never prints, and the count is disclosed rather than minimised.",
+   "falsify_by": "run the audit tool and read check [B]. Then ask, for each unprinted quantity, whether it would have weakened a claim. A quantity computed, unprinted and unfavourable is the finding this check exists for.",
+   "check_command": "python paper/audit_manuscript.py <manuscript-dir>   # check [B]"
   }
  ]
 }
