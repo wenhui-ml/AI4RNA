@@ -1,0 +1,17 @@
+=== M53:把一致性轴换到一个面板里没有模型写过的参考上 ===
+  声明已冻结并推送于本文件存在之前。全离线,$0。
+  重算三个实现的结构(160 条野生型)
+    ViennaRNA 完成  2s
+    RNAstructure 完成 160 条,用时 7s
+    EternaFold 结构 50/160
+    EternaFold 结构 100/160
+    EternaFold 结构 150/160
+    EternaFold 完成  24s
+  野生型 160  探测结构 160  RNet 结构 160  ViennaRNA 160  RNAstructure 160  EternaFold 160  (27s)
+
+=== V 验证(先于任何 arm)===
+  V1 自身 F1 1.0  对空结构 0.0  -> 通过
+  V2 我们的 F1 vs 文件自带 M2_F1 列:最大偏差 0.86700(n=160)
+  V2 我们的 F1 vs 文件自带 RNet_F1 列:最大偏差 0.00000(n=160)
+
+写出 /data/wenhui/openclaude_rna/rna_harness/runs/ceiling/m53_probing_reference.json

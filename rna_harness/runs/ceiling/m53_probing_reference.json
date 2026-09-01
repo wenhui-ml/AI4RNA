@@ -1,0 +1,46 @@
+{
+ "declaration": "m53_probing_reference_declaration.json",
+ "cost": "offline, $0 -- no API, no GPU, no download.",
+ "V": {
+  "V1_zero_point": true,
+  "V2_external_columns": false,
+  "V2_max_dev": {
+   "M2_F1": 0.867,
+   "RNet_F1": 4.440892098500626e-16
+  }
+ },
+ "defect_in_the_released_column": {
+  "what": "M2_structure is not a balanced dot-bracket string for a large minority of the released wild-type rows, so no per-bracket-type parse of it can reproduce the file's own M2_F1 column",
+  "our_parser_is_not_the_cause": {
+   "RNet_F1_max_dev": 4.440892098500626e-16,
+   "n": 160,
+   "note": "same parser, same coordinate shift, same window, exact reproduction"
+  },
+  "balanced": 86,
+  "unbalanced": 74,
+  "reproduce_M2_F1_among_balanced": 80,
+  "reproduce_M2_F1_among_unbalanced": 0,
+  "selection_if_the_balanced_subset_were_used": {
+   "target_pseudoknot_char_fraction_balanced": 0.0844,
+   "target_pseudoknot_char_fraction_unbalanced": 0.1194,
+   "why_it_matters": "the malformed rows are the MORE pseudoknotted ones, so keeping only the well-formed rows selects on structure class in a pseudoknot benchmark. The subset is a bounded robustness check at best and cannot be the primary reference."
+  },
+  "consequence": "M53 is VOID as declared. The question it asks is unchanged and is carried to a successor run that builds a probing-derived reference from the 2A3 profiles rather than reading one out of this column."
+ },
+ "VOID": "K2: V2 未通过 —— released M2_structure 列在 74/160 行上不是配平的点括号串",
+ "log": [
+  "=== M53:把一致性轴换到一个面板里没有模型写过的参考上 ===",
+  "  声明已冻结并推送于本文件存在之前。全离线,$0。",
+  "  结构缓存命中(160 条野生型)",
+  "  野生型 160  探测结构 160  RNet 结构 160  ViennaRNA 160  RNAstructure 160  EternaFold 160  (3s)",
+  "\n=== V 验证(先于任何 arm)===",
+  "  V1 自身 F1 1.0  对空结构 0.0  -> 通过",
+  "  V2 我们的 F1 vs 文件自带 M2_F1 列:最大偏差 0.86700(n=160)",
+  "  V2 我们的 F1 vs 文件自带 RNet_F1 列:最大偏差 0.00000(n=160)",
+  "\n  K2 触发。停下之前先定位原因:",
+  "    RNet_F1 用同一个解析器、同一个坐标平移、同一个窗口复现到 0.00000 —— 所以问题不在我们这边",
+  "    released M2_structure 里括号按类型配平的 86 条,不配平的 74 条",
+  "    配平的里复现文件自带 M2_F1 的 80/86;不配平的 0/74",
+  "    而且这不是随机的:不配平那批的靶标假结字符占比 0.1194,配平那批 0.0844 —— 只用配平的那批就是在假结基准上按假结含量做选择"
+ ]
+}
