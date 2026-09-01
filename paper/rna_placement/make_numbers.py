@@ -741,6 +741,34 @@ put("pcLamTable", ",\\; ".join(f"{float(k):.2f}$\\!\\to\\!${_pb[k]['ratio_median
 put("pcCondF0", f"{_pa['0.00']['cond_route_median']:.3f}")
 put("pcCondF1", f"{_pa['1.00']['cond_route_median']:.3f}")
 
+# ---------------------------------------------------------------- is the covariate anyone's choice
+# (M63). The manuscript said twice that this test was not run. It is the only evidence that the
+# word CHOSE in the title is earned.
+m63 = J("m63_undesigned_placement.json")
+def _g(k, tag):
+    v = m63[k]
+    put(f"un{tag}", f"{v['gap']:+.4f}".replace("-", "\\ensuremath{-}"))
+    put(f"un{tag}Ci", "[$%+.4f$, $%+.4f$]" % tuple(v["ci"]))
+    put(f"un{tag}N", f"{v['n']}")
+    put(f"un{tag}Neg", f"{100*v['frac_negative']:.0f}\\%")
+    return v
+_vd = _g("V_designed", "Des")
+_vr = _g("A1_rfam", "Rfam")
+_vp = _g("A2_pseudobase", "Pkb")
+_vm = _g("B1_rfam_matched", "RfamM")
+_cd = _g("Cprime_repaired_control.designed_core", "X") if False else None
+_cp = m63["Cprime_repaired_control"]
+for tag, key in (("CoreD", "designed_core"), ("CoreI", "inverse_core")):
+    v = _cp[key]
+    put(f"un{tag}", f"{v['gap']:+.4f}".replace("-", "\\ensuremath{-}"))
+    put(f"un{tag}Ci", "[$%+.4f$, $%+.4f$]" % tuple(v["ci"]))
+    put(f"un{tag}N", f"{v['n']}")
+    put(f"un{tag}Neg", f"{100*v['frac_negative']:.0f}\\%")
+put("unRatio", f"{abs(_vd['gap'])/abs(_vr['gap']):.1f}")
+put("unShare", f"{100*_cp['share_reproduced']:.1f}\\%")
+put("unFams", f"{_vr['n_clusters']}")
+put("unMaxSeq", "5")
+
 # ---------------------------------------------------------------- how the corpus was selected
 # (M30). R1's premise is that the covariate distribution was produced by a design algorithm; it
 # was also produced by a selection rule, and the paper has to say so.

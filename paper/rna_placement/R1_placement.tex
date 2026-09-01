@@ -151,6 +151,12 @@ none of it (\jdg{eRet} retained against a placebo's \jdg{ePlaceboMean}$\pm$\jdg{
 neural half of the corpus as on the whole. Where the designer put the pair accounts for most of what
 a naive contrast misses.
 
+\emph{Whose choice it is, tested rather than assumed.} Undesigned RNA carries the same placement
+tendency \jdg{unRatio} times weaker (\jdg{unFams} Rfam families and an independent pseudoknot
+corpus), and a plain thermodynamic inverse folder given \emph{these} target structures reproduces
+\jdg{unShare} of it, with an interval covering zero. The covariate is what the design programs do,
+not what the folding model implies.
+
 \emph{The consequence.} Holding that covariate fixed reorders the released leaderboard:
 \jdg{lbBMoved} of \jdg{lbBNMeth} methods move, by up to \jdg{lbBMaxMove} places, Kendall
 $\tau=\jdg{lbBTau}$ (\jdg{lbBTauCi}), where holding the target fixed alone moves none.
@@ -381,6 +387,11 @@ read the first five, not as the paper's claim on the reader.}
 \item \textbf{The placement gradient is a property of the design method} (\S\ref{sec:gradient}),
   spanning $\jdg{gSpread}$ depth units across \jdg{gNMethods} methods designing for the same targets, with
   the human-designed arm at the pre-registered extreme, reported at the strength it has.
+\item \textbf{And it is a choice, not thermodynamics} (\S\ref{sec:undesigned}). Undesigned RNA
+  carries the same tendency \jdg{unRatio} times weaker (\jdg{unFams} Rfam families,
+  \jdg{unRfam}; Pseudobase\texttt{++}, \jdg{unPkb}), and a plain inverse folder given the same
+  target structures reproduces \jdg{unShare} of it (\jdg{unCoreI}, covering zero, against
+  \jdg{unCoreD} for the design programs on the same pairs).
 \item \textbf{A constructive calibration, which decides which of two estimators may be read here}
   (\S\ref{sec:cal}, \S\ref{sec:pcal}). Inject a known mediated fraction into the real mediator and
   read back what the estimator says. One route covers $\jdg{calNSpanFrac}$ and $\jdg{calVSpanFrac}$
@@ -977,7 +988,8 @@ thermodynamic objective, and \S\ref{sec:mediation} puts the designers' placement
 mediators are the heart of the paper and they answer differently. \S\ref{sec:cal} asks which of the two mediation routes can be read here at all and
 \S\ref{sec:pcal} puts the surviving one through the same test. \S\ref{sec:score} asks what the
 property is worth on the benchmark's own currency, \S\ref{sec:gradient} asks whose rule the
-placement is, and \S\ref{sec:leaderboard} asks whether holding it fixed moves the ranking.
+placement is, \S\ref{sec:undesigned} asks whether it is anyone's rule at all by looking where
+nobody designed, and \S\ref{sec:leaderboard} asks whether holding it fixed moves the ranking.
 
 \subsection{The measurement frame: what a point is worth}
 \label{sec:frame}
@@ -1854,12 +1866,93 @@ we can name but not test.
 \paragraph{What this does and does not extend.} It extends the placement claim from one target set
 to four, and it raises the method component from an arm at its detection edge
 (\S\ref{sec:gradient}) to one that clears $0.005$ on two independent rounds. It does not extend the
-claim beyond \emph{designed} corpora: all \jdg{xrRounds} rounds come from one laboratory, one platform and one
-player community, and no natural-sequence corpus is present in this release. The prediction the
-mechanism makes about natural RNA, that the placement structure should be weaker or absent where
-no designer chose: is stated in \S\ref{sec:limits} as the test we did not run.
+claim beyond \emph{designed} corpora: all \jdg{xrRounds} rounds come from one laboratory, one
+platform and one player community. The prediction the mechanism makes about natural RNA, that the
+placement structure should be weaker or absent where no designer chose, is tested in
+\S\ref{sec:undesigned} and holds in the weaker of its two forms.
 
 % =====================================================================
+
+
+\subsection{Is the covariate anyone's choice? The undesigned control}
+\label{sec:undesigned}
+
+Everything above says a covariate carries the number. The paper's title says the covariate is one
+the \emph{generators chose}, and until now the whole evidence for that word was that
+\jdg{gNMethods} methods in one corpus all do it. There is an obvious competing account: RNA helices
+are more stable with G--C at their ends, the nearest-neighbour model charges a terminal A--U
+penalty, and any molecule selected for stability might show the same gradient with nobody choosing
+anything. Two earlier versions of this manuscript stated this test and did not run it.
+
+The statistic is the one already in use, computed per molecule so that every source is
+commensurate: the mean helix depth of a molecule's G--C target pairs minus that of its A--U pairs,
+admitted when the molecule holds at least four of each. No probing data enters, and the manuscript
+was wrong to say a probing readout was needed: placement is a design-side quantity and needs only
+sequences with structures.
+
+\begin{table}[!htbp]
+\centering\small
+\caption{\textbf{The placement gap where nobody designed anything.} Intervals are percentile
+bootstraps clustered on the unit that repeats: the target for the designed corpus, the Rfam family
+for the seed alignments, the molecule elsewhere. Rfam consensus structures are projected onto each
+individual seed sequence, at most \jdg{unMaxSeq} sequences per family.}
+\label{tab:undesigned}
+\begin{tabular}{@{}llrrl@{}}
+\toprule
+corpus & designed by & $n$ & gap & 95\% CI \\
+\midrule
+OpenKnot targets & \jdg{gNMethods} programs and humans & \jdg{unDesN} & \jdg{unDes} & \jdg{unDesCi} \\
+Rfam seed & nobody & \jdg{unRfamN} & \jdg{unRfam} & \jdg{unRfamCi} \\
+Pseudobase++ & nobody & \jdg{unPkbN} & \jdg{unPkb} & \jdg{unPkbCi} \\
+\midrule
+\multicolumn{5}{@{}l@{}}{\emph{matched by construction: the same target structures, only the writer differs}}\\
+nested core, designed & the same programs & \jdg{unCoreDN} & \jdg{unCoreD} & \jdg{unCoreDCi} \\
+nested core, \texttt{inverse\_fold} & a folding model alone & \jdg{unCoreIN} & \jdg{unCoreI} & \jdg{unCoreICi} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{claimbox}
+\textbf{Undesigned RNA carries the tendency, and carries it small.} Across \jdg{unFams} Rfam
+families the gap is \jdg{unRfam} (\jdg{unRfamCi}), and on \jdg{unPkbN} Pseudobase\texttt{++}
+molecules it is \jdg{unPkb} (\jdg{unPkbCi}): the same sign as the designed corpus, both intervals
+excluding zero, and \textbf{a factor of \jdg{unRatio} smaller}. It is also far less consistent
+molecule to molecule: \jdg{unDesNeg} of designed molecules have a negative gap against
+\jdg{unRfamNeg} of Rfam sequences and \jdg{unPkbNeg} of Pseudobase\texttt{++} entries. The
+prediction this paper made was
+that the structure would be \emph{weaker or absent} without a designer. It is weaker, and we
+report that rather than the absence we would have preferred.
+\end{claimbox}
+
+\paragraph{What decides the attribution is the matched control, not the natural corpora.} Rfam
+molecules differ from these targets in length, class and composition, so a factor of
+\jdg{unRatio} could in principle be a distributional artifact. Restricting Rfam to the designed
+corpus's own range of paired-position count and GC fraction leaves it at \jdg{unRfamM}
+(\jdg{unRfamMCi}, \jdg{unRfamMN} molecules, \jdg{unRfamMNeg} negative), so it is not. But the clean comparison holds the
+structure fixed instead of matching its moments: run ViennaRNA's \texttt{inverse\_fold} on the
+nested core of \emph{these} targets, and score the designed sequences on exactly the same pairs.
+Nothing differs except who wrote the sequence.
+
+\begin{claimbox}
+\textbf{A thermodynamic optimiser does not do this; the design programs do.} On the same targets
+and the same pairs, the designed sequences give \jdg{unCoreD} (\jdg{unCoreDCi}) and inverse-folded
+sequences give \jdg{unCoreI} (\jdg{unCoreICi}, covering zero, \jdg{unCoreINeg} of molecules
+negative against \jdg{unCoreDNeg}). \textbf{The folding model alone reproduces \jdg{unShare} of the
+gap.} The placement structure is therefore not the terminal A--U penalty acting through any
+optimiser: it is a property of what these programs and these designers do, which is what the word
+\emph{chose} was asserting.
+\end{claimbox}
+
+\paragraph{Two things this arm does not settle, and one defect worth naming.} It does not say why
+natural RNA places pairs the way it does; selection for stability, for kinetics and for function
+are not separated here. It touches no probing data, so it says nothing about pair \emph{formation}:
+\S\ref{sec:pairtype} and \S\ref{sec:chem} stand or fall on their own. And the control as
+preregistered could not run at all: every target in this corpus is pseudoknotted,
+\texttt{inverse\_fold} cannot represent a pseudoknot, and our first two implementations flattened
+the crossings into a dot-bracket that was balanced and wrong, failing on all
+$\jdg{gNMethods}\times$ restarts. The two predictions staked on that arm are graded \textbf{failed}
+on the empty result in Appendix~\ref{app:prereg}, in the declaration's wording, and the nested-core
+control above is reported as the repair it is rather than as the arm that was promised.
 
 \subsection{Holding the covariate fixed reorders the benchmark}
 \label{sec:leaderboard}
@@ -2077,10 +2170,12 @@ matched pairs rather than to mine them, and it needs synthesis rather than analy
 \paragraph{(i) One corpus, \jdg{xrRounds} rounds.} The placement structure is now measured on
 $\jdg{xrRounds}$ rounds with disjoint targets (\S\ref{sec:rounds}) and the formation results on
 one. All \jdg{xrRounds} rounds come from the same laboratory, platform and player community, so what
-replicates is the target set and the method mix, not the ecology. The sharpest untried test follows
-from the mechanism itself: \emph{a corpus nobody designed should not carry the placement
-structure.} Homologous natural sequences with a probing readout would decide it, and none is
-present in this release. 
+replicates is the target set and the method mix, not the ecology. The test that mechanism implies
+is no longer untried: \S\ref{sec:undesigned} runs it on two undesigned corpora and on a
+thermodynamic optimiser given the same targets, and the placement structure is \jdg{unRatio} times
+weaker without a designer and \jdg{unShare} reproduced by the optimiser. What remains one corpus is
+the \emph{formation} result, which needs compensatory probing data that no undesigned release
+carries. 
 \paragraph{(ii) Interventional at the mutation, observational at the property.} The rescue readout is produced by an intervention, a compensatory double substitution
 performed at the bench, and that is what licenses a formation claim about an individual pair.
 We did not choose which pairs were mutated, and the exposure whose effect we estimate, the identity
@@ -2515,6 +2610,22 @@ the energy null holds on both method subsets & both in band & \jdg{subNeural},
   existed (\S\ref{sec:pcal}). Its kill condition withdrew $\jdg{medFrac}$ outright if the
   calibration said of this route what \S\ref{sec:cal}'s said of the other one.}}\\
 readback at an injected fraction of zero & $<0.10$ & \jdg{pcF0} & held \\
+\midrule
+\multicolumn{4}{@{}p{0.97\linewidth}@{}}{\emph{frozen before the undesigned control existed
+  (\S\ref{sec:undesigned}). K1 and K2 named the exact edits each outcome would force, including
+  removing two words from the title; neither fired.}}\\
+the designed corpus's per-molecule gap is negative & $<0$ & \jdg{unDes} & held \\
+undesigned RNA's gap is closer to zero & smaller & \jdg{unRfam} vs \jdg{unDes} & held \\
+the designed corpus exaggerates it by half again & $\ge1.5\times$ & \jdg{unRatio}$\times$ & held \\
+the two undesigned corpora agree in sign & same sign & \jdg{unRfam}, \jdg{unPkb} & held \\
+matching length and composition does not reverse it & smaller & \jdg{unRfamM} & held \\
+a plain inverse folder reproduces less of the gap & smaller & \emph{arm empty} & \textbf{failed} \\
+a plain inverse folder still gives a negative gap & $<0$ & \emph{arm empty} & \textbf{failed} \\
+\multicolumn{4}{@{}p{0.97\linewidth}@{}}{\footnotesize\emph{Every target in this corpus is
+  pseudoknotted and \texttt{inverse\_fold} cannot represent a pseudoknot, so the arm as declared
+  returned nothing and both stakes are graded on the empty result rather than regraded. The
+  nested-core repair is in \S\ref{sec:undesigned}: \jdg{unCoreI} against \jdg{unCoreD} on the same
+  pairs, \jdg{unShare} reproduced.}}\\[2pt]
 readback at an injected fraction of one & $>0.80$ & \jdg{pcF1} & held \\
 readback span against the true span & $\ge60\%$ & \jdg{pcSpan} & held \\
 with an affine $h$, the printed ratio reads one & $>0.85$ & min \jdg{pcRatioMin} & held \\
