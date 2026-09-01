@@ -153,6 +153,9 @@ a naive contrast misses.
 $\tau=\jdg{lbBTau}$ (\jdg{lbBTauCi}), where holding the target fixed alone moves none.
 
 \emph{Pricing the channels.} Pricing wants a \emph{share}, and a share is not always estimable.
+Which one is at issue is decided by injection rather than by argument: the route we withdraw
+recovers \jdg{calNSpanFrac} and \jdg{calVSpanFrac} of an injected range, the route we keep recovers
+\jdg{pcSpan}.
 The mediated fraction has two estimators that are treated as interchangeable. They are
 not. They differ by exactly $\mathbb E[r(M)\mid A]-\mathbb E[r(M)\mid B]$, for $r$ the residual of
 the conditional mean after its linear projection, and they agree for every pair of exposure laws
@@ -971,7 +974,8 @@ design score's and the rescue factor's. \S\ref{sec:pairtype} estimates the effec
 instead. \S\ref{sec:energy} puts the folding model's own energy to the effect,
 \S\ref{sec:subsets} checks that answer on the halves of the corpus that do and do not consume a
 thermodynamic objective, and \S\ref{sec:mediation} puts the designers' placement to it; the two
-mediators are the heart of the paper and they answer differently. \S\ref{sec:score} asks what the
+mediators are the heart of the paper and they answer differently. \S\ref{sec:cal} asks which of the two mediation routes can be read here at all and
+\S\ref{sec:pcal} puts the surviving one through the same test. \S\ref{sec:score} asks what the
 property is worth on the benchmark's own currency, \S\ref{sec:gradient} asks whose rule the
 placement is, and \S\ref{sec:leaderboard} asks whether holding it fixed moves the ranking.
 
@@ -1455,6 +1459,18 @@ way, are $\jdg{calNRho}$ and $\jdg{calVRho}$. A six-point correlation produced b
 evidence in either direction, which is why the claim above is made on the span, a statement that
 does not use the degenerate endpoint at all.
 
+
+\paragraph{The withdrawal is about a regime, and the boundary of that regime is measurable.} What
+governs, on this section's own account, is how far the mediator separates the arms, and the
+mediator calibrated above separates them by $\jdg{posSepReal}$ pooled SD. That is not a property of
+mediation analysis; it is a property of \emph{that} mediator. Helix depth separates the same two
+arms by $\jdg{pcSep}$ pooled SD, a factor of \jdg{pcSepRatio} more, and \S\ref{sec:pcal} runs this
+same injection there and finds both routes recover an injected truth. \textbf{So the withdrawal
+above stands where it was calibrated and does not extend by analogy.} It is not lifted anywhere:
+the figures withdrawn here were computed in the regime calibrated here, and nothing in
+\S\ref{sec:pcal} restores them. What \S\ref{sec:pcal} does is stop the withdrawal from being
+applied, by association, to a channel that was never in that regime.
+
 \paragraph{Two reasons this was invisible from inside the analysis.} First, the placebo mediator
 (which the method requires and which we ran) controls the mechanical shrinkage that any
 extra stratifying dimension produces, but a placebo has no relation to the outcome, so it cannot
@@ -1495,6 +1511,53 @@ back what the estimator reports: decides the question on the analyst's own data 
 reference to a rule of thumb. Proposition~\ref{prop:routes} supplies the exact identity and bound
 for the second. We do not claim the failure modes themselves are new.
 \end{scopebox}
+
+
+\subsection{The same injection, applied to the route the paper kept}
+\label{sec:pcal}
+
+\S\ref{sec:cal} withdrew a family of numbers on the strength of an injection calibration. One
+number computed by the other route survived and is a headline (\S\ref{sec:quant}), and the argument
+for keeping it has so far been an argument. This subsection runs the test instead. The estimator is
+the one that produced $\jdg{medFrac}$, called unchanged; only the outcome is synthetic,
+$Y=h(\mathrm{dep})+\delta\,\mathbb 1[\text{G--C}]+\mathcal N(0,\sigma)$ with $\sigma=\jdg{pcSigma}$
+measured from the corpus rather than chosen, the total set to the corpus's own contrast, and
+everything else, the depths, the pair types, the design cells, real. \jdg{pcDraws} draws per rung.
+
+\begin{claimbox}
+\textbf{The product route recovers an injected mediated fraction; the route \S\ref{sec:cal}
+condemned did not.} With $h$ linear, sweeping the injected fraction over \jdg{pcRungs} rungs,
+$\beta g/\Delta$ reads $\jdg{pcF0}$ (\jdg{pcF0Iqr}) at an injected $0$ and $\jdg{pcF1}$
+(\jdg{pcF1Iqr}) at an injected $1$. \textbf{The readback covers \jdg{pcSpan} of the range the truth
+covers}, against the \jdg{calNSpanFrac} and \jdg{calVSpanFrac} that were the grounds for
+\S\ref{sec:cal}'s withdrawal. The printed ratio, whose truth is $1$ here because $h$ was built
+affine, reads \jdg{pcRatios} across the rungs with an injected fraction of a quarter or more.
+On the same draws the conditioning route moves from \jdg{pcCondF0} to \jdg{pcCondF1}, so on
+\emph{this} mediator neither route is the broken one.
+\end{claimbox}
+
+\paragraph{What the second arm calibrates is the reframing, not the number.} \S\ref{sec:quant}
+reads $\jdg{medFrac}$ as the linear share of an attenuation. That reading is itself a claim about
+an estimator and it can be injected too: hold the mediated fraction at the corpus's own level and
+sweep the \emph{true} linear share by adding a component of $h$ orthogonal to depth, so the true
+share is known before an outcome is drawn. Over \jdg{pcLamRungs} rungs the estimator is monotone in
+the truth (Spearman \jdg{pcSpearman}) and reads high when the truth is low: true share to median
+reading runs \jdg{pcLamTable}. At a true share of $1$ it is off by \jdg{pcLamErr1}.
+
+\begin{claimbox}
+\textbf{The printed figure is readable and biased upward, and the calibration says by how much.}
+Inverting that curve at the corpus's own operating point, the reading $\jdg{medFrac}$ corresponds
+to a true linear share of about \jdg{pcLamTrue}, an upward bias of \jdg{pcLamBias} points. We
+report $\jdg{medFrac}$ where the pipeline computed it and \jdg{pcLamTrue} as what it means.
+\end{claimbox}
+
+\paragraph{Three things this does not do.} It does not restore any withdrawn figure: those were
+computed at the separation \S\ref{sec:cal} calibrated, and this arm was run at a different one. It
+does not license adding channels, for the reason already given: the common scale would be the
+withdrawn quantity. And it cannot be read as evidence that \eqref{eq:nointeract} holds on the depth
+channel, because the synthetic outcome satisfies it by construction while the real one misses it by
+\jdg{p3GapPct} of the attenuation (\S\ref{sec:quant}). A calibration that assumes a premise cannot
+test it, and this one does not.
 
 \subsection{The proposition, tested where none of this paper's machinery applies}
 \label{sec:crossdomain}
@@ -1855,8 +1918,12 @@ here at the value it took rather than at the value we expected.
 
 \paragraph{It is not a mediated fraction, and calling it one was the source of a real
 contradiction.} \S\ref{sec:cal} withdraws every mediated fraction this pipeline produced, and a
-reader is right to ask why a headline percentage survives that. The answer is that this ratio is a
-different object and the manuscript previously obscured it. The denominator $\jdg{medObs}$ is the
+reader is right to ask why a headline percentage survives that. Two answers are owed and both are
+given: this ratio is a different object, which the manuscript previously obscured, and it has now
+been put through the same injection calibration that condemned the other route
+(\S\ref{sec:pcal}), where it recovers an injected truth over \jdg{pcSpan} of its range against
+\jdg{calNSpanFrac} and \jdg{calVSpanFrac} for the route that was withdrawn. It is calibrated, not
+merely argued for. The denominator $\jdg{medObs}$ is the
 attenuation, which is the difference between the contrast without depth in the stratification and
 the contrast with it; under \eqref{eq:nointeract} that difference \emph{is} the part carried by
 depth, by construction rather than by estimation. What $\jdg{medFrac}$ measures is how much of that
@@ -1874,7 +1941,10 @@ attenuation, and that difference is a measurement of how far \eqref{eq:nointerac
 on this channel.} It holds tightly on $\Delta G_{\mathrm{loc}}$ (\S\ref{sec:routes}, ratio
 \jdg{a7Ratio}) and only loosely on depth, so the decomposition of \eqref{eq:med} is an
 approximation on the depth channel and $\jdg{medFrac}$ inherits that. We report the gap rather
-than the fraction alone for that reason. The shape is visible in $h$ itself: across depth levels
+than the fraction alone for that reason. The same calibration prices that approximation: read
+against its own injected truth, $\jdg{medFrac}$ corresponds to a true linear share of about
+\jdg{pcLamTrue} (\S\ref{sec:pcal}), and \jdg{pcLamTrue} is the number to carry away. The shape is
+visible in $h$ itself: across depth levels
 \jdg{p3Levels} the within-cell conditional mean of rescue is \jdg{p3H}, which rises steeply and
 then flattens, so a straight line through it under-reads the first step and over-reads the last.
 
@@ -2440,6 +2510,17 @@ the energy null holds on both method subsets & both in band & \jdg{subNeural},
   thermodynamic subset is above it, which is the direction of no mediation rather than of
   mediation, on a quarter of the records. \S\ref{sec:subsets} reports both and does not widen the
   band.}}\\[2pt]
+\midrule
+\multicolumn{4}{@{}p{0.97\linewidth}@{}}{\emph{frozen before the calibration of the kept route
+  existed (\S\ref{sec:pcal}). Its kill condition withdrew $\jdg{medFrac}$ outright if the
+  calibration said of this route what \S\ref{sec:cal}'s said of the other one.}}\\
+readback at an injected fraction of zero & $<0.10$ & \jdg{pcF0} & held \\
+readback at an injected fraction of one & $>0.80$ & \jdg{pcF1} & held \\
+readback span against the true span & $\ge60\%$ & \jdg{pcSpan} & held \\
+with an affine $h$, the printed ratio reads one & $>0.85$ & min \jdg{pcRatioMin} & held \\
+the printed ratio tracks the true linear share & $\rho\ge0.80$ & \jdg{pcSpearman} & held \\
+error at a true linear share of one & $\le0.20$ & \jdg{pcLamErr1} & held \\
+the published decomposition reproduces & $\le0.005$ & \jdg{medFrac} & held \\
 \end{longtable}
 \endgroup
 

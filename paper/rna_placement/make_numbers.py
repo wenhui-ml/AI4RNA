@@ -711,6 +711,36 @@ put("p3Sub", f"{_p3['residual_by_subtraction']:+.4f}".replace("-", "\\ensuremath
 put("p3Gap", f"{_p3['agreement']:.4f}")
 put("p3GapPct", f"{100*_p3['agreement']/abs(_p3['attenuation']):.0f}\\%")
 
+# ---------------------------------------------------------------- the kept route, calibrated
+# (M62). Section 5.5 withdrew the conditioning route on an injection calibration. This is the
+# same calibration applied to the route the paper kept.
+m62 = J("m62_product_route_calibration.json")
+_pa, _pb, _ps = m62["A_fraction_sweep"], m62["B_linearity_sweep"], m62["setup"]
+put("pcSpan", f"{100*_pa['span_ratio']:.1f}\\%")
+put("pcF0", f"{_pa['0.00']['frac_median']:.4f}")
+put("pcF1", f"{_pa['1.00']['frac_median']:.4f}")
+put("pcF0Iqr", "[$%+.4f$, $%+.4f$]" % tuple(_pa["0.00"]["frac_iqr"]))
+put("pcF1Iqr", "[$%+.4f$, $%+.4f$]" % tuple(_pa["1.00"]["frac_iqr"]))
+put("pcRungs", f"{len([k for k in _pa if k not in ('span_readback','span_ratio')])}")
+put("pcRatios", ",\\;".join(f"{_pa[k]['ratio_median']:.3f}"
+                             for k in sorted(_pa) if k not in ("span_readback", "span_ratio")
+                             and _pa[k]["f"] >= 0.25))
+put("pcRatioMin", f"{min(_pa[k]['ratio_median'] for k in _pa if k not in ('span_readback','span_ratio') and _pa[k]['f'] >= 0.25):.3f}")
+put("pcSep", f"{_ps['arm_separation_pooled_sd']:.3f}")
+put("pcSepRatio", f"{_ps['arm_separation_pooled_sd']/_ps['s55_mediator_separation']:.1f}")
+put("pcSigma", f"{_ps['sigma']:.4f}")
+put("pcSpearman", f"{_pb['spearman']:+.3f}")
+put("pcLamTrue", f"{100*_pb['implied_true_lambda']:.0f}\\%")
+put("pcLamBias", f"{100*_pb['bias_at_published']:+.1f}")
+put("pcLamErr1", f"{_pb['1.00']['abs_error']:.3f}")
+put("pcDraws", f"{m62['draws']}")
+put("pcLamRungs", f"{len([k for k in _pb if k.replace('.','').isdigit()])}")
+_bk = sorted((k for k in _pb if k.replace(".", "").isdigit()), key=float, reverse=True)
+put("pcLamTable", ",\\; ".join(f"{float(k):.2f}$\\!\\to\\!${_pb[k]['ratio_median']:.3f}"
+                                for k in _bk))
+put("pcCondF0", f"{_pa['0.00']['cond_route_median']:.3f}")
+put("pcCondF1", f"{_pa['1.00']['cond_route_median']:.3f}")
+
 # ---------------------------------------------------------------- how the corpus was selected
 # (M30). R1's premise is that the covariate distribution was produced by a design algorithm; it
 # was also produced by a selection rule, and the paper has to say so.
