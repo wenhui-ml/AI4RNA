@@ -166,9 +166,10 @@ also price \jdg{chPriced} covariate-choice channels --- \jdg{chCarry} carry the 
 \jdg{chEmpty} bounded and empty, \jdg{chUnres} unresolved. Every agreement number here is
 labelled by the reference it is scored against, because the structure column this benchmark ships
 is a model's own output: the interventional reading separates from the agreement reading by
-\jdg{prReadout}\,SD (\jdg{prReadoutCi}) even when the agreement column is a reference built from
-the probing data and no model at all, and against that built reference the incumbent's largest
-margin loses \jdg{prMarginPct} of its size. Prices are reported as direct contrasts and never as
+\jdg{prReadout}\,SD (\jdg{prReadoutCi}) even when the agreement column is a reference
+reconstructed from this deposit's own probing data rather than predicted from sequence by any
+scored model, and against that reconstructed reference the incumbent's largest margin loses
+\jdg{prMarginPct} of its size. Prices are reported as direct contrasts and never as
 shares, because the estimator for a share is uninformative here, which we show and withdraw a
 metric of our own for.
 
@@ -235,6 +236,17 @@ before anything is read off it, and because the predictors are not innocent of t
 reliability ceiling (\S\ref{sec:ceiling}) and the leakage audit (\S\ref{sec:leakage}) are both in
 the main text. \textbf{Translate}: the margin is converted into experiments at a fixed budget
 (\S\ref{sec:reorder}).
+
+\paragraph{What this instrument measures, stated once.} Because the rest of the paper depends on
+it, the estimand is written here rather than assembled from context. \textbf{This instrument does
+not measure whether a predicted structure is globally correct. It measures whether a predictor's
+probability for a \emph{named} base pair anticipates the measured consequence of a \emph{specific}
+compensatory intervention on that pair, in a molecule whose own wild type is the internal
+control.} Everything that follows is an application of that one quantity: Reading~1 asks who chose
+the covariates it varies over, Reading~2 asks what a margin in it is worth as an experiment, and
+the domain analysis asks which corpora can supply it at all. A benchmark scored on global
+agreement answers a different question, and this paper does not claim that question is the wrong
+one --- only that its answer does not transfer to this one by default.
 
 \paragraph{The two readings.} Stages two and three exist because a benchmark number fails to be
 self-interpreting in two separate ways, and both must be checked before it licenses anything. It
@@ -1225,8 +1237,12 @@ rather than as a neutral incumbent against a challenger.
 \paragraph{The comparison does not depend on which model wrote the column.} That disclosure
 invites the obvious test, and it was run rather than argued. The agreement readout was recomputed
 on the same pairs and the same strata with each of the other three implementations' own
-structures, and with a fourth column that is not a sequence-to-structure model at all: a structure
-folded from this deposit's own chemical probing (Appendix~\ref{app:probing}). All
+structures, and with a fourth column that is not a prediction from sequence at all: a structure
+folded from this deposit's own chemical probing (Appendix~\ref{app:probing}). That column is not
+model-free and we do not claim it is --- it is a nearest-neighbour fold restrained by the measured
+reactivities, and it therefore shares an energy model with one implementation in the panel. What
+it does not contain is a prediction of \emph{these molecules} made from sequence, which is the
+only property this comparison needs. All
 \jdg{prNcol} columns separate from the interventional readout with intervals excluding zero, the
 built one by \jdg{prReadout} standard deviations (\jdg{prReadoutCi}). The published column is
 the \emph{smallest} of the \jdg{prNcol} gaps (\jdg{prReadoutN}, \jdg{prReadoutNCi}), so the
@@ -1607,7 +1623,9 @@ of the measured effect, of which at most \jdg{bdNeural} can run through the mode
 thermodynamic predictor nor a second predictor on that same decomposition fitted to chemical
 mapping resolves such a separation (\jdg{resVienna}, \jdg{resViennaCi}; \jdg{efContrast},
 \jdg{efContrastCi}). The instrument distinguishes something one structural decomposition
-represents and the other does not, with no reference structure in the comparison. Paired over the
+represents and the other does not, with no predicted structure of these molecules in the
+comparison --- the declared target enters only by saying which pair is the target and by keying
+the strata, never as the thing agreement is scored against. Paired over the
 same resample the transformer exceeds both by \jdg{pdNVCi} and \jdg{pdNECi} and they differ from
 each other by \jdg{pdVECi}, so the effect decomposes rather than dichotomises: moving from
 EternaFold to this transformer is worth \jdg{axArch} (\jdg{axArchCi}) and moving the parameters
@@ -1878,6 +1896,15 @@ chosen after seeing the point estimates, which is exactly the shape of the withd
 recorded because it is the sharpest instance of this paper's thesis that the paper did not go
 looking for.
 
+\paragraph{What this claim is and is not about.} Claim~\ref{claim:depth} is a statement about a
+\emph{baseline}, not an explanation of why that baseline works. Helix depth may be carrying real
+structural depth, the accuracy of the designer's declaration, or both, and the split below
+establishes that it is not purely a declaration artefact --- depth read off the probing-derived
+reference is \emph{larger} than depth read off the declaration (\jdg{prDepthBuilt} against
+\jdg{rkRhoD}) --- without separating the first two. \textbf{The claim is that a benchmark which
+does not report this integer will credit a model for recovering it, whatever it turns out to
+encode.} A mechanistic account of helix depth is a different paper and we do not attempt one.
+
 \paragraph{Where the free integer wins, and where nothing is resolved.} Helix depth is read off
 the declared target, and the paragraph above says the declared target is right about
 \jdg{vaPooled} of the time. Splitting the comparison on that --- the probing-derived reference
@@ -2113,8 +2140,14 @@ it is, a second question remains and is almost never asked: what does the margin
 \label{sec:reorder}
 
 A benchmark margin is a claim about a decision only if it survives being converted into one, and
-the conversion is available here because the outcome is an experiment somebody already ran. This
-section makes it twice: first asking whether the intervention readout \emph{reorders} the panel
+the conversion is available here because the outcome is an experiment somebody already ran. The
+decision converted to is stated rather than assumed: \textbf{recovery of a design's rescuing
+interventions under a fixed synthesis budget, one operational experimental utility and not a
+universal definition of one.} An experimenter optimising information gain, cost per synthesis,
+downstream phenotype or an active-learning schedule is making a different decision, and this
+section says nothing about those; what it does say is that the decision a probing library most
+obviously supports --- which constructs to build next --- is not ordered by the agreement margin.
+This section makes the conversion twice: first asking whether the intervention readout \emph{reorders} the panel
 relative to the conventional one, then what the conventional margin is worth at a fixed budget.
 
 \paragraph{The readout does not reorder the panel; it flattens it.} Scoring
@@ -2211,7 +2244,12 @@ median design cell holds \jdg{eqMedCell} candidates, so one construct is \jdg{eq
 budget and $\delta = \jdg{eqDelta}$. Each comparison reports $\delta^\star$, the smallest margin at
 which two one-sided tests would declare equivalence at $\alpha=0.05$ --- the larger absolute
 endpoint of its 90\% target-clustered interval --- so a reader who rejects our $\delta$ can apply
-their own. Depth against itself returns $\delta^\star = \jdg{eqSelfDs}$.
+their own. Depth against itself returns $\delta^\star = \jdg{eqSelfDs}$. \textbf{We do not assert
+$\delta$ as a scientific equivalence margin for this comparison in general.} It is a declared
+operational tolerance --- one additional construct in the median design of this corpus --- and a
+laboratory whose construct costs, cell sizes or budget granularity differ should read
+$\delta^\star$ against its own. Reporting $\delta^\star$ rather than a verdict alone is what makes
+that substitution possible without rerunning anything.
 
 \textbf{\jdg{eqNeq} of the \jdg{eqNcomp} comparisons are equivalent to free depth within one
 construct, and \jdg{eqNfail} are not.} The exceptions are \jdg{eqFailNames}, all at the
@@ -2582,6 +2620,16 @@ written to minimise.
 The result that matters most for how the instrument will be used is Claim~\ref{claim:depth}, one
 row of that ledger: a benchmark that does not report the free baseline will credit a model for
 knowing where a pair sits in its helix. We report ours, and it is not beaten.
+
+\textbf{None of this says the incumbent benchmark is wrong.} It answers the question it asks, and
+that question --- does a predicted structure agree with a reference --- is a real one. What the
+two readings show is that its answer is \emph{incomplete} in two specific, separately measurable
+ways: it does not establish \emph{construct validity}, because the number can be carried by a
+covariate somebody chose and this paper prices \jdg{chPriced} such channels; and it does not
+establish \emph{decision validity}, because a real margin in it need not order the experiment an
+experimenter would actually run. An agreement score with neither check attached is not a false
+number. It is an uninterpreted one, and the instrument this paper describes exists to attach the
+two checks to it.
 
 
 \bibliographystyle{unsrtnat}
