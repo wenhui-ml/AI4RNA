@@ -148,13 +148,18 @@ flips already executed in a public corpus are recovered by a stated criterion --
 two-nucleotide interventions whose outcome is measured and contains no folding model --- and
 \jdg{reNimpl} independent predictor implementations are scored by their response to them.
 \emph{Reading one} prices \jdg{chPriced} covariate-choice channels: \jdg{chCarry} carry the
-number, \jdg{chEmpty} bounded and empty, \jdg{chUnres} unresolved. Read interventionally
-rather than as agreement, the same molecules give \jdg{cvIntvSd} standard deviations against
-\jdg{cvConvSd}; the empty channel is the folding model's own free energy, the objective every one
-of these design programs was optimising. \emph{Reading two} converts the incumbent benchmark's
-margin into experiments. At a fixed budget no implementation outperforms helix depth, a free
-integer, and \jdg{eqNeq} of \jdg{eqNcomp} comparisons are formally equivalent to it within the
-gain one extra construct buys; the panel's largest agreement margin, \jdg{dcTransF1}, is worth
+number, \jdg{chEmpty} bounded and empty, \jdg{chUnres} unresolved. Read interventionally rather
+than as agreement --- against the structure column this benchmark ships, which is a model's own
+output --- the same molecules give \jdg{cvIntvSd} standard deviations against \jdg{cvConvSd};
+the separation survives replacing that column with each of \jdg{prNcol} others including one
+built from the probing data and no model at all (\jdg{prReadout}\,SD, \jdg{prReadoutCi}), and
+against that built reference the incumbent's largest margin loses \jdg{prMarginPct} of its size.
+The empty channel is the folding model's own free energy, the objective every one of these design
+programs was optimising. \emph{Reading two} converts the incumbent benchmark's
+margin into experiments. At a fixed budget no implementation outperforms helix depth --- an
+integer read off the declared target structure, free wherever a target is declared --- and
+\jdg{eqNeq} of \jdg{eqNcomp} comparisons are formally equivalent to it within the gain one extra
+construct buys; the panel's largest agreement margin, \jdg{dcTransF1}, is worth
 \jdg{dcTransPct} of this corpus's rescuing interventions; and the gap changes sign exactly
 \jdg{ivNcross} time as budget is swept, at \jdg{ivCrossA}--\jdg{ivCrossB} of a design built.
 \textbf{A model's agreement advantage is an average, and the better it ranks on that average the
@@ -1065,6 +1070,17 @@ Claim~\ref{claim:identity}'s subject, so the two are not independent: read the c
 model's output examined two ways --- collapsed into a structure, and left as a probability ---
 rather than as a neutral incumbent against a challenger.
 
+\paragraph{The comparison does not depend on which model wrote the column.} That disclosure
+invites the obvious test, and it was run rather than argued. The agreement readout was recomputed
+on the same pairs and the same strata with each of the other three implementations' own
+structures, and with a fourth column that is not a sequence-to-structure model at all: a structure
+folded from this deposit's own chemical probing (Appendix~\ref{app:probing}). All
+\jdg{prNcol} columns separate from the interventional readout with intervals excluding zero, the
+built one by \jdg{prReadout} standard deviations (\jdg{prReadoutCi}). The published column is
+the \emph{smallest} of the \jdg{prNcol} gaps (\jdg{prReadoutN}, \jdg{prReadoutNCi}), so the
+comparison this subsection reports is the most conservative of those available, which was not a
+choice we made.
+
 \paragraph{It is saturated.} Averaged over that model's sampled structures, the target pair is
 present with frequency \jdg{cvHitCG} for G--C targets, \jdg{cvHitAU} for A--U targets and
 \jdg{cvHitGU} for G--U targets. Whatever a benchmark built on that agreement can still resolve, it
@@ -1639,13 +1655,25 @@ are tied on it, and that is the room a tie-break has to work in. This is the who
 claim, and it is small.
 
 \begin{claimbox}
-\claimhead{claim:depth} On this task a free integer matches a transformer trained on roughly two million
-chemical-mapping profiles (\jdg{rkRhoD} against \jdg{rkRhoN}, difference \jdg{rkDiffNCi}). Holding
+\claimhead{claim:depth} On this task an integer read off the declared target structure --- free
+wherever a target is declared, and undefined where one is not --- matches a transformer trained on
+roughly two million chemical-mapping profiles (\jdg{rkRhoD} against \jdg{rkRhoN}, difference \jdg{rkDiffNCi}). Holding
 it fixed, both predictors retain a real but modest ordering ability (\jdg{rkPartN} and
 \jdg{rkPartV}, both $p\jdg{rkPartNP}$), worth \jdg{rkGainN} points of recovery when used to
 break the baseline's ties. \textbf{Any claim that a structure predictor knows which mutations
 rescue must be stated as an increment over helix depth}, and to our knowledge none has been.
 \end{claimbox}
+
+\paragraph{The baseline is not an artefact of the declaration, and it stops being free without
+one.} Helix depth is read off the declared target, so a reader may reasonably ask whether it wins
+because the designer wrote it down. Read instead off the structure folded from this deposit's own
+probing (Appendix~\ref{app:probing}), the same baseline scores \jdg{prDepthBuilt} against
+\jdg{rkRhoD} --- \emph{better}, by \jdg{prDepthGain} (\jdg{prDepthGainCi}) --- and still
+exceeds all three predictors' level arms, the closest at \jdg{prDepthWorstCi}. The flipped pair
+is present in that structure for \jdg{prDepthPresent} of interventions. Two things follow, and
+they point opposite ways. The result does not depend on the declaration. And a depth read from
+probing is not free: it costs the probing experiment and a fold, which is exactly why
+\S\ref{sec:second}'s natural deposits, declaring no structure, have no depth column at all.
 
 \paragraph{A prediction we staked and lost, and what it cost.} We staked in advance that a
 predictor would beat the depth baseline, and wrote that stake's kill condition as a comparison of
@@ -1966,6 +1994,21 @@ construct, $\delta^\star = \jdg{eqBestDs}$, as is every other stacked arm (large
 and both halves are reported. At every budget everything in this panel, including the best ranker
 we can compose from it, sits within one construct of free helix depth --- except where it sits
 worse. This is the shape of Claim~\ref{claim:depth}, now priced.
+
+\paragraph{That margin is a property of the reference, not only of the molecules.} The
+agreement scored here is against the \emph{declared target} --- what the design programs were
+aiming at --- for every implementation alike, so no model is being scored against its own output.
+It is still an intention rather than a measurement. Scored instead against a structure folded from
+the probing data (Appendix~\ref{app:probing}), all three nearest-neighbour implementations rise
+and the transformer falls (\jdg{prBuiltV}, \jdg{prBuiltR}, \jdg{prBuiltE},
+\jdg{prBuiltN}); the order is \jdg{prOrderSame} and the margin goes \jdg{prMarginDecl} to
+\jdg{prMarginBuilt} (\jdg{prMarginBuiltCi}), a change of \jdg{prMarginChange}
+(\jdg{prMarginChangeCi}) that excludes zero --- \jdg{prMarginPct} of its size. The declared
+target remains the primary reference below, fixed before that number existed, because Reading~2 is
+a statement about the margin the incumbent benchmark distributes. What the built reference
+establishes is that the margin's \emph{size} is not a property of the molecules. Reported
+against us: the built reference's closest panel member is \jdg{prClosest} at
+\jdg{prClosestF1}, not either of the two that share its energy model.
 
 \paragraph{The incumbent margin, converted.} RibonanzaNet leads ViennaRNA by \jdg{dcTransF1} on
 structure agreement --- the largest margin in the panel, and the kind a methods paper is written
@@ -2387,6 +2430,49 @@ and the smallest carries \jdg{stPuzMin} interventions, so none is too small to d
 \label{fig:strata}
 \end{figure}
 
+\section{A reference nobody in the panel wrote}
+\label{app:probing}
+
+Every agreement number in this paper is scored against something written down rather than
+measured: \S\ref{sec:conventional}'s column is the benchmark's shipped
+\jdg{cvSourceCol}, and \S\ref{sec:reorder}'s is the declared target, which is the designer's
+intention. This appendix reports a third reference, built from the probing data, and what it
+costs to use.
+
+\paragraph{What was built.} \texttt{ShapeKnots} --- the same \texttt{RNAstructure} distribution
+the panel already contains --- was run on each wild-type construct with that deposit's own 2A3
+reactivity as SHAPE pseudoenergy restraints at the published defaults, no parameter tuned, and
+positions without data marked as such. All \jdg{nWildTypes} folded, none failed, and pairs were
+then restricted to the design window every other agreement number here uses. Four checks ran
+before any number was read: the F1 machinery reproduces the benchmark file's own
+\jdg{cvSourceCol} column to $4\times10^{-16}$ on every construct; every built structure is
+well formed, inside the construct, and canonically paired; a run with the restraints removed
+changes the structure for \jdg{prRestraintN} of \jdg{nWildTypes} constructs, which is what says
+the reference is using its probing data rather than quietly reducing to a free fold; and the four
+published agreement scores reproduce exactly before the reference is swapped.
+
+\paragraph{What it is and is not.} It is a one-dimensional SHAPE-directed fold, not the
+two-dimensional mutate-and-map contact map. It contains no sequence-to-structure prediction from
+any model whose contrast this paper reports. It shares its nearest-neighbour energy model with two
+panel members, and that kinship was measured rather than assumed: its closest panel member is
+\jdg{prClosest} at \jdg{prClosestF1}, and the two that share its energy model are further away.
+
+\paragraph{The released column, and why it is not used.} The benchmark's own probing-derived
+structure column would have been the natural reference and cannot be parsed. It is not a balanced
+bracket string for \jdg{relUnbal} of \jdg{nWildTypes} released wild-type rows: of the
+\jdg{relBal} well-formed rows, \jdg{relReproBal} reproduce the file's own F1 column exactly,
+and of the \jdg{relUnbal} malformed ones, \jdg{relReproUnbal} do. The same parser, coordinate
+shift and window reproduce the file's other structure column exactly, which is what locates the
+fault. Restricting to the rows that parse is not a fallback: the malformed rows are the more
+pseudoknotted ones --- target pseudoknot-character fraction \jdg{relPkUnbal} against
+\jdg{relPkBal} --- so that subset selects on structure class in a pseudoknot benchmark. It is
+reported once as a bounded secondary (\jdg{prA5N} cells, margin \jdg{prA5Margin}) and carries
+no claim. We report this because a reader of this benchmark needs it, not as a criticism of a
+release we depend on.
+
+\FloatBarrier
+% =====================================================================
+
 \section{The purpose-built comparator, in full}
 \label{app:ribosnitch}
 
@@ -2713,6 +2799,32 @@ Parameter variants span less of the response range than implementations \quad(\j
   against a window-restricted value (\jdg{pwV2Win} against \jdg{pwV2Full}) that differs from it by
   \jdg{pwV2Gap}, close enough to have passed a loose tolerance as a reproduction of a quantity it
   is not.}}\\
+\midrule
+\multicolumn{2}{@{}l@{}}{\emph{frozen before the agreement axis had a reference nobody in the panel wrote (\S\ref{sec:conventional}, \S\ref{sec:reorder})}}\\
+The incumbent margin is smaller against a probing-derived reference than the \jdg{dcTransF1} it
+  has against the declared target \quad(\jdg{prMarginBuilt}, \jdg{prMarginBuiltCi}) & correct \\
+The transformer still ranks first against it \quad(order \jdg{prOrderSame}) & correct \\
+The interventional readout still separates from the agreement readout when the agreement column is
+  that reference rather than a model's output \quad(\jdg{prReadout}\,SD, \jdg{prReadoutCi}) & correct \\
+Helix depth read off that reference still exceeds every predictor's level arm
+  \quad(closest \jdg{prDepthWorstCi}) & correct \\
+\multicolumn{2}{@{}p{0.95\textwidth}@{}}{\footnotesize\emph{Two runs, and the first is the one
+  worth reading. It was declared against the benchmark's own probing-derived structure column and
+  voided at its own kill condition, because that column is not a balanced bracket string on
+  \jdg{relUnbal} of \jdg{nWildTypes} released rows and no parse of it reproduces the file's own
+  F1 (\jdg{relReproUnbal} of \jdg{relUnbal}, against \jdg{relReproBal} of \jdg{relBal} among
+  the well-formed ones). The same parser reproduces the file's other structure column exactly, which
+  is what says the fault is not ours, and the well-formed subset is not a fallback because the
+  malformed rows are the more pseudoknotted ones. The successor builds the reference instead, and
+  its primary reference for Reading~2 --- the declared target --- was fixed in the declaration
+  before any of these numbers existed, so the one that flatters the paper was not chosen after the
+  fact. Erratum on the successor's first execution: it reproduced the four published agreement
+  scores to $9\times10^{-4}$ against a $5\times10^{-4}$ tolerance and voided, because it scored
+  agreement on the \jdg{cvDesigns} designs of the readout comparison instead of the
+  \jdg{ccCells} the agreement axis is defined on. Those were never the same set. With the right
+  one the four scores reproduce to $0$. Verified before any reference was swapped: the shipped
+  column reproduces to $4\times10^{-16}$, removing the restraints changes \jdg{prRestraintN} of
+  \jdg{nWildTypes} structures, and this file's estimator equals the original's exactly.}}\\
 \midrule
 \multicolumn{2}{@{}l@{}}{\emph{frozen before Assumption~\ref{ass:placement} had a bound (\S\ref{sec:estimation})}}\\
 An unmeasured confounder must exceed, in the $\beta_u g_u$ product, the placement confounder the

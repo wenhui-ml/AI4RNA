@@ -1055,6 +1055,61 @@ _tab("tab_naccount.tex",
           r"restrictions that are not arithmetic --- the two-arm corpus, the flip floor and the "
           r"leakage cut --- are stated where they are applied.")
 
+# ---- M53/M54: the agreement axis against a reference no model in the panel wrote. Review's
+# charge was that Section 5.1's agreement column is RibonanzaNet's own output, which Section 5.1
+# already says, and that Section 5.10's is too, which it is not -- m43 scores every implementation
+# against the DECLARED TARGET. Both are still references somebody wrote down rather than measured,
+# so a probing-derived one was built. M53 voided because the released one cannot be parsed.
+_m53 = J("m53_probing_reference.json")
+_m54 = J("m54_probing_reference.json")
+assert _m53.get("VOID"), "M53 is no longer void; the defect paragraph is stale"
+# the V block carries counts as well as flags; n_failed is legitimately 0, so check the flags
+assert all(v for k, v in _m54["V"].items() if isinstance(v, bool)), (
+    "M54 verification did not pass")
+_df = _m53["defect_in_the_released_column"]
+put("relBal", f"{_df['balanced']}"); put("relUnbal", f"{_df['unbalanced']}")
+put("relReproBal", f"{_df['reproduce_M2_F1_among_balanced']}")
+put("relReproUnbal", f"{_df['reproduce_M2_F1_among_unbalanced']}")
+_sel = _df["selection_if_the_balanced_subset_were_used"]
+put("relPkBal", f"{_sel['target_pseudoknot_char_fraction_balanced']:.4f}")
+put("relPkUnbal", f"{_sel['target_pseudoknot_char_fraction_unbalanced']:.4f}")
+_a1, _a3, _a4, _a5 = (_m54["A1_ranking"], _m54["A3_depth"],
+                      _m54["A4_independence"], _m54["A5_released_subset"])
+for _k, _t in (("ViennaRNA", "V"), ("RNAstructure", "R"), ("EternaFold", "E"),
+               ("RibonanzaNet", "N")):
+    put(f"prBuilt{_t}", f(_a1["agreement_built"][_k], 4))
+put("prMarginDecl", sig(_a1["margin_declared"], 3))
+put("prMarginBuilt", sig(_a1["margin_built"], 3))
+put("prMarginBuiltCi", ci(_a1["margin_built_ci"], 3))
+put("prMarginChange", sig(_a1["margin_change"], 3))
+put("prMarginChangeCi", ci(_a1["margin_change_ci"], 3))
+put("prMarginPct", pct(abs(_a1["margin_change"]) / _a1["margin_declared"], 0))
+put("prOrderSame", "unchanged" if _a1["order_built"] == _a1["order_declared"] else "changed")
+_pb = _m54["A2_readout"]["columns"]["probing"]
+put("prReadout", sig(_pb["paired_diff_in_sd"], 4)); put("prReadoutCi", ci(_pb["ci95"], 4))
+_pn = _m54["A2_readout"]["columns"]["RibonanzaNet"]
+put("prReadoutN", sig(_pn["paired_diff_in_sd"], 4)); put("prReadoutNCi", ci(_pn["ci95"], 4))
+_cols = _m54["A2_readout"]["columns"]
+put("prNcol", f"{len(_cols)}")
+put("prSmallest", min(_cols, key=lambda k: _cols[k]["paired_diff_in_sd"]))
+put("prDepthBuilt", sig(_a3["depth_built"], 4))
+put("prDepthGain", sig(_a3["difference"], 4)); put("prDepthGainCi", ci(_a3["difference_ci"], 4))
+put("prDepthPresent", pct(_a3["frac_pair_present"], 0))
+put("prDepthWorstCi", ci(min(_a3["vs_level_arms"].values(),
+                             key=lambda v: v["point"])["ci95"], 4))
+put("prClosest", _a4["closest"]); put("prClosestF1", f(_a4["max"], 3))
+put("prA5N", f"{_a5['n']}"); put("prA5Margin", sig(_a5["margin"], 3))
+put("prRestraintN", f"{_m54['V']['V6_n_changed']}")
+# Every column, including the one that is not a model, must still separate the two readouts, and
+# the published column must remain the smallest gap -- otherwise the sentence saying the paper
+# picked the most conservative comparator by accident is stale.
+assert all(not v["ci_contains_zero"] for v in _cols.values()), (
+    "an agreement column no longer separates from the interventional readout")
+assert min(_cols, key=lambda k: _cols[k]["paired_diff_in_sd"]) == "RibonanzaNet", (
+    "the published agreement column is no longer the smallest gap of the five")
+assert all(v["built_depth_wins"] and not v["ci_contains_zero"]
+           for v in _a3["vs_level_arms"].values()), "the built-reference depth no longer wins"
+
 _rs = J("m38_ribosnitch_baseline.json")
 _ra, _rb, _rv = _rs["A_within_design"], _rs["B_vs_free_depth"], _rs["D_verification"]
 put("rsIdentMax", f"{_rv['identity_max']:.0f}")
