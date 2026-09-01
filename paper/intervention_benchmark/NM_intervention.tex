@@ -146,32 +146,39 @@ and still \emph{buy nothing}, because agreement is not the quantity an experimen
 We build an instrument that makes both readable on the same molecules. Compensatory orientation
 flips already executed in a public corpus are recovered by a stated criterion --- \jdg{nAdmitted}
 two-nucleotide interventions whose outcome is measured and contains no folding model --- and
-\jdg{reNimpl} independent predictor implementations are scored by their response to them.
-\emph{Reading one} prices \jdg{chPriced} covariate-choice channels: \jdg{chCarry} carry the
-number, \jdg{chEmpty} bounded and empty, \jdg{chUnres} unresolved. Read interventionally rather
-than as agreement --- against the structure column this benchmark ships, which is a model's own
-output --- the same molecules give \jdg{cvIntvSd} standard deviations against \jdg{cvConvSd};
-the separation survives replacing that column with each of \jdg{prNcol} others including one
-built from the probing data and no model at all (\jdg{prReadout}\,SD, \jdg{prReadoutCi}), and
-against that built reference the incumbent's largest margin loses \jdg{prMarginPct} of its size.
-The empty channel is the folding model's own free energy, the objective every one of these design
-programs was optimising. \emph{Reading two} converts the incumbent benchmark's
-margin into experiments. At a fixed budget no implementation outperforms helix depth --- an
-integer read off the declared target structure, free wherever a target is declared --- and
-\jdg{eqNeq} of \jdg{eqNcomp} comparisons are formally equivalent to it within the gain one extra
-construct buys; the panel's largest agreement margin, \jdg{dcTransF1}, is worth
-\jdg{dcTransPct} of this corpus's rescuing interventions; and the gap changes sign exactly
-\jdg{ivNcross} time as budget is swept, at \jdg{ivCrossA}--\jdg{ivCrossB} of a design built.
-\textbf{A model's agreement advantage is an average, and the better it ranks on that average the
-further from the top of its own ranked list the advantage lies --- while a budgeted experimenter
-only ever sees the top.}
+\jdg{reNimpl} independent predictor implementations are scored by their \emph{response} to them
+rather than by their agreement with a reference. The corpus supplies its own null: constructs
+whose designed substitution is null were synthesised and probed anyway, and \jdg{noopFP} of them
+cross the threshold at which this paper calls an intervention rescued. \textbf{That is a measured
+false-positive rate for the outcome, and we are aware of no benchmark in this neighbourhood that
+reports one.}
 
-Prices are reported as direct contrasts and never as shares, because the estimator for a share is
-uninformative here, which we show and withdraw a metric of our own for. We also report what this
-instrument cannot reach: the largest public probing corpus, \jdg{dmSeq} sequences over
-\jdg{dmLib} libraries, holds \jdg{dmCand} candidate orientation-flip \emph{sequence pairs} in
-total --- from which eligibility and signal gating would retain far fewer --- so its domain has to
-be written into a library on purpose rather than found.
+Read this way, the incumbent benchmark's margin does not survive translation into an experiment.
+At a fixed budget no implementation outperforms helix depth --- an integer read off the declared
+target structure, free wherever a target is declared --- and \jdg{eqNeq} of \jdg{eqNcomp}
+comparisons are formally equivalent to it within the gain one extra construct buys; the panel's
+largest agreement margin, \jdg{dcTransF1}, is worth \jdg{dcTransPct} of this corpus's rescuing
+interventions; and the gap changes sign exactly \jdg{ivNcross} time as budget is swept, at
+\jdg{ivCrossA}--\jdg{ivCrossB} of a design built. \textbf{A model's agreement advantage is an
+average, and the better it ranks on that average the further from the top of its own ranked list
+the advantage lies --- while a budgeted experimenter only ever sees the top.} The same molecules
+also price \jdg{chPriced} covariate-choice channels --- \jdg{chCarry} carry the number,
+\jdg{chEmpty} bounded and empty, \jdg{chUnres} unresolved --- and the interventional reading
+separates from the agreement reading by \jdg{prReadout}\,SD (\jdg{prReadoutCi}) against a
+reference built from the probing data and no model at all, against which the incumbent's largest
+margin loses \jdg{prMarginPct} of its size. Prices are reported as direct contrasts and never as
+shares, because the estimator for a share is uninformative here, which we show and withdraw a
+metric of our own for.
+
+\textbf{This instrument's domain cannot be found; it has to be built, and we specify it.} The
+largest public probing corpus, \jdg{dmSeq} sequences over \jdg{dmLib} libraries, holds
+\jdg{dmCand} candidate orientation-flip \emph{sequence pairs} in total, because diversity and
+intervention are in direct tension: a design library spends every slot on a new molecule and an
+intervention needs four spent on one. The specification that follows is four measured lines ---
+$4n$ slots per $n$ interventions, reference signal-to-noise above \jdg{qcCross07}, per-construct
+design windows and declared targets, and enough probing to check those targets, since a
+probing-derived reference confirms only \jdg{vaPooledPct} of the pairs these design programs
+declared.
 \end{abstract}
 
 % =====================================================================
@@ -705,10 +712,35 @@ named for single-nucleotide mutants contributes \jdg{dmCandZero} candidates, bec
 of \emph{different} parents are not near neighbours. Diversity and intervention are in direct
 tension: an intervention needs two constructs differing in exactly the intended way, which costs a
 slot a design library would rather spend on a new molecule. \textbf{Scaling a design library does
-not produce interventions; this instrument's domain has to be written into a library on purpose},
-and what that costs is one line: for $n$ interventions, $4n$ slots --- wild type, both single
-mutants, double --- at reference signal-to-noise above \jdg{qcCross07}. Against libraries of
-\jdg{dmSeq} constructs that is a rounding error in synthesis.
+not produce interventions; this instrument's domain has to be written into a library on purpose.}
+
+\paragraph{The specification, in four measured lines.} That is the positive content of this
+section, and it is cheap. A library that wants to be readable by this instrument has to supply,
+\emph{for $n$ interventions}:
+\begin{enumerate}[leftmargin=2.4em,itemsep=1pt,label=(\arabic*)]
+\item \textbf{$4n$ slots} --- wild type, both single mutants, double. This is the whole cost, and
+against libraries of \jdg{dmSeq} constructs it is a rounding error in synthesis. What it is not is
+free of \emph{design} effort, which is the tension this section measured: those four slots buy one
+controlled comparison where a diversity-maximising library would have bought four molecules.
+\item \textbf{Reference signal-to-noise above \jdg{qcCross07}}, the point at which split-half
+reliability crosses \jdg{qcThrA} in Figure~\ref{fig:domain}b. Below it the outcome is admitted at
+the bottom of its reliability range, which is where the cutoff this paper inherited
+(\jdg{qcAsserted}) sits. This number is estimated, not asserted, and it is the one line here that
+a laboratory can check before synthesising anything.
+\item \textbf{Per-construct design windows and declared targets, published.} These are exactly the
+fields Definition~\ref{def:flip} quantifies over, and their absence --- not a shortage of
+molecules --- is what makes \jdg{dmCand} of \jdg{dmSeq} sequences the reachable number. A library
+that publishes a barcode and a sequence has made itself unreadable here for the price of a column.
+\item \textbf{Enough probing to check those targets.} A declared target is an intention, and on
+this corpus a probing-derived reference confirms \jdg{vaPooledPct} of the pairs the design programs
+declared (\S\ref{sec:mining}). A library that intends its agreement numbers to mean something has
+to be able to say which of its own declarations the molecules honoured, and that requires probing
+the wild types, which such a library is doing anyway.
+\end{enumerate}
+\textbf{None of the four is a research problem.} Three are metadata and one is a synthesis budget,
+which is why we state them as a specification rather than as future work: the reason this
+instrument reads on one corpus and not on \jdg{dmLib} others is a set of decisions taken when those
+libraries were designed, and every one of those decisions was reversible at the time.
 
 \begin{figure}[t]
 \centering

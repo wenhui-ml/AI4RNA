@@ -1566,6 +1566,8 @@ assert _m57["V"]["V2_reproduces_m54"] and _m57["V"]["V3_reverse_control"], \
 assert _m57["V"]["V4_partition"], "M57's two strata are not a partition of the interventions"
 _c3 = _m57["A1_clause_iii"]
 put("vaPooled", sig(_c3["pooled_over_declared_pairs"], 3))
+put("vaPooledPct", pct(_c3["pooled_over_declared_pairs"], 0))
+put("vaUnconfPct", pct(1.0 - _c3["pooled_over_declared_pairs"], 0))
 put("vaHit", f"{_c3['n_confirmed']:,}".replace(",", "{,}"))
 put("vaAll", f"{_c3['n_declared_pairs']:,}".replace(",", "{,}"))
 put("vaMean", sig(_c3["per_design_mean"], 3))
