@@ -1,0 +1,82 @@
+{
+  "id": "M58",
+  "title": "A pseudoknot-capable nearest-neighbour implementation in the panel",
+  "frozen_utc": "2026-09-01",
+  "cost": "offline, $0. No API, no external inference service. ShapeKnots is a local binary.",
+  "why": [
+    "The corpus is an OpenKnot round -- a pseudoknot benchmark -- and every one of the four panel",
+    "implementations scored in Section 4.2 is pseudoknot-blind in its released configuration.",
+    "A reviewer raised this as the cheapest unmet gap in the panel and did not verify it; we did,",
+    "and it is real: ShapeKnots appears exactly once in the manuscript, in the appendix where M54",
+    "used it to BUILD a reference, and nowhere as a scored member.",
+    "Every panel-level sentence in this paper -- the incumbent's agreement margin, the free-integer",
+    "verdict, the decomposition axis, the budget result -- is therefore currently a statement about",
+    "a pseudoknot-blind panel applied to a pseudoknot corpus. This run removes that qualifier or",
+    "makes it permanent."
+  ],
+  "predictor_added": {
+    "name": "ShapeKnots",
+    "binary": "/home/ubuntu/miniconda3/envs/rnastr/bin/ShapeKnots",
+    "configuration": "sequence only -- NO probing data passed. The -sh restraint file that M54 used",
+    "why_no_data": [
+      "A panel member must be scored from sequence alone. Passing the construct's own 2A3 profile",
+      "would put the measured outcome's own experiment on both sides of the comparison. M54 used",
+      "the restrained form to build a REFERENCE, which is a different role and is why that run",
+      "could use the data and this one must not."
+    ],
+    "shares_an_energy_model_with": "RNAstructure, which is already in the panel",
+    "this_is_declared_not_hidden": [
+      "ShapeKnots is not an independent fifth opinion. It is the panel's own energy model with the",
+      "pseudoknot search switched on, and that is exactly the contrast the reviewer asked for:",
+      "what changes when the panel stops being pseudoknot-blind, holding thermodynamics fixed."
+    ]
+  },
+  "per_pair_score": {
+    "definition": "fraction of the structures ShapeKnots returns for that sequence that contain (i,j)",
+    "why": [
+      "The other members supply a continuous pair probability. ShapeKnots supplies a set of",
+      "structures with free energies and no pseudoknot-aware partition function, so the ensemble",
+      "frequency over its own returned set is the nearest honest analogue.",
+      "V6 checks its zero point: where exactly one structure comes back, the frequency must equal",
+      "the indicator exactly."
+    ]
+  },
+  "structure_used_for_agreement": "the lowest-free-energy structure only, first CT block",
+  "arms": {
+    "A1_agreement": "F1 of ShapeKnots against the declared target and against M54's built probing reference, on the same wild types and the same 158 admitted design cells",
+    "A2_level": "within-cell weighted Spearman of the ensemble frequency against the measured outcome, against free helix depth",
+    "A3_identity": "the matched C-G minus A-U contrast of eq:est on the ensemble frequency, in its own within-stratum SD",
+    "A4_budget": "recovery at the three published budgets with the new column, through M44v's own recover()"
+  },
+  "V_before_any_arm": {
+    "V1_zero_point": "F1(x,x)=1.0 and F1(x,empty)=0.0",
+    "V2_reproduces_M54": "the no-data structures on the 160 wild types must equal M54's cached no_data set exactly, symmetric difference 0 on every one",
+    "V3_reverse_control": "this file's own estimator must reproduce the four published level arms (+0.32947 RibonanzaNet, +0.25570 ViennaRNA, +0.27649 EternaFold, +0.32252 depth) and the four published built-reference agreements (0.86330, 0.70977, 0.70726, 0.77047) to better than 5e-5, read from the artifacts and not typed from the manuscript",
+    "V4_well_formed": "no pair index outside the sequence, no base paired twice; the non-canonical pair fraction is REPORTED, not filtered",
+    "V5_determinism": "20 sequences re-folded; maximum difference 0",
+    "V6_frequency_zero_point": "on sequences returning exactly one structure the ensemble frequency equals the indicator, maximum deviation 0"
+  },
+  "K_void_conditions": {
+    "K1": "more than 1% of the 4475 sequences fail to fold -> VOID",
+    "K2": "V2 fails -> VOID, because then this is not the runner M54 used and the two results cannot be put in one panel"
+  },
+  "stakes": {
+    "S1": "ShapeKnots' F1 against the built reference does NOT exceed RibonanzaNet's 0.86330",
+    "S2": "ShapeKnots' level arm does NOT exceed free depth's +0.32252, and the difference interval excludes zero on the losing side",
+    "S3": "ShapeKnots' identity contrast interval CONTAINS zero, as both other thermodynamic members' do",
+    "S4": "at the tightest published budget ShapeKnots does NOT outperform depth"
+  },
+  "declared_consequences": {
+    "W1_if_S1_fails": "the panel's largest agreement margin and Claim 4's conversion of it are recomputed with ShapeKnots as the leader, and Claim 1's incumbent is renamed. The number that converts to tubes changes; the structure of the argument does not.",
+    "W2_if_S2_fails": "Claim 3 is restated as 'no pseudoknot-blind model outperforms the free integer', and the free-integer headline is narrowed in the abstract, the claim box and the conclusion.",
+    "W3_if_S3_fails": "the decomposition axis is no longer thermodynamic-versus-neural. Claim 2 must state that a pseudoknot-capable thermodynamic implementation resolves the identity separation too, which would make the axis about the pseudoknot search rather than about the decomposition.",
+    "W4_if_S4_fails": "Claim 4's scope is narrowed from 'no model' to the four implementations that were in the panel when it was written.",
+    "W5_regardless_of_direction": "Section 4.2 gains a fifth implementation, and the manuscript states in one sentence that this corpus is a pseudoknot round and that the panel now contains a pseudoknot-capable member. This sentence is owed whichever way every stake falls."
+  },
+  "what_this_run_may_not_do": [
+    "It may not tune the ShapeKnots slope or intercept -- no probing data is passed at all.",
+    "It may not drop sequences that fold slowly or return few structures.",
+    "It may not choose between the declared target and the built reference after seeing which is kinder; both are reported for every arm that has both."
+  ],
+  "verdict_rule": "count the stakes met out of four and name the verdict; the arms are read only after every V check has passed"
+}

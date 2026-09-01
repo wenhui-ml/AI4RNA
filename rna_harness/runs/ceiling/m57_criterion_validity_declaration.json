@@ -1,0 +1,61 @@
+{
+  "id": "M57",
+  "title": "How often the declared target's pair is actually there, and what Claim 3 looks like on each side of that",
+  "frozen_utc": "2026-09-01",
+  "cost": "offline, $0. Reads M54's ShapeKnots cache and M55's record cache. No folding is run.",
+  "why": [
+    "Definition 1 clause (iii) requires the intervened pair to be in the DECLARED target. Nothing",
+    "in the manuscript says how often the molecule agrees. That number is the upper bound on the",
+    "criterion's validity and the paper does not currently carry it.",
+    "M54 measured 0.7948 of intervened pairs present in the built probing reference, but only as a",
+    "descriptive line inside the depth arm, and only for intervened pairs. Two things are missing:",
+    "the same fraction over ALL declared-target pairs in admitted designs, which is what clause",
+    "(iii) actually quantifies over, and what the paper's results look like split on it.",
+    "Splitting Claim 3 on confirmation is the arm with real direction risk. If the free integer",
+    "beats the predictors on both sides, Claim 3 is more robust and more ordinary. If it beats",
+    "them only where the probing reference confirms the pair, Claim 3 becomes a sharper positive",
+    "statement with a stated domain. Both are results; neither is a repair."
+  ],
+  "arms": {
+    "A1_clause_iii_validity": [
+      "Over the admitted design cells, the fraction of DECLARED-TARGET pairs that the built probing",
+      "reference also calls paired -- reported over all declared pairs, and separately over the",
+      "subset that carries an admitted intervention, because those are different populations and",
+      "the manuscript would otherwise quote one for the other.",
+      "Reported with its across-design spread, not as a point alone."
+    ],
+    "A2_claim3_stratified": [
+      "The Claim 3 comparison -- free helix depth against each predictor's level arm -- computed",
+      "separately on interventions whose pair the built reference confirms and on those it does",
+      "not, with a paired interval on the difference between the two strata."
+    ],
+    "A3_depth_is_not_just_confirmation": [
+      "Whether depth's advantage is only a proxy for being confirmed: the level arm of the binary",
+      "confirmation indicator itself, scored the same way, and depth's arm holding it fixed."
+    ]
+  },
+  "V_before_any_arm": {
+    "V1_zero_point": "a pair set scored against itself confirms at 1.0; against the empty structure at 0.0",
+    "V2_reproduces_M54": "the confirmed fraction over intervened pairs must reproduce M54's 0.7948 to better than 5e-5, read from the artifact",
+    "V3_reverse_control": "this file's level arms must reproduce the four published values (+0.32947, +0.25570, +0.27649, +0.32252) to better than 5e-5",
+    "V4_strata_partition": "the two strata must be disjoint and must sum to the full 4317 interventions",
+    "V5_equivalent_form": "pooling the two strata back with their own weights must return the unstratified level arm to better than 1e-9"
+  },
+  "K_void_conditions": {
+    "K1": "either stratum holds fewer than 200 interventions -> the split is not reportable and the run says so instead of reporting an interval",
+    "K2": "V2 fails -> VOID"
+  },
+  "stakes": {
+    "S1": "the clause (iii) confirmation fraction over all declared-target pairs is at least 0.50 -- below that, the criterion admits mostly pairs the molecule does not make, and the manuscript must say so in the Limitations rather than in a footnote",
+    "S2": "free depth beats every predictor's level arm in the CONFIRMED stratum",
+    "S3": "free depth beats every predictor's level arm in the UNCONFIRMED stratum too",
+    "S4": "the confirmation indicator's own level arm is smaller than depth's -- depth is not merely reporting whether the pair is real"
+  },
+  "declared_consequences": {
+    "W1_if_S1_fails": "clause (iii)'s validity bound goes into the Limitations as a headline sentence, and every agreement number scored against the declared target is labelled with it.",
+    "W2_if_S3_fails": "Claim 3 gains a stated domain: the free integer wins where the probing data confirms the pair, and the claim is narrowed to that stratum in the abstract and the claim box.",
+    "W3_if_S4_fails": "the free-integer result is restated as 'a free integer that encodes whether the declared pair is real', which is a weaker and more mechanical claim, and the abstract says so.",
+    "W4_regardless": "the clause (iii) number is printed beside Definition 1, whichever way it falls."
+  },
+  "verdict_rule": "count the stakes met out of four and name the verdict; arms are read only after every V check has passed"
+}
