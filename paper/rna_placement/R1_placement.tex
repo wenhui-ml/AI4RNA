@@ -131,31 +131,41 @@ and a calibration in which neither recovers a known truth}
 \begin{abstract}
 \noindent
 On a corpus written by design programs, a benchmark number is carried by a covariate somebody
-chose, and the work is to price each choice. This paper supplies what pricing needs and cannot
-assume: the condition under which a \emph{share} of that number is estimable at all, and a
-calibration showing that here it is not --- so channels must be priced one at a time and
-never added up. Pre-registration protects against choosing a statistic after seeing the data, not
-against choosing one that cannot be read; we report two such, from one frozen pipeline of
-\jdg{dN} controlled interventions.
+chose, and the work is to price each choice. Pricing wants a \emph{share}. This paper gives the
+condition under which a share is estimable at all, and a calibration showing that here it is not,
+so channels must be priced one at a time and never added up.
 
-The first is a mediated fraction, whose two estimators are treated as interchangeable. They differ
-by exactly $\mathbb E[r(M)\mid A]-\mathbb E[r(M)\mid B]$, for $r$ the residual of
-the conditional mean after its linear projection, bounded by
-$\operatorname{osc}(r)\,d_{\mathrm{TV}}$, and agree for every pair of exposure laws \emph{iff} that
-conditional mean is affine (Prop.~\ref{prop:routes}) --- so they disagree most where the product
-route is the only one computable. Here they disagree by \jdg{eLinearGapPts} points and our frozen
-verdict had silently picked one. Which is readable is settled empirically: injecting a
-\emph{known} mediated fraction into the real mediator, the estimator's reading covers
-\jdg{calNSpanFrac} and \jdg{calVSpanFrac} of the range the truth covers and returns \jdg{calNFull}
-and \jdg{calVFull} at total mediation. Published guidance clears us on both its thresholds and the quantity that governs is not in it.
+Pre-registration protects against choosing a statistic after seeing the data. It does not protect
+against choosing one that cannot be read. We report two such statistics, from one frozen pipeline
+of \jdg{dN} controlled interventions.
 
-Put at risk on \jdg{xdN} designed protein binders the bound does not merely hold, it tracks:
-overlap differs across the two corpora by \jdg{xdDtvRatio} and the route gap by \jdg{xdGapRatio}.
-The two channels we can price directly go opposite ways --- the designers' placement
-carries the effect (\jdg{medMarginal} marginal against \jdg{medMatched} matched) and the free energy
-their programs optimised carries none (\jdg{eMed}, \jdg{eMedCi}) --- and what survives is stated as
-the bounds \jdg{dDgBound} and \jdg{dPmBound}. Every mediated fraction this work previously
-reported is withdrawn.
+The first is a mediated fraction, whose two estimators are treated as interchangeable. They are
+not. They differ by exactly $\mathbb E[r(M)\mid A]-\mathbb E[r(M)\mid B]$, for $r$ the residual of
+the conditional mean after its linear projection, and they agree for every pair of exposure laws
+\emph{iff} that conditional mean is affine (Prop.~\ref{prop:routes}). The gap is bounded by
+$\operatorname{osc}(r)\,d_{\mathrm{TV}}$, whose second factor is the overlap the conditioning route
+needs to be identified. So the two routes disagree most where the product route is the only one
+computable. Here they disagree by \jdg{eLinearGapPts} points, and our frozen verdict had silently
+taken one of them.
+
+Which route is readable is settled empirically. Injecting a \emph{known} mediated fraction into
+the real mediator, the estimator's reading covers \jdg{calNSpanFrac} and \jdg{calVSpanFrac} of the
+range the truth covers, and returns \jdg{calNFull} and \jdg{calVFull} at total mediation. Published
+guidance clears us on both of its thresholds, and the quantity that governs is not in it.
+
+Every mediated fraction this pipeline produced is withdrawn, by named field in the released
+artifacts. What replaces them needs no estimator at all: the same proof step, applied to the
+conditional mean rather than to its residual, bounds what a mediator can carry
+(Prop.~\ref{prop:carry}). On this corpus its crude form is vacuous, for exactly the reason the
+proposition predicts, and its tight form gives \jdg{cbTight}. At most about half of the effect can
+run through the free energy those design programs were optimising.
+
+The two channels we can price directly go opposite ways. The designers' placement carries the
+effect (\jdg{medMarginal} marginal against \jdg{medMatched} matched); the free energy carries none
+(\jdg{eMed}, \jdg{eMedCi}). Put at risk on \jdg{xdN} designed protein binders, a corpus sharing no
+machinery with this one, the bound holds there too, and the two corpora's overlap and route gap
+differ by comparable factors (\jdg{xdDtvRatio} and \jdg{xdGapRatio}). With two corpora that is
+consistent with the mechanism the proposition names and does not establish it.
 \end{abstract}
 
 % =====================================================================
@@ -164,12 +174,11 @@ reported is withdrawn.
 
 Pre-registration answers one question about an analysis: was the statistic chosen before the data
 were seen \citep{simmons2011falsepositive,nosek2018preregistration}. It does not answer a second
-one, which is whether that statistic, on that data, reports anything at all. The two are usually
-conflated because in the settings where pre-registration became standard they coincide --- a
-well-powered randomised trial with a large standardised effect --- and they come apart in exactly
-the setting this paper is about: an observational corpus that some algorithm generated for a
-different purpose, carrying effects an order of magnitude smaller than the ones the estimator's
-guidance was written for.
+one, which is whether that statistic, on that data, reports anything at all. The two are usually conflated because they coincide in the setting where pre-registration became
+standard: a well-powered randomised trial with a large standardised effect. They come apart in
+exactly the setting this paper is about, which is an observational corpus that some algorithm
+generated for a different purpose, carrying effects an order of magnitude smaller than the ones
+the estimator's guidance was written for.
 
 We report two instances from one pipeline. Both statistics were frozen in a declaration and pushed
 before the analysis code existed, both came with permutation tests and constructive power ladders,
@@ -187,8 +196,7 @@ busch2006info,zadeh2011nupack,kleinkauf2015antarna,runge2019learna}, and the con
 scores a design closes the loop: the objective is a folding model's verdict and so is the report
 card. When the packages are scored against experiment rather than against each other they disagree
 with it by margins that depend on the structure class \citep{waymentsteele2022rna}. More to the
-point here, the molecules in such a corpus were not sampled --- they were \emph{built}, by
-programs with preferences, so the covariate distribution an analyst inherits is the generator's
+point here, the molecules in such a corpus were not sampled but \emph{built}, by programs with preferences, so the covariate distribution an analyst inherits is the generator's
 \citep{chaney2018algorithmic}.
 
 Chemical probing is what breaks the loop, because it measures the molecule rather than a belief
@@ -205,11 +213,10 @@ inherits the model's degeneracy.
 
 The instrument that avoids both problems is not new and is not ours. Covariation across
 homologues established the base pairs of large RNAs long before any of them was solved
-\citep{gutell1994lessons,michel1990modelling}, and compensatory mutagenesis is that argument run
-forward as an experiment: mutate one side of a putative pair and the local structure is disrupted;
-mutate both sides to the complementary partner and, if the pair is real, the profile returns
-toward wild type \citep{kladwang2011mutate,kladwang2011two,tian2014high,cordero2015rna,
-cheng2017rna}. Two properties of this readout are what this paper rests on. It is an
+\citep{gutell1994lessons,michel1990modelling}. Compensatory mutagenesis runs that argument forward
+as an experiment. Mutate one side of a putative pair and the local structure is disrupted; mutate
+both sides to the complementary partner and, if the pair is real, the profile returns toward wild
+type \citep{kladwang2011mutate,kladwang2011two,tian2014high,cordero2015rna,cheng2017rna}. Two properties of this readout are what this paper rests on. It is an
 \emph{intervention on the hypothesised pair itself}, so its verdict is per pair, not per molecule.
 And it is not degenerate in the way a profile is: an alternative structure that happens to explain
 the wild-type profile is in general not restored by the particular double substitution that
@@ -217,7 +224,7 @@ restores the intended pair. The fraction restored is a scalar attached to a sing
 is not a design score, and no scoring rule's preferences enter it.
 
 A deployed probing benchmark ships such an arm, where it serves to certify structures. We use it
-to ask the question a designer actually has --- given a target structure and a sequence written
+to ask the question a designer actually has: given a target structure and a sequence written
 against it, \emph{which of the intended base pairs form, and what about the sequence decides it}.
 To our knowledge the rescue arm has not previously been analysed as a dependent variable of
 sequence properties. The first answer is blunt. Holding the design fixed and matching on helix
@@ -230,9 +237,9 @@ xia1998thermodynamic,turner2010nndb}, G--C stacks are the stronger ones, and eve
 produced these sequences was optimising a function built from exactly those terms. A measurement
 that merely recovers the ordering has measured the model. So the central experiment of this paper
 is aimed at the model rather than at the ordering. For each target pair we take the quantity the
-nearest-neighbour model itself assigns to it --- its inner stack, its outer stack and the terminal
+nearest-neighbour model itself assigns to it (its inner stack, its outer stack and the terminal
 penalty on whichever side is a helix end, read from ViennaRNA's parameter tables rather than
-assumed --- and hold it fixed by stratification. If formation is a function of that quantity, the
+assumed) and hold it fixed by stratification. If formation is a function of that quantity, the
 identity contrast should collapse. \textbf{It does not move.} The contrast among pairs sharing a
 local free energy is $\jdg{eCde}$ against a same-population baseline of $\jdg{eBaseSame}$: a
 retained fraction of $\jdg{eRet}$, against $\jdg{ePlaceboMean}\pm\jdg{ePlaceboSd}$ for a placebo
@@ -246,9 +253,9 @@ program can build.
 
 That was our reading, and it was wrong in a way worth reporting. The reading rested on a mediated
 fraction, and a mediated fraction on this corpus has two estimators that disagree by
-$\jdg{eLinearGapPts}$ percentage points --- the product route gives $\jdg{eLinearMed}$, the
-conditioning route the opposite sign --- with both numbers written side by side in our own frozen
-output and the verdict field silently taking one of them. Proposition~\ref{prop:routes} says when
+$\jdg{eLinearGapPts}$ percentage points: the product route gives $\jdg{eLinearMed}$ and the
+conditioning route the opposite sign. Both numbers were written side by side in our own frozen
+output, and the verdict field silently took one of them. Proposition~\ref{prop:routes} says when
 they may be treated as interchangeable, and the condition is testable: it is that the conditional
 mean of the outcome in the mediator is affine. We measure it bin by bin
 ($\jdg{eBinwise}$) and it is not.
@@ -257,11 +264,18 @@ Knowing which route is wrong is not the same as knowing whether either is readab
 settled by calibration rather than by argument (\S\ref{sec:cal}). Injecting a \emph{known}
 mediated fraction into the real mediator, leaving only the outcome synthetic, the conditioning
 estimator's reading spans $\jdg{calNSpanFrac}$ and $\jdg{calVSpanFrac}$ of the range the truth
-spans, and at total mediation returns $\jdg{calNFull}$ and $\jdg{calVFull}$. Every retention figure and mediated
-fraction in earlier versions of this work is withdrawn. What replaces them is a pair of bounds:
-the local energy differs between the pair types by $\jdg{dDg}$\,kcal/mol ($\jdg{dDgCi}$) and the
-ensemble probability by $\jdg{dPm}$ ($\jdg{dPmCi}$, covering zero), bounding their contributions
-at $\jdg{dDgBound}$ and $\jdg{dPmBound}$.
+spans, and at total mediation returns $\jdg{calNFull}$ and $\jdg{calVFull}$. Every retention
+figure and mediated fraction this pipeline produced is withdrawn: \texttt{B1.retention},
+\texttt{P3.mediated\_fraction} and \texttt{B2.mediated\_fraction} in
+\texttt{m21\_thermo\_mediator.json}, and \texttt{D2.retention}, \texttt{D2.mediated} and
+\texttt{D3.*.retention} in \texttt{m26\_model\_scored.json}. Those fields stay in the released
+artifacts, because a retraction a reader cannot open is not one. What replaces them is a direct contrast in each mediator and a bound that needs no mediation
+estimator at all. The local energy differs between the pair types by $\jdg{dDg}$\,kcal/mol
+($\jdg{dDgCi}$) and the ensemble probability by $\jdg{dPm}$ ($\jdg{dPmCi}$, covering zero).
+Applying the proof step of Prop.~\ref{prop:routes} to the conditional mean rather than to its
+residual gives Prop.~\ref{prop:carry}, which bounds what the energy can carry at $\jdg{cbTight}$
+of the effect. The two figures this work previously called bounds, $\jdg{dDgBound}$ and
+$\jdg{dPmBound}$, are product-route readings and are renamed as such (\S\ref{sec:carry}).
 
 Something else does hide the effect, and it is not physics. \emph{The pair types are not placed
 alike.} Every design method in the corpus puts G--C pairs closer to helix ends than A--U pairs, and
@@ -276,9 +290,9 @@ what the contrast finds.
 
 Everything below was preregistered: each criterion, threshold and predicted sign was frozen in a
 committed declaration before the code that would test it existed \citep{simmons2011falsepositive,
-nosek2018preregistration,gelman2014statistical}, evidential claims are held to a
-$0.005$ bar \citep{benjamin2018redefine}, and each arm carries a calibration ladder that reports
-what effect it could have detected. Appendix~\ref{app:prereg} lists every staked prediction and
+nosek2018preregistration,gelman2014statistical}. Evidential claims are held to a $0.005$ bar
+\citep{benjamin2018redefine}, and each arm carries a calibration ladder that reports what effect
+it could have detected. Appendix~\ref{app:prereg} lists every staked prediction and
 both of the two that were wrong. That discipline produced one methodological by-product we state as
 a proposition, because it invalidates the permutation test most naturally written for a matched
 design of this kind.
@@ -287,13 +301,13 @@ design of this kind.
 \centering
 \input{figs/fig0_arch}
 \caption{\textbf{Where each result sits and what it feeds.} The top band is the corpus and its two
-readouts; the middle band is what \S\ref{sec:results} estimates --- the pair-type effect and the two
+readouts; the middle band is what \S\ref{sec:results} estimates, the pair-type effect and the two
 mediators put to it, one taken from the folding model and one from the designers; the bottom band
 is what \S\ref{sec:analysis} composes those estimates into. Blue marks the path on which no folding
 predictor is ever called: the benchmark's own design score enters only in \S\ref{sec:score}, and
 there only inside a balancing covariate. \emph{No magnitude appears in this figure.} Every other
 figure recomputes its coordinates from a committed artifact, so a printed number cannot drift from
-the run that produced it; a structure diagram has no such artifact, so it carries quantity names
+the run that produced it. A structure diagram has no such artifact, so it carries quantity names
 and section pointers only.}
 \label{fig:arch}
 \end{figure}
@@ -305,8 +319,8 @@ and section pointers only.}
   that says where they will not be} (Proposition~\ref{prop:routes}). They differ by
   $\mathbb E[r(M)\mid A]-\mathbb E[r(M)\mid B]$ and agree for all exposure laws iff the
   conditional mean is affine; the disagreement is bounded by
-  $\operatorname{osc}(r)\,d_{\mathrm{TV}}$, which is small exactly when the arms overlap --- that
-  is, exactly when the conditioning route is identified. On this corpus they disagree by
+  $\operatorname{osc}(r)\,d_{\mathrm{TV}}$, which is small exactly when the arms overlap, i.e.\ exactly when the conditioning route is
+  identified. On this corpus they disagree by
   $\jdg{eLinearGapPts}$ points and the affinity condition fails as measured
   ($\jdg{eBinwise}$).
 \item \textbf{A constructive calibration for an estimator, and the demonstration that published
@@ -362,7 +376,7 @@ dependent variable never passes through a predictor at all; predictors appear he
 balancing covariate (\S\ref{sec:score}), and no claim depends on any of them being right.
 
 \paragraph{Probing readouts, and what a profile does and does not pin down.} Structure probing has
-a long instrument literature --- chemical and enzymatic reagents read by primer extension
+a long instrument literature: chemical and enzymatic reagents read by primer extension
 \citep{ehresmann1987probing}, 2\textsuperscript{$\prime$}-OH acylation at nucleotide resolution
 \citep{merino2005rna,wilkinson2006selective,weeks2010advances}, mutational profiling that turns
 adducts into sequencing reads \citep{siegfried2014rna,smola2015selective}, DMS variants
@@ -394,16 +408,32 @@ driven package evaluation and applied mRNA design
 yesselman2019computational}. Two things separate this paper. First the readout: rescue asks
 whether one pair formed and design success asks whether a molecule reached its target, so a rule
 validated on the second is not evidence about the first. Second, and the direction we did not
-anticipate, the same placement acts on the \emph{measurement} --- because designers already place
+anticipate, the same placement acts on the \emph{measurement}, because designers already place
 G--C shallower, a contrast that does not hold depth fixed sees $\jdg{medRatio}\times$ less than the
 matched contrast (\S\ref{sec:mediation}). A designed corpus is a non-random sample of sequence
 space, and here the non-randomness is in the covariate that mediates the effect. That a benchmark number
 on such a corpus can be carried by a covariate rather than by the ability it is named after is
-already established in this field for one covariate --- similarity to what a model was trained on
-\citep{szikszai2022generalize,qiu2023sequence} --- and that channel is closed by changing the
+already established in this field for one covariate (similarity to what a model was trained on
+\citep{szikszai2022generalize,qiu2023sequence}) and that channel is closed by changing the
 split. Pricing a \emph{second} channel is not a matter of splitting, and this paper supplies what
 it needs instead: the condition under which a share of the number is estimable at all, and the
 calibration showing that here it is not.
+
+\paragraph{The same hazard where the corpus is not molecules.} A benchmark whose items were
+produced by an algorithm inherits that algorithm's preferences as covariates, and the evaluation
+literature has named the failure three times without sharing a vocabulary: as algorithmic
+confounding in recommender feedback loops \citep{chaney2018algorithmic}, as generator--judge
+contamination in language-model evaluation \citep{li2025preference}, and as the characteristic
+biases of protein design programs \citep{protdbench2026}. What makes the present corpus a
+controlled instance rather than an analogy is that all three of the things that argument needs are
+in hand at once: the generator is a program with a \emph{written} objective, the covariate it
+chose is \emph{measured} rather than inferred, and the outcome is an experiment somebody executed
+rather than a second model's opinion. That is also the reason the remedy this field has converged
+on does not reach the channel priced here. Rebuilt and homology-aware splits
+\citep{chanrg2026,szikszai2026gauging} reassign \emph{molecules}, which closes a channel when the
+covariate is a property of how molecules resemble one another; placement is a property of a
+\emph{choice somebody made about} a molecule and travels with it into whichever side of a split it
+lands on.
 
 \paragraph{The thermodynamic explanation this must be separated from.} Nearest-neighbour
 parameters \citep{freier1986improved,xia1998thermodynamic,mathews1999expanded,turner2010nndb} give
@@ -435,7 +465,7 @@ matching is invalid, because the permuted assignment would not have produced the
 configuration, and that doing so inflates Type~I error
 \citep{hansen2008covariate,rosenbaum2010design}. What we add is the magnitude on a design of this
 kind. Against a nominal $0.005$, the treatment-side randomisation rejects at $\jdg{m23nT}$
-($\jdg{m23nTN}$ draws) while the outcome-side one rejects at $\jdg{m23nY}$ ($\jdg{m23nYN}$) --- a
+($\jdg{m23nTN}$ draws) while the outcome-side one rejects at $\jdg{m23nY}$ ($\jdg{m23nYN}$), a
 \jdg{m23Ratio}-fold inflation, measured rather than argued. \S\ref{sec:mediation}'s decomposition is a product-of-coefficients mediation
 \citep{baron1986moderator,imai2010general,vanderweele2015explanation} with an observed mediator
 and a non-manipulable exposure, a setting whose identification conditions are stronger than the
@@ -506,7 +536,10 @@ for the presence of a stacking partner on the outer and inner side. Then
 \label{eq:dg}
 \end{equation}
 with the stacking energies $E_{\mathrm{st}}$ and the terminal penalty
-$\Delta G_{\mathrm{term}}=\jdg{eTermAU}$\,kcal/mol read from the ViennaRNA 2.7.2 parameter tables
+$\Delta G_{\mathrm{term}}=\jdg{eTermAU}$\,kcal/mol read from the ViennaRNA 2.7.2 parameter
+tables, one released table, and every $\Delta G_{\mathrm{loc}}$ in this paper is a value in it
+rather than a thermodynamic constant; \S\ref{sec:energy} is a statement about \emph{this model's}
+energy for that reason, and a different table is a different mediator
 rather than transcribed.
 \end{definition}
 
@@ -516,8 +549,8 @@ assembled from these terms, so conditioning on it conditions on what the design 
 It is \emph{local}: coaxial stacking, dangling ends and tertiary contacts are outside it, which
 bounds the conclusion to the local term and not to thermodynamics
 \citep{walter1994coaxial,serra1995predicting}. And it is \emph{undefined at a non-canonical
-partner} --- the parameter tables have no entry, and the library returns a finite but meaningless
-value there --- so the indicators above require canonicity on both sides and a non-canonical
+partner} (the parameter tables have no entry, and the library returns a finite but meaningless
+value there) so the indicators above require canonicity on both sides and a non-canonical
 neighbour is treated as a helix end, which is also what the model does with it
 (Appendix~\ref{app:energy} counts the affected pairs).
 
@@ -559,8 +592,8 @@ and the estimator is the pair-weighted mean of $y_u-y_v$ over $M$. No model prod
 Write $X=(t,\gamma,\pi)$, so that by \eqref{eq:matched} the matched set is $M=M(X)$ and the
 statistic is $T(y,X)$.
 \begin{enumerate}[leftmargin=2.4em,itemsep=1pt,topsep=2pt,label=(\roman*)]
-\item \emph{Identity.} For any dataset, permuting molecule identity within cell --- carrying every
-coordinate of $X$ together --- and permuting $y$ within cell induce the same distribution of $T$.
+\item \emph{Identity.} For any dataset, permuting molecule identity within cell, carrying every
+coordinate of $X$ together, and permuting $y$ within cell induce the same distribution of $T$.
 No hypothesis is needed.
 \item \emph{Validity.} That distribution is an exact reference for $T$ under the hypothesis that
 $y$ is \emph{exchangeable within cell given the design}, i.e.\ $y\perp X$ within cell. It is not
@@ -584,12 +617,14 @@ two differ and $M(X')\neq M(X)$ in distribution.
 
 \noindent \textbf{(iii), measured.} Once $t$ is decoupled from $\gamma$, the caliper on $\gamma$
 admits pairs it would otherwise exclude, so $|M(X')|>|M(X)|$ typically, the null is computed on a
-larger and easier design, and its spread is too small (Fig.~\ref{fig:null}). Measured at a nominal
-$0.005$, the treatment-side randomisation rejects at $\jdg{nullRateOld}$ and the design-fixed one
-at $\jdg{nullRateNew}$. A four-way comparison under an exchangeable null agrees: permuting $t$
+larger and easier design, and its spread is too small (Fig.~\ref{fig:null}). Two constructions measure this, and they are not the same
+experiment, so the rates are stated with what produced each. \emph{On the corpus's own
+populations}, at a nominal $0.005$, the treatment-side randomisation rejects at
+$\jdg{nullRateOld}$ and the design-fixed one at $\jdg{nullRateNew}$. \emph{Under a synthetic
+exchangeable null}, on the same draw count, a four-way comparison agrees: permuting $t$
 rejects $\jdg{m23nTN}=\jdg{m23nT}$, permuting $y$ within cell $\jdg{m23nYN}=\jdg{m23nY}$, a
 Freedman--Lane residual permutation \citep{freedman1983nonstochastic,anderson2001permutation,winkler2014permutation}
-$\jdg{m23nFLN}$, and a permutation blocked on the calipers $\jdg{m23nBlN}$ --- though the last has
+$\jdg{m23nFLN}$, and a permutation blocked on the calipers $\jdg{m23nBlN}$, though the last has
 almost no permutation freedom, its blocks having median size $\jdg{m23BlockMed}$. The equivalence
 in (i) was also checked numerically: permuting all covariates jointly against permuting $y$ gives
 SD ratios of $\jdg{verSdLo}$ to $\jdg{verSdHi}$ and a largest two-sample KS statistic of
@@ -616,9 +651,9 @@ We reached \eqref{eq:imbalance} analytically because on this design the question
 by simulation, for a reason worth stating. A synthetic dataset that is null in $t$ while retaining
 the real $y$--$\gamma$ relation does not exist here: $\gamma$ and $t$ are dependent, so part of
 that relation \emph{is} the effect. Two attempts leak it back. Permuting $t$ inside fixed
-$\gamma$ blocks retains $\jdg{m23LeakLo}$ to $\jdg{m23LeakHi}$ of the real effect --- the caliper
+$\gamma$ blocks retains $\jdg{m23LeakLo}$ to $\jdg{m23LeakHi}$ of the real effect, the caliper
 is a moving window and the blocks a grid of the same width, so $\jdg{m23CrossBlock}$ of matched
-pairs straddle a boundary --- and the retained effect predicts the resulting rejection rates with
+pairs straddle a boundary, and the retained effect predicts the resulting rejection rates with
 correlation $\jdg{m23LeakCorr}$. Replacing the blocks with a non-parametric fit of
 $\mathbb E[y\mid\gamma,\pi]$ leaks $\jdg{m23Dgp3Leak}$. The robust content of
 Prop.~\ref{prop:null}, which does not depend on any of this, is that \emph{inference must preserve
@@ -632,8 +667,8 @@ under each randomisation, $40$ draws in each of \jdg{c5N} populations. Permuting
 the matched set and rejects an order of magnitude too often; permuting the outcome holds the design
 fixed and returns the nominal rate. \emph{Right}: the SD of the statistic under each null, per
 population. The treatment-side null is uniformly the narrower, which is the mechanism rather than
-a coincidence. Two further constructions that hold the design fixed --- Freedman--Lane and a
-blocked permutation --- were run and are reported in Appendix~\ref{app:nulls}.}
+a coincidence. Two further constructions that hold the design fixed, Freedman--Lane and a
+blocked permutation, were run and are reported in Appendix~\ref{app:nulls}.}
 \label{fig:null}
 \end{figure}
 
@@ -672,7 +707,7 @@ which they coincide is exactly the one that fails for the mediator of \S\ref{sec
 \label{prop:routes}
 Let $T\in\{A,B\}$ be the exposure and $M$ an observed mediator supported in a bounded set, with
 conditional laws $P_{M\mid A}$ and $P_{M\mid B}$ both absolutely continuous with respect to a fixed
-reference law $P_M$ --- in the application, the pooled within-stratum law, which is what the slope
+reference law $P_M$: in the application, the pooled within-stratum law, which is what the slope
 below is fitted on and which does not move when the exposure mix does. Suppose that within a
 stratum
 \begin{equation}
@@ -721,26 +756,65 @@ $P_{M\mid A}$ to be point mass at $m_0$ and $P_{M\mid B}=P_M$ makes the right-ha
 $\operatorname{osc}(r)<\infty$ throughout.
 \end{proof}
 
+\paragraph{The premise, tested rather than assumed.} Both propositions above rest on
+\eqref{eq:nointeract}: within a stratum the exposure shifts the outcome by a constant that does
+not depend on $M$. That is an assumption about the corpus and it is checkable, by computing the
+identity contrast separately inside each bin of the mediator. On the channel this paper leans on
+it holds and is not close: across the \jdg{a7N} $\Delta G_{\mathrm{loc}}$ bins carrying enough
+records to be read, the contrast is \jdg{a7Bins}, mean \jdg{a7Mean} with a spread of
+\jdg{a7Spread}, a ratio of \jdg{a7Ratio}. Of the \jdg{a7NAll} channels this paper puts a
+mediator to, \jdg{a7NHeld} support it (\jdg{a7Held}) and the other two do not (\jdg{a7Failed},
+whose within-bin contrasts change sign, ratios \jdg{a7PmutRatio} and \jdg{a7BinderRatio}).
+\textbf{The propositions are therefore licensed on the primary channel and not on the other two},
+which is stated here rather than left for a reader to worry about, and it bounds the cross-domain
+arm of \S\ref{sec:crossdomain} as well.
+
 \noindent Two consequences are used below. First, $\beta$ is a projection, so under a non-affine
 $h$ it can carry a sign and a magnitude that the true mediated part does not: the product route can
 report substantial mediation where the stratified route reports none, which is what happens in
 \S\ref{sec:energy}. Second, \eqref{eq:routebound} says the disagreement is small when the two
 exposure arms overlap in the mediator, which is precisely when the stratified route is well
-identified --- so the two routes are most likely to diverge exactly where the product route is the
+identified, so the two routes are most likely to diverge exactly where the product route is the
 only one that can be computed. The practical rule we follow is to report $h$ bin by bin, and to
 use the product route only where it is affine to within the reported precision.
+
+\begin{proposition}[What a mediator can carry, without an estimator]
+\label{prop:carry}
+Under the hypotheses of Proposition~\ref{prop:routes}, the mediated part is exactly
+$\mathbb E[h(M)\mid A]-\mathbb E[h(M)\mid B]$, so for any constant $c$
+\begin{equation}
+\bigl|\Delta^{\mathrm{tot}}-\Delta^{\mathrm{cde}}\bigr|
+\;\le\;\int\bigl|h-c\bigr|\,\bigl|\mathrm dP_{M\mid A}-\mathrm dP_{M\mid B}\bigr|
+\;\le\;\operatorname{osc}(h)\,d_{\mathrm{TV}}\!\left(P_{M\mid A},P_{M\mid B}\right).
+\label{eq:carrybound}
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+The first equality is the display in the proof of Proposition~\ref{prop:routes} before $h$ is
+split. The middle term follows because the constant $c$ cancels in the difference; the right-hand
+term is that middle term bounded by $\|h-c\|_\infty\|P_{M\mid A}-P_{M\mid B}\|_1$ at
+$c=\tfrac12(\sup h+\inf h)$.
+\end{proof}
+
+\noindent \eqref{eq:carrybound} is what a channel ledger needs and \eqref{eq:routes} is not:
+it bounds \emph{the mediated part itself} rather than the gap between two estimators of it, it
+requires no affinity, and it invokes no mediation estimator, so it is untouched by the calibration
+of \S\ref{sec:cal}. It costs the same two ingredients as the proposition: the amplitude of the
+conditional mean, and the overlap between the arms. \S\ref{sec:carry} measures both, and reports
+that on this corpus the crude right-hand form is vacuous while the middle form is not.
 
 \paragraph{What is and is not new here.} \textbf{We claim no priority for the non-equivalence
 itself.} That the two routes stop agreeing once the outcome model is not linear in the mediator is
 standard \citep{mackinnon2007mediation,vanderweele2015explanation}, and the two are routinely
 compared as competing estimators of a shared target \citep{cheng2023product}. Three things are
 added, and the third is the one the calibration below rests on. The gap is written in closed form
-as a contrast of a single function --- \eqref{eq:routes}, the exposure contrast of the residual of
-the conditional mean after its linear projection --- rather than as a discrepancy attributed to
+as a contrast of a single function: \eqref{eq:routes}, the exposure contrast of the residual of
+the conditional mean after its linear projection: rather than as a discrepancy attributed to
 model form. It is bounded by an observable, \eqref{eq:routebound}, whose second factor is the same
 overlap the stratified route needs to be identified, which is what makes the disagreement
 predictable in advance instead of merely possible. And the characterisation is an \emph{iff} over
-exposure laws: affinity of $h$ is not a sufficient condition offered for convenience, it is the
+exposure laws: affinity of $h$ is not a sufficient condition offered for convenience: it is the
 exact one, so no weaker regularity assumption can rescue interchangeability here.
 
 \subsection{Calibration and preregistration}
@@ -818,14 +892,14 @@ staked numerical prediction, committed and pushed before the code that produced 
 rather than rephrased. \jdg{pvCorpus} are the population data files the analysis runs on, which
 declare nothing because they are not runs. The remaining \jdg{pvUnplanned} were not preregistered:
 \jdg{pvSurvey} is a census of what the bootstrap resamples, \jdg{pvSupport} a supporting quantity
-for a claim made elsewhere, and \jdg{pvReview} are \emph{reviews} --- each written after the run it
+for a claim made elsewhere, and \jdg{pvReview} are \emph{reviews}, each written after the run it
 checks, because that run needed checking, and a review cannot be preregistered without
 preregistering its own conclusion.
 
 \textbf{Two of those reviews are load bearing and we say so here rather than let a reader find
 it.} The direct contrasts that replace the withdrawn mediated fraction, and which appear in this
 paper's abstract, were written after the calibration of \S\ref{sec:cal} showed the fraction
-unreadable --- so the quantity this paper now reports in its place was never staked in advance. So
+unreadable, so the quantity this paper now reports in its place was never staked in advance. So
 was the interval on the reproducibility ceiling of \S\ref{sec:frame}, which repairs a debt an
 earlier review had recorded and not paid. Which artifact falls in which class is recorded in
 \texttt{provenance.json} beside the manuscript rather than asserted here, and the build refuses to
@@ -835,8 +909,8 @@ declaration, its commit and its verdict.
 Three conventions run through the estimating arms and are stated once here rather than
 repeated, with their exceptions, because a convention stated without its exceptions is a claim
 about the paper that the paper does not meet. \emph{First}, every arm that estimates a contrast
-works inside $(\text{target},\text{method})$ --- the design-score arm by centring, the rescue
-arms by carrying the cell as a component of the stratum --- so the two between-cell variance layers
+works inside $(\text{target},\text{method})$, the design-score arm by centring, the rescue
+arms by carrying the cell as a component of the stratum, so the two between-cell variance layers
 of \S\ref{sec:frame} are removed by construction rather than adjusted for. The measurement-frame
 quantities of \S\ref{sec:frame} are not contrasts and are not centred; they are variance
 components of the raw score. \emph{Second}, every permutation test shuffles \emph{within} the
@@ -886,7 +960,7 @@ $\jdg{ceilB}$ $\jdg{ceilBCi}$ we use, and the two intervals do not meet. We repo
 route for the reason above. Which of the two flatters a given claim depends on what the ceiling is
 being used to normalise, and that is not the basis on which we chose. The value declared
 before this measurement, $\jdg{ceilDeclared}$, falls between the two routes' SDs rather than
-outside them. \emph{A design-score point is therefore worth $1/\jdg{ceilWithinSd}$ of a within-cell SD, and $\jdg{ceilB}$ of that SD is reproducible signal} --- which is the scale against which \S\ref{sec:score}'s effect should be read.
+outside them. \emph{A design-score point is therefore worth $1/\jdg{ceilWithinSd}$ of a within-cell SD, and $\jdg{ceilB}$ of that SD is reproducible signal}, which is the scale against which \S\ref{sec:score}'s effect should be read.
 Both routes, per population and with their intervals, are in Appendix~\ref{app:ceiling}.
 
 \subsection{Pair identity decides whether the pair forms}
@@ -925,8 +999,7 @@ program in the corpus optimises a sum of such terms, so holding this quantity fi
 what the design loop was told about the pair.
 
 \paragraph{Stratification, and the overlap it needs.} $\Delta G_{\mathrm{loc}}$ is cut at fixed
-quantiles of the pooled distribution --- $\jdg{eNBins}$ bins, edges fixed once, before any contrast
---- and the bin index joins $(\text{design},\text{depth},\text{crossed})$ in the stratum. Because
+quantiles of the pooled distribution ($\jdg{eNBins}$ bins, edges fixed once, before any contrast) and the bin index joins $(\text{design},\text{depth},\text{crossed})$ in the stratum. Because
 the edges do not depend on the labels, permuting labels cannot rebuild the matched set, which is
 what Prop.~\ref{prop:null} requires. Overlap is real but not free
 (Fig.~\ref{fig:energy}, left): G--C pairs average $\jdg{eDgCG}$\,kcal/mol against $\jdg{eDgAU}$ for
@@ -934,7 +1007,7 @@ A--U and $\jdg{eDgGU}$ for G--U, and the most stable bin holds $\jdg{eBinsCG}$ G
 $\jdg{eBinsAU}$ A--U ones by bin. The estimate therefore lives where a G--C pair with an unusually
 weak stacking context meets an A--U pair with an unusually strong one, on $\jdg{eW}$ of
 $\jdg{eWBase}$ pair-weights
-over $\jdg{eStrata}$ strata --- and the price is visible in the calibration ladder, whose detection
+over $\jdg{eStrata}$ strata, and the price is visible in the calibration ladder, whose detection
 threshold moves from $\jdg{rescueAULad}$ to $\jdg{eLad}$.
 
 \begin{figure}[!htbp]
@@ -945,7 +1018,7 @@ needs: the bin occupancies of the three pair types. \emph{Centre}, the contrast 
 conditioning, at three bin counts, against the band a placebo mediator produces (grey,
 mean $\pm1.96$\,SD; the vertical rule is no change).
 \emph{Right}, the within-stratum conditional mean of rescue against $\Delta G_{\mathrm{loc}}$,
-with the least-squares slope the product route uses --- the assumption of
+with the least-squares slope the product route uses, the assumption of
 Prop.~\ref{prop:routes} drawn against the function it approximates.}
 \label{fig:energy}
 \end{figure}
@@ -955,7 +1028,7 @@ Prop.~\ref{prop:routes} drawn against the function it approximates.}
 reconcile them fails.} The conditioning route: among pairs sharing a bin of
 $\Delta G_{\mathrm{loc}}$ the contrast is $\jdg{eCde}$ (permutation $p=\jdg{eP}$, null SD
 $\jdg{eNullSd}$, cluster interval $\jdg{eCi}$) against a baseline of $\jdg{eBaseSame}$ computed on
-\emph{the same records} with the energy dimension removed --- a retained fraction of $\jdg{eRet}$,
+\emph{the same records} with the energy dimension removed, a retained fraction of $\jdg{eRet}$,
 a mediated fraction of $\jdg{eMed}$, $\jdg{eMedCi}$. The product route, on the same records:
 $\beta=\jdg{eBeta}$ against a gap of $\jdg{eGap}$, giving $\jdg{eLinearMed}$. Both numbers were
 written to the same frozen output file and the verdict field took the first without argument.
@@ -972,10 +1045,11 @@ separates them by $\jdg{dDg}$\,kcal/mol (\jdg{dDgCi}, $p\jdg{dDgP}$), a tight in
 zero; and the same model's ensemble probability that the pair forms separates them by $\jdg{dPm}$
 (\jdg{dPmCi}, $p=\jdg{dPmP}$), which does not resolve from zero. \textbf{The model's pipeline
 absorbs a $|\jdg{dDg}|$\,kcal/mol local energy difference into a probability difference too small
-to detect.} Each bound is that arm's contrast times its own within-stratum slope of the outcome on the
-mediator, divided by the total: those slopes are $\jdg{dDgSlope}$ per kcal/mol and
-$\jdg{dPmSlope}$ per unit probability, giving bounds of $\jdg{dDgBound}$ and $\jdg{dPmBound}$ ---
-upper limits only, for the reason in the box above --- a factor of $\jdg{dBoundRatio}$ apart.
+to detect.} Each \emph{product-route reading} is that arm's contrast times its own within-stratum slope of
+the outcome on the mediator, divided by the total: those slopes are $\jdg{dDgSlope}$ per kcal/mol
+and $\jdg{dPmSlope}$ per unit probability, giving $\jdg{dDgBound}$ and $\jdg{dPmBound}$, a factor
+of $\jdg{dBoundRatio}$ apart. \textbf{These are readings and not limits}; what is provably a
+limit is \S\ref{sec:carry}'s \jdg{cbTight}.
 \end{claimbox}
 
 \paragraph{Why the placebo is the whole experiment.} Appendix~\ref{app:traps} states the two
@@ -986,8 +1060,8 @@ it by exactly that mechanical amount and by nothing else, so the only interpreta
 is the difference between the two shrinkages. It is $\jdg{eZ}$ standard deviations, which is to
 say it is not there. The same construction also exposes a trap in the naive ratio: dividing the
 stratified estimate by the \emph{full}-population baseline gives $\jdg{eRetWrong}$, of which
-$\jdg{eSel}$ is selection --- the energy-overlap region is one where the identity contrast is
-larger to begin with --- and none of it is mediation.
+$\jdg{eSel}$ is selection, the energy-overlap region is one where the identity contrast is
+larger to begin with, and none of it is mediation.
 
 \paragraph{It is not the terminal penalty acting alone.} The terminal A--U penalty is charged only
 at a helix end, so the hypothesis that it generates the effect makes a positional prediction, and
@@ -1013,7 +1087,7 @@ whose slope is the directly estimated $\beta_{\Delta G}=\jdg{eBeta}$ per kcal/mo
 slopes are $\jdg{eSlopeca}$ (C--G $-$ A--U, over $\jdg{eDgdca}$\,kcal/mol), $\jdg{eSlopecg}$
 (C--G $-$ G--U, $\jdg{eDgdcg}$) and $\jdg{eSlopeag}$ (A--U $-$ G--U, $\jdg{eDgdag}$): a spread of
 $\jdg{eSlopeSpread}\times$, with $\beta_{\Delta G}$ outside their range
-(Fig.~\ref{fig:collinear}). The A--U $-$ G--U comparison is the informative one --- the model
+(Fig.~\ref{fig:collinear}). The A--U $-$ G--U comparison is the informative one, the model
 separates those two by only $\jdg{eDgdag}$\,kcal/mol, and the measured separation is
 correspondingly small but in the wrong proportion.
 
@@ -1029,8 +1103,7 @@ $\Delta G_{\mathrm{loc}}$ account requires.}
 
 \paragraph{The linear route would have said the opposite, and Prop.~\ref{prop:routes} says why.}
 Product of coefficients through the energy gives $\beta_{\Delta G}=\jdg{eBeta}$ per kcal/mol
-against a within-stratum gap of $\jdg{eGap}$\,kcal/mol, hence $\jdg{eLinearMed}$ mediated ---
-$\jdg{eLinearGapPts}$ percentage points from the stratified estimate. Proposition~\ref{prop:routes}
+against a within-stratum gap of $\jdg{eGap}$\,kcal/mol, hence $\jdg{eLinearMed}$ mediated: $\jdg{eLinearGapPts}$ percentage points from the stratified estimate. Proposition~\ref{prop:routes}
 locates the disagreement in $h$, and $h$ is measurable here. Across bins running from
 $\jdg{eBinwiseDg}$\,kcal/mol, the within-stratum centred mean of rescue is $\jdg{eBinwise}$: it
 rises and then falls, so $h$ is not affine, $r$ is not constant, and the product route is
@@ -1038,7 +1111,7 @@ inadmissible. We report both and use the stratified one. A mediation analysis ru
 check would have concluded that the model's energy explains most of the effect.
 
 \paragraph{Not an artifact of which designs a program can build.} The compensatory arm holds, for
-each (target, method) cell, the design that scored best --- so the corpus is pre-filtered by the
+each (target, method) cell, the design that scored best, so the corpus is pre-filtered by the
 design programs themselves, and one could ask whether the effect lives only in the subspace current
 algorithms can reach. The \jdg{gNMethods} methods differ widely in capability, so if the effect were
 manufactured that way it should track capability. It is positive in $\jdg{sNPos}$ of
@@ -1069,6 +1142,59 @@ description and no claim rests on it.
 % belong to the companion instrument paper, which owns the scoring step. What is left here is
 % the estimator question, which is what this paper is about.
 
+\subsection{What the channel can carry, without an estimator}
+\label{sec:carry}
+
+The two figures the previous subsection reports, \jdg{dDgBound} and \jdg{dPmBound}, are
+\emph{product-route readings}: each is that arm's contrast in the mediator times its within-stratum
+slope on the outcome, divided by the total. Earlier versions of this manuscript called them upper
+limits. \textbf{They are not, and the reason is Proposition~\ref{prop:routes} itself}: under a
+non-affine conditional mean $\beta$ is a projection that can carry a sign and a magnitude the true
+mediated part does not, and nothing in that statement fixes the direction. \emph{Could be wrong
+either way} does not yield \emph{is an upper limit}. Proposition~\ref{prop:carry} supplies what
+does, and this subsection measures it on the channel where \eqref{eq:nointeract} holds.
+
+\paragraph{Reading a plug-in bound honestly.} Both factors in \eqref{eq:carrybound} are estimated
+by binning the mediator, and a coarse binning \emph{under-resolves} each: it cannot see an
+oscillation finer than a bin, and it cannot see a distributional difference finer than a bin
+either. Both errors shrink the right-hand side, so at coarse resolution the plug-in inequality can
+fail while the inequality it estimates holds. The direction is measured rather than asserted:
+across \jdg{cbNbins} binnings from \jdg{cbBinLo} to \jdg{cbBinHi} bins the right-hand side rises
+monotonically (Spearman \jdg{cbRhoRhs} against bin count, $\operatorname{osc}(h)$ from
+\jdg{cbOscLo} to \jdg{cbOscHi} and $d_{\mathrm{TV}}$ from \jdg{cbDtvLo} to \jdg{cbDtvHi})
+while the left-hand side shows no such trend (\jdg{cbRhoLhs}). We therefore read the bound at the
+coarsest resolution at which the plug-in inequality is satisfied, which is the most conservative
+reading available and not the most flattering one.
+
+\paragraph{The crude form is vacuous here, and the reason is the proposition's own second factor.}
+At that resolution, \jdg{cbAtBins} bins, $\operatorname{osc}(h)\,d_{\mathrm{TV}}$ permits
+\jdg{cbLoose} of the total contrast: it excludes nothing. \textbf{That is not a defect of the
+estimate but a property of the corpus}, and it is the same property that makes the conditioning
+route badly identified: the two arms overlap in $\Delta G_{\mathrm{loc}}$ only to
+$d_{\mathrm{TV}}\approx\jdg{cbDtvLo}$--\jdg{cbDtvHi}, and \eqref{eq:carrybound}'s second
+factor \emph{is} that overlap. A corpus whose design programs place the two pair types in
+different energy regimes cannot bound how much of an effect the energy carries, for the same
+reason it cannot condition on it.
+
+\paragraph{The tight form is not vacuous, and it is what replaces the withdrawn share.} The middle
+expression in \eqref{eq:carrybound} pairs $|h-c|$ against $|\mathrm dP_A-\mathrm dP_B|$ bin by
+bin instead of pairing a supremum against a total mass, and it is minimised in closed form over
+$c$. It gives \jdg{cbTight} at the same resolution and \jdg{cbTightLo}--\jdg{cbTightHi} across
+the resolutions at which it is satisfied. \textbf{At most about half of the identity contrast can
+run through the local nearest-neighbour energy, and that statement needs no mediation estimator,
+no affinity assumption and no calibration.} The product-route reading \jdg{dDgBound} sits inside
+that range, so it was not wrong here; it was simply never derived, and at finer resolutions the
+provable bound exceeds it.
+
+\paragraph{The second channel is not licensed at all.} For $P_{\mathrm{model}}$,
+\eqref{eq:nointeract} fails (\S\ref{sec:routes}: within-bin contrasts change sign, ratio
+\jdg{a7PmutRatio}), so neither proposition applies and \jdg{dPmBound} has no standing beyond
+being a product-route reading. Computed anyway, for completeness rather than for use, the tight
+form gives \jdg{cbPmTight}. \textbf{What survives for that channel is the direct contrast and
+nothing else}: the model's ensemble probability differs between the pair types by \jdg{dPm}
+(\jdg{dPmCi}), which does not resolve from zero, on the same matched design as everything else
+here.
+
 \subsection{Which route is readable is a question for calibration, not for argument}
 \label{sec:cal}
 
@@ -1082,7 +1208,7 @@ it is supposed to recover.
 \input{figs/fig13_cal}
 \caption{\textbf{Two attempts to make the estimator read a truth we planted.} \textbf{a}, The
 first attempt. A known share of the effect was routed through a synthetic mediator and the
-estimator recovered it well --- correlation \jdg{posCorr} --- which is why it was reported. The
+estimator recovered it well, correlation \jdg{posCorr}, which is why it was reported. The
 mediator was built with a separation this corpus does not have, so what the panel shows is the
 estimator working in a regime, not on these data. \textbf{b}, The second attempt, at the
 separation the corpus actually has, routed through the real mediator. The dashed line in both
@@ -1103,14 +1229,14 @@ produces a result that looks like success.
 
 \paragraph{The second attempt calibrated in the wrong regime, by a measurable amount.} Repaired,
 the control recovers a truth of total mediation as $\jdg{posFull}$ retention, correlating with the
-truth at $\jdg{posCorr}$ with mean absolute error $\jdg{posMae}$ --- directionally right and
+truth at $\jdg{posCorr}$ with mean absolute error $\jdg{posMae}$: directionally right and
 compressed hard. But its synthetic mediator separated the arms by $\jdg{posSepSyn}$ pooled
 standard deviations where the real one separates them by $\jdg{posSepReal}$, a factor of
 $\jdg{posSepRatio}$. A calibration an order of magnitude away from the regime it is calibrating
 is not a calibration.
 
-\paragraph{The third changes one thing.} The mediator \emph{is} the real predictor --- real
-distribution, real correlation with the design cells, real binning behaviour --- and only the
+\paragraph{The third changes one thing.} The mediator \emph{is} the real predictor, real
+distribution, real correlation with the design cells, real binning behaviour, and only the
 outcome is synthetic,
 \[
 Y \;=\; \gamma\,M_{\text{real}} \;+\; \delta\,\mathbf 1[\text{G--C}] \;+\;
@@ -1119,7 +1245,7 @@ Y \;=\; \gamma\,M_{\text{real}} \;+\; \delta\,\mathbf 1[\text{G--C}] \;+\;
 with $\gamma=f\,\text{total}/\alpha$ and $\delta=(1-f)\,\text{total}$ set so the total
 stratified contrast equals the corpus's own $\jdg{calTotal}$ and a known fraction $f$ of it runs
 through the mediator. Here $\alpha$ is the mediator's \emph{own} stratified contrast between the
-arms --- $\jdg{calNAlpha}$ for the first predictor and $\jdg{calVAlpha}$ for the second --- and its
+arms: $\jdg{calNAlpha}$ for the first predictor and $\jdg{calVAlpha}$ for the second, and its
 smallness is the design's ceiling rather than an artefact of the sweep: with $\alpha$ this small,
 $\gamma$ has to become implausibly large before $f$ approaches one. Sweeping $f$ over
 $\jdg{calSweep}$ says what a measured retention means here.
@@ -1127,29 +1253,30 @@ $\jdg{calSweep}$ says what a measured retention means here.
 \begin{claimbox}
 \textbf{The conditioning estimator does not track the truth on this corpus.} Over
 $f\in[0,\jdg{calSpanTop}]$ the truth moves $\jdg{calSpanTrue}$ while the measured retention moves
-$\jdg{calNSpan}$ for the first mediator and $\jdg{calVSpan}$ for the second --- $\jdg{calNSpanFrac}$
+$\jdg{calNSpan}$ for the first mediator and $\jdg{calVSpan}$ for the second: $\jdg{calNSpanFrac}$
 and $\jdg{calVSpanFrac}$ of the range it is supposed to cover. Mean absolute error is
 $\jdg{calNMae}$ and $\jdg{calVMae}$. At $f=0$ it returns $\jdg{calNZero}$ and $\jdg{calVZero}$ and
 at $f=100\%$ it returns $\jdg{calNFull}$ and $\jdg{calVFull}$, so it is not biased by a constant:
 it is uninformative about $f$ over the whole range. \textbf{Every retention figure and mediated
-fraction in earlier versions of this work is withdrawn.}
+fraction this pipeline produced is withdrawn}, by named field in the released run artifacts
+(\S\ref{sec:cal}).
 \end{claimbox}
 
 \paragraph{Why that is stated as a range and not as a correlation.} The natural summary of a
 calibration sweep is the correlation between truth and measurement, and we report it, but it
 cannot carry the claim and we say so rather than quoting whichever arm is convenient. The two
 mediators give $\jdg{calNCorr}$ and $\jdg{calVCorr}$: the first has the wrong sign, the second the
-right one. Both are artefacts of a single sweep point. Dropping $f=100\%$ --- the one place where
-the estimator degenerates, returning $\jdg{calVFull}$ --- moves them to $\jdg{calNLoo}$ and
+right one. Both are artefacts of a single sweep point. Dropping $f=100\%$ (the one place where
+the estimator degenerates, returning $\jdg{calVFull}$) moves them to $\jdg{calNLoo}$ and
 $\jdg{calVLoo}$, so the second changes sign; across all six leave-one-out fits the first ranges
 over $[\jdg{calNLooLo},\,\jdg{calNLooHi}]$ and the second over
 $[\jdg{calVLooLo},\,\jdg{calVLooHi}]$. Rank correlations, which one point cannot dominate the same
 way, are $\jdg{calNRho}$ and $\jdg{calVRho}$. A six-point correlation produced by one point is not
-evidence in either direction, which is why the claim above is made on the span --- a statement that
+evidence in either direction, which is why the claim above is made on the span, a statement that
 does not use the degenerate endpoint at all.
 
 \paragraph{Two reasons this was invisible from inside the analysis.} First, the placebo mediator
---- which the method requires and which we ran --- controls the mechanical shrinkage that any
+(which the method requires and which we ran) controls the mechanical shrinkage that any
 extra stratifying dimension produces, but a placebo has no relation to the outcome, so it cannot
 calibrate the bias that arises precisely \emph{because} the mediator does predict the outcome.
 Having a placebo is not having a calibration. Second, the real mediator separates the arms by
@@ -1170,8 +1297,8 @@ is $\jdg{posSepReal}$ here.
 
 \paragraph{The same disease, a different estimator, a different corpus.} The failure is not
 specific to mediation. On a second corpus of natural RNA, a within-stratum \emph{skill slope} of
-the outcome on a predictor --- also declared in advance, also with a permutation test and a
-constructive ladder --- reports $\jdg{legSlope}$ ($p=\jdg{legSlopeP}$) on $n=\jdg{legN}$ records,
+the outcome on a predictor (also declared in advance, also with a permutation test and a
+constructive ladder) reports $\jdg{legSlope}$ ($p=\jdg{legSlopeP}$) on $n=\jdg{legN}$ records,
 while the rank statistic on the same records reports $\jdg{legRho}$ ($p=\jdg{legRhoP}$). The two
 arms being compared differ in outcome dispersion by a factor of $\jdg{legSdRatio}$, and the
 predictor is near-binary, so the linear slope is carried by a few intermediate points and by the
@@ -1183,8 +1310,8 @@ distinguishes them.
 small total effects is known, and that the difference and product methods disagree under
 non-linearity is known. What this section adds is that the published operational thresholds for
 the first are not sufficient on a corpus of this kind, that the governing quantity is a different
-one, and that a constructive calibration --- inject a known target into the real machinery, read
-back what the estimator reports --- decides the question on the analyst's own data rather than by
+one, and that a constructive calibration, inject a known target into the real machinery, read
+back what the estimator reports: decides the question on the analyst's own data rather than by
 reference to a rule of thumb. Proposition~\ref{prop:routes} supplies the exact identity and bound
 for the second. We do not claim the failure modes themselves are new.
 \end{scopebox}
@@ -1197,20 +1324,21 @@ for the second. We do not claim the failure modes themselves are new.
 \input{figs/fig14_crossdomain}
 \caption{\textbf{The proposition, put at risk where none of this paper's apparatus applies.} A
 corpus of designed protein binders: hydrophobicity as the treatment, chain length as the mediator,
-measured binding as the outcome. \textbf{a}, The premise --- how much of the mediator the design
+measured binding as the outcome. \textbf{a}, The premise: how much of the mediator the design
 method explains, target by target, against its mean \jdg{xdEta}. \textbf{b}, The two quantities
 the bound is made of, on the binder corpus and on this paper's: the overlap $d_{\rm TV}$ between
 the two exposure laws, and how much of the bound the observed gap actually uses. The corpora
 differ by \jdg{xdDtvRatio} on the first and \jdg{xdGapRatio} on the second, and the bound holds on
-both --- it does not merely hold, it tracks. \textbf{c}, The mediator's conditional mean on the
+both. Two corpora are two points; the sweep that would make this a curve is reported in the box
+and does not reach the regime it would need. \textbf{c}, The mediator's conditional mean on the
 binder corpus. Proposition~\ref{prop:routes} says the routes agree exactly when this curve is
 affine, and it is not.}
 \label{fig:crossdomain}
 \end{figure}
 
 A proposition proved on a page and exercised on the corpus that motivated it has been checked
-against itself. Proposition~\ref{prop:routes} makes a claim with no RNA in it --- it is about a
-treatment, a mediator and a stratification --- so it can be put at risk somewhere this paper's
+against itself. Proposition~\ref{prop:routes} makes a claim with no RNA in it: it is about a
+treatment, a mediator and a stratification, so it can be put at risk somewhere this paper's
 apparatus has no purchase. We ran it on a corpus of designed \emph{protein} binders: \jdg{xdN}
 records over \jdg{xdCells} target-by-method cells for \jdg{xdTargets}, with binder hydrophobicity
 as the treatment, chain length as the mediator, and measured binding as the outcome. Nothing about
@@ -1231,7 +1359,7 @@ corpus's two arms overlap heavily in the mediator, so the bound leaves little ro
 to separate. A theory that only ever predicts large effects is not being tested by them.
 
 That reading is only admissible if the RNA corpus, where the routes differ by far more, carries a
-correspondingly larger $d_{\mathrm{TV}}$ --- computed by the same function, in the same file, on
+correspondingly larger $d_{\mathrm{TV}}$, computed by the same function, in the same file, on
 the same estimator. It does.
 
 \begin{center}
@@ -1246,14 +1374,26 @@ RNA designs     & \jdg{xdRN} & \jdg{xdRDtv} & \jdg{xdROsc} & \jdg{xdRRhs} & \jdg
 \end{center}
 
 \begin{claimbox}
-\textbf{The bound does not merely hold; it tracks.} The two corpora differ in overlap by a factor
-of \jdg{xdDtvRatio} and in route gap by a factor of \jdg{xdGapRatio}. Proposition~\ref{prop:routes}
-bounds the second by the first, and across two domains sharing no measurement, no model and no
-units, the ratio it bounds and the ratio it is bounded by agree to within the second decimal.
+\textbf{The bound holds on both, and the two ratios agree.} The two corpora differ in overlap by
+a factor of \jdg{xdDtvRatio} and in route gap by a factor of \jdg{xdGapRatio}.
+Proposition~\ref{prop:routes} bounds the second by the first, and across two domains sharing no
+measurement, no model and no units the ratio it bounds and the ratio it is bounded by agree to
+within the second decimal.
+
+\emph{Two corpora are two points, and we do not read them as a characterisation.} A synthetic
+sweep was run to make the relation a curve: the arms are resampled toward and away from the pooled
+law on the mediator, over \jdg{swRungs} rungs, with everything else left real. It reached
+$d_{\mathrm{TV}}$ from \jdg{swDtvLo} to \jdg{swDtvHi} and no lower, because reweighting within
+a design cell cannot remove the arms' differing composition \emph{across} cells, and over that
+restricted range the two sides move together only at Spearman \jdg{swRho}. \textbf{The sweep
+therefore does not establish that the bound tracks overlap; it establishes that this corpus cannot
+be pushed into the low-overlap regime where the question would be answered.} The agreement of the
+two ratios above is reported as consistent with the mechanism the proposition names, and as
+nothing stronger.
 \end{claimbox}
 
 \paragraph{The one thing this comparison had to survive.} $\mathrm{osc}(r)$ is a supremum over the
-support, and estimating it from binned means shrinks it --- which shrinks the bound's right-hand
+support, and estimating it from binned means shrinks it, which shrinks the bound's right-hand
 side, the direction that manufactures false violations. Swept over \jdg{xdSweepN} bin counts from
 \jdg{xdSweepLo} to \jdg{xdSweepHi}, the bound holds on the binder corpus at \jdg{xdBHold} of
 \jdg{xdSweepN} and on the RNA corpus at \jdg{xdRHold}, failing only at the coarsest settings
@@ -1270,7 +1410,7 @@ truth; it correlates at \jdg{xdECorr}, and the prediction failed. It is not read
 truth of \jdg{xdEHalfTrue} mediation, the estimator reports \jdg{xdEHalfMeas}; injecting
 \jdg{xdEQuarterTrue} it reports \jdg{xdEQuarterMeas}, with a mean absolute error of \jdg{xdEMae}
 across the sweep. The correlation is carried by the endpoints. \textbf{Correlation with a known
-truth is not calibration}, and staking a correlation was the wrong bar to have written --- which
+truth is not calibration}, and staking a correlation was the wrong bar to have written, which
 is the same lesson \S\ref{sec:cal} draws on RNA, arrived at here from the opposite side.
 
 \begin{scopebox}
@@ -1363,7 +1503,7 @@ $\jdg{cSmdHi}$ throughout.}
 \noindent \textbf{Dose--response, registered as monotone in advance.} Splitting the matched
 pairs by how large the placement gap is gives $\jdg{doseEff0}$ for gaps in
 $[\jdg{doseLo0},\jdg{doseLo1})$, $\jdg{doseEff1}$ in $[\jdg{doseLo1},\jdg{doseLo2})$ and
-$\jdg{doseEff2}$ above $\jdg{doseLo2}$ --- monotone, on $\jdg{doseN0}$, $\jdg{doseN1}$ and
+$\jdg{doseEff2}$ above $\jdg{doseLo2}$: monotone, on $\jdg{doseN0}$, $\jdg{doseN1}$ and
 $\jdg{doseN2}$ pairs. Appendix~\ref{app:score} carries the remaining robustness arms: a
 one-to-one non-overlapping matching, leave-one-target-out, a free-energy caliper sweep, and the
 corpus authors' own structure filter.
@@ -1404,9 +1544,9 @@ of $\jdg{gNullMean}\pm\jdg{gNullSd}$, $z=\jdg{gZ}$, $p=\jdg{gP}$ on $\jdg{gCells
 which was the registered prediction (Appendix~\ref{app:gradient} gives every method's row); and
 the cross-method slope of observed attenuation on predicted is $\jdg{gSlope}$, permutation $p=\jdg{gSlopeP}$ at $n=\jdg{gSlopeN}$. \emph{None clears
 a $0.005$ bar alone, and the instrument says why}: the observed spread $\jdg{gSpread}$ falls
-between ladder rungs where detection is $\jdg{gLadLo}$ and $\jdg{gLadHi}$ --- the $\delta=0$ rung
+between ladder rungs where detection is $\jdg{gLadLo}$ and $\jdg{gLadHi}$, the $\delta=0$ rung
 returns $\jdg{gLadZero}$ and width-matched noise fires $\jdg{gNoise}$ times, so the edge is one of
-power and not of calibration --- so this arm sits at its own detection edge for the effect present. A larger design pool, not a different analysis, is what
+power and not of calibration, so this arm sits at its own detection edge for the effect present. A larger design pool, not a different analysis, is what
 would settle it.
 \end{claimbox}
 
@@ -1415,7 +1555,7 @@ would settle it.
 \label{sec:rounds}
 
 Everything above is estimated on one round of one benchmark. The release carries three further
-rounds, with \emph{disjoint} puzzle sets --- verified empty intersection in all three --- and
+rounds, with \emph{disjoint} puzzle sets, verified empty intersection in all three, and
 different method mixes, none of which has been read at any earlier point in this work. The depth
 gap is computed from target structures and design sequences alone, so this arm is blind to every
 outcome by construction, and the loader asserts that no score or reactivity column is opened.
@@ -1451,7 +1591,7 @@ compensatory arm's, so it is a replication of \S\ref{sec:gradient} rather than a
 \end{table}
 
 \paragraph{Round 1 is the exception and is reported as one.} Its pooled gap is the weakest by a
-factor of three and $\jdg{xrR1Pos}$ of its \jdg{gNMethods} methods are positive --- $\jdg{xrR1Names}$ --- so
+factor of three and $\jdg{xrR1Pos}$ of its \jdg{gNMethods} methods are positive: $\jdg{xrR1Names}$, so
 the structure is a strong regularity rather than a law. Round 1 is also the round whose targets are
 drawn from a published pseudoknot set rather than composed for the benchmark, which is a difference
 we can name but not test.
@@ -1461,19 +1601,25 @@ to four, and it raises the method component from an arm at its detection edge
 (\S\ref{sec:gradient}) to one that clears $0.005$ on two independent rounds. It does not extend the
 claim beyond \emph{designed} corpora: all \jdg{xrRounds} rounds come from one laboratory, one platform and one
 player community, and no natural-sequence corpus is present in this release. The prediction the
-mechanism makes about natural RNA --- that the placement structure should be weaker or absent where
-no designer chose --- is stated in \S\ref{sec:limits} as the test we did not run.
+mechanism makes about natural RNA, that the placement structure should be weaker or absent where
+no designer chose: is stated in \S\ref{sec:limits} as the test we did not run.
 
 % =====================================================================
 \section{Analysis}
 \label{sec:analysis}
 
-\subsection{Quantitative: the decomposition bounds placement at $\jdg{medFrac}$}
+\subsection{Quantitative: the decomposition puts placement at $\jdg{medFrac}$}
 \label{sec:quant}
 
 Substituting \S\ref{sec:mediation}'s two estimates into \eqref{eq:med} gives a predicted
 attenuation of $\jdg{medPred}$ against an observed $\jdg{medObs}$ (Table~\ref{tab:med}), so
-placement accounts for at most $\jdg{medFrac}$ and $\varepsilon$ carries the rest.
+placement accounts for $\jdg{medFrac}$ and $\varepsilon$ carries the rest. That figure is one of
+the two staked predictions this paper lost: $\jdg{medFrac}$ against a declared $40$--$60\%$,
+graded \textbf{failed} in Appendix~\ref{app:prereg} and reported here at the value it took rather
+than at the value we expected. It is a product-route reading like the two in
+\S\ref{sec:energy}, and the same caution applies to it (\S\ref{sec:carry}): we write
+\emph{accounts for} rather than \emph{at most}, because the direction of a projection's error is
+not fixed by anything we have shown.
 \textbf{At most}, and not exactly: \eqref{eq:med} is the product route, which
 Proposition~\ref{prop:routes} licenses as an equality only where the conditional mean is affine,
 and \S\ref{sec:cal} is the reason we no longer report the conditioning route beside it as though
@@ -1498,8 +1644,8 @@ about what each answer licenses.
 \paragraph{The energy the designs were optimised for accounts for none of it.} Conditioning on
 $\Delta G_{\mathrm{loc}}$ leaves the identity contrast at $\jdg{eRet}$ of its same-population
 baseline, indistinguishable from a placebo mediator's $\jdg{ePlaceboMean}\pm\jdg{ePlaceboSd}$. Taken alone, the scope of that statement would be set by Definition~\ref{def:dg}:
-$\Delta G_{\mathrm{loc}}$ is the \emph{local} nearest-neighbour term --- two stacks and a terminal
-penalty --- while coaxial stacking, dangling ends and tertiary contacts sit outside it
+$\Delta G_{\mathrm{loc}}$ is the \emph{local} nearest-neighbour term, two stacks and a terminal
+penalty, while coaxial stacking, dangling ends and tertiary contacts sit outside it
 \citep{walter1994coaxial,serra1995predicting}. What makes even that narrow statement worth making
 is that the narrow term is the one the design programs consume: a sum over exactly these stacks and
 penalties is the objective, so a property of formation orthogonal to it is a property the design
@@ -1507,10 +1653,11 @@ loop cannot be optimising towards.
 
 What replaces the retention reading is a comparison of two bounds, and it needs no mediation
 estimator at all. Between the two pair types the local nearest-neighbour energy differs by
-$\jdg{dDg}$\,kcal/mol ($\jdg{dDgCi}$, $p\jdg{dDgP}$) --- a tight interval far from zero --- while
+$\jdg{dDg}$\,kcal/mol ($\jdg{dDgCi}$, $p\jdg{dDgP}$), a tight interval far from zero, while
 the same model's ensemble probability that the pair forms differs by $\jdg{dPm}$
-($\jdg{dPmCi}$), which does not resolve from zero. Their structural bounds are $\jdg{dDgBound}$
-and $\jdg{dPmBound}$, a factor of $\jdg{dBoundRatio}$ apart. The model's pipeline absorbs a large
+($\jdg{dPmCi}$), which does not resolve from zero. Their product-route readings are
+$\jdg{dDgBound}$ and $\jdg{dPmBound}$, a factor of $\jdg{dBoundRatio}$ apart, and the one channel
+where a bound is licensed is bounded at $\jdg{cbTight}$ (\S\ref{sec:carry}). The model's pipeline absorbs a large
 local energy difference into a probability difference too small to detect; both quantities are
 direct contrasts on $\jdg{dW}$ matched pair-weights over $\jdg{dStrata}$ strata.
 
@@ -1521,9 +1668,10 @@ account makes a proportionality prediction and the three pair types are not coll
 ($\jdg{eSlopeSpread}\times$ spread in implied slope). A survivorship account makes a prediction
 about design methods and the effect is positive in $\jdg{sNPos}$ of $\jdg{sNMeth}$ of them without
 ordering by their placement strength. None of the three is decisive on its own; they fail as a
-set, and they fail in three different ways. A fourth reading --- that the model's own ensemble
-probability absorbs the effect --- is bounded at $\jdg{dPmBound}$ and not estimated, because the
-estimator that would have estimated it is the one \S\ref{sec:cal} withdraws.
+set, and they fail in three different ways. A fourth reading, that the model's own ensemble probability
+absorbs the effect, is not estimated, because the estimator that would have estimated it is the
+one \S\ref{sec:cal} withdraws, and not bounded either, because \eqref{eq:nointeract} fails on
+that channel (\S\ref{sec:carry}).
 
 \paragraph{Placement accounts for most of it, and placement is a choice somebody made.} The
 attenuation between the marginal and matched contrasts closes to $\jdg{medFrac}$ on two factors
@@ -1537,7 +1685,7 @@ resolving}, and the human-designed arm sitting at the pre-registered extreme is 
 part being a rule.
 
 \paragraph{The two together.} A property of the molecule that the design objective does not encode
-is hidden, in the corpus, by a covariate the designers chose --- and the two facts are independent
+is hidden, in the corpus, by a covariate the designers chose, and the two facts are independent
 of each other. Neither is inferable from the other, and an analysis that had only the second would
 have reported the first backwards: the product-of-coefficients route through the energy returns
 $\jdg{eLinearMed}$ mediated, and Prop.~\ref{prop:routes} shows why a projection can do that when the
@@ -1565,6 +1713,35 @@ and an objective can and cannot carry; neither is a claim about any particular m
 none.
 
 % =====================================================================
+\subsection{What would carry this beyond one corpus, and what we are not claiming}
+\label{sec:beyond}
+
+Propositions~\ref{prop:null}, \ref{prop:routes} and \ref{prop:carry} contain no RNA. The first
+is about a randomisation whose matched set is a function of the covariates; the second and third
+are about an exposure, a mediator and a stratification. The natural question is whether the
+failure they describe is common in machine-learning evaluation more broadly, where corpora are
+increasingly produced by the systems being scored, and we state the answer as a condition rather
+than as a conjecture. \textbf{Three things have to be in hand for the diagnosis to be run at all}:
+an observed covariate that the generator, not nature, chose; an outcome that is not itself
+produced by a model; and enough overlap between the exposure arms in that covariate for the
+conditioning route to be identified. This corpus has the first two and, as \S\ref{sec:carry}
+measures, not much of the third. A language-model benchmark whose items are model-written, or an
+image benchmark scored by a learned metric, satisfies the first and typically fails the second,
+which is a different problem from the one priced here and not one these propositions solve.
+\textbf{We have not run this anywhere else and claim nothing about it.} What transfers without a
+new experiment is narrower and worth stating on its own: the affinity test of
+\S\ref{sec:routes} and the bound of \S\ref{sec:carry} are computable from any stratified
+mediation analysis's own inputs, so a reader who reports a mediated share can check, on their
+data, whether the two routes may be interchanged and how much the mediator could carry at all.
+
+A second question this paper does not answer is what a benchmark should do about a channel it
+cannot price. Requiring a de-biased or counterfactual test split is the obvious proposal and it
+does not reach the channel measured here, for the reason in \S\ref{sec:related}: a split
+reassigns molecules, and placement is a property of a choice made about a molecule. The
+constructive alternative is the one stated in \S\ref{sec:limits}(iii), which is to build the
+matched pairs rather than to mine them, and it needs synthesis rather than analysis.
+
+% =====================================================================
 \section{Limitations}
 \label{sec:limits}
 
@@ -1576,32 +1753,43 @@ replicates is the target set and the method mix, not the ecology. The sharpest u
 from the mechanism itself: \emph{a corpus nobody designed should not carry the placement
 structure.} Homologous natural sequences with a probing readout would decide it, and none is
 present in this release. 
-\paragraph{(ii) Interventional at the mutation, observational at the property.} The rescue readout is produced by an intervention --- a compensatory double substitution
-performed at the bench --- and that is what licenses a formation claim about an individual pair.
+\paragraph{(ii) Interventional at the mutation, observational at the property.} The rescue readout is produced by an intervention, a compensatory double substitution
+performed at the bench, and that is what licenses a formation claim about an individual pair.
 We did not choose which pairs were mutated, and the exposure whose effect we estimate, the identity
 of the target pair, was assigned by a designer. \S\ref{sec:gradient} does not randomise methods.
 
 \paragraph{(iii) No sequence was synthesised to any rule proposed here.} The experiment that would
 close the loop is specific and we state it rather than gesture at it: build matched sequence pairs
-that hold $\Delta G_{\mathrm{loc}}$ fixed while swapping pair identity --- Fig.~\ref{fig:energy}
-(left) shows the overlap region where such pairs exist --- and measure rescue on them. That
+that hold $\Delta G_{\mathrm{loc}}$ fixed while swapping pair identity, Fig.~\ref{fig:energy}
+(left) shows the overlap region where such pairs exist, and measure rescue on them. That
 converts \S\ref{sec:energy} from a stratified estimate on an existing corpus into a construction,
 and it is the one addition that would let the mechanism question of \S\ref{sec:qualitative} be
 asked at all. 
 \paragraph{(iv) Good designs only.} The compensatory arm measured the best-scoring
 design per (target,\,method) cell, so the corpus is pre-filtered by the design programs. The
-per-method decomposition bounds the objection on the axis it runs on --- $\jdg{sNPos}$ of
-$\jdg{sNMeth}$ methods positive, no ordering with placement strength --- but does not remove it,
+per-method decomposition bounds the objection on the axis it runs on ($\jdg{sNPos}$ of
+$\jdg{sNMeth}$ methods positive, no ordering with placement strength) but does not remove it,
 because no method submitted a poor design. 
-\paragraph{(v) The bounds are bounds.} $\jdg{dDgBound}$ and $\jdg{dPmBound}$ come from the product
-route, which Proposition~\ref{prop:routes} licenses only where the conditional mean is affine.
-It is not, as measured. They are therefore upper limits on what each quantity could carry, not
-estimates of what it does, and the statement that survives is the comparison between them rather
-than either number alone.
+\paragraph{(v) One channel is bounded and one is not.} $\jdg{dDgBound}$ and $\jdg{dPmBound}$ are
+product-route readings, not limits: Proposition~\ref{prop:routes} licenses that route as an
+equality only where the conditional mean is affine, it is not, and a projection's error has no
+fixed direction. What is provable is Proposition~\ref{prop:carry}, and it reaches only the first
+channel, because \eqref{eq:nointeract} holds for $\Delta G_{\mathrm{loc}}$ and fails for
+$P_{\mathrm{model}}$ (\S\ref{sec:routes}). So the energy channel is bounded at \jdg{cbTight} and
+the ensemble-probability channel is bounded by nothing here; for the second, what survives is the
+direct contrast \jdg{dPm} (\jdg{dPmCi}) and the statement that it does not resolve from zero.
 
-\paragraph{(vi) Prior art.} GC placement as a design heuristic predates this work
-\citep{lee2014eterna}; what is measured here is its effect on pair formation and on the measurement
-itself.
+\paragraph{(vi) Every interval rests on \jdg{ccPuzzlesR} clusters.} A percentile bootstrap on
+that few clusters is optimistic and no correction is applied (\S\ref{sec:preregprotocol}), so
+every interval printed anywhere in this paper, the abstract included, should be read as at least
+as wide as printed. Two arms sit close enough to their own detection edge for this to matter and
+say so where they are reported: the method component of \S\ref{sec:gradient}, which does not
+clear the $0.005$ gate, and the G--U contrast, which clears its ladder rung by a factor of
+\jdg{rescueGUMargin} (\S\ref{sec:pairtype}).
+
+\paragraph{(vii) Prior art.} GC placement as a design heuristic predates this work
+\citep{lee2014eterna}; what is measured here is its effect on pair formation and on the
+measurement itself.
 
 \section{Conclusion}
 \label{sec:conclusion}
@@ -1612,18 +1800,19 @@ is recovered $\jdg{rescueAU}$ more than an A--U pair and $\jdg{rescueGU}$ more t
 How much of that runs through the free energy the designs were optimised for is a question we can
 bound and cannot answer. The energy differs between the pair types by $\jdg{dDg}$\,kcal/mol
 ($\jdg{dDgCi}$) and the model's ensemble probability by $\jdg{dPm}$ ($\jdg{dPmCi}$, covering
-zero); the bounds are $\jdg{dDgBound}$ and $\jdg{dPmBound}$. Earlier versions of this work
+zero), and at most \jdg{cbTight} of the effect can run through the first of those
+(Prop.~\ref{prop:carry}). This pipeline's own artifacts
 reported a mediated fraction instead, and that number is withdrawn: on this corpus, at these
 effect sizes, the estimator that produced it tracks a known truth at $\jdg{calNCorr}$. The
-contrast survives outside the terminal penalty's domain, it does not scale with the energy gaps
-between the three pair types, and it does not track which program built the sequence.
+contrast survives outside the terminal penalty's domain, does not scale with the energy gaps
+between the three pair types, and does not track which program built the sequence.
 What \emph{does} hide it is where the designer put the pair, and that is estimable from the corpus
 itself: placement accounts for $\jdg{medFrac}$ of the gap between the marginal and matched
 contrasts, it recurs on $\jdg{xrRounds}$ rounds with disjoint targets ($\jdg{xrSign}$ of the
 (round,\,method) cells, $p=\jdg{xrSignP}$), and the same property is worth $\jdg{cEffLo}$ to $\jdg{cEffHi}$ points on the
 benchmark's own score between two real molecules matched on everything else we could match. A
 designed corpus, then, understates a property of its molecules through a covariate its authors
-chose, at a rate it can be made to report --- while the model those authors were optimising has
+chose, at a rate it can be made to report, while the model those authors were optimising has
 nothing to say about the property at all.
 
 \paragraph{Code and data availability.} Every number in this manuscript is generated from a
@@ -1673,7 +1862,7 @@ $\jdg{dgLooseCal}$ down to $\jdg{dgTightCal}$ kcal/mol moves the main population
 $\jdg{dgLooseEff}$ ($p=\jdg{dgLooseP}$) to $\jdg{dgTightEff}$ ($p=\jdg{dgTightP}$), retaining
 $\jdg{dgRetain}$ of the unbalanced $\jdg{dgBase}$, against a within-cell spread of
 $\jdg{dgSd}$\,kcal/mol in the balancing variable itself. \emph{Free energy is a mediator here rather
-than a confounder} --- the treatment moves it by construction --- so attenuation under balancing
+than a confounder}, the treatment moves it by construction, so attenuation under balancing
 is expected and the surviving majority is the quantity of interest.
 
 \begin{table}[!htbp]
@@ -1768,9 +1957,9 @@ Two properties of the table are worth stating because the pooled row cannot show
 depth gap $g_m$ is negative for all \jdg{gNMethods} methods: every program in this corpus,
 human and algorithmic alike, placed its G--C pairs shallower in the helix than its A--U pairs.
 That is what makes placement a channel rather than a quirk of one method. Second, the last two
-columns are computed without each other --- the predicted column is the method's own design-side
+columns are computed without each other, the predicted column is the method's own design-side
 gap times the pooled $\beta_{\mathrm{depth}}$, and the observed column is that method's own
-marginal-minus-matched difference --- so the agreement between them is a claim being tested and
+marginal-minus-matched difference, so the agreement between them is a claim being tested and
 not a fit. The observed attenuation is the larger of the two in magnitude for every method except
 \texttt{Eterna}. That is the residual $\varepsilon$ of \eqref{eq:med} taking one sign across the
 corpus rather than scattering, which \S\ref{sec:quant} reports and does not adjudicate.
@@ -1810,8 +1999,8 @@ from repeat groups and from paired duplicates, each with its interval. The two e
 agree, and the paper uses the lower of them, which is the conservative choice: a lower ceiling
 makes every reported agreement look further from it. \textbf{b}, How many measurements a repeat
 group holds, over the \jdg{ceilGroups} groups the first estimator uses. Most are pairs, which is
-why the second estimator --- built on \jdg{ceilPairs} paired duplicates alone --- is worth
-reporting beside it rather than instead of it.}
+why the second estimator, built on \jdg{ceilPairs} paired duplicates alone, is worth reporting
+beside it rather than instead of it.}
 \label{fig:ceiling}
 \end{figure}
 
@@ -1885,7 +2074,7 @@ the circular shift never indexes a sequence & assertion & source-checked & held 
 \multicolumn{4}{@{}l@{}}{\emph{frozen before \S\ref{sec:rounds} existed}}\\
 treatment-side randomisation over-rejects & $>0.010$ & $\jdg{m23nT}$ & held \\
 $y$-permutation conservative when $y$ tracks the calipers & vs.\ bound &
-  --- & \textbf{void} \\
+  ---  & \textbf{void} \\
 all \jdg{xrRounds} rounds' pooled depth gaps negative & $<0$ & $\jdg{xrGapLo}$ \dots $\jdg{xrGapHi}$ & held \\
 at least two thirds of methods negative in every round & $\ge 2/3$ &
   $\jdg{xrSign}$ pooled & \textbf{failed on round 1} \\
@@ -1904,6 +2093,32 @@ the retention estimator is unreadable here too & $|\rho|\le0.5$ & $\jdg{xdECorr}
   \textbf{failed, high} \\
 matched contrast below marginal & smaller & \jdg{xdMatched} vs \jdg{xdMarg} & held \\
 ladder detection threshold & $\ge0.10$ & \jdg{xdLadderThr} & held \\
+\midrule
+\multicolumn{4}{@{}p{0.97\linewidth}@{}}{\emph{frozen before the carrying-bound arm existed
+  (\S\ref{sec:carry}). The first implementation compared a contrast weighted over
+  (cell\,$\times$\,bin) against one weighted over (cell), which are not the two sides of
+  anything; the declaration was not edited, the defect is recorded in the run directory as an
+  erratum, and the run is kept as the object being corrected. The seven below are graded on the
+  repaired implementation, in the declaration's own wording.}}\\
+the tight bound on $\Delta G_{\mathrm{loc}}$ is below the printed reading & $<\jdg{dDgBound}$ &
+  \jdg{cbTight} & held \\
+the tight bound on $P_{\mathrm{model}}$ is below the printed reading & $<\jdg{dPmBound}$ &
+  \jdg{cbPmTight} & \textbf{failed, high} \\
+the plug-in inequality holds at every binning & all bins & holds where resolved &
+  \textbf{failed} \\
+\multicolumn{4}{@{}p{0.97\linewidth}@{}}{\footnotesize\emph{It fails at coarse binnings, where
+  both factors of the right-hand side are under-resolved. The right-hand side rises with
+  resolution at Spearman \jdg{cbRhoRhs} and the left-hand side does not (\jdg{cbRhoLhs}), which is
+  a downward-biased estimator rather than a violated inequality; the bound is read at the coarsest
+  resolution where the plug-in inequality is satisfied.}}\\[2pt]
+the route gap tracks its bound across a separation sweep & $\rho\ge0.8$ & \jdg{swRho} &
+  \textbf{failed} \\
+\multicolumn{4}{@{}p{0.97\linewidth}@{}}{\footnotesize\emph{The sweep reached $d_{\mathrm{TV}}$
+  \jdg{swDtvLo}--\jdg{swDtvHi} only, so the low-overlap regime was never entered. The
+  characterising verb is withdrawn from \S\ref{sec:crossdomain} rather than defended.}}\\[2pt]
+the readable span falls with separation & monotone & sweep & held \\
+the identity contrast keeps its sign in every mediator bin & same sign & \jdg{a7Bins} & held \\
+spread of the within-bin contrast against its mean & $<2$ & \jdg{a7Ratio} & held \\
 \end{longtable}
 \endgroup
 
@@ -1931,8 +2146,8 @@ coincidence: a design rebuilt by the permutation is a design matched to the perm
 \end{figure}
 
 Freedman--Lane and the blocked construction both hold the design fixed and both return
-nothing at the gate. Neither is used in the main text --- the outcome-side permutation is
-simpler and does the same work --- but they are why that is a choice and not a
+nothing at the gate. Neither is used in the main text, the outcome-side permutation is
+simpler and does the same work, but they are why that is a choice and not a
 convenience.
 
 \FloatBarrier
@@ -1955,7 +2170,7 @@ over $200$ permutations the (pair-weight, stratum-count) pair took exactly one v
 that mediates nothing reads.} \textbf{a}, The constructive power ladder of
 Def.~\ref{def:ladder}: labels are scrambled within stratum so the true effect is zero, a known
 effect $\delta$ is injected, and the arm is asked to detect it. The $\delta=0$ rung does not
-fire, and detection is reliable from \jdg{eLad} upward --- so an arm that reports nothing is
+fire, and detection is reliable from \jdg{eLad} upward, so an arm that reports nothing is
 reporting an absence and not a failure to look. \textbf{b}, Rescue against the model's own local
 free energy, in bins. \textbf{c}, Retention after conditioning on the real mediator, against the
 distribution a placebo mediator produces. The real reading sits inside the placebo's range, which
@@ -1966,7 +2181,7 @@ mediate, and a pipeline in which it does is measuring its own machinery.}
 
 \paragraph{The canonicity guard.} The nearest-neighbour tables have no entry for a stack whose
 partner is not a canonical pair, and the library returns a finite but meaningless number in that
-case --- probed at $\jdg{eProbe}$\,kcal/mol for an A$\cdot$A partner. Definition~\ref{def:dg} therefore
+case, probed at $\jdg{eProbe}$\,kcal/mol for an A$\cdot$A partner. Definition~\ref{def:dg} therefore
 requires canonicity on both sides of a stack and otherwise treats the side as a helix end. The
 guard touches $\jdg{eContam}$ of $\jdg{nPairsTotal}$ records, $\jdg{eContamPct}$, changing
 $\Delta G_{\mathrm{loc}}$ by at most $\jdg{eMaxDgChange}$\,kcal/mol.
@@ -2018,8 +2233,7 @@ are stated here as rules because they apply to any stratified mediation analysis
 not only to this one.
 
 \textbf{A stratified estimate and its baseline must share a population.} Adding a stratifying
-dimension removes records that lose their counterpart. The removed records are not a random sample
---- they are exactly the ones whose mediator value the other exposure arm does not reach --- so the
+dimension removes records that lose their counterpart. The removed records are not a random sample: they are exactly the ones whose mediator value the other exposure arm does not reach, so the
 retained subset can carry a systematically different effect. Reporting the ratio against the full
 population mixes that selection into the mediated fraction. The magnitude here is
 $\jdg{eSel}$, which is larger than any mediation the arm could have found.
@@ -2059,8 +2273,8 @@ that the covariate imbalance surviving inside the caliper could produce, as a sh
 measured effect, with and without the panel matching. \textbf{b}, The standardised difference on the
 global-GC covariate. The panel barely moves it, and that is the point: the panel caliper acts
 almost entirely on the other term of the bound, so panel~a's reduction is not bought by
-balancing GC. The panel is not cosmetic --- it is the difference between a bound worth a third of
-the effect and one worth a few per cent --- but it is not doing it here.}
+balancing GC. The panel is not cosmetic: it is the difference between a bound worth a third of
+the effect and one worth a few per cent, but it is not doing it here.}
 \label{fig:imbalance}
 \end{figure}
 

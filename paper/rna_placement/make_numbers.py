@@ -484,6 +484,64 @@ put("xdEHalfMeas", f"{100*_sw[0.5]:.1f}\\%")
 put("xdEQuarterTrue", "25\\%")
 put("xdEQuarterMeas", f"{100*_sw[0.25]:.1f}\\%")
 
+# ---------------------------------------------------------------- the corollary, and the premise
+# it needs (M60b/M60c). The manuscript called 58.6% and 6.8% bounds in four places; they are
+# product-route readings, and Prop. routes says a projection can be wrong in either direction.
+# M60c computes what IS a bound, and M60b tests, for the first time, the assumption both the
+# proposition and the corollary rest on.
+m60b = J("m60b_carrying_bound.json")
+m60c = J("m60c_tight_bound.json")
+
+# --- assumption (7), per channel.  This is the premise, and it is reported before the bound.
+_a7 = m60b["A3"]
+_dg7 = _a7["rna:dG"]
+put("a7Bins", ", ".join(f"{x['contrast']:+.4f}".replace("-", "\\ensuremath{-}")
+                        for x in _dg7["bins"]))
+put("a7N", f"{len(_dg7['bins'])}")
+put("a7Mean", f"{_dg7['mean']:+.4f}".replace("-", "\\ensuremath{-}"))
+put("a7Spread", f"{_dg7['spread']:.4f}")
+put("a7Ratio", f"{_dg7['spread_over_mean']:.3f}")
+put("a7PmutRatio", f"{_a7['rna:pmut']['spread_over_mean']:.2f}")
+put("a7BinderRatio", f"{_a7['binder:A_length']['spread_over_mean']:.2f}")
+_NICE = {"rna:dG": "$\\Delta G_{\\mathrm{loc}}$", "rna:pmut": "$P_{\\mathrm{model}}$",
+         "rna:depth": "helix depth", "binder:A_length": "binder length"}
+put("a7Held", " and ".join(_NICE[k] for k, v in _a7.items() if v["assumption7_supported"]))
+put("a7Failed", " and ".join(_NICE[k] for k, v in _a7.items()
+                             if not v["assumption7_supported"]))
+put("a7NHeld", f"{sum(1 for v in _a7.values() if v['assumption7_supported'])}")
+put("a7NAll", f"{len(_a7)}")
+
+# --- the bound itself, on the primary channel where the premise holds
+_c = m60c["arms"]["rna:dG"]
+_rows = _c["rows"]
+_hold = [r for r in _rows if r["tight_holds"]]
+_lhold = [r for r in _rows if r["loose_holds"]]
+put("cbNbins", f"{len(_rows)}")
+put("cbBinLo", f"{min(r['nbins'] for r in _rows)}")
+put("cbBinHi", f"{max(r['nbins'] for r in _rows)}")
+put("cbRhoRhs", f"{_c['rho_rhs_vs_nbins']:+.3f}")
+put("cbRhoLhs", f"{_c['rho_lhs_vs_nbins']:+.3f}")
+put("cbLoose", f"{100*_lhold[0]['loose_frac']:.1f}\\%")
+put("cbTight", f"{100*_hold[0]['tight_frac']:.1f}\\%")
+put("cbTightLo", f"{100*min(r['tight_frac'] for r in _hold):.1f}\\%")
+put("cbTightHi", f"{100*max(r['tight_frac'] for r in _hold):.1f}\\%")
+put("cbAtBins", f"{_hold[0]['nbins']}")
+put("cbOscLo", f"{min(r['osc_h'] for r in _rows):.4f}")
+put("cbOscHi", f"{max(r['osc_h'] for r in _rows):.4f}")
+put("cbDtvLo", f"{min(r['d_TV'] for r in _rows):.3f}")
+put("cbDtvHi", f"{max(r['d_TV'] for r in _rows):.3f}")
+_pm = m60c["arms"]["rna:pmut"]
+_pmh = [r for r in _pm["rows"] if r["tight_holds"]]
+put("cbPmTight", f"{100*_pmh[0]['tight_frac']:.1f}\\%")
+
+# --- the separation sweep.  It did not reach the low-overlap regime, and the paper says so.
+_sw2 = m60b["A2"]
+put("swRungs", f"{_sw2['n_rungs']}")
+put("swDtvLo", f"{_sw2['d_TV_swept'][0]:.3f}")
+put("swDtvHi", f"{_sw2['d_TV_swept'][1]:.3f}")
+put("swRho", f"{_sw2['spearman_lhs_rhs']:+.3f}")
+put("swSigma", f"{_sw2['sigma_measured']:.4f}")
+
 # ---------------------------------------------------------------- how the corpus was selected
 # (M30). R1's premise is that the covariate distribution was produced by a design algorithm; it
 # was also produced by a selection rule, and the paper has to say so.
