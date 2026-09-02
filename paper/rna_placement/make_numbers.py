@@ -730,8 +730,6 @@ put("pcSep", f"{_ps['arm_separation_pooled_sd']:.3f}")
 put("pcSepRatio", f"{_ps['arm_separation_pooled_sd']/_ps['s55_mediator_separation']:.1f}")
 put("pcSigma", f"{_ps['sigma']:.4f}")
 put("pcSpearman", f"{_pb['spearman']:+.3f}")
-put("pcLamTrue", f"{100*_pb['implied_true_lambda']:.0f}\\%")
-put("pcLamBias", f"{100*_pb['bias_at_published']:+.1f}")
 put("pcLamErr1", f"{_pb['1.00']['abs_error']:.3f}")
 put("pcDraws", f"{m62['draws']}")
 put("pcLamRungs", f"{len([k for k in _pb if k.replace('.','').isdigit()])}")
@@ -1027,6 +1025,37 @@ put("rfBase", sig(m68b["S5"]["baseline"], 4))
 put("rfCond", sig(m68b["S5"]["conditioned"], 4))
 put("rfRetain", f"{100*m68b['S5']['retained']:.1f}\\%")
 put("rfBar", "70")
+
+# ------------------- M68 arm B, second half: the two pieces of R AFTER excision, radius by radius
+# The published decomposition is computed before excision only. S6 asks what excision does to it.
+m68d = J("m68d_denominator_by_radius.json")
+_r0 = m68d["radii"][0]; _r3 = m68d["radii"][-1]
+put("dnRadDNo", sig(_r0["D"]["effect"], 4))
+put("dnRadDThree", sig(_r3["D"]["effect"], 4))
+put("dnRadDThreeCi", ci(_r3["D"]["ci"], 4))
+put("dnRadNumThree", sig(_r3["rho_ij"]["effect"], 4))
+put("dnRadShrink", f"{100*m68d['D_shrink_frac']:.0f}\\%")
+put("dnRadShareNo", f"{100*m68d['den_share_no_excision']:.0f}\\%")
+put("dnRadShareThree", f"{100*m68d['den_share_radius_three']:.0f}\\%")
+put("dnRadN", f"{_r3['n']}")
+
+# --------- M68 arm D: an interval for the inverted value, and a second perturbation shape.
+# K4 of the declaration: if the interval covers the naive reading, the corrected number is
+# withdrawn and only the direction is reported. It does, so it is.
+m68e = J("m68e_calibration_of_calibration.json")
+_q, _c = m68e["quadratic"], m68e["concave"]
+put("pcInvPoint", f"{100*_q['point']:.0f}\\%")
+put("pcInvConcave", f"{100*_c['point']:.0f}\\%")
+put("pcInvBias", f"{100*_q['bias_at_published']:.0f}")
+put("pcInvCi", "[$%.0f\\%%$, $%.0f\\%%$]" % (100*_q["ci"][0], 100*_q["ci"][1]))
+put("pcInvNBoot", f"{_q['n_boot_used']}")
+put("pcInvClampPct", f"{100*_q['n_clamped']/max(_q['n_boot_used'],1):.0f}\\%")
+put("pcShapeCorr", sig(m68e["shape_correlation"], 2))
+put("pcShapeMove", f"{100*m68e['shape_move']:.1f}")
+put("pcShapeQuarter", f"{100*0.25*m68e['distance_from_naive']:.1f}")
+put("pcInvLoRung", f"{100*min(m68e['lambdas']):.0f}\\%")
+put("pcInvHiRung", f"{100*max(m68e['lambdas']):.0f}\\%")
+put("pcalTargets", "20")
 
 # ---------------------------------------------------------------- survivorship + shift (M22)
 m22 = J("m22_review_arms.json")
