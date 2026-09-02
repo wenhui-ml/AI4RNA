@@ -1,0 +1,53 @@
+{
+  "erratum_for": "M65 (rna_harness/runs/ceiling/m65_sat_transfer_declaration.json)",
+  "date": "2026-09-02",
+  "rule": "The frozen declaration is not edited. Defects found after freezing are recorded here.",
+
+  "defect_1": {
+    "what_the_declaration_says": "covariates.llm_only_extended lists n_hooks_defined and rank_for_deletion_present as usable LLM-vs-LLM covariates.",
+    "why_it_is_wrong": "The harness hands the model a SEED heuristic source inside the prompt ('## Current heuristic source (edit to improve)', sat_harness/rl/prompts.py:34), resolved by sat_harness/generators/dial_seeds.py::resolve_seed_source. The default seed already defines all five hooks including rank_for_deletion. So 'the model defines five hooks' and 'the model defines rank_for_deletion' are properties of the SEED, not choices of the generator.",
+    "evidence": "md5 of the default seed source is f2fc53bde0b8525180eff8649bf788f0; the single most common artifact in the corpus (n=161 of 617, spanning all four LLM families) has that exact md5.",
+    "this_is_the_third_construction_artifact_found": "after rank_for_deletion-vs-floor and randomisation-vs-floor, both already recorded in the declaration itself",
+    "correction": "n_hooks_defined and rank_for_deletion_present are withdrawn as generator covariates in their raw form. They may be used ONLY as departures from the stratum's own seed (hooks added relative to seed, hooks deleted relative to seed), because within a stratum the seed is constant.",
+    "reconnaissance_numbers_hereby_retracted": {
+      "mean hooks 5.00 / 4.99 / 4.76 / 4.37 / 2.96 by generator": "seed-determined for the LLM arms, template-determined for the floor",
+      "rank_for_deletion edited 86-100% by LLM arms": "seed-determined"
+    }
+  },
+
+  "amendment_1_new_primary_covariate": {
+    "covariate": "seed_departure: whether the returned artifact is byte-identical to the seed handed to that run",
+    "why_it_is_sound_where_the_others_were_not": [
+      "it has an exact zero point (the seed) rather than a template-dependent baseline",
+      "the seed is constant within a stratum (dial levels map one-to-one onto train families: L1 cripple_heavy, L2 cripple_mid, L3 cripple_light, L4-L6 default), so stratifying on train family already holds the seed fixed",
+      "it is unambiguously a generator-side act: the same seed was placed in front of every LLM arm",
+      "it is not available to the floor at all, so it is used only in LLM-vs-LLM contrasts, consistent with the declaration's standing rule"
+    ],
+    "measured_before_matching_raw_rates": {
+      "deepseek/deepseek-v4-pro": "65/203 = 32.0%",
+      "z-ai/glm-5.2": "74/259 = 28.6%",
+      "qwen/qwen3.7-max": "21/83 = 25.3%",
+      "anthropic/claude-sonnet-5": "1/15 = 6.7%",
+      "status": "RAW AND UNMATCHED. Not a result. The matched contrast within stratum is what arm B will report."
+    },
+    "the_identity_that_must_be_labelled_as_an_identity": "mean train_improvement over a generator's runs equals (1 - p_unchanged) times mean train_improvement over its edited runs, because an unchanged artifact scores exactly zero improvement against the seed baseline by construction. The observed unchanged mean of +0.0000 is therefore algebraically forced and is NOT an empirical finding. What is empirical, and what arms B and D test, is whether p_unchanged differs across generators once stratum is matched, and whether conditioning on edited-only reorders the leaderboard.",
+    "identified_region": "6 strata contain at least 3 unchanged and at least 3 edited runs, total n=202 of 560 LLM runs. The stratified estimate runs on that region only, and this must be disclosed the way M64's K3 disclosure was written for the energy arm.",
+    "checks_this_amendment_adds": {
+      "S10": "p_unchanged differs across the LLM families by a stratum-matched contrast clearing 0.005 under the M64 permutation null",
+      "S11": "ranking by mean train_improvement and ranking by mean train_improvement among edited runs only are not the same order",
+      "S12": "ood_generalization is NOT algebraically forced to zero for unchanged runs; this is verified before ood is used, and if it is forced the ood arm is dropped",
+      "S13": "p_unchanged falls with budget; if it does not, the covariate is not a disposition but something budget-independent and must be re-described"
+    },
+    "kill_conditions_this_amendment_adds": {
+      "K6": "the 6 identified strata disagree in sign on the generator ordering: no pooled p_unchanged contrast is reported",
+      "K7": "S11 holds only because of claude-sonnet-5 (n=15): the reorder is reported with and without that family and withheld if they disagree"
+    }
+  },
+
+  "unaffected": [
+    "the non_overlap_protocol in full",
+    "the exclusion list of fields belonging to the prior manuscript",
+    "arm A and the shared expressible core, which never involved the seed",
+    "the corpus release restriction"
+  ]
+}
