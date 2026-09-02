@@ -1,0 +1,132 @@
+{
+  "id": "M66",
+  "title": "The placement instruments on a public AI benchmark: is the SWE-bench model ranking carried by the scaffold its submitters chose",
+  "date_declared": "2026-09-02",
+  "status": "frozen_before_code",
+  "offline": true,
+  "api_cost_usd": 0.0,
+
+  "why": [
+    "R1's claim is that a benchmark number can be carried by a covariate the generators chose, and that splitting the corpus does not remove it. Its entire evidence base is one RNA corpus read by a chemical probe. The claim is about benchmarks, so it must instantiate on a benchmark the intended audience already argues about.",
+    "SWE-bench Verified is that benchmark. Its outcome is a formal oracle (a test suite passes or does not), its targets are identical across systems, and its leaderboard is read as a ranking of models. Whether it ranks models or ranks the agent scaffolds around them is an open and actively argued question, and R1's instruments are built to answer exactly that question."
+  ],
+
+  "corpus": {
+    "source": "https://github.com/SWE-bench/experiments",
+    "commit": "8fa0575cea71b5258b6cd211ee0a3f42a2f5fa1e",
+    "commit_date": "2026-09-01T21:49:51-04:00",
+    "cloned_to": "/mnt/beegfs/scratch/wenhui_swebench/experiments",
+    "split": "evaluation/verified",
+    "public": true,
+    "license_note": "entries are public; the artifacts (patches, trajectories) live in submitters' own public repositories and are NOT used by this experiment",
+    "what_is_read": [
+      "metadata.yaml: tags.model, tags.agent, tags.model_org, tags.agent_org, tags.os_model, tags.os_system, tags.system.attempts, tags.reasoning_effort, info.resolved, info.instance_calls",
+      "results/results.json: the resolved instance-id list, and the no_generation / no_logs lists",
+      "per_instance_details.json where present: per-instance resolved and api_calls"
+    ],
+    "what_is_NOT_read": "model patches, trajectories, logs. This experiment needs no artifact contents.",
+    "counts_measured_during_reconnaissance": {
+      "entries_total": 182,
+      "entries_with_metadata": 175,
+      "entries_with_per_instance_resolved_list": 135,
+      "entries_with_per_instance_details_json": 41,
+      "distinct_models": 96,
+      "distinct_agents": 73,
+      "distinct_model_agent_cells": 155,
+      "instances_ever_resolved": 471,
+      "instances_resolved_by_between_10_and_90_percent_of_systems": 354,
+      "models_appearing_under_at_least_two_agents": 15,
+      "agents_appearing_with_at_least_two_models": 16
+    }
+  },
+
+  "suspected_construction_artifacts_to_test_BEFORE_any_arm_is_read": {
+    "rationale": "M63, M65 and the M65 reconnaissance each produced a headline number that turned out to be forced by how the corpus was built. Three candidates are named here, before any result exists, together with what happens if each fires.",
+    "A1_mini_sweep_is_one_submitter_not_44_generators": {
+      "suspicion": "the mini-SWE-agent arm holds 44 distinct models in 48 entries, and its assets.repo fields appear to point at a single submitter. If so these are one standardised sweep, not 44 independent submissions.",
+      "test": "count distinct assets.repo owners and distinct submission dates within the mini-SWE-agent arm",
+      "if_it_fires": "this is NOT a defect. It is a controlled arm and is the single best thing in the corpus, because scaffold and submitter are held fixed while the model varies. It is relabelled a controlled sweep, never counted as 44 independent generators, and the independence of entries is never claimed."
+    },
+    "A2_denominators_differ": {
+      "suspicion": "resolved counts per entry run from 2 to 396, so entries were not all evaluated on the same instance set.",
+      "test": "reconstruct each entry's attempted set as resolved + unresolved-but-attempted, using no_generation and no_logs; keep only entries whose attempted set covers the common instance universe defined below",
+      "if_it_fires": "the common universe is the intersection over retained entries, and both the universe size and the number of entries dropped are reported before any contrast."
+    },
+    "A3_no_generation_is_selection_not_failure": {
+      "suspicion": "an instance in no_generation had no patch produced at all. Scoring it as unresolved silently converts a non-attempt into a failure.",
+      "test": "measure the no_generation rate per entry and per scaffold",
+      "if_it_fires": "this is R1's second producer made explicit and measurable. Every contrast is run twice, once counting no_generation as unresolved and once excluding those instances from the stratum, and if the two disagree in sign the contrast is withheld."
+    },
+    "standing_rule": "any covariate that a generator family cannot express by construction is not compared across families on that covariate. This is the rule M65 had to learn three times."
+  },
+
+  "quantities": {
+    "stratum": "the SWE-bench Verified instance id",
+    "informative_strata": "instances resolved by between 10 and 90 percent of retained systems; the fraction is fixed at these bounds here and not tuned later",
+    "generator": "the pair (model, agent scaffold) as given by tags.model and tags.agent",
+    "outcome": "resolved, a boolean set by the instance's own test suite",
+    "primary_covariate": "the agent scaffold, which the submitter chose and which is not the object the leaderboard is read as ranking",
+    "secondary_covariates": ["tags.system.attempts", "tags.reasoning_effort", "info.instance_calls"],
+    "estimator": "R1's stratum-weighted matched contrast: subtract each stratum's mean over all generators present in it and average what remains, so a generator is compared only against generators sharing its strata",
+    "null": "the M64 within-stratum label permutation, written as subset sums"
+  },
+
+  "arms": {
+    "A_undesigned_control": {
+      "question": "Is the covariate anyone's choice? The corpus contains a RAG baseline, a non-agentic generator run on the same targets with 6 models.",
+      "design": "matched contrast of RAG-baseline entries against agentic entries on the shared instance strata, and where the same model appears on both sides, within model",
+      "this_is_the_analogue_of": "R1's inverse_fold undesigned control and M65's random-floor"
+    },
+    "B_scaffold_gradient": {
+      "question": "Holding the model fixed, does the outcome differ across scaffolds?",
+      "design": "within-model matched contrasts across scaffolds, on the 15 models that appear under at least two scaffolds; claude-3-5-sonnet-20241022 under 16 scaffolds is the deepest cell"
+    },
+    "C_does_the_covariate_carry_the_score": {
+      "question": "Within instance stratum, does the scaffold predict resolution?",
+      "necessity": "arms A and B do not support R1's claim without this link; if it fails, arm D is not run"
+    },
+    "D_leaderboard_reorder": {
+      "question": "Does holding the scaffold fixed reorder the model ranking?",
+      "headline_design": "rank the models by their raw leaderboard resolve rate; then rank the same models inside the single-scaffold controlled sweep (mini-SWE-agent, one scaffold, one submitter, 44 models); report Spearman and Kendall between the two orders, the number of adjacent swaps, and the largest single rank change, each with a permutation interval",
+      "why_this_design": "it is the sharpest available test because the controlled sweep holds scaffold, submitter and harness version fixed while the model varies, so a disagreement between the two orders is attributable to what the raw leaderboard mixes in",
+      "this_is_the_payload": true
+    },
+    "E_selection_as_the_second_producer": {
+      "question": "How much of a system's number is set by which instances it produced a patch for at all?",
+      "design": "no_generation rate by scaffold and by model, and the change in every ranking when no_generation instances are excluded rather than scored as failures",
+      "relation_to_R1": "this is R1's sec:twoproducers instantiated on a corpus where the selection is logged rather than inferred"
+    }
+  },
+
+  "predictions": {
+    "S1": "A1 fires: the mini-SWE-agent arm is one submitter's sweep",
+    "S2": "arm C passes: scaffold predicts resolution within instance stratum at p below 0.005 under the permutation null",
+    "S3": "arm D: Spearman between the raw leaderboard order and the single-scaffold order is below 0.9",
+    "S4": "arm D: at least one model moves by 3 or more ranks between the two orders",
+    "S5": "arm B: the within-model spread across scaffolds is at least as large as the within-scaffold spread across models, on the models where both are measurable",
+    "S6": "arm A: the non-agentic RAG baseline is separated from agentic generators by a matched contrast clearing 0.005",
+    "S7": "arm E: no_generation rates differ across scaffolds, and excluding those instances changes at least one ranking",
+    "S8": "A2 fires: entries do not share a common attempted set, and a common universe must be constructed",
+    "S9": "the common instance universe retains at least 250 instances and at least 60 entries; below either, the experiment is reported as under-powered rather than null"
+  },
+
+  "kill_conditions": {
+    "K0": "S3 fails and the two orders agree at Spearman 0.9 or above: the leaderboard is NOT carried by the scaffold on this corpus. R1 does not get its AI-corpus headline here, the result is reported as a failure to replicate the RNA finding on a second corpus, and it is reported in R1 either way.",
+    "K1": "arm C fails: the chain breaks at the link, arm D is not run, and arms A/B stand only as descriptive facts",
+    "K2": "S9 fails: reported as under-powered, never as a null",
+    "K3": "the two treatments of no_generation disagree in sign on any headline contrast: that contrast is withheld",
+    "K4": "the single-scaffold sweep turns out to span more than one harness version or submitter: it is no longer a controlled arm, and arm D falls back to within-scaffold contrasts across all scaffolds with no headline",
+    "K5": "the informative-strata bound (10 to 90 percent) changes any headline's sign when moved to 5-95 or 20-80: the headline is withheld and the sensitivity is reported"
+  },
+
+  "what_this_experiment_may_NOT_do": [
+    "read or redistribute submitters' patches, trajectories or logs",
+    "claim these systems were run by us, or that any entry is independent of another without checking submitter and date",
+    "treat no_generation as a failure without reporting the alternative",
+    "tune the informative-strata bounds, the Spearman threshold, or the rank-change threshold after seeing results",
+    "present the mini-SWE-agent sweep as independent submissions",
+    "touch anything belonging to the two manuscripts under review at AAAI-2027"
+  ],
+
+  "relation_to_the_paper": "If the gate passes, this becomes R1's public AI-corpus instance and the RNA corpus becomes the case where the covariate is knowable and the instruments can be validated. If it fails, R1 keeps its current structure and reports the failed transfer. Either outcome is reported."
+}
