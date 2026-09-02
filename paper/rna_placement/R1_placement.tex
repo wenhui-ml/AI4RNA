@@ -383,9 +383,10 @@ and section pointers only.}
 \end{figure}
 
 \begin{claimbox}
-\textbf{Contributions.} \emph{The first five are findings about a corpus and its leaderboard. The
-last two are instruments this corpus forced us to build; we report them because they are needed to
-read the first five, not as the paper's claim on the reader.}
+\textbf{Contributions.} \emph{The first seven are findings about benchmarks: six about one corpus
+and its leaderboard, and the seventh about a benchmark on which the same question cannot be asked.
+The last two are instruments this corpus forced us to build; we report them because they are
+needed to read the findings, not as the paper's claim on the reader.}
 \begin{enumerate}[leftmargin=1.6em,itemsep=2pt,topsep=2pt,label=\textbf{\arabic*.}]
 \item \textbf{Base-pair identity predicts formation, measured interventionally}
   (\S\ref{sec:pairtype}): matched within design on helix depth and crossing, a G--C target pair is
@@ -417,6 +418,14 @@ read the first five, not as the paper's claim on the reader.}
   \jdg{unRfam}; Pseudobase\texttt{++}, \jdg{unPkb}), and a plain inverse folder given the same
   target structures reproduces \jdg{unShare} of it (\jdg{unCoreI}, covering zero, against
   \jdg{unCoreD} for the design programs on the same pairs).
+\item \textbf{Whether the question can be asked is itself a measurable property of a benchmark,
+  and on a second one the answer is no} (\S\ref{sec:swebench}). Applied unchanged to SWE-bench
+  Verified, the same instruments return a count rather than an effect: \jdg{swbSolo} of
+  \jdg{swbModels} models were measured under exactly one agent scaffold, and
+  \jdg{swbScafGeThree} of \jdg{swbScafPairs} scaffold pairs share three models, so the covariate
+  cannot be held fixed by any analysis of the submissions as they were collected. That the scaffold
+  moves a score is not ours and is credited to the work reporting it; the deficiency is, and it is
+  what says the repair has to be a new experiment rather than a correction.
 \item \textbf{A constructive calibration, which decides which of two estimators may be read here}
   (\S\ref{sec:cal}, \S\ref{sec:pcal}). Inject a known mediated fraction into the real mediator and
   read back what the estimator says. One route covers $\jdg{calNSpanFrac}$ and $\jdg{calVSpanFrac}$
@@ -507,7 +516,9 @@ calibration showing that here it is not.
 produced by an algorithm inherits that algorithm's preferences as covariates, and the evaluation
 literature has named the failure three times without sharing a vocabulary: as algorithmic
 confounding in recommender feedback loops \citep{chaney2018algorithmic}, as generator--judge
-contamination in language-model evaluation \citep{li2025preference}, and as the characteristic
+contamination in language-model evaluation \citep{li2025preference}, as benchmarks whose
+classification score is carried by how the decoys were assembled rather than by any chemistry the
+model learned \citep{wallach2018most}, and as the characteristic
 biases of protein design programs \citep{protdbench2026}. What makes the present corpus a
 controlled instance rather than an analogy is that all three of the things that argument needs are
 in hand at once: the generator is a program with a \emph{written} objective, the covariate it
@@ -574,7 +585,18 @@ kind. Against a nominal $0.005$, the treatment-side randomisation rejects at $\j
 \citep{baron1986moderator,imai2010general,vanderweele2015explanation} with an observed mediator
 and a non-manipulable exposure, a setting whose identification conditions are stronger than the
 estimator's algebra suggests \citep{vanderweele2009conceptual}; we state them and say which one
-the corpus cannot support.
+the corpus cannot support. That a mediation \emph{proportion} in particular is unstable when the
+total effect is small is also established rather than found here: its percent bias grows as the
+total effect shrinks, and estimating it reliably needs sample sizes well above those the indirect
+effect alone would require \citep{cheng2021product}, while the partial-versus-full reading it is
+usually taken to license does not survive an effect-size treatment \citep{ledermann2025partial}.
+\textbf{We claim no priority for that instability.} What \S\ref{sec:cal} adds is not the warning but
+a way to act on it. A finite-sample result tells a reader that a printed fraction may be wrong; a
+readback curve, built by injecting a known mediated fraction into the real mediator and measuring
+what the estimator returns, tells them how wrong this one is and in which direction, which is what
+turns a caution into a withdrawal (\S\ref{sec:cal}) and then into a corrected number
+(\S\ref{sec:pcal}). The two are complementary and we would not have known which route to keep from
+the warning alone.
 
 % =====================================================================
 \section{Method}
@@ -2087,9 +2109,16 @@ resulting table is read as a ranking of language models. That verdict is compute
 we wanted, but it is not thereby above suspicion: the shipped tests were written to confirm
 one merged fix rather than to grade an arbitrary one, and an independent judge re-reviewing
 graded runs disagrees with such inherited suites at a rate an order of magnitude above a
-purpose-written verifier \citep{huang2026deepswe}. Nothing below turns on the oracle being
-right, for the same reason nothing in \S\ref{sec:corpus} turns on a folding model being
-right: the quantities are counts of what the board itself recorded. \jdg{swbDropped} submissions are dropped
+purpose-written verifier \citep{huang2026deepswe}, and a systematic red-team drives this very
+split to a perfect score with a test hook that reports every test as passing, no bug fixed
+\citep{wang2026benchjack}. We therefore separate two things the subsection does. The census is
+a count of which model was measured under which scaffold, and it is invariant to all of this: a
+submission obtained by gaming the suite still occupies exactly one cell of the design, so an
+ungameable oracle would not add a single crossed pair. The contrast of
+\S\ref{sec:swebench} that uses the outcome is not invariant, and we say so where it is made.
+Nothing else below turns on the oracle being right, for the same reason nothing in
+\S\ref{sec:corpus} turns on a folding model being right: the quantities are counts of what the
+board itself recorded. \jdg{swbDropped} submissions are dropped
 before any of those counts, for a per-target record that contradicts the leaderboard number beside
 it; one of them reports every target unresolved next to a stated score near seventy percent. The
 same retained set is used by the census and by every arm below, which is the only reason the two
@@ -2118,7 +2147,10 @@ models) buys one crossed pair and nothing else: over \jdg{swbBothEntries} submis
 \end{claimbox}
 
 This is a census rather than a contrast. There is no comparison group to defend, no null to beat
-and no noise floor to clear: a reader who disputes it disputes a count. It also says what a
+and no noise floor to clear: a reader who disputes it disputes a count. It is also, once the
+magnitude is credited to the work that reported it first, the whole of what this subsection
+contributes, and we would rather write that sentence than let a reader infer a larger claim from
+the length of the subsection. It also says what a
 sensitivity analysis of the kind run in \S\ref{sec:leaderboard} would mean here, which is nothing.
 That analysis holds a covariate fixed and re-ranks. Holding the scaffold fixed on this corpus
 leaves almost no model with a second measurement to be re-ranked against.
@@ -2178,7 +2210,12 @@ resolves \jdg{swbAd} points more often (\jdg{swbAStrata} strata, \jdg{swbANperm}
 label permutations, $p\jdg{swbAP}$, bootstrap \jdg{swbACi}). The covariate therefore does predict
 the outcome inside a stratum, which is what the rest of this subsection needed and did not have.
 What it does not do is generalise: two models against one scaffold is a separation, not a
-gradient, and the census above is the reason a gradient cannot be built from this corpus.
+gradient, and the census above is the reason a gradient cannot be built from this corpus. It is
+also the one quantity here that a gamed submission could move \citep{wang2026benchjack}, since
+it reads the outcome rather than counting the design. Both arms of it are early academic
+submissions predating the exploits that report has since catalogued, which is a reason for
+believing the direction and not a control for it; a controlled version is future work and is
+not attempted here.
 
 \paragraph{What does survive without a control to defend.} A target a system never attempted is
 scored exactly as a target it attempted and failed. Across \jdg{swbNgEntries} submissions that
@@ -2469,7 +2506,10 @@ is no longer untried: \S\ref{sec:undesigned} runs it on two undesigned corpora a
 thermodynamic optimiser given the same targets, and the placement structure is \jdg{unRatio} times
 weaker without a designer and \jdg{unShare} reproduced by the optimiser. What remains one corpus is
 the \emph{formation} result, which needs compensatory probing data that no undesigned release
-carries. 
+carries. The experiment that would settle it is a compensatory-mutagenesis panel run on the same
+targets by a second laboratory on a different platform, which is wet-lab work and is future work;
+we do not attempt a computational substitute for it, because the point of the readout is that it
+is not computed. 
 \paragraph{(ii) Interventional at the mutation, observational at the property.} The rescue readout is produced by an intervention, a compensatory double substitution
 performed at the bench, and that is what licenses a formation claim about an individual pair.
 We did not choose which pairs were mutated, and the exposure whose effect we estimate, the identity
