@@ -2026,7 +2026,117 @@ the corpus. It is not a claim that the reweighted ordering is the correct one. W
 benchmark should report depends on what it means to ask, and that question is not settled by
 anything here; what is settled is that the two orderings differ, so the choice is not free.
 Nothing about a \emph{split} addresses it, for the reason in \S\ref{sec:intro}: the covariate is a
-property of the molecule and follows it into whichever split it is placed in.
+property of the molecule and follows it into whichever split it is placed in. Whether a
+benchmark permits the question to be asked at all is a separate matter, and \S\ref{sec:swebench}
+shows a widely read one on which it cannot be.
+
+% =====================================================================
+\subsection{The same question on a benchmark whose readout is a test suite}
+\label{sec:swebench}
+
+Everything above is one corpus and its readout is a chemical measurement. The claim, though, is
+about benchmarks, so it should survive being asked of one whose verdict is computed rather than
+measured. We ask it of SWE-bench Verified \citep{jimenez2024swebench,swebenchverified2024} through
+the public submission records \citep{swebenchexperiments}. The targets are identical across
+systems, a system's outcome on a target is whether that target's own test suite passes, and the
+resulting table is read as a ranking of language models. What a submitter also chooses, and what
+the ranking does not name, is the agent scaffold the model is placed inside. That is this paper's
+covariate in another substrate: a property of how the artefact was produced, fixed by the
+producer, and carried into whichever split the artefact is placed in.
+
+The answer this corpus gives is not the answer the compensatory arm gives, and the difference is
+what makes it worth reporting.
+
+\begin{claimbox}
+\textbf{The ranking is read against the model and was never crossed against the scaffold, so no
+analysis can separate the two.} Of \jdg{swbModels} models in \jdg{swbEntries} retained
+submissions spread over \jdg{swbScaf} scaffolds, \jdg{swbSolo} of them (\jdg{swbSoloPct}) have their number produced by exactly one
+scaffold and were never re-measured under a second; \jdg{swbCrossed} were. Of the
+\jdg{swbScafPairs} pairs of scaffolds, \jdg{swbScafGeOne} share at least one model,
+\jdg{swbScafGeTwo} share two, and \jdg{swbScafGeThree} share three. Turning it round, of all
+\jdg{swbModelPairs} pairs of models, \jdg{swbCoMeas} (\jdg{swbCoMeasPct}) have ever been compared
+inside a common scaffold and \jdg{swbCoGeTwo} inside two of them. Pooling the Lite split
+(\jdg{swbLiteEntries} further submissions, \jdg{swbLiteGeThree} scaffold pairs sharing three
+models) does not move it: over \jdg{swbBothEntries} submissions, \jdg{swbBothGeThree} scaffold
+pair in \jdg{swbBothScafPairs} shares three models, and \jdg{swbBothSolo} of \jdg{swbBothModels}
+models (\jdg{swbBothSoloPct}) stand on a single scaffold.
+\end{claimbox}
+
+This is a census rather than a contrast. There is no comparison group to defend, no null to beat
+and no noise floor to clear: a reader who disputes it disputes a count. It also says what a
+sensitivity analysis of the kind run in \S\ref{sec:leaderboard} would mean here, which is nothing.
+That analysis holds a covariate fixed and re-ranks. Holding the scaffold fixed on this corpus
+leaves almost no model with a second measurement to be re-ranked against.
+
+\paragraph{The three things we tried before that, and why none of them is a result.} They are
+reported because the section would otherwise present a census as though it were the first thing we
+looked for. \emph{One.} A model's number moves a median of \jdg{swbSpreadMed} points across the
+scaffolds that ran it (\jdg{swbSpreadN} models, \jdg{swbSpreadCi}), reaching \jdg{swbSpreadMax}
+for \jdg{swbDeepModel}, which runs from \jdg{swbDeepLo} under \jdg{swbDeepLoScaf} to
+\jdg{swbDeepHi} under \jdg{swbDeepHiScaf} across \jdg{swbDeepCells} of them, a spread of
+\jdg{swbDeepSpread} points against an
+interquartile range of \jdg{swbBoardIqr} points for the board itself (\jdg{swbBoardN} entries,
+median \jdg{swbBoardMed}). The movement is real and it is large. Attributing it to the scaffold is
+what fails: resubmitting the \emph{same} scaffold moves a model's number by a median
+\jdg{swbCtrlSameMed} points and by as much as \jdg{swbCtrlSameMax} (\jdg{swbCtrlSameN} pairs),
+against \jdg{swbCtrlAcrossMed} across scaffolds (\jdg{swbCtrlAcrossN} models), a difference of
+\jdg{swbCtrlDiff} with interval \jdg{swbCtrlCi} covering zero. Paired on the
+\jdg{swbCtrlPairN} models measured both ways it separates, \jdg{swbCtrlPairDiff}
+\jdg{swbCtrlPairCi}, and three models is an anecdote. What the corpus supports is that the number
+moves with the submission; which of the submitter's choices moved it is not identified, for the
+reason the claimbox counts.
+
+\emph{Two.} We registered the prediction that a model would move more across scaffolds than a
+scaffold moves across models. It does not: \jdg{swbSFiveWm} points against \jdg{swbSFiveWc}
+(\jdg{swbSFiveNm} models, \jdg{swbSFiveNc} scaffolds), a difference of \jdg{swbSFiveDiff} with
+interval \jdg{swbSFiveCi}. The interval covers zero, so this is unresolved rather than refuted,
+but the point estimate runs against the prediction and does so at both bars we looked at. The
+sentence that the board ranks scaffolds rather than models is not supported and is not written
+here. The comparison is also not symmetric, since the models inside one scaffold are far more
+heterogeneous than the scaffolds around one model; that is a defect in the prediction as
+registered, and repairing it belongs to a declaration made before the repair, not to this
+paragraph.
+
+\emph{Three.} Pairing at the target rather than at the submission gives the sharpest reading in
+the corpus and the one that does not survive. Two scaffolds running one model and scoring within
+\jdg{swbNearGap} points of each other still disagree on which targets they resolve, a median
+\jdg{swbNearChurn} of the targets either of them resolved (\jdg{swbNearN} comparisons over
+\jdg{swbNearModels} models). Two entries the board treats as equivalent are not solving the same
+problems. The control refuses it: the same model under the same scaffold, resubmitted, disagrees
+with itself on \jdg{swbChurnSame} (\jdg{swbChurnSameN} pairs) against \jdg{swbChurnCross} across
+scaffolds (\jdg{swbChurnN} comparisons), a gap of \jdg{swbChurnGap} with interval
+\jdg{swbChurnGapCi}. The effect sits at the corpus's own reproducibility floor and the near-tied
+comparisons sit below it.
+
+\paragraph{The corpus's own undesigned control.} The board carries a non-agentic RAG baseline
+run on the same targets, which is the analogue of \S\ref{sec:undesigned}'s comparison against a
+producer that chose nothing. It covers \jdg{swbAragModels} models, of which \jdg{swbAModels} were
+also run agentically, so the comparison exists but is narrow, and its agentic side is
+\jdg{swbAScafN} scaffold, \jdg{swbAScaf}. Within a fixed (model, target) stratum the agentic side
+resolves \jdg{swbAd} points more often (\jdg{swbAStrata} strata, \jdg{swbANperm} within-stratum
+label permutations, $p=\jdg{swbAP}$, bootstrap \jdg{swbACi}). The covariate therefore does predict
+the outcome inside a stratum, which is what the rest of this subsection needed and did not have.
+What it does not do is generalise: two models against one scaffold is a separation, not a
+gradient, and the census above is the reason a gradient cannot be built from this corpus.
+
+\paragraph{What does survive without a control to defend.} A target a system never attempted is
+scored exactly as a target it attempted and failed. Across \jdg{swbNgEntries} submissions that
+record it, \jdg{swbNgTotal} target-attempts are absent in this way; the rate runs from
+\jdg{swbNgLo} points of the board for \jdg{swbNgLoScaf} to \jdg{swbNgHi} for \jdg{swbNgHiScaf},
+and one submission carries \jdg{swbNgWorst} points of never-attempted targets inside its published
+number. This is the second producer of \S\ref{sec:twoproducers} in a corpus that logs it instead
+of leaving it to be inferred, and it is a selection acting on the score directly.
+
+\paragraph{What the two corpora do that neither does alone.} The compensatory arm is a corpus in
+which the crossing exists: every design method produced sequences for every target, so a covariate
+the producers chose can be held fixed and the consequence measured, which is what
+\S\ref{sec:gradient} through \S\ref{sec:leaderboard} do. SWE-bench Verified is a corpus in which
+the crossing does not exist, and the same instruments, applied in the same order, return the count
+above instead of an effect. The instruments therefore report which of the two situations a
+benchmark is in, and that is a more useful thing to hand a reader than a second effect size would
+have been. A benchmark in the second situation is not one whose covariate has been shown to be
+harmless. It is one in which the question cannot be asked of the data as collected, and the repair
+is a design decision taken before the submissions arrive, not an analysis applied after.
 
 % =====================================================================
 \subsection{What survives when the whole family is corrected at once}
@@ -2779,6 +2889,16 @@ the contrast holds on within-stratum ranks & $p\le0.005$ & \jdg{shpRankP} & held
 trimming $5\%$ at each tail keeps half the effect & $\ge50\%$ & \jdg{shpTrimRet} & held \\
 the energy-stratified subset is representative & $\le0.20$ SMD & \jdg{supSmdMax} &
   \textbf{failed} \\
+\midrule
+\multicolumn{4}{@{}l@{}}{\emph{frozen before \S\ref{sec:swebench} existed}}\\
+the largest scaffold arm is one submitter's sweep & one sweep & \jdg{swbScafGeThree} crossed pairs; many versions & \textbf{failed} \\
+entries do not share an attempted set & fires & fires & held \\
+the common universe holds enough to test & $\ge250$, $\ge60$ & \jdg{swbUniverse}, \jdg{swbEntries} & held \\
+the board order and a fixed-scaffold order disagree & $\rho<0.9$ & not identified & \textbf{not identified} \\
+some model moves three ranks or more & $\ge3$ & not identified & \textbf{not identified} \\
+a model moves more across scaffolds than a scaffold across models & $\ge0$ & \jdg{swbSFiveDiff} \jdg{swbSFiveCi} & \textbf{failed} \\
+the non-agentic control separates & $p\le0.005$ & $p=\jdg{swbAP}$ & held \\
+non-attempt rates differ across scaffolds & differ & \jdg{swbNgLo} to \jdg{swbNgHi} points & held \\
 \multicolumn{4}{@{}p{0.97\linewidth}@{}}{\footnotesize\emph{The subset is balanced on crossing
   (\jdg{supSmdCross}) and on the outcome (\jdg{supSmdRf}) but runs \jdg{supSmdDepth} shallower in
   helix depth. K3 of the declaration says what follows and \S\ref{sec:energy} says it: the

@@ -125,3 +125,14 @@ if same:
 
 print("\n### how many distinct models carry the near-tied result?")
 print("   models:", dict(collections.Counter(r['model'][:26] for r in near)))
+
+# --- persist the control (the first dump above ran before the control existed)
+out["control_same_scaffold"] = dict(n=len(same), median_churn=float(np.median(sc)),
+                                    iqr=[float(np.percentile(sc,25)), float(np.percentile(sc,75))])
+out["gap_cross_minus_same"] = dict(diff=float(np.median(ch)-np.median(sc)), ci=[float(lo), float(hi)],
+                                   separated=bool(lo > 0))
+out["gap_near_minus_same"] = dict(diff=float(np.median(cn)-np.median(sc)), ci=[float(lo2), float(hi2)],
+                                  separated=bool(lo2 > 0))
+out["near_tied_models"] = {k: v for k, v in collections.Counter(r['model'] for r in near).items()}
+json.dump(out, open(p, "w"), indent=1)
+print(f"re-wrote {p} with the control")
