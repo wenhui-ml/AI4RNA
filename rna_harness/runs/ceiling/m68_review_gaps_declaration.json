@@ -1,0 +1,72 @@
+{
+  "id": "M68",
+  "title": "The three missing controls a second review named, run before anything is rewritten",
+  "date_declared": "2026-09-02",
+  "status": "frozen_before_code",
+  "offline": true,
+  "api_cost_usd": 0.0,
+
+  "why": "A second review at conference standard named three controls whose absence each leaves one of this paper's main claims with an open alternative explanation. They are accepted as valid. Each is computable from artifacts already in hand with no wet-lab work and no API.",
+
+  "arm_A_placebo_covariate_for_the_reorder": {
+    "the_objection": "Adding any stratification dimension mechanically changes method means: strata thin, each method's comparable set shrinks, and between-stratum weighting changes. The manuscript states this rule itself for mediators (Appendix on placebo mediators) and never applied it to the leaderboard arm, which is its benchmark-facing headline.",
+    "design": "build a placebo covariate with the SAME marginal distribution and the SAME stratum granularity as the real one but no relation to the design method, by permuting the quintile labels WITHIN target; run the identical reorder estimator; repeat to obtain a placebo distribution of Kendall tau and of the number of methods that move.",
+    "n_placebo": 2000,
+    "estimator": "unchanged from the published arm; only the covariate is replaced",
+    "reported": "the real tau and moved-count, their placebo quantiles, and a two-sided placebo p for each",
+    "this_decides": "whether 'holding the covariate fixed reorders the leaderboard' is a statement about the covariate or about stratification"
+  },
+
+  "arm_B_refolding_channel": {
+    "the_objection": "Radius excision closes local reagent chemistry at the mutated positions. It does not close global refolding: a G/C substitution and an A/U substitution perturb the accessible pairing ensemble by different amounts, so the single-mutant profile distances rho_i and rho_j can be systematically larger for one pair type far from the mutation site, independent of whether the target pair formed. R's denominator is sqrt(rho_i^2+rho_j^2), so a larger denominator raises R in exactly the anti-conservative direction the manuscript already names.",
+    "design": "for each (wild type, mutant i, mutant j, double mutant) quadruple, compute a purely predicted, experiment-free perturbation size with ViennaRNA: the base-pair probability matrix distance between the wild type ensemble and each single mutant, and the ensemble defect of each. Contrast it by pair type with the same matched estimator the outcome uses.",
+    "then": "run it as a THIRD mediator through the stratified machinery, since it is the only variable in this paper that is both a function of the treatment and a candidate predictor of the outcome while requiring no experiment",
+    "also": "report the numerator/denominator decomposition AFTER excision at each radius, not only before, so the reader can see how much of the denominator's two-arm difference the excision removed",
+    "consequence_if_it_fires": "Contribution 1's second sentence is narrowed from 'it is not the probing chemistry' to 'it is not the base chemistry of the mutated positions themselves', and the refolding channel is priced rather than denied"
+  },
+
+  "arm_C_a_real_optimiser": {
+    "the_objection": "The undesigned control stops at the first sequence whose MFE equals the target, so it samples near-uniformly from correctly-folding sequences rather than producing stability-optimised ones. The claim it licenses is therefore about an early-stopping inverse folder, not about a thermodynamic optimiser, and the title's verb rests on that distinction.",
+    "design": "on the same targets and the same pairs, run a designer that keeps optimising after the structure constraint is met: ViennaRNA's RNAinverse in probabilistic mode (-Fp), and where available a free-energy-minimising search subject to the target structure. Compute the same placement gap.",
+    "consequence_if_it_produces_the_gradient": "the undesigned-control claim is rewritten, unShare's reading changes, and the title's verb is re-examined rather than defended"
+  },
+
+  "arm_D_calibration_of_the_calibration": {
+    "the_objection": "The kept route's readback value is a point read off a synthetic curve with no interval, and the manuscript argues elsewhere that a six-point relation driven by one point is not evidence. The same ruler must be applied here. The synthetic family also sweeps one perturbation shape only.",
+    "design": "bootstrap the readback over targets to give the inverted value an interval; then repeat the whole injection with a second perturbation shape chosen to resemble the real conditional mean's steep-then-flat form rather than the linear one, and report how far the inverted value moves"
+  },
+
+  "arm_E_multiplicity_coverage": {
+    "the_objection": "The precision purchase covers the previous version's headlines. Claims that now carry weight are not in it.",
+    "design": "buy the same 10^6-draw precision for the excision contrast at radius three; and enumerate explicitly which claims are members of the corrected family and which are not, with the reason (an interval is not a p-value and cannot be a Holm member)",
+    "note": "the reorder's tau carries a bootstrap interval and not a permutation p, so it is NOT a Holm member by construction; the review conflated the two and the manuscript will say so rather than manufacture a p for it"
+  },
+
+  "predictions": {
+    "S1": "arm A: the real reorder's moved-count lies above the 97.5th percentile of the placebo distribution",
+    "S2": "arm A: the real tau lies below the 2.5th percentile of the placebo tau distribution",
+    "S3": "arm A: the placebo distribution is NOT centred on no movement, that is, stratification alone moves methods",
+    "S4": "arm B: predicted ensemble perturbation differs by pair type, with G/C substitutions perturbing more",
+    "S5": "arm B: conditioning on that predicted perturbation retains at least 70 percent of the identity contrast",
+    "S6": "arm B: the denominator's two-arm difference shrinks with excision radius",
+    "S7": "arm C: an optimiser that continues past the structure constraint still does not reproduce the designed corpus's placement gap",
+    "S8": "arm D: the readback interval excludes the naive uncorrected reading",
+    "S9": "arm D: changing the perturbation shape moves the inverted value by less than a quarter of its distance from the naive reading"
+  },
+
+  "kill_conditions": {
+    "K0": "S1 or S2 fails: the reorder is a statement about stratification and not about the covariate. The claim is withdrawn from the abstract and from the contributions, and the section is rewritten as a null.",
+    "K1": "S5 fails and conditioning on predicted perturbation removes most of the contrast: the refolding channel carries the effect, Contribution 1 is withdrawn to the excision-invariant part, and the paper says so in the abstract.",
+    "K2": "S7 fails and a real optimiser reproduces the gradient: the undesigned-control claim is rewritten and the title's verb is re-examined.",
+    "K3": "arm B cannot be computed for a material fraction of quadruples: the fraction is reported and the arm is labelled partial rather than silently restricted.",
+    "K4": "arm D's readback interval covers the naive reading: the corrected number is withdrawn and only the direction is reported."
+  },
+
+  "what_this_experiment_may_NOT_do": [
+    "manufacture a permutation p for a quantity that carries an interval",
+    "choose the placebo permutation scheme after seeing the real value",
+    "drop a perturbation shape from arm D because it moved the answer",
+    "re-run the reorder estimator with any change other than the covariate",
+    "touch anything belonging to the two manuscripts under review at AAAI-2027"
+  ]
+}
