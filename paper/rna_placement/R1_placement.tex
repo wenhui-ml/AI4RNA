@@ -2448,7 +2448,7 @@ matched pairs rather than to mine them, and it needs synthesis rather than analy
 \section{Limitations}
 \label{sec:limits}
 
-Eight are stated, each naming what a reader of \S\ref{sec:conclusion} would have to discount
+Nine are stated, each naming what a reader of \S\ref{sec:conclusion} would have to discount
 and, where one exists, the experiment that would remove it.
 
 
@@ -2525,6 +2525,22 @@ reported at the resolution they have rather than re-run.
 \citep{lee2014eterna}; what is measured here is its effect on pair formation and on the
 measurement itself.
 
+\paragraph{(ix) What the second corpus does and does not add.} \S\ref{sec:swebench} is not a second
+effect and should not be read as one. Its result is a count, and the three quantities that would
+have been effects each fail something: the magnitude is already reported in the literature we cite
+and its attribution here does not clear a resubmission control; the rank comparison is not
+identified, which the census then explains; and the target-level reading sits at the corpus's own
+reproducibility floor. The one contrast that clears its permutation null, the non-agentic baseline
+of \jdg{swbAModels} models against \jdg{swbAScafN} agentic scaffold, is a separation on two models
+and not a gradient. The outcome there is also a shipped test suite with documented failure modes
+\citep{huang2026deepswe}, so ``computed'' is not ``correct''; nothing in that subsection depends on
+the suite being right, because every quantity in it counts what the board recorded rather than
+re-adjudicating it. Finally the census describes one snapshot of a live leaderboard
+\citep{swebenchexperiments}, and submissions accumulate: it is a statement about the board as
+collected on the recorded commit, and a later reader should recount rather than cite it forward.
+The experiment that would remove this limitation is not an analysis of that board at all. It is the
+crossed design \citep{hal2025holistic} that the census says has to be run.
+
 \section{Conclusion}
 \label{sec:conclusion}
 
@@ -2551,6 +2567,21 @@ chose, at a rate it can be made to report, while the thermodynamic account that 
 explain the property has nothing to say about it. Holding that same covariate fixed reorders the
 benchmark's own leaderboard, \jdg{lbBMoved} of \jdg{lbBNMeth} methods and up to \jdg{lbBMaxMove}
 places (\S\ref{sec:leaderboard}).
+
+That is a statement about one benchmark, and the reason to end on a second one is that it answers a
+question the first cannot: whether a reader holding a different leaderboard can do any of this.
+Often not. Asked of SWE-bench Verified, the same instruments in the same order return a count and
+no effect, because \jdg{swbSolo} of \jdg{swbModels} models on that board were measured under
+exactly one agent scaffold and \jdg{swbScafGeThree} pairs of scaffolds share three models
+(\S\ref{sec:swebench}). The covariate there is not shown to be harmless; it is not separable from
+the thing being ranked by any analysis of the submissions as they exist, and the repair is a
+crossed design run before the submissions arrive rather than a correction applied after
+\citep{hal2025holistic}. Both readings are useful and neither is visible from a leaderboard. What
+this paper offers a reader is the order in which to find out which one they have: hold the target
+fixed, then hold the chosen covariate fixed, and if the second step has nothing to hold, that is
+the answer rather than the absence of one. The corpus of designed RNA is the case where the step
+can be taken, and it is only because somebody had already run every method against every target
+that it could be.
 
 \paragraph{Code and data availability.} Every number in this manuscript is generated from a
 committed run artifact by a single script; no measured value is typed into the source, and a check
