@@ -153,9 +153,11 @@ a naive contrast misses.
 
 \emph{Whose choice it is, tested rather than assumed.} Undesigned RNA carries the same placement
 tendency \jdg{unRatio} times weaker (\jdg{unFams} Rfam families and an independent pseudoknot
-corpus), and a plain thermodynamic inverse folder given \emph{these} target structures reproduces
-\jdg{unShare} of it, with an interval covering zero. The covariate is what the design programs do,
-not what the folding model implies.
+corpus), and an inverse folder given \emph{these} target structures reproduces
+\jdg{unShare} of it, with an interval covering zero. An ensemble optimiser that does not stop at the
+first correct fold cannot be compared at all: it spends its pairs on one type and leaves the
+statistic undefined. The covariate is what the design programs do, not what a folding model
+implies.
 
 \emph{The consequence.} Holding that covariate fixed reorders the released leaderboard:
 \jdg{lbBMoved} of \jdg{lbBNMeth} methods move, by up to \jdg{lbBMaxMove} places, Kendall
@@ -2110,6 +2112,49 @@ optimiser: it is a property of what these programs and these designers do, which
 \emph{chose} was asserting.
 \end{claimbox}
 
+\paragraph{The optimiser that does not stop, and what the comparison turned into.} The control
+above uses \texttt{inverse\_fold}, which returns as soon as the sequence's MFE equals the target. It
+is therefore a sampler of correctly-folding sequences, not a stability optimiser, and a reader is
+entitled to ask whether a designer that keeps optimising past the structure constraint would
+reproduce the gradient after all. We ran one: ViennaRNA's \texttt{inverse\_pf\_fold}, which
+minimises the ensemble free energy difference and has no constraint-met stopping rule, on the same
+\jdg{optTargets} targets, the same pairs, and the same summariser, with the harness verified first
+by reproducing this section's designed arm exactly ($n=\jdg{optDesN}$, $\jdg{optDesGap}$,
+\jdg{optDesCi}: it \jdg{optRepro} the published figures to the last digit).
+
+It does not produce a weaker gradient. It produces no gradient that can be computed. Requiring the
+MFE to equal the target, \jdg{optStrictAcc} of \jdg{optStrictTry} attempts were accepted
+(\jdg{optStrictPct}) and \jdg{optStrictN} molecules met the admission rule; without that
+requirement, \jdg{optAnyAcc} of \jdg{optAnyTry} and again \jdg{optAnyN}. The optimiser works; the
+statistic does not apply to it.
+
+\begin{claimbox}
+\textbf{A pure ensemble optimiser does not place G--C and A--U. It spends almost nothing on A--U,
+so there is no second arm to contrast against.} On the same targets, with no admission rule applied
+and every molecule counted, the designed sequences spend \jdg{pbDesAu} of their pairs on A--U
+(\jdg{pbDesAuN} pairs, \jdg{pbDesAuCi}, \jdg{pbDesN} molecules over \jdg{pbDesClust} targets) and
+\jdg{pbDesZero} of them spend none; \texttt{inverse\_fold} spends \jdg{pbIfAu}
+(\jdg{pbIfAuN} pairs, \jdg{pbIfAuCi}, \jdg{pbIfN} molecules) and \jdg{pbIfZero} spend none; \texttt{inverse\_pf\_fold} spends \jdg{pbPfAu} (\jdg{pbPfAuCi}) and \jdg{pbPfZero}
+(\jdg{pbPfZeroCi}) of its molecules spend none at all, putting \jdg{pbPfCg} (\jdg{pbPfCgCi}) of
+every pair into G--C. \textbf{The three intervals do not overlap, and the designers sit between the
+two folding models}: on the G--C share of paired positions, \texttt{inverse\_fold} reads
+\jdg{pbIfCg} (\jdg{pbIfCgCi}), the designed sequences \jdg{pbDesCg} (\jdg{pbDesCgCi}), and the
+ensemble optimiser \jdg{pbPfCg} (\jdg{pbPfCgCi}). A molecule needs \jdg{optMinPair} pairs of each
+type to enter the placement statistic at all, which is why the optimiser yields none.
+\end{claimbox}
+
+This is a stronger reading of \S\ref{sec:undesigned} than the one we set out to test, and it is not
+the one the declaration predicted, so it is reported as what it is. The declared prediction S7 asked
+whether an optimiser that continues past the structure constraint still fails to reproduce the gap;
+it is graded \textbf{not defined} rather than held, because the optimiser produces no molecule the
+gap exists on. What replaces it is the budget above. The placement structure is not something a
+thermodynamic optimiser does less of --- \emph{it is not the problem a thermodynamic optimiser is
+solving}. Maximising the target's ensemble probability calls for the strongest pair everywhere, and
+a designer that does that has no placement decision left to make. The design programs and the human
+players do make one: they spend a quarter of their pairs on A--U, and where they spend them is the
+covariate this paper measures. That is what the word \emph{chose} is asserting, and it now rests on
+a designer that optimises rather than on one that stops early.
+
 \paragraph{Two things this arm does not settle, and one defect worth naming.} It does not say why
 natural RNA places pairs the way it does; selection for stability, for kinetics and for function
 are not separated here. It touches no probing data, so it says nothing about pair \emph{formation}:
@@ -2626,9 +2671,11 @@ $\jdg{xrRounds}$ rounds with disjoint targets (\S\ref{sec:rounds}) and the forma
 one. All \jdg{xrRounds} rounds come from the same laboratory, platform and player community
 (\S\ref{sec:setup}), so what
 replicates is the target set and the method mix, not the ecology. The test that mechanism implies
-is no longer untried: \S\ref{sec:undesigned} runs it on two undesigned corpora and on a
-thermodynamic optimiser given the same targets, and the placement structure is \jdg{unRatio} times
-weaker without a designer and \jdg{unShare} reproduced by the optimiser. What remains one corpus is
+is no longer untried: \S\ref{sec:undesigned} runs it on two undesigned corpora and on
+folding models given the same targets, and the placement structure is \jdg{unRatio} times
+weaker without a designer and \jdg{unShare} reproduced by an inverse folder that stops at the first
+correct fold --- while an optimiser that does not stop there produces no molecule the statistic is
+defined on at all. What remains one corpus is
 the \emph{formation} result, which needs compensatory probing data that no undesigned release
 carries. The experiment that would settle it is a compensatory-mutagenesis panel run on the same
 targets by a second laboratory on a different platform, which is wet-lab work and is future work;
@@ -3183,6 +3230,13 @@ the ensemble mediator is itself identity-dependent & $p\le0.005$ & $p\jdg{rfP}$ 
 the denominator's arm difference shrinks with excision radius & shrinks & \jdg{dnRadDNo} to \jdg{dnRadDThree} & held \\
 the readback interval excludes the naive reading & excludes & \jdg{pcInvCi} covers \jdg{medFrac} & \textbf{failed} \\
 changing the perturbation shape barely moves the inversion & $<\jdg{pcShapeQuarter}$ pts & \jdg{pcShapeMove} pts & held \\
+an optimiser past the structure constraint still fails to reproduce the gap & fails & \jdg{optStrictN} molecules & \textbf{not defined} \\
+\multicolumn{4}{@{}p{0.97\linewidth}@{}}{\footnotesize\emph{The optimiser folds to the target in
+  \jdg{optStrictPct} of attempts and yields no molecule the statistic exists on, because it spends
+  \jdg{pbPfCg} of its pairs on G--C. The stake is graded \emph{not defined} rather than held: the
+  prediction was that the gap would be smaller, and there is no gap to be smaller. What replaces it
+  is the pair-type budget, which was not preregistered and is reported as a measurement rather than
+  as a met prediction.}}\\[2pt]
 \multicolumn{4}{@{}p{0.97\linewidth}@{}}{\footnotesize\emph{Kill condition K4 fired on the first of
   these and was applied as written: the corrected linear share is withdrawn from
   \S\ref{sec:pcal} and from \S\ref{sec:qualitative}, and only its direction is reported. The second

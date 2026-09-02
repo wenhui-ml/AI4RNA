@@ -1057,6 +1057,45 @@ put("pcInvLoRung", f"{100*min(m68e['lambdas']):.0f}\\%")
 put("pcInvHiRung", f"{100*max(m68e['lambdas']):.0f}\\%")
 put("pcalTargets", "20")
 
+# ------------------------------------------- M68 arm C: a designer that does not stop at the fold
+# inverse_pf_fold minimises the ensemble free energy difference and has no "constraint met" stop
+# rule. It folds to the target almost every time and produces no molecule the placement statistic
+# is defined on, because it spends essentially every pair on G--C.
+m68c = J("m68c_real_optimiser.json")
+put("optTargets", f"{m68c['targets']}")
+put("optDesN", f"{m68c['designed_core']['n']}")
+put("optDesGap", sig(m68c["designed_core"]["gap"], 4))
+put("optDesCi", ci(m68c["designed_core"]["ci"], 4))
+put("optRepro", "reproduces" if m68c["reproduces_m63_designed_core"] else "does not reproduce")
+for _k, _n in (("inv_pf_strict", "Strict"), ("inv_pf_any", "Any")):
+    _v = m68c[_k]
+    put(f"opt{_n}Try", f"{_v['attempts']}")
+    put(f"opt{_n}Acc", f"{_v['accepted']}")
+    put(f"opt{_n}Pct", f"{100*_v['accepted']/max(_v['attempts'],1):.0f}\\%")
+    put(f"opt{_n}N", f"{_v['n']}")
+put("optMinPair", "4")
+
+# ------ M68 arm C, the measurement the arm turned into: what each designer spends its pairs on
+# No admission rule is applied here; every molecule produced is counted, because the admission rule
+# is binary and would hide the size of the difference.
+m68f = J("m68f_pair_type_budget.json")
+def _pb(tag, key):
+    v = m68f[key]
+    put(f"pb{tag}N", f"{v['n']}")
+    if tag == "Des":
+        put(f"pb{tag}Clust", f"{v['au_pairs']['n_clusters']}")
+    put(f"pb{tag}Au", f"{v['au_share']['mean']:.3f}")
+    put(f"pb{tag}AuCi", "[$%.3f$, $%.3f$]" % tuple(v["au_share"]["ci"]))
+    put(f"pb{tag}AuN", f"{v['au_pairs']['mean']:.2f}")
+    put(f"pb{tag}Cg", f"{v['cg_share']['mean']:.3f}")
+    put(f"pb{tag}CgCi", "[$%.3f$, $%.3f$]" % tuple(v["cg_share"]["ci"]))
+    put(f"pb{tag}Zero", f"{100*v['frac_zero_au']['mean']:.1f}\\%")
+    if tag == "Pf":
+        put(f"pb{tag}ZeroCi", "[$%.1f\\%%$, $%.1f\\%%$]" % (100*v["frac_zero_au"]["ci"][0],
+                                                              100*v["frac_zero_au"]["ci"][1]))
+_pb("Des", "designed"); _pb("If", "inverse_fold"); _pb("Pf", "inverse_pf_fold")
+put("pbGap", f"{m68f['designed_minus_optimiser_au_share']:.3f}")
+
 # ---------------------------------------------------------------- survivorship + shift (M22)
 m22 = J("m22_review_arms.json")
 a22 = m22["A"]
