@@ -1,0 +1,27 @@
+{
+ "id": "M68-erratum",
+ "declaration": "m68_review_gaps_declaration.json",
+ "why_this_file_exists": "A frozen declaration is never edited. Defects found in the code written under it are recorded here.",
+ "date": "2026-09-02",
+ "defects": [
+  {
+   "id": "E1",
+   "arm": "C",
+   "found": "before the first run's results were read; the run was killed at 30 minutes and no number from it reached the manuscript",
+   "what": "The first implementation of arm C built its target structures by filtering M63.pairs_from_db's multi-family pairing map to the design window and re-emitting it as a single-family dot-bracket string. pairs_from_db parses ([{<ABCD, so the filtered map contains crossing (pseudoknotted) pairs; collapsing it to () and reparsing reassigns every crossing by stack order.",
+   "measured_severity": "All 20 targets carry crossings. Only 180 of 594 intended pairs (30.3%) survive the flattening; target P19 keeps 0 of 45, P14 keeps 5 of 35, P01 keeps 5 of 17. The optimiser was therefore designing for, and being scored on, structures that are mostly not the targets.",
+   "prior_occurrence": "This is the third time this exact flattening has been made in this project. M63's own erratum records it as F4: 'our first two implementations flattened the crossings into a dot-bracket that was balanced and wrong'. The balanced-but-wrong property is why no assertion caught it.",
+   "second_defect_in_the_same_code": "the admission threshold was written as len(Q) < 8 on a double-indexed map, admitting targets with 4 pairs where M63's own rule requires 8",
+   "third_defect_in_the_same_code": "the comparison baseline was M63's FULL designed corpus (n=160, whole molecules) rather than designed_core (n=104, the same nested-core pairs), so the arms would not have been scored on the same pair set",
+   "repair": "arm C now calls M63.nested_core, the same function M63's own C' control uses, so crossings are dropped rather than reassigned; the admission rule is len(Q)//2 >= 8; the designed arm is rebuilt on the same nested-core pairs; and the script verifies the harness by reproducing M63's published Cprime_repaired_control.designed_core before the optimiser runs.",
+   "what_this_does_not_change": "no prediction of the declaration is regraded, no arm is dropped, and S7 is still graded on the repaired run in the declaration's wording"
+  }
+ ],
+ "declared_but_not_run": [
+  {
+   "arm": "C",
+   "text": "'and where available a free-energy-minimising search subject to the target structure'",
+   "status": "not run. ViennaRNA exposes no constrained free-energy-minimising designer beyond inverse_fold (structure constraint, early stop) and inverse_pf_fold (ensemble objective, no stop rule), both of which ARE run. The declaration's 'where available' is read as it is written; the absence is recorded here rather than left silent."
+  }
+ ]
+}
