@@ -519,6 +519,26 @@ covariate is a property of how molecules resemble one another; placement is a pr
 \emph{choice somebody made about} a molecule and travels with it into whichever side of a split it
 lands on.
 
+\paragraph{The literature the second corpus lands in, and what is left of ours in it.} That an
+agent benchmark's number is a joint property of the model and the harness around it is not our
+observation. It has been argued as a position, that the harness is often the stronger determinant
+and that a leaderboard without harness disclosure should be read as incomplete
+\citep{zhang2026harness}; as a critique of agent evaluation generally, that benchmarks conflate the
+questions a model developer and a downstream developer are asking and so misattribute where an
+accuracy gain came from \citep{kapoor2024agents}; and as infrastructure, by running the crossing
+rather than arguing for it, over tens of thousands of rollouts with models, scaffolds and
+benchmarks varied as three separate axes \citep{hal2025holistic}. Reported swings for one model
+across scaffolds in that line of work are as large as the ones \S\ref{sec:swebench} recovers, so
+we do not claim that magnitude and \S\ref{sec:swebench} says where ours fails its own control.
+What is not in that literature is the deficiency itself. The position paper is explicit that it
+counts no leaderboard entries, and the infrastructure paper's remedy is to generate a crossed
+design rather than to characterise the uncrossed one. \S\ref{sec:swebench} supplies the count: on
+the board as submitted, \jdg{swbSolo} of \jdg{swbModels} models stand on a single scaffold and
+\jdg{swbScafGeThree} scaffold pairs share three models, which is the precise sense in which the
+remedy has to be a new experiment and cannot be an analysis. It is also why this paper's own
+instruments return a census there and an effect on the corpus of \S\ref{sec:corpus}: the
+difference between the two is whether somebody ran the crossing, and on designed RNA somebody did.
+
 \paragraph{The thermodynamic explanation this must be separated from.} Nearest-neighbour
 parameters \citep{freier1986improved,xia1998thermodynamic,mathews1999expanded,turner2010nndb} give
 a terminal A--U a penalty a terminal G--C does not carry, and helix ends are further modulated by
@@ -2063,7 +2083,13 @@ about benchmarks, so it should survive being asked of one whose verdict is compu
 measured. We ask it of SWE-bench Verified \citep{jimenez2024swebench,swebenchverified2024} through
 the public submission records \citep{swebenchexperiments}. The targets are identical across
 systems, a system's outcome on a target is whether that target's own test suite passes, and the
-resulting table is read as a ranking of language models. What a submitter also chooses, and what
+resulting table is read as a ranking of language models. That verdict is computed, which is what
+we wanted, but it is not thereby above suspicion: the shipped tests were written to confirm
+one merged fix rather than to grade an arbitrary one, and an independent judge re-reviewing
+graded runs disagrees with such inherited suites at a rate an order of magnitude above a
+purpose-written verifier \citep{huang2026deepswe}. Nothing below turns on the oracle being
+right, for the same reason nothing in \S\ref{sec:corpus} turns on a folding model being
+right: the quantities are counts of what the board itself recorded. What a submitter also chooses, and what
 the ranking does not name, is the agent scaffold the model is placed inside. That is this paper's
 covariate in another substrate: a property of how the artefact was produced, fixed by the
 producer, and carried into whichever split the artefact is placed in.
@@ -2094,7 +2120,8 @@ leaves almost no model with a second measurement to be re-ranked against.
 
 \paragraph{The three things we tried before that, and why none of them is a result.} They are
 reported because the section would otherwise present a census as though it were the first thing we
-looked for. \emph{One.} A model's number moves a median of \jdg{swbSpreadMed} points across the
+looked for. \emph{One.} Movement of this kind is already reported \citep{hal2025holistic,zhang2026harness}
+and we recovered it rather than discovered it. A model's number moves a median of \jdg{swbSpreadMed} points across the
 scaffolds that ran it (\jdg{swbSpreadN} models, \jdg{swbSpreadCi}), reaching \jdg{swbSpreadMax}
 for \jdg{swbDeepModel}, which runs from \jdg{swbDeepLo} under \jdg{swbDeepLoScaf} to
 \jdg{swbDeepHi} under \jdg{swbDeepHiScaf} across \jdg{swbDeepCells} of them, a spread of
@@ -2116,7 +2143,9 @@ scaffold moves across models. It does not: \jdg{swbSFiveWm} points against \jdg{
 interval \jdg{swbSFiveCi}. The interval covers zero, so this is unresolved rather than refuted,
 but the point estimate runs against the prediction and does so at both bars we looked at. The
 sentence that the board ranks scaffolds rather than models is not supported and is not written
-here. The comparison is also not symmetric, since the models inside one scaffold are far more
+here. That sentence is close to a thesis argued in the literature
+\citep{zhang2026harness}, so a point estimate running the other way on this corpus is worth
+recording even unresolved, and it is recorded as unresolved. The comparison is also not symmetric, since the models inside one scaffold are far more
 heterogeneous than the scaffolds around one model; that is a defect in the prediction as
 registered, and repairing it belongs to a declaration made before the repair, not to this
 paragraph.
