@@ -208,7 +208,8 @@ def fig4():
     body = rf"""\nextgroupplot[width=5.0cm, height=4.7cm, xbar, bar width=6pt,
     ytick={{{t1}}}, yticklabels={{{l1}}}, yticklabel style={{font=\tiny}},
     xlabel={{effect (OpenKnot points)}}, ymin=0.4, ymax={len(nms)+0.6},
-    legend columns=1, legend style={{at={{(0.5,1.02)}}, anchor=south, font=\tiny}},]
+    legend columns=-1, legend style={{at={{(0.5,-0.36)}}, anchor=north, font=\tiny,
+    /tikz/every even column/.append style={{column sep=0.35cm}}}},]
 {zeroline(0.4, len(nms)+0.6)}
 \addplot[fill={S1}, draw=none] coordinates {{{co([f"{v:.4f}" for v in real], ys)}}};
 \addlegendentry{{true paired set}}
@@ -219,8 +220,9 @@ def fig4():
     xtick={{{",".join(map(str, x2))}}},
     xticklabels={{{",".join("{{" + f"{float(k):.1f}" + "}}" for k in ks)}}},
     xlabel={{stringency $k$ (residual SD)}}, ylabel={{median slope}},
-    ymin=-14, ymax=68, legend columns=1,
-    legend style={{at={{(0.5,1.02)}}, anchor=south, font=\tiny}}]
+    ymin=-14, ymax=68,
+    legend columns=-1, legend style={{at={{(0.5,-0.30)}}, anchor=north, font=\tiny,
+    /tikz/every even column/.append style={{column sep=0.35cm}}}}]
 \addplot[color={S1}, mark=*, mark size=1.8pt, line width=1.1pt]
   coordinates {{{co(x2, [f"{v:.3f}" for v in sp])}}};
 \addlegendentry{{contrast pairing}}
@@ -231,7 +233,7 @@ def fig4():
 \nextgroupplot[width=4.5cm, height=4.7cm, ybar, bar width=11pt,
     xtick={{{",".join(map(str, x3))}}},
     xticklabels={{{",".join("{{" + lab[k] + "}}" for k in ks2)}}},
-    ylabel={{$\Delta$ partner reactivity}}, ymin=0, ymax=0.70,
+    ylabel={{$\Delta$ reactivity}}, ymin=0, ymax=0.78, xmin=0.45, xmax={len(ks2)+0.55},
     nodes near coords, point meta=explicit symbolic,
     every node near coord/.append style={{font=\tiny, color={INK2}}}]
 \addplot[fill={S1}, draw=none] coordinates {{{
@@ -264,7 +266,8 @@ def fig5():
     ytick={{{t1}}}, yticklabels={{{l1}}}, yticklabel style={{font=\tiny}},
     xlabel={{difference in rescue factor}}, xmin=0, xmax=0.155,
     ymin=0.4, ymax={len(keys)+0.6},
-    legend style={{at={{(0.5,1.02)}}, anchor=south}}, legend columns=2]
+    legend columns=-1, legend style={{at={{(0.5,-0.30)}}, anchor=north,
+    /tikz/every even column/.append style={{column sep=0.35cm}}}}]
 \addplot[fill={S3}, draw=none] coordinates {{{co([f"{v:.4f}" for v in marg], ys)}}};
 \addlegendentry{{marginal}}
 \addplot[fill={S1}, draw=none] coordinates {{{co([f"{v:.4f}" for v in matc], ys)}}};
@@ -274,7 +277,8 @@ def fig5():
     xtick={{0,1,2,3}}, xticklabels={{{{0\\(end)}},{{1}},{{2}},{{3+}}}},
     xticklabel style={{align=center}},
     xlabel={{helix depth}}, ylabel={{rescue factor}}, xmin=-0.2, xmax=3.6,
-    legend style={{at={{(0.5,1.02)}}, anchor=south}}, legend columns=2]
+    legend columns=-1, legend style={{at={{(0.5,-0.46)}}, anchor=north,
+    /tikz/every even column/.append style={{column sep=0.35cm}}}}]
 \addplot[color={S1}, mark=*, mark size=1.8pt, line width=1.1pt]
   coordinates {{{co(range(4), [f"{v:.4f}" for v in curves['CG']])}}};
 \addlegendentry{{G--C}}
@@ -301,13 +305,14 @@ def fig6():
     xlabel={{predicted attenuation\quad $g_m \times \beta_{{\rm depth}}$}},
     ylabel={{observed attenuation}},
     xmin={lo:.5f}, ymin={lo:.5f}, ymax=0.002,
-    title={{depth accounts for {100*a2['mediated_fraction']:.0f}\% of the pooled gap}},
-    xmax=0.0035, enlarge y limits=0.08]
+    xmax=0.0045, enlarge y limits=0.08]
+\node[font=\scriptsize, color={INK}, anchor=north west] at (rel axis cs:0.02,0.97)
+  {{depth accounts for {100*a2['mediated_fraction']:.0f}\% of the pooled gap}};
 \addplot[color={INK3}, dashed, line width=0.7pt, forget plot]
   coordinates {{({lo:.5f},{lo:.5f}) (0.002,0.002)}};
 {chr(10).join(pts)}
 {pt(f"{a2['predicted_attenuation']:.5f}", f"{a2['observed_attenuation']:.5f}", S3, "3.0pt", "diamond*")}
-\node[font=\tiny, color={INK2}, above right=1pt] at
+\node[font=\tiny, color={INK2}, below right=2.5pt] at
   (axis cs:{a2['predicted_attenuation']:.5f},{a2['observed_attenuation']:.5f}) {{pooled}};
 {chr(10).join(notes)}
 \end{{axis}}"""
@@ -331,7 +336,7 @@ def fig7():
                        rf"(axis cs:{p['gap']:.4f},{y}) {{{p['gap']:+.3f}}};"
                        for p, y in zip(pm, ys))
     mu, sd = a1["null_mean"], a1["null_sd"]
-    lo = min(p["gap"] for p in pm) * 1.22
+    lo = min(p["gap"] for p in pm) * 1.42
 
     body = rf"""\nextgroupplot[width=6.2cm, height=4.3cm, xbar, bar width=6pt,
     ytick={{{t1}}}, yticklabels={{{l1}}}, yticklabel style={{font=\tiny}},
@@ -348,12 +353,12 @@ def fig7():
 {band(mu - 1.96*sd, mu + 1.96*sd, -0.32, 0.32, INK3, "0.30")}
 {pt(f"{mu:.4f}", 0, INK2, "3pt", "|")}
 {pt(f"{a1['method_component']:.4f}", 0, S2, "2.8pt")}
-\node[font=\tiny, color={INK2}, align=center, above=8pt] at
+\node[font=\tiny, color={INK2}, align=center, above=15pt] at
   (axis cs:{a1['method_component']:.4f},0)
   {{observed {a1['method_component']:.3f}\\$z={a1['z']:.2f}$, $p={a1['p_perm']:.3f}$}};
-\node[font=\tiny, color={INK2}, align=center, below=8pt] at (axis cs:{mu:.4f},0)
+\node[font=\tiny, color={INK2}, align=center, below=15pt] at (axis cs:{mu:.4f},0)
   {{permutation null\\mean $\pm$ 1.96\,SD}};"""
-    emit("fig7_gradient.tex", grp(2, body, hsep="2.5cm"))
+    emit("fig7_gradient.tex", grp(2, body, hsep="3.1cm"))
 
 
 # ---------------------------------------------------------------- fig 8: the permutation rule
@@ -380,14 +385,15 @@ def fig8():
 \addplot[fill={S1}, draw=none] coordinates {{(2,{rates[1]:.5f})}};
 \draw[color={INK2}, dashed, line width=0.8pt]
   (axis cs:0.4,{d['nominal']}) -- (axis cs:2.75,{d['nominal']});
-\node[font=\tiny, color={INK2}, anchor=south west] at
-  (axis cs:0.42,{d['nominal']}) {{nominal {d['nominal']}}};
+\node[font=\tiny, color={INK2}, anchor=south east] at
+  (axis cs:2.73,{d['nominal']}) {{nominal {d['nominal']}}};
 {ann}
 
 \nextgroupplot[width=6.8cm, height=4.6cm, xbar, bar width=6pt,
     ytick={{{t1}}}, yticklabels={{{l1}}}, yticklabel style={{font=\tiny}},
     xlabel={{SD of the statistic under each null}}, ymin=0.4, ymax={len(pops)+0.6},
-    legend style={{at={{(0.5,1.02)}}, anchor=south}}, legend columns=2]
+    legend columns=-1, legend style={{at={{(0.5,-0.30)}}, anchor=north,
+    /tikz/every even column/.append style={{column sep=0.35cm}}}}]
 \addplot[fill={S2}, draw=none] coordinates {{{co([f"{v:.4f}" for v in sa], ys)}}};
 \addlegendentry{{design rebuilt by the permutation}}
 \addplot[fill={S1}, draw=none] coordinates {{{co([f"{v:.4f}" for v in sb], ys)}}};
@@ -414,7 +420,7 @@ def fig9():
     re = d["B1"]["retention"] * 100
     vals = [re, d["sensitivity_bins"]["3"]["retention"] * 100,
             d["sensitivity_bins"]["8"]["retention"] * 100, pm]
-    names = [f"real, {d['nbins']} bins", "real, 3 bins", "real, 8 bins", "placebo mediator"]
+    names = [f"real, {d['nbins']} bins", "real, 3", "real, 8", "placebo"]
     t2, l2 = ylabels(names)
     cols = [S1, S1, S1, INK3]
     marks = "\n".join(pt(f"{v:.3f}", len(vals) - i, c, "2.2pt")
@@ -432,7 +438,8 @@ def fig9():
     xticklabel style={{rotate=32, anchor=east, font=\tiny}},
     xlabel={{$\Delta G_{{\mathrm{{loc}}}}$ bin, upper edge (kcal/mol)}}, ylabel={{target pairs}},
     enlarge x limits=0.09,
-    legend style={{at={{(0.5,1.02)}}, anchor=south}}, legend columns=3]
+    legend columns=-1, legend style={{at={{(0.5,-0.52)}}, anchor=north,
+    /tikz/every even column/.append style={{column sep=0.30cm}}}}]
 {chr(10).join(series)}
 
 \nextgroupplot[width=4.8cm, height=4.0cm,
@@ -450,7 +457,8 @@ def fig9():
 
 \nextgroupplot[width=4.7cm, height=4.0cm,
     xlabel={{$\Delta G_{{\mathrm{{loc}}}}$ (kcal/mol)}},
-    ylabel={{rescue, centred}}, legend pos=south east]
+    ylabel={{rescue, centred}},
+    legend columns=-1, legend style={{at={{(0.5,-0.44)}}, anchor=north}}]
 \addplot[color={INK3}, line width=0.6pt, forget plot]
   coordinates {{({min(gx):.4f},0) ({max(gx):.4f},0)}};
 \addplot[color={S1}, mark=*, mark size=1.5pt, line width=0.9pt, forget plot]
@@ -458,7 +466,7 @@ def fig9():
 \addplot[color={S2}, dashed, line width=0.8pt]
   coordinates {{{co([f"{v:.4f}" for v in fx], [f"{v:.5f}" for v in fy])}}};
 \addlegendentry{{the linear fit $\beta_{{\Delta G}}$}}"""
-    emit("fig9_energy.tex", grp(3, body, hsep="1.9cm"))
+    emit("fig9_energy.tex", grp(3, body, hsep="2.7cm"))
 
 
 # ---------------------------------------------------------------- fig 10: depth and method
@@ -498,7 +506,7 @@ def fig10():
     xlabel={{C--G $-$ A--U rescue, matched within design}}, ymin=0.4, ymax={len(rows)+0.6},]
 {zeroline(0.4, len(rows)+0.6)}
 {marks}"""
-    emit("fig10_depth_method.tex", grp(2, body, hsep="2.5cm"))
+    emit("fig10_depth_method.tex", grp(2, body, hsep="3.3cm"))
 
 
 # ---------------------------------------------------------------- fig 11: not one line
@@ -625,7 +633,7 @@ def fig0():
 \draw[ar] (m2.south) -- (o3.north);
 \draw[ar] (ds.south) -- (o3.north);
 
-\node[font=\tiny, color=rpBlue, anchor=west] at (-1.7,-6.4)
+\node[font=\tiny, color=rpBlue, anchor=north] at (5.1,-6.15)
   {blue: nothing on this path calls a folding predictor};
 \end{tikzpicture}"""
     emit("fig0_arch.tex", body)
@@ -660,31 +668,31 @@ def fig_cal():
     vfull = r3["ViennaRNA"]["sweep"][-1]["measured_retention"]
     body = rf"""\nextgroupplot[width=7.6cm, height=5.4cm, clip=true,
     xlabel={{retention injected}}, ylabel={{retention the metric read}},
-    xmin=-0.05, xmax=1.05, ymin=-0.15, ymax=1.45, title={{a}}]
+    xmin=-0.05, xmax=1.05, ymin=-0.22, ymax=1.75, title={{a}}]
 \addplot[color={INK3}, dashed, line width=0.8pt, forget plot]
   coordinates {{(0,0) (1,1)}};
-\node[font=\tiny, color={INK3}, rotate=30, anchor=south] at (axis cs:0.72,0.72) {{the truth}};
+\node[font=\tiny, color={INK3}, rotate=32, anchor=south] at (axis cs:0.46,0.46) {{the truth}};
 {a}
-\node[font=\tiny, color={INK2}, anchor=north west, align=left] at (axis cs:0.02,1.42)
+\node[font=\tiny, color={INK2}, anchor=north west, align=left] at (axis cs:-0.02,1.73)
   {{first attempt: correlation {r2['corr_true_vs_measured']:.3f},\\
     mean absolute error {r2['mean_abs_error']:.4f}}};
 
 \nextgroupplot[width=7.6cm, height=5.4cm, clip=true,
     xlabel={{retention injected}},
-    xmin=-0.05, xmax=1.05, ymin=-0.15, ymax=1.45,
-    legend style={{at={{(0.5,-0.28)}}, anchor=north, font=\tiny, draw=none}},
-    legend columns=2, title={{b}}]
+    xmin=-0.05, xmax=1.05, ymin=-0.22, ymax=1.75,
+    legend columns=-1, legend style={{at={{(0.5,-0.30)}}, anchor=north, font=\tiny, draw=none,
+    /tikz/every even column/.append style={{column sep=0.35cm}}}}, title={{b}}]
 \addplot[color={INK3}, dashed, line width=0.8pt, forget plot]
   coordinates {{(0,0) (1,1)}};
-\node[font=\tiny, color={INK3}, rotate=30, anchor=south] at (axis cs:0.72,0.72) {{the truth}};
+\node[font=\tiny, color={INK3}, rotate=32, anchor=south] at (axis cs:0.46,0.46) {{the truth}};
 {chr(10).join(curves)}
 \draw[color={INK2}, -{{Latex[length=1.3mm, width=0.9mm]}}, line width=0.6pt]
-  (axis cs:0.30,-0.10) -- (axis cs:0.02,-0.13);
-\node[font=\tiny, color={INK2}, anchor=west] at (axis cs:0.31,-0.10)
+  (axis cs:0.32,-0.16) -- (axis cs:0.04,-0.19);
+\node[font=\tiny, color={INK2}, anchor=east] at (axis cs:1.04,-0.16)
   {{ViennaRNA reads ${vfull:.1f}$, off scale}};
-\node[font=\tiny, color={INK2}, anchor=north west, align=left] at (axis cs:0.02,1.42)
+\node[font=\tiny, color={INK2}, anchor=north west, align=left] at (axis cs:-0.02,1.73)
   {{second attempt, at the separation\\this corpus actually has}};"""
-    emit("fig13_cal.tex", grp(2, body, hsep="1.6cm"))
+    emit("fig13_cal.tex", grp(2, body, hsep="2.2cm"))
 
 
 # ---------------------------------------------------------------- the proposition off this corpus
@@ -745,7 +753,7 @@ def fig_crossdomain():
   coordinates {{{co(zs, hs)}}};
 \draw[color={INK3}, densely dotted, line width=0.7pt]
   (axis cs:{D[0]['z']:.3f},0) -- (axis cs:{D[-1]['z']:.3f},0);"""
-    emit("fig14_crossdomain.tex", grp(3, body, hsep="1.85cm"))
+    emit("fig14_crossdomain.tex", grp(3, body, hsep="1.95cm"))
 
 
 # ================================================================ appendix display items
@@ -813,7 +821,7 @@ def figA_energy():
 \draw[color={INK3}, densely dashed, line width=0.7pt]
   (axis cs:{1 + [float(k) for k in ks].index(m['P2_threshold'])},-0.05)
   -- (axis cs:{1 + [float(k) for k in ks].index(m['P2_threshold'])},1.15);
-\node[font=\tiny, color={INK2}, anchor=south west, rotate=90] at
+\node[font=\tiny, color={INK2}, anchor=south west, rotate=90, xshift=-10pt] at
   (axis cs:{1 + [float(k) for k in ks].index(m['P2_threshold'])},-0.02)
   {{smallest reliably detected}};
 
@@ -827,7 +835,7 @@ def figA_energy():
 
 \nextgroupplot[width=4.2cm, height=5.0cm,
     xlabel={{retention}}, ytick={{1,2}},
-    yticklabels={{{{placebo mediator}},{{the real mediator}}}},
+    yticklabels={{{{placebo}},{{real}}}},
     yticklabel style={{font=\tiny}}, ymin=0.4, ymax=2.6,
     xmin={min(lo, P3['real_retention']) - 0.02:.4f},
     xmax={max(hi, P3['real_retention']) + 0.02:.4f},
@@ -838,7 +846,7 @@ def figA_energy():
 {pt(f"{P3['real_retention']:.4f}", 2, S1, "2.6pt")}
 \node[font=\tiny, color={INK2}, anchor=south] at (axis cs:{mu:.4f},1.32)
   {{range, and mean $\pm$1\,SD}};"""
-    emit("figA2_energy.tex", grp(3, body, hsep="1.6cm"))
+    emit("figA2_energy.tex", grp(3, body, hsep="2.4cm"))
 
 
 def figA_imbalance():
@@ -882,7 +890,7 @@ def figA_imbalance():
     ytick={{{t}}}, yticklabels={{\empty}}, ymin=0.4, ymax={len(pops)+0.6}, xmin=0,
     title={{b}}]
 {chr(10).join(smd)}"""
-    emit("figA3_imbalance.tex", grp(2, body, hsep="1.5cm"))
+    emit("figA3_imbalance.tex", grp(2, body, hsep="2.55cm"))
 
 
 def figA_ceiling():

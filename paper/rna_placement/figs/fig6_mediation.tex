@@ -13,8 +13,9 @@
     xlabel={predicted attenuation\quad $g_m \times \beta_{\rm depth}$},
     ylabel={observed attenuation},
     xmin=-0.04489, ymin=-0.04489, ymax=0.002,
-    title={depth accounts for 71\% of the pooled gap},
-    xmax=0.0035, enlarge y limits=0.08]
+    xmax=0.0045, enlarge y limits=0.08]
+\node[font=\scriptsize, color=rpInk, anchor=north west] at (rel axis cs:0.02,0.97)
+  {depth accounts for 71\% of the pooled gap};
 \addplot[color=rpInkC, dashed, line width=0.7pt, forget plot]
   coordinates {(-0.04489,-0.04489) (0.002,0.002)};
 \addplot[color=rpOrange, mark=*, mark size=2.6pt, only marks, forget plot] coordinates {(-0.03937,-0.03880)};
@@ -27,7 +28,7 @@
 \addplot[color=rpBlue, mark=*, mark size=2.0pt, only marks, forget plot] coordinates {(-0.01972,-0.02744)};
 \addplot[color=rpBlue, mark=*, mark size=2.0pt, only marks, forget plot] coordinates {(-0.02496,-0.04008)};
 \addplot[color=rpAqua, mark=diamond*, mark size=3.0pt, only marks, forget plot] coordinates {(-0.02062,-0.02896)};
-\node[font=\tiny, color=rpInkB, above right=1pt] at
+\node[font=\tiny, color=rpInkB, below right=2.5pt] at
   (axis cs:-0.02062,-0.02896) {pooled};
 \node[font=\tiny, color=rpInkB, right=2pt] at (axis cs:-0.03937,-0.03880) {Eterna};
 \node[font=\tiny, color=rpInkB, right=2pt] at (axis cs:-0.00422,-0.01012) {Rosetta};

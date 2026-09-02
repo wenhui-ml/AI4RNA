@@ -783,13 +783,15 @@ the joint covariate structure used to construct the matched set}.
 \begin{figure}[!htbp]
 \centering
 \input{figs/fig8_null}
-\caption{\textbf{Prop.~\ref{prop:null} measured.} \emph{Left}: rejection rate at the $0.005$ gate
-under each randomisation, $40$ draws in each of \jdg{c5N} populations. Permuting the treatment rebuilds
-the matched set and rejects an order of magnitude too often; permuting the outcome holds the design
-fixed and returns the nominal rate. \emph{Right}: the SD of the statistic under each null, per
-population. The treatment-side null is uniformly the narrower, which is the mechanism rather than
-a coincidence. Two further constructions that hold the design fixed, Freedman--Lane and a
-blocked permutation, were run and are reported in Appendix~\ref{app:nulls}.}
+\caption{\textbf{Prop.~\ref{prop:null} measured, on the corpus's own populations.} \emph{Left}:
+rejection rate at the $0.005$ gate under each randomisation, $40$ draws in each of \jdg{c5N}
+populations. Permuting the treatment rebuilds the matched set and rejects an order of magnitude too
+often; permuting the outcome holds the design fixed and returns the nominal rate. \emph{Right}: the
+SD of the statistic under each null, per population. The treatment-side null is uniformly the
+narrower, which is the mechanism rather than a coincidence. Two further constructions that hold the
+design fixed, Freedman--Lane and a blocked permutation, were run under a \emph{synthetic}
+exchangeable null and are reported in Appendix~\ref{app:nulls}. That is a different construction
+from this one, so its treatment-side count is its own and not this figure's.}
 \label{fig:null}
 \end{figure}
 
@@ -1528,9 +1530,9 @@ first attempt. A known share of the effect was routed through a synthetic mediat
 estimator recovered it well, correlation \jdg{posCorr}, which is why it was reported. The
 mediator was built with a separation this corpus does not have, so what the panel shows is the
 estimator working in a regime, not on these data. \textbf{b}, The second attempt, at the
-separation the corpus actually has, routed through the real mediator. The dashed line in both
-panels is what a working metric returns. At total mediation the thermodynamic arm reads
-\jdg{calVFull}, off this scale and marked rather than drawn. Neither arm follows the truth, which
+separation the corpus actually has, routed through the real mediator. The dashed line in both panels is what a working
+metric returns. At total mediation the thermodynamic arm reads $\jdg{calVFullAxis}$ on this axis, that is
+\jdg{calVFull} as a retention, off the scale and marked rather than drawn. Neither arm follows the truth, which
 is the reason every mediated fraction in this work is withdrawn.}
 \label{fig:cal}
 \end{figure}
@@ -3333,11 +3335,13 @@ more when the unbroken alternatives are shown beside it (Figure~\ref{fig:nulls})
 \begin{figure}[!htbp]
 \centering
 \input{figs/figA1_nulls}
-\caption{\textbf{Four ways to build the null, and what each one rejects.} \textbf{a}, The
-false-positive rate at the $0.005$ gate under each construction, with the count of
-rejections over draws beside each bar. Permuting the treatment rebuilds
-the matched set and rejects an order of magnitude too often; the three constructions that hold the
-design fixed do not. \textbf{b}, The dispersion of the statistic under each null. The
+\caption{\textbf{Four ways to build the null under a synthetic exchangeable process.} The
+construction here is the synthetic null of \S\ref{sec:inference} and not the corpus's own
+populations, so its treatment-side count is not the one in Fig.~\ref{fig:null} and the two are not
+the same measurement. \textbf{a}, The false-positive rate at the $0.005$ gate under each
+construction, with the count of rejections over draws beside each bar. Permuting the treatment
+rebuilds the matched set and rejects an order of magnitude too often; the three constructions that
+hold the design fixed do not. \textbf{b}, The dispersion of the statistic under each null. The
 treatment-side null is not merely wrong, it is narrow, which is the mechanism rather than a
 coincidence: a design rebuilt by the permutation is a design matched to the permuted labels.}
 \label{fig:nulls}

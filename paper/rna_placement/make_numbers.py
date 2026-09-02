@@ -388,6 +388,9 @@ for nm, tag in (("RibonanzaNet", "N"), ("ViennaRNA", "V")):
     put(f"cal{tag}Zero", f"{100 * a['sweep'][0]['measured_retention']:.1f}\\%")
     put(f"cal{tag}Alpha", sig(a["alpha"], 5))
     put(f"cal{tag}Bound", f"{100 * a['structural_bound']:.1f}\\%")
+# the same reading in the units Fig. 7's axis is drawn in, so the figure and its caption
+# cannot disagree about which number is on the plot
+put("calVFullAxis", f"{r3['ViennaRNA']['sweep'][-1]['measured_retention']:.1f}")
 put("calSweep", ", ".join(f"{100*x['f']:.0f}\\%" for x in r3["RibonanzaNet"]["sweep"]))
 put("calTotal", sig(r3["RibonanzaNet"]["total"], 5))
 
