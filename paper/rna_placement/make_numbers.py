@@ -907,7 +907,11 @@ put("swbAModels", f"{len(m66a['shared_models'])}")
 put("swbAStrata", f"{m66a['n_strata']}")
 put("swbAd", sig(m66a["d_points"], 2))
 put("swbACi", ci(m66a["ci_points"], 2))
-put("swbAP", ("$<10^{-5}$" if m66a["p"] <= 1.01e-5 else f"{m66a['p']:.1e}"))
+# make_check treats a macro whose value STARTS with "<" as carrying its own relation, so the
+# use site is $p\jdg{swbAP}$ with no relation of its own. Always emit a true upper bound.
+import math as _math
+_pex = int(_math.ceil(_math.log10(m66a["p"])))
+put("swbAP", "<10^{%d}" % (_pex if _pex > -5 else -5))
 put("swbANperm", f"{m66a['nperm']:,}".replace(",", "{,}"))
 put("swbAScaf", sorted({x["agentic"] for x in m66a["per_model"]})[0])
 put("swbAScafN", f"{len({x['agentic'] for x in m66a['per_model']})}")

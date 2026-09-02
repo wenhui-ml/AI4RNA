@@ -122,8 +122,8 @@
 % (Sec. 5.6): on this mediator both routes recover. The title now names what was found and what it
 % costs a leaderboard, and the propositions are described as instruments where they are used.
 \title{\bf A Benchmark Number Carried by a Covariate Its Generators Chose\\[4pt]
-\large Base-pair identity, where the designer put it,\\
-and what holding placement fixed does to an RNA design leaderboard}
+\large Base-pair identity, where the designer put it, what holding placement fixed\\
+does to an RNA design leaderboard, and which benchmarks admit the question at all}
 
 \author{Wenhui Chen\thanks{\texttt{wenhui.chen@titanresearchlabs.ai}}}
 \date{}
@@ -160,6 +160,18 @@ not what the folding model implies.
 \emph{The consequence.} Holding that covariate fixed reorders the released leaderboard:
 \jdg{lbBMoved} of \jdg{lbBNMeth} methods move, by up to \jdg{lbBMaxMove} places, Kendall
 $\tau=\jdg{lbBTau}$ (\jdg{lbBTauCi}), where holding the target fixed alone moves none.
+
+\emph{Whether the question can be asked at all.} The same instruments, applied in the same order
+to SWE-bench Verified, return a count instead of an effect. Of \jdg{swbModels} models on that board
+\jdg{swbSolo} have their number from exactly one agent scaffold and were never measured under a
+second, and \jdg{swbScafGeThree} of \jdg{swbScafPairs} scaffold pairs share three models. A
+benchmark read against the model and never crossed against the scaffold does not admit the
+question, and the instruments report that rather than returning a null. What they do return there
+is this paper's second producer in plain sight: a target a system never attempted is scored as one
+it attempted and failed, worth \jdg{swbNgLo} to \jdg{swbNgHi} points of the board depending on the
+scaffold. The two corpora are therefore not a replication. One is a benchmark on which the
+covariate can be held fixed, the other is one on which it cannot, and telling them apart is what
+the instruments are for.
 
 \emph{Pricing the channels.} Pricing wants a \emph{share}, and a share is not always estimable.
 Which one is at issue is decided by injection rather than by argument: the route we withdraw
@@ -209,6 +221,18 @@ whether an individual designed base pair physically forms, through the covariate
 to what the leaderboard does when the covariate is held fixed. The covariate is a design choice so
 ordinary that no one records it, \emph{where in the helix a designer puts a G--C pair}, and every
 program in the corpus makes the same choice in the same direction.
+
+Following one covariate on one corpus does not settle whether the failure mode is general, so the
+same instruments are then applied, in the same order, to a benchmark sharing no machinery with this
+one and whose verdict is a test suite rather than a chemical measurement (\S\ref{sec:swebench}).
+What they return there is not a second effect but a count. On SWE-bench Verified the ranking is
+read against the model and was never crossed against the agent scaffold the submitter also chose,
+so \jdg{swbSolo} of \jdg{swbModels} models stand on a single scaffold and \jdg{swbScafGeThree} of
+\jdg{swbScafPairs} scaffold pairs share three models. The covariate cannot be held fixed there, and
+no analysis of the data as collected can separate it from the thing being ranked. That is worth
+reporting for the same reason the RNA result is: a benchmark on which the question cannot be asked
+is not a benchmark on which the answer is no, and which of the two a leaderboard is is not visible
+from the leaderboard.
 
 Getting an answer at that resolution requires a readout that does not route through the model
 under examination, and pricing the covariate requires deciding which of two standard estimators
@@ -2114,7 +2138,7 @@ producer that chose nothing. It covers \jdg{swbAragModels} models, of which \jdg
 also run agentically, so the comparison exists but is narrow, and its agentic side is
 \jdg{swbAScafN} scaffold, \jdg{swbAScaf}. Within a fixed (model, target) stratum the agentic side
 resolves \jdg{swbAd} points more often (\jdg{swbAStrata} strata, \jdg{swbANperm} within-stratum
-label permutations, $p=\jdg{swbAP}$, bootstrap \jdg{swbACi}). The covariate therefore does predict
+label permutations, $p\jdg{swbAP}$, bootstrap \jdg{swbACi}). The covariate therefore does predict
 the outcome inside a stratum, which is what the rest of this subsection needed and did not have.
 What it does not do is generalise: two models against one scaffold is a separation, not a
 gradient, and the census above is the reason a gradient cannot be built from this corpus.
@@ -2897,7 +2921,7 @@ the common universe holds enough to test & $\ge250$, $\ge60$ & \jdg{swbUniverse}
 the board order and a fixed-scaffold order disagree & $\rho<0.9$ & not identified & \textbf{not identified} \\
 some model moves three ranks or more & $\ge3$ & not identified & \textbf{not identified} \\
 a model moves more across scaffolds than a scaffold across models & $\ge0$ & \jdg{swbSFiveDiff} \jdg{swbSFiveCi} & \textbf{failed} \\
-the non-agentic control separates & $p\le0.005$ & $p=\jdg{swbAP}$ & held \\
+the non-agentic control separates & $p\le0.005$ & $p\jdg{swbAP}$ & held \\
 non-attempt rates differ across scaffolds & differ & \jdg{swbNgLo} to \jdg{swbNgHi} points & held \\
 \multicolumn{4}{@{}p{0.97\linewidth}@{}}{\footnotesize\emph{The subset is balanced on crossing
   (\jdg{supSmdCross}) and on the outcome (\jdg{supSmdRf}) but runs \jdg{supSmdDepth} shallower in
