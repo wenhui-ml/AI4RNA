@@ -1,0 +1,66 @@
+{
+  "id": "M67",
+  "title": "The benchmark-facing claim, replicated population by population, and the census extended to the rest of the family",
+  "date_declared": "2026-09-02",
+  "status": "frozen_before_code",
+  "offline": true,
+  "api_cost_usd": 0.0,
+
+  "why": [
+    "A peer review of this manuscript at conference standard found the paper's centre of gravity on the biochemical side and its benchmark-facing layer thinnest. Two of that layer's three claims rest on a single computation each: the leaderboard reorder is computed once, on all six released populations pooled, and the census is computed on two of the five SWE-bench splits.",
+    "Neither weakness needs new data. Both are re-runs of existing code on artifacts already in the repository or already cloned, and both attack exactly the layer the review named."
+  ],
+
+  "arm_A_reorder_per_population": {
+    "question": "Does holding the covariate fixed reorder the released leaderboard inside each population separately, or is the pooled result carried by one of them?",
+    "data": "rna_harness/runs/ceiling/m13_features.json, the same artifact the pooled arm reads",
+    "estimator": "identical to the pooled arm of m61 C2: strata (target) and (target, G-C-paired-fraction quintile), Kendall tau of the adjusted order against the released order, target-clustered bootstrap",
+    "populations_and_their_sizes_measured_before_any_result": {
+      "panel_f1_fresh": {"n": 8787, "methods": 12, "targets": 57},
+      "panel_f1_designs": {"n": 4354, "methods": 12, "targets": 57},
+      "panel_f1_third": {"n": 4384, "methods": 11, "targets": 57},
+      "panel_f1_fourth": {"n": 2639, "methods": 4, "targets": 53},
+      "panel_f1_fifth": {"n": 1435, "methods": 2, "targets": 42},
+      "panel_f1_sixth": {"n": 1280, "methods": 9, "targets": 49}
+    },
+    "inclusion_rule_fixed_now": "a population enters the headline if it carries at least 9 methods: fresh, designs, third and sixth. panel_f1_fourth is reported beside them and labelled under-powered at 4 methods. panel_f1_fifth is EXCLUDED before any computation because two methods cannot produce a ranking; the exclusion is recorded here so it cannot be read as a response to its result.",
+    "what_this_is_NOT": "This is a decomposition of a number the manuscript already reports, not independent replication. The pooled tau is a weighted mixture of these, so agreement across populations cannot be counted as new evidence for the effect. What it can establish is that the pooled sign is not produced by one population, which is the specific thing a reviewer cannot currently check.",
+    "quintile_bins": "computed WITHIN each population, because a pooled bin edge would import the other populations into a per-population estimate; the pooled arm's edges are left untouched"
+  },
+
+  "arm_B_census_family_wide": {
+    "question": "Is the uncrossed structure a property of SWE-bench Verified, or of the whole submission family?",
+    "data": "the same clone at commit 8fa0575cea71b5258b6cd211ee0a3f42a2f5fa1e, splits multilingual (14 dirs), multimodal (22), test (24), added to verified and lite",
+    "method": "identical to m66_identifiability.py, including the retained-set rule that drops a submission whose per-instance record contradicts its own leaderboard number, and independently recomputed by m66_recheck.py",
+    "note": "multilingual carries per_instance_details rather than results.json for most entries, and the loader already reads both formats"
+  },
+
+  "predictions": {
+    "S1": "arm A: all four headline populations return a Kendall tau below 1, that is, at least one method moves in every one of them",
+    "S2": "arm A: the sign of the reorder is the same in all four, so no population reverses it",
+    "S3": "arm A: at least three of the four have a bootstrap interval on tau that excludes 1",
+    "S4": "arm A: the pooled tau lies inside the range spanned by the per-population taus",
+    "S5": "arm A: holding the target alone still moves no method in at least three of the four, matching the pooled arm",
+    "S6": "arm B: no scaffold pair shares three models in any additional split",
+    "S7": "arm B: the fraction of models standing on a single scaffold, pooled over all five splits, stays above 0.75",
+    "S8": "arm B: adding the three splits does not raise the count of scaffold pairs sharing three models above 5"
+  },
+
+  "kill_conditions": {
+    "K0": "S2 fails and a population reverses the sign: the pooled reorder is reported as population-dependent, the manuscript's claim is rewritten to name which populations carry it, and the headline is withdrawn from the abstract",
+    "K1": "only one population moves any method: the pooled result is carried by that population and must be reported as such",
+    "K2": "S4 fails and the pooled tau falls outside the per-population range: an aggregation defect is present and the pooled number is withheld until it is found",
+    "K3": "arm B: if an added split shows the crossing the others lack, the census claim is restricted to the splits that lack it and the exception is named in the manuscript",
+    "K4": "a population's within-population quintile bins leave a bin empty for a method: that method is reported as unrankable there rather than silently pooled"
+  },
+
+  "scope_limit": "Both arms re-run existing estimators on data already in hand. No new corpus is acquired, no API is called, nothing is generated. Total cost is CPU time.",
+
+  "what_this_experiment_may_NOT_do": [
+    "present arm A as independent replication of the pooled reorder",
+    "change the pooled arm's bin edges, strata or estimator",
+    "add panel_f1_fifth to the headline after seeing any result",
+    "re-describe the SWE-bench magnitude claim, which stays credited to the literature that reported it",
+    "touch anything belonging to the two manuscripts under review at AAAI-2027"
+  ]
+}
