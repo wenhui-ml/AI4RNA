@@ -164,9 +164,10 @@ $\tau=\jdg{lbBTau}$ (\jdg{lbBTauCi}), where holding the target fixed alone moves
 \emph{Whether the question can be asked at all.} The same instruments, applied in the same order
 to SWE-bench Verified, return a count instead of an effect. Of \jdg{swbModels} models on that board
 \jdg{swbSolo} have their number from exactly one agent scaffold and were never measured under a
-second, and \jdg{swbScafGeThree} of \jdg{swbScafPairs} scaffold pairs share three models. A
-benchmark read against the model and never crossed against the scaffold does not admit the
-question, and the instruments report that rather than returning a null. What they do return there
+second, and \jdg{swbScafGeThree} of \jdg{swbScafPairs} scaffold pairs share three models. The
+question is answerable about agent benchmarks and has been answered by running the crossing
+\citep{hal2025holistic}; what cannot be done is to answer it from this archive, and the
+instruments report that rather than returning a null. What they do return there
 is this paper's second producer in plain sight: a target a system never attempted is scored as one
 it attempted and failed, worth \jdg{swbNgLo} to \jdg{swbNgHi} points of the board depending on the
 scaffold. The two corpora are therefore not a replication. One is a benchmark on which the
@@ -392,21 +393,29 @@ needed to read the findings, not as the paper's claim on the reader.}
   (\S\ref{sec:pairtype}): matched within design on helix depth and crossing, a G--C target pair is
   rescued $\jdg{rescueAU}$ above a matched A--U pair and $\jdg{rescueGU}$ above a matched G--U
   pair, on a readout that is neither a design score nor degeneracy-sensitive, and positive in
-  $\jdg{sNPos}$ of $\jdg{sNMeth}$ design methods. It is not the probing chemistry
-  (\S\ref{sec:chem}): recomputing the readout with the mutated bases and three nucleotides either
-  side deleted, so that every position entering it carries the same base in the wild type and in
-  all three mutants, retains \jdg{cxRet3} of the effect ($p=\jdg{cxP3}$).
+  $\jdg{sNPos}$ of $\jdg{sNMeth}$ design methods. It is not the base chemistry of the mutated
+  positions themselves (\S\ref{sec:chem}): recomputing the readout with those bases and three
+  nucleotides either side deleted, so that every position entering it carries the same base in the
+  wild type and in all three mutants, retains \jdg{cxRet3} of the effect ($p=\jdg{cxP3}$, a single
+  test that does not survive the family correction of \S\ref{sec:family}).
 \item \textbf{The thermodynamic explanation accounts for none of it, and the covariate the
   designers chose accounts for most of it} (\S\ref{sec:energy}, \S\ref{sec:mediation}): conditioning
   on the model's own local free energy retains \jdg{eRet} of the contrast against a placebo's
   \jdg{ePlaceboMean}$\pm$\jdg{ePlaceboSd}, on the neural half of the corpus as on the whole
   (\S\ref{sec:subsets}), while the marginal contrast is attenuated by $\jdg{medObs}$ and a linear
-  depth term reproduces $\jdg{medPred}$ of that attenuation.
+  depth term reproduces $\jdg{medPred}$ of that attenuation. A third mediator defined on the
+  \emph{whole} base-pairing ensemble rather than the local stack --- and itself strongly
+  identity-dependent, $\jdg{rfDiff}$ between pair types --- retains \jdg{rfRetain}
+  (\S\ref{sec:refold}).
 \item \textbf{Holding the covariate fixed reorders the released leaderboard}
   (\S\ref{sec:leaderboard}): \jdg{lbBMoved} of \jdg{lbBNMeth} methods move by up to
   \jdg{lbBMaxMove} places (Kendall $\tau=\jdg{lbBTau}$, \jdg{lbBTauCi}) where holding the target
-  fixed alone moves none. A re-split cannot recover the released ordering, because the covariate
-  travels with the molecule.
+  fixed alone moves none, and a placebo covariate with the same marginal and granularity but
+  permuted within target moves \jdg{plMovedHi} at the \jdg{plPct} percentile, so this is a
+  statement about the covariate and not about stratification. It is a \emph{sensitivity}
+  statement: a re-split cannot reproduce it, because the covariate travels with the molecule,
+  but which ordering a benchmark ought to report is undecidable from the corpus, since placing
+  G--C well may be part of the ability being ranked rather than a confounder of it.
 \item \textbf{The property is worth $\jdg{cEffLo}$ to $\jdg{cEffHi}$ points on the design score}
   (\S\ref{sec:score}), in matched pairs of real molecules, with three cuts against a
   probing-chemistry explanation.
@@ -884,9 +893,14 @@ records to be read, the contrast is \jdg{a7Bins}, mean \jdg{a7Mean} with a sprea
 \jdg{a7Spread}, a ratio of \jdg{a7Ratio}. Of the \jdg{a7NAll} channels this paper puts a
 mediator to, \jdg{a7NHeld} support it (\jdg{a7Held}) and the other two do not (\jdg{a7Failed},
 whose within-bin contrasts change sign, ratios \jdg{a7PmutRatio} and \jdg{a7BinderRatio}).
-\textbf{The propositions are therefore licensed on the primary channel and not on the other two},
-which is stated here rather than left for a reader to worry about, and it bounds the cross-domain
-arm of \S\ref{sec:crossdomain} as well.
+Support is not uniform across the two that hold, and \S\ref{sec:quant} measures the difference:
+on $\Delta G_{\mathrm{loc}}$ the premise is off by a ratio of \jdg{a7Ratio}, while on the depth
+channel the two ways of evaluating the same remainder differ by \jdg{p3Gap}, which is
+\jdg{p3GapPct} of the attenuation. \textbf{The propositions are therefore licensed tightly on the
+primary channel, only approximately on depth, and not on the other two}, which is stated here
+rather than left for a reader to worry about, and it bounds the cross-domain arm of
+\S\ref{sec:crossdomain} as well. Every quantity this paper reads through the depth channel
+inherits that approximation, and \S\ref{sec:quant} says so again where the number is printed.
 
 \noindent Two consequences are used below. First, $\beta$ is a projection, so under a non-affine
 $h$ it can carry a sign and a magnitude that the true mediated part does not: the product route can
@@ -1426,6 +1440,32 @@ $n=\jdg{subNThermo}$) it retains \jdg{subThermo}, which is outside that band on 
 calibrated on the full corpus and this subset is a quarter of it, so we read the excursion as noise
 about a null rather than as a reversal of one, and we report the number rather than widening the
 band to fit it.
+
+\subsection{A third mediator: the whole ensemble, not the local stack}
+\label{sec:refold}
+
+Definition~\ref{def:dg} is a \emph{local} quantity, and a reader is entitled to the objection that
+the identity of a pair may act globally instead: swapping C--G for A--U at one position changes the
+base-pairing ensemble of the entire molecule, and a mediator that only sees the neighbouring stack
+would miss that. This tests it directly. For each of the \jdg{rfN} records the estimator uses we
+fold the wild type and both single mutants of the compensatory pair, and take the perturbation to be
+the Euclidean combination of the two $L_1$ distances between wild-type and single-mutant base-pair
+probability matrices --- an ensemble-level quantity with no local structure imposed on it.
+\jdg{rfQuadPct}\% of the records have both single mutants present, and \jdg{rfSeqs} distinct
+sequences were folded.
+
+\textbf{The channel is real, and it does not carry the effect.} The perturbation itself is strongly
+identity-dependent: in the same matched design, C--G pairs perturb the ensemble by
+$\jdg{rfDiff}$ more than A--U pairs (\jdg{rfWeight} pair-weights over \jdg{rfStrata} strata,
+permutation $p\jdg{rfP}$ over \jdg{rfPerm} draws). So this is not a null instrument being reported as
+a null mediator: the mediator moves with the treatment about as clearly as anything in this paper
+does. Adding it as a stratification dimension nonetheless leaves the identity contrast where it was.
+On the \jdg{rfKept} records the stratified estimator retains, the baseline contrast is
+$\jdg{rfBase}$ and the contrast conditioned on ensemble perturbation is $\jdg{rfCond}$, a retention
+of \jdg{rfRetain} against a declared bar of \jdg{rfBar}\%. A live channel that still explains none of
+it is a stronger negative than a dead one, and it is the third independent mediator --- after local
+free energy (\S\ref{sec:energy}) and the model's own pairing probability --- to return the same
+answer.
 
 \subsection{What the channel can carry, without an estimator}
 \label{sec:carry}
@@ -2032,7 +2072,7 @@ nested core of \emph{these} targets, and score the designed sequences on exactly
 Nothing differs except who wrote the sequence.
 
 \begin{claimbox}
-\textbf{A thermodynamic optimiser does not do this; the design programs do.} On the same targets
+\textbf{An inverse folder that stops at the first correct fold does not do this; the design programs do.} On the same targets
 and the same pairs, the designed sequences give \jdg{unCoreD} (\jdg{unCoreDCi}) and inverse-folded
 sequences give \jdg{unCoreI} (\jdg{unCoreICi}, covering zero, \jdg{unCoreINeg} of molecules
 negative against \jdg{unCoreDNeg}). \textbf{The folding model alone reproduces \jdg{unShare} of the
@@ -2085,6 +2125,21 @@ stronger arm alone. Adjusting for target alone already moves \jdg{lbMovedTarget}
 $\tau=\jdg{lbTau}$ (bootstrap \jdg{lbTauCi}, which touches $1$), with \jdg{lbMoved} methods moving
 by at most \jdg{lbMaxMove} place. A pair-level readout has less to say about a method-level ranking
 than a design-level score does, which is what one would expect.
+
+\paragraph{The control the sensitivity statement needs: a covariate that carries only the
+stratification.} A reader could accept everything above and still hold that any second
+stratification dimension reorders a leaderboard, because finer strata mean fewer methods per
+stratum and a noisier average. That objection is testable. We build a placebo covariate by
+permuting the real one \emph{within each target}, so it has the real covariate's marginal
+distribution, the real covariate's granularity, and the real covariate's stratum sizes --- and no
+relationship to the molecule beyond the target it already shares. Over \jdg{plDraws} draws the
+placebo moves a median of \jdg{plMovedMed} methods and at most \jdg{plMaxMoveHi} place at the
+\jdg{plPct} percentile, against the real covariate's \jdg{plMovedReal}; its Kendall $\tau$ has
+median \jdg{plTauMed} with a \jdg{plPct}-percentile lower edge of \jdg{plTauLo}, against the real
+\jdg{plTauReal}. Both give $p\jdg{plP}$. The reorder is a statement about \emph{this} covariate and
+not about stratification. One declared prediction failed here and it failed favourably: S3 said
+stratification alone would move some methods, and it \jdg{plS3}, which is a stronger control than
+the one we staked.
 
 \paragraph{What this is and is not.} It is a sensitivity statement: the released ordering is not
 invariant to a covariate the designers chose, and the size of that sensitivity is measurable from
@@ -2183,51 +2238,16 @@ sensitivity analysis of the kind run in \S\ref{sec:leaderboard} would mean here,
 That analysis holds a covariate fixed and re-ranks. Holding the scaffold fixed on this corpus
 leaves almost no model with a second measurement to be re-ranked against.
 
-\paragraph{The three things we tried before that, and why none of them is a result.} They are
-reported because the section would otherwise present a census as though it were the first thing we
-looked for. \emph{One.} Movement of this kind is already reported \citep{hal2025holistic,zhang2026harness}
-and we recovered it rather than discovered it. A model's number moves a median of \jdg{swbSpreadMed} points across the
-scaffolds that ran it (\jdg{swbSpreadN} models, \jdg{swbSpreadCi}), reaching \jdg{swbSpreadMax}
-for \jdg{swbDeepModel}, which runs from \jdg{swbDeepLo} under \jdg{swbDeepLoScaf} to
-\jdg{swbDeepHi} under \jdg{swbDeepHiScaf} across \jdg{swbDeepCells} of them, a spread of
-\jdg{swbDeepSpread} points against an
-interquartile range of \jdg{swbBoardIqr} points for the board itself (\jdg{swbBoardN} entries,
-median \jdg{swbBoardMed}). The movement is real and it is large. Attributing it to the scaffold is
-what fails: resubmitting the \emph{same} scaffold moves a model's number by a median
-\jdg{swbCtrlSameMed} points and by as much as \jdg{swbCtrlSameMax} (\jdg{swbCtrlSameN} pairs),
-against \jdg{swbCtrlAcrossMed} across scaffolds (\jdg{swbCtrlAcrossN} models), a difference of
-\jdg{swbCtrlDiff} with interval \jdg{swbCtrlCi} covering zero. Paired on the
-\jdg{swbCtrlPairN} models measured both ways it separates, \jdg{swbCtrlPairDiff}
-\jdg{swbCtrlPairCi}, and three models is an anecdote. What the corpus supports is that the number
-moves with the submission; which of the submitter's choices moved it is not identified, for the
-reason the claimbox counts.
-
-\emph{Two.} We registered the prediction that a model would move more across scaffolds than a
-scaffold moves across models. It does not, on the models and cells measured deeply
-enough for both sides of the comparison to exist, which is why the first number here is not the
-median quoted above: \jdg{swbSFiveWm} points against \jdg{swbSFiveWc}
-(\jdg{swbSFiveNm} models under at least \jdg{swbDeepBar} cells, \jdg{swbSFiveNc} cells holding
-at least \jdg{swbDeepBar} models), a difference of \jdg{swbSFiveDiff} with
-interval \jdg{swbSFiveCi}. The interval covers zero, so this is unresolved rather than refuted,
-but the point estimate runs against the prediction and does so at both bars we looked at. The
-sentence that the board ranks scaffolds rather than models is not supported and is not written
-here. That sentence is close to a thesis argued in the literature
-\citep{zhang2026harness}, so a point estimate running the other way on this corpus is worth
-recording even unresolved, and it is recorded as unresolved. The comparison is also not symmetric, since the models inside one scaffold are far more
-heterogeneous than the scaffolds around one model; that is a defect in the prediction as
-registered, and repairing it belongs to a declaration made before the repair, not to this
-paragraph.
-
-\emph{Three.} Pairing at the target rather than at the submission gives the sharpest reading in
-the corpus and the one that does not survive. Two scaffolds running one model and scoring within
-\jdg{swbNearGap} points of each other still disagree on which targets they resolve, a median
-\jdg{swbNearChurn} of the targets either of them resolved (\jdg{swbNearN} comparisons over
-\jdg{swbNearModels} models). Two entries the board treats as equivalent are not solving the same
-problems. The control refuses it: the same model under the same scaffold, resubmitted, disagrees
-with itself on \jdg{swbChurnSame} (\jdg{swbChurnSameN} pairs) against \jdg{swbChurnCross} across
-scaffolds (\jdg{swbChurnN} comparisons), a gap of \jdg{swbChurnGap} with interval
-\jdg{swbChurnGapCi}. The effect sits at the corpus's own reproducibility floor and the near-tied
-comparisons sit below it.
+\paragraph{Three readings that did not survive their own controls.} Before the count above we
+looked for an effect three times and none of the three is reported as one. A model's number moves
+a median \jdg{swbSpreadMed} points across the scaffolds that ran it, movement already reported in
+the work we cite \citep{hal2025holistic,zhang2026harness} and recovered rather than discovered
+here, and attributing it to the scaffold fails a resubmission control whose interval covers zero.
+A registered prediction that a model moves more across scaffolds than a scaffold moves across
+models failed, unresolved. And the sharpest reading in the corpus, two scaffolds at the same score
+resolving different targets, sits at the corpus's own reproducibility floor. All three are given in
+full, with their controls and their numbers, in Appendix~\ref{app:swebench}; none of them supports
+a claim and the section does not rest on any of them.
 
 \paragraph{The corpus's own undesigned control.} The board carries a non-agentic RAG baseline
 run on the same targets, which is the analogue of \S\ref{sec:undesigned}'s comparison against a
@@ -2326,6 +2346,21 @@ Benjamini--Hochberg at $q=0.005$ rejects \jdg{fwBhNew} either way; \textbf{Holm 
 paper quotes}, because it is the one valid under arbitrary dependence, and \jdg{fwM} statistics
 computed on overlapping records are anything but independent.
 \end{claimbox}
+
+\paragraph{What the correction does not carry.} A correction that rejects \jdg{fwHolmNew} of
+\jdg{fwM} leaves \jdg{fwNotHolm} standing, and a reader is entitled to the list rather than the
+count. \jdg{fwBhOnly} of them clear Benjamini--Hochberg and not Holm, and \jdg{fwNeither} clear
+neither. Two of that second group are load bearing elsewhere in this paper, and we name them here
+rather than leave them to be found. The excision contrast at radius three, which
+\S\ref{sec:chem} uses to separate the effect from the probing chemistry, \jdg{fwCxThreeHolm}
+survive Holm and \jdg{fwCxThreeBh} Benjamini--Hochberg, at $p=\jdg{cxP3}$; the contrast with only
+the mutated positions removed \jdg{fwCxZeroHolm} survive Holm either, at $p=\jdg{cxP0}$. The method
+component of the gradient does not survive, which \S\ref{sec:gradient} already reports at the
+strength it has. A further \jdg{fwFloorStuck} members sit at the permutation floor and would need
+the purchase the five load-bearing ones received; the declaration limited that purchase to five and
+we did not extend it after seeing which others were close. \textbf{The consequence is stated rather
+than softened}: this paper's separation of the effect from the probing chemistry is a single-test
+result, and it does not survive correction over the family this paper itself froze.
 
 \paragraph{The outcome is skewed, and the finding does not depend on the skew.} $R$ is a ratio of
 distances: bounded above by $1$, unbounded below, and in this corpus it has skew $\jdg{shpSkew}$
@@ -2518,6 +2553,34 @@ constructive alternative is the one stated in \S\ref{sec:limits}(iii), which is 
 matched pairs rather than to mine them, and it needs synthesis rather than analysis.
 
 % =====================================================================
+\begin{claimbox}
+\textbf{What is live, and what this paper has withdrawn.} Four numbers in this paper's own history
+were retracted or narrowed by its own checks, and a reader is owed one place that says which is
+which rather than four scattered admissions.
+
+\emph{Withdrawn.} Every mediated fraction produced by the conditioning pipeline, by named field in
+the released artifacts, because injection shows the estimator covers \jdg{calNSpanFrac} and
+\jdg{calVSpanFrac} of the range it must (\S\ref{sec:cal}). The claim that the route bound governs
+the size of the gap it bounds; the bound itself holds on both corpora and that is all
+(\S\ref{sec:crossdomain}). The description of the undesigned control as a thermodynamic optimiser,
+narrowed to what it is, an inverse folder that stops at the first correct fold
+(\S\ref{sec:undesigned}). And the separation of the effect from the probing chemistry, which is a
+single test at $p=\jdg{cxP3}$ and does not survive this paper's own family correction
+(\S\ref{sec:family}); Contribution~1's second clause is narrowed accordingly.
+
+\emph{Live, and corrected over the family of \jdg{fwM}.} The two pair-type contrasts,
+\jdg{rescueAU} and \jdg{rescueGU}, at \jdg{fwPAU} and \jdg{fwPGU} after \jdg{fwDraws} draws. The
+identity contrast conditioned on the model's own local free energy, and that contrast separately at
+helix depth zero and at depth two or more. The cross-round sign test. Those are the
+\jdg{fwHolmNew} members Holm rejects.
+
+\emph{Live, and not members of that family.} The undesigned control and the leaderboard reorder
+carry intervals rather than permutation $p$-values, so neither is a Holm member by construction and
+no $p$ is manufactured for either. The reorder additionally clears a placebo covariate built to the
+rule this paper applies to every mediator (\S\ref{sec:leaderboard}). The census of
+\S\ref{sec:swebench} is a count and has no null to clear.
+\end{claimbox}
+
 \section{Limitations}
 \label{sec:limits}
 
@@ -3072,9 +3135,74 @@ single-scaffold fraction stays above the bar & $>0.75$ & \jdg{swbFamSoloPct} & h
   (\jdg{supSmdCross}) and on the outcome (\jdg{supSmdRf}) but runs \jdg{supSmdDepth} shallower in
   helix depth. K3 of the declaration says what follows and \S\ref{sec:energy} says it: the
   controlled direct effect is reported as the effect on the overlap region, which is shallower
-  than the corpus.}}\\[2pt]
+  than the corpus. That direction runs \emph{against} the arm's own conclusion rather than for
+  it: the identity contrast is largest at depth zero and the terminal A--U penalty operates
+  only there, so the energy explanation is being tested on the subgroup most favourable to it.}}\\[2pt]
+\midrule
+\multicolumn{4}{@{}p{0.97\linewidth}@{}}{\emph{frozen before the placebo covariate and the
+  ensemble mediator existed. S3 predicted that stratification alone would move methods; it does
+  not, and the failure runs in the direction that helps the claim, so it is graded failed and the
+  consequence is stated rather than reinterpreted.}}\\
+the real covariate moves more methods than a placebo & $>\jdg{plPct}$ & \jdg{plMovedReal} vs \jdg{plMovedHi} & held \\
+the real $\tau$ falls below the placebo band & below & \jdg{plTauReal} vs \jdg{plTauLo} & held \\
+stratification alone moves methods & $>0$ & placebo median \jdg{plMovedMed} & \textbf{failed} \\
+the ensemble mediator is itself identity-dependent & $p\le0.005$ & $p\jdg{rfP}$ & held \\
+conditioning on it retains the contrast & $\ge\jdg{rfBar}\%$ & \jdg{rfRetain} & held \\
 \end{longtable}
 \endgroup
+
+
+\section{The second corpus's three failed readings}
+\label{app:swebench}
+
+\S\ref{sec:swebench} reports a census and says the three attempts that preceded it are not
+results. They are given here in full so that the judgement can be checked rather than taken.
+
+\paragraph{The three things we tried before that, and why none of them is a result.} They are
+reported because the section would otherwise present a census as though it were the first thing we
+looked for. \emph{One.} Movement of this kind is already reported \citep{hal2025holistic,zhang2026harness}
+and we recovered it rather than discovered it. A model's number moves a median of \jdg{swbSpreadMed} points across the
+scaffolds that ran it (\jdg{swbSpreadN} models, \jdg{swbSpreadCi}), reaching \jdg{swbSpreadMax}
+for \jdg{swbDeepModel}, which runs from \jdg{swbDeepLo} under \jdg{swbDeepLoScaf} to
+\jdg{swbDeepHi} under \jdg{swbDeepHiScaf} across \jdg{swbDeepCells} of them, a spread of
+\jdg{swbDeepSpread} points against an
+interquartile range of \jdg{swbBoardIqr} points for the board itself (\jdg{swbBoardN} entries,
+median \jdg{swbBoardMed}). The movement is real and it is large. Attributing it to the scaffold is
+what fails: resubmitting the \emph{same} scaffold moves a model's number by a median
+\jdg{swbCtrlSameMed} points and by as much as \jdg{swbCtrlSameMax} (\jdg{swbCtrlSameN} pairs),
+against \jdg{swbCtrlAcrossMed} across scaffolds (\jdg{swbCtrlAcrossN} models), a difference of
+\jdg{swbCtrlDiff} with interval \jdg{swbCtrlCi} covering zero. Paired on the
+\jdg{swbCtrlPairN} models measured both ways it separates, \jdg{swbCtrlPairDiff}
+\jdg{swbCtrlPairCi}, and three models is an anecdote. What the corpus supports is that the number
+moves with the submission; which of the submitter's choices moved it is not identified, for the
+reason the claimbox counts.
+
+\emph{Two.} We registered the prediction that a model would move more across scaffolds than a
+scaffold moves across models. It does not, on the models and cells measured deeply
+enough for both sides of the comparison to exist, which is why the first number here is not the
+median quoted above: \jdg{swbSFiveWm} points against \jdg{swbSFiveWc}
+(\jdg{swbSFiveNm} models under at least \jdg{swbDeepBar} cells, \jdg{swbSFiveNc} cells holding
+at least \jdg{swbDeepBar} models), a difference of \jdg{swbSFiveDiff} with
+interval \jdg{swbSFiveCi}. The interval covers zero, so this is unresolved rather than refuted,
+but the point estimate runs against the prediction and does so at both bars we looked at. The
+sentence that the board ranks scaffolds rather than models is not supported and is not written
+here. That sentence is close to a thesis argued in the literature
+\citep{zhang2026harness}, so a point estimate running the other way on this corpus is worth
+recording even unresolved, and it is recorded as unresolved. The comparison is also not symmetric, since the models inside one scaffold are far more
+heterogeneous than the scaffolds around one model; that is a defect in the prediction as
+registered, and repairing it belongs to a declaration made before the repair, not to this
+paragraph.
+
+\emph{Three.} Pairing at the target rather than at the submission gives the sharpest reading in
+the corpus and the one that does not survive. Two scaffolds running one model and scoring within
+\jdg{swbNearGap} points of each other still disagree on which targets they resolve, a median
+\jdg{swbNearChurn} of the targets either of them resolved (\jdg{swbNearN} comparisons over
+\jdg{swbNearModels} models). Two entries the board treats as equivalent are not solving the same
+problems. The control refuses it: the same model under the same scaffold, resubmitted, disagrees
+with itself on \jdg{swbChurnSame} (\jdg{swbChurnSameN} pairs) against \jdg{swbChurnCross} across
+scaffolds (\jdg{swbChurnN} comparisons), a gap of \jdg{swbChurnGap} with interval
+\jdg{swbChurnGapCi}. The effect sits at the corpus's own reproducibility floor and the near-tied
+comparisons sit below it.
 
 
 \section{Proofs}

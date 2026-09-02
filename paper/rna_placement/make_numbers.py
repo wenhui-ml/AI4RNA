@@ -784,6 +784,17 @@ put("fwHolmPub", f"{_A['n_holm']}")
 put("fwBhPub", f"{_A['n_bh']}")
 put("fwHolmNew", f"{m64['B_corrected']['n_holm']}")
 put("fwBhNew", f"{m64['B_corrected']['n_bh']}")
+# --- which claims the correction does NOT carry. A reviewer asked for this list and it is a
+# --- fact about the frozen family, not a new computation.
+_H = m64["B_corrected"]["holm_reject"]; _BH = m64["B_corrected"]["bh_reject"]
+_R = m64["B_corrected"]["resolved_p"]; _PP = m64["published_p"]
+put("fwNotHolm", f"{sum(1 for k in _PP if not _H.get(k))}")
+put("fwBhOnly", f"{sum(1 for k in _PP if _BH.get(k) and not _H.get(k))}")
+put("fwNeither", f"{sum(1 for k in _PP if not _BH.get(k) and not _H.get(k))}")
+put("fwCxThreeHolm", "does not" if not _H.get("cxP3") else "does")
+put("fwCxZeroHolm", "does not" if not _H.get("cxP0") else "does")
+put("fwCxThreeBh", "nor under" if not _BH.get("cxP3") else "though it does under")
+put("fwFloorStuck", f"{sum(1 for k in _PP if _R.get(k, 1) >= 4.9e-4 and _R.get(k, 1) <= 5.1e-4 and not _H.get(k))}")
 put("fwDraws", f"{m64['nperm_buy']:,}".replace(",", "{,}"))
 _names = {"rescueAUP": "AU", "rescueGUP": "GU", "eP": "Cde", "eDZeroP": "DZero", "eDTwoP": "DTwo"}
 for k, tag in _names.items():
@@ -977,6 +988,45 @@ put("swbNearN", f"{m66i['near_tied']['n']}")
 put("swbNearGap", f"{m66i['near_tied']['median_gap_pp']:.1f}")
 put("swbNearChurn", f"{m66i['near_tied']['median_churn']:.3f}")
 put("swbNearModels", f"{len(m66i['near_tied_models'])}")
+
+# ------------------------------------------- M68 arm A: the reorder's placebo covariate
+# A covariate with the reorder's exact marginal and granularity, permuted WITHIN target, so it
+# carries the stratification and nothing else. If stratification alone moved methods, this would
+# move them too.
+m68a = J("m68a_reorder_placebo.json")
+put("plDraws", f"{m68a['n_placebo']}")
+put("plTauReal", sig(m68a["real"]["tau"], 4))
+put("plMovedReal", f"{m68a['real']['moved']}")
+put("plTauMed", sig(m68a["placebo"]["tau_median"], 4))
+put("plTauLo", sig(m68a["placebo"]["tau_lo"], 4))
+put("plMovedMed", f"{m68a['placebo']['moved_median']:.0f}")
+put("plMovedHi", f"{m68a['placebo']['moved_hi']:.0f}")
+put("plMaxMoveHi", f"{m68a['placebo']['maxmove_hi']:.0f}")
+put("plPct", "97.5th")
+import math as _m
+_ple = int(_m.ceil(_m.log10(max(m68a["p_tau"], 1e-300))))
+put("plP", "<10^{%d}" % (_ple if _ple > -5 else -5))
+put("plS3", "moves none" if not m68a["S3"] else "moves some")
+
+# ------------------------------------------- M68 arm B: the refolding channel as a third mediator
+# The two mutations of a compensatory pair change the whole base-pairing ensemble, not just the
+# local stack. This measures that change directly (L1 distance between wild-type and single-mutant
+# base-pair probability matrices) and asks whether conditioning on it removes the identity effect.
+m68b = J("m68b_refolding_channel.json")
+put("rfN", f"{m68b['n_records']}")
+put("rfQuadPct", f"{100*m68b['frac_quadruples']:.1f}")
+put("rfSeqs", f"{m68b['n_distinct_seqs']}")
+put("rfDiff", sig(m68b["S4"]["diff"], 4))
+put("rfWeight", f"{m68b['S4']['weight']}")
+put("rfStrata", f"{m68b['S4']['strata']}")
+_rfe = int(_m.ceil(_m.log10(max(m68b["S4"]["p"], 1e-300))))
+put("rfP", "<10^{%d}" % (_rfe if _rfe > -5 else -5))
+put("rfPerm", f"{m68b['S4']['nperm']}")
+put("rfKept", f"{m68b['S5']['n_kept']}")
+put("rfBase", sig(m68b["S5"]["baseline"], 4))
+put("rfCond", sig(m68b["S5"]["conditioned"], 4))
+put("rfRetain", f"{100*m68b['S5']['retained']:.1f}\\%")
+put("rfBar", "70")
 
 # ---------------------------------------------------------------- survivorship + shift (M22)
 m22 = J("m22_review_arms.json")
