@@ -1,0 +1,152 @@
+{
+  "id": "M65",
+  "title": "Porting the placement instruments to an AI artifact corpus with an exact reward",
+  "date_declared": "2026-09-02",
+  "status": "frozen_before_code",
+  "offline": true,
+  "api_cost_usd": 0.0,
+  "why": [
+    "R1's benchmark-facing claim is currently carried entirely by an RNA corpus whose readout is a chemical probe. The claim itself is about benchmarks: that a score can be carried by a covariate the generator chose, which splitting does not remove. If that claim is real it must instantiate on a corpus where the reward is a formal oracle rather than a measurement, and where the generators are language models rather than design programs.",
+    "The openclaude_sat campaign is structurally the same object as R1's corpus (targets given, generators write artifacts, an exact verifier scores them, a leaderboard ranks the generators) with two advantages: the reward is exact and ungameable, and a non-LLM generator ran in the same cells."
+  ],
+
+  "corpus": {
+    "path": "/data/wenhui/openclaude_sat/campaign/artifacts",
+    "runs_with_summary": 617,
+    "runs_carrying_best_source": 617,
+    "generators": {
+      "z-ai/glm-5.2": 259,
+      "deepseek/deepseek-v4-pro": 203,
+      "qwen/qwen3.7-max": 83,
+      "random_search(model_slot=random-floor)": 51,
+      "anthropic/claude-sonnet-5": 15,
+      "random_search(other slots: fake-slot/smoke/fake-floor)": 6
+    },
+    "public": false,
+    "release_status": "submitted as supplementary material to AAAI-2027 in late July 2026; not on arXiv; artifact not publicly released as of the declaration date",
+    "consequence_for_R1": "No result from this experiment may appear in a publicly posted version of R1 while the corpus is unreleased, because R1's own standard is that every number is recomputable from a released artifact. This experiment is run for internal knowledge and for structural decisions about R1; whether and when it enters the manuscript is a separate decision recorded elsewhere."
+  },
+
+  "non_overlap_protocol": {
+    "purpose": "The corpus underlies a manuscript by the same author currently under review at AAAI-2027. This section is frozen before any analysis so that the non-overlap argument cannot be constructed after seeing results.",
+    "prior_manuscript": "paper/AAAI2027/compounding-profile-AAAI.tex (+ supplementary.tex) in /data/wenhui/openclaude_sat",
+    "prior_unit_of_analysis": "a run pair (retention loop vs call-matched best-of-N)",
+    "prior_estimands": ["depth premium (win rate difference)", "selection-bias error +0.144 (Limit 1)", "audit catch rates (Limit 2)", "sigma ordering diagnostic"],
+    "this_unit_of_analysis": "a single artifact (the best_source string: the heuristic code the generator wrote)",
+    "this_estimand": "whether a generator-chosen property of the artifact carries the benchmark score, and whether conditioning on it reorders the generator leaderboard",
+    "verified_zero_overlap_wordcounts_in_prior_manuscript": {
+      "best_source": 0, "pick_var": 0, "rank_for_deletion": 0, "should_restart": 0,
+      "covariate": 0, "source code": 0,
+      "note": "counts taken over compounding-profile-AAAI.tex and supplementary.tex on 2026-09-02 before any analysis code existed"
+    },
+    "fields_this_experiment_may_read": ["best_source", "model", "resolved_model", "method", "train", "ood", "budget", "train_improvement", "ood_generalization", "seed", "run_seed", "prompt_template_hash"],
+    "fields_this_experiment_may_NOT_read_or_report": ["coordinates", "actuation", "transfer_matrix", "select", "dev", "n_evals", "verifier_calls_total"],
+    "rationale_for_the_exclusion_list": "those fields are the prior manuscript's own evidence; reading them invites re-derivation of its estimands",
+    "ceded_territory": "The selection side is ceded entirely. The prior manuscript's Limit 1 (a population rate over unlogged discard-gated survivors is non-identifiable when survival correlates with the measured property) is the same mechanism R1 names as its SECOND producer. R1 cites it and does not re-derive it. This experiment is confined to the GENERATION side.",
+    "reverse_direction_check": "No conclusion of this experiment may be needed to support any claim of the prior manuscript. To be re-checked at write-up.",
+    "credit": "R1 claims no credit for producing this corpus. It is cited the way OpenKnot and Ribonanza are cited: an input."
+  },
+
+  "known_construction_artifacts_recorded_before_analysis": [
+    {
+      "claim_retracted": "the non-LLM floor never edits rank_for_deletion (0%) while LLM generators edit it 86-100% of the time",
+      "why_it_is_an_artifact": "sat_harness/generators/random_search.py::_source(restart_base, glucose, reduce_bound, occ_branch, phase) emits only pick_var, pick_phase, should_restart and should_reduce. rank_for_deletion is not in the floor's parameter space, so the 0% is definitional, not a choice.",
+      "precedent": "M63's give_up, which was not a time bound"
+    },
+    {
+      "claim_retracted": "the floor never uses a randomised branching idiom (0%) while LLM generators do 13-47% of the time",
+      "why_it_is_an_artifact": "the floor's pick_var template is a deterministic activity/occurrence argmax and its source contains no rng call at all"
+    },
+    {
+      "general_rule_this_forces": "ANY LLM-vs-floor comparison on a property the floor's template cannot express is definitional and may not be reported. Comparisons against the floor are confined to the shared expressible core (arm A)."
+    }
+  ],
+
+  "covariates": {
+    "shared_expressible_core": {
+      "usable_against_the_floor": true,
+      "justification": "each of these five is emitted by the floor's own template family AND is writable by a language model, so a difference is a generation-side difference and not a construction artifact",
+      "list": [
+        "restart_family: LBD/glucose-adaptive vs luby/fixed-threshold",
+        "restart_threshold_magnitude",
+        "reduce_bound_magnitude",
+        "branch_key: activity-only vs activity+occurrence",
+        "phase_policy: save / false / occurrence"
+      ],
+      "primary": "restart_family",
+      "primary_justification": "binary, extractable without ambiguity, and NOT floor-degenerate: a pre-analysis scan put the floor at 71 percent on the luby side, i.e. both levels occur in both arms"
+    },
+    "llm_only_extended": {
+      "usable_against_the_floor": false,
+      "list": ["n_hooks_defined", "rank_for_deletion_present", "source_length_chars", "randomisation_idiom_present"],
+      "restriction": "arm B only (LLM vs LLM). Reporting any of these against the floor is forbidden by the rule above."
+    }
+  },
+
+  "strata": {
+    "definition": "(train task family tuple, budget)",
+    "budget_missing": "runs without a budget field are an older schema; they form their own level 'unknown' and are never pooled with a numeric budget",
+    "floor_LLM_shared_cells_verified": [
+      {"cell": "['rand3sat','php'], budget=10", "floor": 11, "llm": 25},
+      {"cell": "['rand3sat_hard','tseitin_hard'], budget=10", "floor": 35, "llm": 66}
+    ],
+    "arm_A_total_n": {"floor": 46, "llm": 91}
+  },
+
+  "arms": {
+    "A_generation_vs_selection": {
+      "question": "Is the covariate placed by the generator, or by the exact reward selecting among whatever the generator emitted?",
+      "design": "matched contrast between the LLM arms pooled and the non-LLM floor, on the shared expressible core only, within the two verified shared strata. The floor is a pure reward-selection control: it selects on the SAME exact reward with no language model, so the difference is the generation-side contribution.",
+      "estimator": "R1's stratum-weighted matched contrast d with w_s = min(n_A, n_B), and the M64 within-stratum permutation null written as subset sums",
+      "this_is_R1s_two_producer_separation": true
+    },
+    "B_generator_gradient": {
+      "question": "Does the covariate differ across the four LLM families once task family and budget are matched?",
+      "design": "pairwise matched contrasts among the four LLM families; floor excluded; extended covariates permitted here",
+      "confound_to_check_first": "prompt_template_hash must be constant across the families being contrasted, otherwise the difference is a prompt difference and not a generator difference. If it is not constant, stratify on it and say so."
+    },
+    "C_does_it_carry_the_score": {
+      "question": "Within stratum, does the covariate predict train_improvement and ood_generalization?",
+      "necessity": "arms A and B are worthless to R1's claim without this link. If the covariate does not predict the score, the chain is broken at step two and arm D is not run.",
+      "estimator": "within-stratum contrast of the score across covariate levels, same estimator, same permutation null"
+    },
+    "D_leaderboard_reorder": {
+      "question": "Does conditioning on the covariate reorder the generator leaderboard?",
+      "design": "rank the four LLM families by mean score, then by covariate-adjusted score (stratum- and covariate-matched), and report the rank change with a permutation interval",
+      "this_is_the_payload": "this is R1's headline claim instantiated on an AI benchmark with a formal reward",
+      "gate": "run only if C passes"
+    }
+  },
+
+  "predictions": {
+    "S1": "arm A: the LLM arms differ from the floor on restart_family by a matched contrast whose permutation p is below 0.005",
+    "S2": "arm A: the direction is that LLM generators concentrate on the LBD/glucose-adaptive side more than reward selection alone does",
+    "S3": "arm B: the four LLM families are NOT interchangeable on the shared core; at least one pairwise contrast clears 0.005 after Holm over the family of pairwise tests",
+    "S4": "arm B: prompt_template_hash is constant within each contrasted pair (if false, the arm is re-run stratified on it and this prediction is recorded as failed)",
+    "S5": "arm C: the covariate predicts train_improvement within stratum with a matched contrast clearing 0.005",
+    "S6": "arm C: the covariate predicts ood_generalization in the same direction as train_improvement",
+    "S7": "arm D: the leaderboard order changes by at least one adjacent swap under covariate adjustment",
+    "S8": "the floor's own covariate distribution is NOT uniform over its template grid, i.e. exact-reward selection alone already places the covariate (this is the null R1 must beat, not a nuisance)",
+    "S9": "no covariate used against the floor is degenerate in the floor arm: both levels occur with at least 5 observations each"
+  },
+
+  "kill_conditions": {
+    "K0": "any covariate turns out to be inexpressible by the floor's template family: that covariate is dropped from arm A and the drop is reported, never quietly rebalanced",
+    "K1": "arm C fails: the covariate does not carry the score. Then arms A and B stand as descriptive facts about generators and the SAT transfer does NOT enter R1 as support for the headline. Arm D is not run.",
+    "K2": "S9 fails: fewer than 5 observations at a level in the floor arm makes the contrast a floor-degeneracy statement, and arm A is reported as non-identifiable rather than null",
+    "K3": "S4 fails and the prompt template differs across families: arm B measures a prompt effect, and must be relabelled as such throughout",
+    "K4": "arm A's two shared strata disagree in sign: the pooled contrast is not reported as a single number; both are reported and the pooled estimate is withheld",
+    "K5": "the leaderboard in arm D turns out to be driven by a single family's small n (sonnet, n=15): the reorder is reported with that family excluded as well as included, and if the two disagree the claim is withheld"
+  },
+
+  "scope_limit": "This experiment reads artifacts already on disk. It launches no generation, calls no API, and costs nothing. It does not attempt to reproduce, contradict, or extend any claim of the prior manuscript.",
+
+  "what_this_experiment_may_NOT_do": [
+    "release, publish, or describe the corpus publicly while the prior manuscript is under review",
+    "report any comparison against the floor on a property the floor's template cannot express",
+    "re-report any estimand of the prior manuscript",
+    "read the fields on the exclusion list",
+    "claim credit for producing the corpus",
+    "become R1's load-bearing headline: R1's public AI-corpus claim must rest on a corpus that is already public, with this one entering later as a second instance"
+  ]
+}
