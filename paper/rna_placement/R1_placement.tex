@@ -2101,15 +2101,16 @@ what makes it worth reporting.
 \textbf{The ranking is read against the model and was never crossed against the scaffold, so no
 analysis can separate the two.} Of \jdg{swbModels} models in \jdg{swbEntries} retained
 submissions spread over \jdg{swbScaf} scaffolds, \jdg{swbSolo} of them (\jdg{swbSoloPct}) have their number produced by exactly one
-scaffold and were never re-measured under a second; \jdg{swbCrossed} were. Of the
+scaffold and were never re-measured under a second; \jdg{swbCrossed} were. That count is by scaffold; counted instead by scaffold \emph{and harness version}, the unit the rest of this subsection uses because a scaffold's own versions are not interchangeable, \jdg{swbSpreadN} models were measured more than once. Of the
 \jdg{swbScafPairs} pairs of scaffolds, \jdg{swbScafGeOne} share at least one model,
 \jdg{swbScafGeTwo} share two, and \jdg{swbScafGeThree} share three. Turning it round, of all
 \jdg{swbModelPairs} pairs of models, \jdg{swbCoMeas} (\jdg{swbCoMeasPct}) have ever been compared
 inside a common scaffold and \jdg{swbCoGeTwo} inside two of them. Pooling the Lite split
 (\jdg{swbLiteEntries} further submissions, \jdg{swbLiteGeThree} scaffold pairs sharing three
-models) does not move it: over \jdg{swbBothEntries} submissions, \jdg{swbBothGeThree} scaffold
-pair in \jdg{swbBothScafPairs} shares three models, and \jdg{swbBothSolo} of \jdg{swbBothModels}
-models (\jdg{swbBothSoloPct}) stand on a single scaffold.
+models) buys one crossed pair and nothing else: over \jdg{swbBothEntries} submissions,
+\jdg{swbBothGeThree} scaffold pair in \jdg{swbBothScafPairs} shares three models, up from
+\jdg{swbScafGeThree}, and \jdg{swbBothSolo} of \jdg{swbBothModels} models
+(\jdg{swbBothSoloPct}) still stand on a single scaffold.
 \end{claimbox}
 
 This is a census rather than a contrast. There is no comparison group to defend, no null to beat
@@ -2138,8 +2139,11 @@ moves with the submission; which of the submitter's choices moved it is not iden
 reason the claimbox counts.
 
 \emph{Two.} We registered the prediction that a model would move more across scaffolds than a
-scaffold moves across models. It does not: \jdg{swbSFiveWm} points against \jdg{swbSFiveWc}
-(\jdg{swbSFiveNm} models, \jdg{swbSFiveNc} scaffolds), a difference of \jdg{swbSFiveDiff} with
+scaffold moves across models. It does not, on the models and cells measured deeply
+enough for both sides of the comparison to exist, which is why the first number here is not the
+median quoted above: \jdg{swbSFiveWm} points against \jdg{swbSFiveWc}
+(\jdg{swbSFiveNm} models under at least \jdg{swbDeepBar} cells, \jdg{swbSFiveNc} cells holding
+at least \jdg{swbDeepBar} models), a difference of \jdg{swbSFiveDiff} with
 interval \jdg{swbSFiveCi}. The interval covers zero, so this is unresolved rather than refuted,
 but the point estimate runs against the prediction and does so at both bars we looked at. The
 sentence that the board ranks scaffolds rather than models is not supported and is not written

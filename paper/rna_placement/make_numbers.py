@@ -900,6 +900,9 @@ _bs = sorted(_ng["by_scaffold"].items(), key=lambda kv: -kv[1])
 put("swbNgHiScaf", _bs[0][0]); put("swbNgHi", f"{_bs[0][1]:.1f}")
 put("swbNgLoScaf", _bs[-1][0]); put("swbNgLo", f"{_bs[-1][1]:.2f}")
 
+# the depth bar S5 is evaluated at, kept in the pipeline so the text never spells it out
+put("swbDeepBar", "4")
+
 m66a = J("m66_armA.json")
 put("swbUniverse", "500")
 put("swbAragModels", f"{m66a['rag_models']}")
