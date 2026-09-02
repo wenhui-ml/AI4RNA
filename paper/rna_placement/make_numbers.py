@@ -847,6 +847,7 @@ put("selRhoRankCi", ci(m30["S4c_scale_free"]["openknot_score"]["ci"]))
 m66 = J("m66_identifiability.json")
 _v, _l, _cb = m66["verified"], m66["lite"], m66["combined"]
 put("swbEntries", f"{_v['entries']}")
+put("swbDropped", f"{_v['dropped_self_inconsistent']}")
 put("swbModels", f"{_v['models']}")
 put("swbScaf", f"{_v['agents']}")
 put("swbSolo", f"{_v['models_under_1_agent']}")

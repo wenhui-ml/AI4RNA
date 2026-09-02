@@ -2,14 +2,25 @@
 'the leaderboard was never crossed, so nobody can'.  Needs no control: it is a census."""
 import os, sys, json, collections, itertools
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from m66_load import load
+from m66_load import load, UNIVERSE
 BASE = "/mnt/beegfs/scratch/wenhui_swebench/experiments/evaluation"
 BAD = {"Undisclosed", "NA"}
+
+def keep(r):
+    """the census must count the same retained submissions the effect arms use: an entry whose
+    per-instance record contradicts its own leaderboard number is not a measurement."""
+    v = r.get("info_resolved")
+    if not isinstance(v, (int, float)):
+        return True
+    return abs(v - 100.0 * len(r["resolved"]) / UNIVERSE) <= 0.25
 
 out = {}
 for split in ["verified", "lite"]:
     R = [r for r in load(os.path.join(BASE, split))
          if r["model"] not in BAD and not r["model"].startswith("http")]
+    _pre = len(R)
+    R = [r for r in R if keep(r)]   # same retained set the effect arms use
+    _dropped = _pre - len(R)
     am = collections.defaultdict(set); ma = collections.defaultdict(set)
     for r in R: am[r["agent"]].add(r["model"]); ma[r["model"]].add(r["agent"])
     agents, models = sorted(am), sorted(ma)
@@ -20,7 +31,8 @@ for split in ["verified", "lite"]:
         for x, y in itertools.combinations(sorted(ms), 2): mp[(x, y)] += 1
     mpairs = list(itertools.combinations(models, 2))
     solo = [m for m, a in ma.items() if len(a) == 1]
-    d = dict(entries=len(R), models=len(models), agents=len(agents),
+    d = dict(entries=len(R), dropped_self_inconsistent=_dropped,
+             models=len(models), agents=len(agents),
              agent_pairs=len(apairs),
              agent_pairs_sharing_ge1=sum(1 for s in sh if s >= 1),
              agent_pairs_sharing_ge2=sum(1 for s in sh if s >= 2),
@@ -49,7 +61,7 @@ for split in ["verified", "lite"]:
 R = []
 for split in ["verified", "lite"]:
     R += [dict(r, split=split) for r in load(os.path.join(BASE, split))
-          if r["model"] not in BAD and not r["model"].startswith("http")]
+          if r["model"] not in BAD and not r["model"].startswith("http") and keep(r)]
 am = collections.defaultdict(set); ma = collections.defaultdict(set)
 for r in R: am[r["agent"]].add(r["model"]); ma[r["model"]].add(r["agent"])
 ap = list(itertools.combinations(sorted(am), 2))
