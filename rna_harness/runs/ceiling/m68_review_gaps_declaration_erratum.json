@@ -15,6 +15,16 @@
    "third_defect_in_the_same_code": "the comparison baseline was M63's FULL designed corpus (n=160, whole molecules) rather than designed_core (n=104, the same nested-core pairs), so the arms would not have been scored on the same pair set",
    "repair": "arm C now calls M63.nested_core, the same function M63's own C' control uses, so crossings are dropped rather than reassigned; the admission rule is len(Q)//2 >= 8; the designed arm is rebuilt on the same nested-core pairs; and the script verifies the harness by reproducing M63's published Cprime_repaired_control.designed_core before the optimiser runs.",
    "what_this_does_not_change": "no prediction of the declaration is regraded, no arm is dropped, and S7 is still graded on the repaired run in the declaration's wording"
+  },
+  {
+   "id": "E2",
+   "arm": "E",
+   "found": "while running arm E, from a gate that disagreed with the published value on the same data",
+   "what": "M64's purchase engine computes a ONE-SIDED permutation p, (null >= d), while every published p in the frozen family comes from designaudit.core.contrast, which is TWO-SIDED, (|null| >= |d|). M64 therefore substituted one-sided values into a family whose other members are two-sided.",
+   "why_nothing_caught_it": "M64's equivalence gate compared the statistic and the null width, both of which are sidedness-blind, and every arm it bought sat at the permutation floor where the two conventions give the same number. cxP3 is the first purchased arm not at the floor, and it disagreed: one-sided 0.0165 against a published 0.0305, while two-sided reads 0.0310.",
+   "measured_consequence": "NONE. Re-derived on identical seeds, all five M64 arms reproduce their printed one-sided values exactly, confirming the diagnosis; four of the five give the same value two-sided (1e-6, 1e-6, 1e-6, 2e-6) because |null| never reaches |d|, and only eDTwoP moves, 7.0e-6 to 1.3e-5. With every purchased p two-sided the family of 42 still has Holm rejecting 7 and the membership is unchanged.",
+   "repair": "arm E reports both conventions and uses the two-sided one. No number in the manuscript changes. The defect is recorded because the convention was inconsistent, not because the answer was wrong.",
+   "what_this_does_not_change": "no stake of M64 is regraded and no figure in the manuscript is edited on account of E2"
   }
  ],
  "declared_but_not_run": [

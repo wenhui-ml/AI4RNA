@@ -947,6 +947,18 @@ predictable in advance instead of merely possible. And the characterisation is a
 exposure laws: affinity of $h$ is not a sufficient condition offered for convenience: it is the
 exact one, so no weaker regularity assumption can rescue interchangeability here.
 
+\textbf{The quantifier in that \emph{iff} is over exposure laws, and it matters where the paper
+uses it.} Necessity is proved by exhibiting a law --- a point mass --- on which the routes diverge,
+so the statement is that affinity is exactly the condition under which the two routes agree
+\emph{for every} pair of exposure laws. A corpus realises one pair. For that single realised pair,
+affinity remains sufficient, but its failure does not by itself imply the routes disagree: a
+non-affine $h$ can still integrate to the same contrast under the two laws the data happen to
+supply. Nothing in this paper is allowed to rest on that inference. Where the manuscript reports
+that the two routes differ on a channel, the difference is \emph{measured} on that channel and the
+measurement is printed (\S\ref{sec:routes}, \S\ref{sec:quant}); the non-affinity of $h$ is reported
+beside it as the reason to expect the difference, not as a proof of it. Readers who take only the
+proposition away should take the sufficiency direction, which is the one that transfers.
+
 \subsection{Calibration and preregistration}
 \label{sec:cal2}
 
@@ -2432,9 +2444,19 @@ the mutated positions removed \jdg{fwCxZeroHolm} survive Holm either, at $p=\jdg
 component of the gradient does not survive, which \S\ref{sec:gradient} already reports at the
 strength it has. A further \jdg{fwFloorStuck} members sit at the permutation floor and would need
 the purchase the five load-bearing ones received; the declaration limited that purchase to five and
-we did not extend it after seeing which others were close. \textbf{The consequence is stated rather
-than softened}: this paper's separation of the effect from the probing chemistry is a single-test
-result, and it does not survive correction over the family this paper itself froze.
+we did not extend it after seeing which others were close.
+
+An earlier version of this paragraph argued that no purchase could rescue the excision contrast,
+because $\jdg{cxP3}$ is not a floor value. That is an argument, and this paper's own rule is that a
+declared check is run rather than reasoned about, so it was run. Buying \jdg{cxBuyDraws} draws on
+the same statistic, gated first by reproducing it at the published draw count (\jdg{cxBuyGate}
+against $\jdg{cxP3}$), resolves it to $p=\jdg{cxBuyP}$ --- \jdg{cxBuyGe} of \jdg{cxBuyDraws}
+permutations at least as extreme, $z=\jdg{cxBuyZ}$ --- against a Holm threshold of \jdg{cxBuyThr}.
+Holm rejections over the family go \jdg{cxBuyHolmBefore} to \jdg{cxBuyHolmAfter} and the members
+that change are \jdg{cxBuyChanged}. \textbf{The consequence is stated rather than softened}: this
+paper's separation of the effect from the probing chemistry is a single-test result, it does not
+survive correction over the family this paper itself froze, and now that is measured rather than
+inferred.
 
 \paragraph{The outcome is skewed, and the finding does not depend on the skew.} $R$ is a ratio of
 distances: bounded above by $1$, unbounded below, and in this corpus it has skew $\jdg{shpSkew}$
@@ -2692,7 +2714,12 @@ not hold. The estimand this paper actually supports is a contrast between molecu
 that pair and are matched on the covariates named, not the effect of an intervention that sets a
 pair's identity while holding the molecule otherwise fixed. An interventional or separable-effects
 framework \citep{vanderweele2015explanation} is the right vocabulary for that estimand; we do not
-adopt its estimators here and do not claim their identification conditions.
+adopt its estimators here and do not claim their identification conditions. One consequence of the
+non-unique version is measured rather than left as a caveat: substituting a pair perturbs the whole
+base-pairing ensemble, not only the local stack, and \S\ref{sec:refold} measures that perturbation
+directly, finds it strongly identity-dependent, and finds that conditioning on it leaves the
+contrast intact. That closes the version-of-treatment objection on the one channel where it can be
+computed without an experiment; it does not close it in general.
 
 \paragraph{(iii) No sequence was synthesised to any rule proposed here.} The experiment that would
 close the loop is specific and we state it rather than gesture at it: build matched sequence pairs
@@ -2726,14 +2753,31 @@ every interval printed anywhere in this paper, the abstract included, should be 
 as wide as printed. Two arms sit close enough to their own detection edge for this to matter and
 say so where they are reported: the method component of \S\ref{sec:gradient}, which does not
 clear the $0.005$ gate, and the G--U contrast, which clears its ladder rung by a factor of
-\jdg{rescueGUMargin} (\S\ref{sec:pairtype}).
+\jdg{rescueGUMargin} (\S\ref{sec:pairtype}). What this costs is now measured on one quantity
+rather than only asserted: the inverted linear share of \S\ref{sec:pcal}, bootstrapped over these
+same clusters, returns \jdg{pcInvCi} --- the whole swept range --- which is why that number is
+withdrawn and only its direction reported. No correction buys resolution the corpus does not have,
+and we do not report one that pretends otherwise.
 
 \paragraph{(vii) Multiplicity is corrected for what was reported, not for what was run.}
 \S\ref{sec:family} applies Holm at $\alpha=0.005$ over the frozen family of every $p$-value this
-paper prints, and every claim the paper rests on survives it. What that does not reach is
+paper prints. \jdg{fwHolmNew} of \jdg{fwM} members survive it, and one claim the paper uses does
+not: the excision contrast that separates the effect from the probing chemistry, resolved to
+$p=\jdg{cxBuyP}$ at \jdg{cxBuyDraws} draws against a threshold of \jdg{cxBuyThr}. That is stated in
+\S\ref{sec:family} and Contribution~1 is narrowed to match rather than being defended. What that does not reach is
 multiplicity across analyses that were computed and not reported. The preregistration record is
 the only control on that one, and it is weaker in kind: it constrains what may be reported, not
-what may be computed. Two further caveats belong with the correction itself. Benjamini--Hochberg
+what may be computed. One defect in the correction machinery was found while buying the resolution above and is
+recorded rather than quietly repaired: the purchase engine computed a one-sided permutation $p$
+where every published $p$ in the family is two-sided. It went unseen because the equivalence gate
+compares the statistic and the null width, which are blind to sidedness, and because every arm
+purchased before this one sat at the permutation floor, where the two conventions agree. Re-derived
+two-sided on identical seeds, \jdg{sideNSame} of the \jdg{sideNArms} purchased arms return the
+identical value and \jdg{sideMoved} moves; the corrected family still has Holm rejecting
+\jdg{sideHolm}, with \jdg{sideChanged} membership change. No figure in this paper is edited on
+account of it.
+
+Two further caveats belong with the correction itself. Benjamini--Hochberg
 is reported beside Holm and is not quoted, because $q$-value control is not valid under arbitrary
 dependence and these \jdg{fwM} statistics share records. And the resolution purchase covers the
 five load-bearing tests named in the declaration; the \jdg{fwFloorOther} remaining

@@ -1096,6 +1096,28 @@ def _pb(tag, key):
 _pb("Des", "designed"); _pb("If", "inverse_fold"); _pb("Pf", "inverse_pf_fold")
 put("pbGap", f"{m68f['designed_minus_optimiser_au_share']:.3f}")
 
+# ---------------- M68 arm E: the declared precision purchase for the excision contrast
+# The manuscript argued that buying precision could not rescue cxP3 because 0.0305 is not at the
+# permutation floor. The declaration says to buy it, so it is bought and the sentence is measured.
+m68g = J("m68g_buy_excision_precision.json")
+_bq = m68g["bought"]; _fa = m68g["family_after_purchase"]
+put("cxBuyP", f"{_bq['p']:.4f}")
+put("cxBuyDraws", f"{_bq['nperm']}")
+put("cxBuyGe", f"{_bq['n_ge']}")
+put("cxBuyZ", f"{_bq['z']:.2f}")
+put("cxBuyThr", "%.2e" % _fa["cxP3_holm_threshold"])
+put("cxBuyGate", f"{m68g['gate']['p_at_check']:.4f}")
+put("cxBuyHolmBefore", f"{_fa['n_holm_reject_before']}")
+put("cxBuyHolmAfter", f"{_fa['n_holm_reject_after']}")
+put("cxBuyChanged", "none" if not _fa["changed"] else ", ".join(_fa["changed"]))
+_sd = m68g["E2_m64_sidedness_repair"]
+put("sideNArms", f"{len(_sd)}")
+put("sideNSame", f"{sum(1 for v in _sd.values() if v['p_two_sided'] == v['p_one_sided'])}")
+put("sideMoved", f"{sum(1 for v in _sd.values() if v['p_two_sided'] != v['p_one_sided'])}")
+put("sideHolm", f"{m68g['family_fully_two_sided']['n_holm_reject']}")
+put("sideChanged", "none" if not m68g["family_fully_two_sided"]["changed_vs_m64"]
+    else ", ".join(m68g["family_fully_two_sided"]["changed_vs_m64"]))
+
 # ---------------------------------------------------------------- survivorship + shift (M22)
 m22 = J("m22_review_arms.json")
 a22 = m22["A"]

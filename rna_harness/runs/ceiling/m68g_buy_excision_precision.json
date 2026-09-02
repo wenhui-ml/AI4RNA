@@ -1,0 +1,103 @@
+{
+ "seed": 20260902,
+ "radius": 3,
+ "published": {
+  "radius": 3,
+  "n": 4453,
+  "median_sites_used": 86,
+  "effect": 0.01945,
+  "ci": [
+   -0.0094,
+   0.0451
+  ],
+  "p": 0.03048,
+  "weight": 902.0,
+  "retention_vs_recomputed": 0.4779,
+  "retention_vs_released": 0.3607,
+  "ci_excludes_zero": false
+ },
+ "gate": {
+  "d": 0.019451,
+  "weight": 902.0,
+  "n_strata": 553,
+  "p_at_check": 0.03098,
+  "d_matches": true,
+  "weight_matches": true,
+  "pass": true
+ },
+ "bought": {
+  "d": 0.019451,
+  "p": 0.032685967314032685,
+  "p_one_sided": 0.016524983475016526,
+  "n_ge": 32685,
+  "nperm": 1000000,
+  "null_sd": 0.009109,
+  "z": 2.135,
+  "published_p": 0.03048
+ },
+ "family_after_purchase": {
+  "m": 42,
+  "cxP3_p": 0.032685967314032685,
+  "cxP3_holm_threshold": 0.0005555555555555556,
+  "cxP3_holm_reject": false,
+  "cxP3_bh_reject": false,
+  "n_holm_reject_before": 7,
+  "n_holm_reject_after": 7,
+  "changed": []
+ },
+ "E2_m64_sidedness_repair": {
+  "rescueAUP": {
+   "d": 0.053928,
+   "p_two_sided": 9.99999000001e-07,
+   "p_one_sided": 9.99999000001e-07,
+   "m64_reported": 9.99999000001e-07,
+   "one_sided_reproduces": true
+  },
+  "rescueGUP": {
+   "d": 0.104519,
+   "p_two_sided": 9.99999000001e-07,
+   "p_one_sided": 9.99999000001e-07,
+   "m64_reported": 9.99999000001e-07,
+   "one_sided_reproduces": true
+  },
+  "eP": {
+   "d": 0.082009,
+   "p_two_sided": 9.99999000001e-07,
+   "p_one_sided": 9.99999000001e-07,
+   "m64_reported": 9.99999000001e-07,
+   "one_sided_reproduces": true
+  },
+  "eDZeroP": {
+   "d": 0.092158,
+   "p_two_sided": 1.999998000002e-06,
+   "p_one_sided": 1.999998000002e-06,
+   "m64_reported": 1.999998000002e-06,
+   "one_sided_reproduces": true
+  },
+  "eDTwoP": {
+   "d": 0.06075,
+   "p_two_sided": 1.2999987000013e-05,
+   "p_one_sided": 6.999993000007e-06,
+   "m64_reported": 6.999993000007e-06,
+   "one_sided_reproduces": true
+  }
+ },
+ "family_fully_two_sided": {
+  "m": 42,
+  "n_holm_reject": 7,
+  "holm_members": [
+   "cpop2SmdP",
+   "eDTwoP",
+   "eDZeroP",
+   "eP",
+   "rescueAUP",
+   "rescueGUP",
+   "xrSignP"
+  ],
+  "n_bh_reject": 22,
+  "changed_vs_m64": [],
+  "cxP3_holm_reject": false,
+  "cxP3_bh_reject": false
+ },
+ "verdict": "complete"
+}
