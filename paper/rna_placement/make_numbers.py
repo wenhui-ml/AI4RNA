@@ -844,6 +844,40 @@ put("selRhoRankCi", ci(m30["S4c_scale_free"]["openknot_score"]["ci"]))
 # whose readout is a test suite rather than a chemical probe. What the corpus supports is a census
 # and not a contrast, and the numbers that failed their controls are generated here too, because
 # the section reports them.
+# ---------------------------------------------------------------- M67: the same claim, replicated
+m67 = J("m67_reorder_per_population.json")
+_H = {k: v for k, v in m67["populations"].items() if v["role"] == "headline"}
+_hd = m67["headline"]
+put("rpN", f"{len(_H)}")
+put("rpTauLo", f"{_hd['tau_min']:+.3f}")
+put("rpTauHi", f"{_hd['tau_max']:+.3f}")
+put("rpCiAll", f"{_hd['n_ci_excluding_one']}")
+put("rpMovedMin", f"{min(v['moved_gc'] for v in _H.values())}")
+put("rpMovedMax", f"{max(v['moved_gc'] for v in _H.values())}")
+put("rpMaxMove", f"{max(v['max_move'] for v in _H.values())}")
+put("rpNTot", f"{sum(v['n'] for v in _H.values()):,}".replace(",", "{,}"))
+_under = [k for k, v in m67["populations"].items() if v["role"] == "under-powered"]
+put("rpUnder", f"{len(_under)}")
+_unr = sorted({m for v in m67["populations"].values() for m in v["unrankable_here"]})
+put("rpUnrank", ", ".join(x.replace("_", "\\_") for x in _unr) if _unr else "none")
+put("rpPooled", f"{m67['pooled_tau']:+.3f}")
+m67k = J("m67_k2_diagnostic.json")
+put("rpCommon", f"{len(m67k['common_methods'])}")
+put("rpPooledMatched", f"{m67k['pooled_common_perpop_bins']:+.3f}")
+put("rpRangeLo", f"{m67k['range_common'][0]:+.3f}")
+put("rpRangeHi", f"{m67k['range_common'][1]:+.3f}")
+
+m67c = J("m67_census_family.json")
+_P = m67c["pooled"]
+put("swbFamSplits", f"{len(m67c['splits'])}")
+put("swbFamEntries", f"{_P['entries']}")
+put("swbFamModels", f"{_P['models']}")
+put("swbFamScaf", f"{_P['agents']}")
+put("swbFamPairs", f"{_P['agent_pairs']:,}".replace(",", "{,}"))
+put("swbFamGeThree", f"{_P['ge3']}")
+put("swbFamSolo", f"{_P['solo']}")
+put("swbFamSoloPct", f"{100*_P['solo_frac']:.0f}\\%")
+
 m66 = J("m66_identifiability.json")
 _v, _l, _cb = m66["verified"], m66["lite"], m66["combined"]
 put("swbEntries", f"{_v['entries']}")

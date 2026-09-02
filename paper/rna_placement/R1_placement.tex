@@ -2092,7 +2092,31 @@ the corpus. It is not a claim that the reweighted ordering is the correct one. W
 benchmark should report depends on what it means to ask, and that question is not settled by
 anything here; what is settled is that the two orderings differ, so the choice is not free.
 Nothing about a \emph{split} addresses it, for the reason in \S\ref{sec:intro}: the covariate is a
-property of the molecule and follows it into whichever split it is placed in. Whether a
+property of the molecule and follows it into whichever split it is placed in.
+
+\paragraph{The same comparison inside each released population.} The number above pools the
+\jdg{c5N} populations the benchmark released, so a reader cannot see whether one of them carries
+it. We therefore run the identical estimator, imported rather than reimplemented, inside each
+population separately. \jdg{rpN} of them carry enough methods to rank, together
+\jdg{rpNTot} designs. In every one the covariate-adjusted order differs from the released one:
+Kendall $\tau$ between \jdg{rpTauLo} and \jdg{rpTauHi}, between \jdg{rpMovedMin} and
+\jdg{rpMovedMax} methods moving and the largest movement \jdg{rpMaxMove} places, with
+\jdg{rpCiAll} of \jdg{rpN} target-clustered intervals excluding $\tau=1$. \jdg{rpUnder} further
+populations are reported beside them and labelled under-powered, one of them because a method
+(\jdg{rpUnrank}) shares no stratum with any other there and is unrankable rather than pooled in.
+\textbf{This is a decomposition and not a replication}: the pooled $\tau$ is a weighted mixture of
+exactly these, so their agreement is not new evidence for the effect. What it settles is the
+question the pooled number leaves open, which is whether one population produces the sign.
+
+\paragraph{Where the pooled number sits, and why it is not inside that range.} It is not:
+\jdg{rpPooled} against a per-population range of \jdg{rpTauLo} to \jdg{rpTauHi}. We had staked that
+it would be, so the discrepancy was traced before it was reported. The bin rule is not the cause,
+returning \jdg{rpPooled} whether the quintile edges are cut within each population or across all of
+them. The cause is composition: the pooled arm ranks one method no single population carries.
+Matched to the \jdg{rpCommon} methods common to all three under one bin rule, the pooled value is
+\jdg{rpPooledMatched} against a range of \jdg{rpRangeLo} to \jdg{rpRangeHi}, and lies inside it. A
+pooled rank statistic is not an average of the rank statistics of its parts, and here the gap
+between them is a measured method-set effect rather than an aggregation error. Whether a
 benchmark permits the question to be asked at all is a separate matter, and \S\ref{sec:swebench}
 shows a widely read one on which it cannot be.
 
@@ -2146,7 +2170,11 @@ models) buys one crossed pair and nothing else: over \jdg{swbBothEntries} submis
 (\jdg{swbBothSoloPct}) still stand on a single scaffold.
 \end{claimbox}
 
-This is a census rather than a contrast. There is no comparison group to defend, no null to beat
+It is not a property of one split either. Repeating the count over every split in the same
+release, \jdg{swbFamSplits} of them and \jdg{swbFamEntries} submissions covering \jdg{swbFamModels}
+models and \jdg{swbFamScaf} scaffolds, \jdg{swbFamGeThree} scaffold pair in \jdg{swbFamPairs}
+shares three models and \jdg{swbFamSolo} of \jdg{swbFamModels} models (\jdg{swbFamSoloPct}) stand
+on a single scaffold. This is a census rather than a contrast. There is no comparison group to defend, no null to beat
 and no noise floor to clear: a reader who disputes it disputes a count. It is also, once the
 magnitude is credited to the work that reported it first, the whole of what this subsection
 contributes, and we would rather write that sentence than let a reader infer a larger claim from
@@ -3031,6 +3059,15 @@ some model moves three ranks or more & $\ge3$ & not identified & \textbf{not ide
 a model moves more across scaffolds than a scaffold across models & $\ge0$ & \jdg{swbSFiveDiff} \jdg{swbSFiveCi} & \textbf{failed} \\
 the non-agentic control separates & $p\le0.005$ & $p\jdg{swbAP}$ & held \\
 non-attempt rates differ across scaffolds & differ & \jdg{swbNgLo} to \jdg{swbNgHi} points & held \\
+\midrule
+\multicolumn{4}{@{}l@{}}{\emph{frozen before the per-population replication existed}}\\
+every headline population moves at least one method & $\ge1$ & \jdg{rpMovedMin}--\jdg{rpMovedMax} & held \\
+no population reverses the sign of the reorder & same side & \jdg{rpTauLo} to \jdg{rpTauHi} & held \\
+at least three intervals exclude $\tau=1$ & $\ge3$ & \jdg{rpCiAll} of \jdg{rpN} & held \\
+the pooled $\tau$ lies inside the per-population range & inside & \jdg{rpPooled} vs \jdg{rpTauLo}--\jdg{rpTauHi} & \textbf{failed} \\
+target alone still moves no method in three of them & $\ge3$ & 1 of \jdg{rpN} & \textbf{failed} \\
+no added split shares three models on a scaffold pair & none & \jdg{swbFamGeThree} pooled only & held \\
+single-scaffold fraction stays above the bar & $>0.75$ & \jdg{swbFamSoloPct} & held \\
 \multicolumn{4}{@{}p{0.97\linewidth}@{}}{\footnotesize\emph{The subset is balanced on crossing
   (\jdg{supSmdCross}) and on the outcome (\jdg{supSmdRf}) but runs \jdg{supSmdDepth} shallower in
   helix depth. K3 of the declaration says what follows and \S\ref{sec:energy} says it: the
