@@ -221,40 +221,27 @@ randomised trials with large standardised effects, and separate on an observatio
 algorithm generated for another purpose, carrying effects an order of magnitude smaller than the
 estimator's guidance assumes.
 
-We report two frozen statistics that came apart that way and one that did not. All were declared
-and pushed before the analysis code existed, with permutation tests and constructive power ladders.
-A mediated fraction's two estimators disagree by $\jdg{eLinearGapPts}$ percentage points on the
-same records, and a skill slope contradicts a rank statistic on them; the machinery detected
-neither. Injecting a known truth does separate the readable from the unreadable, and settles which route may
+We report two frozen statistics that came apart that way and one that did not. A mediated fraction's
+two estimators disagree by $\jdg{eLinearGapPts}$ percentage points on the same records, and a skill
+slope contradicts a rank statistic on them; the machinery detected neither. Injecting a known truth does separate the readable from the unreadable, and settles which route may
 be read here (\S\ref{sec:cal}, \S\ref{sec:pcal}).
 
-The corpus that makes this concrete is one of designed RNA, and the setting matters because it is
-what puts the effect sizes where they are. Designing an RNA that folds to a target structure has been posed for three decades as a search
-problem against a thermodynamic model
-\citep{zuker1981optimal,mccaskill1990equilibrium,hofacker1994fast,andronescu2004new,busch2006info,zadeh2011nupack,kleinkauf2015antarna,runge2019learna},
-and the convention that scores a design closes the loop: the objective is a folding model's verdict
-and so is the report card. Scored against experiment rather than against each other, the packages
-disagree with it by margins depending on the structure class \citep{waymentsteele2022rna}. More to the point, the molecules in such a corpus were not sampled but \emph{built}, by programs
-with preferences, so the covariate distribution an analyst inherits is the generator's
-\citep{chaney2018algorithmic}.
+The corpus that makes this concrete is one of designed RNA, and the setting is what puts the effect
+sizes where they are. Inverse folding has been posed for three decades as a search against a
+thermodynamic model and is scored by a round trip through one (\S\ref{sec:related}), so the
+objective and the report card are the same verdict. More to the point, the molecules were not
+sampled but \emph{built}, by programs with preferences, so the covariate distribution an analyst
+inherits is the generator's \citep{chaney2018algorithmic}.
 
-Chemical probing is what breaks the loop, because it measures the molecule rather than a belief
-about it. Reagents that acylate flexible riboses or methylate unpaired Watson--Crick faces, read
-out by primer extension or by mutational profiling, give an accessibility value per nucleotide
-\citep{ehresmann1987probing,merino2005rna,wilkinson2006selective,weeks2010advances,
-siegfried2014rna,smola2015selective,cordero2012quantitative,marinus2021novel}, and the same
-chemistry now runs inside cells \citep{rouskin2014genome,spitale2015structural,zubradt2017dms}.
-But a profile is not a list of base pairs: it is used as a \emph{constraint} on a folding algorithm
-\citep{mathews2004incorporating,deigan2009accurate,hajdin2013accurate}, and that map is one-to-many.
-Asking a profile whether a molecule folded as designed therefore still routes the answer through a
-model, and inherits its degeneracy.
+Chemical probing breaks the loop, because it measures the molecule rather than a belief about it,
+giving an accessibility value per nucleotide (\S\ref{sec:related}). But a profile is not a list of
+base pairs: used as a \emph{constraint} on a folding algorithm the map is one-to-many, so asking a
+profile whether a molecule folded as designed still routes the answer through a model, and inherits
+its degeneracy.
 
-The instrument that avoids both problems is neither new nor ours. Covariation across homologues
-established the base pairs of large RNAs long before any was solved \citep{gutell1994lessons,
-michel1990modelling}, and compensatory mutagenesis runs that argument forward as an experiment: mutate one side of a
-putative pair and the local structure is disrupted; mutate both to the complementary partner and, if
-the pair is real, the profile returns toward wild type
-\citep{kladwang2011mutate,kladwang2011two,tian2014high,cordero2015rna,cheng2017rna}. This paper
+The instrument that avoids both problems is neither new nor ours (\S\ref{sec:related}): mutate one
+side of a putative pair and the local structure is disrupted; mutate both to the complementary
+partner and, if the pair is real, the profile returns toward wild type. This paper
 rests on two properties of that readout. It is an \emph{intervention on the hypothesised pair
 itself}, so its verdict is per pair, not per molecule. And it is not degenerate as a profile is: an
 alternative structure that happens to explain the wild-type profile is generally not restored by
@@ -270,9 +257,9 @@ The first answer is blunt: holding the design fixed and matching on helix depth 
 pair is crossed, a G--C target pair is rescued $\jdg{rescueAU}$ above a matched A--U pair and
 $\jdg{rescueGU}$ above a matched G--U pair.
 
-That ordering is not news; it is what nearest-neighbour thermodynamics predicts. A terminal A--U carries a penalty a terminal G--C does not
-\citep{freier1986improved,xia1998thermodynamic,turner2010nndb}, G--C stacks are stronger, and a
-folding model scores the two types differently for those reasons. A measurement that merely recovers the ordering has measured the
+That ordering is not news; it is what nearest-neighbour thermodynamics predicts, a terminal A--U
+carrying a penalty a terminal G--C does not \citep{freier1986improved,xia1998thermodynamic,turner2010nndb}
+and G--C stacks being stronger. A measurement that merely recovers the ordering has measured the
 model, so the central experiment here is aimed at the model. For each target pair we take the quantity the nearest-neighbour model assigns it (inner stack, outer
 stack, and the terminal penalty on whichever side is a helix end, read from ViennaRNA's parameter
 tables rather than assumed) and hold it fixed by stratification. Were formation a function of that
@@ -302,12 +289,10 @@ $\jdg{calVFull}$ at total mediation. Every retention figure and mediated fractio
 produced is withdrawn: \texttt{B1.retention}, \texttt{P3.mediated\_fraction} and
 \texttt{B2.mediated\_fraction} in \texttt{m21\_thermo\_mediator.json}, and \texttt{D2.retention},
 \texttt{D2.mediated} and \texttt{D3.*.retention} in \texttt{m26\_model\_scored.json}. Those fields
-stay in the released artifacts, because a retraction a reader cannot open is not one. They are
-replaced by a direct contrast in each mediator and a bound needing no mediation estimator. The
-local energy differs between pair types by $\jdg{dDg}$\,kcal/mol ($\jdg{dDgCi}$) and the ensemble
-probability by $\jdg{dPm}$ ($\jdg{dPmCi}$, covering zero). Applying the proof step of
-Prop.~\ref{prop:routes} to the conditional mean rather than its residual gives
-Prop.~\ref{prop:carry}, bounding what the energy can carry at $\jdg{cbTight}$ of the effect. The
+stay in the released artifacts, because a retraction a reader cannot open is not one. They are replaced by a direct contrast in each mediator and a bound needing no mediation estimator
+(Prop.~\ref{prop:carry}). The local energy differs between pair types by $\jdg{dDg}$\,kcal/mol
+($\jdg{dDgCi}$) and the ensemble probability by $\jdg{dPm}$ ($\jdg{dPmCi}$, covering zero), and the
+bound puts what the energy can carry at $\jdg{cbTight}$ of the effect. The
 two figures previously called bounds, $\jdg{dDgBound}$ and $\jdg{dPmBound}$, are product-route
 readings and are renamed as such (\S\ref{sec:carry}).
 
@@ -320,9 +305,9 @@ disjoint arms predicts $\jdg{medPred}$ of it, $\jdg{medFrac}$. The two mediators
 most of what a naive contrast misses, while the thermodynamic explanation accounts for none of what
 the contrast finds, on the neural half of the corpus as on the whole (\S\ref{sec:subsets}).
 
-Everything below was preregistered: each criterion, threshold and predicted sign frozen in a
-committed declaration before the code that would test it existed \citep{simmons2011falsepositive,
-nosek2018preregistration,gelman2014statistical}. Evidential claims are held to a $0.005$ bar \citep{benjamin2018redefine}, and each arm carries a
+Every criterion, threshold and predicted sign below was frozen in a committed declaration before the
+code that would test it existed \citep{simmons2011falsepositive,nosek2018preregistration,gelman2014statistical}.
+Evidential claims are held to a $0.005$ bar \citep{benjamin2018redefine}, and each arm carries a
 calibration ladder reporting what effect it could have detected. Appendix~\ref{app:prereg} lists
 every staked prediction and both that were wrong. That discipline produced one methodological by-product we state as a proposition, since it
 invalidates the permutation test most naturally written for such a matched design. Figure~\ref{fig:arch} maps what follows: which section estimates which quantity, and which paths
@@ -496,9 +481,8 @@ over tens of thousands of rollouts with models, scaffolds and benchmarks as thre
 the ones \S\ref{sec:swebench} recovers, so we do not claim that magnitude and say where ours fails
 its own control. What is not in that literature is the deficiency itself: the position paper counts
 no leaderboard entries, and the infrastructure paper's remedy is to generate a crossed design, not
-to characterise the uncrossed one. \S\ref{sec:swebench} supplies the count: on the board as submitted, \jdg{swbSolo} of
-\jdg{swbModels} models stand on a single scaffold and \jdg{swbScafGeThree} scaffold pairs share
-three models, the precise sense in which the remedy must be a new experiment and not an analysis. It is also why our instruments return a
+to characterise the uncrossed one. \S\ref{sec:swebench} supplies the count, which is the precise sense in which the remedy must be a
+new experiment and not an analysis. It is also why our instruments return a
 census there and an effect on the corpus of \S\ref{sec:corpus}: the difference is whether somebody
 ran the crossing, and on designed RNA somebody did.
 
