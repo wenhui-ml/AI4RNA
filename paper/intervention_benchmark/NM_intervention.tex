@@ -136,51 +136,41 @@ recovered from a public chemical-probing corpus}
 
 \begin{abstract}
 \noindent
-Chemical-probing benchmarks score RNA structure predictors by how far a predicted structure agrees
-with a reference. We argue, and measure, that such a number is not self-interpreting. It fails in
-two separate ways. It can be \emph{carried by a covariate somebody chose}, since these corpora are
-written by design programs, filtered by a rule, mutated at pairs an experimenter picked, and scored
-against a column that is itself a model's output. And it can be entirely real and still \emph{buy
-nothing}, because agreement is not the quantity an experimenter acts on.
+Chemical-probing benchmarks score RNA structure predictors by agreement with a reference. Such a
+number is not self-interpreting, and it fails in two ways that look identical from outside. It can
+be \emph{carried by a covariate somebody chose}, since these corpora are program-designed,
+rule-filtered, mutated at chosen pairs, and scored against a column that is itself a model's
+output. Or it can be entirely real and still \emph{buy nothing}, because agreement is not the
+quantity an experimenter acts on.
 
-We build an instrument that makes both readable on the same molecules. A stated criterion recovers
-compensatory orientation flips already executed in a public corpus, yielding \jdg{nAdmitted}
-two-nucleotide interventions whose outcome is measured and contains no folding model, and
-\jdg{reNimpl} independent predictor implementations are scored by their \emph{response} to them
-rather than by their agreement with a reference. The corpus supplies its own null: constructs whose
-designed substitution is null were synthesised and probed anyway, and \jdg{noopFP} of them cross
-the threshold at which this paper calls an intervention rescued. \textbf{That is a measured
-false-positive rate for the outcome, and we are aware of no benchmark in this neighbourhood that
-reports one.}
+We make both readable on the same molecules. A stated criterion recovers \jdg{nAdmitted}
+compensatory orientation flips already executed in a public corpus, two-nucleotide interventions
+whose measured outcome contains no folding model, and \jdg{reNimpl} independent predictor
+implementations are scored by their \emph{response} to them, not by their agreement with a
+reference. The corpus supplies its own null:
+constructs whose designed substitution is null were synthesised and probed anyway, and
+\jdg{noopFP} of them cross our rescue threshold. \textbf{That is a measured false-positive rate for
+the outcome, and we know of no benchmark in this neighbourhood that reports one.}
 
-Read this way, the incumbent benchmark's margin does not survive translation into an experiment. At
-a fixed budget no implementation outperforms helix depth, an integer read off the declared target
-structure and free wherever a target is declared; \jdg{eqNeq} of \jdg{eqNcomp} comparisons are
-formally equivalent to it within the gain one extra construct buys; the panel's largest agreement
-margin, \jdg{dcTransF1}, is worth \jdg{dcTransPct} of this corpus's rescuing interventions; and the
-gap changes sign exactly \jdg{ivNcross} time as budget is swept, at
-\jdg{ivCrossA}--\jdg{ivCrossB} of a design built. \textbf{A model's agreement advantage is an
-average, and the better it ranks on that average the further from the top of its own ranked list
-the advantage lies, while a budgeted experimenter only ever sees the top.} The same molecules also
-price \jdg{chPriced} covariate-choice channels: \jdg{chCarry} carry the number, \jdg{chEmpty}
-bounded and empty, \jdg{chUnres} unresolved. Because the structure column this benchmark ships is a
-model's own output, every agreement number here is labelled by the reference it is scored against.
-The interventional reading separates from the agreement reading by \jdg{prReadout}\,SD
-(\jdg{prReadoutCi}) even against a reference reconstructed from this deposit's own probing data
-rather than predicted from sequence by any scored model, and against that reference the incumbent's
-largest margin loses \jdg{prMarginPct} of its size. Prices are reported as direct contrasts and
-never as shares, because the estimator for a share is uninformative here, which we show and
-withdraw a metric of our own for.
+The incumbent margin does not survive translation into an experiment. At a fixed budget no
+implementation outperforms helix depth, an integer free wherever a target is declared: \jdg{eqNeq}
+of \jdg{eqNcomp} comparisons are formally equivalent to it, the panel's largest agreement margin
+\jdg{dcTransF1} buys \jdg{dcTransPct} of this corpus's rescuing interventions, and the gap changes
+sign at \jdg{ivCrossA}--\jdg{ivCrossB} of a design built. \textbf{An agreement advantage is an
+average, and the better a model ranks on it the further from the top of its own ranked list that
+advantage lies, while a budgeted experimenter only ever sees the top.} The same molecules price
+\jdg{chPriced} covariate-choice channels, \jdg{chCarry} of which carry the number, as direct
+contrasts and never as shares. The interventional reading separates from the agreement one by
+\jdg{prReadout}\,SD (\jdg{prReadoutCi}) even against a reference rebuilt from this deposit's own
+probing data.
 
-\textbf{This instrument's domain cannot be found; it has to be built, and we specify it.} The
+\textbf{The instrument's domain cannot be found; it has to be built, and we specify it.} The
 largest public probing corpus, \jdg{dmSeq} sequences over \jdg{dmLib} libraries, holds
-\jdg{dmCand} candidate orientation-flip \emph{sequence pairs} in total, because diversity and
-intervention are in direct tension: a design library spends every slot on a new molecule and an
-intervention needs four spent on one. The specification that follows is four measured lines: 
-$4n$ slots per $n$ interventions, reference signal-to-noise above \jdg{qcCross07}, per-construct
-design windows and declared targets, and enough probing to check those targets, since a
-probing-derived reference confirms only \jdg{vaPooledPct} of the pairs these design programs
-declared.
+\jdg{dmCand} candidate orientation-flip pairs, since a design library spends every slot on a new
+molecule and an intervention needs four on one. The specification is four measured lines: $4n$
+slots per $n$ interventions, signal-to-noise above \jdg{qcCross07}, declared per-construct targets,
+and probing enough to check them, which this corpus supplies for only \jdg{vaPooledPct} of the
+pairs its design programs declared.
 \end{abstract}
 
 % =====================================================================
@@ -188,110 +178,93 @@ declared.
 \section{Introduction}
 \label{sec:intro}
 
-Every benchmark that scores an RNA secondary-structure predictor asks a version of the same
-question: does the structure the model produced match a structure someone else believes to be
-right \citep{mathews2004incorporating,hajdin2013accurate,waymentsteele2022rna}. It has organised
-the field for thirty years, and on any corpus where models have become good it runs out of room
-twice over. First, saturation: when the compared pairs are already recovered nine times in ten,
-the residual variation is mostly noise about which structure a degenerate profile happened to
-select. Second, a rarely reported degree of freedom: \emph{which} pairs enter the comparison.
-Restricting to designed target pairs and admitting every pair a predictor emits are both
-defensible choices benchmarking practice leaves open \citep{mathews2019benchmark}, and on the
-corpus below they move the same measurement by a factor of \jdg{cvSwing}.
+Every benchmark that scores an RNA secondary-structure predictor asks a version of one question:
+does the structure the model produced match a structure someone else believes to be right
+\citep{mathews2004incorporating,hajdin2013accurate,waymentsteele2022rna}. It has organised the
+field for thirty years, and on a corpus where models have become good it runs out of room twice.
+First, saturation: once nine of ten compared pairs are already recovered, the residual variation is
+mostly noise about which structure a degenerate profile happened to select. Second, a rarely
+reported degree of freedom: \emph{which} pairs enter the comparison. Restricting to designed target
+pairs or admitting every pair a predictor emits are both defensible \citep{mathews2019benchmark},
+and on the corpus below they move the same measurement by \jdg{cvSwing}$\times$.
 
 A different question is available, and the data to ask it already exists. For more than a decade,
-chemical-probing campaigns have synthesised and measured mutant libraries differing from a wild
-type at a few positions \citep{kladwang2011two,cordero2015rich,tian2014correcting}. One class of
-mutant is unusual. A \emph{compensatory} double mutant of a target pair exchanges its two bases:
-G--C becomes C--G, A--U becomes U--A. Outside those positions the molecule and the unordered pair
-type are unchanged; what changes is nearest-neighbour context and whatever else the exchange
-disturbs. That is a controlled two-nucleotide experiment with its own internal control, already
-performed and recorded.
+chemical-probing campaigns have measured mutant libraries differing from a wild type at a few
+positions \citep{kladwang2011two,cordero2015rich,tian2014correcting}. One class is unusual: a
+\emph{compensatory} double mutant of a target pair exchanges its two bases, G--C for C--G and A--U
+for U--A. Outside those positions the molecule and the unordered pair type are unchanged; what
+varies is nearest-neighbour context and whatever else the exchange disturbs. That is a
+controlled two-nucleotide experiment with its own internal control, already performed and
+recorded.
 
-We use those interventions to score models rather than to infer structures, and that is where we
-depart from the technique's own literature. Mutate-and-map and mutate-map-rescue use mutations to
+We use those interventions to score models rather than to infer structures, and there we depart
+from the technique's own literature. Mutate-and-map and mutate-map-rescue use mutations to
 \emph{establish} which nucleotides pair \citep{kladwang2011two,tian2014correcting,cheng2017rna}:
-the mutation is an instrument aimed at the molecule. We aim it at the model. Given a mutant that
-was actually made, what did the model predict would happen to the target pair, and did the
-measurement agree? \textbf{No \emph{inferred} structure enters that comparison's outcome.} The
-declared target does enter, naming which pair is the target, how deep it sits and whether it
-crosses (\S\ref{sec:mining}), but nothing on the measured side is a structure anybody inferred or
-any model produced. That removes the degeneracy that makes profile-based scoring awkward, and
-saturation does not arise, because the predicted quantity is a change rather than a state.
+the mutation is aimed at the molecule. We aim it at the model. Given a mutant that was actually
+made, what did the model predict would happen to the target pair, and did the measurement agree?
+\textbf{No \emph{inferred} structure enters that comparison's outcome.} The declared target enters only
+as a label, naming which pair it is, how deep it sits and whether it crosses (\S\ref{sec:mining}).
+That removes the degeneracy that makes profile-based scoring awkward, and saturation does not
+arise, because the predicted quantity is a change rather than a state.
 
 \paragraph{What this paper is about.} We introduce \textbf{an intervention-based instrument for
 auditing benchmark scores}: given a probing corpus and a set of predictors, it returns, for a
 benchmark number computed on them, whether it measures the construct it is named after and whether
 its margin survives translation into an experimental decision. It is not a predictor and does not
 replace structure-agreement benchmarks; it interrogates what their scores mean. Three stages
-organise the paper. \textbf{Recover}: a stated criterion mines controlled two-nucleotide
-interventions somebody already executed (\S\ref{sec:mining}). \textbf{Measure}: predictors are
-scored by their response, on an outcome no folding model enters (\S\ref{sec:outcome}). Resolution
-must be established before anything is read off it, and the predictors are not innocent of the
-corpus, so the reliability ceiling (\S\ref{sec:ceiling}) and the leakage audit
-(\S\ref{sec:leakage}) are both in the main text.
-\textbf{Translate}: the margin is converted into experiments at a fixed budget
-(\S\ref{sec:reorder}).
+organise the paper. \textbf{Recover}: a stated criterion mines interventions somebody already
+executed (\S\ref{sec:mining}). \textbf{Measure}: predictors are scored by their response, on an
+outcome no folding model enters (\S\ref{sec:outcome}); since resolution must be established first
+and the predictors are not innocent of the corpus, the reliability ceiling (\S\ref{sec:ceiling})
+and the leakage audit (\S\ref{sec:leakage}) are both in the main text. \textbf{Translate}: the
+margin is converted into experiments at a fixed budget (\S\ref{sec:reorder}). The last two stages
+answer the two failure modes separately, because neither shows on the number's face: the first
+looks the same either way, the second goes unnoticed because nobody converts.
+Section~\ref{sec:ledger} is the resulting ledger: \jdg{chPriced} covariate-choice channels, each
+named by its chooser and priced by a direct contrast, \jdg{chCarry} carrying the number,
+\jdg{chEmpty} empty, \jdg{chUnres} unresolved. The one we are entitled to call empty is \emph{the
+folding model's own free energy}, the objective every one of these design programs was optimising.
+\textbf{The prices are not shares and cannot be added up}, for a reason that is itself a result:
+\S\ref{sec:withdrawal} retracts a quantity this work previously reported, because calibrating that
+estimator against a known truth shows it does not measure what it was read as measuring. No claim
+below depends on it.
 
-\paragraph{What this instrument measures, stated once.} The estimand is written here rather than
-assembled from context. \textbf{This instrument does
-not measure whether a predicted structure is globally correct. It measures whether a predictor's
-probability for a \emph{named} base pair anticipates the measured consequence of a \emph{specific}
-compensatory intervention on that pair, in a molecule whose own wild type is the internal
-control.} Everything below applies that one quantity: Reading~1 asks who chose the covariates it
-varies over, Reading~2 what a margin in it buys as an experiment, the domain analysis which
-corpora can supply it at all. A benchmark scored on global agreement answers a different question;
-we do not claim it is the wrong one, only that its answer does not transfer to this one by
-default.
-
-\paragraph{The two readings.} Stages two and three exist because a benchmark number is not
-self-interpreting, and fails in two separate ways that must both be checked before it licenses
-anything. It can be \emph{carried by a covariate somebody chose} rather than by the property it
-names: these molecules were written by design programs, filtered by a selection rule, mutated at
-pairs somebody picked, and scored against a reference column that is itself a model's output. Or
-it can be entirely real and still \emph{buy nothing}, because what it reports is not what an
-experimenter acts on. The first failure is invisible because the number looks the same either way,
-the second because nobody converts. Section~\ref{sec:ledger} is the resulting ledger:
-\jdg{chPriced} channels, each named by its chooser and priced by a direct contrast, \jdg{chCarry}
-carrying the number, \jdg{chEmpty} empty, \jdg{chUnres} unresolved. The one this paper is entitled
-to call empty is \emph{the folding model's own free energy}, the objective every one of these
-design programs was optimising. \textbf{The prices are not shares and cannot be added up}, for a
-reason that is itself a result: \S\ref{sec:withdrawal} retracts a quantity this work previously
-reported, because calibrating that estimator against a known truth shows it does not measure what
-it was read as measuring. No claim below depends on it.
+\paragraph{The estimand, stated once.} \textbf{This instrument does not measure whether a predicted
+structure is globally correct. It measures whether a predictor's probability for a \emph{named}
+base pair anticipates the measured consequence of a \emph{specific} compensatory intervention on
+that pair, in a molecule whose own wild type is the internal control.} A benchmark scored on global
+agreement answers a different question; we do not claim it is the wrong one, only that its answer
+does not transfer to this one by default.
 
 \paragraph{Contributions.}
 \begin{enumerate}[leftmargin=1.4em,itemsep=2pt]
 \item An eligibility criterion that recovers controlled two-nucleotide interventions from a probing
 corpus, with named and counted exclusions, ambiguity refused rather than resolved, and no threshold
-that can be tuned to raise the yield (\jdg{nAdmitted} admitted here).
+tunable to raise the yield (\jdg{nAdmitted} admitted here).
 \item \textbf{A ledger of \jdg{chPriced} covariate-choice channels} (\S\ref{sec:ledger}), each
-named by who chose it and priced by a direct contrast with an interval, plus the \jdg{chUnpriced}
+named by its chooser and priced by a direct contrast with an interval, plus the \jdg{chUnpriced}
 choosers we can name but not price. The incumbent readout is one row: exhausted on this corpus,
 carrying a researcher degree of freedom worth \jdg{cvSwing}$\times$, and worth \jdg{cvConvSd}
 against the interventional readout's \jdg{cvIntvSd} standard deviations on the same molecules,
-pairs and strata, a separation the conventional readout cannot express
-(Claim~\ref{claim:identity}).
-\item \textbf{The conversion of a benchmark margin into experiments} (\S\ref{sec:reorder}), which no
-benchmark performs on itself: no implementation beats a free integer as a standalone ranker of
+pairs and strata (Claim~\ref{claim:identity}).
+\item \textbf{The conversion of a benchmark margin into experiments} (\S\ref{sec:reorder}), which
+no benchmark performs on itself: no implementation beats a free integer as a standalone ranker of
 which interventions to build, \jdg{eqNeq} of \jdg{eqNcomp} comparisons are formally equivalent to
 it and the other \jdg{eqNfail} fail on the side of being worse, and at the tightest budget the
-margin's sign \emph{inverts}
-(Claim~\ref{claim:budget}).
+margin's sign \emph{inverts} (Claim~\ref{claim:budget}).
 \item \textbf{The instrument's domain, as a specification a laboratory can act on}
-(\S\ref{sec:ceiling}): a resolution ceiling, a signal-to-noise gate, and the measured fact that
-the largest public probing corpus holds \jdg{dmCand} candidate orientation-flip sequence pairs in
-total, so the instrument's reach cannot be enlarged by finding a bigger corpus and must be written
-into a library on purpose. All of it is packaged as \texttt{designaudit}, whose selftest
-reproduces this paper's headline numbers from the public data.
+(\S\ref{sec:ceiling}): a resolution ceiling, a signal-to-noise gate, and the measured fact that the
+largest public probing corpus holds \jdg{dmCand} candidate orientation-flip sequence pairs in
+total, so its reach must be written into a library on purpose rather than found in a bigger corpus.
+All of it is packaged as \texttt{designaudit}, whose selftest reproduces this paper's headline
+numbers from the public data.
 \end{enumerate}
 
 \paragraph{What carries what.} This paper reports many numbers and four claims, and the two lists
-are not the same length. Table~\ref{tab:guide} maps each claim to the small set of quantities that
-carries it and to where the argument is made; everything outside its first column is context,
-control or bound. The table's second half lists the quantities this work has \emph{withdrawn},
-three from earlier versions of this paper. Read its last column, empty in every row on purpose: no
-claim here rests on any of them.
+are not the same length. Table~\ref{tab:guide} maps each claim to the quantities that carry it and
+to where it is argued; everything outside its first column is context, control or bound. Its second
+half lists the \emph{withdrawn} quantities, three from earlier versions of this paper, whose last
+column is empty in every row on purpose.
 
 \begin{table}[!htbp]
 \centering
