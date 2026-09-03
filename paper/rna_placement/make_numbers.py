@@ -46,6 +46,18 @@ def sig(x, d=3):
     return ("+" if x >= 0 else "") + f"{x:.{d}f}"
 
 
+# ---- the outcome contains no model. Same artifact the instrument paper reads; R1 used to
+# ---- point at that paper for it, which is a reference a referee cannot follow.
+w = J("m26w_rescue_provenance.json")
+put("rcN", f"{w['n']}")
+put("rcPearson", f"{w['pearson']:.4f}")
+put("rcSpearman", f"{w['spearman']:.4f}")
+put("rcMaxDiff", f"{w['max_abs_diff']:.4f}")
+put("rcMedDiff", f"{w['median_abs_diff']:.6f}".rstrip("0"))
+put("rcCorpusMean", f(w["corpus_mean"], 4))
+put("rcCorpusSd", f(w["corpus_sd"], 4))
+
+
 # ---------------------------------------------------------------- 3  pair type -> formation
 m16 = J("m16_rescue.json")
 c = m16["counts"]

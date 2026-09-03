@@ -591,8 +591,7 @@ untruncated, negative values included.
 quoted from a paper, and the distinction is load bearing. The technique's own literature
 \citep{tian2014correcting,tian2018allosteric} is the quantity's provenance; we do not assert it
 normalises the two single-mutant perturbations the same way, and every claim below is about the
-column this corpus released. A companion study
-records the recomputation from the raw per-nucleotide reactivities.
+column this corpus released. What has to be established is that \emph{that} column contains no folding model, and it is checkable rather than arguable: recomputing \eqref{eq:rf} from the raw per-nucleotide reactivity columns, for all \jdg{rcN} double mutants whose two single mutants and wild type are present, returns the corpus's own value at Pearson $\jdg{rcPearson}$ and Spearman $\jdg{rcSpearman}$, the same mean \jdg{rcCorpusMean} and standard deviation \jdg{rcCorpusSd}, with a maximum absolute deviation of \jdg{rcMaxDiff} and a median of \jdg{rcMedDiff}. \textbf{The outcome is measurement-derived end to end; no folding model enters it anywhere.}
 
 Two properties of \eqref{eq:rf} carry the paper. It contains no design score, so no scoring rule's
 preferences enter it; and it interrogates the pair it mutates, so an alternative structure consistent
