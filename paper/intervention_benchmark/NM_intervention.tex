@@ -335,146 +335,125 @@ results, and the order is enforced: resolution before any of them.}
 \label{sec:probing}
 Reagents that acylate flexible riboses or methylate unpaired Watson--Crick faces report per
 nucleotide on accessibility \citep{ehresmann1987probing,merino2005rna,wilkinson2006selective,
-weeks2010advances,siegfried2014rna}; treating the resulting profiles quantitatively is itself a
-body of method \citep{cordero2012quantitative,smola2015selective}, and mutational profiling made
+weeks2010advances,siegfried2014rna}; treating the resulting profiles quantitatively is a body of
+method in itself \citep{cordero2012quantitative,smola2015selective}, and mutational profiling made
 the readout cheap enough for libraries rather than single molecules, in cells as well as in vitro
 \citep{rouskin2014genome,spitale2015structural,zubradt2017dms,marinus2021novel}. A reactivity
-profile is not a list of base pairs, though, and the standard route from one to the other is to
-use the profile as a constraint on a folding algorithm
-\citep{deigan2009accurate,hajdin2013accurate}. That map is one-to-many: two structures consistent
-with one profile cannot be separated by it, so a benchmark built on profile-derived structures
-inherits a degeneracy it cannot see.
+profile is not a list of base pairs, though, and the standard route from one to the other uses the
+profile as a constraint on a folding algorithm \citep{deigan2009accurate,hajdin2013accurate}. That
+map is one-to-many: two structures consistent with one profile cannot be separated by it, so a
+benchmark built on profile-derived structures inherits a degeneracy it cannot see.
 
 \subsection{Covariation and compensatory mutagenesis}
 The argument that survives that objection is older than the models. Compensatory changes across
 homologues established the base pairs of ribosomal RNA before any structure was solved
-\citep{gutell1994lessons,michel1990modelling}, and compensatory mutagenesis is the same argument
-performed rather than observed: disrupt a putative pair with one mutation, disrupt it again with
-the partner mutation, and ask whether the pair of mutations together restores what either alone
-destroyed. Mutate-and-map applied this systematically \citep{kladwang2011mutate,kladwang2011two,
-cordero2015rich,cordero2015rna}, at a throughput that made whole libraries routine
-\citep{tian2014high,leppek2022combinatorial}, and mutate-map-rescue added the compensatory arm
-that this paper mines
-\citep{tian2014correcting,cheng2017rna}, later extended to a fourth dimension by locking one
-helix before probing the rest \citep{tian2018allosteric}. In every one of those studies the target
-of inference is the molecule; we keep the experiment and change that target to the model.
+\citep{gutell1994lessons,michel1990modelling}, and compensatory mutagenesis performs that argument
+rather than observing it: disrupt a putative pair with one mutation, then with its partner, and ask
+whether the two together restore what either alone destroyed. Mutate-and-map
+applied this systematically \citep{kladwang2011mutate,kladwang2011two,cordero2015rich,
+cordero2015rna} at a throughput that made whole libraries routine
+\citep{tian2014high,leppek2022combinatorial}, and mutate-map-rescue added the compensatory arm this
+paper mines \citep{tian2014correcting,cheng2017rna}, later extended by locking one helix before
+probing the rest \citep{tian2018allosteric}. Throughout, the target of inference is the molecule;
+we keep the experiment and change that target to the model.
 
 \subsection{Models that predict secondary structure}
 \label{sec:models}
-
 Three families produce the pairing probabilities this paper scores, and the boundary between the
 first two is where its result falls. \emph{Thermodynamic} models minimise or sum a free energy over
-a nearest-neighbour decomposition of the structure \citep{zuker1981optimal,mccaskill1990equilibrium,
+a nearest-neighbour decomposition \citep{zuker1981optimal,mccaskill1990equilibrium,
 hofacker1994fast,lorenz2011vienna}, with parameters measured by optical melting on short duplexes,
 coaxial stacks and helix ends \citep{freier1986improved,walter1994coaxial,serra1995predicting,
 xia1998thermodynamic,mathews1999expanded,turner2010nndb}. \emph{Learned-parameter} models keep that
-decomposition, or a close relative, and fit its weights discriminatively to structural data instead
-\citep{do2006contrafold,andronescu2007efficient,waymentsteele2022rna}; the statistical basis for
-doing so on probing data is developed separately \citep{waymentsteele2021theoretical}.
-\emph{Neural} models drop the decomposition and predict pairing from sequence with a learned
-architecture and no explicit energy \citep{singh2019spotrna,sato2021rna,fu2022ufold,
-ribonanzanet2024}. A fourth axis cuts across all three (whether a model can represent a
-pseudoknot at all \citep{rivas1999dynamic,reeder2004design,bellaousov2010probknot,janssen2015pkiss}) and it matters here only because the corpus is a pseudoknot round, so crossing is carried as a
-covariate and never as a selection rule.
-
-This list is usually organised as thermodynamic versus neural; \emph{this paper's} result is
-organised instead by whether a model shares the nearest-neighbour decomposition and where its
-parameters came from, which is what \S\ref{sec:predictors} chooses its predictors to separate.
+decomposition, or a close relative, and fit its weights discriminatively to structural data
+\citep{do2006contrafold,andronescu2007efficient,waymentsteele2022rna}, on a statistical basis
+developed separately \citep{waymentsteele2021theoretical}. \emph{Neural} models drop the
+decomposition and predict pairing from sequence with no explicit energy \citep{singh2019spotrna,
+sato2021rna,fu2022ufold,ribonanzanet2024}. Whether a model can represent a pseudoknot at all
+\citep{rivas1999dynamic,reeder2004design,bellaousov2010probknot,janssen2015pkiss} cuts across all
+three, and matters here only because the corpus is a pseudoknot round, so crossing is a covariate
+and never a selection rule. The usual axis is thermodynamic versus neural; \emph{this paper's}
+result is organised instead by whether a model shares the nearest-neighbour decomposition and where
+its parameters came from, which is what \S\ref{sec:predictors} selects predictors to separate.
 
 \subsection{Benchmarks in the neighbourhood}
-Three efforts are close enough to be worth separating from ours explicitly. EternaBench scored
-structure packages against a large body of experimental data and used the result to train an
-improved model \citep{waymentsteele2022rna}; its question is agreement, ours is response.
-RNAGym assembles deep mutational scanning assays and reactivity profiles into a common benchmark
-\citep{rnagym2025} and keeps variant-effect prediction and structure prediction as \emph{separate}
-tasks; our primitive joins them, scoring a structure model by whether its structural prediction
-responds correctly to a mutation. CHANRG rebuilds the splits so that homology cannot leak across
-them, and finds that foundation models keep their lead within distribution and lose most of it
-outside \citep{chanrg2026}: it changes the split where we change the question, and where the two
-agree we read that as corroboration and not as evidence from either.
+Three efforts are close enough to separate from ours explicitly. EternaBench scored structure
+packages against a large body of experimental data and trained an improved model on the result
+\citep{waymentsteele2022rna}; its question is agreement, ours is response. RNAGym assembles deep
+mutational scanning assays and reactivity profiles into a common benchmark \citep{rnagym2025} but
+keeps variant-effect and structure prediction \emph{separate}; our primitive joins them, scoring a
+structure model by whether its structural prediction responds correctly to a mutation. CHANRG
+rebuilds the splits so that homology cannot leak across them, and finds foundation models keeping
+their lead within distribution and losing most of it outside \citep{chanrg2026}: it changes the
+split where we change the question, and where the two agree we read corroboration, not evidence
+from either.
 
 Scoring a model by the effect of a mutation is established outside this field, and the separation
-is one of quantities rather than ambition: ProteinGym \citep{proteingym2023} and NABench
-\citep{nabench2025} compare a model's sequence-level likelihood or fitness score with a
-\emph{functional} measurement, whereas here a model's \emph{structural} prediction, the
-probability it assigns to one named base pair, meets a \emph{structural} measurement of that same
-pair on a mutant whose own wild type is the internal control. The mutation is the same kind of
-object in both cases; what sits on either side of the comparison is not, which is why a structure
-predictor can be scored here at all. The mutate-and-map literature owns the experiment, including
-a public server that will predict a mutate-and-map profile \citep{ribonanzanet2024}; what it does
-not do is treat those predictions as a benchmark with a control for who chose the pairs.
+is one of quantities rather than ambition. ProteinGym \citep{proteingym2023} and NABench
+\citep{nabench2025} match a model's sequence-level likelihood against a \emph{functional}
+measurement; here a model's \emph{structural} prediction, the probability on one named pair, meets
+a \emph{structural} measurement of that pair on a mutant whose own wild type is the control. That
+asymmetry is why a structure predictor can be scored here at all. The mutate-and-map literature owns the experiment, including a public server
+that will predict a mutate-and-map profile \citep{ribonanzanet2024}; what it does not do is treat
+those predictions as a benchmark with a control for who chose the pairs.
 
 \paragraph{Scoring a folding algorithm by its response to a mutation, inside this field.}
 riboSNitch prediction asks whether a single-nucleotide variant reorganises a transcript's
 structure, and \citet{corley2015ribosnitch} turned it into a genome-wide benchmark of folding
-algorithms (including remuRNA, RNAsnp and SNPfold, built for that task) graded against
-structural change detected by parallel probing, a line still being built on
-\citep{kirven2025variantfold}. Three things differ here: the intervention is a compensatory
-\emph{pair} rather than a single substitution, so the unordered pair type is held fixed and the
-wild type is the internal control; the estimand is one \emph{named} base pair rather than a
+algorithms (including remuRNA, RNAsnp and SNPfold) graded against structural change detected by
+parallel probing, a line still being built on \citep{kirven2025variantfold}. Three things differ
+here: the intervention is a compensatory \emph{pair}, holding the unordered pair type fixed and
+making the wild type the internal control; the estimand is one \emph{named} pair, not a
 whole-transcript ensemble distance; and the grading column contains no folding model, a riboSNitch
-label being a structural change inferred by comparing two probing profiles, exactly the
-one-to-many map of \S\ref{sec:probing}, whereas the outcome here is arithmetic on reactivities
-(\S\ref{sec:outcome}). Both lines share the premise that a prediction about a \emph{change} tests a
-folding model more sharply than a prediction about a state, which we read as corroboration and not
-as evidence for any number below. The separation is measured, not asserted: \S\ref{sec:ranking}
-scores the standard riboSNitch quantities on these interventions, beside the predictors and the
-free baseline.
+label being structural change inferred from two probing profiles, exactly the one-to-many map of
+\S\ref{sec:probing}, whereas our outcome is arithmetic on reactivities (\S\ref{sec:outcome}). The
+separation is measured, not asserted: \S\ref{sec:ranking} scores the standard riboSNitch
+quantities on these interventions, beside the predictors and the free baseline.
 
-\paragraph{An average advantage, and a budget.} The observation Reading~2 rests on (that an
-average metric advantage need not survive a budget, and that a ranking can invert once only the
-top of the list is acted on) has a long prior life outside this field. Virtual screening
-introduced enrichment factors and early-recognition metrics for that reason: a global figure of
-merit does not say how many actives fall in the first few percent of a ranked list, and two
-methods with the same global score can differ sharply there
-\citep{sheridan2001protocols,truchon2007evaluating}. That a method's benchmark standing need not
-transfer to a prospective campaign is that literature's central negative result
-\citep{wallach2018most}. We claim no novelty for the shape of the argument, which makes clear what
-is new here: it is done for RNA structure prediction, the conversion is into experiments somebody
-has already executed rather than a simulated screen, and the mechanism is stated sharply enough to
-attack: \emph{the larger a model's average agreement
-advantage, the further from the top of its own ranked list that advantage lies}, while a budgeted
-experimenter only ever sees the top.
+\paragraph{An average advantage, and a budget.} That an average metric advantage need not survive a
+budget, and that a ranking can invert once only the top of a list is acted on, has a long prior
+life outside this field. Virtual screening introduced enrichment factors and early-recognition
+metrics for exactly that reason \citep{sheridan2001protocols,truchon2007evaluating}: a global
+figure of merit does not say how many actives fall in the first few percent of a ranked list, and
+that benchmark standing need not transfer to a prospective campaign is that literature's central
+negative result \citep{wallach2018most}. We claim no novelty for the argument's shape, which makes
+clear what is new: it is done for RNA structure prediction, the conversion is into experiments
+somebody has already executed rather than a simulated screen, and the mechanism is stated sharply
+enough to attack, \emph{the larger a model's average agreement advantage, the further from the top
+of its own ranked list that advantage lies}.
 
-\paragraph{A free baseline, and the calibration of the metric it is compared on.}
-Claim~\ref{claim:depth}'s genre, a deep model failing to beat a simple baseline on a benchmark
-task, has an immediate precedent in perturbation prediction, where deep models were found not
-to outperform linear global baselines \citep{ahlmanneltze2025deep}. The standing objection to
-results of that shape is that they turn on how the metric is calibrated rather than on what the
-models know. We take it seriously rather than answer it: hence a baseline defended with a measured
-split-half reliability, a dynamic range and an empirical null distribution (\S\ref{sec:ceiling})
-rather than a single number, and a comparison reported across a swept threshold rather than at one
-(\S\ref{sec:ranking}).
-
-\paragraph{The closest prior analysis of this outcome.} \citet{tian2018allosteric} validated the
-rescue factor as a readout by showing that rescue factors from \emph{simulated} mutate-map-rescue
-experiments track helix frequencies across Rfam families, averaged over the helix. That result is
-why the quantity is worth measuring at all, and we cite it as our outcome's provenance rather than
-as a competitor: it compares a simulation against itself, at helix resolution, on natural
-sequences. It is not a test of whether a predictor anticipates \emph{measured} rescue at a
-\emph{single} pair on sequences a design program wrote, which is what a benchmark must answer.
+\paragraph{A free baseline, and the closest prior reading of this outcome.}
+Claim~\ref{claim:depth}'s genre, a deep model failing to beat a simple baseline, has an immediate
+precedent in perturbation prediction, where deep models were found not to outperform linear global
+baselines \citep{ahlmanneltze2025deep}. The standing objection to such results is that they turn
+on the metric's calibration rather than on what the models know. We take it seriously rather than
+answer it: hence a baseline defended by measured split-half reliability, dynamic range and an
+empirical null (\S\ref{sec:ceiling}) rather than a single number, and a comparison swept across
+thresholds rather than read at one (\S\ref{sec:ranking}). The outcome itself has one prior
+validation: \citet{tian2018allosteric} showed that rescue factors from \emph{simulated}
+mutate-map-rescue experiments track helix frequencies across Rfam families, averaged over the
+helix. That is why the quantity is worth measuring, and we cite it as provenance rather than as a
+competitor, since it compares a simulation against itself, at helix resolution, on natural
+sequences.
 
 \subsection{Corpora made by design programs}
 The molecules here were produced by design methods competing on shared targets (energy-directed
 search \citep{andronescu2004new,busch2006info,zadeh2011nupack}, sampling and learning agents
 \citep{kleinkauf2015antarna,runge2019learna}, human players and the models trained on them
 \citep{lee2014eterna,andersonlee2016eterna100,koodli2021eternabrain}, and pipelines assembled from
-several \citep{yesselman2019computational}) and such a corpus carries its producers' preferences
-as covariates. Inside this field the hazard has been demonstrated once already, closely enough
-that the present thesis reads as its generalisation: a deep model's benchmark score is carried by
-family membership and by sequence similarity to its training set rather than by an ability to
-predict structure \citep{szikszai2022generalize,flamm2022caveats,qiu2023sequence}, restated on
-rebuilt splits and curated held-out structures four years later
-\citep{chanrg2026,szikszai2026gauging}. Those studies name \emph{one} channel, homology, and close
-it by changing the split. \S\ref{sec:ledger} asks the next question: on a corpus nobody sampled,
-how many such channels are there, who chose each, and how much does each carry.
-The same hazard is recognised qualitatively elsewhere (feedback in recommender systems
-\citep{chaney2018algorithmic}, generator--judge contamination in language-model evaluation
-\citep{li2025preference}, characteristic biases of protein design programs
-\citep{protdbench2026}); the correction it demands here is quantitative, so we state it as an
-assumption in Section~\ref{sec:method} and size it in Section~\ref{sec:conventional}.
-
-% =====================================================================
+several \citep{yesselman2019computational}), and such a corpus carries its producers' preferences
+as covariates. The hazard has been demonstrated inside this field once already, closely enough that
+this thesis reads as its generalisation: a deep model's benchmark score is carried by family
+membership and by sequence similarity to its training set rather than by an ability to predict
+structure \citep{szikszai2022generalize,flamm2022caveats,qiu2023sequence}, restated on rebuilt
+splits and curated held-out structures four years later \citep{chanrg2026,szikszai2026gauging}.
+Those studies name \emph{one} channel, homology, and close it by changing the split.
+\S\ref{sec:ledger} asks the next question: on a corpus nobody sampled, how many channels are there,
+who chose each, and how much does each carry. The hazard is recognised qualitatively elsewhere too
+(feedback in recommender systems \citep{chaney2018algorithmic}, generator--judge contamination in
+language-model evaluation \citep{li2025preference}, characteristic biases of protein design
+programs \citep{protdbench2026}); the correction it demands here is quantitative, so we state it as
+an assumption in Section~\ref{sec:method} and size it in Section~\ref{sec:conventional}.
 
 % =====================================================================
 
