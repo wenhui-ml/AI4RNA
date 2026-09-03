@@ -128,7 +128,7 @@
 \large \jdg{nAdmitted} controlled two-nucleotide experiments,
 recovered from a public chemical-probing corpus}
 
-\author{Wenhui Chen\thanks{\texttt{wenhui.chen@titanresearchlabs.ai}}}
+\author{Wenhui Chen\thanks{\texttt{splendon@163.com}}}
 \date{}
 
 \begin{document}
@@ -1855,8 +1855,7 @@ The quantity being withdrawn is a mediated fraction, and the literature defining
 explicit that they require assumptions this design cannot supply
 \citep{baron1986moderator,imai2010general,vanderweele2015explanation}; a ratio of two contrasts
 computed within strata can also reverse under aggregation in ways the strata hide
-\citep{simpson1951interpretation,vanderweele2009conceptual}. That failure is general rather than
-particular to this corpus, and a companion study develops it. \textbf{None of that is needed
+\citep{simpson1951interpretation,vanderweele2009conceptual}. That failure is general rather than particular to this corpus. \textbf{None of that is needed
 here.} This instrument reports direct contrasts and bounds, never a ratio of two contrasts, a decision
 taken because of the number above: the quantities in Section~\ref{sec:results} are differences of
 matched contrasts, each with its own interval, none dividing one small noisy quantity by
@@ -2250,17 +2249,13 @@ than its size suggests: a scan enumerating every pair has no chooser left to pri
 
 \paragraph{Beyond RNA.} The primitive is not specific to base pairs, and corpora produced by design
 programs are becoming common in other fields. We have not tested it elsewhere and make no claim
-about it; the estimator theory the conditioning step needs is developed in a companion study that
-this paper cites and does not depend on.
+about it; the estimator theory the conditioning step needs is developed separately and is not relied on here.
 
 \paragraph{Code and data availability.} Every number in this manuscript is generated from a
 committed run artifact by a single script; no measured value is typed by hand, and the build fails
 if one is. The criterion, the estimators and the audit arms are packaged as \texttt{designaudit},
 whose \texttt{selftest} reproduces this paper's corpus statistics from the public source files
-alone. \textsc{[On acceptance: \texttt{designaudit} will be released at
-\url{https://github.com/PLACEHOLDER/designaudit}, and the tagged release archived with a Zenodo
-DOI, \texttt{PLACEHOLDER-DOI}, cited here. The corpus is already public: the OpenKnot benchmark and
-mutate-and-map-rescue tables, and the RMDB deposits named in Appendix~\ref{app:prereg}.]} The
+alone. \texttt{designaudit} will be released at \url{https://github.com/wenhui-ml/designaudit}, with the tagged release archived under a Zenodo DOI minted at that tag. The corpus is already public: the OpenKnot benchmark and mutate-and-map-rescue tables, and the RMDB deposits named in Appendix~\ref{app:prereg}. The
 analysed file is the versioned release \texttt{OK7a\_M2R\_data.v4.5.1.csv}; a different version of
 it is a different corpus.
 

@@ -125,7 +125,7 @@
 \large Base-pair identity, where the designer put it, what holding placement fixed\\
 does to an RNA design leaderboard, and which benchmarks admit the question at all}
 
-\author{Wenhui Chen\thanks{\texttt{wenhui.chen@titanresearchlabs.ai}}}
+\author{Wenhui Chen\thanks{\texttt{splendon@163.com}}}
 \date{}
 
 \begin{document}
@@ -916,7 +916,7 @@ pool that rule recovers \jdg{selRepro} of \jdg{selNCells} cells (\jdg{selAgree})
 without the filter recovers \jdg{selReproB} (\jdg{selAgreeB}), and in \jdg{selPassedOver} of the
 disagreements eligible designs were passed over. The operative rule is the top \emph{prior
 experimental} score, and \jdg{selNFallback} of \jdg{selCells} tested designs fail the published
-cutoff outright. A companion study reports this in full; two consequences are load bearing here.
+cutoff outright. Two consequences of that replay are load bearing here.
 First, selection acts on the design cell, a component of every stratum here, so selection status is
 constant in \jdg{selNStrata} of \jdg{selNStrata} strata (\jdg{selStrataMixed} mixed), and the
 conditioning that removes placement removes it too. Second, it runs \emph{against} the effects
@@ -2721,10 +2721,7 @@ taken, and only because somebody had already run every method against every targ
 committed run artifact by a single script; no measured value is typed into the source, and a check
 run at build time fails the build if one is. Each experiment's criteria were frozen in a JSON
 declaration committed before the code that grades them existed, and Appendix~\ref{app:prereg}
-lists every declaration with its verdict, including the ones that failed. \textsc{[Public release:
-the analysis pipeline and every run artifact will be released as a public repository at
-\url{https://github.com/PLACEHOLDER/designaudit}, with the tagged release archived under a Zenodo
-DOI, \texttt{PLACEHOLDER-DOI}.]} The corpora are already public: the OpenKnot benchmark release
+lists every declaration with its verdict, including the ones that failed. The analysis pipeline and every run artifact are packaged as \texttt{designaudit} and will be released at \url{https://github.com/wenhui-ml/designaudit}, with the tagged release archived under a Zenodo DOI minted at that tag. The corpora are already public: the OpenKnot benchmark release
 \texttt{OK7a\_M2R\_data.v4.5.1.csv} and the design-score tables it ships with, the RMDB deposits
 named in Appendix~\ref{app:prereg}, and the protein-binder corpus of \S\ref{sec:crossdomain}.
 Every count in this paper is a count over those versioned files, and a different version of one of
@@ -2974,8 +2971,7 @@ effect positive in at least seven of \jdg{gNMethods} methods & $\ge7/9$ &
 effect size not monotone in placement strength & $|\rho_s|<0.6$ & $\jdg{sSpear}$ & held \\
 the circular shift never indexes a sequence & assertion & source-checked & held \\
 \midrule
-\multicolumn{4}{@{}l@{}}{\emph{frozen before the scoring experiment, which is reported in the companion paper}}\\
-\multicolumn{4}{@{}l@{}}{\emph{\small (nine predictions there; not restated here)}}\\
+\multicolumn{4}{@{}l@{}}{\emph{frozen before the scoring experiment, which is not part of this paper}}\\ \multicolumn{4}{@{}l@{}}{\emph{\small (nine predictions, none of them a claim made here)}}\\
 \midrule
 \multicolumn{4}{@{}l@{}}{\emph{frozen before \S\ref{sec:rounds} existed}}\\
 treatment-side randomisation over-rejects & $>0.010$ & $\jdg{m23nT}$ & held \\
