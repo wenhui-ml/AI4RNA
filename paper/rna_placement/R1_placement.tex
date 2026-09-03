@@ -1162,15 +1162,13 @@ decomposition of the rescue contrast attributes $\jdg{dnFromDen}$ to the denomin
 $\jdg{dnFromNum}$ to the numerator: \jdg{dnDenShare} of the movement is denominator, and the
 numerator pushes the other way.
 
-That is the decomposition \emph{before} the cut below, which is the only place a previous version of
-this manuscript reported it. Running the two pieces separately at each excision radius says how much
+That is the decomposition \emph{before} the cut below. Running the two pieces separately at each excision radius says how much
 of the denominator's arm difference the cut actually removes. It removes a third of it and not all
 of it: the denominator contrast falls from $\jdg{dnRadDNo}$ with nothing excised to
 $\jdg{dnRadDThree}$ with the mutated positions and three nucleotides either side gone
 ($\jdg{dnRadDThreeCi}$, $n=\jdg{dnRadN}$), a reduction of \jdg{dnRadShrink}, while the numerator
 falls to $\jdg{dnRadNumThree}$ and the denominator's share of the movement goes from
-\jdg{dnRadShareNo} to \jdg{dnRadShareThree}. So the cut does what it was built to do --- the part of
-the denominator difference that lives at the mutated bases is gone --- and the part that survives is
+\jdg{dnRadShareNo} to \jdg{dnRadShareThree}. So the cut does what it was built to do, in that the part of the denominator difference that lives at the mutated bases is gone, and the part that survives is
 the part that has no address, which is what a structural effect looks like. The manuscript claims
 the second reading and reports the first number rather than the ratio alone.
 
@@ -1437,7 +1435,7 @@ base-pairing ensemble of the entire molecule, and a mediator that only sees the 
 would miss that. This tests it directly. For each of the \jdg{rfN} records the estimator uses we
 fold the wild type and both single mutants of the compensatory pair, and take the perturbation to be
 the Euclidean combination of the two $L_1$ distances between wild-type and single-mutant base-pair
-probability matrices --- an ensemble-level quantity with no local structure imposed on it.
+probability matrices, an ensemble-level quantity with no local structure imposed on it.
 \jdg{rfQuadPct}\% of the records have both single mutants present, and \jdg{rfSeqs} distinct
 sequences were folded.
 
@@ -1674,24 +1672,20 @@ reading runs \jdg{pcLamTable}. At a true share of $1$ it is off by \jdg{pcLamErr
 \paragraph{The same ruler, applied to that inversion.} A point read off a synthetic curve with no
 interval is exactly the object this paper refuses elsewhere, so it is priced here. Two things were
 declared before either was computed: bootstrap the whole injection over targets, and repeat it with
-a second perturbation shape. The second shape is the one the data suggest --- the conditional mean
-below rises steeply and then flattens --- so it is concave where the swept shape is convex, and the
+a second perturbation shape. The second shape is the one the data suggest, since the conditional mean below rises steeply and then flattens, so it is concave where the swept shape is convex, and the
 two are correlated $\jdg{pcShapeCorr}$ with each other.
 
 \begin{claimbox}
 \textbf{The printed figure reads high; how high is not readable from \jdg{pcalTargets} targets, so
 the corrected number is withdrawn.} Inverting the curve at the corpus's own operating point puts
 $\jdg{medFrac}$ at a true linear share of \jdg{pcInvPoint}, an upward bias of \jdg{pcInvBias}
-points; the concave shape puts it at \jdg{pcInvConcave}, moving the point by
-\jdg{pcShapeMove} points --- less than the
-\jdg{pcShapeQuarter} the declaration allowed, so the inversion is not an artifact of the curvature
+points; the concave shape puts it at \jdg{pcInvConcave}, moving the point by \jdg{pcShapeMove} points, less than the \jdg{pcShapeQuarter} the declaration allowed, so the inversion is not an artifact of the curvature
 we chose to sweep. The resolution is the problem, not the shape. A target-clustered bootstrap of
 the entire injection, the clustering unit used everywhere else here, gives \jdg{pcInvCi} over
 \jdg{pcInvNBoot} replicates, \jdg{pcInvClampPct} of which land on an end of the swept range
 \jdg{pcInvLoRung}--\jdg{pcInvHiRung}. That interval is the whole sweep and it covers the
 uncorrected reading. \textbf{Kill condition K4 of the declaration fires and the corrected number
-is withdrawn.} What survives is the direction --- both shapes put the truth below the printed
-reading --- and the reason the size does not: inverting a six-rung curve at this clustering is
+is withdrawn.} What survives is the direction, both shapes putting the truth below the printed reading, and the reason the size does not: inverting a six-rung curve at this clustering is
 beyond what \jdg{pcalTargets} targets can resolve.
 \end{claimbox}
 
@@ -2400,8 +2394,7 @@ An earlier version of this paragraph argued that no purchase could rescue the ex
 because $\jdg{cxP3}$ is not a floor value. That is an argument, and this paper's own rule is that a
 declared check is run rather than reasoned about, so it was run. Buying \jdg{cxBuyDraws} draws on
 the same statistic, gated first by reproducing it at the published draw count (\jdg{cxBuyGate}
-against $\jdg{cxP3}$), resolves it to $p=\jdg{cxBuyP}$ --- \jdg{cxBuyGe} of \jdg{cxBuyDraws}
-permutations at least as extreme, $z=\jdg{cxBuyZ}$ --- against a Holm threshold of \jdg{cxBuyThr}.
+against $\jdg{cxP3}$), resolves it to $p=\jdg{cxBuyP}$, with \jdg{cxBuyGe} of \jdg{cxBuyDraws} permutations at least as extreme ($z=\jdg{cxBuyZ}$), against a Holm threshold of \jdg{cxBuyThr}.
 Holm rejections over the family go \jdg{cxBuyHolmBefore} to \jdg{cxBuyHolmAfter} and the members
 that change are \jdg{cxBuyChanged}. \textbf{The consequence is stated rather than softened}: this
 paper's separation of the effect from the probing chemistry is a single-test result, it does not
@@ -2421,9 +2414,7 @@ neighbourhood and leaves $\jdg{shpTrimN}$ pairs, gives $\jdg{shpTrim}$, or $\jdg
 the untrimmed contrast. The effect is in the body of the distribution.
 
 \paragraph{Three things this does not buy.} It does not make a corrected $p$ into a true finding;
-it removes one objection and leaves every other one where it was. It says nothing about
-multiplicity across analyses that were run and not reported --- the preregistration record is the
-only control on that, and it is a weaker one, because it constrains what gets reported rather than
+it removes one objection and leaves every other one where it was. It says nothing about multiplicity across analyses that were run and not reported: the preregistration record is the only control on that, and it is a weaker one, because it constrains what gets reported rather than
 what gets computed. And the resolution was bought for five tests, named in the declaration before
 the corrections were computed; the other floor members are reported at the resolution they have.
 
@@ -2637,9 +2628,7 @@ one. All \jdg{xrRounds} rounds come from the same laboratory, platform and playe
 replicates is the target set and the method mix, not the ecology. The test that mechanism implies
 is no longer untried: \S\ref{sec:undesigned} runs it on two undesigned corpora and on
 folding models given the same targets, and the placement structure is \jdg{unRatio} times
-weaker without a designer and \jdg{unShare} reproduced by an inverse folder that stops at the first
-correct fold --- while an optimiser that does not stop there produces no molecule the statistic is
-defined on at all. What remains one corpus is
+weaker without a designer and \jdg{unShare} reproduced by an inverse folder that stops at the first correct fold, while an optimiser that does not stop there produces no molecule the statistic is defined on at all. What remains one corpus is
 the \emph{formation} result, which needs compensatory probing data that no undesigned release
 carries. The experiment that would settle it is a compensatory-mutagenesis panel run on the same
 targets by a second laboratory on a different platform, which is wet-lab work and is future work;
