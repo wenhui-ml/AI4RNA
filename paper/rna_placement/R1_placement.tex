@@ -136,8 +136,7 @@ does to an RNA design leaderboard, and which benchmarks admit the question at al
 When a benchmark's items were written by the systems it ranks, a number on it can be carried by a
 covariate the generators chose. Re-splitting cannot remove such a covariate: it is a property of
 the item and follows it into whichever split it lands in. This paper measures one end to end on a
-deployed benchmark of designed RNA, from the molecules to the leaderboard, using \jdg{dN}
-controlled interventions with a readout that calls no folding model.
+deployed benchmark of designed RNA, from the molecules to the leaderboard, using \jdg{dN} controlled interventions with a readout that calls no folding model, and states the procedure as a six-step \emph{generator-covariate audit} a reader can run on a benchmark of their own.
 
 \emph{The property.} Matched on where the designer put the pair, a target G--C pair is recovered
 $\jdg{rescueAU}$ more often than an A--U pair ($p=\jdg{rescueAUP}$). The readout is a ratio of
@@ -329,66 +328,97 @@ and section pointers only.}
 \end{figure}
 
 \begin{claimbox}
+\textbf{The audit, named and detached from this corpus.} We call the procedure a
+\emph{generator-covariate audit}. It has six steps, stated here so that it can be run on a benchmark
+that has nothing to do with RNA; \S\ref{sec:swebench} runs it on one.
+\begin{enumerate}[leftmargin=2.0em,itemsep=2pt,topsep=2pt,label=\textbf{G\arabic*.}]
+\item \textbf{Generator.} Establish who produced the items and what they were free to choose
+  (\S\ref{sec:twoproducers}). Items nobody designed are not exposed to this failure mode, which is
+  what makes the undesigned control of \S\ref{sec:undesigned} the step that turns a tendency into a
+  choice.
+\item \textbf{Covariate.} Name one such choice and show it is structured rather than incidental
+  (\S\ref{sec:mediation}, \S\ref{sec:gradient}).
+\item \textbf{Outcome.} Fix a readout that does not route through the systems being ranked
+  (Def.~\ref{def:rf}). A readout computed by a ranked model cannot separate that model's preferences
+  from its skill.
+\item \textbf{Identifiability.} Ask whether the archive crosses the covariate against what is ranked
+  often enough to hold it fixed. This is a census over the submissions, and it can return no: on
+  SWE-bench Verified it does (\S\ref{sec:swebench}).
+\item \textbf{Conditional effect.} Estimate the contrast with the covariate held fixed, against a
+  placebo covariate of the same marginal and granularity, and calibrate whichever estimator is to be
+  read back (\S\ref{sec:pairtype} through \S\ref{sec:pcal}).
+\item \textbf{Ranking sensitivity.} Re-derive the published order under that conditioning and report
+  how far it moves (\S\ref{sec:leaderboard}).
+\end{enumerate}
+\textbf{Five ways the audit returns nothing, each of them met here.} The archive does not cross the
+covariate, so G5 has no estimand (G4; SWE-bench). The readout is produced by a ranked system, so the
+contrast is circular (excluded by construction at G3). The permutation is written without holding
+the calipered matched set fixed, and then runs at $\jdg{nullRateOld}$ against a nominal $0.005$
+(Prop.~\ref{prop:null}). The mediator does not separate the arms far enough for the estimator to be
+read back, at $\jdg{posSepReal}$ pooled SD, which withdraws one of our own two routes
+(\S\ref{sec:cal}). And the covariate may be part of the ability being ranked rather than a
+confounder of it, which is a question no quantity of data on the corpus decides
+(\S\ref{sec:limits}).
+\end{claimbox}
+
+\begin{claimbox}
 \textbf{Contributions.} \emph{The first seven are findings about benchmarks: six about one corpus and its leaderboard, the
 seventh about a benchmark on which the same question cannot be asked. The last two are instruments
 this corpus forced us to build, reported because they are needed to read the findings and not as the
-paper's claim on the reader.}
+paper's claim on the reader. Table~\ref{tab:status} gives every arm its status.}
 \begin{enumerate}[leftmargin=1.6em,itemsep=2pt,topsep=2pt,label=\textbf{\arabic*.}]
 \item \textbf{Base-pair identity predicts formation, measured interventionally}
   (\S\ref{sec:pairtype}): matched within design on helix depth and crossing, a G--C target pair is
-  rescued $\jdg{rescueAU}$ above a matched A--U pair and $\jdg{rescueGU}$ above a matched G--U
-  pair, on a readout that is neither a design score nor degeneracy-sensitive, and positive in
-  $\jdg{sNPos}$ of $\jdg{sNMeth}$ design methods. It is not the base chemistry of the mutated
-  positions themselves (\S\ref{sec:chem}): recomputing the readout with those bases and three nucleotides either side deleted, so every
-position entering it carries the same base in the wild type and all three mutants, retains
-\jdg{cxRet3} of the effect ($p=\jdg{cxP3}$, a single
-  test that does not survive the family correction of \S\ref{sec:family}).
+  rescued $\jdg{rescueAU}$ above a matched A--U pair, on a readout that is neither a design score
+  nor degeneracy-sensitive, and positive in $\jdg{sNPos}$ of $\jdg{sNMeth}$ design methods. It is
+  not the base chemistry of the mutated positions themselves (\S\ref{sec:chem}): deleting those
+  bases and three nucleotides either side, so every position entering the readout carries the same
+  base in the wild type and in all three mutants, retains \jdg{cxRet3} of the effect, a single test
+  that does not survive the family correction of \S\ref{sec:family}.
 \item \textbf{The thermodynamic explanation accounts for none of it, and the covariate the
-  designers chose accounts for most of it} (\S\ref{sec:energy}, \S\ref{sec:mediation}): conditioning on the model's own local free energy retains \jdg{eRet} of the contrast against a
-placebo's \jdg{ePlaceboMean}$\pm$\jdg{ePlaceboSd}, on the neural half of the corpus as on the whole
-(\S\ref{sec:subsets}), while the marginal contrast is attenuated by $\jdg{medObs}$ and a linear
-depth term reproduces $\jdg{medPred}$ of it. A third mediator defined on the \emph{whole} base-pairing ensemble rather than the local stack,
-itself strongly identity-dependent ($\jdg{rfDiff}$ between pair types), retains \jdg{rfRetain}
-(\S\ref{sec:refold}).
+  designers chose accounts for most of it} (\S\ref{sec:energy}, \S\ref{sec:mediation}):
+  conditioning on the model's own local free energy retains \jdg{eRet} of the contrast against a
+  placebo's \jdg{ePlaceboMean}$\pm$\jdg{ePlaceboSd}, on the neural half of the corpus as on the
+  whole (\S\ref{sec:subsets}), while a linear depth term reproduces $\jdg{medFrac}$ of the
+  attenuation a marginal contrast suffers. A third mediator defined on the \emph{whole}
+  base-pairing ensemble rather than the local stack retains \jdg{rfRetain} (\S\ref{sec:refold}).
 \item \textbf{Holding the covariate fixed reorders the released leaderboard}
-  (\S\ref{sec:leaderboard}): \jdg{lbBMoved} of \jdg{lbBNMeth} methods move by up to \jdg{lbBMaxMove} places (Kendall
-$\tau=\jdg{lbBTau}$, \jdg{lbBTauCi}) where holding the target fixed alone moves none, and a placebo
-covariate with the same marginal and granularity but permuted within target moves \jdg{plMovedHi}
-at the \jdg{plPct} percentile: a statement about the covariate, not about stratification. It is a \emph{sensitivity} statement: a re-split cannot reproduce it, the covariate travelling with
-the molecule, but which ordering a benchmark ought to report is undecidable from the corpus, since
-placing G--C well may be part of the ability ranked rather than a confounder of it.
+  (\S\ref{sec:leaderboard}): \jdg{lbBMoved} of \jdg{lbBNMeth} methods move by up to
+  \jdg{lbBMaxMove} places where holding the target fixed alone moves none, and a placebo covariate
+  with the same marginal and granularity but permuted within target moves \jdg{plMovedHi} at the
+  \jdg{plPct} percentile. It is a \emph{sensitivity} statement rather than a diagnosis of
+  confounding: a re-split cannot reproduce it, the covariate travelling with the molecule, but
+  placing G--C well may be part of the ability ranked.
 \item \textbf{The property is worth $\jdg{cEffLo}$ to $\jdg{cEffHi}$ points on the design score}
   (\S\ref{sec:score}), in matched pairs of real molecules, with three cuts against a
   probing-chemistry explanation.
 \item \textbf{The placement gradient is a property of the design method} (\S\ref{sec:gradient}),
-  spanning $\jdg{gSpread}$ depth units across \jdg{gNMethods} methods designing for the same targets, with
-  the human-designed arm at the pre-registered extreme, reported at the strength it has.
+  spanning $\jdg{gSpread}$ depth units across \jdg{gNMethods} methods designing for the same
+  targets, with the human-designed arm at the pre-registered extreme, reported at the strength it
+  has.
 \item \textbf{And it is a choice, not thermodynamics} (\S\ref{sec:undesigned}). Undesigned RNA
-  carries the same tendency \jdg{unRatio} times weaker (\jdg{unFams} Rfam families,
-  \jdg{unRfam}; Pseudobase\texttt{++}, \jdg{unPkb}), and a plain inverse folder given the same targets reproduces \jdg{unShare} of it (\jdg{unCoreI},
-covering zero, against \jdg{unCoreD} for the design programs on the same pairs).
+  carries the same tendency \jdg{unRatio} times weaker (\jdg{unFams} Rfam families), and a plain
+  inverse folder given the same targets reproduces \jdg{unShare} of it.
 \item \textbf{Whether the question can be asked is itself a measurable property of a benchmark,
-  and on a second one the answer is no} (\S\ref{sec:swebench}). Applied unchanged to SWE-bench Verified, the same instruments return a count rather than an effect:
-\jdg{swbSolo} of \jdg{swbModels} models were measured under exactly one agent scaffold and
-\jdg{swbScafGeThree} of \jdg{swbScafPairs} scaffold pairs share three, so the covariate cannot be
-held fixed by any analysis of the submissions as collected. That the scaffold
-  moves a score is not ours and is credited to the work reporting it; the deficiency is, and it is
-  what says the repair has to be a new experiment rather than a correction.
+  and on a second one the answer is no} (\S\ref{sec:swebench}). Applied unchanged to SWE-bench
+  Verified, the same instruments return a count rather than an effect: \jdg{swbSolo} of
+  \jdg{swbModels} models were measured under exactly one agent scaffold, so the covariate cannot be
+  held fixed by any analysis of the submissions as collected. That the scaffold moves a score is
+  not ours and is credited to the work reporting it; the deficiency is, and it is what says the
+  repair has to be a new experiment rather than a correction.
 \item \textbf{A constructive calibration, which decides which of two estimators may be read here}
-  (\S\ref{sec:cal}, \S\ref{sec:pcal}). Inject a known mediated fraction into the real mediator and read back what the estimator says. One
-route covers $\jdg{calNSpanFrac}$ and $\jdg{calVSpanFrac}$ of the truth's range and is withdrawn;
-the other covers \jdg{pcSpan} and is kept. The
-  published guidance passes us on both of its thresholds, and the quantity that governs is not in
-  it: it is how far the mediator separates the arms, $\jdg{posSepReal}$ pooled SD for the first
-  and $\jdg{pcSep}$ for the second.
-\item \textbf{Two inference rules this class of design forces.} A permutation must hold a calipered matched set fixed, or its type-I error is $\jdg{nullRateOld}$
-against $\jdg{nullRateNew}$ at nominal $0.005$ (Prop.~\ref{prop:null}). And the stratified and product-of-coefficients routes to
+  (\S\ref{sec:cal}, \S\ref{sec:pcal}). Inject a known mediated fraction into the real mediator and
+  read back what the estimator says. One route covers $\jdg{calNSpanFrac}$ of the truth's range and
+  is withdrawn; the other covers \jdg{pcSpan} and is kept. The published guidance passes us on both
+  of its thresholds, and the quantity that governs is not in it: it is how far the mediator
+  separates the arms, $\jdg{posSepReal}$ pooled SD.
+\item \textbf{Two inference rules this class of design forces.} A permutation must hold a calipered
+  matched set fixed, or its type-I error is $\jdg{nullRateOld}$ against $\jdg{nullRateNew}$ at
+  nominal $0.005$ (Prop.~\ref{prop:null}). And the stratified and product-of-coefficients routes to
   a mediated fraction differ by $\mathbb E[r(M)\mid A]-\mathbb E[r(M)\mid B]$, agreeing for all
-  exposure laws iff the conditional mean is affine, with the disagreement bounded by
-  $\operatorname{osc}(r)\,d_{\mathrm{TV}}$, whose second factor is the overlap the conditioning
-  route needs to be identified (Prop.~\ref{prop:routes}); here they disagree by
-  $\jdg{eLinearGapPts}$ points. The same proof step applied to the conditional mean rather than to
-  its residual bounds what a channel can carry without any mediation estimator at all
+  exposure laws iff the conditional mean is affine (Prop.~\ref{prop:routes}); here they disagree by
+  $\jdg{eLinearGapPts}$ points, and the same proof step applied to the conditional mean rather than
+  to its residual bounds what a channel can carry without any mediation estimator at all
   (Prop.~\ref{prop:carry}). \emph{We claim no priority for the non-equivalence itself
   (\S\ref{sec:routes}); what these buy is the right to read the numbers above.}
 \end{enumerate}
@@ -979,18 +1009,49 @@ groups because targets are not its unit of replication, and is marked where it a
 \section{Results}
 \label{sec:results}
 
-\paragraph{Order of the arms.} Every quantity below is the one defined in
-\S\ref{sec:quantities}, estimated on the corpus of \S\ref{sec:corpus}. \S\ref{sec:frame} fixes the
-two scales a point is read on. \S\ref{sec:pairtype} estimates the effect and \S\ref{sec:chem} tests
-whether the readout is measuring the probing chemistry instead. \S\ref{sec:energy} puts the folding
-model's own energy to the effect, \S\ref{sec:subsets} checks that on the halves of the corpus that
-do and do not consume a thermodynamic objective, and \S\ref{sec:mediation} puts the designers'
-placement to it; the two mediators are the heart of the paper and they answer differently.
-\S\ref{sec:cal} asks which mediation route can be read here at all and \S\ref{sec:pcal} puts the
-survivor through the same test. \S\ref{sec:score} asks what the property is worth in the
-benchmark's own currency, \S\ref{sec:gradient} whose rule the placement is,
-\S\ref{sec:undesigned} whether it is anyone's rule at all, and \S\ref{sec:leaderboard} whether
-holding it fixed moves the ranking.
+\paragraph{Order of the arms, and what each returned.} Every quantity below is the one defined in
+\S\ref{sec:quantities}, estimated on the corpus of \S\ref{sec:corpus}. The two mediators put to the
+effect, one taken from the folding model and one from the designers, are the heart of the paper and
+they answer differently. Table~\ref{tab:status} is the ledger the rest of this section fills in:
+what each arm asked, what it returned, and at what status, assigned after the family-wise correction
+of \S\ref{sec:family} rather than before it.
+
+\begin{table}[!htbp]
+\centering\footnotesize
+\caption{\textbf{Every arm, what it returned, and what that entitles the reader to.}
+\emph{Confirmed} means the arm's null rejects under Holm at $\alpha=0.005$ over the frozen family of
+\jdg{fwM} $p$-values (\S\ref{sec:family}); \emph{single test} means it clears $0.005$ on its own and
+does not survive that family; \emph{supporting} means it was not separately corrected and is read
+only alongside a confirmed arm; \emph{bounded} means the arm delivers a bound and no point claim;
+\emph{withdrawn} means our own calibration disqualified it; \emph{sensitivity} means a statement
+about how far a published order moves, which is not a claim that the covariate is a confounder; and
+\emph{not identifiable} means the archive admits no estimand to correct.}
+\label{tab:status}
+\begin{tabular}{@{}lp{3.9cm}p{5.5cm}p{3.0cm}@{}}
+\toprule
+\S & what the arm asks & what it returned & status \\
+\midrule
+\ref{sec:frame} & what one point is worth & reproducible fraction \jdg{ceilB} of within-cell variance & frame, not a test \\
+\ref{sec:pairtype} & does pair identity decide that the pair forms & G--C above matched A--U by \jdg{rescueAU} & \textbf{confirmed} \\
+\ref{sec:chem} & is the readout the probing chemistry instead & \jdg{cxRet3} retained with the mutated bases and three either side deleted & single test \\
+\ref{sec:energy} & does the folding model's own local energy explain it & \jdg{eRet} retained after conditioning on it & \textbf{confirmed} \\
+\ref{sec:subsets} & does that depend on which half of the corpus consumes an energy objective & null on the neural half as on the whole & supporting \\
+\ref{sec:refold} & does a whole-ensemble mediator explain it & \jdg{rfRetain} retained & supporting \\
+\ref{sec:carry} & what can the channel carry with no mediation estimator at all & a bound, by Prop.~\ref{prop:carry} & bounded \\
+\ref{sec:cal} & can the stratified route be read back on this mediator & covers \jdg{calNSpanFrac} of the injected truth's range & \textbf{withdrawn} \\
+\ref{sec:pcal} & can the product route & covers \jdg{pcSpan} & kept \\
+\ref{sec:crossdomain} & does the bound hold on a corpus sharing no machinery with this one & holds on \jdg{xdN} designed protein binders & supporting \\
+\ref{sec:mediation} & does the designers' placement explain what a naive contrast misses & \jdg{medFrac} of the attenuation reproduced & \textbf{confirmed} \\
+\ref{sec:score} & what is the property worth in the benchmark's own currency & \jdg{cEffLo} to \jdg{cEffHi} design-score points & \textbf{confirmed} \\
+\ref{sec:gradient} & whose rule is the placement & \jdg{gSpread} depth units across design methods & method component: single test \\
+\ref{sec:rounds} & does the structure hold on rounds held out & holds on all three & supporting \\
+\ref{sec:undesigned} & is the covariate anyone's choice & undesigned RNA \jdg{unRatio} times weaker & \textbf{confirmed} \\
+\ref{sec:leaderboard} & does holding the covariate fixed reorder the leaderboard & \jdg{lbBMoved} of \jdg{lbBNMeth} methods move, placebo does not & sensitivity \\
+\ref{sec:swebench} & can the same question be asked on a benchmark sharing no machinery & \jdg{swbSolo} of \jdg{swbModels} models stand on one scaffold & \textbf{not identifiable} \\
+\ref{sec:family} & does the whole family survive one correction & Holm rejects \jdg{fwHolmNew} of \jdg{fwM}, the five load-bearing among them & the correction itself \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \subsection{The measurement frame: what a point is worth}
 \label{sec:frame}
@@ -2496,9 +2557,7 @@ needs sequences built to separate them rather than sequences that already exist
 
 Inverse-folding models are increasingly trained and evaluated on corpora of designed sequences.
 \S\ref{sec:gradient} measures a property of such a corpus that bears on that use: its components do
-not place base pairs identically, spanning $\jdg{gSpread}$ depth units, so a property learned from
-the pooled corpus is learned from a mixture whose parts differ on exactly the axis
-\S\ref{sec:quant} shows to be confounding. The attenuation this produces does not shrink with more
+not place base pairs identically, spanning $\jdg{gSpread}$ depth units, so a property learned from the pooled corpus is learned from a mixture whose parts differ on exactly the axis \S\ref{sec:quant} shows to be non-collapsible. The attenuation this produces does not shrink with more
 items, because it is generated by a systematic choice present in every design rather than by noise.
 \S\ref{sec:energy} adds the complementary point: the part of formation that the identity contrast
 picks up is not recoverable from the local nearest-neighbour energy, so it is not available to a
@@ -2712,8 +2771,7 @@ Verified, the same instruments in the same order return a count and no effect, b
 not shown to be harmless; it is not separable from the thing being ranked by any analysis of the
 submissions as they exist, and the repair is a crossed design run before the submissions arrive,
 not a correction applied after \citep{hal2025holistic}. Both readings are useful and neither is
-visible from a leaderboard. What this paper offers is the order in which to find out which one you
-have: hold the target fixed, then the chosen covariate, and if the second step has nothing to hold,
+visible from a leaderboard. What this paper offers is the generator-covariate audit named in \S\ref{sec:intro}: hold the target fixed, then the chosen covariate, and if the second step has nothing to hold,
 that is the answer and not the absence of one. Designed RNA is the case where the step can be
 taken, and only because somebody had already run every method against every target.
 
