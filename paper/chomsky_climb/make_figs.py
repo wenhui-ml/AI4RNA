@@ -153,6 +153,93 @@ def _arms(fname):
     return out
 
 
+_KAPPA = re.compile(
+    r"^\s{2}(\S+)\s*~\s*(\S+)\s+kappa=([+-][\d.]+)\s*\[([+-][\d.]+),\s*([+-][\d.]+)\]")
+
+
+def fig_panel():
+    """MEASURED (n=80 native bpRNA pseudoknots): the panel is structured, not exchangeable.
+
+    Reads runs/cc_ascent/panel_agreement.{json,txt}. Left: each predictor's marginal recall of a
+    native's own crossing. Right: the three pairwise chance-corrected agreements with bootstrap
+    intervals. The point the figure exists to make is the uncomfortable one: the held-out predictor
+    (ShapeKnots) is the MOST correlated with the in-loop reference (pKiss), so panel unanimity is
+    nearer a two-voice conjunction than a three-voice one.
+    """
+    import json
+    jp = os.path.join(RUNS, "panel_agreement.json")
+    tp = os.path.join(RUNS, "panel_agreement.txt")
+    if not (os.path.exists(jp) and os.path.exists(tp)):
+        print("  (skip fig_panel)"); return
+    d = json.load(open(jp))
+    n = d["n"]
+    marg = [("pKiss", d["marginal"]["pkiss"]),
+            ("ShapeKnots", d["marginal"]["shapeknots"]),
+            ("ProbKnot", d["marginal"]["probknot"]),
+            ("all three", d["unanimous"])]
+    ks = []
+    for line in open(tp):
+        m = _KAPPA.match(line.rstrip("\n"))
+        if m:
+            a, b, k, lo, hi = m.groups()
+            ks.append((a, b, float(k), float(lo), float(hi)))
+    if not ks:
+        print("  (skip fig_panel: no kappa rows)"); return
+    nice = {"pkiss": "pKiss", "probknot": "ProbKnot", "shapeknots": "ShapeKnots"}
+    ks.sort(key=lambda r: r[2])
+
+    fig, (axL, axR) = plt.subplots(1, 2, figsize=(7.1, 2.55),
+                                   gridspec_kw={"width_ratios": [1.0, 1.25], "wspace": 0.42})
+
+    # ---- left: marginal recall -------------------------------------------------
+    ys = range(len(marg))
+    for y, (lab, k) in zip(ys, marg):
+        held = lab == "ShapeKnots"
+        unan = lab == "all three"
+        fc = CF_F if unan else (NEG_F if held else MCF_F)
+        ec = CF if unan else (NEG if held else MCF)
+        axL.barh(y, k / n, height=0.58, facecolor=fc, edgecolor=ec, lw=0.8, zorder=2)
+        axL.text(k / n + 0.006, y, f"${k}/{n}$", va="center", fontsize=7.4, color=INK)
+    axL.set_yticks(list(ys))
+    axL.set_yticklabels([lab + (" (held out)" if lab == "ShapeKnots" else "") for lab, _ in marg],
+                        fontsize=7.6)
+    axL.invert_yaxis()
+    axL.set_xlim(0, 0.30)
+    axL.set_xticks([0, 0.1, 0.2, 0.3])
+    axL.set_xticklabels(["$0$", "$.1$", "$.2$", "$.3$"])
+    axL.set_xlabel("recall of a native's own crossing", fontsize=7.8)
+    axL.set_title(r"\textbf{Each voice is weak}", fontsize=8.6, pad=5)
+    axL.grid(axis="x", color=FAINT, lw=0.4, alpha=0.4, zorder=0)
+    for sp in ("top", "right", "left"):
+        axL.spines[sp].set_visible(False)
+    axL.tick_params(axis="y", length=0)
+
+    # ---- right: pairwise kappa -------------------------------------------------
+    for y, (a, b, k, lo, hi) in enumerate(ks):
+        block = {a, b} == {"pkiss", "shapeknots"}
+        col = NEG if block else MCF
+        axR.plot([lo, hi], [y, y], color=col, lw=1.5, solid_capstyle="round", zorder=2)
+        for e in (lo, hi):
+            axR.plot([e, e], [y - 0.13, y + 0.13], color=col, lw=1.0, zorder=2)
+        axR.plot([k], [y], "o", ms=6, color=col, mec="white", mew=0.7, zorder=3)
+        axR.text(hi + 0.03, y, f"$\\kappa={k:+.3f}$", va="center", fontsize=7.4, color=col)
+    axR.axvline(0, color=FAINT, lw=0.7, ls=(0, (3, 2)), zorder=1)
+    axR.set_yticks(range(len(ks)))
+    axR.set_yticklabels([f"{nice[a]}\\,$\\sim$\\,{nice[b]}" for a, b, *_ in ks], fontsize=7.6)
+    axR.set_ylim(-0.6, len(ks) - 0.4)
+    axR.set_xlim(-0.25, 1.30)
+    axR.set_xticks([0, 0.25, 0.5, 0.75, 1.0])
+    axR.set_xticklabels(["$0$", "$.25$", "$.50$", "$.75$", "$1$"])
+    axR.set_xlabel("chance-corrected agreement (Cohen's $\\kappa$), $95\\%$ bootstrap", fontsize=7.8)
+    axR.set_title(r"\textbf{but two of them are one voice}", fontsize=8.6, pad=5)
+    axR.grid(axis="x", color=FAINT, lw=0.4, alpha=0.4, zorder=0)
+    for sp in ("top", "right", "left"):
+        axR.spines[sp].set_visible(False)
+    axR.tick_params(axis="y", length=0)
+    _save(fig, "fig_cc_panel.pdf")
+    print("  wrote fig_cc_panel.pdf")
+
+
 def fig_attrib():
     """Every intervention on the hand-built operator, against the arm it is trying to reproduce.
 
@@ -277,13 +364,13 @@ def fig_family():
     fig, ax = plt.subplots(figsize=(7.0, 2.95))
     ax.grid(axis="y", color=FAINT, lw=0.4, alpha=0.35, zorder=0)
     ax.plot(xs, mix, color=FAINT, lw=1.2, ls=(0, (3, 2)), zorder=2,
-            label="$r_{\\mathrm{mix}}=r_{\\mathrm{in}}\\times$carry-over (what rises)")
+            label="$r_{\\mathrm{cons}}=r_{\\mathrm{in}}\\times$carry-over (what rises)")
     ax.plot(xs, rin, color=MCF, lw=1.6, marker="o", ms=3.4, mfc="white", mew=1.1, zorder=4,
             label="$r_{\\mathrm{in}}$: the operator's own rate")
     ax.plot(xs, carry, color=CF, lw=1.6, marker="s", ms=3.2, mfc="white", mew=1.1, zorder=4,
             label="carry-over to the held-out predictor")
     ax.plot(xs, gam, color=NEG, lw=1.1, ls=(0, (1, 1.6)), marker="^", ms=3.0, zorder=3,
-            label="gamer's pKiss$\\to$ProbKnot agreement (control)")
+            label="single-oracle arm's pKiss$\\to$ProbKnot agreement (control)")
 
     ax.set_xlim(min(xs) - 0.4, max(xs) + 0.4); ax.set_ylim(-0.04, 1.17)
     ax.set_xticks([x for x in xs if x % 2 == 0])
@@ -489,7 +576,7 @@ def fig_models():
 
     gamer = 1.0 / 60.0
     ax.axhline(gamer, color=NEG, lw=0.9, ls=(0, (3, 2)), zorder=1)
-    ax.text(0.5, gamer + 0.012, "single-oracle gamer, $1/60$", fontsize=7, color=NEG, ha="center",
+    ax.text(0.5, gamer + 0.012, "single-oracle operator, $1/60$", fontsize=7, color=NEG, ha="center",
             bbox=dict(fc="white", ec="none", pad=1.4))
     ax.axhspan(3 / 60, 8 / 60, color=FAINT, alpha=0.16, lw=0, zorder=0)
     ax.text(0.5, 8 / 60 + 0.008, "hand-built \\texttt{panel\\_auto}, $3$--$8/60$",
@@ -521,7 +608,7 @@ def fig_carry():
             ("$-$ objective, $-$ bias", 23, 209, 0.110, 0.071, 0.161),
             ("$-$ objective (undirected)", 24, 253, 0.095, 0.062, 0.138),
             ("panel operator", 48, 530, 0.091, 0.068, 0.118),
-            ("gamer (pKiss)", 22, 643, 0.034, 0.022, 0.051),
+            ("single-oracle (pKiss)", 22, 643, 0.034, 0.022, 0.051),
             ("DesiRNA (min. free energy)", 1, 43, 0.023, 0.001, 0.123)]
     fig, ax = plt.subplots(figsize=(7.0, 2.5))
     for y, (lab, k, n, p, lo, hi) in enumerate(rows):
@@ -592,13 +679,13 @@ def fig_margin():
                         for k, r in enumerate(rows)], fontsize=7.6)
     ax.tick_params(axis="x", length=0, pad=6)
     ax.set_ylim(0, 53); ax.set_xlim(-0.62, 1.62)
-    ax.set_ylabel("targets won ($r_{\\mathrm{mix}}$, $15$ executions)", fontsize=8)
+    ax.set_ylabel("targets won ($r_{\\mathrm{cons}}$, $15$ executions)", fontsize=8)
     ax.grid(axis="y", color=FAINT, lw=0.4, alpha=0.35, zorder=0)
     for sp in ("top", "right", "bottom"):
         ax.spines[sp].set_visible(False)
     from matplotlib.patches import Patch
     ax.legend(handles=[Patch(fc=MCF_F, ec=MCF, lw=0.9, label="panel operator"),
-                       Patch(fc=NEG_F, ec=NEG, lw=0.9, label="gamer (pKiss only)")],
+                       Patch(fc=NEG_F, ec=NEG, lw=0.9, label="single-oracle (pKiss only)")],
               loc="upper right", frameon=False, fontsize=7.4, handlelength=1.4)
     _save(fig, "fig_cc_margin.pdf")
     print("  wrote figs/fig_cc_margin.pdf")
@@ -636,12 +723,12 @@ def fig_paired():
         ax.text(3 * s + 1, 9.4, f"seed {s}", ha="center", fontsize=7.2, color=GREY)
         if s:
             ax.axvline(3 * s - 0.5, color=FAINT, lw=0.4, alpha=0.6, zorder=0)
-    ax.annotate("the one execution the gamer wins", xy=(13, -1.3), xytext=(12.6, -5.2),
+    ax.annotate("the one execution the single-oracle arm wins", xy=(13, -1.3), xytext=(12.6, -5.2),
                 fontsize=7.0, color=NEG, ha="right",
                 arrowprops=dict(arrowstyle="-|>", color=NEG, lw=0.8))
     ax.set_xlim(-0.8, 14.9); ax.set_ylim(-6.6, 10.8)
     ax.set_xticks([])
-    ax.set_ylabel("panel $-$ gamer,\nwithin cell ($r_{\\mathrm{mix}}$/60)", fontsize=8)
+    ax.set_ylabel("panel $-$ single-oracle,\nwithin cell ($r_{\\mathrm{cons}}$/60)", fontsize=8)
     for sp in ("top", "right", "bottom"):
         ax.spines[sp].set_visible(False)
     _save(fig, "fig_cc_paired.pdf")
@@ -680,6 +767,7 @@ if __name__ == "__main__":
     fig_oracle()
     fig_collapse()
     fig_attrib()
+    fig_panel()
     fig_family()
     fig_grade()
     fig_grades()
